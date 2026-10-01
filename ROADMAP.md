@@ -61,7 +61,20 @@ code still stores pointers in `unsigned int`, which only works when pointers are
 `WinMain`, even if it fails right after. **Decision:** MSVC 2022 or clang-cl. clang-cl is closer to the
 compilers used for Linux and Android.
 
-## Phase 3: the game's initialized data
+## Phase 3: the game's initialized data (done)
+
+**Status:** done. `tools/gen_data.py` embeds the original `.rdata` + `.data` (94 KB) in the generated
+`port/port_data.c`; `PortLoadData()` runs first in `WinMain`. It patches 1,370 pointer slots (to port globals,
+functions, or the embedded copy for strings and unnamed data) and fills 410 globals. The exe has no relocation
+table, so pointers are found heuristically, with text filtered out (string literals, text runs, short strings);
+the generator's `--report` lists everything it skipped or left unchanged. `legoland.exe -port-selftest` checks
+the result and writes `port-selftest.txt`: 0 problems. It also lists 140 globals the port declares smaller than
+the original data around them (an upper bound: much of it is constants the code uses as literals). Those are the
+first suspects when something misbehaves in phase 4. Rerun the generator whenever globals are added or retyped.
+Different from the plan above: the data is embedded as bytes and copied at startup rather than written as typed
+C initializers, because many globals' decomp types are still placeholders; typed initializers can replace it in
+phase 8.
+
 
 The original program starts with about 92 KB of tables, strings and constants already in memory. The port
 needs them too.

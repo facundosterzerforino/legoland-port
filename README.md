@@ -15,7 +15,7 @@ modern Windows support.
 | | |
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
-| Runs on Windows 11 | **not yet**: builds and links with clang-cl, but most globals still lack their original values (phase 3) |
+| Runs on Windows 11 | **not yet**: builds with clang-cl and loads the original data at startup (`-port-selftest` passes); first boot is phase 4 |
 | Hand-written assembly | **done**: all 44 inline-asm functions are plain C (phase 1 of `ROADMAP.md`) |
 
 ## Goal and approach

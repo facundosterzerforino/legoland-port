@@ -1012,7 +1012,7 @@ extern void *PTR_004b8770[5];
 // 0x004b87a8
 extern unsigned char MONEY_SFX[12];
 // 0x004b87b0
-extern void *PTR_004b87b0[];
+extern void *PTR_004b87b0[4];
 // 0x004b8bbc
 extern unsigned char DAT_004b8bbc[1];
 // 0x004b90f8

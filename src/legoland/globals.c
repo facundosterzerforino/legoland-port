@@ -808,7 +808,7 @@ void *PTR_004b8770[5];
 unsigned char MONEY_SFX[12];
 
 // GLOBAL: LEGOLAND 0x004b87b0
-void *PTR_004b87b0[1];
+void *PTR_004b87b0[4]; /* 4 dwords up to the strings at 0x4b87c0 */
 
 // GLOBAL: LEGOLAND 0x004b8bbc
 unsigned char DAT_004b8bbc[1];

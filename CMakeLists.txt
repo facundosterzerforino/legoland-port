@@ -9,7 +9,9 @@ if(LEGOLAND_MODERN_BUILD)
     # point (bootstrap.c) and the stub symbols for Windows imports (imports.c); the real C runtime and Windows
     # import libraries provide those.
     list(FILTER LEGOLAND_SOURCES EXCLUDE REGEX "/src/legoland/(bootstrap|imports)\\.c$")
-    add_executable(legoland WIN32 ${LEGOLAND_SOURCES})
+    # Port-only code (startup data, asm helpers, later platform layers).
+    file(GLOB PORT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/*.c")
+    add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
     # DirectInput 3 is what the game asks for (input.c); it also makes the SDK declare DirectInputCreateA.
     target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0300)
     target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port")
