@@ -16,6 +16,17 @@ struct TextureNode {
     /* 0x18 */ unsigned char pad_18[0x2c - 0x18];
 };
 
+/* A projected vertex of a 3D person's triangle (see FUN_00440a30). */
+struct PersonVertex {
+    /* 0x00 */ int x; /* 16.16 */
+    /* 0x04 */ int y; /* 16.16 */
+    /* 0x08 */ unsigned int depth;
+    /* 0x0c */ float u;
+    /* 0x10 */ float v;
+    /* 0x14 */ int shade;
+    /* 0x18 */ int pad_18;
+};
+
 LEGO_EXPORT void RenderThickBox(int x, int y, int w, int h, int thickness, unsigned int color);
 LEGO_EXPORT void RenderBox(unsigned int a1, unsigned int a2, unsigned int a3, unsigned int a4, unsigned int a5);
 LEGO_EXPORT unsigned int RenderBlock(int x, int y, int w, int h, unsigned int color);
@@ -27,6 +38,12 @@ void FUN_004860f0(void);
 void FUN_00486250(void);
 unsigned int FUN_00486280(int param_1, void *param_2);
 void FUN_00488700(unsigned int base, struct RenderViewport *vp);
+void FUN_004864e0(unsigned int param_1);
 int FUN_00486540(void);
+void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
+void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
+void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
+void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
+void FUN_004886e0(unsigned int index);
 void FUN_00488670(struct Image *image, unsigned int index);
 void FUN_004886a0(void);

@@ -11,6 +11,7 @@
 #include "gfx.h"
 #include "globals.h"
 #include "image_sprite.h"
+#include "port_asm.h"
 #include "print_sprite.h"
 #include "render.h"
 
@@ -209,17 +210,314 @@ int FUN_00486540(void) {
     return 0;
 }
 
+/* Port: the original has four near-identical triangle fillers in inline asm (FUN_00486590, FUN_00486c70,
+ * FUN_004877b0, FUN_00487d40). They share one scan converter, PortRasterTriangle, which is parameterised by
+ * a per-pixel colour function.
+ *
+ * Every vertex carries x, y (16.16 fixed point) and a few more values that are interpolated along the edges
+ * and then along each scanline: v[0] = x, v[1] = depth, v[2..] = shading level and/or texture coordinates.
+ * The triangle is split at the middle vertex into two parts (a flat-top triangle has only the second).
+ * A pixel is drawn only if its depth is >= the depth already in the z-buffer (unsigned compare); drawing a
+ * pixel also sets DAT_007feb14 when it is the pixel under the mouse (DAT_007fe9a8).
+ *
+ * Quirks kept from the original: the z-buffer address is zbuf + y * 512 + x * 4 (rows 512 bytes apart,
+ * although a sprite is up to 160 pixels = 640 bytes wide); the reciprocal table DAT_00798000 only has
+ * entries 1..99 (the original reads past it for taller triangles, here the index is clamped). */
+#define PORT_NV 5
+
+struct PortVert {
+    int y;
+    unsigned int v[PORT_NV];
+};
+
+struct PortEdge {
+    unsigned int v[PORT_NV];
+    unsigned int d[PORT_NV]; /* step per scanline */
+};
+
+/* Returns the 16-bit colour for a pixel; s[1] is the depth, s[2..] the other interpolated values. */
+typedef unsigned short (*PortPixelFn)(const unsigned int *s, const void *ctx);
+
+static __inline int PortRecip(int n) {
+    if (n > 99) {
+        n = 99;
+    }
+    return DAT_00798000[n];
+}
+
+static void PortEdgeInit(struct PortEdge *e, const struct PortVert *from, const struct PortVert *to, int inv, int nv) {
+    int i;
+
+    for (i = 0; i < nv; i++) {
+        e->v[i] = from->v[i];
+        e->d[i] = PortFixMul((int)(to->v[i] - from->v[i]), inv);
+    }
+}
+
+/* Draws scanlines from *py up to (not including) yend, advancing both edges. */
+static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, unsigned int *prow, int yend, int nv, PortPixelFn pixel, const void *ctx) {
+    int y = *py;
+    unsigned int row = *prow;
+    int n;
+    int i;
+
+    /* skip the lines above the clip rectangle */
+    n = (int)DAT_0081c8d4 - y;
+    if (n > 0 && yend - y > 0) {
+        if (n > yend - y) {
+            n = yend - y;
+        }
+        y += n;
+        for (i = 0; i < nv; i++) {
+            e1->v[i] += e1->d[i] * n;
+            e2->v[i] += e2->d[i] * n;
+        }
+        row += DAT_00701e58 * n;
+    }
+    while (y < yend && y <= (int)DAT_0081c8dc) {
+        const struct PortEdge *lo;
+        const struct PortEdge *hi;
+        unsigned int s[PORT_NV];
+        unsigned int ds[PORT_NV];
+        unsigned int rowaddr = row;
+        unsigned int p;
+        unsigned int plimit;
+        unsigned int *zp;
+        int inv;
+        int x;
+        int xend;
+
+        row += DAT_00701e58;
+        if ((int)e1->v[0] > (int)e2->v[0]) {
+            lo = e2;
+            hi = e1;
+        } else {
+            lo = e1;
+            hi = e2;
+        }
+        inv = PortRecip((int)((hi->v[0] - lo->v[0]) >> 16) + 1);
+        for (i = 1; i < nv; i++) {
+            s[i] = lo->v[i];
+            ds[i] = PortFixMul((int)(hi->v[i] - lo->v[i]), inv);
+        }
+        x = (int)lo->v[0] >> 16;
+        xend = (int)hi->v[0] >> 16;
+        if (x < (int)DAT_0081c8d0) {
+            n = (int)DAT_0081c8d0 - x;
+            x = (int)DAT_0081c8d0;
+            for (i = 1; i < nv; i++) {
+                s[i] += ds[i] * n;
+            }
+        }
+        p = rowaddr + x * 2;
+        plimit = rowaddr + DAT_0081c8d8 * 2;
+        while (x < xend && p <= plimit) {
+            zp = (unsigned int *)(DAT_00701e5c + (y << 9) + x * 4);
+            if (s[1] >= *zp) {
+                *zp = s[1];
+                DAT_007feb14 |= (p == DAT_007fe9a8);
+                *(unsigned short *)p = pixel(s, ctx);
+            }
+            x++;
+            for (i = 1; i < nv; i++) {
+                s[i] += ds[i];
+            }
+            p += 2;
+        }
+        for (i = 0; i < nv; i++) {
+            e1->v[i] += e1->d[i];
+            e2->v[i] += e2->d[i];
+        }
+        y++;
+    }
+    *py = y;
+    *prow = row;
+}
+
+static void PortRasterTriangle(struct PortVert *a, struct PortVert *b, struct PortVert *c, int nv, PortPixelFn pixel, const void *ctx) {
+    struct PortVert *t;
+    struct PortEdge e1;
+    struct PortEdge e2;
+    int ya;
+    int yb;
+    int yc;
+    int y;
+    int i;
+    int inv;
+    unsigned int row;
+
+    /* sort the vertices by y (a on top) */
+    if (a->y > b->y) {
+        t = a;
+        a = b;
+        b = t;
+    }
+    if (b->y > c->y) {
+        t = b;
+        b = c;
+        c = t;
+    }
+    if (a->y > b->y) {
+        t = a;
+        a = b;
+        b = t;
+    }
+    ya = a->y >> 16;
+    yb = b->y >> 16;
+    yc = c->y >> 16;
+    y = ya;
+    row = DAT_00797e68 + DAT_00701e58 * ya;
+    if (ya != yb) {
+        /* first part: edges a-b and a-c down to the middle vertex */
+        PortEdgeInit(&e1, a, b, PortRecip(yb - ya), nv);
+        PortEdgeInit(&e2, a, c, PortRecip(yc - ya), nv);
+        PortScanLines(&e1, &e2, &y, &row, yb, nv, pixel, ctx);
+        /* the second part carries on from where the first left off; only the b-c slopes are new */
+        inv = PortRecip(yc - yb);
+        for (i = 0; i < nv; i++) {
+            e1.d[i] = PortFixMul((int)(c->v[i] - b->v[i]), inv);
+        }
+    } else {
+        /* flat top: edges a-c and b-c */
+        PortEdgeInit(&e1, a, c, PortRecip(yc - ya), nv);
+        PortEdgeInit(&e2, b, c, PortRecip(yc - yb), nv);
+    }
+    PortScanLines(&e1, &e2, &y, &row, yc, nv, pixel, ctx);
+}
+
+/* shaded solid colour: the colour set (a TextureFrame) indexed by the high half of the shade value s[2] */
+static unsigned short PortShadedPixel(const unsigned int *s, const void *ctx) {
+    const struct TextureFrame *frame = (const struct TextureFrame *)ctx;
+
+    return frame->data[s[2] >> 16];
+}
+
+/* one fixed colour */
+static unsigned short PortFlatPixel(const unsigned int *s, const void *ctx) {
+    (void)s;
+    return *(const unsigned short *)ctx;
+}
+
+/* Textured, shade interpolated (s[2]), u = s[3], v = s[4] (16.16, already shifted by the texture's log2
+ * width / height): the high halves pick a texel, whose value selects a colour set (TextureFrame) that the
+ * high half of the shade indexes. The row mask is width_m1 and the column mask height_m1, as in the
+ * original (equivalent for the square textures). */
+static unsigned short PortTexturedPixel(const unsigned int *s, const void *ctx) {
+    const struct TextureNode *tex = (const struct TextureNode *)ctx;
+    unsigned int row = ((s[4] >> 16) & tex->width_m1) << tex->format_w;
+    unsigned int col = (s[3] >> 16) & tex->height_m1;
+    const struct TextureFrame *frame = (const struct TextureFrame *)tex->data_c[tex->data_8[row + col]];
+
+    return frame->data[s[2] >> 16];
+}
+
+/* Textured with a constant shade: u = s[2], v = s[3]; no masks. */
+struct PortTexCtx {
+    const struct TextureNode *tex;
+    unsigned int shade;
+};
+
+static unsigned short PortTexturedFlatPixel(const unsigned int *s, const void *ctx) {
+    const struct PortTexCtx *tc = (const struct PortTexCtx *)ctx;
+    const struct TextureNode *tex = tc->tex;
+    unsigned int row = (s[3] >> 16) << tex->format_w;
+    unsigned int col = s[2] >> 16;
+    const struct TextureFrame *frame = (const struct TextureFrame *)tex->data_c[tex->data_8[row + col]];
+
+    return frame->data[tc->shade >> 16];
+}
+
 // FUNCTION: LEGOLAND 0x00486590
-void FUN_00486590(void) { STUB(); }
+void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
+    /* Port [render:asm]: the original is inline asm. Fills a Gouraud-shaded solid-colour triangle into the
+     * 16-bit surface with z-buffering. The shade (vertex shade * 64) is interpolated and indexes the
+     * colour set chosen with FUN_004864e0 (DAT_0066b61c). */
+    struct PortVert v[3];
+    struct PersonVertex *in[3];
+    int i;
+
+    in[0] = a;
+    in[1] = b;
+    in[2] = c;
+    for (i = 0; i < 3; i++) {
+        v[i].y = in[i]->y;
+        v[i].v[0] = in[i]->x;
+        v[i].v[1] = in[i]->depth;
+        v[i].v[2] = (unsigned int)in[i]->shade << 6;
+    }
+    PortRasterTriangle(&v[0], &v[1], &v[2], 3, PortShadedPixel, (const void *)DAT_0066b61c);
+}
 
 // FUNCTION: LEGOLAND 0x00486c70
-void FUN_00486c70(void) { STUB(); }
+void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
+    /* Port [render:asm]: the original is inline asm. Fills a textured, Gouraud-shaded triangle (texture
+     * chosen with FUN_00485f20 / DAT_0066b630) with z-buffering; u, v and the shade are interpolated. */
+    struct PortVert v[3];
+    struct PersonVertex *in[3];
+    const struct TextureNode *tex = (const struct TextureNode *)DAT_0066b630;
+    int i;
+
+    in[0] = a;
+    in[1] = b;
+    in[2] = c;
+    for (i = 0; i < 3; i++) {
+        v[i].y = in[i]->y;
+        v[i].v[0] = in[i]->x;
+        v[i].v[1] = in[i]->depth;
+        v[i].v[2] = (unsigned int)in[i]->shade << 6;
+        v[i].v[3] = ((unsigned int)PortRound(in[i]->u * 65536.0f) & 0xffff) << tex->format_w;
+        v[i].v[4] = ((unsigned int)PortRound(in[i]->v * 65536.0f) & 0xffff) << tex->format_h;
+    }
+    PortRasterTriangle(&v[0], &v[1], &v[2], 5, PortTexturedPixel, tex);
+}
 
 // FUNCTION: LEGOLAND 0x004877b0
-void FUN_004877b0(void) { STUB(); }
+void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
+    /* Port [render:asm]: the original is inline asm. Like FUN_00486590 but flat shaded: the whole triangle
+     * gets the colour picked by the first vertex's shade (the original also stores that vertex's shade * 64
+     * back into the caller's vertex). */
+    struct PortVert v[3];
+    struct PersonVertex *in[3];
+    const struct TextureFrame *frame = (const struct TextureFrame *)DAT_0066b61c;
+    unsigned short color;
+    int i;
+
+    in[0] = a;
+    in[1] = b;
+    in[2] = c;
+    a->shade = a->shade << 6;
+    color = frame->data[(unsigned int)a->shade >> 16];
+    for (i = 0; i < 3; i++) {
+        v[i].y = in[i]->y;
+        v[i].v[0] = in[i]->x;
+        v[i].v[1] = in[i]->depth;
+    }
+    PortRasterTriangle(&v[0], &v[1], &v[2], 2, PortFlatPixel, &color);
+}
 
 // FUNCTION: LEGOLAND 0x00487d40
-void FUN_00487d40(void) { STUB(); }
+void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
+    /* Port [render:asm]: the original is inline asm. Like FUN_00486c70 but flat shaded with the first
+     * vertex's shade; u and v are interpolated. */
+    struct PortVert v[3];
+    struct PersonVertex *in[3];
+    struct PortTexCtx ctx;
+    int i;
+
+    in[0] = a;
+    in[1] = b;
+    in[2] = c;
+    ctx.tex = (const struct TextureNode *)DAT_0066b630;
+    ctx.shade = (unsigned int)a->shade << 6;
+    for (i = 0; i < 3; i++) {
+        v[i].y = in[i]->y;
+        v[i].v[0] = in[i]->x;
+        v[i].v[1] = in[i]->depth;
+        v[i].v[2] = ((unsigned int)PortRound(in[i]->u * 65536.0f) & 0xffff) << ctx.tex->format_w;
+        v[i].v[3] = ((unsigned int)PortRound(in[i]->v * 65536.0f) & 0xffff) << ctx.tex->format_h;
+    }
+    PortRasterTriangle(&v[0], &v[1], &v[2], 4, PortTexturedFlatPixel, &ctx);
+}
 
 // FUNCTION: LEGOLAND 0x00488670
 void FUN_00488670(struct Image *image, unsigned int index) {

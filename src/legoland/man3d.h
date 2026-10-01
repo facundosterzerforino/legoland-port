@@ -117,6 +117,9 @@ struct Person {
 typedef struct Person Person;
 struct Bloke;
 
+struct IntVec3;
+struct Vec3;
+void FUN_00440980(struct MeshElem *elem, struct IntVec3 *out);
 void FUN_0043f840(struct Person *person);
 void FUN_0043f870(struct Person *person);
 

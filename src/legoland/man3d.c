@@ -235,8 +235,103 @@ void FUN_0043fa10(float *param_1, int param_2) {
     }
 }
 
+/* One triangle of a mesh file (0x24 bytes). */
+struct MeshFace {
+    /* 0x00 */ unsigned int flags; /* bit 13 (0x2000): solid colour, otherwise textured */
+    /* 0x04 */ unsigned char rgb[3];
+    /* 0x07 */ unsigned char pad_7;
+    /* 0x08 */ unsigned int texture; /* colour-cache id, or the texture id plus the caller's ctx */
+    /* 0x0c */ float uv[6]; /* three (u, v) pairs */
+};
+
 // FUNCTION: LEGOLAND 0x0043fa80
-void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) { STUB(); }
+void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
+    /* Port [man3d:asm]: the original loads this with C plus x87 float-to-int stores. Loads the mesh file
+     * .\3ddata\new\<dir>\<name>: per element the vertices and normals are read, Y is flipped, the normals are
+     * normalised and both are converted to 16.16 fixed point; then the shared index list and the faces. */
+    char path[256];
+    struct ResFile *file;
+    struct Mesh *mesh;
+    struct MeshShared *shared;
+    struct MeshElem *elem;
+    struct MeshFace *faces;
+    float *v;
+    int *iv;
+    int count;
+    int n;
+    int e;
+    int i;
+    unsigned char rgb[3];
+
+    sprintf(path, ".\\3ddata\\new\\%s\\%s", dir, name);
+    mesh = 0;
+    file = RES_OpenFile(path);
+    if (file != 0) {
+        mesh = (struct Mesh *)malloc(sizeof(struct Mesh));
+        memset(mesh, 0, sizeof(struct Mesh));
+        shared = (struct MeshShared *)malloc(sizeof(struct MeshShared));
+        shared->count = 0;
+        shared->field_4 = 0;
+        shared->field_8 = 0;
+        RES_ReadFile(file, &count, 4);
+        mesh->count = count;
+        mesh->elems = (struct MeshElem *)malloc(count * sizeof(struct MeshElem));
+        memset(mesh->elems, 0, count * sizeof(struct MeshElem));
+        for (e = 0; e < count; e++) {
+            elem = &mesh->elems[e];
+            RES_ReadFile(file, &n, 4);
+            elem->vert_count = n;
+            elem->verts = malloc(n * 12);
+            RES_ReadFile(file, elem->verts, n * 12);
+            v = (float *)elem->verts;
+            for (i = 0; i < n; i++) {
+                v[i * 3 + 1] = -v[i * 3 + 1];
+            }
+            iv = (int *)elem->verts;
+            for (i = 0; i < n * 3; i++) {
+                iv[i] = PortRound(v[i] * 65536.0f);
+            }
+            RES_ReadFile(file, &n, 4);
+            elem->norm_count = n;
+            elem->norms = malloc(n * 12);
+            RES_ReadFile(file, elem->norms, n * 12);
+            v = (float *)elem->norms;
+            for (i = 0; i < n; i++) {
+                NormaliseVector((struct Vec3 *)&v[i * 3]);
+            }
+            for (i = 0; i < n; i++) {
+                v[i * 3 + 1] = -v[i * 3 + 1];
+            }
+            iv = (int *)elem->norms;
+            for (i = 0; i < n * 3; i++) {
+                iv[i] = PortRound(v[i] * 65536.0f);
+            }
+            elem->shared = shared;
+            FUN_00440980(elem, (struct IntVec3 *)elem);
+        }
+        RES_ReadFile(file, &count, 4);
+        RES_ReadFile(file, &shared->field_4, 4);
+        shared->count = count;
+        shared->field_8 = malloc(count * 12);
+        RES_ReadFile(file, shared->field_8, count * 12);
+        mesh->field_8 = malloc(count * sizeof(struct MeshFace));
+        RES_ReadFile(file, mesh->field_8, count * sizeof(struct MeshFace));
+        RES_CloseFile(file);
+        faces = (struct MeshFace *)mesh->field_8;
+        for (i = 0; i < count; i++) {
+            if (faces[i].flags & 0x2000) {
+                rgb[0] = faces[i].rgb[0];
+                rgb[1] = faces[i].rgb[1];
+                rgb[2] = faces[i].rgb[2];
+                faces[i].texture = FUN_00486280(0x40, rgb);
+            } else {
+                faces[i].texture += ctx;
+            }
+            FUN_0043fa10(faces[i].uv, 3);
+        }
+    }
+    return mesh;
+}
 
 // FUNCTION: LEGOLAND 0x0043fde0
 void FUN_0043fde0(struct Mesh *mesh) {
@@ -848,5 +943,249 @@ void FUN_00440980(struct MeshElem *elem, struct IntVec3 *out) {
     out[1] = mx;
 }
 
+static void PortSetVec(int *v, int x, int y, int z) {
+    v[0] = x;
+    v[1] = y;
+    v[2] = z;
+}
+
+/* One normal dotted with the light direction (16.16). A negative result becomes 1: the original shifts the
+ * value right by (sign * 31), which leaves it unchanged when positive and gives 1 when negative. */
+static int PortLightLevel(const int *normal, const int *light) {
+    int dot = PortFixMul(normal[0], light[0]) + PortFixMul(normal[1], light[1]) + PortFixMul(normal[2], light[2]);
+
+    if (dot < 0) {
+        dot = 1;
+    }
+    return dot + 0x3333;
+}
+
+/* The mirrored case (negative parity) lists the triangle's vertices in reverse order, but the original
+ * still gives vertex k the depth / texture coordinates / shade of index k (so these are not mirrored). */
+static void PortProjectTriangle(const int *tri, int ox, int oy, int mirrored, struct PersonVertex *out) {
+    int k;
+    int j;
+    int idx;
+    int x;
+    int y;
+
+    for (k = 0; k < 3; k++) {
+        /* isometric projection of the rotated, scaled vertex */
+        idx = tri[k];
+        x = DAT_00643ee8[idx][0];
+        y = DAT_00643ee8[idx][1];
+        j = mirrored ? 2 - k : k;
+        out[j].x = ox + (DAT_00643ee8[idx][2] + x) * 2;
+        out[j].y = y - x + DAT_00643ee8[idx][2] + oy;
+        out[k].depth = DAT_00641004[tri[k]];
+    }
+}
+
 // FUNCTION: LEGOLAND 0x00440a30
-void FUN_00440a30(struct Person *person) { STUB(); }
+void FUN_00440a30(struct Person *person) {
+    /* Port [man3d:asm]: the original is inline asm. Draws one 3D person (a Mesh element of the current
+     * animation frame, see FUN_0043fa80) into the 160x120 sprite surface: rotates and scales the vertices,
+     * projects them isometrically, shades them from a fixed light and a height / depth term, then fills each
+     * front-facing triangle (solid colour or textured) with the triangle fillers in render.c. The first
+     * shared->field_4 triangles have a normal per vertex (smooth shading), the rest one per triangle. */
+    struct Anim3D *anim;
+    struct MeshElem *elem;
+    struct MeshShared *shared;
+    const int *tris;
+    const int *norms;
+    const struct MeshFace *face;
+    struct PersonVertex rec[3];
+    int light_dir[3];
+    int mt[9];
+    int corners[8][3];
+    int scaled[8][3];
+    int scale[3];
+    int light;
+    int cx;
+    int cz;
+    int ox;
+    int oy;
+    int min_x;
+    int max_x;
+    int min_y;
+    int max_y;
+    int min_z;
+    int max_z;
+    int zscale;
+    int depth_scale;
+    int divisor;
+    int vcount;
+    int tri_count;
+    int smooth_count;
+    int parity;
+    int i;
+    int k;
+    const int *verts;
+    float shade_f;
+
+    anim = GetBlokeAnim3DFromPerson(person);
+    elem = &anim->elems[person->field_4c];
+    face = (const struct MeshFace *)person->field_50;
+    shared = elem->shared;
+    tri_count = shared->count;
+    smooth_count = shared->field_4;
+    tris = (const int *)shared->field_8;
+    vcount = elem->vert_count;
+    norms = (const int *)elem->norms;
+
+    /* the person's scale, 16.16 (x and z are first multiplied by 0.447, the isometric foreshortening) */
+    scale[0] = PortRound((float)(person->scale.x * 0.447f) * 65536.0f);
+    scale[1] = PortRound(person->scale.y * 65536.0f);
+    scale[2] = PortRound((float)(person->scale.z * 0.447f) * 65536.0f);
+
+    /* shade_f == 0 is kept as the raw float bits (0), otherwise 16.16 shifted up by 8 */
+    shade_f = person->field_38;
+    if (shade_f == 0.0f) {
+        memcpy(&light, &person->field_38, sizeof(light));
+    } else {
+        light = (int)((unsigned int)PortRound(shade_f * 65536.0f) << 8);
+    }
+    FUN_00485fe0(person->sprite, person->offset.x, person->offset.y);
+
+    /* light direction, rotated into the person's frame (by the transposed orientation) */
+    mt[0] = person->m[0];
+    mt[1] = person->m[3];
+    mt[2] = person->m[6];
+    mt[3] = person->m[1];
+    mt[4] = person->m[4];
+    mt[5] = person->m[7];
+    mt[6] = person->m[2];
+    mt[7] = person->m[5];
+    mt[8] = person->m[8];
+    PortSetVec(light_dir, -0x1800, -0x5000, 0x3000);
+    TransformVectorsL(light_dir, light_dir, mt, 1);
+
+    /* centre of the element on x and z, negated */
+    cx = -(elem->max_x + elem->min_x) >> 1;
+    cz = -(elem->min_z + elem->max_z) >> 1;
+
+    /* The element's bounding box corners, rotated and scaled, give the sprite's origin so the person ends up
+     * centred. The original lists (min x, max y, max z) twice and never (max x, max y, min z); kept. */
+    PortSetVec(corners[0], elem->min_x, elem->min_y, elem->min_z);
+    PortSetVec(corners[1], elem->min_x, elem->min_y, elem->max_z);
+    PortSetVec(corners[2], elem->min_x, elem->max_y, elem->min_z);
+    PortSetVec(corners[3], elem->min_x, elem->max_y, elem->max_z);
+    PortSetVec(corners[4], elem->max_x, elem->min_y, elem->min_z);
+    PortSetVec(corners[5], elem->max_x, elem->min_y, elem->max_z);
+    PortSetVec(corners[6], elem->min_x, elem->max_y, elem->max_z);
+    PortSetVec(corners[7], elem->max_x, elem->max_y, elem->max_z);
+    TransformVectorsL(&corners[0][0], &corners[0][0], person->m, 8);
+    for (i = 0; i < 8; i++) {
+        for (k = 0; k < 3; k++) {
+            scaled[i][k] = PortFixMul(corners[i][k], scale[k]);
+        }
+    }
+    min_x = max_x = scaled[0][0];
+    min_y = max_y = scaled[0][1];
+    for (i = 1; i < 8; i++) {
+        if (scaled[i][0] < min_x) {
+            min_x = scaled[i][0];
+        }
+        if (scaled[i][0] > max_x) {
+            max_x = scaled[i][0];
+        }
+        if (scaled[i][1] < min_y) {
+            min_y = scaled[i][1];
+        }
+        if (scaled[i][1] > max_y) {
+            max_y = scaled[i][1];
+        }
+    }
+    ox = 0x500000 - ((max_x - min_x) >> 1);
+    oy = 0x5a0000 - ((max_y - min_y) >> 1);
+
+    /* the vertices, moved to the element's centre / floor, then rotated */
+    verts = (const int *)elem->verts;
+    for (i = 0; i < vcount; i++) {
+        DAT_00643ee8[i][0] = verts[i * 3] + cx;
+        DAT_00643ee8[i][1] = verts[i * 3 + 1] - elem->min_y;
+        DAT_00643ee8[i][2] = verts[i * 3 + 2] + cz;
+    }
+    TransformVectorsL(&DAT_00643ee8[0][0], &DAT_00643ee8[0][0], person->m, vcount);
+
+    /* depth range of the rotated vertices */
+    min_z = max_z = DAT_00643ee8[0][2];
+    for (i = 0; i < vcount; i++) {
+        if (DAT_00643ee8[i][2] < min_z) {
+            min_z = DAT_00643ee8[i][2];
+        }
+        if (DAT_00643ee8[i][2] > max_z) {
+            max_z = DAT_00643ee8[i][2];
+        }
+    }
+    /* the original divides without a check (a flat element would crash it) */
+    divisor = (max_z - min_z) >> 5;
+    zscale = divisor != 0 ? 0x40000000 / divisor : 0;
+    depth_scale = PortRound(person->depth * 65536.0f);
+
+    /* per vertex: the depth/shade value stored in DAT_00641004, then the vertex is scaled */
+    for (i = 0; i < vcount; i++) {
+        int z = PortFixMul(DAT_00643ee8[i][2] - min_z, zscale);
+
+        if (person->field_2c != 0) {
+            z = PortFixMul(z, depth_scale);
+        }
+        DAT_00641004[i] = (person->field_34 << 24) + z + PortFixMul(DAT_00643ee8[i][1], light);
+        for (k = 0; k < 3; k++) {
+            DAT_00643ee8[i][k] = PortFixMul(DAT_00643ee8[i][k], scale[k]);
+        }
+    }
+
+    /* The orientation is 16.16 ints here but TMNegParity reads floats (as in the original), so in practice
+     * this returns 0. */
+    parity = TMNegParity(person->fm);
+
+    /* smooth-shaded triangles: three normals each (9 ints) */
+    for (i = 0; i < smooth_count; i++) {
+        int cross;
+
+        PortProjectTriangle(&tris[i * 3], ox, oy, parity != 0 ? 0 : 1, rec);
+        /* back-face test: skip if the screen-space cross product is not negative */
+        cross = PortFixMul(rec[1].x - rec[0].x, rec[2].y - rec[0].y) - PortFixMul(rec[2].x - rec[0].x, rec[1].y - rec[0].y);
+        if (cross < 0) {
+            for (k = 0; k < 3; k++) {
+                rec[k].shade = PortLightLevel(&norms[i * 9 + k * 3], light_dir);
+            }
+            if (face[i].flags & 0x2000) {
+                FUN_004864e0(face[i].texture);
+                FUN_00486590(&rec[0], &rec[1], &rec[2]);
+            } else {
+                for (k = 0; k < 3; k++) {
+                    rec[k].u = face[i].uv[k * 2];
+                    rec[k].v = face[i].uv[k * 2 + 1];
+                }
+                FUN_004886e0(face[i].texture);
+                FUN_00486c70(&rec[0], &rec[1], &rec[2]);
+            }
+        }
+    }
+
+    /* flat-shaded triangles: one normal each, stored after the smooth ones' 36 bytes per triangle */
+    i = smooth_count > 0 ? smooth_count : 0;
+    norms = (const int *)((const char *)norms + i * 24);
+    for (; i < tri_count; i++) {
+        int cross;
+
+        PortProjectTriangle(&tris[i * 3], ox, oy, parity != 0 ? 0 : 1, rec);
+        cross = PortFixMul(rec[1].x - rec[0].x, rec[2].y - rec[0].y) - PortFixMul(rec[2].x - rec[0].x, rec[1].y - rec[0].y);
+        if (cross < 0) {
+            rec[0].shade = PortLightLevel(&norms[i * 3], light_dir);
+            if (face[i].flags & 0x2000) {
+                FUN_004864e0(face[i].texture);
+                FUN_004877b0(&rec[0], &rec[1], &rec[2]);
+            } else {
+                for (k = 0; k < 3; k++) {
+                    rec[k].u = face[i].uv[k * 2];
+                    rec[k].v = face[i].uv[k * 2 + 1];
+                }
+                FUN_004886e0(face[i].texture);
+                FUN_00487d40(&rec[0], &rec[1], &rec[2]);
+            }
+        }
+    }
+}
