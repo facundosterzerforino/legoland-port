@@ -18,6 +18,8 @@ struct VideoArg {
     /* 0x14 */ int field_14;
 };
 struct Sprite;
+struct DrawLLS;
+struct Point;
 
 struct AviFrame {
     /* 0x00 */ unsigned char pad_0[4];
@@ -41,7 +43,7 @@ LEGO_EXPORT void SetOverrideFrame(unsigned int param_1);
 LEGO_EXPORT unsigned int GetOverridePalette(void);
 LEGO_EXPORT unsigned int GetOverrideFrame(void);
 LEGO_EXPORT void ClearSpriteOverrides(void);
-LEGO_EXPORT void ZBufferHelper(unsigned int *param_1, int *param_2, int *param_3, void *param_4);
+LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *pos, unsigned int *zbuf);
 LEGO_EXPORT void ClearOverrideFrame(void);
 LEGO_EXPORT void ClearOverridePalette(void);
 void FUN_00465850(struct AviFrame *frame);
@@ -58,7 +60,7 @@ LEGO_EXPORT int CheckHostSystemGPU(void);
 int FUN_004661d0(void);
 void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off);
 LEGO_EXPORT void SoftPrint_Clear(void);
-LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *a, RECT *b, unsigned int param_4);
+LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint);
 void FUN_004663f0(void);
 int FUN_00463ef0(void);
 
@@ -81,6 +83,16 @@ struct DrawLLSFrame {
     unsigned short pixels[1];
 };
 
+/* A frame of an indexed-colour (type 2) animation: one palette index per visible pixel, then (frame 0 only)
+ * a 256-entry 16-bit palette, then the 2-bit-code stream that says where the pixels go. */
+struct DrawLLSIdxFrame {
+    /* 0x00 */ unsigned int size; /* bytes to the next frame */
+    /* 0x04 */ unsigned int pixel_count; /* bytes of palette indices */
+    /* 0x08 */ unsigned char pixels[1];
+};
+
+void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos);
+void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos);
 void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos);
 void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
@@ -91,4 +103,5 @@ void FUN_00467b00(unsigned short *dst, unsigned short *src, unsigned char *runs,
 void FUN_00467d10(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_00467f00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip);
 void FUN_00465ee0(struct DrawLLS *lls, RECT *clip, struct Point *pos);
+void FUN_00468410(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
