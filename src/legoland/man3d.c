@@ -280,7 +280,7 @@ void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
     int i;
     unsigned char rgb[3];
 
-    sprintf(path, ".\3ddata\new\%s\%s", dir, name);
+    sprintf(path, ".\\3ddata\\new\\%s\\%s", dir, name);
     mesh = 0;
     file = RES_OpenFile(path);
     if (file != 0) {
