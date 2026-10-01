@@ -71,3 +71,4 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
 LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count);
 struct Vec3;
 LEGO_EXPORT void NormaliseVector(struct Vec3 *v);
+LEGO_EXPORT int TMNegParity(float *param_1);
