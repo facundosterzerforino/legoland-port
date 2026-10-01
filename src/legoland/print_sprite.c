@@ -573,5 +573,5 @@ void FUN_00485fe0(struct Sprite *sprite, int x, int y) {
     } else {
         offsets[1] = 0;
     }
-    ZBufferHelper((unsigned int *)sprite->image->data, (int *)&rect1, offsets, DAT_00701e5c);
+    ZBufferHelper((struct DrawLLS *)sprite->image->data, &rect1, (struct Point *)offsets, (unsigned int *)DAT_00701e5c);
 }

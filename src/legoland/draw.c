@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "clipping.h"
+#include "debug.h"
 #include "debug_alloc.h"
 #include "globals.h"
 
@@ -450,14 +451,630 @@ LEGO_EXPORT void ClearSpriteOverrides(void) {
     DAT_006681e8 = 0;
 }
 
+/* Port [sprites:asm]: bit reader for the stream that places the pixels of an indexed-colour animation frame
+ * (FUN_00464480, FUN_00465240, ZBufferHelper). The stream is a list of 32-bit words of sixteen 2-bit codes each,
+ * lowest bits first. A run length is the next 8 bits (four codes) of the same word; if fewer than four codes are
+ * left in the word, the rest of the word is dropped and the length is the low byte of the next word. */
+struct PortIdxBits {
+    unsigned int bits; /* current word, shifted so the next code is in bits 0-1 */
+    int left; /* codes not yet read from the current word */
+    const unsigned int *next; /* next word of the stream */
+};
+
+enum {
+    PORT_IDX_LEFT, /* still inside the clipped-off left margin of the row */
+    PORT_IDX_BODY, /* inside the visible part of the row */
+    PORT_IDX_COPY, /* draw `run` pixels from the source */
+    PORT_IDX_RUN, /* draw a run: fill if is_fill, else copy */
+    PORT_IDX_END, /* past the right clip: skip the rest of the row's stream */
+    PORT_IDX_NEXT /* row finished */
+};
+
+static unsigned int PortIdxCode(struct PortIdxBits *r) {
+    r->bits >>= 2;
+    if (r->left == 0) {
+        r->bits = *r->next++;
+        r->left = 16;
+    }
+    r->left--;
+    return r->bits & 3;
+}
+
+static unsigned int PortIdxCount(struct PortIdxBits *r) {
+    unsigned int count;
+
+    r->bits >>= 2;
+    if (r->left < 4) {
+        r->bits = *r->next++;
+        r->left = 16;
+    }
+    count = r->bits & 0xff;
+    r->bits >>= 6;
+    r->left -= 4;
+    return count;
+}
+
+/* Codes: 00/01 one source pixel; 10 one transparent pixel; 11 a run, whose length is read with PortIdxCount
+ * (0 ends the row) and whose kind is the next code: 1x transparent, 01 one source pixel repeated, 00 that many
+ * source pixels. Skips the rest of one row, advancing the source pointer past the pixels it would have used. */
+static const unsigned char *PortIdxSkipRow(struct PortIdxBits *r, const unsigned char *src) {
+    unsigned int c;
+    unsigned int run;
+
+    for (;;) {
+        c = PortIdxCode(r);
+        if (!(c & 2)) {
+            src++;
+        } else if (c & 1) {
+            run = PortIdxCount(r);
+            if (run == 0) {
+                return src;
+            }
+            c = PortIdxCode(r);
+            if (!(c & 2)) {
+                if (c & 1) {
+                    src++;
+                } else {
+                    src += run;
+                }
+            }
+        }
+    }
+}
+
+static struct DrawLLSIdxFrame *PortIdxFrameAt(struct DrawLLS *lls, int index) {
+    struct DrawLLSIdxFrame *frame = (struct DrawLLSIdxFrame *)(lls + 1);
+
+    while (index-- != 0) {
+        frame = (struct DrawLLSIdxFrame *)((unsigned char *)frame + frame->size);
+    }
+    return frame;
+}
+
+/* The frame to draw: the override (DAT_004b9ca8) if set, else the animation's own, clamped to the last frame. */
+static int PortLLSFrameIndex(struct DrawLLS *lls) {
+    int index = (int)DAT_004b9ca8;
+
+    if (index < 0) {
+        index = lls->frame;
+    }
+    if (index >= lls->frame_count) {
+        index = lls->frame_count - 1;
+    }
+    return index;
+}
+
 // FUNCTION: LEGOLAND 0x00464480
-void FUN_00464480(void) { STUB(); }
+void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
+    /* Port [sprites:asm]: the original is inline asm. Draws one frame (two, for animations with flag 1: the base
+     * frame, then the delta frame on top) of an indexed-colour animation into the software screen at pos, showing
+     * only the part inside rect. Each source byte indexes a 16-bit palette (DAT_006681e8 if overridden, else the one
+     * stored with frame 0). Sets DAT_007feb14 bit 0 when a drawn run touches the mouse cursor (DAT_007fe9a8).
+     * Quirks kept: when a transparent or copy run ends exactly at the left clip edge the decoder stays in its
+     * left-margin state (so the next item is dropped); a single-pixel skip after the visible width is used up wraps
+     * the remaining width; a fill run that starts with no width left still stores one pixel. */
+    struct PortIdxBits bits;
+    struct DrawLLSIdxFrame *first;
+    struct DrawLLSIdxFrame *frame;
+    const unsigned short *palette;
+    const unsigned char *src;
+    unsigned short *row;
+    unsigned short *dst;
+    unsigned short *cursor;
+    unsigned short colour;
+    unsigned int width;
+    unsigned int left;
+    unsigned int rem;
+    unsigned int run;
+    unsigned int count;
+    unsigned int leftover;
+    unsigned int k;
+    unsigned int c;
+    int frame_index;
+    int passes;
+    int pass;
+    int pitch;
+    int top;
+    int height;
+    int rows;
+    int state;
+    int is_fill;
+    int with_palette;
+    int hit;
+
+    frame_index = PortLLSFrameIndex(lls);
+    passes = (lls->flags & 1) ? 2 : 1;
+    pitch = DAT_0066809c.lPitch;
+    cursor = (unsigned short *)DAT_007fe9a8;
+    left = rect->left;
+    width = rect->right - rect->left;
+    top = rect->top;
+    height = rect->bottom - rect->top;
+    palette = NULL;
+    is_fill = 0;
+    hit = 0;
+    first = PortIdxFrameAt(lls, 0);
+    for (pass = 0; pass < passes; pass++) {
+        if (passes == 1) {
+            frame = PortIdxFrameAt(lls, frame_index);
+            with_palette = (frame_index == 0);
+        } else if (pass == 0) {
+            frame = first;
+            with_palette = 1;
+        } else {
+            frame = PortIdxFrameAt(lls, frame_index + 1);
+            with_palette = 0;
+        }
+        if (passes == 1 || pass == 0) {
+            if (DAT_006681e8 != 0) {
+                palette = (const unsigned short *)DAT_006681e8;
+            } else {
+                palette = (const unsigned short *)(first->pixels + first->pixel_count);
+            }
+        }
+        src = frame->pixels;
+        bits.bits = 0;
+        bits.left = 0;
+        bits.next = (const unsigned int *)(frame->pixels + frame->pixel_count + (with_palette ? 0x200 : 0));
+        row = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->x * 2 + pos->y * pitch);
+        for (rows = top; rows > 0; rows--) {
+            src = PortIdxSkipRow(&bits, src);
+        }
+        for (rows = height; rows != 0; rows--) {
+            dst = row;
+            if (left != 0) {
+                rem = left;
+                state = PORT_IDX_LEFT;
+            } else {
+                rem = width;
+                state = PORT_IDX_BODY;
+            }
+            while (state != PORT_IDX_NEXT) {
+                switch (state) {
+                case PORT_IDX_LEFT:
+                    c = PortIdxCode(&bits);
+                    if (!(c & 2) || !(c & 1)) {
+                        /* one source pixel, or one transparent pixel */
+                        if (!(c & 2)) {
+                            src++;
+                        }
+                        rem--;
+                        if (rem == 0) {
+                            rem = width;
+                            state = PORT_IDX_BODY;
+                        }
+                        break;
+                    }
+                    run = PortIdxCount(&bits);
+                    if (run == 0) {
+                        state = PORT_IDX_NEXT;
+                        break;
+                    }
+                    c = PortIdxCode(&bits);
+                    if (c & 2) {
+                        rem -= run;
+                        if ((int)rem >= 0) {
+                            break;
+                        }
+                        rem = 0 - rem;
+                        dst += rem;
+                        if ((int)(width - rem) < 0) {
+                            state = PORT_IDX_END;
+                        } else {
+                            rem = width - rem;
+                            state = PORT_IDX_BODY;
+                        }
+                    } else if (c & 1) {
+                        src++;
+                        rem -= run;
+                        if ((int)rem >= 0) {
+                            break;
+                        }
+                        run = 0 - rem;
+                        rem = width;
+                        if (rem == 0) {
+                            state = PORT_IDX_END;
+                            break;
+                        }
+                        hit = (dst <= cursor);
+                        if (run != 0) {
+                            src--;
+                            is_fill = 1;
+                            state = PORT_IDX_RUN;
+                        } else {
+                            state = PORT_IDX_BODY;
+                        }
+                    } else {
+                        src += run;
+                        rem -= run;
+                        if ((int)rem >= 0) {
+                            break;
+                        }
+                        run = 0 - rem;
+                        rem = width;
+                        if (rem == 0) {
+                            state = PORT_IDX_END;
+                            break;
+                        }
+                        src -= run;
+                        hit = (dst <= cursor);
+                        state = (run != 0) ? PORT_IDX_COPY : PORT_IDX_BODY;
+                    }
+                    break;
+                case PORT_IDX_BODY:
+                    c = PortIdxCode(&bits);
+                    if (!(c & 2)) {
+                        run = 1;
+                        hit = (dst == cursor);
+                        state = PORT_IDX_COPY;
+                        break;
+                    }
+                    if (!(c & 1)) {
+                        rem--;
+                        dst++;
+                        break;
+                    }
+                    run = PortIdxCount(&bits);
+                    if (run == 0) {
+                        state = PORT_IDX_NEXT;
+                        break;
+                    }
+                    c = PortIdxCode(&bits);
+                    hit = (dst <= cursor);
+                    if (c & 2) {
+                        rem -= run;
+                        if ((int)rem < 0) {
+                            state = PORT_IDX_END;
+                        } else {
+                            dst += run;
+                        }
+                        break;
+                    }
+                    is_fill = c & 1;
+                    state = PORT_IDX_RUN;
+                    break;
+                case PORT_IDX_RUN:
+                    if (!is_fill) {
+                        state = PORT_IDX_COPY;
+                        break;
+                    }
+                    colour = palette[*src++];
+                    if (rem <= run) {
+                        if (rem == 0) {
+                            *dst = colour;
+                        }
+                        for (k = 0; k < rem; k++) {
+                            dst[k] = colour;
+                        }
+                        dst += rem;
+                        state = PORT_IDX_END;
+                    } else {
+                        rem -= run;
+                        for (k = 0; k < run; k++) {
+                            *dst++ = colour;
+                        }
+                        state = PORT_IDX_BODY;
+                    }
+                    if (hit && dst >= cursor) {
+                        DAT_007feb14 |= 1;
+                    }
+                    break;
+                case PORT_IDX_COPY:
+                    if (rem <= run) {
+                        count = rem;
+                        leftover = run - rem;
+                        if (count != 0) {
+                            for (k = 0; k < count; k++) {
+                                *dst++ = palette[*src++];
+                            }
+                            if (hit && dst >= cursor) {
+                                DAT_007feb14 |= 1;
+                            }
+                        }
+                        src += leftover;
+                        state = PORT_IDX_END;
+                    } else {
+                        rem -= run;
+                        for (k = 0; k < run; k++) {
+                            *dst++ = palette[*src++];
+                        }
+                        if (hit && dst >= cursor) {
+                            DAT_007feb14 |= 1;
+                        }
+                        state = PORT_IDX_BODY;
+                    }
+                    break;
+                case PORT_IDX_END:
+                    src = PortIdxSkipRow(&bits, src);
+                    state = PORT_IDX_NEXT;
+                    break;
+                }
+            }
+            row = (unsigned short *)((unsigned char *)row + pitch);
+        }
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00464a90
-LEGO_EXPORT void ZBufferHelper(unsigned int *param_1, int *param_2, int *param_3, void *param_4) { STUB(); }
+LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *pos, unsigned int *zbuf) {
+    /* Port [sprites:asm]: the original is inline asm. Draws one frame of an indexed-colour animation into a
+     * 32-bit buffer (rows 0x200 bytes apart) at pos, showing only the part inside rect: each visible pixel is
+     * written as its source byte shifted into the top byte (its depth); the palette is not used. Same stream
+     * decoder as FUN_00464480. Quirks kept: a transparent run that crosses the left clip edge advances the
+     * destination by 2 bytes per pixel instead of 4; a run ending exactly at the left clip edge leaves the decoder
+     * in its left-margin state. */
+    struct PortIdxBits bits;
+    struct DrawLLSIdxFrame *frame;
+    const unsigned char *src;
+    unsigned int *row;
+    unsigned int *dst;
+    unsigned int depth;
+    unsigned int width;
+    unsigned int left;
+    unsigned int rem;
+    unsigned int run;
+    unsigned int count;
+    unsigned int leftover;
+    unsigned int k;
+    unsigned int c;
+    int frame_index;
+    int top;
+    int height;
+    int rows;
+    int state;
+    int is_fill;
+
+    frame_index = PortLLSFrameIndex(lls);
+    frame = PortIdxFrameAt(lls, frame_index);
+    src = frame->pixels;
+    bits.bits = 0;
+    bits.left = 0;
+    bits.next = (const unsigned int *)(frame->pixels + frame->pixel_count + (frame_index == 0 ? 0x200 : 0));
+    row = (unsigned int *)((unsigned char *)zbuf + pos->x * 4 + pos->y * 0x200);
+    left = rect->left;
+    width = rect->right - rect->left;
+    top = rect->top;
+    height = rect->bottom - rect->top;
+    is_fill = 0;
+    for (rows = top; rows > 0; rows--) {
+        src = PortIdxSkipRow(&bits, src);
+    }
+    for (rows = height; rows != 0; rows--) {
+        dst = row;
+        if (left != 0) {
+            rem = left;
+            state = PORT_IDX_LEFT;
+        } else {
+            rem = width;
+            state = PORT_IDX_BODY;
+        }
+        while (state != PORT_IDX_NEXT) {
+            switch (state) {
+            case PORT_IDX_LEFT:
+                c = PortIdxCode(&bits);
+                if (!(c & 2) || !(c & 1)) {
+                    if (!(c & 2)) {
+                        src++;
+                    }
+                    rem--;
+                    if (rem == 0) {
+                        rem = width;
+                        state = PORT_IDX_BODY;
+                    }
+                    break;
+                }
+                run = PortIdxCount(&bits);
+                if (run == 0) {
+                    state = PORT_IDX_NEXT;
+                    break;
+                }
+                c = PortIdxCode(&bits);
+                if (c & 2) {
+                    rem -= run;
+                    if ((int)rem >= 0) {
+                        break;
+                    }
+                    rem = 0 - rem;
+                    dst = (unsigned int *)((unsigned char *)dst + rem * 2);
+                    if ((int)(width - rem) < 0) {
+                        state = PORT_IDX_END;
+                    } else {
+                        rem = width - rem;
+                        state = PORT_IDX_BODY;
+                    }
+                } else if (c & 1) {
+                    src++;
+                    rem -= run;
+                    if ((int)rem >= 0) {
+                        break;
+                    }
+                    run = 0 - rem;
+                    src--;
+                    rem = width;
+                    if (rem == 0) {
+                        state = PORT_IDX_END;
+                    } else {
+                        is_fill = 1;
+                        state = PORT_IDX_RUN;
+                    }
+                } else {
+                    src += run;
+                    rem -= run;
+                    if ((int)rem >= 0) {
+                        break;
+                    }
+                    src += (int)rem;
+                    run = 0 - rem;
+                    rem = width;
+                    state = (rem == 0) ? PORT_IDX_END : PORT_IDX_COPY;
+                }
+                break;
+            case PORT_IDX_BODY:
+                c = PortIdxCode(&bits);
+                if (!(c & 2)) {
+                    run = 1;
+                    state = PORT_IDX_COPY;
+                    break;
+                }
+                if (!(c & 1)) {
+                    rem--;
+                    if (rem == 0) {
+                        state = PORT_IDX_END;
+                    } else {
+                        dst++;
+                    }
+                    break;
+                }
+                run = PortIdxCount(&bits);
+                if (run == 0) {
+                    state = PORT_IDX_NEXT;
+                    break;
+                }
+                c = PortIdxCode(&bits);
+                if (c & 2) {
+                    rem -= run;
+                    if ((int)rem < 0) {
+                        state = PORT_IDX_END;
+                    } else {
+                        dst += run;
+                    }
+                    break;
+                }
+                is_fill = c & 1;
+                state = PORT_IDX_RUN;
+                break;
+            case PORT_IDX_RUN:
+                if (!is_fill) {
+                    state = PORT_IDX_COPY;
+                    break;
+                }
+                depth = (unsigned int)*src++ << 24;
+                if (rem <= run) {
+                    for (k = 0; k < rem; k++) {
+                        *dst++ = depth;
+                    }
+                    state = PORT_IDX_END;
+                } else {
+                    rem -= run;
+                    for (k = 0; k < run; k++) {
+                        *dst++ = depth;
+                    }
+                    state = PORT_IDX_BODY;
+                }
+                break;
+            case PORT_IDX_COPY:
+                if (rem <= run) {
+                    count = rem;
+                    leftover = run - rem;
+                    for (k = 0; k < count; k++) {
+                        *dst++ = (unsigned int)*src++ << 24;
+                    }
+                    src += leftover;
+                    state = PORT_IDX_END;
+                } else {
+                    rem -= run;
+                    for (k = 0; k < run; k++) {
+                        *dst++ = (unsigned int)*src++ << 24;
+                    }
+                    state = PORT_IDX_BODY;
+                }
+                break;
+            case PORT_IDX_END:
+                src = PortIdxSkipRow(&bits, src);
+                state = PORT_IDX_NEXT;
+                break;
+            }
+        }
+        row = (unsigned int *)((unsigned char *)row + 0x200);
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00464ee0
-void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) { STUB(); }
+void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
+    /* Port [sprites:asm]: the original is inline asm in its 16-bit copy loops. Software BltFast: draws the part
+     * of the sprite inside rect (relative to the sprite, then moved by the sprite's source offset) into the
+     * software screen at off = {x, y}, skipping pixels equal to the transparent colour DAT_007fea44. Animated
+     * sprites (image types 2 and 3) go to their own blitters; type 0 images are 8-bit with a palette, others 16-bit.
+     * Sprites with flag 0x20 are DirectDraw surfaces, locked for the copy. Moves *rect by the source offset. */
+    struct VideoArg lock;
+    struct Image fake;
+    struct Image *image;
+    const unsigned short *palette;
+    const unsigned char *src8;
+    const unsigned short *src16;
+    unsigned short *dst;
+    unsigned short colour;
+    int pitch;
+    int stride;
+    int width;
+    int height;
+    int x;
+    int y;
+
+    if (sprite->flags & 0x20) {
+        GetSprite((unsigned int *)&lock, sprite);
+        fake.data = lock.field_c;
+        fake.width = (short)((short)lock.field_0 / 2);
+        fake.height = (short)lock.field_8;
+        fake.field_14 = 1;
+        image = &fake;
+    } else {
+        image = sprite->image;
+        if (IsBadReadPtr(image->data, 1)) {
+            // STRING: LEGOLAND 0x004b9d0c
+            FUN_0047f870("BltFast:Sprite Not Available:%s\n", image->name);
+            return;
+        }
+    }
+    rect->left += (short)sprite->src_x;
+    rect->top += (short)sprite->src_y;
+    rect->right += (short)sprite->src_x;
+    rect->bottom += (short)sprite->src_y;
+    pitch = DAT_0066809c.lPitch;
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * pitch + DAT_00813a44.x * 2);
+    if (image->field_14 == 2) {
+        FUN_00464480((struct DrawLLS *)image->data, rect, (struct Point *)off);
+        return;
+    }
+    if (image->field_14 == 3) {
+        FUN_00466770((struct DrawLLS *)image->data, rect, (struct Point *)off);
+        return;
+    }
+    width = rect->right - rect->left;
+    height = rect->bottom - rect->top;
+    dst = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + off[0] * 2 + off[1] * pitch);
+    if (image->field_14 == 0) {
+        stride = (image->width + 3) & ~3;
+        palette = (const unsigned short *)((unsigned char *)image->aux + 4);
+        src8 = (const unsigned char *)image->data + rect->left + rect->top * stride;
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
+                colour = palette[src8[x]];
+                if (colour != DAT_007fea44) {
+                    dst[x] = colour;
+                }
+            }
+            src8 += stride;
+            dst = (unsigned short *)((unsigned char *)dst + pitch);
+        }
+    } else {
+        stride = image->width * 2;
+        src16 = (const unsigned short *)((unsigned char *)image->data + rect->left * 2 + rect->top * stride);
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
+                colour = src16[x];
+                if (colour != DAT_007fea44) {
+                    dst[x] = colour;
+                }
+            }
+            src16 = (const unsigned short *)((const unsigned char *)src16 + stride);
+            dst = (unsigned short *)((unsigned char *)dst + pitch);
+        }
+    }
+    if (sprite->flags & 0x20) {
+        ReleaseSprite((struct Sprite *)&lock);
+    }
+}
 
 // The original fills the rows with an inline __asm block (pusha; rep stosw per row; popa) that
 // reads its loop bounds from the globals below. This is the C equivalent: same effect, but it
@@ -482,7 +1099,249 @@ LEGO_EXPORT void SoftPrint_Clear(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00465240
-void FUN_00465240(void) { STUB(); }
+void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
+    /* Port [sprites:asm]: the original is inline asm. Same as FUN_00464480 (indexed-colour animation frame drawn
+     * into the software screen at pos, clipped to rect) but every pixel is ANDed with the colour mask DAT_007fe998
+     * (the tint of SoftPrint_XBltFast), the palette is never overridden, and the cursor test is stricter. Differences
+     * kept: with an overridden frame the palette is re-read from the current frame only if the animation's own
+     * frame is 0; the delta frame of a two-frame animation comes from lls->frame, not the override. */
+    struct PortIdxBits bits;
+    struct DrawLLSIdxFrame *first;
+    struct DrawLLSIdxFrame *frame;
+    const unsigned short *palette;
+    const unsigned char *src;
+    unsigned short *row;
+    unsigned short *dst;
+    unsigned short *cursor;
+    unsigned short colour;
+    unsigned short tint;
+    unsigned int width;
+    unsigned int left;
+    unsigned int rem;
+    unsigned int run;
+    unsigned int count;
+    unsigned int leftover;
+    unsigned int k;
+    unsigned int c;
+    int frame_index;
+    int passes;
+    int pass;
+    int pitch;
+    int top;
+    int height;
+    int rows;
+    int state;
+    int is_fill;
+    int with_palette;
+    int hit;
+
+    frame_index = PortLLSFrameIndex(lls);
+    passes = (lls->flags & 1) ? 2 : 1;
+    pitch = DAT_0066809c.lPitch;
+    cursor = (unsigned short *)DAT_007fe9a8;
+    tint = (unsigned short)DAT_007fe998;
+    left = rect->left;
+    width = rect->right - rect->left;
+    top = rect->top;
+    height = rect->bottom - rect->top;
+    palette = NULL;
+    is_fill = 0;
+    hit = 0;
+    first = PortIdxFrameAt(lls, 0);
+    for (pass = 0; pass < passes; pass++) {
+        if (passes == 1) {
+            frame = PortIdxFrameAt(lls, frame_index);
+            palette = (const unsigned short *)(first->pixels + first->pixel_count);
+            with_palette = (lls->frame == 0);
+            if (with_palette) {
+                palette = (const unsigned short *)(frame->pixels + frame->pixel_count);
+            }
+        } else if (pass == 0) {
+            frame = first;
+            palette = (const unsigned short *)(first->pixels + first->pixel_count);
+            with_palette = 1;
+        } else {
+            frame = PortIdxFrameAt(lls, lls->frame + 1);
+            with_palette = 0;
+        }
+        src = frame->pixels;
+        bits.bits = 0;
+        bits.left = 0;
+        bits.next = (const unsigned int *)(frame->pixels + frame->pixel_count + (with_palette ? 0x200 : 0));
+        row = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->x * 2 + pos->y * pitch);
+        for (rows = top; rows > 0; rows--) {
+            src = PortIdxSkipRow(&bits, src);
+        }
+        for (rows = height; rows != 0; rows--) {
+            dst = row;
+            if (left != 0) {
+                rem = left;
+                state = PORT_IDX_LEFT;
+            } else {
+                rem = width;
+                state = PORT_IDX_BODY;
+            }
+            while (state != PORT_IDX_NEXT) {
+                switch (state) {
+                case PORT_IDX_LEFT:
+                    c = PortIdxCode(&bits);
+                    if (!(c & 2) || !(c & 1)) {
+                        if (!(c & 2)) {
+                            src++;
+                        }
+                        rem--;
+                        if (rem == 0) {
+                            rem = width;
+                            state = PORT_IDX_BODY;
+                        }
+                        break;
+                    }
+                    run = PortIdxCount(&bits);
+                    if (run == 0) {
+                        state = PORT_IDX_NEXT;
+                        break;
+                    }
+                    c = PortIdxCode(&bits);
+                    if (c & 2) {
+                        if (rem > run) {
+                            rem -= run;
+                            break;
+                        }
+                        rem = run - rem;
+                        dst += rem;
+                        if (width <= rem) {
+                            state = PORT_IDX_END;
+                        } else {
+                            rem = width - rem;
+                            state = PORT_IDX_BODY;
+                        }
+                    } else if (c & 1) {
+                        src++;
+                        if (rem > run) {
+                            rem -= run;
+                            break;
+                        }
+                        run = run - rem;
+                        rem = width;
+                        if (rem == 0) {
+                            state = PORT_IDX_END;
+                            break;
+                        }
+                        hit = (dst <= cursor);
+                        if (run != 0) {
+                            src--;
+                            is_fill = 1;
+                            state = PORT_IDX_RUN;
+                        } else {
+                            state = PORT_IDX_BODY;
+                        }
+                    } else {
+                        src += run;
+                        if (rem > run) {
+                            rem -= run;
+                            break;
+                        }
+                        src += (int)(rem - run);
+                        run = run - rem;
+                        rem = width;
+                        if (rem == 0) {
+                            state = PORT_IDX_END;
+                            break;
+                        }
+                        hit = (dst <= cursor);
+                        state = (run != 0) ? PORT_IDX_COPY : PORT_IDX_BODY;
+                    }
+                    break;
+                case PORT_IDX_BODY:
+                    c = PortIdxCode(&bits);
+                    if (!(c & 2)) {
+                        run = 1;
+                        hit = (dst == cursor);
+                        state = PORT_IDX_COPY;
+                        break;
+                    }
+                    if (!(c & 1)) {
+                        rem--;
+                        if (rem == 0) {
+                            state = PORT_IDX_END;
+                        } else {
+                            dst++;
+                        }
+                        break;
+                    }
+                    run = PortIdxCount(&bits);
+                    if (run == 0) {
+                        state = PORT_IDX_NEXT;
+                        break;
+                    }
+                    c = PortIdxCode(&bits);
+                    hit = (dst <= cursor);
+                    if (c & 2) {
+                        rem -= run;
+                        if ((int)rem < 0) {
+                            state = PORT_IDX_END;
+                        } else {
+                            dst += run;
+                        }
+                        break;
+                    }
+                    is_fill = c & 1;
+                    state = PORT_IDX_RUN;
+                    break;
+                case PORT_IDX_RUN:
+                    if (!is_fill) {
+                        state = PORT_IDX_COPY;
+                        break;
+                    }
+                    colour = (unsigned short)(palette[*src++] & tint);
+                    if (rem <= run) {
+                        count = rem;
+                        state = PORT_IDX_END;
+                    } else {
+                        count = run;
+                        rem -= run;
+                        state = PORT_IDX_BODY;
+                    }
+                    if (count != 0) {
+                        for (k = 0; k < count; k++) {
+                            *dst++ = colour;
+                        }
+                        if (hit && dst > cursor) {
+                            DAT_007feb14 |= 1;
+                        }
+                    }
+                    break;
+                case PORT_IDX_COPY:
+                    if (rem <= run) {
+                        count = rem;
+                        leftover = run - rem;
+                        state = PORT_IDX_END;
+                    } else {
+                        count = run;
+                        leftover = 0;
+                        rem -= run;
+                        state = PORT_IDX_BODY;
+                    }
+                    if (count != 0) {
+                        for (k = 0; k < count; k++) {
+                            *dst++ = (unsigned short)(palette[*src++] & tint);
+                        }
+                        if (hit && dst > cursor) {
+                            DAT_007feb14 |= 1;
+                        }
+                    }
+                    src += leftover;
+                    break;
+                case PORT_IDX_END:
+                    src = PortIdxSkipRow(&bits, src);
+                    state = PORT_IDX_NEXT;
+                    break;
+                }
+            }
+            row = (unsigned short *)((unsigned char *)row + pitch);
+        }
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00465850
 void FUN_00465850(struct AviFrame *frame) {
@@ -576,8 +1435,129 @@ void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3) {
     }
 }
 
+/* Port [sprites:asm]: draws one frame of a 16-bit animation darkened to half brightness through FUN_00468410
+ * (the original sets up its 11 arguments by hand in SoftPrint_XBltFast). */
+static void PortHalfFrame(unsigned short *dst, struct DrawLLSFrame *frame, int height, int pitch, int top, int left, int width, unsigned short *cursor) {
+    unsigned char *runs = (unsigned char *)(frame->pixels + frame->pixel_count);
+    unsigned int *mask = (unsigned int *)(runs + frame->run_bytes);
+
+    FUN_00468410(dst, frame->pixels, runs, mask, height, pitch, top, left, width, 0, cursor);
+}
+
 // FUNCTION: LEGOLAND 0x00465a40
-LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *a, RECT *b, unsigned int param_4) { STUB(); }
+LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint) {
+    /* Port [sprites:asm]: the original is inline asm in its 16-bit copy loops. Same as FUN_00464ee0 (software
+     * BltFast of the part of the sprite inside src, moved by the sprite's source offset, to dst->left/top) but the
+     * colour of every pixel is ANDed with a mask from tint (0x00RRGGBB, via GetNearestColour) stored in
+     * DAT_007fe998. Type 3 animations with tint alpha (the top byte) are drawn at half brightness instead, with the
+     * mask ~GetNearestColour(15, 15, 15), by FUN_00468410; without alpha they use the plain FUN_00465ee0. */
+    struct VideoArg lock;
+    struct Image fake;
+    struct Image *image;
+    struct DrawLLS *lls;
+    struct DrawLLSFrame *frame;
+    const unsigned short *palette;
+    const unsigned char *src8;
+    const unsigned short *src16;
+    unsigned short *out;
+    unsigned short colour;
+    unsigned short mask;
+    int pitch;
+    int stride;
+    int width;
+    int height;
+    int frame_index;
+    int i;
+    int x;
+    int y;
+
+    if (sprite->flags & 0x20) {
+        GetSprite((unsigned int *)&lock, sprite);
+        fake.data = lock.field_c;
+        fake.width = (short)((short)lock.field_0 / 2);
+        fake.height = (short)lock.field_8;
+        fake.field_14 = 1;
+        image = &fake;
+    } else {
+        image = sprite->image;
+        if (IsBadReadPtr(image->data, 1)) {
+            FUN_0047f870("BltFast:Sprite Not Available:%s\n", image->name);
+            return;
+        }
+    }
+    DAT_007fe998 = GetNearestColour((tint >> 16) & 0xff, (tint >> 8) & 0xff, tint & 0xff);
+    src->left += (short)sprite->src_x;
+    src->top += (short)sprite->src_y;
+    src->right += (short)sprite->src_x;
+    src->bottom += (short)sprite->src_y;
+    pitch = DAT_0066809c.lPitch;
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * pitch + DAT_00813a44.x * 2);
+    if (image->field_14 == 2) {
+        FUN_00465240((struct DrawLLS *)image->data, src, (struct Point *)dst);
+        return;
+    }
+    if (image->field_14 == 3) {
+        lls = (struct DrawLLS *)image->data;
+        if (!(tint & 0xff000000)) {
+            FUN_00465ee0(lls, src, (struct Point *)dst);
+            return;
+        }
+        DAT_007fe998 = ~GetNearestColour(15, 15, 15);
+        width = src->right - src->left;
+        height = src->bottom - src->top;
+        frame_index = PortLLSFrameIndex(lls);
+        out = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + dst->top * pitch + (dst->left - src->left) * 2);
+        frame = (struct DrawLLSFrame *)(lls + 1);
+        if (lls->flags & 1) {
+            PortHalfFrame(out, frame, height, pitch, src->top, src->left, width, (unsigned short *)DAT_007fe9a8);
+            for (i = lls->frame + 1; i != 0; i--) {
+                frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
+            }
+            PortHalfFrame(out, frame, height, pitch, src->top, src->left, width, (unsigned short *)DAT_007fe9a8);
+        } else {
+            for (i = frame_index; i != 0; i--) {
+                frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
+            }
+            PortHalfFrame(out, frame, height, pitch, src->top, src->left, width, (unsigned short *)DAT_007fe9a8);
+        }
+        return;
+    }
+    mask = (unsigned short)DAT_007fe998;
+    width = src->right - src->left;
+    height = src->bottom - src->top;
+    out = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + dst->left * 2 + dst->top * pitch);
+    if (image->field_14 == 0) {
+        stride = (image->width + 3) & ~3;
+        palette = (const unsigned short *)((unsigned char *)image->aux + 4);
+        src8 = (const unsigned char *)image->data + src->left + src->top * stride;
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
+                colour = palette[src8[x]];
+                if (colour != DAT_007fea44) {
+                    out[x] = (unsigned short)(colour & mask);
+                }
+            }
+            src8 += stride;
+            out = (unsigned short *)((unsigned char *)out + pitch);
+        }
+    } else {
+        stride = image->width * 2;
+        src16 = (const unsigned short *)((unsigned char *)image->data + src->left * 2 + src->top * stride);
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
+                colour = src16[x];
+                if (colour != DAT_007fea44) {
+                    out[x] = (unsigned short)(colour & mask);
+                }
+            }
+            src16 = (const unsigned short *)((const unsigned char *)src16 + stride);
+            out = (unsigned short *)((unsigned char *)out + pitch);
+        }
+    }
+    if (sprite->flags & 0x20) {
+        ReleaseSprite((struct Sprite *)&lock);
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00465ee0
 void FUN_00465ee0(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
@@ -1372,8 +2352,268 @@ void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs,
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_AND | PORT_BLIT_HIT_RUN);
 }
 
+/* Port [sprites:asm]: reads the next 2-bit code of a 16-bit animation's mask stream (16 codes per word, lowest
+ * bits first). The caller tests the result against 0xaaaaaaaa (high bit) and 0x55555555 (low bit). */
+static unsigned int PortHalfCode(unsigned int **mask, unsigned int *m) {
+    unsigned int c = **mask & *m;
+
+    *m = _rotl(*m, 2);
+    *mask += *m & 1;
+    return c;
+}
+
+/* Port [sprites:asm]: a pixel at half brightness: clear the low bit of each colour channel, then shift right. */
+static unsigned short PortHalfPixel(unsigned short pixel) {
+    return (unsigned short)((pixel & (unsigned short)DAT_007fe998) >> 1);
+}
+
+enum {
+    PORT_HALF_LEFT, /* in the clipped-off left margin */
+    PORT_HALF_TAIL, /* left margin handled: decide where to go next */
+    PORT_HALF_BODY, /* in the visible part of the row */
+    PORT_HALF_END, /* past the right clip: skip the rest of the row's stream */
+    PORT_HALF_NEXT /* row finished */
+};
+
 // FUNCTION: LEGOLAND 0x00468410
-void FUN_00468410(void) { STUB(); }
+void FUN_00468410(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [sprites:asm]: the original is inline asm. Draws one frame of a 16-bit run-length animation at half
+     * brightness (each pixel PortHalfPixel of the source, using the mask DAT_007fe998), clipped on both sides: the
+     * first `skip` rows and the first `left` columns are not drawn, and at most `width` columns per row are. dst
+     * is the first row's pixel for column `left`; rows are `stride` bytes apart. Runs of source pixels and fills
+     * that touch the cursor set DAT_007feb14 bit 0. The same decoder as the other run-length blitters. `flags`
+     * is unused (the original reuses its slot as scratch). */
+    unsigned short *line;
+    unsigned short colour;
+    unsigned int m;
+    unsigned int c;
+    int left_rem;
+    int width_rem;
+    int n;
+    int e;
+    int cnt;
+    int k;
+    int state;
+
+    m = 3;
+    if (skip != 0) {
+        do {
+            for (;;) {
+                c = PortHalfCode(&mask, &m);
+                if (!(c & 0xaaaaaaaa)) {
+                    src++;
+                }
+                if (c & 0x55555555) {
+                    n = *runs++;
+                    if (n == 0) {
+                        break;
+                    }
+                    c = PortHalfCode(&mask, &m);
+                    if (!(c & 0xaaaaaaaa)) {
+                        if (c & 0x55555555) {
+                            src++;
+                        } else {
+                            src += n;
+                        }
+                    }
+                }
+            }
+        } while (--skip > 0);
+    }
+    line = dst;
+    left_rem = left;
+    width_rem = width;
+    state = (left_rem > 0) ? PORT_HALF_LEFT : PORT_HALF_BODY;
+    for (;;) {
+        switch (state) {
+        case PORT_HALF_LEFT:
+            left_rem--;
+            dst++;
+            src++;
+            c = PortHalfCode(&mask, &m);
+            if (!(c & 0xaaaaaaaa)) {
+                state = PORT_HALF_TAIL;
+                break;
+            }
+            src--;
+            if (!(c & 0x55555555)) {
+                state = PORT_HALF_TAIL;
+                break;
+            }
+            left_rem++;
+            dst--;
+            n = *runs++;
+            if (n == 0) {
+                state = PORT_HALF_NEXT;
+                break;
+            }
+            c = PortHalfCode(&mask, &m);
+            if (c & 0xaaaaaaaa) {
+                /* transparent run */
+                dst += n;
+                left_rem -= n;
+                if (left_rem < 0) {
+                    width_rem += left_rem;
+                }
+                state = PORT_HALF_TAIL;
+            } else if (!(c & 0x55555555)) {
+                /* run of source pixels */
+                left_rem -= n;
+                if (left_rem >= 0) {
+                    src += n;
+                    dst += n;
+                    state = PORT_HALF_TAIL;
+                    break;
+                }
+                width_rem += left_rem;
+                e = left_rem + n;
+                src += e;
+                dst += e;
+                if (width_rem > 0) {
+                    cnt = -left_rem;
+                    state = PORT_HALF_TAIL;
+                } else {
+                    cnt = n - e + width_rem;
+                    state = PORT_HALF_END;
+                }
+                for (k = 0; k < cnt; k++) {
+                    *dst++ = PortHalfPixel(*src++);
+                }
+                if (state == PORT_HALF_END) {
+                    src += -width_rem;
+                }
+            } else {
+                /* one source pixel repeated */
+                left_rem -= n;
+                if (left_rem >= 0) {
+                    src++;
+                    dst += n;
+                    state = PORT_HALF_TAIL;
+                    break;
+                }
+                width_rem += left_rem;
+                e = left_rem + n;
+                dst += e;
+                colour = PortHalfPixel(*src++);
+                if (width_rem > 0) {
+                    cnt = -left_rem;
+                    state = PORT_HALF_TAIL;
+                } else {
+                    cnt = n - e + width_rem;
+                    state = PORT_HALF_END;
+                }
+                for (k = 0; k < cnt; k++) {
+                    *dst++ = colour;
+                }
+            }
+            break;
+        case PORT_HALF_TAIL:
+            if (left_rem > 0) {
+                state = PORT_HALF_LEFT;
+            } else if (width_rem <= 0) {
+                state = PORT_HALF_END;
+            } else {
+                state = PORT_HALF_BODY;
+            }
+            break;
+        case PORT_HALF_BODY:
+            width_rem--;
+            dst++;
+            c = PortHalfCode(&mask, &m);
+            if (!(c & 0xaaaaaaaa)) {
+                dst[-1] = PortHalfPixel(*src++);
+            } else if (c & 0x55555555) {
+                width_rem++;
+                dst--;
+                n = *runs++;
+                if (n == 0) {
+                    state = PORT_HALF_NEXT;
+                    break;
+                }
+                c = PortHalfCode(&mask, &m);
+                if (c & 0xaaaaaaaa) {
+                    dst += n;
+                    width_rem -= n;
+                } else {
+                    if ((unsigned int)(cursor - dst) < (unsigned int)n) {
+                        DAT_007feb14 |= 1;
+                    }
+                    e = width_rem - n;
+                    if (!(c & 0x55555555)) {
+                        if (e >= 0) {
+                            width_rem = e;
+                            for (k = 0; k < n; k++) {
+                                *dst++ = PortHalfPixel(*src++);
+                            }
+                        } else {
+                            for (k = 0; k < width_rem; k++) {
+                                *dst++ = PortHalfPixel(*src++);
+                            }
+                            src += -e;
+                            state = PORT_HALF_END;
+                            break;
+                        }
+                    } else {
+                        colour = PortHalfPixel(*src++);
+                        if (e >= 0) {
+                            width_rem = e;
+                            for (k = 0; k < n; k++) {
+                                *dst++ = colour;
+                            }
+                        } else {
+                            for (k = 0; k < width_rem; k++) {
+                                *dst++ = colour;
+                            }
+                            state = PORT_HALF_END;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (width_rem <= 0) {
+                state = PORT_HALF_END;
+            }
+            break;
+        case PORT_HALF_END:
+            for (;;) {
+                c = PortHalfCode(&mask, &m);
+                if (!(c & 0xaaaaaaaa)) {
+                    src++;
+                    continue;
+                }
+                if (!(c & 0x55555555)) {
+                    continue;
+                }
+                n = *runs++;
+                if (n == 0) {
+                    break;
+                }
+                c = PortHalfCode(&mask, &m);
+                if (c & 0xaaaaaaaa) {
+                    continue;
+                }
+                if (c & 0x55555555) {
+                    src++;
+                } else {
+                    src += n;
+                }
+            }
+            state = PORT_HALF_NEXT;
+            break;
+        case PORT_HALF_NEXT:
+            line = (unsigned short *)((unsigned char *)line + stride);
+            dst = line;
+            h--;
+            left_rem = left;
+            width_rem = width;
+            if (h == 0) {
+                return;
+            }
+            state = (left_rem > 0) ? PORT_HALF_LEFT : PORT_HALF_BODY;
+            break;
+        }
+    }
+}
 
 // FUNCTION: LEGOLAND 0x004687f0
 void FUN_004687f0(const char *param_1) {
