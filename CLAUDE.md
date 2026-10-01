@@ -1,4 +1,33 @@
-# legoland — matching decompilation (instructions for Claude)
+# legoland — Windows 11 port (instructions for Claude)
+
+**This is the `port` branch.** Its goal is a game that runs natively on modern Windows 11, built from the matching
+decompilation on `main`. The rules in this first section override the matching rules further down, which still
+describe how `main` works.
+
+## Port rules
+
+- **Goal:** working, readable C that runs on Windows 11, not byte-identical output. A function does not need to
+  match the original to be correct here.
+- **Keep game logic close to `main`.** `main` is the source of truth and keeps improving; merge it into `port`
+  regularly. Change decompiled game code only when the port needs it, and keep the change small so merges
+  stay easy.
+- **Put port-only code in its own files** (startup, data loading, assembly replacements, platform code) rather
+  than scattering it through the decompiled TUs.
+- **Inline-assembly functions:** write plain-C equivalents that do the same thing. Note in a comment that the
+  original used inline asm.
+- **Game data:** never commit proprietary files. The port reads the user's own `legoland.exe` and game data at
+  runtime.
+- **Matching-only workarounds** from `main` (`volatile` temporaries, `#pragma optimize`, duplicated `static
+  __inline` helpers) may be cleaned up here when they get in the way.
+- `./tools/verify` still works and is useful to see which functions a change touched, but a lower score is not a
+  failure on this branch.
+- See `README.md` for the milestones (a program that starts, the title screen, playable, modern niceties).
+- The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, branch `port`); the Windows folder
+  `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
+
+---
+
+# Matching rules (from `main`)
 
 This is a matching decomp of `legoland.exe` (MSVC6, x86) in the isledecomp/reccmp style. Goal: write C
 that the *original* MSVC6 compiler turns into bytes identical to the original binary, checked
