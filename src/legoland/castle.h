@@ -297,3 +297,8 @@ struct RecSrc;
 void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src);
 void FUN_0041fa10(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
 void FUN_0041fba0(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+void FUN_0041fd80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+void FUN_0041ff80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+int FUN_004234e0(void *param1);
+struct PolyArg;
+void FUN_0042a2f0(int n, struct PolyArg *poly);

@@ -2516,11 +2516,119 @@ void FUN_0041fd30(void) {
     }
 }
 
+/* Port: the original fills textured polygons in inline asm. Same edge-table walk as PortFillPolygon; the left
+ * edge also carries the texture coordinate u (f0c, slope f20) and the depth z (f10, slope f24), both 16.16.
+ * Along a span u advances by shade[1] per pixel and z by shade[2]; each pixel is palette[texture[u]], with
+ * texture = DAT_004d89c4. With depth set, a pixel is only drawn where its depth is >= the depth buffer
+ * (unsigned), and the depth is written too.
+ *
+ * The original steps u as a pointer into the texture plus a fraction register, adding the integer part of
+ * |du| and the fraction's carry, backwards when du < 0 (so negative steps round oddly; kept as is). In the
+ * depth variant the fraction register is shared: bits 0-23 hold the depth (16.8) and bits 24-31 the top 8
+ * fraction bits of u, with bit 24 cleared after every step. */
+static void PortTexturePolygon(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src, int depth) {
+    unsigned short *colors = (unsigned short *)DAT_00829c60[palette];
+    struct RecSrc *last = &src[idx[n - 1].k];
+    unsigned short *row;
+    unsigned short *zrow;
+    unsigned char *texel;
+    unsigned int du = shade[1];
+    int backwards = 0;
+    unsigned int step_int;
+    unsigned int step_frac;
+    unsigned int acc;
+    unsigned int sum;
+    int y = idx[0].v;
+    int end;
+    int lx = 0;
+    int ldx = 0;
+    int lu = 0;
+    int ldu = 0;
+    int lz = 0;
+    int ldz = 0;
+    int rx = 0;
+    int rdx = 0;
+    int x;
+
+    ((short *)&last->f0)[1]++;
+    end = ((short *)&last->f0)[1];
+    idx[n].v = end;
+    DAT_0060f900++;
+    if ((int)du < 0) {
+        du = -(int)du;
+        backwards = 1;
+    }
+    step_int = (int)du >> 16;
+    if (depth) {
+        step_frac = ((du & 0xffffff00) << 16) | (((unsigned int)shade[2] >> 8) & 0xffffff);
+    } else {
+        step_frac = du << 16;
+    }
+    row = (unsigned short *)DAT_004b5b20 + DAT_004b5b28 * y;
+    zrow = DAT_004b5b24 + DAT_004b5b28 * y;
+    do {
+        struct RecSrc *e = &src[idx->k];
+
+        idx++;
+        if (e->flag) {
+            rx = e->fx - e->d;
+            rdx = e->d;
+        } else {
+            lx = e->fx - e->d;
+            ldx = e->d;
+            lu = e->f0c - e->f20;
+            ldu = e->f20;
+            lz = e->f10 - e->f24;
+            ldz = e->f24;
+        }
+        while (y < idx->v) {
+            y++;
+            lx += ldx;
+            lu += ldu;
+            lz += ldz;
+            rx += rdx;
+            if (rx - lx >= 0x8000) {
+                if (depth) {
+                    texel = (unsigned char *)DAT_004d89c4 + (lu >> 16);
+                    acc = ((unsigned int)lz >> 8) & 0xffffff;
+                } else {
+                    texel = (unsigned char *)DAT_004d89c4 + ((lu >> 16) & 0xffff);
+                    acc = (unsigned int)lu << 16;
+                }
+                for (x = lx >> 16; x <= rx >> 16; x++) {
+                    if (!depth) {
+                        row[x] = colors[*texel];
+                    } else if ((unsigned short)(acc >> 8) >= zrow[x]) {
+                        zrow[x] = (unsigned short)(acc >> 8);
+                        row[x] = colors[*texel];
+                    }
+                    sum = acc + step_frac;
+                    if (backwards) {
+                        texel -= step_int + (sum < acc);
+                    } else {
+                        texel += step_int + (sum < acc);
+                    }
+                    acc = depth ? sum & 0xfeffffff : sum;
+                }
+            }
+            row += DAT_004b5b28;
+            zrow += DAT_004b5b28;
+        }
+    } while (y < end);
+}
+
 // FUNCTION: LEGOLAND 0x0041fd80
-void FUN_0041fd80(void) { STUB(); }
+void FUN_0041fd80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Textured polygon fill, no depth buffer. */
+    PortTexturePolygon(palette, shade, n, idx, src, 0);
+}
 
 // FUNCTION: LEGOLAND 0x0041ff80
-void FUN_0041ff80(void) { STUB(); }
+void FUN_0041ff80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Textured polygon fill, depth-tested against and written to the depth
+     * buffer DAT_004b5b24. */
+    PortTexturePolygon(palette, shade, n, idx, src, 1);
+}
 
 #pragma optimize("", off)
 // FUNCTION: LEGOLAND 0x00420200
@@ -4427,8 +4535,106 @@ void FUN_00423480(struct ClearRect *r) {
     }
 }
 
+/* Port: a polygon vertex as FUN_0042a2f0 reads it: screen y and x, then the interpolated attributes. */
+struct PolyVert {
+    int pad_0;
+    int y;
+    int x;
+    int attr[4];
+};
+
+typedef void (*PolyFiller)(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+
+/* Port: the polygon FUN_0042a2f0 rasterizes. dx1/dy1 and dx2/dy2 are v[1] - v[0] and v[2] - v[0]; area is
+ * their cross product. */
+struct PolyArg {
+    /* 0x00 */ unsigned int flags; /* 1: add the polygon to the dirty rows (FUN_00423200) */
+    /* 0x04 */ int palette;
+    /* 0x08 */ unsigned int and_codes; /* clip codes of the vertices, and-ed */
+    /* 0x0c */ unsigned int or_codes; /* or-ed; 0xf0 = a vertex lies in a dirty rectangle */
+    /* 0x10 */ int shade;
+    /* 0x14 */ float dx1;
+    /* 0x18 */ float dx2;
+    /* 0x1c */ float dy1;
+    /* 0x20 */ float dy2;
+    /* 0x24 */ float area;
+    /* 0x28 */ struct PolyVert *v[4]; /* the 3 corners; [3] closes the loop */
+    /* 0x38 */ const PolyFiller *fillers; /* [0]: outside dirty rectangles, [1]: inside (depth-buffered) */
+};
+
+/* Port: the original's filler table at 0x4b5658. */
+static const PolyFiller port_texture_fillers[2] = {FUN_0041fd80, FUN_0041ff80};
+
+/* Port: the textured mesh FUN_004234e0 draws. */
+struct MeshVert {
+    int x;
+    int y;
+    int z;
+    unsigned int codes; /* clip code, as FUN_00426250 computes it */
+    int u;
+};
+
+struct TexMesh {
+    /* 0x00 */ int palette;
+    /* 0x04 */ int pad_4[2];
+    /* 0x0c */ int face_count;
+    /* 0x10 */ struct MeshVert *verts;
+    /* 0x14 */ int (*corners)[2]; /* vertex pairs */
+    /* 0x18 */ unsigned int (*faces)[3]; /* corner indices; the top bit picks the pair's second vertex */
+};
+
 // FUNCTION: LEGOLAND 0x004234e0
-void FUN_004234e0(void *param1) { STUB(); }
+int FUN_004234e0(void *param1) {
+    /* Port: the original is inline asm (rdtsc profiling). Draws every front-facing, not trivially clipped
+     * triangle of a textured mesh through FUN_0042a2f0, with the texture coordinate and depth as attributes. */
+    struct TexMesh *mesh = (struct TexMesh *)param1;
+    struct VideoArg video;
+    struct PolyArg poly;
+    struct PolyVert corner[3];
+    struct MeshVert *mv[3];
+    unsigned int start;
+    unsigned int f;
+    int i;
+    int j;
+
+    FUN_00423760(&video);
+    start = PortTimestamp();
+    poly.flags = 1;
+    poly.fillers = port_texture_fillers;
+    for (j = 0; j < 3; j++) {
+        poly.v[j] = &corner[j];
+    }
+    for (i = 0; i < mesh->face_count; i++) {
+        for (j = 0; j < 3; j++) {
+            f = mesh->faces[i][j];
+            mv[j] = &mesh->verts[mesh->corners[f & 0x7fffffff][f >> 31]];
+        }
+        poly.dx1 = (float)(mv[1]->x - mv[0]->x);
+        poly.dy1 = (float)(mv[1]->y - mv[0]->y);
+        poly.dx2 = (float)(mv[2]->x - mv[0]->x);
+        poly.dy2 = (float)(mv[2]->y - mv[0]->y);
+        poly.area = poly.dy2 * poly.dx1 - poly.dx2 * poly.dy1;
+        if (poly.area <= FLOAT_004ab390) {
+            continue; /* back-facing */
+        }
+        poly.and_codes = mv[0]->codes & mv[1]->codes & mv[2]->codes & 0xff;
+        poly.or_codes = mv[0]->codes | mv[1]->codes | mv[2]->codes;
+        if ((poly.or_codes & 0xf) != 0xf) {
+            continue; /* entirely outside one edge of the view */
+        }
+        for (j = 0; j < 3; j++) {
+            corner[j].y = mv[j]->y;
+            corner[j].x = mv[j]->x;
+            corner[j].attr[0] = mv[j]->u;
+            corner[j].attr[1] = mv[j]->z;
+        }
+        poly.palette = mesh->palette;
+        FUN_0042a2f0(3, &poly);
+    }
+    DAT_0060f8fc += PortTimestamp() - start;
+    FUN_00423790();
+    return 1;
+}
 
 // FUNCTION: LEGOLAND 0x004236f0
 unsigned int FUN_004236f0(void) {
@@ -8736,7 +8942,106 @@ void FUN_0042a2e0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042a2f0
-void FUN_0042a2f0(void) { STUB(); }
+void FUN_0042a2f0(int n, struct PolyArg *poly) {
+    /* Port: the original is inline asm (fistp). Rasterizes a triangle with n interpolated values (x, then
+     * attr[0..n-2]): clips it to the view (FUN_0041ef60) unless all corners are inside, computes the per-pixel
+     * gradients of the attributes, builds the edge table sorted by first scanline and hands it to a filler.
+     * Outside dirty rectangles the last attribute (the depth) is dropped and fillers[0] is used. */
+    struct PolyVert **v = poly->v;
+    struct RecSrc edges[9];
+    struct RecIdx order[9];
+    struct RecIdx tmp;
+    struct PolyVert *a;
+    struct PolyVert *b;
+    struct RecSrc *e;
+    int shade[4];
+    int count = 3;
+    int inside;
+    int edge_count = 0;
+    int dy;
+    float scale;
+    float grad;
+    float inv;
+    int i;
+    int k;
+
+    if ((poly->or_codes & 0xf0) == 0xf0) {
+        inside = 1;
+    } else {
+        inside = 0;
+        n--;
+    }
+    if ((poly->and_codes & 0xf) != 0xf) {
+        count = 0;
+        v = (struct PolyVert **)FUN_0041ef60(v, &count, poly->and_codes & 0xf, n);
+        if (count == 0) {
+            return;
+        }
+    }
+    v[count] = v[0];
+
+    shade[0] = poly->shade;
+    if (n > 1) {
+        scale = 65536.0f / poly->area;
+        for (k = 0; k < n - 1; k++) {
+            int d1 = poly->v[1]->attr[k] - poly->v[0]->attr[k];
+            int d2 = poly->v[2]->attr[k] - poly->v[0]->attr[k];
+
+            grad = ((float)d1 * poly->dy2 - (float)d2 * poly->dy1) * scale;
+            shade[k + 1] = PortRound(grad);
+        }
+    }
+
+    for (i = 0; i < count; i++) {
+        a = v[i];
+        b = v[i + 1];
+        dy = b->y - a->y;
+        if (dy == 0) {
+            continue;
+        }
+        inv = 65536.0f / (float)dy;
+        e = &edges[edge_count];
+        order[edge_count].k = edge_count;
+        edge_count++;
+        if (dy < 0) {
+            /* upward edge: the left side; runs from b down to a, carrying all n values */
+            order[edge_count - 1].v = b->y;
+            e->flag = 0;
+            ((short *)&e->f0)[0] = (short)b->y;
+            ((short *)&e->f0)[1] = (short)a->y;
+            for (k = 0; k < n; k++) {
+                (&e->fx)[k] = (&b->x)[k] << 16;
+                (&e->d)[k] = PortRound((float)((&b->x)[k] - (&a->x)[k]) * inv);
+            }
+        } else {
+            /* downward edge: the right side; only x */
+            order[edge_count - 1].v = a->y;
+            e->flag = 1;
+            ((short *)&e->f0)[0] = (short)a->y;
+            ((short *)&e->f0)[1] = (short)b->y;
+            e->fx = a->x << 16;
+            e->d = PortRound((float)(b->x - a->x) * inv);
+        }
+    }
+    if (edge_count == 0) {
+        return;
+    }
+
+    /* bubble sort by first scanline */
+    for (i = edge_count - 1; i >= 0; i--) {
+        for (k = 1; k <= i; k++) {
+            if (order[k - 1].v > order[k].v) {
+                tmp = order[k - 1];
+                order[k - 1] = order[k];
+                order[k] = tmp;
+            }
+        }
+    }
+    if ((poly->flags & 1) && inside == 1) {
+        FUN_00423200(edge_count, ((short *)&edges[order[edge_count - 1].k].f0)[1], order, edges);
+    }
+    poly->fillers[inside](poly->palette, shade, edge_count, order, edges);
+}
 
 struct Struct42a5e0Data {
     unsigned int v[5];
