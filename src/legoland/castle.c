@@ -2406,25 +2406,42 @@ struct RecSrc {
     int f2c;
 };
 
-/* Port: the original fills polygons in inline asm. Fills a flat polygon from its edge table with one 16-bit
- * color: idx[0..n-1] are {first scanline, edge}; between two starts the current left and right edges (16.16
- * fixed-point x and slope) bound the spans. idx[n] receives the last line (the original's bookkeeping). */
-static void PortFillPolygon(unsigned short *buffer, unsigned short color, int n, struct RecIdx *idx, struct RecSrc *src) {
+/* Port: the original fills polygons in inline asm, in three variants. PortFillPolygon fills a flat polygon
+ * from its edge table with one 16-bit color: idx[0..n-1] are {first scanline, edge}; between two starts the
+ * current left and right edges (16.16 fixed-point x and slope) bound the spans. The left edge also carries a
+ * 16.16 depth (f0c, slope f20) that advances by dz per pixel along a span:
+ *   PORT_FILL_FLAT     color only
+ *   PORT_FILL_WRITE_Z  color, and the depth written to zbuf
+ *   PORT_FILL_TEST_Z   only where depth >= zbuf (unsigned), writing both
+ * idx[n] receives the last line (the original's bookkeeping). */
+#define PORT_FILL_FLAT 0
+#define PORT_FILL_WRITE_Z 1
+#define PORT_FILL_TEST_Z 2
+
+static void PortFillPolygon(unsigned short *screen, unsigned short *zbuf, unsigned short color, int dz, int mode, int n, struct RecIdx *idx, struct RecSrc *src) {
     struct RecSrc *last = &src[idx[n - 1].k];
     unsigned short *row;
+    unsigned short *zrow = NULL;
+    unsigned short depth;
     int y = idx[0].v;
     int end;
     int lx = 0;
     int ldx = 0;
+    int lz = 0;
+    int ldz = 0;
     int rx = 0;
     int rdx = 0;
     int x;
+    int z;
 
     ((short *)&last->f0)[1]++;
     end = ((short *)&last->f0)[1];
     idx[n].v = end;
     DAT_0060f900++;
-    row = buffer + DAT_004b5b28 * y;
+    row = screen + DAT_004b5b28 * y;
+    if (mode != PORT_FILL_FLAT) {
+        zrow = zbuf + DAT_004b5b28 * y;
+    }
     do {
         struct RecSrc *e = &src[idx->k];
 
@@ -2435,17 +2452,31 @@ static void PortFillPolygon(unsigned short *buffer, unsigned short color, int n,
         } else {
             lx = e->fx - e->d;
             ldx = e->d;
+            lz = e->f0c - e->f20;
+            ldz = e->f20;
         }
         while (y < idx->v) {
             y++;
             lx += ldx;
+            lz += ldz;
             rx += rdx;
             if (rx - lx >= 0x8000) {
+                z = lz;
                 for (x = lx >> 16; x <= rx >> 16; x++) {
-                    row[x] = color;
+                    depth = (unsigned short)(z >> 16);
+                    if (mode != PORT_FILL_TEST_Z || depth >= zrow[x]) {
+                        row[x] = color;
+                        if (mode != PORT_FILL_FLAT) {
+                            zrow[x] = depth;
+                        }
+                    }
+                    z += dz;
                 }
             }
             row += DAT_004b5b28;
+            if (mode != PORT_FILL_FLAT) {
+                zrow += DAT_004b5b28;
+            }
         }
     } while (y < end);
 }
@@ -2453,14 +2484,22 @@ static void PortFillPolygon(unsigned short *buffer, unsigned short color, int n,
 // FUNCTION: LEGOLAND 0x0041f8d0
 void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src) {
     /* Port: the original is inline asm. Fills a polygon on the screen buffer with palette color *color_index. */
-    PortFillPolygon((unsigned short *)DAT_004b5b20, ((unsigned short *)DAT_00829c60[palette])[*color_index], n, idx, src);
+    PortFillPolygon((unsigned short *)DAT_004b5b20, NULL, ((unsigned short *)DAT_00829c60[palette])[*color_index], 0, PORT_FILL_FLAT, n, idx, src);
 }
 
 // FUNCTION: LEGOLAND 0x0041fa10
-void FUN_0041fa10(void) { STUB(); }
+void FUN_0041fa10(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Fills a polygon with palette color shade[0] and writes its depth
+     * (per-pixel step shade[1]) into the depth buffer DAT_004b5b24. */
+    PortFillPolygon((unsigned short *)DAT_004b5b20, DAT_004b5b24, ((unsigned short *)DAT_00829c60[palette])[shade[0]], shade[1], PORT_FILL_WRITE_Z, n, idx, src);
+}
 
 // FUNCTION: LEGOLAND 0x0041fba0
-void FUN_0041fba0(void) { STUB(); }
+void FUN_0041fba0(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Like FUN_0041fa10, but only draws where the polygon's depth is >= the
+     * depth buffer. */
+    PortFillPolygon((unsigned short *)DAT_004b5b20, DAT_004b5b24, ((unsigned short *)DAT_00829c60[palette])[shade[0]], shade[1], PORT_FILL_TEST_Z, n, idx, src);
+}
 
 // FUNCTION: LEGOLAND 0x0041fd30
 void FUN_0041fd30(void) {
@@ -4369,7 +4408,7 @@ void FUN_004232b0(struct RecBuf *rb) {
 // FUNCTION: LEGOLAND 0x00423350
 void FUN_00423350(int n, struct RecIdx *idx, struct RecSrc *src) {
     /* Port: the original is inline asm. Fills a polygon with 0 in the buffer at DAT_004b5b24. */
-    PortFillPolygon(DAT_004b5b24, 0, n, idx, src);
+    PortFillPolygon(DAT_004b5b24, NULL, 0, 0, PORT_FILL_FLAT, n, idx, src);
 }
 
 // FUNCTION: LEGOLAND 0x00423480

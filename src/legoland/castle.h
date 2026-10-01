@@ -295,3 +295,5 @@ void FUN_00426510(unsigned int *m3, struct Mat4x4 *out);
 struct RecIdx;
 struct RecSrc;
 void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src);
+void FUN_0041fa10(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+void FUN_0041fba0(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
