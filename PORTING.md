@@ -124,14 +124,36 @@ These are what make an Android (64-bit ARM) build possible later. They apply to 
 - **The one exception is `legoland.exe`**, the program itself, which stays committed as `external/legoland.exe`
   (the decomp needs it to match against, and the port reads its initialized data).
 - On the maintainer's machine the game files live outside the repo in `C:\Users\fsterzer\Dropbox\legoland pc port`:
-  `cd/` is a copy of the CD and `installed/` is the unpacked `main.z`.
+  `installed/` is the port's data folder (layout below) and `cd-extras/` holds the CD's installer-only files.
+
+### The data folder
+
+The original game looks in its own folder first and falls back to the CD only when a file is missing
+(`resource.c`, `stream.c`, `interface.c`). The port's data folder is a complete install, so the fallback is never
+needed and the CD check (`cdcheck.c`) can pass whenever this folder is present:
+
+```
+installed/
+  legoland.exe, Lego.TTF, Legoland.icm, EGC.BMP, *.avi (26 small animations)   <- main.z (core)
+  IMusic/                       DirectMusic segments and styles                <- main.z
+  RollerCoaster/RollerCoaster/CreatedData/, zbuffers/, strings/                <- main.z
+  volumes/   Legoland.res, Graphics1.res, Graphics2.res                        <- CD root
+  speech/    1,266 .wav files                                                  <- CD Speech/
+  FMV/       14 movies                                                         <- CD root
+```
+
+This is the original "install everything" layout. The folder names are the ones the code asks for (`volumes\`,
+`speech\`, `FMV\`). On case-sensitive systems (Android, Linux) the filesystem layer still has to match names
+case-insensitively, because the code and the data don't always agree on case. The same folder, copied as is,
+is what an Android build will load.
 - The reference CD (`LEGOLAND.iso`, volume `LEGOLAND`, readme dated 10 April 2000) has these loose files: the
   `.res` volumes (`Legoland.res`, `Graphics1.res`, `Graphics2.res`), 14 `.avi` movies, 1,266 speech `.wav`
   files, an Indeo 5 codec installer and DirectX 7 setup. The game itself is inside the InstallShield 3 archive
   `main.z` (PKWARE DCL compression): `legoland.exe`, 30 `.sgt` and 212 `.sty` music files, 26 small silent
   `.avi` animations (Indeo 5, 112x96),
   23 `.bnv` and other level files. Its `legoland.exe` is byte-identical to the decomp's target (sha256
-  `c50865b6...e2bd9`). The port will need a small installer step that unpacks `main.z`.
+  `c50865b6...e2bd9`). Setting up the data folder means doing what the original installer did: unpack `main.z` and copy the
+  `.res` files, `Speech/` and the movies into place. The port can ship a small tool for this.
 - The port reads everything from the user's own installation, including the initialized globals from
   `legoland.exe` (the `.data` tables that `globals.c` declares without values). That loader lives in `port/`.
 
