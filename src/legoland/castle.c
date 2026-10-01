@@ -2386,8 +2386,75 @@ void FUN_0041f880(struct Walker *walker) {
     } while (walker->field_4->field_50 != NULL);
 }
 
+struct RecIdx {
+    int v;
+    int k;
+};
+
+struct RecSrc {
+    int f0;
+    int flag;
+    int fx;
+    int f0c;
+    int f10;
+    int f14;
+    int f18;
+    int d;
+    int f20;
+    int f24;
+    int f28;
+    int f2c;
+};
+
+/* Port: the original fills polygons in inline asm. Fills a flat polygon from its edge table with one 16-bit
+ * color: idx[0..n-1] are {first scanline, edge}; between two starts the current left and right edges (16.16
+ * fixed-point x and slope) bound the spans. idx[n] receives the last line (the original's bookkeeping). */
+static void PortFillPolygon(unsigned short *buffer, unsigned short color, int n, struct RecIdx *idx, struct RecSrc *src) {
+    struct RecSrc *last = &src[idx[n - 1].k];
+    unsigned short *row;
+    int y = idx[0].v;
+    int end;
+    int lx = 0;
+    int ldx = 0;
+    int rx = 0;
+    int rdx = 0;
+    int x;
+
+    ((short *)&last->f0)[1]++;
+    end = ((short *)&last->f0)[1];
+    idx[n].v = end;
+    DAT_0060f900++;
+    row = buffer + DAT_004b5b28 * y;
+    do {
+        struct RecSrc *e = &src[idx->k];
+
+        idx++;
+        if (e->flag) {
+            rx = e->fx - e->d;
+            rdx = e->d;
+        } else {
+            lx = e->fx - e->d;
+            ldx = e->d;
+        }
+        while (y < idx->v) {
+            y++;
+            lx += ldx;
+            rx += rdx;
+            if (rx - lx >= 0x8000) {
+                for (x = lx >> 16; x <= rx >> 16; x++) {
+                    row[x] = color;
+                }
+            }
+            row += DAT_004b5b28;
+        }
+    } while (y < end);
+}
+
 // FUNCTION: LEGOLAND 0x0041f8d0
-void FUN_0041f8d0(void) { STUB(); }
+void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Fills a polygon on the screen buffer with palette color *color_index. */
+    PortFillPolygon((unsigned short *)DAT_004b5b20, ((unsigned short *)DAT_00829c60[palette])[*color_index], n, idx, src);
+}
 
 // FUNCTION: LEGOLAND 0x0041fa10
 void FUN_0041fa10(void) { STUB(); }
@@ -4210,26 +4277,6 @@ struct RecBuf {
 };
 #pragma pack(pop)
 
-struct RecIdx {
-    int v;
-    int k;
-};
-
-struct RecSrc {
-    int f0;
-    int flag;
-    int fx;
-    int f0c;
-    int f10;
-    int f14;
-    int f18;
-    int d;
-    int f20;
-    int f24;
-    int f28;
-    int f2c;
-};
-
 // FUNCTION: LEGOLAND 0x00423140
 void FUN_00423140(int param_1) {
     /* Port: the original is inline asm. It flushes the queued draw records, timing itself with rdtsc. */
@@ -4320,7 +4367,10 @@ void FUN_004232b0(struct RecBuf *rb) {
 }
 
 // FUNCTION: LEGOLAND 0x00423350
-void FUN_00423350(int n, struct RecIdx *idx, struct RecSrc *src) { STUB(); }
+void FUN_00423350(int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Fills a polygon with 0 in the buffer at DAT_004b5b24. */
+    PortFillPolygon(DAT_004b5b24, 0, n, idx, src);
+}
 
 // FUNCTION: LEGOLAND 0x00423480
 void FUN_00423480(struct ClearRect *r) {
@@ -5962,8 +6012,56 @@ unsigned int FUN_00426230(float in[][3], int out[][4], int n) {
     return FUN_00426250(in, out, &DAT_008299fc.m[0][0], 0x10, n);
 }
 
+/* Port: clip code of (x, y) against a rectangle: 1 = x >= left, 2 = x <= right, 4 = y >= top,
+ * 8 = y <= bottom; 0xf means inside. */
+static int PortOutCode(int x, int y, int left, int top, int right, int bottom) {
+    int code;
+
+    if (x < left) {
+        code = 2;
+    } else if (x > right) {
+        code = 1;
+    } else {
+        code = 3;
+    }
+    if (y < top) {
+        code |= 8;
+    } else if (y > bottom) {
+        code |= 4;
+    } else {
+        code |= 0xc;
+    }
+    return code;
+}
+
 // FUNCTION: LEGOLAND 0x00426250
-unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int stride, int n) { STUB(); }
+unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int stride, int n) {
+    /* Port: the original is inline asm (fistp). Projects n points with the 4x4 float matrix m into records
+     * stride bytes apart: x, y, z as rounded ints and [3] = the clip code against the view rectangle, with 0xf0
+     * added when the point lies inside a dirty rectangle whose mask accepts it. */
+    float (*mat)[4] = (float (*)[4])m;
+    int *rec = (int *)out;
+    struct FlagNode *node;
+    struct ClearRect *r;
+    int i;
+    int k;
+
+    for (i = 0; i < n; i++) {
+        for (k = 0; k < 3; k++) {
+            rec[k] = PortRound(FLOAT_004ab390 + in[i][0] * mat[k][0] + in[i][1] * mat[k][1] + in[i][2] * mat[k][2] + mat[k][3]);
+        }
+        rec[3] = PortOutCode(rec[0], rec[1], DAT_008299ac, DAT_008299b0, DAT_008299b4, DAT_008299b8);
+        for (node = (struct FlagNode *)DAT_00829a3c.var_18; node != (struct FlagNode *)&DAT_00829a3c; node = node->next) {
+            r = (struct ClearRect *)node;
+            if ((node->kind & PortOutCode(rec[0], rec[1], r->left, r->top, r->right, r->bottom)) == 0xf) {
+                rec[3] |= 0xf0;
+                break;
+            }
+        }
+        rec = (int *)((char *)rec + stride);
+    }
+    return 0;
+}
 
 // FUNCTION: LEGOLAND 0x004263a0
 void FUN_004263a0(void *pts, unsigned int m[4][4], int n, unsigned int out) {

@@ -292,3 +292,6 @@ void FUN_004261c0(float *in, float *out, float m[4][4], int n);
 void FUN_004264e0(unsigned int *t, unsigned int *m3, unsigned int dst[4][4]);
 struct Mat4x4;
 void FUN_00426510(unsigned int *m3, struct Mat4x4 *out);
+struct RecIdx;
+struct RecSrc;
+void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src);
