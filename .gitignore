@@ -23,3 +23,22 @@ reccmp-build.yml
 # stray cvdump temp files written into cwd
 /a[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]??
 report.json
+
+# Game files are copyrighted: never commit them. Keep them outside the repo
+# (C:\Users\fsterzer\Dropbox\legoland pc port). external/legoland.exe predates this rule.
+*.iso
+*.res
+*.avi
+*.wav
+*.sgt
+*.sty
+*.dls
+*.bnv
+*.bnd
+*.lpt
+*.ltx
+*.lfm
+*.lms
+*.z
+*.cab
+gamedata/
