@@ -3522,6 +3522,8 @@ extern unsigned int DAT_007fe920;
 extern unsigned char DAT_007fe930[10];
 // 0x007fe994
 extern unsigned int DAT_007fe994;
+// 0x007fe998
+extern unsigned short DAT_007fe998;
 // 0x007fe9a8
 extern unsigned int DAT_007fe9a8;
 // 0x007fe9c0

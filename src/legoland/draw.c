@@ -1041,14 +1041,151 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     }
 }
 
+/* Port: the run-length sprite format that FUN_00466d80 and its siblings draw (the original blits are inline asm).
+ * A sprite frame is three streams: 16-bit pixels, a byte stream of run lengths, and a stream of 2-bit codes
+ * (16 per dword, lowest bits first). Each row is a sequence of codes that ends with a run length of 0:
+ *   0 or 1  one literal pixel, copied from the pixel stream
+ *   2       one transparent pixel (nothing drawn, nothing consumed)
+ *   3       a run: take a length n from the run stream (0 ends the row), then one more code:
+ *           0 copy n pixels from the pixel stream, 1 fill n pixels with the next single pixel,
+ *           2 or 3 skip n transparent pixels. */
+typedef struct PortBlitStream {
+    const unsigned short *pixels;
+    const unsigned char *runs;
+    const unsigned int *mask; /* code dword being read */
+    unsigned int shift; /* bit offset of the next code in *mask */
+} PortBlitStream;
+
+/* Clip and hit-test options for PortBlitRuns. */
+#define PORT_BLIT_LEFT 0x01 /* skip the first `left` pixels of every row */
+#define PORT_BLIT_RIGHT 0x02 /* draw at most `width` pixels after that */
+#define PORT_BLIT_HIT 0x04 /* set bit 0 of DAT_007feb14 if the cursor is on a pixel that gets drawn */
+#define PORT_BLIT_HIT_RUN 0x08 /* like HIT but for runs only, tested on the whole run before clipping (FUN_00468040) */
+#define PORT_BLIT_AND 0x10 /* AND every written pixel with DAT_007fe998 */
+
+static __inline unsigned int PortBlitNextCode(PortBlitStream *s) {
+    unsigned int code = (*s->mask >> s->shift) & 3;
+
+    s->shift += 2;
+    if (s->shift == 32) {
+        s->shift = 0;
+        s->mask++;
+    }
+    return code;
+}
+
+/* True if the cursor lies in the count pixels starting at p (a cursor before p gives a huge unsigned distance). */
+static __inline int PortBlitHits(const unsigned short *cursor, const unsigned short *p, unsigned int count) {
+    return (unsigned int)(cursor - p) < count;
+}
+
+/* Decode one row. Only columns lo <= x < hi of the row are written, to dst[x]; the rest is decoded and dropped. */
+static void PortBlitRow(unsigned short *dst, PortBlitStream *s, int lo, int hi, const unsigned short *cursor, int flags) {
+    int x = 0;
+    int n;
+    int first;
+    int last;
+    int i;
+    unsigned int code;
+    unsigned short *p;
+    unsigned short v;
+
+    for (;;) {
+        code = PortBlitNextCode(s);
+        if (!(code & 2)) {
+            if (x >= lo && x < hi) {
+                p = dst + x;
+                if ((flags & PORT_BLIT_HIT) && cursor == p) {
+                    DAT_007feb14 |= 1;
+                }
+                v = *s->pixels;
+                if (flags & PORT_BLIT_AND) {
+                    v &= DAT_007fe998;
+                }
+                *p = v;
+            }
+            s->pixels++;
+            x++;
+        } else if (!(code & 1)) {
+            x++;
+        } else {
+            n = *s->runs++;
+            if (n == 0) {
+                break;
+            }
+            code = PortBlitNextCode(s);
+            if (code & 2) {
+                x += n;
+                continue;
+            }
+            if ((flags & PORT_BLIT_HIT_RUN) && x >= lo && x < hi && PortBlitHits(cursor, dst + x, n)) {
+                DAT_007feb14 |= 1;
+            }
+            first = x > lo ? x : lo;
+            last = x + n < hi ? x + n : hi;
+            if (first < last) {
+                p = dst + first;
+                if ((flags & PORT_BLIT_HIT) && PortBlitHits(cursor, p, last - first)) {
+                    DAT_007feb14 |= 1;
+                }
+                for (i = 0; i < last - first; i++) {
+                    v = (code & 1) ? s->pixels[0] : s->pixels[first - x + i];
+                    if (flags & PORT_BLIT_AND) {
+                        v &= DAT_007fe998;
+                    }
+                    p[i] = v;
+                }
+            }
+            s->pixels += (code & 1) ? 1 : n;
+            x += n;
+        }
+    }
+}
+
+/* Draw h rows of a sprite frame, after first skipping `skip` rows at the top. dst is the first row's start and
+ * stride is in bytes. The visible columns are chosen by flags: with LEFT the first `left` columns are dropped,
+ * with RIGHT only `width` columns after that are drawn (the caller already shifted dst left by `left` so the
+ * first visible column lands on the destination). The original variants assume left > 0 when only LEFT is set,
+ * width > 0 when RIGHT is set, and h > 0; a negative `skip` skips one row. */
+static void PortBlitRuns(unsigned short *dst, const unsigned short *src, const unsigned char *runs, const unsigned int *mask, int h, int stride, int skip, int left, int width, const unsigned short *cursor, int flags) {
+    PortBlitStream s;
+    int lo;
+    int hi;
+
+    s.pixels = src;
+    s.runs = runs;
+    s.mask = mask;
+    s.shift = 0;
+    if (skip != 0) {
+        do {
+            PortBlitRow(NULL, &s, 0, 0, cursor, 0);
+        } while (--skip > 0);
+    }
+    lo = (flags & PORT_BLIT_LEFT) ? left : 0;
+    hi = (flags & PORT_BLIT_RIGHT) ? lo + width : 0x7fffffff;
+    for (; h > 0; h--) {
+        PortBlitRow(dst, &s, lo, hi, cursor, flags);
+        dst = (unsigned short *)((char *)dst + stride);
+    }
+}
+
 // FUNCTION: LEGOLAND 0x00466d80
-void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. Draws a run-length sprite clipped on both sides (columns left .. left+width) and records in DAT_007feb14 whether the cursor is on a drawn pixel (mouse hit test). */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_HIT);
+}
 
 // FUNCTION: LEGOLAND 0x00467180
-void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 but clipped only on the left (the sprite already fits on the right); caller guarantees left > 0. */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_HIT);
+}
 
 // FUNCTION: LEGOLAND 0x004673f0
-void FUN_004673f0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_004673f0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 but clipped only on the right (draws at most width columns, no left clip); caller guarantees width > 0. */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_RIGHT | PORT_BLIT_HIT);
+}
 
 // FUNCTION: LEGOLAND 0x00467640
 void FUN_00467640(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
@@ -1135,13 +1272,22 @@ void FUN_00467640(unsigned short *dst, unsigned short *src, unsigned char *runs,
 }
 
 // FUNCTION: LEGOLAND 0x004677b0
-void FUN_004677b0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_004677b0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 without the cursor hit test: clipped on both sides, cursor and DAT_007feb14 untouched. */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT);
+}
 
 // FUNCTION: LEGOLAND 0x00467b00
-void FUN_00467b00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_00467b00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As FUN_00467180 without the hit test: clipped only on the left. */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT);
+}
 
 // FUNCTION: LEGOLAND 0x00467d10
-void FUN_00467d10(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_00467d10(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As FUN_004673f0 without the hit test: clipped only on the right. */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_RIGHT);
+}
 
 // FUNCTION: LEGOLAND 0x00467f00
 void FUN_00467f00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip) {
@@ -1221,7 +1367,10 @@ void FUN_00467f00(unsigned short *dst, unsigned short *src, unsigned char *runs,
 }
 
 // FUNCTION: LEGOLAND 0x00468040
-void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) { STUB(); }
+void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. Clipped on both sides like FUN_00466d80, but every written pixel is ANDed with the 16-bit mask DAT_007fe998 (colour masking), and the cursor hit test only looks at runs and uses the whole run length even when the run is clipped (a quirk, kept). */
+    PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_AND | PORT_BLIT_HIT_RUN);
+}
 
 // FUNCTION: LEGOLAND 0x00468410
 void FUN_00468410(void) { STUB(); }
