@@ -120,8 +120,8 @@ struct CastleObj {
     struct RingNode *field_158;
 };
 
+#include "../../port/port_asm.h"
 #include "image_sprite.h"
-#include "port_asm.h"
 // FUNCTION: LEGOLAND 0x0041cc50
 unsigned int FUN_0041cc50(unsigned int dir) {
     if (dir == 1) return 4;
@@ -1245,7 +1245,7 @@ struct AnimObj {
 
 // FUNCTION: LEGOLAND 0x0041e130
 void FUN_0041e130(void *host) {
-    /* Port: the original is inline asm (rdtsc profiling). Steps the object's animation through the game time
+    /* Port [library:asm]: the original is inline asm (rdtsc profiling). Steps the object's animation through the game time
      * elapsed since the last call (in seconds, capped at 0.8), moving on to the next key whenever a step
      * finishes before the time is used up. */
     struct AnimObj *obj = (struct AnimObj *)host;
@@ -2406,7 +2406,7 @@ struct RecSrc {
     int f2c;
 };
 
-/* Port: the original fills polygons in inline asm, in three variants. PortFillPolygon fills a flat polygon
+/* Port [library:asm]: the original fills polygons in inline asm, in three variants. PortFillPolygon fills a flat polygon
  * from its edge table with one 16-bit color: idx[0..n-1] are {first scanline, edge}; between two starts the
  * current left and right edges (16.16 fixed-point x and slope) bound the spans. The left edge also carries a
  * 16.16 depth (f0c, slope f20) that advances by dz per pixel along a span:
@@ -2483,20 +2483,20 @@ static void PortFillPolygon(unsigned short *screen, unsigned short *zbuf, unsign
 
 // FUNCTION: LEGOLAND 0x0041f8d0
 void FUN_0041f8d0(int palette, int *color_index, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Fills a polygon on the screen buffer with palette color *color_index. */
+    /* Port [library:asm]: the original is inline asm. Fills a polygon on the screen buffer with palette color *color_index. */
     PortFillPolygon((unsigned short *)DAT_004b5b20, NULL, ((unsigned short *)DAT_00829c60[palette])[*color_index], 0, PORT_FILL_FLAT, n, idx, src);
 }
 
 // FUNCTION: LEGOLAND 0x0041fa10
 void FUN_0041fa10(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Fills a polygon with palette color shade[0] and writes its depth
+    /* Port [library:asm]: the original is inline asm. Fills a polygon with palette color shade[0] and writes its depth
      * (per-pixel step shade[1]) into the depth buffer DAT_004b5b24. */
     PortFillPolygon((unsigned short *)DAT_004b5b20, DAT_004b5b24, ((unsigned short *)DAT_00829c60[palette])[shade[0]], shade[1], PORT_FILL_WRITE_Z, n, idx, src);
 }
 
 // FUNCTION: LEGOLAND 0x0041fba0
 void FUN_0041fba0(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Like FUN_0041fa10, but only draws where the polygon's depth is >= the
+    /* Port [library:asm]: the original is inline asm. Like FUN_0041fa10, but only draws where the polygon's depth is >= the
      * depth buffer. */
     PortFillPolygon((unsigned short *)DAT_004b5b20, DAT_004b5b24, ((unsigned short *)DAT_00829c60[palette])[shade[0]], shade[1], PORT_FILL_TEST_Z, n, idx, src);
 }
@@ -2516,7 +2516,7 @@ void FUN_0041fd30(void) {
     }
 }
 
-/* Port: the original fills textured polygons in inline asm. Same edge-table walk as PortFillPolygon; the left
+/* Port [library:asm]: the original fills textured polygons in inline asm. Same edge-table walk as PortFillPolygon; the left
  * edge also carries the texture coordinate u (f0c, slope f20) and the depth z (f10, slope f24), both 16.16.
  * Along a span u advances by shade[1] per pixel and z by shade[2]; each pixel is palette[texture[u]], with
  * texture = DAT_004d89c4. With depth set, a pixel is only drawn where its depth is >= the depth buffer
@@ -2619,13 +2619,13 @@ static void PortTexturePolygon(int palette, int *shade, int n, struct RecIdx *id
 
 // FUNCTION: LEGOLAND 0x0041fd80
 void FUN_0041fd80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Textured polygon fill, no depth buffer. */
+    /* Port [library:asm]: the original is inline asm. Textured polygon fill, no depth buffer. */
     PortTexturePolygon(palette, shade, n, idx, src, 0);
 }
 
 // FUNCTION: LEGOLAND 0x0041ff80
 void FUN_0041ff80(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Textured polygon fill, depth-tested against and written to the depth
+    /* Port [library:asm]: the original is inline asm. Textured polygon fill, depth-tested against and written to the depth
      * buffer DAT_004b5b24. */
     PortTexturePolygon(palette, shade, n, idx, src, 1);
 }
@@ -3101,25 +3101,25 @@ static void PortDrawFaces(struct Mesh3D *mesh, struct Material *materials, unsig
 
 // FUNCTION: LEGOLAND 0x00420810
 void FUN_00420810(unsigned int mesh, unsigned int b, unsigned int flags) {
-    /* Port: the original is inline asm. Draws the object's flat-shaded faces. */
+    /* Port [library:asm]: the original is inline asm. Draws the object's flat-shaded faces. */
     PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_FLAT);
 }
 
 // FUNCTION: LEGOLAND 0x00420a20
 void FUN_00420a20(unsigned int mesh, unsigned int b, unsigned int flags) {
-    /* Port: the original is inline asm. Draws the object's smooth-shaded faces. */
+    /* Port [library:asm]: the original is inline asm. Draws the object's smooth-shaded faces. */
     PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_SMOOTH);
 }
 
 // FUNCTION: LEGOLAND 0x00420c40
 void FUN_00420c40(unsigned int mesh, unsigned int b, unsigned int flags) {
-    /* Port: the original is inline asm. Draws the object's textured faces. */
+    /* Port [library:asm]: the original is inline asm. Draws the object's textured faces. */
     PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_TEXTURED);
 }
 
 // FUNCTION: LEGOLAND 0x00420e90
 unsigned int FUN_00420e90(unsigned int a, unsigned int b, void *c, void *d, unsigned int e) {
-    /* Port: the original is inline asm (rdtsc profiling). Draws one 3D object: a = mesh (vertex count at
+    /* Port [library:asm]: the original is inline asm (rdtsc profiling). Draws one 3D object: a = mesh (vertex count at
      * [0], vertices at [3]), c = position, d = orientation. Builds the object-to-screen matrix, transforms
      * the vertices into DAT_004d8bb8 and the light vector into DAT_004dcbb8, then, if the screen can be
      * locked, runs the three drawing passes. Returns 1 when it drew. */
@@ -4592,7 +4592,7 @@ struct RecBuf {
 
 // FUNCTION: LEGOLAND 0x00423140
 void FUN_00423140(int param_1) {
-    /* Port: the original is inline asm. It flushes the queued draw records, timing itself with rdtsc. */
+    /* Port [library:asm]: the original is inline asm. It flushes the queued draw records, timing itself with rdtsc. */
     unsigned int start = PortTimestamp();
     struct FlagNode *node;
     struct RecBuf *rec;
@@ -4681,7 +4681,7 @@ void FUN_004232b0(struct RecBuf *rb) {
 
 // FUNCTION: LEGOLAND 0x00423350
 void FUN_00423350(int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Fills a polygon with 0 in the buffer at DAT_004b5b24. */
+    /* Port [library:asm]: the original is inline asm. Fills a polygon with 0 in the buffer at DAT_004b5b24. */
     PortFillPolygon(DAT_004b5b24, NULL, 0, 0, PORT_FILL_FLAT, n, idx, src);
 }
 
@@ -4703,7 +4703,7 @@ void FUN_00423480(struct ClearRect *r) {
 
 // FUNCTION: LEGOLAND 0x004234e0
 int FUN_004234e0(void *param1) {
-    /* Port: the original is inline asm (rdtsc profiling). Draws every front-facing, not trivially clipped
+    /* Port [library:asm]: the original is inline asm (rdtsc profiling). Draws every front-facing, not trivially clipped
      * triangle of a textured mesh through FUN_0042a2f0, with the texture coordinate and depth as attributes. */
     struct TexMesh *mesh = (struct TexMesh *)param1;
     struct VideoArg video;
@@ -4756,7 +4756,7 @@ int FUN_004234e0(void *param1) {
 
 // FUNCTION: LEGOLAND 0x004236f0
 unsigned int FUN_004236f0(void) {
-    /* Port: the original reads the x87 control word with fstcw and, unless it already is, sets single
+    /* Port [library:asm]: the original reads the x87 control word with fstcw and, unless it already is, sets single
      * precision, round to nearest and all exceptions masked with fldcw. It returns the old word. */
     unsigned int old = _control87(0, 0);
 
@@ -4766,7 +4766,7 @@ unsigned int FUN_004236f0(void) {
 
 // FUNCTION: LEGOLAND 0x00423730
 void FUN_00423730(unsigned int control_word) {
-    /* Port: the original restores the saved x87 control word with fldcw. */
+    /* Port [library:asm]: the original restores the saved x87 control word with fldcw. */
     _control87(control_word, _MCW_PC | _MCW_RC | _MCW_EM);
 }
 
@@ -6399,7 +6399,7 @@ static int PortOutCode(int x, int y, int left, int top, int right, int bottom) {
 
 // FUNCTION: LEGOLAND 0x00426250
 unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int stride, int n) {
-    /* Port: the original is inline asm (fistp). Projects n points with the 4x4 float matrix m into records
+    /* Port [library:asm]: the original is inline asm (fistp). Projects n points with the 4x4 float matrix m into records
      * stride bytes apart: x, y, z as rounded ints and [3] = the clip code against the view rectangle, with 0xf0
      * added when the point lies inside a dirty rectangle whose mask accepts it. */
     float (*mat)[4] = (float (*)[4])m;
@@ -6428,7 +6428,7 @@ unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int st
 
 // FUNCTION: LEGOLAND 0x004263a0
 void FUN_004263a0(void *pts, unsigned int m[4][4], int n, unsigned int out) {
-    /* Port: the original is inline asm. Projects n points (3 floats each) with the first two rows of the
+    /* Port [library:asm]: the original is inline asm. Projects n points (3 floats each) with the first two rows of the
      * 4x4 float matrix m and grows the integer bounding box out = {min x, min y, max x, max y}. */
     float (*mat)[4] = (float (*)[4])m;
     float *p = (float *)pts;
@@ -8238,7 +8238,7 @@ static unsigned short port_texture_colors[1024];
 
 // FUNCTION: LEGOLAND 0x00428860
 void FUN_00428860(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
-    /* Port: the original is inline asm. Texture-mapped, depth-tested polygon fill. palette selects the texture
+    /* Port [library:asm]: the original is inline asm. Texture-mapped, depth-tested polygon fill. palette selects the texture
      * (FUN_00420780); its texels are palette numbers, drawn in the color of light level shade[0]. The left
      * edge carries u (f0c), v (f10) and z (f14); along a span they step by shade[1], shade[2] and shade[3].
      * u and v are rescaled so that or-ing them and shifting right by 16 gives the texel index (v * width + u),
@@ -8394,7 +8394,7 @@ struct Struct428e70 {
 
 // FUNCTION: LEGOLAND 0x00428cb0
 struct TexMesh *FUN_00428cb0(struct Struct428e70 *obj, const struct FVec3 *offset, int fn, int count, const int *keys) {
-    /* Port [castle:asm]: the original is inline asm (rdtsc, x87). Builds the roller-coaster track tube into
+    /* Port [library:asm]: the original is inline asm (rdtsc, x87). Builds the roller-coaster track tube into
      * DAT_004b5f60: for each of the count keys it asks curve function pair fn for the track's direction and
      * position, turns them into a frame (basis), transforms a ring of 6 vertices (DAT_006121c8) by it into
      * DAT_006139c8, and lights each vertex (texture coordinate u) from the light direction DAT_004b5ca0. */
@@ -8603,7 +8603,7 @@ void FUN_00429270(void) {
 
 // FUNCTION: LEGOLAND 0x004292f0
 void FUN_004292f0(struct FVec3 *pos, struct FVec3 *basis) {
-    /* Port [castle:asm]: the original is inline asm (rdtsc, x87). Builds the 3-part marker mesh (3 groups of 4
+    /* Port [library:asm]: the original is inline asm (rdtsc, x87). Builds the 3-part marker mesh (3 groups of 4
      * vertices in DAT_006137e8) at pos and draws it through FUN_00420e90. Part 0 is a quad snapped to a grid of
      * 1.0 (pos / 5 truncated, times 1.0), part 1 a flat quad at pos, part 2 a quad lying in the plane through
      * pos whose normal is basis[2]. */
@@ -9275,7 +9275,7 @@ void FUN_0042a2e0(void) {
 
 // FUNCTION: LEGOLAND 0x0042a2f0
 void FUN_0042a2f0(int n, struct PolyArg *poly) {
-    /* Port: the original is inline asm (fistp). Rasterizes a triangle with n interpolated values (x, then
+    /* Port [library:asm]: the original is inline asm (fistp). Rasterizes a triangle with n interpolated values (x, then
      * attr[0..n-2]): clips it to the view (FUN_0041ef60) unless all corners are inside, computes the per-pixel
      * gradients of the attributes, builds the edge table sorted by first scanline and hands it to a filler.
      * Outside dirty rectangles the last attribute (the depth) is dropped and fillers[0] is used. */

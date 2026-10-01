@@ -5,9 +5,15 @@
 #include <windows.h>
 #include <math.h>
 
-/* fistp: convert to int by rounding to nearest (the x87 default), not C's truncation. */
+/* fistp: convert to int by rounding to nearest, ties to even (the x87 default mode), not C's truncation. */
 static __inline int PortRound(double v) {
-    return (int)floor(v + 0.5);
+    double r = floor(v);
+    double frac = v - r;
+
+    if (frac > 0.5 || (frac == 0.5 && fmod(r, 2.0) != 0.0)) {
+        r += 1.0;
+    }
+    return (int)r;
 }
 
 /* 16.16 fixed-point multiply with a 64-bit intermediate (imul + shrd 16). */

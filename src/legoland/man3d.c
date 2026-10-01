@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../port/port_asm.h"
 #include "bloke.h"
 #include "challenge.h"
 #include "draw.h"
@@ -10,7 +11,6 @@
 #include "legoland.h"
 #include "map_object.h"
 #include "math.h"
-#include "port_asm.h"
 #include "print_sprite.h"
 #include "render.h"
 #include "render3d.h"
@@ -246,7 +246,7 @@ struct MeshFace {
 
 // FUNCTION: LEGOLAND 0x0043fa80
 void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
-    /* Port [man3d:asm]: the original loads this with C plus x87 float-to-int stores. Loads the mesh file
+    /* Port [library:asm]: the original loads this with C plus x87 float-to-int stores. Loads the mesh file
      * .\3ddata\new\<dir>\<name>: per element the vertices and normals are read, Y is flipped, the normals are
      * normalised and both are converted to 16.16 fixed point; then the shared index list and the faces. */
     char path[256];
@@ -440,7 +440,7 @@ LEGO_EXPORT void IP_RenderBlokeIn3DNow(struct Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00440020
 LEGO_EXPORT void SetPersonRotation(struct Person *person, float *src) {
-    /* Port: the original builds the matrix in inline asm (fsin/fcos, fistp). Copies the rotation and builds
+    /* Port [library:asm]: the original builds the matrix in inline asm (fsin/fcos, fistp). Copies the rotation and builds
      * a 16.16 fixed-point rotation about the Y axis from src[1], with Y flipped. */
     float angle = src[1];
     int s;
@@ -983,7 +983,7 @@ static void PortProjectTriangle(const int *tri, int ox, int oy, int mirrored, st
 
 // FUNCTION: LEGOLAND 0x00440a30
 void FUN_00440a30(struct Person *person) {
-    /* Port [man3d:asm]: the original is inline asm. Draws one 3D person (a Mesh element of the current
+    /* Port [library:asm]: the original is inline asm. Draws one 3D person (a Mesh element of the current
      * animation frame, see FUN_0043fa80) into the 160x120 sprite surface: rotates and scales the vertices,
      * projects them isometrically, shades them from a fixed light and a height / depth term, then fills each
      * front-facing triangle (solid colour or textured) with the triangle fillers in render.c. The first

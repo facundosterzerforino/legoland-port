@@ -6,12 +6,12 @@
 #include <string.h>
 #include "legoland.h"
 
+#include "../../port/port_asm.h"
 #include "challenge.h"
 #include "draw.h"
 #include "gfx.h"
 #include "globals.h"
 #include "image_sprite.h"
-#include "port_asm.h"
 #include "print_sprite.h"
 #include "render.h"
 
@@ -210,7 +210,7 @@ int FUN_00486540(void) {
     return 0;
 }
 
-/* Port: the original has four near-identical triangle fillers in inline asm (FUN_00486590, FUN_00486c70,
+/* Port [library:asm]: the original has four near-identical triangle fillers in inline asm (FUN_00486590, FUN_00486c70,
  * FUN_004877b0, FUN_00487d40). They share one scan converter, PortRasterTriangle, which is parameterised by
  * a per-pixel colour function.
  *
@@ -429,7 +429,7 @@ static unsigned short PortTexturedFlatPixel(const unsigned int *s, const void *c
 
 // FUNCTION: LEGOLAND 0x00486590
 void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
-    /* Port [render:asm]: the original is inline asm. Fills a Gouraud-shaded solid-colour triangle into the
+    /* Port [library:asm]: the original is inline asm. Fills a Gouraud-shaded solid-colour triangle into the
      * 16-bit surface with z-buffering. The shade (vertex shade * 64) is interpolated and indexes the
      * colour set chosen with FUN_004864e0 (DAT_0066b61c). */
     struct PortVert v[3];
@@ -450,7 +450,7 @@ void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 
 // FUNCTION: LEGOLAND 0x00486c70
 void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
-    /* Port [render:asm]: the original is inline asm. Fills a textured, Gouraud-shaded triangle (texture
+    /* Port [library:asm]: the original is inline asm. Fills a textured, Gouraud-shaded triangle (texture
      * chosen with FUN_00485f20 / DAT_0066b630) with z-buffering; u, v and the shade are interpolated. */
     struct PortVert v[3];
     struct PersonVertex *in[3];
@@ -473,7 +473,7 @@ void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 
 // FUNCTION: LEGOLAND 0x004877b0
 void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
-    /* Port [render:asm]: the original is inline asm. Like FUN_00486590 but flat shaded: the whole triangle
+    /* Port [library:asm]: the original is inline asm. Like FUN_00486590 but flat shaded: the whole triangle
      * gets the colour picked by the first vertex's shade (the original also stores that vertex's shade * 64
      * back into the caller's vertex). */
     struct PortVert v[3];
@@ -497,7 +497,7 @@ void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 
 // FUNCTION: LEGOLAND 0x00487d40
 void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c) {
-    /* Port [render:asm]: the original is inline asm. Like FUN_00486c70 but flat shaded with the first
+    /* Port [library:asm]: the original is inline asm. Like FUN_00486c70 but flat shaded with the first
      * vertex's shade; u and v are interpolated. */
     struct PortVert v[3];
     struct PersonVertex *in[3];

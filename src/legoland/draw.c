@@ -451,7 +451,7 @@ LEGO_EXPORT void ClearSpriteOverrides(void) {
     DAT_006681e8 = 0;
 }
 
-/* Port [sprites:asm]: bit reader for the stream that places the pixels of an indexed-colour animation frame
+/* Port [library:asm]: bit reader for the stream that places the pixels of an indexed-colour animation frame
  * (FUN_00464480, FUN_00465240, ZBufferHelper). The stream is a list of 32-bit words of sixteen 2-bit codes each,
  * lowest bits first. A run length is the next 8 bits (four codes) of the same word; if fewer than four codes are
  * left in the word, the rest of the word is dropped and the length is the low byte of the next word. */
@@ -546,7 +546,7 @@ static int PortLLSFrameIndex(struct DrawLLS *lls) {
 
 // FUNCTION: LEGOLAND 0x00464480
 void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
-    /* Port [sprites:asm]: the original is inline asm. Draws one frame (two, for animations with flag 1: the base
+    /* Port [library:asm]: the original is inline asm. Draws one frame (two, for animations with flag 1: the base
      * frame, then the delta frame on top) of an indexed-colour animation into the software screen at pos, showing
      * only the part inside rect. Each source byte indexes a 16-bit palette (DAT_006681e8 if overridden, else the one
      * stored with frame 0). Sets DAT_007feb14 bit 0 when a drawn run touches the mouse cursor (DAT_007fe9a8).
@@ -797,7 +797,7 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
 
 // FUNCTION: LEGOLAND 0x00464a90
 LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *pos, unsigned int *zbuf) {
-    /* Port [sprites:asm]: the original is inline asm. Draws one frame of an indexed-colour animation into a
+    /* Port [library:asm]: the original is inline asm. Draws one frame of an indexed-colour animation into a
      * 32-bit buffer (rows 0x200 bytes apart) at pos, showing only the part inside rect: each visible pixel is
      * written as its source byte shifted into the top byte (its depth); the palette is not used. Same stream
      * decoder as FUN_00464480. Quirks kept: a transparent run that crosses the left clip edge advances the
@@ -991,7 +991,7 @@ LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *po
 
 // FUNCTION: LEGOLAND 0x00464ee0
 void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
-    /* Port [sprites:asm]: the original is inline asm in its 16-bit copy loops. Software BltFast: draws the part
+    /* Port [library:asm]: the original is inline asm in its 16-bit copy loops. Software BltFast: draws the part
      * of the sprite inside rect (relative to the sprite, then moved by the sprite's source offset) into the
      * software screen at off = {x, y}, skipping pixels equal to the transparent colour DAT_007fea44. Animated
      * sprites (image types 2 and 3) go to their own blitters; type 0 images are 8-bit with a palette, others 16-bit.
@@ -1100,7 +1100,7 @@ LEGO_EXPORT void SoftPrint_Clear(void) {
 
 // FUNCTION: LEGOLAND 0x00465240
 void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
-    /* Port [sprites:asm]: the original is inline asm. Same as FUN_00464480 (indexed-colour animation frame drawn
+    /* Port [library:asm]: the original is inline asm. Same as FUN_00464480 (indexed-colour animation frame drawn
      * into the software screen at pos, clipped to rect) but every pixel is ANDed with the colour mask DAT_007fe998
      * (the tint of SoftPrint_XBltFast), the palette is never overridden, and the cursor test is stricter. Differences
      * kept: with an overridden frame the palette is re-read from the current frame only if the animation's own
@@ -1435,7 +1435,7 @@ void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3) {
     }
 }
 
-/* Port [sprites:asm]: draws one frame of a 16-bit animation darkened to half brightness through FUN_00468410
+/* Port [library:asm]: draws one frame of a 16-bit animation darkened to half brightness through FUN_00468410
  * (the original sets up its 11 arguments by hand in SoftPrint_XBltFast). */
 static void PortHalfFrame(unsigned short *dst, struct DrawLLSFrame *frame, int height, int pitch, int top, int left, int width, unsigned short *cursor) {
     unsigned char *runs = (unsigned char *)(frame->pixels + frame->pixel_count);
@@ -1446,7 +1446,7 @@ static void PortHalfFrame(unsigned short *dst, struct DrawLLSFrame *frame, int h
 
 // FUNCTION: LEGOLAND 0x00465a40
 LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint) {
-    /* Port [sprites:asm]: the original is inline asm in its 16-bit copy loops. Same as FUN_00464ee0 (software
+    /* Port [library:asm]: the original is inline asm in its 16-bit copy loops. Same as FUN_00464ee0 (software
      * BltFast of the part of the sprite inside src, moved by the sprite's source offset, to dst->left/top) but the
      * colour of every pixel is ANDed with a mask from tint (0x00RRGGBB, via GetNearestColour) stored in
      * DAT_007fe998. Type 3 animations with tint alpha (the top byte) are drawn at half brightness instead, with the
@@ -2352,7 +2352,7 @@ void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs,
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_AND | PORT_BLIT_HIT_RUN);
 }
 
-/* Port [sprites:asm]: reads the next 2-bit code of a 16-bit animation's mask stream (16 codes per word, lowest
+/* Port [library:asm]: reads the next 2-bit code of a 16-bit animation's mask stream (16 codes per word, lowest
  * bits first). The caller tests the result against 0xaaaaaaaa (high bit) and 0x55555555 (low bit). */
 static unsigned int PortHalfCode(unsigned int **mask, unsigned int *m) {
     unsigned int c = **mask & *m;
@@ -2362,7 +2362,7 @@ static unsigned int PortHalfCode(unsigned int **mask, unsigned int *m) {
     return c;
 }
 
-/* Port [sprites:asm]: a pixel at half brightness: clear the low bit of each colour channel, then shift right. */
+/* Port [library:asm]: a pixel at half brightness: clear the low bit of each colour channel, then shift right. */
 static unsigned short PortHalfPixel(unsigned short pixel) {
     return (unsigned short)((pixel & (unsigned short)DAT_007fe998) >> 1);
 }
@@ -2377,7 +2377,7 @@ enum {
 
 // FUNCTION: LEGOLAND 0x00468410
 void FUN_00468410(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [sprites:asm]: the original is inline asm. Draws one frame of a 16-bit run-length animation at half
+    /* Port [library:asm]: the original is inline asm. Draws one frame of a 16-bit run-length animation at half
      * brightness (each pixel PortHalfPixel of the source, using the mask DAT_007fe998), clipped on both sides: the
      * first `skip` rows and the first `left` columns are not drawn, and at most `width` columns per row are. dst
      * is the first row's pixel for column `left`; rows are `stride` bytes apart. Runs of source pixels and fills

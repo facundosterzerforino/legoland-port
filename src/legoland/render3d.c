@@ -15,8 +15,8 @@
 #include "resource.h"
 #include "tilemap.h"
 
+#include "../../port/port_asm.h"
 #include "image_sprite.h"
-#include "port_asm.h"
 
 // FUNCTION: LEGOLAND 0x00441800
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport) {
@@ -99,7 +99,7 @@ void FUN_00441910(int *param_1, float *param_2, int *param_3) {
 
 // FUNCTION: LEGOLAND 0x00441980
 void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
-    /* Port: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
+    /* Port [library:asm]: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
      * animation param_1: the position from FUN_00441910, offset by (param_5, param_6), and the 16.16 fixed-point
      * orientation from the frame's 3x3 float matrix, with axes 1 and 2 swapped and some signs flipped. */
     static const int src_col[3] = {0, 2, 1};
@@ -1292,7 +1292,7 @@ LEGO_EXPORT void BuildYRotationMatrix(float angle, float *out) {
 
 // FUNCTION: LEGOLAND 0x004433b0
 LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count) {
-    /* Port: the original is inline asm (imul + shrd). Multiplies count 3-vectors by the 3x3 16.16
+    /* Port [library:asm]: the original is inline asm (imul + shrd). Multiplies count 3-vectors by the 3x3 16.16
      * fixed-point matrix m. src and dst may be the same array. */
     int x;
     int y;

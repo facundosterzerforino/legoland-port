@@ -2,6 +2,7 @@
 #include <string.h>
 #include "legoland.h"
 
+#include "../../port/port_asm.h"
 #include "bloke.h"
 #include "copters.h"
 #include "gamemap.h"
@@ -11,7 +12,6 @@
 #include "map_object.h"
 #include "obj_instance.h"
 #include "objclass.h"
-#include "port_asm.h"
 #include "print_sprite.h"
 #include "render3d.h"
 #include "ride_queue.h"
@@ -561,7 +561,7 @@ void FUN_00404600(Element *obj, int *coords) {
 
 // FUNCTION: LEGOLAND 0x00404630
 void FUN_00404630(struct CopterNode *node, int index) {
-    /* Port [copters:asm]: the original is inline asm (x87). Poses the rider of helicopter seat layer `index`: places
+    /* Port [library:asm]: the original is inline asm (x87). Poses the rider of helicopter seat layer `index`: places
      * the rider's person at the seat's screen position plus the recorded animation offset, and sets the person's
      * orientation from the current frame of the copters.pos animation (track `track` of DAT_00830f98). */
     static const int src_col[3] = {0, 2, 1};
