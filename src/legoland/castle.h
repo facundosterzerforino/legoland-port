@@ -279,3 +279,7 @@ extern struct BoxSolid DAT_004b58c8;
 
 void FUN_00420fd0(struct BoxSolid *box, struct FVec3 *verts, struct FVec3 *xverts, int unused, float w, float h, float d);
 void FUN_00421130(struct BoxSolid *box, struct FVec3 *verts, struct FVec3 *xverts, int unused, float w, float h, float d);
+struct RecBuf;
+struct ClearRect;
+void FUN_004232b0(struct RecBuf *rb);
+void FUN_00423480(struct ClearRect *r);

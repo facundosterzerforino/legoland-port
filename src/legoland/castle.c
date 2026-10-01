@@ -121,6 +121,7 @@ struct CastleObj {
 };
 
 #include "image_sprite.h"
+#include "port_asm.h"
 // FUNCTION: LEGOLAND 0x0041cc50
 unsigned int FUN_0041cc50(unsigned int dir) {
     if (dir == 1) return 4;
@@ -4140,7 +4141,34 @@ struct RecSrc {
 };
 
 // FUNCTION: LEGOLAND 0x00423140
-void FUN_00423140(int param_1) { STUB(); }
+void FUN_00423140(int param_1) {
+    /* Port: the original is inline asm. It flushes the queued draw records, timing itself with rdtsc. */
+    unsigned int start = PortTimestamp();
+    struct FlagNode *node;
+    struct RecBuf *rec;
+    struct RecBuf *next;
+
+    if (DAT_0060f90c != 0) {
+        /* full redraw requested: clear the whole back buffer */
+        memset(DAT_004e3870, 0, 0x25800 * 4);
+        DAT_0060f914[0].r[0] = 10;
+    } else {
+        /* clear the dirty rectangles, then replay the records queued since the last flush */
+        for (node = (struct FlagNode *)DAT_00829a3c.var_18; node != (struct FlagNode *)&DAT_00829a3c; node = node->next) {
+            if (node->kind != 0) {
+                FUN_00423480((struct ClearRect *)node);
+            }
+        }
+        for (rec = (struct RecBuf *)DAT_004dd870; rec != DAT_004b5b3c; rec = next) {
+            next = (struct RecBuf *)((char *)rec + rec->n * 8 + 8);
+            FUN_004232b0(rec);
+        }
+    }
+    DAT_004b5b3c = (struct RecBuf *)DAT_004dd870;
+    DAT_0060f90c = 0;
+    DAT_0060f908 = 0;
+    DAT_0060f910 = PortTimestamp() - start;
+}
 
 // FUNCTION: LEGOLAND 0x00423200
 void FUN_00423200(int n, int x, struct RecIdx *idx, struct RecSrc *src) {
@@ -4224,10 +4252,20 @@ void FUN_00423480(struct ClearRect *r) {
 void FUN_004234e0(void *param1) { STUB(); }
 
 // FUNCTION: LEGOLAND 0x004236f0
-unsigned short FUN_004236f0(void) { STUB(); }
+unsigned int FUN_004236f0(void) {
+    /* Port: the original reads the x87 control word with fstcw and, unless it already is, sets single
+     * precision, round to nearest and all exceptions masked with fldcw. It returns the old word. */
+    unsigned int old = _control87(0, 0);
+
+    _control87(_PC_24 | _RC_NEAR | _MCW_EM, _MCW_PC | _MCW_RC | _MCW_EM);
+    return old;
+}
 
 // FUNCTION: LEGOLAND 0x00423730
-unsigned short FUN_00423730(unsigned short control_word) { STUB(); }
+void FUN_00423730(unsigned int control_word) {
+    /* Port: the original restores the saved x87 control word with fldcw. */
+    _control87(control_word, _MCW_PC | _MCW_RC | _MCW_EM);
+}
 
 // FUNCTION: LEGOLAND 0x00423740
 void FUN_00423740(void) {
@@ -5838,7 +5876,38 @@ unsigned int FUN_00426230(float in[][3], int out[][4], int n) {
 unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int stride, int n) { STUB(); }
 
 // FUNCTION: LEGOLAND 0x004263a0
-void FUN_004263a0(void *pts, unsigned int m[4][4], int n, unsigned int out) { STUB(); }
+void FUN_004263a0(void *pts, unsigned int m[4][4], int n, unsigned int out) {
+    /* Port: the original is inline asm. Projects n points (3 floats each) with the first two rows of the
+     * 4x4 float matrix m and grows the integer bounding box out = {min x, min y, max x, max y}. */
+    float (*mat)[4] = (float (*)[4])m;
+    float *p = (float *)pts;
+    int *box = (int *)out;
+    int xy[2];
+    int row;
+
+    box[0] = 0x7fffffff;
+    box[1] = 0x7fffffff;
+    box[2] = (int)0x80000000;
+    box[3] = (int)0x80000000;
+    for (; n > 0; n--) {
+        for (row = 0; row < 2; row++) {
+            xy[row] = PortRound(FLOAT_004ab390 + p[0] * mat[row][0] + p[1] * mat[row][1] + p[2] * mat[row][2] + mat[row][3]);
+        }
+        if (xy[0] > box[2]) {
+            box[2] = xy[0];
+        }
+        if (xy[0] < box[0]) {
+            box[0] = xy[0];
+        }
+        if (xy[1] > box[3]) {
+            box[3] = xy[1];
+        }
+        if (xy[1] < box[1]) {
+            box[1] = xy[1];
+        }
+        p += 3;
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00426460
 void FUN_00426460(unsigned int *dst, void *src) {
@@ -7655,7 +7724,7 @@ struct Struct428e70 {
 
 // FUNCTION: LEGOLAND 0x00428e70
 void FUN_00428e70(struct Struct428e70 *p, unsigned int a, unsigned int b) {
-    unsigned short handle = FUN_004236f0();
+    unsigned int handle = FUN_004236f0();
     unsigned int result = p->vtable[6](p, DAT_00612178);
     DAT_00615f6c = result;
     FUN_00428cb0(p, a, b, result, DAT_00612178);
@@ -7665,7 +7734,7 @@ void FUN_00428e70(struct Struct428e70 *p, unsigned int a, unsigned int b) {
 
 // FUNCTION: LEGOLAND 0x00428ec0
 void FUN_00428ec0(void *p, unsigned int a, unsigned int b) {
-    unsigned short handle = FUN_004236f0();
+    unsigned int handle = FUN_004236f0();
     FUN_00428cb0(p, a, b, DAT_00615f6c, DAT_00612178);
     FUN_004234e0(DAT_004b5f60);
     FUN_00423730(handle);

@@ -10,6 +10,7 @@
 #include "legoland.h"
 #include "map_object.h"
 #include "math.h"
+#include "port_asm.h"
 #include "print_sprite.h"
 #include "render.h"
 #include "render3d.h"
@@ -360,7 +361,28 @@ LEGO_EXPORT void IP_RenderBlokeIn3DNow(struct Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x00440020
-LEGO_EXPORT void SetPersonRotation(struct Person *person, float *src) { STUB(); }
+LEGO_EXPORT void SetPersonRotation(struct Person *person, float *src) {
+    /* Port: the original builds the matrix in inline asm (fsin/fcos, fistp). Copies the rotation and builds
+     * a 16.16 fixed-point rotation about the Y axis from src[1], with Y flipped. */
+    float angle = src[1];
+    int s;
+    int c;
+
+    person->field_40 = src[0];
+    person->field_44 = src[1];
+    person->field_48 = src[2];
+    s = PortRound(sin(angle) * 65536.0f);
+    c = PortRound(cos(angle) * 65536.0f);
+    person->m[0] = c;
+    person->m[1] = 0;
+    person->m[2] = s;
+    person->m[3] = 0;
+    person->m[4] = -0x10000; /* the original stores 0x10000, then negates it */
+    person->m[5] = 0;
+    person->m[6] = -s;
+    person->m[7] = 0;
+    person->m[8] = c;
+}
 
 // FUNCTION: LEGOLAND 0x004400b0
 LEGO_EXPORT void SetPersonDirection(struct Person *person, unsigned int direction) {

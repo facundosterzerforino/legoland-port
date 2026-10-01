@@ -68,3 +68,4 @@ LEGO_EXPORT void RenderBlokeList(struct BlokeListHead *list);
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport);
 void *FUN_00442580(struct Person *person, void *context, unsigned int arg3, unsigned int arg4, unsigned int arg5);
 void FUN_00442980(const char *param_1, const char *param_2, const char *param_3, int param_4, unsigned int param_5);
+LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count);

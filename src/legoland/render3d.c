@@ -16,6 +16,7 @@
 #include "tilemap.h"
 
 #include "image_sprite.h"
+#include "port_asm.h"
 
 // FUNCTION: LEGOLAND 0x00441800
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport) {
@@ -1261,7 +1262,24 @@ LEGO_EXPORT void BuildYRotationMatrix(float angle, float *out) {
 }
 
 // FUNCTION: LEGOLAND 0x004433b0
-LEGO_EXPORT void TransformVectorsL(void) { STUB(); }
+LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count) {
+    /* Port: the original is inline asm (imul + shrd). Multiplies count 3-vectors by the 3x3 16.16
+     * fixed-point matrix m. src and dst may be the same array. */
+    int x;
+    int y;
+    int z;
+
+    do {
+        x = PortFixMul(m[0], src[0]) + PortFixMul(m[1], src[1]) + PortFixMul(m[2], src[2]);
+        y = PortFixMul(m[3], src[0]) + PortFixMul(m[4], src[1]) + PortFixMul(m[5], src[2]);
+        z = PortFixMul(m[6], src[0]) + PortFixMul(m[7], src[1]) + PortFixMul(m[8], src[2]);
+        dst[0] = x;
+        dst[1] = y;
+        dst[2] = z;
+        src += 3;
+        dst += 3;
+    } while (--count != 0);
+}
 
 // FUNCTION: LEGOLAND 0x00443450
 LEGO_EXPORT void NormaliseVector(struct Vec3 *v) {
