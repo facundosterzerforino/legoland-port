@@ -64,6 +64,7 @@ The port reads data from an original LEGOLAND installation (the `.res` volumes, 
 
 ## More documentation
 
+- `ROADMAP.md`: the phase-by-phase plan, from finishing the assembly replacements to Android.
 - `PORTING.md`: the porting rules (layout, library substitutions, portable C, order of work).
 - `CLAUDE.md`: working rules for AI-assisted sessions (port rules first, then the matching rules from `main`).
 - `DECOMPILING.md`, `HEADERS.md`, `docs/decomp-tips.md`: how the matching decompilation works.
