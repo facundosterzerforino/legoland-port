@@ -2942,14 +2942,180 @@ int FUN_004207d0(unsigned int key) {
     return -1;
 }
 
+/* Port: a polygon vertex as FUN_0042a2f0 reads it: screen y and x, then the interpolated attributes. */
+struct PolyVert {
+    int pad_0;
+    int y;
+    int x;
+    int attr[4];
+};
+
+typedef void (*PolyFiller)(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+
+/* Port: the polygon FUN_0042a2f0 rasterizes. dx1/dy1 and dx2/dy2 are v[1] - v[0] and v[2] - v[0]; area is
+ * their cross product. */
+struct PolyArg {
+    /* 0x00 */ unsigned int flags; /* 1: add the polygon to the dirty rows (FUN_00423200) */
+    /* 0x04 */ int palette;
+    /* 0x08 */ unsigned int and_codes; /* clip codes of the vertices, and-ed */
+    /* 0x0c */ unsigned int or_codes; /* or-ed; 0xf0 = a vertex lies in a dirty rectangle */
+    /* 0x10 */ int shade;
+    /* 0x14 */ float dx1;
+    /* 0x18 */ float dx2;
+    /* 0x1c */ float dy1;
+    /* 0x20 */ float dy2;
+    /* 0x24 */ float area;
+    /* 0x28 */ struct PolyVert *v[4]; /* the 3 corners; [3] closes the loop */
+    /* 0x38 */ const PolyFiller *fillers; /* [0]: outside dirty rectangles, [1]: inside (depth-buffered) */
+};
+
+/* Port: the original's filler table at 0x4b5658. */
+static const PolyFiller port_texture_fillers[2] = {FUN_0041fd80, FUN_0041ff80};
+
+/* Port: a 3D object as FUN_00420e90 draws it. Its vertices are transformed into DAT_004d8bb8 ({x, y, z,
+ * clip code} each) before the face passes run. */
+struct MeshFace {
+    short material;
+    short normal; /* face normal (flat and textured faces) */
+    short v[3]; /* vertices */
+    short vnormal[3]; /* vertex normals (smooth faces) */
+};
+
+struct Mesh3D {
+    /* 0x00 */ int vert_count;
+    /* 0x04 */ int pad_4[2];
+    /* 0x0c */ float (*verts)[3];
+    /* 0x10 */ float (*face_normals)[3];
+    /* 0x14 */ float (*vert_normals)[3];
+    /* 0x18 */ struct MeshFace *flat_faces;
+    /* 0x1c */ int flat_count;
+    /* 0x20 */ struct MeshFace *smooth_faces;
+    /* 0x24 */ int smooth_count;
+    /* 0x28 */ struct MeshFace *textured_faces;
+    /* 0x2c */ int textured_count;
+};
+
+struct Material {
+    int palette;
+    unsigned char uv[3][2]; /* texture coordinates of the face's corners */
+    short pad;
+};
+
+#define PORT_FACES_FLAT 0
+#define PORT_FACES_SMOOTH 1
+#define PORT_FACES_TEXTURED 2
+
+/* Port: light level of a normal: the dot product with the light vector DAT_004dcbb8, plus the ambient light. */
+static int PortLight(const float *normal) {
+    float light = DAT_004dcbb8[2] * normal[2] + DAT_004dcbb8[1] * normal[1] + DAT_004dcbb8[0] * normal[0] + DAT_00829a60;
+
+    return PortRound(light);
+}
+
+/* Port: the original's three face passes are inline asm (rdtsc profiling) and differ only in the face list and
+ * the values interpolated across each triangle. Every front-facing, not trivially clipped face goes to
+ * FUN_0042a2f0:
+ *   flat:     one light level per face; interpolates x, z (fillers FUN_0041f8d0 / FUN_0041fba0)
+ *   smooth:   a light level per corner from the vertex normals; interpolates x, light, z (fillers
+ *             FUN_0041fd80 / FUN_0041ff80, indexing the shade ramp DAT_004d89c4 with the light)
+ *   textured: one light level per face; interpolates x, u, v, z (filler FUN_00428860)
+ * flags != 0 adds the drawn faces to the dirty rows. */
+static void PortDrawFaces(struct Mesh3D *mesh, struct Material *materials, unsigned int flags, int kind) {
+    static const PolyFiller flat_fillers[2] = {FUN_0041f8d0, FUN_0041fba0};
+    static const PolyFiller textured_fillers[2] = {FUN_00428860, FUN_00428860};
+    unsigned int start = PortTimestamp();
+    struct PolyArg poly;
+    struct PolyVert corner[3];
+    struct MeshFace *faces;
+    struct MeshFace *f;
+    int *p[3];
+    int count;
+    int i;
+    int j;
+
+    if (kind == PORT_FACES_FLAT) {
+        faces = mesh->flat_faces;
+        count = mesh->flat_count;
+        poly.fillers = flat_fillers;
+    } else if (kind == PORT_FACES_SMOOTH) {
+        faces = mesh->smooth_faces;
+        count = mesh->smooth_count;
+        poly.fillers = port_texture_fillers;
+    } else {
+        faces = mesh->textured_faces;
+        count = mesh->textured_count;
+        poly.fillers = textured_fillers;
+    }
+    poly.flags = flags != 0;
+    poly.shade = 0;
+    for (j = 0; j < 3; j++) {
+        poly.v[j] = &corner[j];
+    }
+    for (i = 0; i < count; i++) {
+        f = &faces[i];
+        for (j = 0; j < 3; j++) {
+            p[j] = DAT_004d8bb8[f->v[j]];
+        }
+        poly.dx1 = (float)(p[1][0] - p[0][0]);
+        poly.dy1 = (float)(p[1][1] - p[0][1]);
+        poly.dx2 = (float)(p[2][0] - p[0][0]);
+        poly.dy2 = (float)(p[2][1] - p[0][1]);
+        poly.area = poly.dy2 * poly.dx1 - poly.dx2 * poly.dy1;
+        if (poly.area <= FLOAT_004ab390) {
+            continue; /* back-facing */
+        }
+        poly.and_codes = p[0][3] & p[1][3] & p[2][3] & 0xff;
+        poly.or_codes = p[0][3] | p[1][3] | p[2][3];
+        if ((poly.or_codes & 0xf) != 0xf) {
+            continue; /* entirely outside one edge of the view */
+        }
+        poly.palette = materials[f->material].palette;
+        for (j = 0; j < 3; j++) {
+            corner[j].y = p[j][1];
+            corner[j].x = p[j][0];
+        }
+        if (kind == PORT_FACES_FLAT) {
+            poly.shade = PortLight(mesh->face_normals[f->normal]);
+            for (j = 0; j < 3; j++) {
+                corner[j].attr[0] = p[j][2];
+            }
+            FUN_0042a2f0(2, &poly);
+        } else if (kind == PORT_FACES_SMOOTH) {
+            for (j = 0; j < 3; j++) {
+                corner[j].attr[0] = PortLight(mesh->vert_normals[f->vnormal[j]]);
+                corner[j].attr[1] = p[j][2];
+            }
+            FUN_0042a2f0(3, &poly);
+        } else {
+            poly.shade = PortLight(mesh->face_normals[f->normal]);
+            for (j = 0; j < 3; j++) {
+                corner[j].attr[0] = materials[f->material].uv[j][0];
+                corner[j].attr[1] = materials[f->material].uv[j][1];
+                corner[j].attr[2] = p[j][2];
+            }
+            FUN_0042a2f0(4, &poly);
+        }
+    }
+    DAT_004dcbc8 += PortTimestamp() - start;
+}
+
 // FUNCTION: LEGOLAND 0x00420810
-void FUN_00420810(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
+void FUN_00420810(unsigned int mesh, unsigned int b, unsigned int flags) {
+    /* Port: the original is inline asm. Draws the object's flat-shaded faces. */
+    PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_FLAT);
+}
 
 // FUNCTION: LEGOLAND 0x00420a20
-void FUN_00420a20(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
+void FUN_00420a20(unsigned int mesh, unsigned int b, unsigned int flags) {
+    /* Port: the original is inline asm. Draws the object's smooth-shaded faces. */
+    PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_SMOOTH);
+}
 
 // FUNCTION: LEGOLAND 0x00420c40
-void FUN_00420c40(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
+void FUN_00420c40(unsigned int mesh, unsigned int b, unsigned int flags) {
+    /* Port: the original is inline asm. Draws the object's textured faces. */
+    PortDrawFaces((struct Mesh3D *)mesh, (struct Material *)b, flags, PORT_FACES_TEXTURED);
+}
 
 // FUNCTION: LEGOLAND 0x00420e90
 unsigned int FUN_00420e90(unsigned int a, unsigned int b, void *c, void *d, unsigned int e) {
@@ -4534,36 +4700,6 @@ void FUN_00423480(struct ClearRect *r) {
         row += DAT_004b5b28;
     }
 }
-
-/* Port: a polygon vertex as FUN_0042a2f0 reads it: screen y and x, then the interpolated attributes. */
-struct PolyVert {
-    int pad_0;
-    int y;
-    int x;
-    int attr[4];
-};
-
-typedef void (*PolyFiller)(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
-
-/* Port: the polygon FUN_0042a2f0 rasterizes. dx1/dy1 and dx2/dy2 are v[1] - v[0] and v[2] - v[0]; area is
- * their cross product. */
-struct PolyArg {
-    /* 0x00 */ unsigned int flags; /* 1: add the polygon to the dirty rows (FUN_00423200) */
-    /* 0x04 */ int palette;
-    /* 0x08 */ unsigned int and_codes; /* clip codes of the vertices, and-ed */
-    /* 0x0c */ unsigned int or_codes; /* or-ed; 0xf0 = a vertex lies in a dirty rectangle */
-    /* 0x10 */ int shade;
-    /* 0x14 */ float dx1;
-    /* 0x18 */ float dx2;
-    /* 0x1c */ float dy1;
-    /* 0x20 */ float dy2;
-    /* 0x24 */ float area;
-    /* 0x28 */ struct PolyVert *v[4]; /* the 3 corners; [3] closes the loop */
-    /* 0x38 */ const PolyFiller *fillers; /* [0]: outside dirty rectangles, [1]: inside (depth-buffered) */
-};
-
-/* Port: the original's filler table at 0x4b5658. */
-static const PolyFiller port_texture_fillers[2] = {FUN_0041fd80, FUN_0041ff80};
 
 /* Port: the textured mesh FUN_004234e0 draws. */
 struct MeshVert {
@@ -8108,8 +8244,121 @@ unsigned int FUN_00428840(unsigned int param_1) {
     return result;
 }
 
+/* Port: a texture as FUN_00420780 returns it: power-of-two sizes, then one palette index per texel. */
+struct Texture {
+    int width;
+    int height;
+    unsigned char texels[1];
+};
+
+/* Port: the color of each palette at the current light level (the original's table at 0x611960). */
+static unsigned short port_texture_colors[1024];
+
 // FUNCTION: LEGOLAND 0x00428860
-void FUN_00428860(void) { STUB(); }
+void FUN_00428860(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src) {
+    /* Port: the original is inline asm. Texture-mapped, depth-tested polygon fill. palette selects the texture
+     * (FUN_00420780); its texels are palette numbers, drawn in the color of light level shade[0]. The left
+     * edge carries u (f0c), v (f10) and z (f14); along a span they step by shade[1], shade[2] and shade[3].
+     * u and v are rescaled so that or-ing them and shifting right by 16 gives the texel index (v * width + u),
+     * which wraps around the texture. */
+    struct RecSrc *last = &src[idx[n - 1].k];
+    struct Texture *tex;
+    unsigned short *row;
+    unsigned short *zrow;
+    unsigned short depth;
+    int wbits;
+    int hbits;
+    int ushift;
+    int vshift;
+    unsigned int vmask;
+    unsigned int index_mask;
+    int du;
+    int dv;
+    int dz;
+    int y = idx[0].v;
+    int end;
+    int lx = 0;
+    int ldx = 0;
+    int lu = 0;
+    int ldu = 0;
+    int lv = 0;
+    int ldv = 0;
+    int lz = 0;
+    int ldz = 0;
+    int rx = 0;
+    int rdx = 0;
+    int u;
+    unsigned int v;
+    int z;
+    int x;
+    int i;
+
+    ((short *)&last->f0)[1]++;
+    end = ((short *)&last->f0)[1];
+    tex = (struct Texture *)FUN_00420780(palette);
+    if (tex == NULL) {
+        return;
+    }
+    wbits = FUN_00428840(tex->width);
+    hbits = FUN_00428840(tex->height);
+    ushift = 8 - wbits;
+    vshift = 16 - wbits - hbits;
+    vmask = (unsigned int)((int)0xff000000 >> ushift);
+    du = shade[1] >> ushift;
+    dv = (shade[2] << 8) >> vshift;
+    dz = shade[3];
+    index_mask = (1 << (wbits + hbits)) - 1;
+    DAT_0060f900++;
+    idx[n].v = end;
+    row = (unsigned short *)DAT_004b5b20 + DAT_004b5b28 * y;
+    zrow = DAT_004b5b24 + DAT_004b5b28 * y;
+    for (i = 0; i < DAT_0060f904; i++) {
+        port_texture_colors[i] = ((unsigned short *)DAT_00829c60[i])[shade[0]];
+    }
+    do {
+        struct RecSrc *e = &src[idx->k];
+
+        idx++;
+        if (e->flag) {
+            rx = e->fx - e->d;
+            rdx = e->d;
+        } else {
+            lx = e->fx - e->d;
+            ldx = e->d;
+            lu = e->f0c - e->f20;
+            ldu = e->f20;
+            lv = e->f10 - e->f24;
+            ldv = e->f24;
+            lz = e->f14 - e->f28;
+            ldz = e->f28;
+        }
+        while (y < idx->v) {
+            y++;
+            lx += ldx;
+            rx += rdx;
+            lu += ldu;
+            lv += ldv;
+            lz += ldz;
+            if (rx - lx >= 0x8000) {
+                u = lu >> ushift;
+                v = (unsigned int)(lv << 8) >> vshift;
+                z = lz;
+                for (x = lx >> 16; x <= rx >> 16; x++) {
+                    depth = (unsigned short)(z >> 16);
+                    if (depth >= zrow[x]) {
+                        zrow[x] = depth;
+                        row[x] = port_texture_colors[tex->texels[(((v & vmask) | (unsigned int)u) >> 16) & index_mask]];
+                    }
+                    u += du;
+                    v += dv;
+                    z += dz;
+                }
+            }
+            row += DAT_004b5b28;
+            zrow += DAT_004b5b28;
+        }
+    } while (y < end);
+}
 
 // FUNCTION: LEGOLAND 0x00428b70
 void FUN_00428b70(void) {
