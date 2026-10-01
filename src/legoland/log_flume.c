@@ -4325,13 +4325,15 @@ void FUN_0040ec90(unsigned int param_1, unsigned int param_2, unsigned int param
 // FUNCTION: LEGOLAND 0x0040ecc0
 unsigned int FUN_0040ecc0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 1;
-    return FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
+    FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ecf0
 unsigned int FUN_0040ecf0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 2;
-    return FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
+    FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ed20
@@ -4807,7 +4809,8 @@ void FUN_0040fa60(unsigned int param_1, struct FlumeBytes *param_2) {
 
 // FUNCTION: LEGOLAND 0x0040fab0
 unsigned int FUN_0040fab0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
-    return FUN_0040db00(param_1, param_2, param_3, FUN_0040f830);
+    FUN_0040db00(param_1, param_2, param_3, FUN_0040f830);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040fad0
@@ -5006,7 +5009,8 @@ void FUN_00410110(unsigned int param_1, struct FlumeBytes *param_2) {
 
 // FUNCTION: LEGOLAND 0x00410160
 unsigned int FUN_00410160(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
-    return FUN_0040db00(param_1, param_2, param_3, FUN_0040feb0);
+    FUN_0040db00(param_1, param_2, param_3, FUN_0040feb0);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x00410180
@@ -5221,7 +5225,8 @@ void FUN_00410740(unsigned int param_1, struct FlumeBytes *param_2) {
 
 // FUNCTION: LEGOLAND 0x00410790
 unsigned int FUN_00410790(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
-    return FUN_0040db00(param_1, param_2, param_3, FUN_00410360);
+    FUN_0040db00(param_1, param_2, param_3, FUN_00410360);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x004107b0

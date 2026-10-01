@@ -1337,7 +1337,8 @@ void FUN_0041b4c0(Element *obj, unsigned int param_2, unsigned int param_3) {
 
 // FUNCTION: LEGOLAND 0x0041b6d0
 unsigned int FUN_0041b6d0(unsigned int param_1, unsigned int param_2) {
-    return BasicObjectDCalcCursor(param_1, param_2);
+    BasicObjectDCalcCursor(param_1, param_2);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0041b6f0

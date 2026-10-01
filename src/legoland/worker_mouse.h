@@ -2,6 +2,9 @@
 
 #include "legoland.h"
 
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct Point;
+
 LEGO_EXPORT void CheckWorkerOnMouseStatus(int a);
 LEGO_EXPORT void ResetMoveAWorkerStruct(void);
 LEGO_EXPORT void ResetWorkersOldCoords(void);

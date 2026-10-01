@@ -245,7 +245,7 @@ unsigned int FUN_00478be0(unsigned int param_1, unsigned int param_2, unsigned i
         }
         return 1;
     }
-    return FUN_0047a480(param_1, param_2, param_3);
+    return FUN_0047a480(param_1, param_2); /* [port] the original also pushed param_3, which FUN_0047a480 never reads */
 }
 
 // FUNCTION: LEGOLAND 0x00478c60

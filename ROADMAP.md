@@ -35,7 +35,15 @@ Finish replacing the inline assembly, so every function is C a modern compiler c
 
 **Done when:** no inline-asm `STUB()` is left in the game files. **Size:** a few sessions.
 
-## Phase 2: a modern build
+## Phase 2: a modern build (done)
+
+**Status:** done with clang-cl + lld-link from WSL (preset `clang-cl-x86`, SDK from `xwin`). Fixed on the
+way: prototype-scope structs (forward declarations), prototypes out of date with their definitions, the
+game's `wWinMain` colliding with the SDK's (renamed `LegolandMain` in the port build), `DIRECTINPUT_VERSION`
+0x0300, and a few calls with stray arguments. Still warnings, on purpose: about 650 pointer/integer mixes
+(phase 8) and 17 functions that can end without returning a value (look at them when they misbehave in
+phase 4). Not yet checked: that the exe actually reaches `WinMain`; that needs phase 3's data first.
+
 
 Build with a current compiler and the real C runtime, still as 32-bit Windows. 32-bit comes first because the
 code still stores pointers in `unsigned int`, which only works when pointers are 32 bits (phase 8 fixes that).

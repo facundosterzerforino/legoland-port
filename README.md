@@ -15,7 +15,7 @@ modern Windows support.
 | | |
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
-| Runs on Windows 11 | **not yet**: the build links but does not start (see milestone 2) |
+| Runs on Windows 11 | **not yet**: builds and links with clang-cl, but most globals still lack their original values (phase 3) |
 | Hand-written assembly | **done**: all 44 inline-asm functions are plain C (phase 1 of `ROADMAP.md`) |
 
 ## Goal and approach
@@ -44,8 +44,26 @@ once the hand-written assembly is plain C, showing a frame on any platform is a 
 
 ## Building
 
-For now this repository builds exactly like the decomp, with the original MSVC6 toolchain run through
-[`wibo`](https://github.com/decompals/wibo) from WSL:
+### The port build (clang-cl, 32-bit Windows)
+
+The runnable build cross-compiles from Linux or WSL with clang-cl and lld-link, against the Windows SDK and
+MSVC runtime fetched by [`xwin`](https://github.com/Jake-Shadle/xwin):
+
+```sh
+sudo apt install clang lld llvm cmake ninja-build
+# xwin: download a release binary from GitHub, then (this accepts Microsoft's license for the SDK/CRT):
+xwin --accept-license --arch x86 splat --output ~/xwin
+cmake --preset clang-cl-x86
+cmake --build build-clang-x86    # -> build-clang-x86/legoland.exe + .pdb
+```
+
+Set `XWIN_DIR` if the SDK isn't in `~/xwin`. The preset defines `LEGOLAND_PORT`, leaves out the matching-only
+files (`bootstrap.c`, `imports.c`) and links the real C runtime (static) and Windows import libraries.
+Pointer/integer mixing from the decompiled code is reported as warnings, not errors, until phase 8 (64-bit).
+
+### The matching build (MSVC6)
+
+The original MSVC6 toolchain, run through [`wibo`](https://github.com/decompals/wibo) from WSL, still works:
 
 ```sh
 uv run setup.py          # download MSVC6 + DLLs into toolchain/
@@ -54,8 +72,7 @@ cmake --build build      # -> build/legoland.exe
 ./tools/verify           # still useful: shows which functions a port change touched
 ```
 
-Milestone 1 moves the port to modern compilers (MSVC 2022, clang, gcc, later the Android NDK) with CMake
-presets per platform; the MSVC6 build stays in the decomp repo, where matching happens.
+More presets (x64, Linux, Android) come with later milestones.
 
 ## You need your own game
 

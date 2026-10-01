@@ -4,6 +4,9 @@
 
 #include "obj_instance.h"
 
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct DSCarLayer;
+
 struct DSHead;
 struct DSRenderRoot;
 

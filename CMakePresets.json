@@ -1,6 +1,10 @@
 {
   "version": 3,
-  "cmakeMinimumRequired": { "major": 3, "minor": 20, "patch": 0 },
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "msvc6",
@@ -8,9 +12,26 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "toolchainFile": "${sourceDir}/cmake/msvc6-toolchain.cmake"
+    },
+    {
+      "name": "clang-cl-x86",
+      "displayName": "Port: clang-cl, 32-bit Windows (runnable)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-clang-x86",
+      "toolchainFile": "${sourceDir}/cmake/clang-cl-x86.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
-    { "name": "msvc6", "configurePreset": "msvc6" }
+    {
+      "name": "msvc6",
+      "configurePreset": "msvc6"
+    },
+    {
+      "name": "clang-cl-x86",
+      "configurePreset": "clang-cl-x86"
+    }
   ]
 }

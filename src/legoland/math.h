@@ -3,7 +3,11 @@
 #include "legoland.h"
 
 // This header shadows the CRT <math.h>; pull the real one in explicitly.
+#ifdef LEGOLAND_PORT
+#include <math.h> /* [port] angle brackets skip this directory, so this is the C runtime's math.h */
+#else
 #include "../../toolchain/msvc6/Include/math.h"
+#endif
 
 struct Point {
     /* 0x00 */ int x;

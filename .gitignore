@@ -1,5 +1,6 @@
 # Build output
 build/
+build-*/
 
 # Downloaded toolchain (populated by `uv run setup.py`) — never committed
 toolchain/

@@ -2,6 +2,9 @@
 
 #include "objclass.h"
 
+/* [port] declared at file scope so prototypes below refer to the same type */
+struct SafariListEntry;
+
 struct SafariNode {
     unsigned short field_0;
     unsigned char pad_2[2];

@@ -2,6 +2,9 @@
 
 #include "obj_instance.h"
 
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct RideQueueEntry;
+
 struct LLIDB_Head;
 struct RoadEditArg;
 struct RoadPlaceArg;

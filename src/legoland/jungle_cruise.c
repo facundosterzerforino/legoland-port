@@ -743,7 +743,8 @@ void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
 
 // FUNCTION: LEGOLAND 0x00433fa0
 unsigned int FUN_00433fa0(unsigned int param_1, unsigned int param_2) {
-    return BasicObjectDCalcCursor(param_1, param_2);
+    BasicObjectDCalcCursor(param_1, param_2);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x00433fc0
@@ -930,7 +931,8 @@ void FUN_00434330(Element *obj, unsigned int param_2, int *param_3) {
 
 // FUNCTION: LEGOLAND 0x00434650
 unsigned int FUN_00434650(unsigned int param_1, unsigned int param_2) {
-    return BasicObjectDCalcCursor(param_1, param_2);
+    BasicObjectDCalcCursor(param_1, param_2);
+    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x00434670
@@ -1490,7 +1492,7 @@ void FUN_00435750(void) {
             AdjustBlokePosition((struct Point *)&pos);
             pos.x = person->field_1c - pos.x - 0x10;
             pos.y = person->field_20 - pos.y;
-            ScreenToMapRef2(&pos, &map, 0);
+            ScreenToMapRef2(&pos, &map); /* [port] the original also pushed 0, which ScreenToMapRef2 never reads */
             bloke->flags &= 0xff7f;
             bloke->pos = map;
             bloke->field_72 = 10;

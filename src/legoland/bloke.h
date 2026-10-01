@@ -3,6 +3,10 @@
 #include "legoland.h"
 #include "math.h"
 
+/* [port] declared at file scope so prototypes below refer to the same type */
+struct MapRect;
+struct Bloke;
+
 /* Canonical "bloke" record (one 0xac allocation).  Shared by the AI code
    (bloke_ai.c) and the visitor allocator (bloke.c), which previously each
    declared their own private view of the same object.  Gardeners and mechanics
@@ -216,7 +220,7 @@ LEGO_EXPORT int BNVPath_GetDFrame(BNVPath *path);
 LEGO_EXPORT void BNVPath_SetDFrame(Bloke *bloke, BNVPath *path, int frame);
 Point FUN_004831a0(unsigned char dir, short dist);
 LEGO_EXPORT Point GetTileInDir(Point pos, unsigned char dir);
-LEGO_EXPORT int OverNewTile(struct OverTile *tile, unsigned int x, unsigned int y);
+LEGO_EXPORT int OverNewTile(struct Bloke *bloke, unsigned int x, unsigned int y);
 void FUN_00482b10(void);
 void FUN_00482b20(int force);
 int FUN_00482b60(Point *pos);

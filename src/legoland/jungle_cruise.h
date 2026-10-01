@@ -2,6 +2,9 @@
 
 #include "llidb.h"
 
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct EditObject;
+
 struct Cursor;
 
 struct Bloke;
@@ -75,7 +78,7 @@ void FUN_004333b0(struct JungleRide *param_1);
 struct JungleRide *FUN_004333e0(struct JungleRide *param_1);
 void FUN_004334c0(struct JungleRide *param_1, int param_2);
 void FUN_00433840(struct JungleRide *ride, int from, int to);
-void FUN_00436130(unsigned short owner, int delta);
+void FUN_00436130(unsigned short owner, unsigned int delta);
 void FUN_00437570(struct RideNode *node, Element *obj, TileId *tile, int sfx);
 void FUN_00436dc0(int x, int y, int mask, unsigned short *owner);
 void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3);

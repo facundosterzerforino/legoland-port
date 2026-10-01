@@ -6,7 +6,6 @@
 // Per-TU header for clipping.c — canonical declarations for sprite clipping.
 
 struct ClipQueryResult;
-extern struct ClipQueryResult DAT_004bdeb8[0x86];
 struct ClipQueryResult {
     unsigned char id;
     unsigned char pad_1[3];
@@ -14,6 +13,7 @@ struct ClipQueryResult {
     unsigned int field_8;
     unsigned int field_c;
 };
+extern struct ClipQueryResult DAT_004bdeb8[0x86];
 
 struct ClippedObject;
 

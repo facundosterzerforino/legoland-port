@@ -99,7 +99,6 @@ struct IconNode;
 struct InterfaceProfileObj;
 struct InterfaceListNode;
 struct MoviePool;
-struct TrackElemPair;
 struct PanelNode;
 struct InterfaceQueryNode;
 struct InterfaceEventNode;

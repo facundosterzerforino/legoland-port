@@ -1,5 +1,15 @@
 #pragma once
 
+/* [port] declared at file scope so prototypes below refer to the same type */
+struct FVec3;
+
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct BlokeInfo;
+struct CallbackTable;
+struct ClassNode;
+struct HitHost;
+struct PlaneSet;
+
 struct Point;
 int FUN_00424050(struct Point *pos, void *a2, void *a3, void *a4, void *a5);
 
@@ -174,7 +184,7 @@ void FUN_00424280(struct Element *param_1, int param_2, unsigned int param_3);
 void FUN_004244b0(unsigned int param_1, TileId param_2, unsigned int param_3);
 void FUN_00424620(short *param_1);
 void FUN_00424800(void);
-void FUN_00424850(void);
+void FUN_00424850(unsigned char *p1, unsigned int *p2, unsigned int *p3, struct FVec3 *p4);
 float FUN_00424890(unsigned char *param_1, float param_2);
 struct CastleActor;
 struct CastleSub;

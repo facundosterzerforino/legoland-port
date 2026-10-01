@@ -2,6 +2,9 @@
 
 #include "legoland.h"
 
+/* [port] file-scope forward declarations (structs first named in a prototype) */
+struct Point;
+
 struct Bloke;
 struct Ride;
 struct RideNode;
