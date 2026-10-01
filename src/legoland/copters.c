@@ -11,6 +11,7 @@
 #include "map_object.h"
 #include "obj_instance.h"
 #include "objclass.h"
+#include "port_asm.h"
 #include "print_sprite.h"
 #include "render3d.h"
 #include "ride_queue.h"
@@ -559,7 +560,83 @@ void FUN_00404600(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00404630
-void FUN_00404630(struct CopterNode *node, int index) { STUB(); }
+void FUN_00404630(struct CopterNode *node, int index) {
+    /* Port [copters:asm]: the original is inline asm (x87). Poses the rider of helicopter seat layer `index`: places
+     * the rider's person at the seat's screen position plus the recorded animation offset, and sets the person's
+     * orientation from the current frame of the copters.pos animation (track `track` of DAT_00830f98). */
+    static const int src_col[3] = {0, 2, 1};
+    static const int row_sign[3] = {1, -1, -1};
+    static const int col_sign[3] = {-1, 1, 1};
+    struct CopterLayer *layer = &node->layer[index];
+    struct Point screen;
+    struct Point sprite_off;
+    struct Point seat_off;
+    struct Point person_pos;
+    struct Sprite *sprite;
+    struct Person *person;
+    struct PosFrame *frame;
+    int sprite_layer;
+    int track;
+    int y_bias;
+    int i;
+    int j;
+
+    screen = GetScreenCoordsForObject((TileId *)node, (struct Ride *)DAT_004c1198);
+    if (layer->rider == NULL) {
+        return;
+    }
+    sprite_layer = layer->field_c;
+    /* index is 0..4 for every caller; anything else falls through with track 1 and bias = index (as the original) */
+    track = 1;
+    y_bias = index;
+    switch (index) {
+    case 0:
+        track = 3;
+        y_bias = 0xd7;
+        break;
+    case 1:
+        track = 0;
+        y_bias = 0xeb;
+        break;
+    case 2:
+        track = 4;
+        y_bias = 0xe1;
+        break;
+    case 3:
+        track = 1;
+        y_bias = 0xe6;
+        break;
+    case 4:
+        track = 2;
+        y_bias = 0xe6;
+        break;
+    }
+    sprite_off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1138, sprite_layer);
+    sprite = GetSpriteForLayer((struct Sprite *)DAT_004c1138, sprite_layer);
+    AdjustOffsetForViewMode(&sprite_off);
+    /* layer->field_4 is the current animation frame (a signed char) */
+    frame = &DAT_00830f98->entries[track][(signed char)layer->field_4];
+    seat_off.x = 0;
+    seat_off.y = (int)frame->pos[1] + y_bias;
+    AdjustOffsetForViewMode(&seat_off);
+    seat_off.x = sprite->width >> 1;
+    person_pos.x = screen.x + sprite_off.x + seat_off.x;
+    person_pos.y = screen.y + sprite_off.y + seat_off.y;
+    AdjustBlokePosition(&person_pos);
+    person = layer->rider->person;
+    SetPersonPosition(person, person_pos.x, person_pos.y);
+
+    /* The frame's third matrix row is rebuilt as a cross product of the first two (this edits the shared frame data) */
+    frame->mat[2][0] = frame->mat[0][2] * frame->mat[1][1] - frame->mat[1][2] * frame->mat[0][1];
+    frame->mat[2][1] = frame->mat[1][2] * frame->mat[0][0] - frame->mat[1][0] * frame->mat[0][2];
+    frame->mat[2][2] = frame->mat[1][0] * frame->mat[0][1] - frame->mat[0][0] * frame->mat[1][1];
+    /* person->m is the orientation in 16.16 fixed point, with axes 1 and 2 swapped and some signs flipped */
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            person->m[j * 3 + i] = row_sign[j] * col_sign[i] * PortRound(frame->mat[i][src_col[j]] * 65536.0f);
+        }
+    }
+}
 
 // FUNCTION: LEGOLAND 0x00404860
 void FUN_00404860(struct CopterNode *node, int index) {

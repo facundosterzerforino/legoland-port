@@ -3,8 +3,25 @@
 #include "legoland.h"
 #include "math.h"
 
-struct Position;
 struct Bloke;
+
+/* One frame of a .pos animation: the position, then the 3x3 orientation. */
+struct PosFrame {
+    float pos[3];
+    float mat[3][3];
+};
+
+struct Position {
+    int count_inner; /* frames per track */
+    int count; /* tracks */
+    float field_8;
+    float field_c;
+    float field_10;
+    int field_14;
+    int field_18;
+    unsigned char pad_1c[0x24 - 0x1c];
+    struct PosFrame **entries; /* one array of count_inner frames per track */
+};
 
 struct MeshShared {
     /* 0x00 */ int count;
