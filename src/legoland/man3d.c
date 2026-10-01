@@ -17,23 +17,6 @@
 #include "resource.h"
 #include "worker_mouse.h"
 
-struct PosFrame {
-    float pos[3];
-    float mat[3][3];
-};
-
-struct Position {
-    int count_inner;
-    int count;
-    float field_8;
-    float field_c;
-    float field_10;
-    int field_14;
-    int field_18;
-    unsigned char pad_1c[0x24 - 0x1c];
-    struct PosFrame **entries;
-};
-
 struct Mesh {
     /* 0x00 */ int count;
     /* 0x04 */ struct MeshElem *elems;

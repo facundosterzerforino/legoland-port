@@ -302,7 +302,26 @@ struct ListLink {
 struct CastleFloatEnt {
     float a;
     float b;
-    int c;
+    float c;
+};
+
+/* The textured mesh FUN_004234e0 draws (the roller-coaster track tube is built into DAT_004b5f60). */
+struct MeshVert {
+    int x;
+    int y;
+    int z;
+    unsigned int codes; /* clip code, as FUN_00426250 computes it */
+    int u;
+};
+
+struct TexMesh {
+    /* 0x00 */ int palette;
+    /* 0x04 */ int pad_4;
+    /* 0x08 */ int corner_count;
+    /* 0x0c */ int face_count;
+    /* 0x10 */ struct MeshVert *verts;
+    /* 0x14 */ int (*corners)[2]; /* vertex pairs */
+    /* 0x18 */ unsigned int (*faces)[3]; /* corner indices; the top bit picks the pair's second vertex */
 };
 
 struct Int16Pair {
@@ -838,7 +857,9 @@ extern unsigned int DAT_004b5ef4[4][2];
 // 0x004b5f14
 extern unsigned int DAT_004b5f14[4][2];
 // 0x004b5f60
-extern unsigned char DAT_004b5f60[1];
+extern struct TexMesh DAT_004b5f60;
+// 0x004b6150
+extern unsigned int DAT_004b6150[12];
 // 0x004b61e0
 extern struct CastleFloatEnt DAT_004b61e0[8];
 
@@ -1788,7 +1809,7 @@ extern Vector3 DAT_006117c0[34];
 // 0x00611958
 extern unsigned int DAT_00611958;
 // 0x00612178
-extern char DAT_00612178[1];
+extern int DAT_00612178[20];
 // 0x006122a0
 extern float DAT_006122a0[90][3];
 // 0x00614858
@@ -1802,6 +1823,8 @@ extern struct Cursor DAT_00622320[4];
 extern int DAT_006159c8[90][4];
 // 0x00615f6c
 extern unsigned int DAT_00615f6c;
+// 0x00615f70
+extern unsigned int DAT_00615f70[5];
 // 0x00615f84
 extern void *DAT_00615f84;
 extern int DAT_00615fc4;
@@ -4378,11 +4401,15 @@ extern float DAT_006121c8[6][3];
 // 0x006126d8
 extern float DAT_006126d8[6][2];
 // 0x00612708
-extern unsigned int DAT_00612708[31][36];
+extern unsigned int DAT_00612708[30][36];
+// 0x006137e8
+extern float DAT_006137e8[3][4][3];
 // 0x00613878
 extern unsigned int DAT_00613878[36];
 // 0x00613908
 extern int DAT_00613908[24][2];
+// 0x006139c8
+extern int DAT_006139c8[31][6][5];
 // 0x006148b8
 extern int DAT_006148b8[546][2];
 

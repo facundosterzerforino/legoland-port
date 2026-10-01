@@ -4701,24 +4701,6 @@ void FUN_00423480(struct ClearRect *r) {
     }
 }
 
-/* Port: the textured mesh FUN_004234e0 draws. */
-struct MeshVert {
-    int x;
-    int y;
-    int z;
-    unsigned int codes; /* clip code, as FUN_00426250 computes it */
-    int u;
-};
-
-struct TexMesh {
-    /* 0x00 */ int palette;
-    /* 0x04 */ int pad_4[2];
-    /* 0x0c */ int face_count;
-    /* 0x10 */ struct MeshVert *verts;
-    /* 0x14 */ int (*corners)[2]; /* vertex pairs */
-    /* 0x18 */ unsigned int (*faces)[3]; /* corner indices; the top bit picks the pair's second vertex */
-};
-
 // FUNCTION: LEGOLAND 0x004234e0
 int FUN_004234e0(void *param1) {
     /* Port: the original is inline asm (rdtsc profiling). Draws every front-facing, not trivially clipped
@@ -8396,29 +8378,79 @@ void FUN_00428b80(struct Curve *curve, float *off) {
     FUN_004238a0(&DAT_006159c8[0][0], 0x5a, -1);
 }
 
-// FUNCTION: LEGOLAND 0x00428cb0
-void FUN_00428cb0(void *p, unsigned int a, unsigned int b, unsigned int c, const char *name) { STUB(); }
+/* One entry of the curve function table at obj+0x4c: where the track is, and which way it points. */
+struct CurveFns {
+    void (*position)(struct Struct428e70 *obj, int key, struct FVec3 *out);
+    void (*direction)(struct Struct428e70 *obj, int key, struct FVec3 *out);
+};
 
 struct Struct428e70 {
     unsigned char pad_0[0x4c];
-    unsigned int (**vtable)(void *self, const char *name);
+    union {
+        unsigned int (**vtable)(struct Struct428e70 *self, const int *keys);
+        struct CurveFns *fns;
+    };
 };
+
+// FUNCTION: LEGOLAND 0x00428cb0
+struct TexMesh *FUN_00428cb0(struct Struct428e70 *obj, const struct FVec3 *offset, int fn, int count, const int *keys) {
+    /* Port [castle:asm]: the original is inline asm (rdtsc, x87). Builds the roller-coaster track tube into
+     * DAT_004b5f60: for each of the count keys it asks curve function pair fn for the track's direction and
+     * position, turns them into a frame (basis), transforms a ring of 6 vertices (DAT_006121c8) by it into
+     * DAT_006139c8, and lights each vertex (texture coordinate u) from the light direction DAT_004b5ca0. */
+    const float *light = (const float *)&DAT_004b5ca0;
+    struct FVec3 dir;
+    struct FVec3 basis[3];
+    struct FVec3 pos;
+    float m4[4][4];
+    float out4[4][4];
+    float side;
+    float up;
+    unsigned int start;
+    int i;
+    int j;
+
+    start = PortTimestamp();
+    for (i = 0; i < count; i++) {
+        struct MeshVert *ring = (struct MeshVert *)DAT_006139c8[i];
+
+        obj->fns[fn].direction(obj, keys[i], &dir);
+        FUN_00426560(&dir, basis);
+        obj->fns[fn].position(obj, keys[i], &pos);
+        pos.x += offset->x;
+        pos.y += offset->y;
+        pos.z += offset->z;
+        FUN_004264e0((unsigned int *)&pos, (unsigned int *)basis, (unsigned int (*)[4])m4);
+        FUN_00426120(DAT_008299fc.m, m4, out4);
+        FUN_00426250(DAT_006121c8, (int (*)[4])ring, &out4[0][0], 0x14, 6);
+        /* how much the light lines up with the frame's second and third axes */
+        side = (light[2] * basis[1].z + light[1] * basis[1].y + light[0] * basis[1].x) * DAT_0082999c;
+        up = (light[2] * basis[2].z + light[1] * basis[2].y + light[0] * basis[2].x) * DAT_0082999c;
+        for (j = 0; j < 6; j++) {
+            ring[j].u = (int)(up * DAT_006126d8[j][1] + side * DAT_006126d8[j][0] + DAT_00829a60);
+        }
+    }
+    DAT_004b5f60.corner_count = 18 * (count - 1) + 6;
+    DAT_004b5f60.face_count = 12 * (count - 1);
+    DAT_00615f68 += PortTimestamp() - start;
+    return &DAT_004b5f60;
+}
 
 // FUNCTION: LEGOLAND 0x00428e70
 void FUN_00428e70(struct Struct428e70 *p, unsigned int a, unsigned int b) {
     unsigned int handle = FUN_004236f0();
     unsigned int result = p->vtable[6](p, DAT_00612178);
     DAT_00615f6c = result;
-    FUN_00428cb0(p, a, b, result, DAT_00612178);
-    FUN_004234e0(DAT_004b5f60);
+    FUN_00428cb0(p, (const struct FVec3 *)a, b, result, DAT_00612178);
+    FUN_004234e0(&DAT_004b5f60);
     FUN_00423730(handle);
 }
 
 // FUNCTION: LEGOLAND 0x00428ec0
-void FUN_00428ec0(void *p, unsigned int a, unsigned int b) {
+void FUN_00428ec0(struct Struct428e70 *p, unsigned int a, unsigned int b) {
     unsigned int handle = FUN_004236f0();
-    FUN_00428cb0(p, a, b, DAT_00615f6c, DAT_00612178);
-    FUN_004234e0(DAT_004b5f60);
+    FUN_00428cb0(p, (const struct FVec3 *)a, b, DAT_00615f6c, DAT_00612178);
+    FUN_004234e0(&DAT_004b5f60);
     FUN_00423730(handle);
 }
 
@@ -8570,7 +8602,58 @@ void FUN_00429270(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004292f0
-void FUN_004292f0(struct FVec3 *pos, struct FVec3 *basis) { STUB(); }
+void FUN_004292f0(struct FVec3 *pos, struct FVec3 *basis) {
+    /* Port [castle:asm]: the original is inline asm (rdtsc, x87). Builds the 3-part marker mesh (3 groups of 4
+     * vertices in DAT_006137e8) at pos and draws it through FUN_00420e90. Part 0 is a quad snapped to a grid of
+     * 1.0 (pos / 5 truncated, times 1.0), part 1 a flat quad at pos, part 2 a quad lying in the plane through
+     * pos whose normal is basis[2]. */
+    struct FVec3 *normal = &basis[2];
+    float zero_pos[3];
+    float identity[9];
+    double gx;
+    double gy;
+    float x;
+    float y;
+    float d;
+    unsigned int start;
+    int i;
+
+    start = PortTimestamp();
+    gx = (double)(int)pos->x * 0.2 * 5.0f;
+    gy = (double)(int)pos->y * 0.2 * 5.0f;
+    for (i = 0; i < 4; i++) {
+        DAT_006137e8[0][i][0] = (float)(gx + DAT_00612210[0][i].a);
+        DAT_006137e8[0][i][1] = (float)(gy + DAT_00612210[0][i].b);
+        DAT_006137e8[0][i][2] = DAT_00612210[0][i].c;
+    }
+    for (i = 0; i < 4; i++) {
+        DAT_006137e8[1][i][0] = DAT_00612210[1][i].a + pos->x;
+        DAT_006137e8[1][i][1] = DAT_00612210[1][i].b + pos->y;
+        DAT_006137e8[1][i][2] = 0.0f;
+    }
+    d = FUN_00425d30(pos, normal);
+    for (i = 0; i < 4; i++) {
+        x = DAT_00612210[2][i].a + pos->x;
+        y = DAT_00612210[2][i].b + pos->y;
+        DAT_006137e8[2][i][0] = x;
+        DAT_006137e8[2][i][1] = y;
+        DAT_006137e8[2][i][2] = (d - x * normal->x - y * normal->y) / normal->z;
+    }
+    DAT_00615f68 += PortTimestamp() - start;
+    zero_pos[0] = 0.0f;
+    zero_pos[1] = 0.0f;
+    zero_pos[2] = 0.0f;
+    identity[0] = 1.0f;
+    identity[1] = 0.0f;
+    identity[2] = 0.0f;
+    identity[3] = 0.0f;
+    identity[4] = 1.0f;
+    identity[5] = 0.0f;
+    identity[6] = 0.0f;
+    identity[7] = 0.0f;
+    identity[8] = 1.0f;
+    FUN_00420e90((unsigned int)DAT_004b6150, (unsigned int)DAT_00615f70, zero_pos, identity, 1);
+}
 
 // FUNCTION: LEGOLAND 0x00429490
 void FUN_00429490(unsigned int param_1, unsigned int param_2) {
@@ -8594,11 +8677,11 @@ void FUN_004294f0(unsigned int a, unsigned int *b, unsigned int c, unsigned int 
     if (c == 1) {
         FUN_00428e70((struct Struct428e70 *)a, (unsigned int)b, 0);
         FUN_00429150((struct Curve *)a, (float *)b, d);
-        FUN_00428ec0((void *)a, (unsigned int)b, 2);
+        FUN_00428ec0((struct Struct428e70 *)a, (unsigned int)b, 2);
     } else {
         FUN_00428e70((struct Struct428e70 *)a, (unsigned int)b, 2);
         FUN_00429150((struct Curve *)a, (float *)b, d);
-        FUN_00428ec0((void *)a, (unsigned int)b, 0);
+        FUN_00428ec0((struct Struct428e70 *)a, (unsigned int)b, 0);
     }
 }
 
