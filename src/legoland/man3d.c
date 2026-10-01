@@ -252,8 +252,103 @@ void FUN_0043fa10(float *param_1, int param_2) {
     }
 }
 
+/* One triangle of a mesh file (0x24 bytes). */
+struct MeshFace {
+    /* 0x00 */ unsigned int flags; /* bit 13 (0x2000): solid colour, otherwise textured */
+    /* 0x04 */ unsigned char rgb[3];
+    /* 0x07 */ unsigned char pad_7;
+    /* 0x08 */ unsigned int texture; /* colour-cache id, or the texture id plus the caller's ctx */
+    /* 0x0c */ float uv[6]; /* three (u, v) pairs */
+};
+
 // FUNCTION: LEGOLAND 0x0043fa80
-void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) { STUB(); }
+void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
+    /* Port [man3d:asm]: the original loads this with C plus x87 float-to-int stores. Loads the mesh file
+     * .\3ddata\new\<dir>\<name>: per element the vertices and normals are read, Y is flipped, the normals are
+     * normalised and both are converted to 16.16 fixed point; then the shared index list and the faces. */
+    char path[256];
+    struct ResFile *file;
+    struct Mesh *mesh;
+    struct MeshShared *shared;
+    struct MeshElem *elem;
+    struct MeshFace *faces;
+    float *v;
+    int *iv;
+    int count;
+    int n;
+    int e;
+    int i;
+    unsigned char rgb[3];
+
+    sprintf(path, ".\3ddata\new\%s\%s", dir, name);
+    mesh = 0;
+    file = RES_OpenFile(path);
+    if (file != 0) {
+        mesh = (struct Mesh *)malloc(sizeof(struct Mesh));
+        memset(mesh, 0, sizeof(struct Mesh));
+        shared = (struct MeshShared *)malloc(sizeof(struct MeshShared));
+        shared->count = 0;
+        shared->field_4 = 0;
+        shared->field_8 = 0;
+        RES_ReadFile(file, &count, 4);
+        mesh->count = count;
+        mesh->elems = (struct MeshElem *)malloc(count * sizeof(struct MeshElem));
+        memset(mesh->elems, 0, count * sizeof(struct MeshElem));
+        for (e = 0; e < count; e++) {
+            elem = &mesh->elems[e];
+            RES_ReadFile(file, &n, 4);
+            elem->vert_count = n;
+            elem->verts = malloc(n * 12);
+            RES_ReadFile(file, elem->verts, n * 12);
+            v = (float *)elem->verts;
+            for (i = 0; i < n; i++) {
+                v[i * 3 + 1] = -v[i * 3 + 1];
+            }
+            iv = (int *)elem->verts;
+            for (i = 0; i < n * 3; i++) {
+                iv[i] = PortRound(v[i] * 65536.0f);
+            }
+            RES_ReadFile(file, &n, 4);
+            elem->norm_count = n;
+            elem->norms = malloc(n * 12);
+            RES_ReadFile(file, elem->norms, n * 12);
+            v = (float *)elem->norms;
+            for (i = 0; i < n; i++) {
+                NormaliseVector((struct Vec3 *)&v[i * 3]);
+            }
+            for (i = 0; i < n; i++) {
+                v[i * 3 + 1] = -v[i * 3 + 1];
+            }
+            iv = (int *)elem->norms;
+            for (i = 0; i < n * 3; i++) {
+                iv[i] = PortRound(v[i] * 65536.0f);
+            }
+            elem->shared = shared;
+            FUN_00440980(elem, (struct IntVec3 *)elem);
+        }
+        RES_ReadFile(file, &count, 4);
+        RES_ReadFile(file, &shared->field_4, 4);
+        shared->count = count;
+        shared->field_8 = malloc(count * 12);
+        RES_ReadFile(file, shared->field_8, count * 12);
+        mesh->field_8 = malloc(count * sizeof(struct MeshFace));
+        RES_ReadFile(file, mesh->field_8, count * sizeof(struct MeshFace));
+        RES_CloseFile(file);
+        faces = (struct MeshFace *)mesh->field_8;
+        for (i = 0; i < count; i++) {
+            if (faces[i].flags & 0x2000) {
+                rgb[0] = faces[i].rgb[0];
+                rgb[1] = faces[i].rgb[1];
+                rgb[2] = faces[i].rgb[2];
+                faces[i].texture = FUN_00486280(0x40, rgb);
+            } else {
+                faces[i].texture += ctx;
+            }
+            FUN_0043fa10(faces[i].uv, 3);
+        }
+    }
+    return mesh;
+}
 
 // FUNCTION: LEGOLAND 0x0043fde0
 void FUN_0043fde0(struct Mesh *mesh) {
