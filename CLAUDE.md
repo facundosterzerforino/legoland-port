@@ -1,15 +1,16 @@
 # legoland — Windows 11 port (instructions for Claude)
 
-**This is the `port` branch.** Its goal is a game that runs natively on modern Windows 11, built from the matching
-decompilation on `main`. The rules in this first section override the matching rules further down, which still
+**This is the Windows 11 port** ([facundosterzerforino/legoland-port](https://github.com/facundosterzerforino/legoland-port)).
+Its goal is a game that runs natively on modern Windows 11, built from the matching decompilation (`main` of the
+decomp repo, [facundosterzerforino/legoland](https://github.com/facundosterzerforino/legoland)). The rules in this first section override the matching rules further down, which still
 describe how `main` works.
 
 ## Port rules
 
 - **Goal:** working, readable C that runs on Windows 11, not byte-identical output. A function does not need to
   match the original to be correct here.
-- **Keep game logic close to `main`.** `main` is the source of truth and keeps improving; merge it into `port`
-  regularly. Change decompiled game code only when the port needs it, and keep the change small so merges
+- **Keep game logic close to `main`.** `main` is the source of truth and keeps improving; merge it into the port
+  regularly (`git merge main` in `~/wt/port`). Change decompiled game code only when the port needs it, and keep the change small so merges
   stay easy.
 - **Put port-only code in its own files** (startup, data loading, assembly replacements, platform code) rather
   than scattering it through the decompiled TUs.
@@ -22,8 +23,11 @@ describe how `main` works.
 - `./tools/verify` still works and is useful to see which functions a change touched, but a lower score is not a
   failure on this branch.
 - See `README.md` for the milestones (a program that starts, the title screen, playable, modern niceties).
-- The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, branch `port`); the Windows folder
-  `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
+- The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
+  `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
+- **Publishing:** the local `port` branch is pushed to `main` of the `legoland-port` repo with `~/push-port.sh`
+  (remote `port-repo` in `~/legoland`). Decomp work still goes to the `legoland` repo; never push port changes
+  there.
 
 ---
 

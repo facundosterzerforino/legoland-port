@@ -1,12 +1,13 @@
 # legoland — Windows 11 port
 
-This branch (`port`) turns the LEGOLAND decompilation into a **game that runs natively on modern Windows 11**.
+This repository turns the LEGOLAND decompilation into a **game that runs natively on modern Windows 11**.
 You supply your own copy of the 1999 game; the port uses its files and does not ship any game data.
 
-It is built on the **matching decompilation** on the `main` branch, which recreates `legoland.exe` as C that
+It is built on the **matching decompilation**
+([facundosterzerforino/legoland](https://github.com/facundosterzerforino/legoland)), which recreates `legoland.exe` as C that
 the original Microsoft Visual C++ 6.0 compiler turns into byte-identical code (verified per function with
-[`reccmp`](https://github.com/isledecomp/reccmp)). `main` is the source of truth for the game's code. This branch
-adds what it takes to run it: a real program entry, the game's data, replacements for hand-written assembly, and
+[`reccmp`](https://github.com/isledecomp/reccmp)). The decomp's `main` is the source of truth for the game's code. This
+repository adds what it takes to run it: a real program entry, the game's data, replacements for hand-written assembly, and
 modern Windows support.
 
 ## Status
@@ -33,18 +34,19 @@ modern Windows support.
 4. **Modern niceties.** Windowed mode, higher resolutions, and, where the 1999 APIs misbehave, replacing them
    (for example DirectDraw/DirectSound with SDL), plus music without DirectMusic.
 
-## How this branch relates to `main`
+## How this repository relates to the decomp
 
-- Game logic stays as close to `main` as possible, so new matches can flow in: **merge `main` into `port`
-  regularly**.
+- Game logic stays as close to `main` as possible, so new matches can flow in: **merge the decomp's `main` in
+  regularly** (`git remote add decomp https://github.com/facundosterzerforino/legoland.git`, then
+  `git fetch decomp && git merge decomp/main`).
 - Port-only work (startup, data loading, assembly replacements, platform code) is kept separate where possible,
   for example in new files, so those merges stay easy.
-- Matching-only tricks on `main` (`volatile` temporaries, `#pragma optimize`, duplicated inline helpers) can be
+- Matching-only tricks in the decomp (`volatile` temporaries, `#pragma optimize`, duplicated inline helpers) can be
   cleaned up here when they get in the way.
 
 ## Building
 
-For now this branch builds exactly like `main`, with the original MSVC6 toolchain run through
+For now this repository builds exactly like the decomp, with the original MSVC6 toolchain run through
 [`wibo`](https://github.com/decompals/wibo) from WSL:
 
 ```sh
