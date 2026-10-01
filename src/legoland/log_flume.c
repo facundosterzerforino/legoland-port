@@ -1818,13 +1818,15 @@ int FUN_0040adb0(TileId tile, struct FlumeRect *rect, int param_3, int y, float 
     struct Point pt;
     int top;
     float f;
-    int tx = tile.pos.x;
-    int ty = tile.pos.y;
-    int x0 = rect->var_0 + tx;
-    int y0 = rect->var_4 + ty;
-    int x1 = rect->var_8 + tx;
-    int y1 = rect->var_c + ty;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
 
+    x0 = rect->var_0 + tile.pos.x;
+    x1 = rect->var_8 + tile.pos.x;
+    y1 = rect->var_c + tile.pos.y;
+    y0 = rect->var_4 + tile.pos.y;
     pt.x = x0;
     pt.y = y0;
     GetTileBounds(&pt, bounds);

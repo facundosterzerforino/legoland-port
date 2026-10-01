@@ -477,10 +477,12 @@ unsigned int FUN_0046a750(struct NerpsArg *arg) {
     struct RenderObj *robj;
     struct TileGroup *group;
     struct TileNode *node;
+    struct MapElement *tile;
     int total;
     int blocked;
-    int x;
-    int y;
+    Point pt;
+    int ox;
+    int oy;
 
     total = 0;
     blocked = 0;
@@ -488,53 +490,55 @@ unsigned int FUN_0046a750(struct NerpsArg *arg) {
         group = ((struct TileGroupHolder *)arg->field_4)->group;
         node = group->list;
         if (node == NULL) {
-            return 1;
+            goto ok;
         }
         do {
-            x = group->field_c + node->x;
-            y = group->field_10 + node->y;
-            if (x < 0 || x >= (int)(unsigned int)lpConfig->width || y < 0 ||
-                y >= (int)(unsigned int)lpConfig->height ||
-                (struct MapElement *)((char *)GameMap[y] + x * 0x14) == NULL) {
+            ox = node->x;
+            oy = node->y;
+            pt.x = group->field_c + ox;
+            pt.y = group->field_10 + oy;
+            tile = GetTileAtPoint(&pt);
+            if (tile == NULL || ((tile->flags == 0) & 0x10)) {
                 total++;
                 blocked++;
-            } else if (FUN_00482b60((struct Point *)&x) == 0) {
+            } else if (FUN_00482b60(&pt) == 0) {
                 total++;
             }
             node = node->next;
         } while (node != NULL);
     } else {
         robj = (struct RenderObj *)GetFirstRenderObject();
-        blocked = 0;
         if (robj == NULL) {
-            return 1;
+            goto ok;
         }
         do {
             group = robj->field_0->group;
             if (FUN_0046a730((struct NerpsArg *)group) != 0) {
-                x = group->field_c + robj->field_4;
-                y = group->field_10 + robj->field_5;
-                if (x < 0 || x >= (int)(unsigned int)lpConfig->width || y < 0 ||
-                    y >= (int)(unsigned int)lpConfig->height ||
-                    (struct MapElement *)((char *)GameMap[y] + x * 0x14) == NULL) {
+                ox = robj->field_4;
+                oy = robj->field_5;
+                pt.x = group->field_c + ox;
+                pt.y = group->field_10 + oy;
+                tile = GetTileAtPoint(&pt);
+                if (tile == NULL || ((tile->flags == 0) & 0x10)) {
                     total++;
                     blocked++;
-                } else if (FUN_00482b60((struct Point *)&x) == 0) {
+                } else if (FUN_00482b60(&pt) == 0) {
                     total++;
                 }
             }
             robj = (struct RenderObj *)GetNextRenderObject((MapElement *)robj);
         } while (robj != NULL);
     }
-    if (blocked == 0) {
-        if (total == 0) {
-            return 1;
-        }
+    if (blocked != 0) {
+        FUN_00468dc0(arg, arg->field_4);
+        return 0;
+    }
+    if (total != 0) {
         FUN_00468e00(arg, arg->field_4);
         return 0;
     }
-    FUN_00468dc0(arg, arg->field_4);
-    return 0;
+ok:
+    return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a900
@@ -570,18 +574,24 @@ unsigned int FUN_0046a960(struct NerpsArg *arg) {
     unsigned int x;
     unsigned int y;
     int xb;
+    int xstart;
+    int yend;
+    struct LegoConfig *cfg;
 
     total = 0;
     y = arg->field_2c;
     count = 0;
-    if ((int)y <= arg->field_34) {
+    yend = arg->field_34;
+    cfg = lpConfig;
+    if ((int)y <= yend) {
+        xstart = arg->field_28;
         do {
-            x = arg->field_28;
+            x = xstart;
             if ((int)x <= arg->field_30) {
                 xb = x * 0x14;
                 do {
-                    if (xb < 0 || (int)(unsigned int)lpConfig->width <= (int)x || (int)y < 0 ||
-                        (int)(unsigned int)lpConfig->height <= (int)y) {
+                    if (xb < 0 || (int)(unsigned int)cfg->width <= (int)x || (int)y < 0 ||
+                        (int)(unsigned int)cfg->height <= (int)y) {
                         tile = NULL;
                     } else {
                         tile = (struct MapElement *)((char *)GameMap[y] + xb);
@@ -591,11 +601,11 @@ unsigned int FUN_0046a960(struct NerpsArg *arg) {
                     }
                     x++;
                     xb += 0x14;
-                    total = count;
                 } while ((int)x <= arg->field_30);
+                total = count;
             }
             y++;
-        } while ((int)y <= arg->field_34);
+        } while ((int)y <= yend);
     }
     if (total <= (int)arg->field_14) {
         return 1;

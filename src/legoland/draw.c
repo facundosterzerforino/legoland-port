@@ -1403,35 +1403,41 @@ void FUN_00465850(struct AviFrame *frame) {
 void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3) {
     int height;
     int width;
+    int last;
     unsigned short *src;
     unsigned short *dst;
     int offset;
     int i;
     int j;
     unsigned short *p;
-    unsigned short v;
+    short v;
 
     height = param_1->height;
     width = param_1->width;
     dst = (unsigned short *)((char *)DAT_0066809c.lpSurface + DAT_0066809c.lPitch * param_3 + param_2 * 2);
-    src = param_1->pixels + (height - 1) * width;
-    for (i = height; i != 0; i--) {
-        if (width > 0) {
-            offset = (char *)src - (char *)dst;
-            p = dst;
-            j = width;
-            do {
-                v = *(unsigned short *)((char *)p + offset);
-                if (DAT_00668088 == 2) {
-                    v = (v & 0x1f) | (v & 0xffe0) << 1;
-                }
-                *p = v;
-                p++;
-                j--;
-            } while (j != 0);
-        }
-        dst = (unsigned short *)((char *)dst + DAT_0066809c.lPitch);
-        src -= width;
+    last = height - 1;
+    src = param_1->pixels + last * width;
+    if (height != 0) {
+        i = last + 1;
+        do {
+            if (width > 0) {
+                offset = (char *)src - (char *)dst;
+                p = dst;
+                j = width;
+                do {
+                    v = *(short *)(offset + (char *)p);
+                    if (DAT_00668088 == 2) {
+                        v = (v & 0x1f) | (v & ~0x1f) << 1;
+                    }
+                    *p = v;
+                    p++;
+                    j--;
+                } while (j != 0);
+            }
+            dst = (unsigned short *)((char *)dst + DAT_0066809c.lPitch);
+            src -= width;
+            i--;
+        } while (i != 0);
     }
 }
 

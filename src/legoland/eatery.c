@@ -1574,6 +1574,18 @@ void FUN_004304e0(unsigned short *param_1, int param_2, unsigned int param_3) {
     c7 = state->field_7;
     switch (state->field_18) {
     case 0:
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
+        AdjustOffsetForViewMode(&off);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 3), c9);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
+        AdjustOffsetForViewMode(&off);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        if (state->field_c == 0) {
+            return;
+        }
+        goto set_l6;
     case 1:
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
@@ -1583,32 +1595,29 @@ void FUN_004304e0(unsigned short *param_1, int param_2, unsigned int param_3) {
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
         AdjustOffsetForViewMode(&off);
         PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
-        if (state->field_18 == 0 && state->field_c == 0) {
-            return;
-        }
+    set_l6:
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 6), c8);
         return;
     case 2:
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
         AdjustOffsetForViewMode(&off);
-        sx = off.x + sx;
-        sy = off.y + sy;
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 1), sx, sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
-    case 3:
+    case 4:
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
         AdjustOffsetForViewMode(&off);
         PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
-        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 2), c6);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 2);
         AdjustOffsetForViewMode(&off);
-        sx = off.x + sx;
-        sy = off.y + sy;
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 3), sx, sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 2), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 0), c6);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 0);
+        AdjustOffsetForViewMode(&off);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
-    case 4:
     case 5:
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
@@ -1621,9 +1630,17 @@ void FUN_004304e0(unsigned short *param_1, int param_2, unsigned int param_3) {
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 0), c6);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 0);
         AdjustOffsetForViewMode(&off);
-        sx = off.x + sx;
-        sy = off.y + sy;
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 0), sx, sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        return;
+    case 3:
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 1), c7);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 1);
+        AdjustOffsetForViewMode(&off);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 3), c9);
+        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
+        AdjustOffsetForViewMode(&off);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_00616118, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
     }
 }

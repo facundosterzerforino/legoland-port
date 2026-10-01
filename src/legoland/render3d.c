@@ -319,28 +319,30 @@ struct RinRender {
 LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct ViewportEntry *param_3, unsigned char *param_4) {
     struct Point coords;
     int idx;
+    void *base;
     int *entry;
     int i;
     struct Point offset;
 
     coords = GetScreenCoordsForObject(param_4, param_3);
     idx = param_2;
-    if (param_1->modulo <= param_2) {
+    if (param_2 >= param_1->modulo) {
         idx = param_2 % param_1->modulo;
     }
+    base = param_1->frame_array[idx];
     i = param_1->loop_count - 1;
     if (i >= 0) {
-        entry = (int *)((char *)param_1->frame_array[idx] + i * 4);
+        entry = (int *)((char *)base + i * 4);
         i = i + 1;
         do {
             int sprite_id = *entry;
-            int lookup = sprite_id;
             struct BlokeRideNode *node;
             int *frame;
-            if (param_1->data_table != NULL) {
-                lookup = param_1->data_table[param_1->remap_table[sprite_id]];
+            if (param_1->data_table == NULL) {
+                node = (struct BlokeRideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
+            } else {
+                node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[param_1->remap_table[sprite_id]], param_3, (short *)param_4);
             }
-            node = (struct BlokeRideNode *)FUN_004418c0(lookup, param_3, (short *)param_4);
             if (node != NULL && (node->inner->flags & 0x80) != 0) {
                 IP_RenderBlokeIn3DNow((struct Bloke *)node->inner);
             }

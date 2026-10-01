@@ -108,7 +108,7 @@ void FUN_0045a030(int power, struct MapElement *object);
 void FUN_0045a060(void);
 void FUN_0045a0d0(void);
 LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos);
-LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, unsigned int coords);
+LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, TileId coords);
 LEGO_EXPORT void DefaultCursor(struct Cursor *cursor);
 void FUN_0045a3e0(int *param);
 void FUN_0045a430(short param_1, int *param_2);

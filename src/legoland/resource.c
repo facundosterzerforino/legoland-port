@@ -375,7 +375,6 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
 
     base_name[0] = '\0';
     memset(base_name + 1, 0, sizeof(base_name) - 1);
-    orig_str[0] = '\0';
 
     if (FUN_004515e0(0) == 0) {
         exit(1);
@@ -398,9 +397,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
         }
     }
 
-    if (last_slash == 0) {
-        file_name = orig_str;
-    } else {
+    if (last_slash != 0) {
         prefix_len = (int)(last_slash - orig_str) + 1;
         if (orig_str[0] == '.') {
             while (prefix[1] == '\\') {
@@ -414,6 +411,8 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
         memcpy(base_name, prefix, prefix_len);
         base_name[prefix_len] = '\0';
         file_name = last_slash + 1;
+    } else {
+        file_name = orig_str;
     }
 
     dir = GetMasterDirPtr(base_name);

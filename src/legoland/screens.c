@@ -620,7 +620,7 @@ void FUN_00459360(void) {
     unsigned int var_4;
     struct HitInfo hit_info;
     RECT clipping;
-    RECT old_clipping;
+    int ticks;
 
     var_4 = 1;
     hit_info.field_0 = 0;
@@ -641,24 +641,26 @@ void FUN_00459360(void) {
         return;
     }
     if ((Hover.type & 0x100) != 0) {
+        RECT old_clipping = {0, 0x20, 0x280, 0x174};
+
         GetClipping(&clipping);
         SetClipping(&old_clipping);
         RenderMouseBounds();
-        SetClipping(&old_clipping);
-        if ((DAT_00813ac4 & 1) != 0) {
+        SetClipping(&clipping);
+        if ((DAT_00813ac4 & var_4) != 0) {
             MapScreenSetScrollPos(&DAT_00813a44);
         }
         if ((DAT_00813ac4 & 2) != 0) {
-            hit_info.field_8 = GetTicks();
-            if (hit_info.field_8 - DAT_00667c68 < 0x1f4 && abs(DAT_00813a44.x - DAT_00667c70) < 5 &&
+            ticks = GetTicks();
+            if (ticks - DAT_00667c68 < 0x1f4 && abs(DAT_00813a44.x - DAT_00667c70) < 5 &&
                 abs(DAT_00813a44.y - DAT_00667c74) < 5) {
-                DAT_0080ff70 = 1;
+                DAT_0080ff70 = var_4;
                 EditMode.unk4 = DAT_00667c60;
-                DAT_00667c60 = 1;
+                DAT_00667c60 = var_4;
             }
             DAT_00667c70 = DAT_00813a44.x;
             DAT_00667c74 = DAT_00813a44.y;
-            DAT_00667c68 = hit_info.field_8;
+            DAT_00667c68 = ticks;
         }
     }
     UpdateFocussedIconPtr();

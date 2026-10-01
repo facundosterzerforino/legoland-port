@@ -45,7 +45,7 @@ struct EarthRideObj {
 
 void FUN_0042cd70(unsigned short *a1);
 void FUN_0042cdc0(struct EarthNode *node);
-struct EarthNode *FUN_0042ce20(unsigned short *param_1);
+struct EarthNode *FUN_0042ce20(volatile unsigned short *param_1);
 void FUN_0042ce50(struct EarthNode *node, struct EarthBlokeElem *elem);
 void FUN_0042ce90(struct EarthNode *p, struct EarthQueue *value);
 void FUN_0042cec0(struct Cursor *param_1, unsigned char *param_2, int *param_3);

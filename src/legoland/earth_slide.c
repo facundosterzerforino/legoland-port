@@ -57,7 +57,7 @@ void FUN_0042cdc0(struct EarthNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ce20
-struct EarthNode *FUN_0042ce20(unsigned short *param_1) {
+struct EarthNode *FUN_0042ce20(volatile unsigned short *param_1) {
     struct EarthNode *node = DAT_006160e8;
 
     if (node != NULL) {

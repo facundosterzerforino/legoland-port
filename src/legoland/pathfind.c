@@ -225,12 +225,11 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
     int hi_x;
     int lo_y;
     int hi_y;
-    struct Point *to = goal;
 
     DAT_004bcec0.x = goal->x >> 8;
     DAT_004bcec0.y = goal->y >> 8;
     start = FUN_004817d0((int *)pos);
-    end = FUN_004817d0((int *)to);
+    end = FUN_004817d0((int *)goal);
     if (start == 0) {
         return -2;
     }
@@ -238,16 +237,15 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
         return -1;
     }
     if (start == end) {
-        *out = *to;
+        *out = *goal;
         out->x += 0x80;
         out->y += 0x80;
         return 2;
     }
     FUN_00481ee0();
-    if (!FUN_00481f00(start, end, (struct BestNode **)&goal)) {
+    if (!FUN_00481f00(start, end, &prev)) {
         return -1;
     }
-    prev = (struct BestNode *)goal;
     FUN_00481e60((struct PathQuery *)pos, (struct PathBox *)prev);
     lo_x = prev->x_min << 8;
     hi_x = prev->x_max << 8;

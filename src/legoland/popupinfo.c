@@ -1466,6 +1466,7 @@ void FUN_004736f0(void) {
     int iVar1;
     int iVar2;
     int iVar3;
+    int iVar4;
     struct PrintCtx ctx;
 
     iVar1 = DAT_007fe014;
@@ -1485,15 +1486,17 @@ void FUN_004736f0(void) {
             } while (iVar2 < DAT_00668964);
         }
         PrintSprite(DAT_0066890c, iVar3, iVar1, 0, (int *)&ctx);
+        iVar3 = iVar3 + 0x4e;
         DAT_007fdea8->flags = DAT_007fdea8->flags & 0xfffffbff;
-        DAT_007fdea8->x = (short)iVar3 + 3;
+        DAT_007fdea8->x = (short)(iVar3 - 0x4b);
         DAT_007fdea8->y = (short)DAT_007fe014 + 3;
         DAT_007fe000->flags = DAT_007fe000->flags & 0xfffffbff;
-        DAT_007fe000->x = (short)iVar3 + 0x27;
+        DAT_007fe000->x = (short)(iVar3 - 0x27);
         DAT_007fe000->y = (short)DAT_007fe014 + 3;
-        FUN_00455e50(DAT_00668968, DAT_007fe010 + 0xc, DAT_007fe014 + 6,
-            (DAT_007fe010 + 0x86 + DAT_00668964 * 0x14) - (DAT_007fe010 + 0xc),
-            (DAT_007fe014 + 0x21) - (DAT_007fe014 + 6), 1, 5, 0xff0000, 0xffffff);
+        iVar2 = DAT_007fe010 + 0xc;
+        iVar4 = DAT_007fe014 + 6;
+        FUN_00455e50(DAT_00668968, iVar2, iVar4, (iVar2 + DAT_00668964 * 0x14 + 0x7a) - iVar2,
+            (iVar4 + 0x1b) - iVar4, 1, 5, 0xff0000, 0xffffff);
         if ((DAT_007fe000->x + 0x24 < (int)DAT_00813a44.x) || ((int)DAT_00813a44.x < DAT_007fdea8->x)) {
             FUN_00471d60();
         }

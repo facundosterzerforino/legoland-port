@@ -110,7 +110,7 @@ unsigned int FUN_004434d0(struct Image *param_1) {
     }
     aligned_width = (*(int *)(info + 4) + 3) & 0xfffffffc;
     row_size = *(int *)(info + 8) * aligned_width;
-    RES_SetFilePointer(file, offbits);
+    RES_SetFilePointer(file, *(unsigned int *)(header + 0xa));
     pixels = (unsigned char *)malloc(row_size);
     if (pixels == NULL) {
         free(param_1);
@@ -133,9 +133,9 @@ unsigned int FUN_004434d0(struct Image *param_1) {
         src = pixels + row_size;
         RES_SetFilePointer(file, pixel_offset);
         for (x = 0; x < 0x100; x++) {
-            (&DAT_0081c0c0[256])[x] = 0;
+            DAT_0081c4c0[x] = 0;
         }
-        RES_ReadFile(file, &DAT_0081c0c0[256], *(int *)(info + 0x20) * 4);
+        RES_ReadFile(file, DAT_0081c4c0, *(int *)(info + 0x20) * 4);
         RES_SetFilePointer(file, offbits);
         RES_ReadFile(file, pixels, row_size);
         for (y = 0; y < param_1->height; y++) {
