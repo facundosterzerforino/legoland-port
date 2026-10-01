@@ -7,22 +7,34 @@ describe how `main` works.
 
 ## Port rules
 
-- **Goal:** working, readable C that runs on Windows 11, not byte-identical output. A function does not need to
-  match the original to be correct here.
-- **Keep game logic close to `main`.** `main` is the source of truth and keeps improving; merge it into the port
-  regularly (`git merge main` in `~/wt/port`). Change decompiled game code only when the port needs it, and keep the change small so merges
-  stay easy.
-- **Put port-only code in its own files** (startup, data loading, assembly replacements, platform code) rather
-  than scattering it through the decompiled TUs.
-- **Inline-assembly functions:** write plain-C equivalents that do the same thing. Note in a comment that the
-  original used inline asm.
+**`PORTING.md` holds the full rules; read it before changing code.** It follows
+[isle-portable](https://github.com/isledecomp/isle-portable), so that the game can later run on other systems
+(Android is a planned target). The short version:
+
+- **Goal:** platform independence, not a better game. Keep gameplay, timing and visuals; no rewrites for
+  improvement's sake. A function does not need to match the original byte for byte here.
+- **The decomp is the source of truth.** Merge its `main` in regularly. Change `src/legoland/` only when
+  portability needs it, in small single-subsystem commits; never rename or reorder decompiled code only for the
+  port.
+- **Layout:** `src/legoland/` is the decompiled game; `miniwin/` reimplements the Windows APIs it calls on
+  SDL3; `port/` holds the entry point, config, data loading and asm replacements; `extensions/` holds optional
+  features (off by default); `3rdparty/` holds unmodified libraries.
+- **Prefer a `miniwin/` shim** over editing a call. When a call must change, change it in place and tag it with
+  the subsystem: `// [library:video]`, `[library:audio]`, `[library:input]`, `[library:config]`, and the rest of
+  the table in `PORTING.md`. No `#ifdef PORT` blocks around whole functions.
+- **Inline-assembly functions:** write plain-C equivalents that do the same thing. Comment that the original
+  was inline asm and tag them `// [library:asm]`.
+- **Portable C:** no pointers stored in `int`/`unsigned int` (use pointer types or `uintptr_t`), exact-size
+  types and explicit little-endian loads for file formats, no unaligned or type-punned access, explicit
+  `signed`/`unsigned char`, no compiler-specific keywords or x87 assumptions in shared code, `/` paths with
+  case-insensitive lookup.
 - **Game data:** never commit proprietary files. The port reads the user's own `legoland.exe` and game data at
   runtime.
-- **Matching-only workarounds** from `main` (`volatile` temporaries, `#pragma optimize`, duplicated `static
-  __inline` helpers) may be cleaned up here when they get in the way.
-- `./tools/verify` still works and is useful to see which functions a change touched, but a lower score is not a
-  failure on this branch.
-- See `README.md` for the milestones (a program that starts, the title screen, playable, modern niceties).
+- **Matching-only workarounds** from the decomp (`volatile` temporaries, `#pragma optimize`, duplicated
+  `static __inline` helpers) may be cleaned up here when they get in the way.
+- `./tools/verify` still works and is useful to see which functions a change touched, but a lower score is not
+  a failure in this repo.
+- See `README.md` for status and `PORTING.md` for the order of work.
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
   `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
 - **Publishing:** the local `port` branch is pushed to `main` of the `legoland-port` repo with `~/push-port.sh`

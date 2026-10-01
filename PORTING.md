@@ -1,0 +1,120 @@
+# Porting rules
+
+These are the rules for turning the LEGOLAND decompilation into a portable game. They follow the model of
+[isle-portable](https://github.com/isledecomp/isle-portable), the portable version of LEGO Island built on the
+[isle](https://github.com/isledecomp/isle) decompilation, which now runs on Windows, macOS, Linux, Android,
+iOS, the web and consoles from one codebase.
+
+The first target is Windows 11. Android is a planned target, so every rule below is written so that the same
+code can also build for Android (64-bit ARM), Linux and macOS later, without a rewrite.
+
+## Scope
+
+- **The goal is platform independence, not a better game.** Keep the original gameplay, timing, visuals and
+  bugs. Don't rewrite code to improve it or to make it more "modern".
+- **The decompilation is the source of truth.** Game logic comes from
+  [facundosterzerforino/legoland](https://github.com/facundosterzerforino/legoland) and is merged in regularly.
+  Every change to decompiled code makes those merges harder, so make one only when portability needs it.
+- **Optional features** such as widescreen, higher resolutions, mods or cheats live in `extensions/` and are
+  off by default. They never change the default game.
+
+## Repository layout
+
+| Directory | Contents | Rules |
+|---|---|---|
+| `src/legoland/` | The decompiled game (like isle-portable's `LEGO1/`). | Change only to make it portable. Keep its structure, names and address annotations, so merges from the decomp stay clean. |
+| `miniwin/` | A small re-implementation of the Windows APIs the game calls, built on SDL3: `include/miniwin/windows.h`, `ddraw.h`, `dsound.h`, `dinput.h`, `vfw.h`, `mmsystem.h` and so on, plus `src/` grouped by API. | The game includes these headers instead of the Windows SDK on every platform except a "native Windows" build. Implement only what the game uses. |
+| `port/` | Port-only code that isn't a Windows API: the real entry point and main loop, config, loading the game's data, plain-C replacements for inline assembly (today's `port_asm.h` moves here), path handling. | |
+| `extensions/` | Optional features. | Each one has its own switch, is off by default and hooks in at as few points as possible. |
+| `3rdparty/` | SDL3, miniaudio, iniparser and any other libraries, unmodified. | Don't edit them; style rules don't apply. Prefer git submodules or CMake `FetchContent` over copied sources. |
+| `android-project/`, `packaging/` | Platform build and packaging files (Gradle project, installers). | Added when that platform is started. |
+
+## Library substitutions
+
+Every place in the code that touches one of these subsystems carries a searchable tag comment, as
+isle-portable does (`// [library:window]` and so on). That way `grep -rn "\[library:audio\]"` lists everything
+that still needs work, or everything that changed, for one subsystem.
+
+| Subsystem (what the original uses) | Replacement | Tag |
+|---|---|---|
+| Window, message loop, events (`CreateWindow`, `PeekMessage`, `WndProc`) | SDL3 | `[library:window]` |
+| 2D video (DirectDraw: 640x480 16-bit surfaces, blits, locking) | SDL3 (a 16-bit framebuffer uploaded to a texture each frame) | `[library:video]` |
+| Software 3D renderer (inline asm in `castle.c`, `draw.c`, `render.c`, `man3d.c`) | Plain C; it already draws into a memory buffer, so it needs no GPU API | `[library:asm]` |
+| Keyboard, mouse, cursor (DirectInput, `GetCursorPos`, `ShowCursor`) | SDL3; touch on Android acts as the mouse | `[library:input]` |
+| Sound effects (DirectSound, `waveOut`, ACM decompression `acmStream*`) | SDL3 audio + miniaudio | `[library:audio]` |
+| Music (DirectMusic through COM `CoCreateInstance`) | To be decided: a MIDI/DLS synth, or pre-rendered audio from the user's files | `[library:music]` |
+| Movies (`AVIFile*`/`AVIStream*` from vfw32; FLC) | To be decided: a decoder for the codecs the game's AVIs use | `[library:movie]` |
+| Settings (Windows registry `Reg*`) | iniparser (an `.ini` file in the user's data folder) | `[library:config]` |
+| Files and folders (`CreateFile`, `fopen`, `SetCurrentDirectory`, drive/volume and CD checks) | SDL3 filesystem plus a case-insensitive path lookup; the CD check passes when the data is present | `[library:filesystem]` |
+| Timers (`timeGetTime`, `GetTickCount`, `QueryPerformanceCounter`, `rdtsc` profiling) | SDL3 timers | `[library:timer]` |
+| Threads and sync (music thread, events, critical sections) | SDL3 | `[library:thread]` |
+| Message boxes (`MessageBox`) | `SDL_ShowSimpleMessageBox` | `[library:dialog]` |
+| GDI bitmaps (`CreateDIB*`, `BitBlt`, `StretchBlt`) | Plain C on memory buffers | `[library:gdi]` |
+| Certificate printing (winspool, `StartDoc`) | Save the certificate as an image instead | `[library:print]` |
+
+Unlike LEGO Island, LEGOLAND has **no Direct3D**: its 3D is drawn by its own software renderer. Once the
+inline assembly is plain C, the whole picture is one 16-bit buffer. Showing it on any platform is a single
+texture upload, so the port doesn't need renderer backends.
+
+## How to change decompiled code
+
+1. **Prefer `miniwin/`.** If an API can be reimplemented behind the same name and signature, do that, and the
+   decompiled code stays untouched.
+2. **If a call has to change, change it in place** and tag it: `// [library:audio] was DirectSoundCreate`.
+   Don't wrap whole functions in `#ifdef PORT`; one build of `src/legoland/` serves every platform.
+3. **Keep each change small and in one subsystem**: one subsystem per commit, about 10 files at most, so a
+   merge conflict with the decomp is easy to resolve.
+4. **Don't rename or reorder** decompiled functions, globals or struct fields only for the port. A better name
+   belongs in the decomp, from where it is merged in.
+5. **Inline assembly** becomes plain C that does the same thing. Add a comment saying the original was inline
+   asm, plus the `[library:asm]` tag. Shared helpers (`PortRound`, `PortFixMul`, `PortTimestamp`) live in
+   `port/`.
+
+## Portable C rules
+
+These are what make an Android (64-bit ARM) build possible later. They apply to all new and changed code.
+
+- **Pointers are pointers.** Never store a pointer in `int` or `unsigned int`: on 64-bit platforms it doesn't
+  fit. Use real pointer types, or `uintptr_t` when an integer is unavoidable. Many decompiled signatures still
+  use `unsigned int` for pointers (for example `FUN_00420e90(unsigned int mesh, ...)`); fix them as you touch
+  them.
+- **File formats use exact sizes.** Read the game's files into structs made of `int32_t`, `uint16_t` and so on,
+  with explicit little-endian loads. Never `fread` straight into a struct that contains pointers, and don't
+  rely on MSVC padding.
+- **No unaligned or type-punned access** through casted pointers (`*(int *)(bytes + 3)`). Use `memcpy` or
+  byte-wise loads; ARM and optimizing compilers can break the cast.
+- **`char` signedness.** `char` is unsigned on ARM. Where the sign matters, write `signed char` or
+  `unsigned char`.
+- **No compiler-specific code** in shared files: no `__stdcall`/`__cdecl` (miniwin defines them as empty),
+  `__int64` (use `int64_t`), `__declspec`, `_ftol`, inline asm or `#pragma` packing tricks.
+- **Floating point.** Don't depend on x87 80-bit precision or `_control87`. Where the original rounds with
+  `fistp` (round to nearest), use `PortRound`; a plain C cast truncates.
+- **Paths.** Use `/` and compare names case-insensitively through the filesystem layer. Never hard-code drive
+  letters or `C:\`.
+- **The data folder is configurable.** On Android it is app storage the user copies the game into; on Windows
+  it is the game's install folder.
+
+## Game data
+
+- Never commit proprietary files: no game data, movies, sounds or `legoland.exe`.
+- The port reads everything from the user's own installation, including the initialized globals from
+  `legoland.exe` (the `.data` tables that `globals.c` declares without values). That loader lives in `port/`.
+
+## Build
+
+- CMake with presets per platform. The port moves to modern compilers (MSVC 2022, clang, gcc, and the Android
+  NDK later). The MSVC6/`wibo` build stays in the decomp repo, where matching happens.
+- Builds must have no warnings in `port/`, `miniwin/` and `extensions/`. Turn on `-Wall` and the 64-bit
+  pointer-truncation warnings early, because they find the "pointer in an int" bugs.
+- Formatting: `clang-format` with the repo's `.clang-format`, on everything except `3rdparty/`.
+
+## Order of work
+
+1. **Finish the inline asm** in plain C (22 functions left) and make the code build with a modern compiler
+   as 32-bit x86 Windows.
+2. **Startup:** a real entry point in `port/`, the C runtime, and the data loader for initialized globals.
+3. **miniwin + SDL3 on Windows:** window, 2D video, input, timers. Goal: the title screen.
+4. **Sound, then movies and music**, then every screen of the game: playable on Windows 11.
+5. **64-bit clean:** build and run as x64 Windows with no pointer-size warnings.
+6. **Linux** (a cheap test that nothing Windows-only is left), **then Android**: Gradle project, touch input,
+   data-folder picker.

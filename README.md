@@ -15,34 +15,31 @@ modern Windows support.
 | | |
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
-| Runs on Windows 11 | **not yet**: the build links but does not start (see milestone 1) |
-| Hand-written assembly still missing | 44 functions (software renderer, 3D math, character renderer) |
+| Runs on Windows 11 | **not yet**: the build links but does not start (see milestone 2) |
+| Hand-written assembly still missing | 22 of 44 functions (2D blitters, character renderer, 3D math) |
+
+## Goal and approach
+
+The port follows [isle-portable](https://github.com/isledecomp/isle-portable), which took the LEGO Island
+decompilation to Windows, macOS, Linux, Android, the web and consoles. Here too, the decompiled game stays as
+close to the decomp as possible. Windows APIs are reimplemented in a small `miniwin/` layer on
+[SDL3](https://www.libsdl.org/), and every changed call is tagged by subsystem (`// [library:video]` and so on).
+Windows 11 comes first; the rules keep the code ready for Android and other systems later. See
+[`PORTING.md`](PORTING.md) for the rules and the library substitution table.
+
+LEGOLAND helps here: it has no Direct3D. Its 3D is drawn by its own software renderer into a 16-bit buffer, so
+once the hand-written assembly is plain C, showing a frame on any platform is a single texture upload.
 
 ## Milestones
 
-1. **A program that starts.** Today the build links with no C runtime and a dummy entry point, purely so
-   `reccmp` can compare functions. The port needs:
-   - the real C runtime startup and libraries;
-   - the game's initialized data (about 92 KB of tables and constants), loaded at startup from your own
-     `legoland.exe`, since most globals in `globals.c` are declared without their original values;
-   - plain-C versions of the 44 functions the original wrote in inline assembly.
-2. **Title screen on Windows 11.** Boot, load the title-screen UI, and run the frame loop with input. Windows 11
-   still ships DirectDraw, DirectSound and DirectInput, so the original API calls are the first thing to try.
-   Movies (FLC/AVI) and music are out of scope at this stage; the game already has a `-nomusic` switch, and
-   DirectMusic may not be available on Windows 11.
-3. **Playable.** All game screens, sound effects, saving and loading, the parks themselves.
-4. **Modern niceties.** Windowed mode, higher resolutions, and, where the 1999 APIs misbehave, replacing them
-   (for example DirectDraw/DirectSound with SDL), plus music without DirectMusic.
-
-## How this repository relates to the decomp
-
-- Game logic stays as close to `main` as possible, so new matches can flow in: **merge the decomp's `main` in
-  regularly** (`git remote add decomp https://github.com/facundosterzerforino/legoland.git`, then
-  `git fetch decomp && git merge decomp/main`).
-- Port-only work (startup, data loading, assembly replacements, platform code) is kept separate where possible,
-  for example in new files, so those merges stay easy.
-- Matching-only tricks in the decomp (`volatile` temporaries, `#pragma optimize`, duplicated inline helpers) can be
-  cleaned up here when they get in the way.
+1. **Plain C everywhere.** Finish the assembly replacements and build with a modern compiler (32-bit Windows).
+2. **A program that starts.** A real entry point and C runtime, and the game's initialized data (about 92 KB of
+   tables and constants) loaded from your own `legoland.exe`, since most globals in `globals.c` are declared
+   without their original values.
+3. **Title screen.** `miniwin` + SDL3: window, 2D video, input and timers on Windows 11.
+4. **Playable.** Sound, then movies and music, then every screen, saving and loading.
+5. **64-bit and other systems.** x64 Windows with no pointer-size warnings, then Linux, then Android (touch
+   input, choosing the data folder).
 
 ## Building
 
@@ -56,8 +53,8 @@ cmake --build build      # -> build/legoland.exe
 ./tools/verify           # still useful: shows which functions a port change touched
 ```
 
-Whether to move to a modern compiler (MSVC 2022 or clang-cl, still 32-bit x86) is an open decision for
-milestone 1.
+Milestone 1 moves the port to modern compilers (MSVC 2022, clang, gcc, later the Android NDK) with CMake
+presets per platform; the MSVC6 build stays in the decomp repo, where matching happens.
 
 ## You need your own game
 
@@ -66,6 +63,7 @@ The port reads data from an original LEGOLAND installation (the `.res` volumes, 
 
 ## More documentation
 
+- `PORTING.md`: the porting rules (layout, library substitutions, portable C, order of work).
 - `CLAUDE.md`: working rules for AI-assisted sessions (port rules first, then the matching rules from `main`).
 - `DECOMPILING.md`, `HEADERS.md`, `docs/decomp-tips.md`: how the matching decompilation works.
 - `docs/title-screen-port.md`: an earlier scoping study of the boot-to-title-screen path. Its match numbers
