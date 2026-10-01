@@ -577,6 +577,10 @@ extern struct FlumeDims DAT_004cbde8[4];
 // 0x004cbe38
 extern struct FlumeDims DAT_004cbe38[2];
 
+// 0x004d8bb8
+extern int DAT_004d8bb8[1024][4];
+// 0x004dcbb8
+extern float DAT_004dcbb8[3];
 // 0x0066b638
 extern struct ColorLutEntry DAT_0066b638[256];
 // 0x004ab44c

@@ -1191,17 +1191,17 @@ struct Dispatcher {
 
 struct Vtable110 {
     unsigned char pad_0[0x110];
-    unsigned int (*method_110)(struct Dispatcher *self, unsigned int arg);
+    float (*method_110)(struct Dispatcher *self, float time_left);
 };
 
 // FUNCTION: LEGOLAND 0x0041e0e0
-unsigned int FUN_0041e0e0(struct Dispatcher *self, unsigned int arg) {
-    return self->vtable->method_110(self, arg);
+float FUN_0041e0e0(struct Dispatcher *self, float time_left) {
+    return self->vtable->method_110(self, time_left);
 }
 
 struct Hook114 {
     unsigned char pad_0[0x114];
-    void (*field_114)(void *self, unsigned int arg);
+    float (*field_114)(void *self, float time_left);
 };
 
 struct Hooked {
@@ -1212,15 +1212,81 @@ struct Hooked {
 };
 
 // FUNCTION: LEGOLAND 0x0041e100
-void FUN_0041e100(struct Hooked *self, unsigned int arg) {
+float FUN_0041e100(struct Hooked *self, float time_left) {
     unsigned int saved = self->field_34;
+    float used = self->field_6c->field_114(self, time_left);
 
-    self->field_6c->field_114(self, arg);
     self->field_34 = saved;
+    return used;
 }
 
+struct AnimWalker {
+    unsigned int field_0;
+    unsigned int field_4;
+    unsigned int field_8;
+};
+
+/* Port: view of the animated object FUN_0041e130 steps (shared with FUN_0041e000/0e0/100). */
+struct AnimKey {
+    unsigned char pad_0[0x44];
+    unsigned int field_44;
+};
+
+struct AnimObj {
+    /* 0x00 */ unsigned int flags; /* 4: playing a hooked step next, 8: dispatched step, 0x10: hooked step */
+    /* 0x04 */ int last_time;
+    /* 0x08 */ unsigned int pad_8;
+    /* 0x0c */ struct AnimWalker walker; /* walker.field_4 is the current AnimKey */
+    /* 0x18 */ unsigned char pad_18[0x24 - 0x18];
+    /* 0x24 */ unsigned int field_24;
+    /* 0x28 */ unsigned char pad_28[0x6c - 0x28];
+    /* 0x6c */ unsigned char *hooks;
+};
+
 // FUNCTION: LEGOLAND 0x0041e130
-void FUN_0041e130(void) { STUB(); }
+void FUN_0041e130(void *host) {
+    /* Port: the original is inline asm (rdtsc profiling). Steps the object's animation through the game time
+     * elapsed since the last call (in seconds, capped at 0.8), moving on to the next key whenever a step
+     * finishes before the time is used up. */
+    struct AnimObj *obj = (struct AnimObj *)host;
+    unsigned int now = GetGameTimer();
+    float elapsed = ((float)(int)now - (float)obj->last_time) * 0.001f;
+    unsigned char *hooks = obj->hooks;
+    unsigned int start;
+    float done = 0.0f;
+    float limit;
+    unsigned int key;
+
+    if (elapsed > 0.8f) {
+        elapsed = 0.8f;
+    }
+    start = PortTimestamp();
+    limit = elapsed - 1e-6f;
+    for (;;) {
+        key = obj->walker.field_0;
+        if (obj->flags & 8) {
+            done += FUN_0041e0e0((struct Dispatcher *)obj, elapsed - done);
+        } else if (obj->flags & 0x10) {
+            done += FUN_0041e100((struct Hooked *)obj, elapsed - done);
+        } else {
+            done += FUN_0041e000((unsigned char *)obj, elapsed - done);
+        }
+        if (!(done < limit)) {
+            break;
+        }
+        FUN_0041f850(&obj->walker);
+        obj->field_24 = ((struct AnimKey *)obj->walker.field_4)->field_44;
+        if (key != obj->walker.field_0) {
+            if (obj->flags & 8) {
+                obj->flags = (obj->flags & ~8u) | 4;
+            } else if ((obj->flags & 4) && obj->walker.field_0 == (unsigned int)(hooks + 4)) {
+                obj->flags = (obj->flags & ~4u) | 0x10;
+            }
+        }
+    }
+    obj->last_time = now;
+    DAT_004d83bc += PortTimestamp() - start;
+}
 
 struct Timed {
     int field_0;
@@ -2275,12 +2341,6 @@ struct OuterAt28 {
     unsigned int field_28;
 };
 
-struct AnimWalker {
-    unsigned int field_0;
-    unsigned int field_4;
-    unsigned int field_8;
-};
-
 // FUNCTION: LEGOLAND 0x0041f850
 unsigned int FUN_0041f850(struct AnimWalker *cursor) {
     struct InnerAt50 *inner = (struct InnerAt50 *)cursor->field_4;
@@ -2669,16 +2729,46 @@ int FUN_004207d0(unsigned int key) {
 }
 
 // FUNCTION: LEGOLAND 0x00420810
-void FUN_00420810(void) { STUB(); }
+void FUN_00420810(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
 
 // FUNCTION: LEGOLAND 0x00420a20
-void FUN_00420a20(void) { STUB(); }
+void FUN_00420a20(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
 
 // FUNCTION: LEGOLAND 0x00420c40
-void FUN_00420c40(void) { STUB(); }
+void FUN_00420c40(unsigned int mesh, unsigned int b, unsigned int flags) { STUB(); }
 
 // FUNCTION: LEGOLAND 0x00420e90
-unsigned int FUN_00420e90(unsigned int a, unsigned int b, void *c, void *d, unsigned int e) { STUB(); }
+unsigned int FUN_00420e90(unsigned int a, unsigned int b, void *c, void *d, unsigned int e) {
+    /* Port: the original is inline asm (rdtsc profiling). Draws one 3D object: a = mesh (vertex count at
+     * [0], vertices at [3]), c = position, d = orientation. Builds the object-to-screen matrix, transforms
+     * the vertices into DAT_004d8bb8 and the light vector into DAT_004dcbb8, then, if the screen can be
+     * locked, runs the three drawing passes. Returns 1 when it drew. */
+    unsigned int start = PortTimestamp();
+    float rot[4][4];
+    float m[4][4];
+    struct VideoArg video;
+
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+    FUN_00426510((unsigned int *)d, (struct Mat4x4 *)rot);
+    FUN_004261c0((float *)&DAT_004b5ca0, DAT_004dcbb8, rot, 1);
+    DAT_004dcbb8[0] *= DAT_0082999c;
+    DAT_004dcbb8[1] *= DAT_0082999c;
+    DAT_004dcbb8[2] *= DAT_0082999c;
+    FUN_004264e0((unsigned int *)c, (unsigned int *)d, (unsigned int (*)[4])rot);
+    FUN_00426120(DAT_008299fc.m, rot, m);
+    FUN_00426250((float (*)[3])((unsigned int *)a)[3], (int (*)[4])DAT_004d8bb8, &m[0][0], 0x10, ((unsigned int *)a)[0]);
+    DAT_004dcbc8 += PortTimestamp() - start;
+    if (FUN_00423760(&video) == 0) {
+        return 0;
+    }
+    FUN_00420810(a, b, e);
+    FUN_00420a20(a, b, e);
+    FUN_00420c40(a, b, e);
+    FUN_00423790();
+    return 1;
+}
 
 // FUNCTION: LEGOLAND 0x00420fb0
 unsigned int FUN_00420fb0(unsigned char *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {

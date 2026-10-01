@@ -82,6 +82,12 @@ struct FlumeDims DAT_004cbde8[4];
 // GLOBAL: LEGOLAND 0x004cbe38
 struct FlumeDims DAT_004cbe38[2];
 
+// GLOBAL: LEGOLAND 0x004d8bb8
+int DAT_004d8bb8[1024][4];
+
+// GLOBAL: LEGOLAND 0x004dcbb8
+float DAT_004dcbb8[3];
+
 // GLOBAL: LEGOLAND 0x0066b638
 struct ColorLutEntry DAT_0066b638[256];
 

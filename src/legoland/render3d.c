@@ -98,7 +98,36 @@ void FUN_00441910(int *param_1, float *param_2, int *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00441980
-void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) { STUB(); }
+void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
+    /* Port: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
+     * animation param_1: the position from FUN_00441910, offset by (param_5, param_6), and the 16.16 fixed-point
+     * orientation from the frame's 3x3 float matrix, with axes 1 and 2 swapped and some signs flipped. */
+    static const int src_col[3] = {0, 2, 1};
+    static const int row_sign[3] = {1, -1, -1};
+    static const int col_sign[3] = {-1, 1, 1};
+    struct Person *person = (struct Person *)param_4;
+    float *frame_data;
+    int pos[2];
+    int frame = param_3;
+    int i;
+    int j;
+
+    if (frame < 0) {
+        frame = 0;
+    }
+    if (frame >= param_1[0]) {
+        frame = param_1[0] - 1;
+    }
+    /* each frame is 12 floats: the position, then the 3x3 matrix */
+    frame_data = (float *)((char *)((int **)param_1[9])[param_2] + frame * 48);
+    FUN_00441910(param_1, frame_data, pos);
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            person->m[j * 3 + i] = row_sign[j] * col_sign[i] * PortRound(frame_data[3 + i * 3 + src_col[j]] * 65536.0f);
+        }
+    }
+    SetPersonPosition(person, pos[0] + param_5, pos[1] + param_6);
+}
 
 struct BlokeRideInner {
     unsigned char pad_0[0x62];
