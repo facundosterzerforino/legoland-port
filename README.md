@@ -21,8 +21,9 @@ modern Windows support.
 ## Goal and approach
 
 The port follows [isle-portable](https://github.com/isledecomp/isle-portable), which took the LEGO Island
-decompilation to Windows, macOS, Linux, Android, the web and consoles. Here too, the decompiled game stays as
-close to the decomp as possible. Windows APIs are reimplemented in a small `miniwin/` layer on
+decompilation to Windows, macOS, Linux, Android, the web and consoles. Here too, the decompiled game keeps behaving
+exactly like the original. Unlike isle-portable, code may also be rewritten to be clearer or faster when that
+breaks nothing. Windows APIs are reimplemented in a small `miniwin/` layer on
 [SDL3](https://www.libsdl.org/), and every changed call is tagged by subsystem (`// [library:video]` and so on).
 Windows 11 comes first; the rules keep the code ready for Android and other systems later. See
 [`PORTING.md`](PORTING.md) for the rules and the library substitution table.

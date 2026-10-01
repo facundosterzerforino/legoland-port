@@ -10,11 +10,21 @@ code can also build for Android (64-bit ARM), Linux and macOS later, without a r
 
 ## Scope
 
-- **The goal is platform independence, not a better game.** Keep the original gameplay, timing, visuals and
-  bugs. Don't rewrite code to improve it or to make it more "modern".
-- **The decompilation is the source of truth.** Game logic comes from
+- **The goal is platform independence.** The game must look, sound and play the same as the original: same
+  gameplay, timing, visuals and saves.
+- **Rewriting is allowed when it breaks nothing.** Unlike isle-portable, code may be rewritten to be clearer,
+  safer or faster, as long as the behavior stays the same. "The same" means the same pixels, sounds, timing
+  and saved data. Check it before committing, for example by comparing the old and new function on the same
+  inputs or on screenshots. Fixing crashes and undefined behavior is welcome. Fixes that change gameplay
+  (including original game bugs players may rely on) go in `extensions/` as an option.
+- **The decompilation is the source of truth for what the game does.** Game logic comes from
   [facundosterzerforino/legoland](https://github.com/facundosterzerforino/legoland) and is merged in regularly.
-  Every change to decompiled code makes those merges harder, so make one only when portability needs it.
+  A rewritten function no longer merges cleanly, so:
+  - tag it `// [port:rewrite]` (with a line on what changed), so a merge conflict there is resolved by keeping
+    the port's version;
+  - prefer rewriting functions that are already finished in the decomp (100% matched), since they won't
+    change there any more;
+  - keep rewrites in their own commits, separate from portability changes.
 - **Optional features** such as widescreen, higher resolutions, mods or cheats live in `extensions/` and are
   off by default. They never change the default game.
 
@@ -64,8 +74,9 @@ texture upload, so the port doesn't need renderer backends.
    Don't wrap whole functions in `#ifdef PORT`; one build of `src/legoland/` serves every platform.
 3. **Keep each change small and in one subsystem**: one subsystem per commit, about 10 files at most, so a
    merge conflict with the decomp is easy to resolve.
-4. **Don't rename or reorder** decompiled functions, globals or struct fields only for the port. A better name
-   belongs in the decomp, from where it is merged in.
+4. **Names belong in the decomp.** A better name for a decompiled function, global or struct field should go
+   into the decomp first and be merged in from there, so both repos agree. Don't reorder decompiled functions;
+   address order keeps merges readable.
 5. **Inline assembly** becomes plain C that does the same thing. Add a comment saying the original was inline
    asm, plus the `[library:asm]` tag. Shared helpers (`PortRound`, `PortFixMul`, `PortTimestamp`) live in
    `port/`.

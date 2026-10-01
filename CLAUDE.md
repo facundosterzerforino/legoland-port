@@ -11,11 +11,15 @@ describe how `main` works.
 [isle-portable](https://github.com/isledecomp/isle-portable), so that the game can later run on other systems
 (Android is a planned target). The short version:
 
-- **Goal:** platform independence, not a better game. Keep gameplay, timing and visuals; no rewrites for
-  improvement's sake. A function does not need to match the original byte for byte here.
-- **The decomp is the source of truth.** Merge its `main` in regularly. Change `src/legoland/` only when
-  portability needs it, in small single-subsystem commits; never rename or reorder decompiled code only for the
-  port.
+- **Goal:** platform independence. The game must look, sound and play the same as the original. A function
+  does not need to match the original byte for byte here.
+- **Rewrites and optimizations are allowed when they break nothing**: same pixels, sounds, timing and saves.
+  Verify before committing (old vs new on the same inputs, or screenshots). Tag rewritten functions
+  `// [port:rewrite]` with what changed, prefer functions already 100% matched in the decomp, and keep
+  rewrites in their own commits. Gameplay-changing fixes go in `extensions/` as an option.
+- **The decomp is the source of truth for what the game does.** Merge its `main` in regularly. Portability
+  changes to `src/legoland/` go in small single-subsystem commits; better names go into the decomp first; don't
+  reorder decompiled functions.
 - **Layout:** `src/legoland/` is the decompiled game; `miniwin/` reimplements the Windows APIs it calls on
   SDL3; `port/` holds the entry point, config, data loading and asm replacements; `extensions/` holds optional
   features (off by default); `3rdparty/` holds unmodified libraries.
