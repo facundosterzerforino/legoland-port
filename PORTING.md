@@ -51,9 +51,9 @@ that still needs work, or everything that changed, for one subsystem.
 | 2D video (DirectDraw: 640x480 16-bit surfaces, blits, locking) | SDL3 (a 16-bit framebuffer uploaded to a texture each frame) | `[library:video]` |
 | Software 3D renderer (inline asm in `castle.c`, `draw.c`, `render.c`, `man3d.c`) | Plain C; it already draws into a memory buffer, so it needs no GPU API | `[library:asm]` |
 | Keyboard, mouse, cursor (DirectInput, `GetCursorPos`, `ShowCursor`) | SDL3; touch on Android acts as the mouse | `[library:input]` |
-| Sound effects (DirectSound, `waveOut`, ACM decompression `acmStream*`) | SDL3 audio + miniaudio | `[library:audio]` |
-| Music (DirectMusic through COM `CoCreateInstance`) | To be decided: a MIDI/DLS synth, or pre-rendered audio from the user's files | `[library:music]` |
-| Movies (`AVIFile*`/`AVIStream*` from vfw32; FLC) | To be decided: a decoder for the codecs the game's AVIs use | `[library:movie]` |
+| Sound effects (DirectSound, `waveOut`, ACM decompression `acmStream*`) | SDL3 audio + miniaudio (its WAV decoder also handles MS and IMA ADPCM, which ACM decoded) | `[library:audio]` |
+| Music (DirectMusic through COM `CoCreateInstance`: 30 segments `.sgt` and 212 styles `.sty`) | [GothicKit/dmusic](https://github.com/GothicKit/dmusic), a C re-implementation of DirectMusic's segment and style playback (see the notes below) | `[library:music]` |
+| Movies (`AVIFile*`/`AVIStream*` from vfw32): Indeo Video 5 (`IV50`) and one Indeo 3.2 (`IV32`), with PCM, MS ADPCM or IMA ADPCM sound | FFmpeg's `libavcodec`, built with only the `indeo5`, `indeo3`, `adpcm_ms` and `adpcm_ima_wav` decoders (LGPL), plus a small AVI reader of our own | `[library:movie]` |
 | Settings (Windows registry `Reg*`) | iniparser (an `.ini` file in the user's data folder) | `[library:config]` |
 | Files and folders (`CreateFile`, `fopen`, `SetCurrentDirectory`, drive/volume and CD checks) | SDL3 filesystem plus a case-insensitive path lookup; the CD check passes when the data is present | `[library:filesystem]` |
 | Timers (`timeGetTime`, `GetTickCount`, `QueryPerformanceCounter`, `rdtsc` profiling) | SDL3 timers | `[library:timer]` |
@@ -61,6 +61,18 @@ that still needs work, or everything that changed, for one subsystem.
 | Message boxes (`MessageBox`) | `SDL_ShowSimpleMessageBox` | `[library:dialog]` |
 | GDI bitmaps (`CreateDIB*`, `BitBlt`, `StretchBlt`) | Plain C on memory buffers | `[library:gdi]` |
 | Certificate printing (winspool, `StartDoc`) | Save the certificate as an image instead | `[library:print]` |
+
+Notes on the two harder rows:
+
+- **Music.** LEGOLAND uses DirectMusic's adaptive composition (styles and segments), not plain MIDI files, so
+  a MIDI player isn't enough. GothicKit/dmusic plays exactly these formats and is used by the Gothic remakes on
+  several systems; it is still incomplete, so LEGOLAND's soundtrack must be checked by ear. The game ships no
+  instrument file (`.dls`): it relies on the General MIDI set built into Windows (`gm.dls`), which can't be
+  redistributed. On Windows the port can load the user's own `gm.dls`; other systems need a free General MIDI
+  sound bank instead.
+- **Movies.** Indeo was never open, and FFmpeg's decoders are the only maintained open implementations.
+  Building `libavcodec` with just these four decoders keeps it small. The fallback, if a dependency on FFmpeg
+  is unwanted, is to port its `indeo5` decoder (a few thousand lines) into `port/`.
 
 Unlike LEGO Island, LEGOLAND has **no Direct3D**: its 3D is drawn by its own software renderer. Once the
 inline assembly is plain C, the whole picture is one 16-bit buffer. Showing it on any platform is a single
@@ -108,6 +120,12 @@ These are what make an Android (64-bit ARM) build possible later. They apply to 
 ## Game data
 
 - Never commit proprietary files: no game data, movies, sounds or `legoland.exe`.
+- The reference CD (`LEGOLAND.iso`, volume `LEGOLAND`, readme dated 10 April 2000) has these loose files: the
+  `.res` volumes (`Legoland.res`, `Graphics1.res`, `Graphics2.res`), 14 `.avi` movies, 1,266 speech `.wav`
+  files, an Indeo 5 codec installer and DirectX 7 setup. The game itself is inside the InstallShield 3 archive
+  `main.z` (PKWARE DCL compression): `legoland.exe`, 30 `.sgt` and 212 `.sty` music files, 26 more `.avi` files,
+  23 `.bnv` and other level files. Its `legoland.exe` is byte-identical to the decomp's target (sha256
+  `c50865b6...e2bd9`). The port will need a small installer step that unpacks `main.z`.
 - The port reads everything from the user's own installation, including the initialized globals from
   `legoland.exe` (the `.data` tables that `globals.c` declares without values). That loader lives in `port/`.
 
