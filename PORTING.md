@@ -119,11 +119,17 @@ These are what make an Android (64-bit ARM) build possible later. They apply to 
 
 ## Game data
 
-- Never commit proprietary files: no game data, movies, sounds or `legoland.exe`.
+- **Never commit game data**: no `.res` volumes, movies, sounds, music, level files, installer archives or
+  CD images. They are copyrighted. `.gitignore` blocks these file types.
+- **The one exception is `legoland.exe`**, the program itself, which stays committed as `external/legoland.exe`
+  (the decomp needs it to match against, and the port reads its initialized data).
+- On the maintainer's machine the game files live outside the repo in `C:\Users\fsterzer\Dropbox\legoland pc port`:
+  `cd/` is a copy of the CD and `installed/` is the unpacked `main.z`.
 - The reference CD (`LEGOLAND.iso`, volume `LEGOLAND`, readme dated 10 April 2000) has these loose files: the
   `.res` volumes (`Legoland.res`, `Graphics1.res`, `Graphics2.res`), 14 `.avi` movies, 1,266 speech `.wav`
   files, an Indeo 5 codec installer and DirectX 7 setup. The game itself is inside the InstallShield 3 archive
-  `main.z` (PKWARE DCL compression): `legoland.exe`, 30 `.sgt` and 212 `.sty` music files, 26 more `.avi` files,
+  `main.z` (PKWARE DCL compression): `legoland.exe`, 30 `.sgt` and 212 `.sty` music files, 26 small silent
+  `.avi` animations (Indeo 5, 112x96),
   23 `.bnv` and other level files. Its `legoland.exe` is byte-identical to the decomp's target (sha256
   `c50865b6...e2bd9`). The port will need a small installer step that unpacks `main.z`.
 - The port reads everything from the user's own installation, including the initialized globals from

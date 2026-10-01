@@ -24,8 +24,9 @@ reccmp-build.yml
 /a[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]??
 report.json
 
-# Game files are copyrighted: never commit them. Keep them outside the repo
-# (C:\Users\fsterzer\Dropbox\legoland pc port). external/legoland.exe predates this rule.
+# Game data is copyrighted: never commit it. Keep it outside the repo
+# (C:\Users\fsterzer\Dropbox\legoland pc port). The one exception is external/legoland.exe,
+# the program itself, which stays committed.
 *.iso
 *.res
 *.avi
