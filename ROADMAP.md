@@ -16,7 +16,11 @@ the decisions to make on the way.
 - **Game files:** a complete install in `C:\Users\fsterzer\Dropbox\legoland pc port\installed` (see `PORTING.md`),
   and the original `legoland.exe` in `external/`.
 
-## Phase 1: plain C everywhere
+## Phase 1: plain C everywhere (done)
+
+**Status:** done. All 44 inline-asm functions are plain C, tagged `[library:asm]`; the helpers are in
+`port/port_asm.h`. None of it has run yet, so expect bugs to show up in phases 4 and 5.
+
 
 Finish replacing the inline assembly, so every function is C a modern compiler can build for any CPU.
 

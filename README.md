@@ -16,7 +16,7 @@ modern Windows support.
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
 | Runs on Windows 11 | **not yet**: the build links but does not start (see milestone 2) |
-| Hand-written assembly still missing | 22 of 44 functions (2D blitters, character renderer, 3D math) |
+| Hand-written assembly | **done**: all 44 inline-asm functions are plain C (phase 1 of `ROADMAP.md`) |
 
 ## Goal and approach
 
