@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #pragma intrinsic(strcpy, strlen)
+#include "debug.h"
 #include "globals.h"
 #include "legoland.h"
 
@@ -701,19 +702,27 @@ void FUN_00459520(void) {
     DAT_0081cd08 = ElemID("HEDGE")->data;
     FUN_004594f0();
     InitSoundSystem();
+    DebugTrace("boot: after InitSoundSystem()");
     SetMusicGrooveLevel(1);
     SuspendMusicThread();
     SetupControllers();
+    DebugTrace("boot: after SetupControllers()");
     LLIDB_ClearOnLevel();
     InitMouse();
+    DebugTrace("boot: after InitMouse()");
     SetPointer(0);
     ProcessSystemEvents();
+    DebugTrace("boot: after ProcessSystemEvents()");
     // STRING: LEGOLAND 0x004b9200
     PlayMovie("lmi.avi", 0, 1);
+    DebugTrace("boot: after PlayMovie lmi.avi");
     PrintTitleScreen1();
+    DebugTrace("boot: after PrintTitleScreen1()");
     ResumeMusicThread();
     LoadWatchSprite(0, 0);
+    DebugTrace("boot: after LoadWatchSprite(0, 0)");
 
+    DebugTrace("boot: waiting for lmi.avi, DAT_007988bc=%d", DAT_007988bc);
     while (DAT_007988bc == 0) {
         PeekMessageA(&msg, NULL, 0, 0, 0);
         Sleep(100);
@@ -721,26 +730,34 @@ void FUN_00459520(void) {
     }
 
     LoadGBarSprites();
+    DebugTrace("boot: after LoadGBarSprites()");
     LoadWorkerInterfaceGFX();
     LoadBubbleHelpGFX();
     InitialiseBlokes();
+    DebugTrace("boot: after InitialiseBlokes()");
     InitGameMap();
+    DebugTrace("boot: after InitGameMap()");
     SetPointer(0);
     // STRING: LEGOLAND 0x004b91f4
     PlayMovie("Intro.avi", 1, 0);
+    DebugTrace("boot: after PlayMovie Intro.avi");
     FUN_00492ca0(0);
     SetPointer(5);
     FrameCounter = 0;
     Load_Interface_ControlIcons();
+    DebugTrace("boot: after Load_Interface_ControlIcons()");
     DrawWatchSprite();
     Load_Interface_ThemeIcons();
     FreeTileSpace(0, 0x800);
     EditMode.unk4 = 3;
     LoadMapTiles();
+    DebugTrace("boot: after LoadMapTiles()");
     DrawWatchSprite();
     InitMan();
+    DebugTrace("boot: after InitMan()");
     DrawWatchSprite();
     CreateObjectClasses();
+    DebugTrace("boot: after CreateObjectClasses()");
     DrawWatchSprite();
     FUN_00458bc0();
     DrawWatchSprite();
@@ -748,11 +765,15 @@ void FUN_00459520(void) {
     ir50 = LoadLibraryA("Ir50_32.dll");
     DrawWatchSprite();
     LoadAdvisorAnims();
+    DebugTrace("boot: after LoadAdvisorAnims()");
     DrawWatchSprite();
     UnloadWatchSprite();
+    DebugTrace("boot: after UnloadWatchSprite()");
     ResumeMusicThread();
+    DebugTrace("boot: entering main loop");
     while (FUN_00458c00() != 0) {
     }
+    DebugTrace("boot: main loop ended");
     FUN_004594e0();
     SpeechCloseFile();
     if (SPRITE_TitleScreenBk != NULL) {

@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <dinput.h>
+#include "debug.h"
 #include "legoland.h"
 
 #include <ctype.h>
@@ -47,6 +48,10 @@ int CreateKeyboardDevice(void) {
 
     if (IDirectInput_CreateDevice((LPDIRECTINPUTA)dinput, &GUID_SysKeyboard, (LPDIRECTINPUTDEVICEA *)&dinput_keyboard, NULL) == 0) {
         IDirectInputDevice_SetDataFormat((LPDIRECTINPUTDEVICEA)dinput_keyboard, &c_dfDIKeyboard);
+        /* [library:input] the original never set the keyboard's cooperative level (DirectX 3 on Win9x defaulted
+         * it); modern DirectInput refuses Acquire with E_INVALIDARG until it is set, so ScanKeyboard spun forever. */
+        IDirectInputDevice_SetCooperativeLevel((LPDIRECTINPUTDEVICEA)dinput_keyboard, WNDENV_Gethwnd(),
+            DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
         caps.dwSize = 0x2c;
         IDirectInputDevice_GetCapabilities((LPDIRECTINPUTDEVICEA)dinput_keyboard, &caps);
         if (!((caps.dwFlags == 0) & 1)) {
@@ -55,6 +60,9 @@ int CreateKeyboardDevice(void) {
     }
     return 0;
 }
+
+static int kb_trace; /* [port] trace throttles */
+static int ms_trace;
 
 // FUNCTION: LEGOLAND 0x00473930
 LEGO_EXPORT void ScanKeyboard(void) {
@@ -68,8 +76,15 @@ LEGO_EXPORT void ScanKeyboard(void) {
         if (hr == DI_OK) {
             return;
         }
+        if (kb_trace < 5) {
+            kb_trace++;
+            DebugTrace("ScanKeyboard: GetDeviceState hr=%lx", hr);
+        }
         if (hr == 0x8007000c || hr == 0x8007001e) {
-            IDirectInputDevice_Acquire((IDirectInputDeviceA *)dinput_keyboard);
+            hr = IDirectInputDevice_Acquire((IDirectInputDeviceA *)dinput_keyboard);
+            if (kb_trace < 5) {
+                DebugTrace("ScanKeyboard: Acquire hr=%lx", hr);
+            }
         }
     }
 }
@@ -123,8 +138,15 @@ LEGO_EXPORT void ScanMouse(void) {
             if (hr == DI_OK) {
                 break;
             }
+            if (ms_trace < 5) {
+                ms_trace++;
+                DebugTrace("ScanMouse: GetDeviceState hr=%lx", hr);
+            }
             if (hr == 0x8007000c || hr == 0x8007001e) {
-                IDirectInputDevice_Acquire((IDirectInputDeviceA *)dintput_mouse);
+                hr = IDirectInputDevice_Acquire((IDirectInputDeviceA *)dintput_mouse);
+                if (ms_trace < 5) {
+                    DebugTrace("ScanMouse: Acquire hr=%lx", hr);
+                }
             }
         }
     }

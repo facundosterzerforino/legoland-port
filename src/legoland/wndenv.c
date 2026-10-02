@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "debug.h"
 #include "legoland.h"
 
 #include <stdlib.h>
@@ -77,6 +78,9 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
             SetCursor(NULL);
         }
         if ((lpConfig->field_1c & 1) != 0) {
+            if (!peeked) {
+                DebugTrace("ProcessSystemEvents: inactive (field_1c=%x), waiting", lpConfig->field_1c);
+            }
             peeked = 1;
             WaitMessage();
         }

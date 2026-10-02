@@ -10,6 +10,25 @@
 #include "saveload.h"
 #include "wndenv.h"
 
+#ifdef LEGOLAND_PORT
+// [library:filesystem] The port's data folder is a complete install (volumes\, speech\, FMV\ next to
+// the exe), so the CD is never needed. Pretend the current folder is the CD drive: every CD fallback
+// path is built as "%sfile" from CdDrivePath, and ".\\" makes those point at the data folder.
+static int PortDataFolderIsCd(void) {
+    static int checked = 0;
+    static int present = 0;
+
+    if (!checked) {
+        checked = 1;
+        present = GetFileAttributesA(".\\volumes\\Legoland.res") != INVALID_FILE_ATTRIBUTES;
+        if (present) {
+            strcpy(CdDrivePath, ".\\");
+        }
+    }
+    return present;
+}
+#endif
+
 // FUNCTION: LEGOLAND 0x00450f30
 int FindCdDriveWithVolume(char *cd_volume) {
     DWORD drives;
@@ -23,6 +42,11 @@ int FindCdDriveWithVolume(char *cd_volume) {
     DWORD max_component_length;
     DWORD fs_flags;
 
+#ifdef LEGOLAND_PORT
+    if (PortDataFolderIsCd()) { // [library:filesystem]
+        return 1;
+    }
+#endif
     // STRING: LEGOLAND 0x004b8630
     strcpy(root_path, "c:\\");
     result = 0;
@@ -72,6 +96,11 @@ int IsCdVolumePresent(char *cd_volume) {
     DWORD max_component_length;
     DWORD fs_flags;
 
+#ifdef LEGOLAND_PORT
+    if (PortDataFolderIsCd()) { // [library:filesystem]
+        return 1;
+    }
+#endif
     strcpy(root_path, "c:\\");
     result = 0;
     root_path[0] = CdDrivePath[0];

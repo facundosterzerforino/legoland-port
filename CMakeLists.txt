@@ -12,8 +12,10 @@ if(LEGOLAND_MODERN_BUILD)
     # Port-only code (startup data, asm helpers, later platform layers).
     file(GLOB PORT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/*.c")
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
-    # DirectInput 3 is what the game asks for (input.c); it also makes the SDK declare DirectInputCreateA.
-    target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0300)
+    # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
+    # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
+    # below 0x0800 keeps DirectInputCreateA declared.
+    target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500)
     target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port")
     # Static C runtime, debug info in the objects, a PDB for debuggers.
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
@@ -23,7 +25,8 @@ if(LEGOLAND_MODERN_BUILD)
         -Wno-error=int-conversion
         -Wno-error=incompatible-function-pointer-types
         -Wno-error=return-mismatch)
-    target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
+    # /SAFESEH:NO: the old dinput.lib (c_dfDI* tables, DirectInputCreateA) predates SafeSEH
+    target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO /SAFESEH:NO)
     # The modern SDK has no dinput.lib (only dinput8.lib), and the game calls DirectInputCreateA:
     # use the repo's import library for it.
     target_link_libraries(legoland PRIVATE

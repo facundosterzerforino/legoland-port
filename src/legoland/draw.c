@@ -90,6 +90,7 @@ LEGO_EXPORT unsigned int SetPointer(unsigned int param_1) {
 
 // FUNCTION: LEGOLAND 0x00463870
 LEGO_EXPORT int InitScreen(void) {
+    HRESULT hr;
     LOGFONTA font;
     WNDCLASSEXA wc;
     DDSURFACEDESC desc;
@@ -155,9 +156,11 @@ LEGO_EXPORT int InitScreen(void) {
             // STRING: LEGOLAND 0x004b86d0
             "LEGOLAND", 0x90000000, 0, 0, lpConfig->screen_width, lpConfig->screen_height, GetDesktopWindow(), NULL, WNDENV_GethInstance(), NULL));
         if (WNDENV_Gethwnd() == NULL) {
+            DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
         }
-        if (IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 0x11) != 0) {
+        if ((hr = IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 0x11)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_SetCooperativeLevel failed hr=%lx", hr);
             return 0;
         }
         if (SetDisplayModeAndDetectPixelFormat() == 0) {
@@ -174,7 +177,8 @@ LEGO_EXPORT int InitScreen(void) {
         desc.dwSize = sizeof(desc);
         desc.dwFlags = 1;
         desc.ddsCaps.dwCaps = 0x4200;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &PrimarySurface, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &PrimarySurface, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
         }
         LoadColourTable();
@@ -183,7 +187,8 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x800;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
         }
         renderEngine = DAT_00668078;
@@ -192,7 +197,8 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x4000;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
         }
         IDirectDraw2_CreateClipper(DDRAWENV.ddraw2, 0, &DDrawClipper, NULL);
@@ -216,9 +222,11 @@ LEGO_EXPORT int InitScreen(void) {
             // STRING: LEGOLAND 0x004b9cf0
             "Lego Land", 0x10cf0000, 0, 0, window_rect.right - window_rect.left + 1, window_rect.bottom - window_rect.top + 1, NULL, NULL, WNDENV_GethInstance(), NULL));
         if (WNDENV_Gethwnd() == NULL) {
+            DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
         }
-        if (IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 8) != 0) {
+        if ((hr = IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 8)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_SetCooperativeLevel failed hr=%lx", hr);
             DestroyWindow(WNDENV_Gethwnd());
             return 0;
         }
@@ -231,7 +239,8 @@ LEGO_EXPORT int InitScreen(void) {
         desc.dwSize = sizeof(desc);
         desc.dwFlags = 1;
         desc.ddsCaps.dwCaps = 0x200;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &PrimarySurface, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &PrimarySurface, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             DestroyWindow(WNDENV_Gethwnd());
             return 0;
         }
@@ -241,7 +250,8 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x40;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             IDirectDrawSurface_Release(PrimarySurface);
             DestroyWindow(WNDENV_Gethwnd());
             return 0;
@@ -252,10 +262,12 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x40;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if (IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL)) != 0) {
+            DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
         }
     }
+    DebugTrace("InitScreen: ok");
     return 1;
 }
 
@@ -267,8 +279,10 @@ int SetDisplayModeAndDetectPixelFormat(void) {
     if (DAT_00667d6c == 0) {
         ddraw2 = DDRAWENV.ddraw2;
         if (IDirectDraw2_SetDisplayMode(ddraw2, lpConfig->screen_width, lpConfig->screen_height, 0x10, 0, 0) != 0) {
+            DebugTrace("SetDisplayMode: %dx%d 16bpp refused", lpConfig->screen_width, lpConfig->screen_height);
             ddraw2 = DDRAWENV.ddraw2;
             if (IDirectDraw2_SetDisplayMode(ddraw2, lpConfig->screen_width, lpConfig->screen_height, 8, 0, 0) != 0) {
+                DebugTrace("SetDisplayMode: 8bpp refused too");
                 return 0;
             }
         }
@@ -276,6 +290,9 @@ int SetDisplayModeAndDetectPixelFormat(void) {
     desc.dwSize = 0x6c;
     ddraw2 = DDRAWENV.ddraw2;
     IDirectDraw2_GetDisplayMode(ddraw2, &desc);
+    DebugTrace("SetDisplayMode: display is %lux%lu %lu bpp (masks %lx %lx %lx)", desc.dwWidth, desc.dwHeight,
+        desc.ddpfPixelFormat.dwRGBBitCount, desc.ddpfPixelFormat.dwRBitMask, desc.ddpfPixelFormat.dwGBitMask,
+        desc.ddpfPixelFormat.dwBBitMask);
     if (desc.ddpfPixelFormat.dwRGBBitCount != 8) {
         if (desc.ddpfPixelFormat.dwRGBBitCount != 0x10) {
             return 0;

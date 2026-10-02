@@ -4,6 +4,9 @@
 #include <string.h>
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "port_trace.h"
+#endif
 
 struct ExceptionEntry {
     unsigned int code;
@@ -107,6 +110,26 @@ int stackdump(void *exc_info, const char *filename) {
             }
         }
         // STRING: LEGOLAND 0x004b8ae0
+#ifdef LEGOLAND_PORT
+        {
+            /* [port] list the stack words that point into the exe, as RVAs, so the crash site's callers can be
+             * resolved with llvm-symbolizer against legoland.pdb */
+            DWORD *psp = (DWORD *)ctx->Esp;
+            DWORD mod = (DWORD)GetModuleHandleA(NULL);
+            DWORD size = ((IMAGE_NT_HEADERS *)(mod + ((IMAGE_DOS_HEADER *)mod)->e_lfanew))->OptionalHeader.SizeOfImage;
+            int k;
+
+            PortTrace("crash: eip rva %08lx (module at %08lx)", ctx->Eip - mod, mod);
+            __try {
+                for (k = 0; k < 1024; k++) {
+                    if (psp[k] >= mod && psp[k] < mod + size) {
+                        PortTrace("  stack+%04x: rva %08lx", k * 4, psp[k] - mod);
+                    }
+                }
+            } __except (1) {
+            }
+        }
+#endif
         WriteFileFormatted(hFile, "\r\nStack dump:\r\n");
         __try {
             sp = (DWORD *)ctx->Esp;
