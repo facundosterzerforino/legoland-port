@@ -9,7 +9,7 @@ struct Cursor;
 
 /* Callback-table entry points for the western-town shops (General Store,
  * Sheriff, Jail Cells, Bank, Saloon), registered by the shops dispatcher
- * (FUN_0043a400). */
+ * (ShopsGetInterfaces). */
 void FUN_004375d0(struct MapObject *obj);
 void FUN_00437610(void);
 void FUN_00437630(void);

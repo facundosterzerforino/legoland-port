@@ -22,7 +22,7 @@ struct InstanceList {
 };
 
 // FUNCTION: LEGOLAND 0x00489e60
-char *FUN_00489e60(struct ResFile *file, char *dest, int maxlen) {
+char *ReadResFileLine(struct ResFile *file, char *dest, int maxlen) {
     int error;
     int count;
     char c;
@@ -151,7 +151,7 @@ LEGO_EXPORT void AddInstanceToList(struct InstanceNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a040
-void FUN_0048a040(void) {
+void FreeAllObjectClassInstances(void) {
     struct Ride *node;
 
     for (node = ObjectClassList; node != 0; node = node->next) {

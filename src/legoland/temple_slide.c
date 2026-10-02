@@ -93,22 +93,22 @@ void FUN_00416ec0(TileId *key) {
     if (node != NULL) {
         memset(node, 0, 0x20);
         node->key = key->id;
-        node->next = DAT_004cbfd4;
-        DAT_004cbfd4 = node;
+        node->next = SlideNodeList;
+        SlideNodeList = node;
         FUN_00417130((struct TempleRide *)node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00416f00
-void FUN_00416f00(struct SlideNode *node) {
+void RemoveSlideNode(struct SlideNode *node) {
     struct SlideNode *prev;
     struct SlideNode *cur;
 
-    if (DAT_004cbfd4 == node) {
-        DAT_004cbfd4 = node->next;
+    if (SlideNodeList == node) {
+        SlideNodeList = node->next;
     } else {
-        cur = DAT_004cbfd4->next;
-        prev = DAT_004cbfd4;
+        cur = SlideNodeList->next;
+        prev = SlideNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -124,8 +124,8 @@ void FUN_00416f00(struct SlideNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00416f60
-struct SlideNode *FUN_00416f60(void *arg) {
-    struct SlideNode *cur = DAT_004cbfd4;
+struct SlideNode *FindSlideNode(void *arg) {
+    struct SlideNode *cur = SlideNodeList;
 
     if (cur != NULL) {
         do {
@@ -150,14 +150,14 @@ void FUN_00416fa0(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     struct Point pos;
     struct Point off1;
 
-    FUN_00416f60(tile);
+    FindSlideNode(tile);
     pos = GetScreenCoordsForObject((TileId *)tile, ride);
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && (node->rider->flags & 0x80) == 0) {
             IP_RenderBlokeIn3DNow(node->rider);
         }
     }
-    PrintSprite(DAT_004cbf78, pos.x, pos.y, clip, 0);
+    PrintSprite(TempSlideMatteSprite, pos.x, pos.y, clip, 0);
     RenderItems_New();
     DAT_004cbf84 = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
@@ -200,10 +200,10 @@ void FUN_00417150(struct SlideContext *arg) {
     DAT_004cbf80->var_1c |= 0x20;
     DAT_004cbf7c = DAT_004cbf80->var_64;
     DAT_004cbf7c->var_10 |= 0x2000;
-    DAT_004cbfd0 = LoadSprite(
+    ZTempSlideSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f7c
         "z_tempslide.lls", 1);
-    DAT_004cbfc4 = LoadBinV(
+    TempSlideBinV = LoadBinV(
         // STRING: LEGOLAND 0x004b4f64
         "Zbuffers\\tempslide.bnv");
     GetLLSForSprite((struct SpriteLLS *)DAT_004cbf80->var_64);
@@ -211,20 +211,20 @@ void FUN_00417150(struct SlideContext *arg) {
     DAT_004cbfcc[0] = 1;
     DAT_004cbf88 = 13;
     DAT_004cbf8c = 93;
-    DAT_004cbf78 = LoadSprite(
+    TempSlideMatteSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f50
         "tempslide_matte.lls", 1);
-    DAT_004cbfb8[0] = (unsigned int)DAT_004cbfc4;
+    DAT_004cbfb8[0] = (unsigned int)TempSlideBinV;
 }
 
 // FUNCTION: LEGOLAND 0x00417200
 void FUN_00417200(struct SlideContext *arg) {
     DAT_004cbf80 = arg->var_c;
-    if (DAT_004cbf78 != 0) {
-        KillSprite(DAT_004cbf78);
+    if (TempSlideMatteSprite != 0) {
+        KillSprite(TempSlideMatteSprite);
     }
-    KillSprite(DAT_004cbfd0);
-    FreeBinV(DAT_004cbfc4);
+    KillSprite(ZTempSlideSprite);
+    FreeBinV(TempSlideBinV);
 }
 
 // FUNCTION: LEGOLAND 0x00417240
@@ -237,9 +237,9 @@ void FUN_00417240(void) {
 
 // FUNCTION: LEGOLAND 0x00417280
 void FUN_00417280(struct SlideObject *obj, TileId tile, struct Cursor *cursor) {
-    struct SlideNode *node = FUN_00416f60(&tile);
+    struct SlideNode *node = FindSlideNode(&tile);
     if (node != NULL) {
-        FUN_00416f00(node);
+        RemoveSlideNode(node);
     }
     StandardRemoveObject((Element *)obj, tile, cursor);
     RemoveAllBlokesFromRide((struct Ride *)obj->ride, tile);
@@ -272,7 +272,7 @@ unsigned int *FUN_00417300(struct SlideContext *ctx, unsigned short param) {
 
 // FUNCTION: LEGOLAND 0x00417340
 void FUN_00417340(void *arg) {
-    unsigned int *array = FUN_00416f60(arg)->slots;
+    unsigned int *array = FindSlideNode(arg)->slots;
     int i = 0;
 
     while (i < 4) {
@@ -290,7 +290,7 @@ int FUN_00417380(void *arg) {
     int avail[4];
     int count;
     int pick;
-    struct SlideNode *node = FUN_00416f60(arg);
+    struct SlideNode *node = FindSlideNode(arg);
 
     if (node != NULL) {
         count = 0;
@@ -316,7 +316,7 @@ int FUN_00417380(void *arg) {
 
 // FUNCTION: LEGOLAND 0x00417400
 void FUN_00417400(unsigned int index, void *arg) {
-    struct SlideNode *result = FUN_00416f60(arg);
+    struct SlideNode *result = FindSlideNode(arg);
 
     if (result != NULL) {
         result->slots[index] = 0;
@@ -412,7 +412,7 @@ void FUN_00417430(Element *obj) {
                 cy = cy - DAT_004cbfcc[0] / 2 - coords.y;
                 off[0] = cx * 2;
                 off[1] = cy * 2;
-                bloke->person->sprite = DAT_004cbfd0;
+                bloke->person->sprite = ZTempSlideSprite;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617664.875f, -1617913.0f);
                 bloke->field_35 = 0;
@@ -499,7 +499,7 @@ LEGO_EXPORT int SaveTempleSlide(void) {
     int zero = 0;
     struct SlideNode *p;
 
-    p = DAT_004cbfd4;
+    p = SlideNodeList;
     while (p != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
@@ -532,7 +532,7 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
         if (last != NULL) {
             last->next = save;
         } else {
-            DAT_004cbfd4 = save;
+            SlideNodeList = save;
         }
         last = save;
         if (!SaveGameRead(&marker, 4)) {

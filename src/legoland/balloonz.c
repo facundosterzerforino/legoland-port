@@ -24,23 +24,23 @@ void FUN_0042a7b0(Element *obj) {
     DAT_00616044 = DAT_0081cde4->layer;
     DAT_0081cde4->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b64ac
-    DAT_00616048 = LoadSprite("Ballbasem1.lls", 1);
+    BallBaseM1Sprite = LoadSprite("Ballbasem1.lls", 1);
     // STRING: LEGOLAND 0x004b649c
-    DAT_0061604c = LoadSprite("Ballbasem2.lls", 1);
+    BallBaseM2Sprite = LoadSprite("Ballbasem2.lls", 1);
     // STRING: LEGOLAND 0x004b648c
-    DAT_00616050 = LoadSprite("Ballbasem3.lls", 1);
+    BallBaseM3Sprite = LoadSprite("Ballbasem3.lls", 1);
     // STRING: LEGOLAND 0x004b647c
-    DAT_00616054 = LoadSprite("BZRedCarM1.lls", 1);
+    BZRedCarM1Sprite = LoadSprite("BZRedCarM1.lls", 1);
     // STRING: LEGOLAND 0x004b6468
-    DAT_00616058 = LoadSprite("BZGreenCarM1.lls", 1);
+    BZGreenCarM1Sprite = LoadSprite("BZGreenCarM1.lls", 1);
     // STRING: LEGOLAND 0x004b6458
-    DAT_0061605c = LoadSprite("BZBlueCarM1.lls", 1);
+    BZBlueCarM1Sprite = LoadSprite("BZBlueCarM1.lls", 1);
     // STRING: LEGOLAND 0x004b6448
-    DAT_0081cde8 = LoadSprite("z_Balloon2.lls", 1);
-    DAT_00616040 = DAT_0081cde8;
+    ZBalloon2Sprite = LoadSprite("z_Balloon2.lls", 1);
+    DAT_00616040 = ZBalloon2Sprite;
     // STRING: LEGOLAND 0x004b6430
-    DAT_00616010 = LoadBinV("Zbuffers\\balloonz.bnv");
-    DAT_00616018[0] = DAT_00616010;
+    BalloonzBinV = LoadBinV("Zbuffers\\balloonz.bnv");
+    DAT_00616018[0] = BalloonzBinV;
     HideLayer(DAT_00616044, 2);
     StopLayerPlaying(DAT_00616044, 2);
     LLSSetFrame(GetLLSForLayer(DAT_00616044, 2), 0);
@@ -50,14 +50,14 @@ void FUN_0042a7b0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042a8f0
-void FUN_0042a8f0(TileId *tile) {
+void AddBalloonNode(TileId *tile) {
     BalloonNode *node;
 
     node = malloc(sizeof(BalloonNode));
     if (node != NULL) {
         memset(node, 0, sizeof(BalloonNode));
         node->tile = *tile;
-        node->next = DAT_00616060;
+        node->next = BalloonNodeList;
         node->queued = 0;
         node->riders = 0;
         memset(node->cars, 0, sizeof(node->cars));
@@ -68,7 +68,7 @@ void FUN_0042a8f0(TileId *tile) {
         node->leaving = 0;
         node->can_board = 0;
         node->can_unload = 0;
-        DAT_00616060 = node;
+        BalloonNodeList = node;
     }
 }
 
@@ -79,14 +79,14 @@ void FUN_0042a950(Element *obj, int *coords) {
     tile.pos.x = coords[0];
     tile.pos.y = coords[1];
     AddBasicObject(obj, coords);
-    FUN_0042a8f0(&tile);
+    AddBalloonNode(&tile);
 }
 
 // FUNCTION: LEGOLAND 0x0042a980
-BalloonNode *FUN_0042a980(TileId *tile) {
+BalloonNode *FindBalloonNode(TileId *tile) {
     BalloonNode *node;
 
-    node = DAT_00616060;
+    node = BalloonNodeList;
     if (node == NULL) {
         return NULL;
     }
@@ -100,15 +100,15 @@ BalloonNode *FUN_0042a980(TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x0042a9b0
-void FUN_0042a9b0(BalloonNode *node) {
+void RemoveBalloonNode(BalloonNode *node) {
     BalloonNode *cur;
     BalloonNode *prev;
 
-    if (DAT_00616060 == node) {
-        DAT_00616060 = node->next;
+    if (BalloonNodeList == node) {
+        BalloonNodeList = node->next;
     } else {
-        cur = DAT_00616060->next;
-        prev = DAT_00616060;
+        cur = BalloonNodeList->next;
+        prev = BalloonNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -124,16 +124,16 @@ void FUN_0042a9b0(BalloonNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0042a9f0
-void FUN_0042a9f0(void) {
+void RemoveAllBalloonNodes(void) {
     BalloonNode *node;
 
-    node = DAT_00616060;
+    node = BalloonNodeList;
     if (node == NULL) {
         return;
     }
     do {
-        FUN_0042a9b0(node);
-        node = DAT_00616060;
+        RemoveBalloonNode(node);
+        node = BalloonNodeList;
     } while (node != NULL);
 }
 
@@ -141,9 +141,9 @@ void FUN_0042a9f0(void) {
 void FUN_0042aa10(Element *obj, TileId tile, Cursor *cursor) {
     BalloonNode *node;
 
-    node = FUN_0042a980(&tile);
+    node = FindBalloonNode(&tile);
     if (node != NULL) {
-        FUN_0042a9b0(node);
+        RemoveBalloonNode(node);
     }
     StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
@@ -186,7 +186,7 @@ void FUN_0042aa90(Element *obj) {
         next = elem->next;
         bloke = elem->rider;
         tile = &elem->tile;
-        state = FUN_0042a980(tile);
+        state = FindBalloonNode(tile);
         if (state == NULL) {
             return;
         }
@@ -198,7 +198,7 @@ void FUN_0042aa90(Element *obj) {
         leaving = state->leaving;
         can_unload = state->can_unload;
         can_board = state->can_board;
-        (*DAT_0081cde8->lls)->frame = state->frame;
+        (*ZBalloon2Sprite->lls)->frame = state->frame;
         x = ride->x + tile->pos.x;
         y = tile->pos.y + ride->y;
         if (bloke->field_e == 0) {
@@ -317,27 +317,27 @@ void FUN_0042aa90(Element *obj) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617692.375f, -1617904.25f);
                 sprintf(&buf[5], "%02d", bloke->field_36);
-                SetBlokePositionFromBNV(DAT_00616010, bloke, buf, 0, -1617692.375f, -1617904.25f, 0);
+                SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, 0, -1617692.375f, -1617904.25f, 0);
                 bloke->param_action++;
                 break;
             case 10:
                 cars[bloke->field_36] = 2;
                 sprintf(&buf[5], "%02d", bloke->field_36);
-                SetBlokePositionFromBNV(DAT_00616010, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
+                SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 if (--bloke->field_58 == 0) {
                     bloke->param_action++;
                 }
                 break;
             case 11:
                 sprintf(&buf[5], "%02d", bloke->field_36);
-                SetBlokePositionFromBNV(DAT_00616010, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
+                SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 bloke->param_action++;
                 leaving++;
                 cars[bloke->field_36] = 3;
                 break;
             case 12:
                 sprintf(&buf[5], "%02d", bloke->field_36);
-                SetBlokePositionFromBNV(DAT_00616010, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
+                SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 if (can_unload == 1) {
                     car = FUN_0042aa60(pos, lap);
                     if (car == bloke->field_36) {
@@ -398,7 +398,7 @@ void FUN_0042aa90(Element *obj) {
         state->can_unload = can_unload;
         elem = next;
     }
-    for (state = DAT_00616060; state != NULL; state = state->next) {
+    for (state = BalloonNodeList; state != NULL; state = state->next) {
         char pos;
         int stop;
         char car;
@@ -482,7 +482,7 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
     elem = ride->riders;
     count = 0;
     AdjustOffsetForViewMode(&off);
-    state = FUN_0042a980(tile);
+    state = FindBalloonNode(tile);
     if (state == NULL) {
         return;
     }
@@ -511,13 +511,13 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        PrintSprite(DAT_00616048, screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(BallBaseM1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 4) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        PrintSprite(DAT_0061604c, screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(BallBaseM2Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 0) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
@@ -538,7 +538,7 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        PrintSprite(DAT_00616050, screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(BallBaseM3Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 7) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
@@ -585,15 +585,15 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
             switch (FUN_0042aa60(frame, lap)) {
             case 0:
             case 3:
-                PrintSprite(DAT_00616054, screen.x + off.x, screen.y + off.y, param_6, 0);
+                PrintSprite(BZRedCarM1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
                 break;
             case 1:
             case 4:
-                PrintSprite(DAT_00616058, screen.x + off.x, screen.y + off.y, param_6, 0);
+                PrintSprite(BZGreenCarM1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
                 break;
             case 2:
             case 5:
-                PrintSprite(DAT_0061605c, screen.x + off.x, screen.y + off.y, param_6, 0);
+                PrintSprite(BZBlueCarM1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
                 break;
             }
         }
@@ -641,15 +641,15 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
 
 // FUNCTION: LEGOLAND 0x0042b9d0
 void FUN_0042b9d0(void) {
-    KillSprite(DAT_00616048);
-    KillSprite(DAT_0061604c);
-    KillSprite(DAT_00616050);
-    KillSprite(DAT_00616054);
-    KillSprite(DAT_00616058);
-    KillSprite(DAT_0061605c);
-    KillSprite(DAT_0081cde8);
+    KillSprite(BallBaseM1Sprite);
+    KillSprite(BallBaseM2Sprite);
+    KillSprite(BallBaseM3Sprite);
+    KillSprite(BZRedCarM1Sprite);
+    KillSprite(BZGreenCarM1Sprite);
+    KillSprite(BZBlueCarM1Sprite);
+    KillSprite(ZBalloon2Sprite);
     FreeBinV(DAT_00616018[0]);
-    FUN_0042a9f0();
+    RemoveAllBalloonNodes();
 }
 
 // FUNCTION: LEGOLAND 0x0042ba40
@@ -661,14 +661,14 @@ void FUN_0042ba40(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ba80
-unsigned int FUN_0042ba80(void) {
+unsigned int SaveBalloonNodes(void) {
     unsigned int marker;
     unsigned int terminator;
     BalloonNode *node;
 
     marker = 1;
     terminator = 0;
-    node = DAT_00616060;
+    node = BalloonNodeList;
     while (node != NULL) {
         if (SaveGameWrite(&marker, 4) == 0) {
             return 0;
@@ -685,7 +685,7 @@ unsigned int FUN_0042ba80(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042baf0
-unsigned int FUN_0042baf0(Element *obj) {
+unsigned int Balloonz_Load(Element *obj) {
     Ride *ride = obj->ride;
     BalloonNode *node;
     BalloonNode *prev;
@@ -706,7 +706,7 @@ unsigned int FUN_0042baf0(Element *obj) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_00616060 = node;
+            BalloonNodeList = node;
         }
         prev = node;
         if (SaveGameRead(&more, 4) == 0) {

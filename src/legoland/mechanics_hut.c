@@ -17,12 +17,12 @@
 
 // FUNCTION: LEGOLAND 0x0043d250
 void FUN_0043d250(Element *ctx) {
-    DAT_0081caf4 = ctx->ride;
-    DAT_0081caf4->flags |= 0x420;
-    DAT_0062fe50 = DAT_0081caf4->layer;
-    DAT_0081caf4->flags |= 0x2000;
+    MechanicsHutRide = ctx->ride;
+    MechanicsHutRide->flags |= 0x420;
+    MechanicsHutLayer = MechanicsHutRide->layer;
+    MechanicsHutRide->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b79a4
-    DAT_0062fe54 = LoadSprite("MechHutMask.lls", 1);
+    MechHutMaskSprite = LoadSprite("MechHutMask.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0043d2a0
@@ -172,7 +172,7 @@ void FUN_0043d580(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     pos = GetScreenCoordsForObject((unsigned char *)tile, hut);
-    PrintSprite(DAT_0062fe54, pos.x, pos.y, 0, 0);
+    PrintSprite(MechHutMaskSprite, pos.x, pos.y, 0, 0);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 102) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -181,14 +181,14 @@ void FUN_0043d580(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x0043d730
-void FUN_0043d730(void) {
-    KillSprite(DAT_0062fe54);
+void KillMechHutMaskSprite(void) {
+    KillSprite(MechHutMaskSprite);
 }
 
 // FUNCTION: LEGOLAND 0x0043d740
 void FUN_0043d740(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081caf4;
+    EditMode.unk8 = MechanicsHutRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->field_3c);
 }

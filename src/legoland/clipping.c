@@ -51,18 +51,18 @@ LEGO_EXPORT void GetClipping(RECT *dest) {
 
 // FUNCTION: LEGOLAND 0x0048a660
 LEGO_EXPORT void StoreClipping(void) {
-    DAT_00798630 = SPRITE_ClipRect.left;
-    DAT_00798634 = SPRITE_ClipRect.top;
-    DAT_00798638 = SPRITE_ClipRect.right;
-    DAT_0079863c = SPRITE_ClipRect.bottom;
+    SavedClipLeft = SPRITE_ClipRect.left;
+    SavedClipTop = SPRITE_ClipRect.top;
+    SavedClipRight = SPRITE_ClipRect.right;
+    SavedClipBottom = SPRITE_ClipRect.bottom;
 }
 
 // FUNCTION: LEGOLAND 0x0048a690
 LEGO_EXPORT void RestoreClipping(void) {
-    SPRITE_ClipRect.left = DAT_00798630;
-    SPRITE_ClipRect.top = DAT_00798634;
-    SPRITE_ClipRect.right = DAT_00798638;
-    SPRITE_ClipRect.bottom = DAT_0079863c;
+    SPRITE_ClipRect.left = SavedClipLeft;
+    SPRITE_ClipRect.top = SavedClipTop;
+    SPRITE_ClipRect.right = SavedClipRight;
+    SPRITE_ClipRect.bottom = SavedClipBottom;
 }
 
 // FUNCTION: LEGOLAND 0x0048a6c0
@@ -76,8 +76,8 @@ void FUN_0048a6e0(struct ClippedObject *object) {
 
     for (entry = DAT_004bdeb8; strlen(entry->name) != 0; entry++) {
         if (_stricmp(object->name, entry->name) == 0) {
-            if (DAT_0080ffa0.field_46[entry->id] == 0) {
-                DAT_0080ffa0.field_46[entry->id] = 1;
+            if (CurrentProfile.field_46[entry->id] == 0) {
+                CurrentProfile.field_46[entry->id] = 1;
                 UpDateCurrentProfile();
             }
             return;

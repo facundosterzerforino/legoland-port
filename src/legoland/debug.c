@@ -19,10 +19,10 @@
 #include "string.h"
 
 // FUNCTION: LEGOLAND 0x0047f870
-void FUN_0047f870(const char *fmt, ...) {}
+void DebugTrace(const char *fmt, ...) {}
 
 // FUNCTION: LEGOLAND 0x0047f880
-int FUN_0047f880(void) {
+int GameMain(void) {
     char buffer[1024];
     int i;
     int j;
@@ -31,33 +31,33 @@ int FUN_0047f880(void) {
     lpConfig->field_1e = 1;
 
     // STRING: LEGOLAND 0x004bcd44
-    if (FUN_0047f830("legoland.log") == 0) {
+    if (OpenLogFile("legoland.log") == 0) {
         return 1;
     }
-    if (FUN_004515e0(1) == 0) {
+    if (WaitForLegolandCd(1) == 0) {
         return 1;
     }
 
     for (i = 0; i < 3; i++) {
-        DAT_007fd640[i] = RES_OpenVolume(DAT_004bcba4[i]);
-        if (DAT_007fd640[i] == NULL) {
+        ResourceVolumes[i] = RES_OpenVolume(ResourceFileNames[i]);
+        if (ResourceVolumes[i] == NULL) {
             // STRING: LEGOLAND 0x004bcd28
-            sprintf(buffer, "Failed to open resource %s", DAT_004bcba4[i]);
+            sprintf(buffer, "Failed to open resource %s", ResourceFileNames[i]);
             // STRING: LEGOLAND 0x004bcd18
             MessageBoxA(GetDesktopWindow(), buffer, "LEGOLAND Error", 0x30);
             for (j = 0; j < i; j++) {
-                RES_CloseVolume(DAT_007fd640[j]);
+                RES_CloseVolume(ResourceVolumes[j]);
             }
             return 1;
         }
     }
 
-    FUN_00498d00();
+    LoadStringTable();
     InitHostSystemGPU();
     if (InitScreen() == 0) {
         MessageBoxA(GetDesktopWindow(), GetString(0xcc), GetString(0xcb), 0x30);
         KillHostSystemGPU();
-        for (vol = DAT_007fd640; vol < DAT_007fd640 + 3; vol++) {
+        for (vol = ResourceVolumes; vol < ResourceVolumes + 3; vol++) {
             RES_CloseVolume(*vol);
         }
         return 1;
@@ -67,7 +67,7 @@ int FUN_0047f880(void) {
         MessageBoxA(GetDesktopWindow(), GetString(0x9c4), GetString(0xcb), 0x30);
         KillInputSystem();
         KillHostSystemGPU();
-        for (vol = DAT_007fd640; vol < DAT_007fd640 + 3; vol++) {
+        for (vol = ResourceVolumes; vol < ResourceVolumes + 3; vol++) {
             RES_CloseVolume(*vol);
         }
         return 1;
@@ -107,16 +107,16 @@ int FUN_0047f880(void) {
 
     KillHostSystemGPU();
 
-    for (vol = DAT_007fd640; vol < DAT_007fd640 + 3; vol++) {
+    for (vol = ResourceVolumes; vol < ResourceVolumes + 3; vol++) {
         if (*vol != 0) {
             RES_CloseVolume(*vol);
         }
     }
 
     // STRING: LEGOLAND 0x004bcc28
-    FUN_0047f870("Finished shutting stuff down");
+    DebugTrace("Finished shutting stuff down");
 
-    FUN_0047f840();
+    CloseLogFile();
     DeleteStrings();
     LLIDB_CloseICM();
 
@@ -165,7 +165,7 @@ LEGO_EXPORT unsigned int mystrlen(const char *s) {
 }
 
 // FUNCTION: LEGOLAND 0x0047fc40
-char *FUN_0047fc40(const char *haystack, const char *needle) {
+char *StrIStr(const char *haystack, const char *needle) {
     char *upper_haystack;
     char *upper_needle;
     char *match;
@@ -218,28 +218,28 @@ int __cdecl wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
     // STRING: LEGOLAND 0x004bcd70
-    if (FUN_0047fc40(lpCmdLine, "WINDEBUG")) {
-        DAT_004b9ca4 = FUN_004661d0;
+    if (StrIStr(lpCmdLine, "WINDEBUG")) {
+        DAT_004b9ca4 = BlitFrameToWindow;
         DAT_00667d6c = 1;
         // STRING: LEGOLAND 0x004bcd6c
-    } else if (FUN_0047fc40(lpCmdLine, "BLT")) {
-        DAT_004b9ca4 = FUN_004661d0;
+    } else if (StrIStr(lpCmdLine, "BLT")) {
+        DAT_004b9ca4 = BlitFrameToWindow;
     }
 
     // STRING: LEGOLAND 0x004bcd60
-    if (FUN_0047fc40(lpCmdLine, "-nointro")) {
+    if (StrIStr(lpCmdLine, "-nointro")) {
         lpConfig->field_40 = 1;
     } else {
         lpConfig->field_40 = 0;
     }
 
     // STRING: LEGOLAND 0x004bcd54
-    DAT_004bf774 = FUN_0047fc40(lpCmdLine, "-nomusic") ? 0 : 1;
+    MusicEnabled = StrIStr(lpCmdLine, "-nomusic") ? 0 : 1;
     g_hInstance = hInstance;
-    DAT_0066920c = nCmdShow;
+    g_nCmdShow = nCmdShow;
 
     if (CheckHostSystemGPU() == 0) {
         return 0;
     }
-    return FUN_0047f880();
+    return GameMain();
 }

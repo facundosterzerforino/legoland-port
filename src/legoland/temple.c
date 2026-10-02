@@ -27,18 +27,18 @@ void FUN_004169c0(Element *obj) {
         }
     }
     // STRING: LEGOLAND 0x004b4edc
-    DAT_004cbf68 = LoadSprite("temple_matte1.lls", 1);
+    TempleMatte1Sprite = LoadSprite("temple_matte1.lls", 1);
     // STRING: LEGOLAND 0x004b4ec8
-    DAT_004cbf6c = LoadSprite("temple_matte2.lls", 1);
+    TempleMatte2Sprite = LoadSprite("temple_matte2.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x00416a30
 void FUN_00416a30(void) {
-    if (DAT_004cbf68 != 0) {
-        KillSprite(DAT_004cbf68);
+    if (TempleMatte1Sprite != 0) {
+        KillSprite(TempleMatte1Sprite);
     }
-    if (DAT_004cbf6c != 0) {
-        KillSprite(DAT_004cbf6c);
+    if (TempleMatte2Sprite != 0) {
+        KillSprite(TempleMatte2Sprite);
     }
 }
 
@@ -60,10 +60,10 @@ void FUN_00416a60(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     pos = GetScreenCoordsForObject((unsigned char *)coords, ride);
     offset = GetRenderOffsetForLayer(DAT_004cbf64, 0);
     AdjustOffsetForViewMode(&offset);
-    PrintSprite(DAT_004cbf68, offset.x + pos.x, offset.y + pos.y, clip, 0);
+    PrintSprite(TempleMatte1Sprite, offset.x + pos.x, offset.y + pos.y, clip, 0);
     offset = GetRenderOffsetForLayer(DAT_004cbf64, 3);
     AdjustOffsetForViewMode(&offset);
-    PrintSprite(DAT_004cbf6c, offset.x + pos.x, offset.y + pos.y, clip, 0);
+    PrintSprite(TempleMatte2Sprite, offset.x + pos.x, offset.y + pos.y, clip, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00416b50
@@ -204,7 +204,7 @@ void FUN_00416e20(Element *a1, TileId tile, unsigned int a3) {
 }
 
 // FUNCTION: LEGOLAND 0x00416e50
-void FUN_00416e50(struct ClassNode *str, struct CallbackTable *obj) {
+void Temple_GetInterfaces(struct ClassNode *str, struct CallbackTable *obj) {
     // STRING: LEGOLAND 0x004b4ef0
     if (_stricmp("TEMPLE", str->name) == 0) {
         obj->cb_a4 = FUN_004169c0;

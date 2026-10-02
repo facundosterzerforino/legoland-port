@@ -59,7 +59,7 @@ LEGO_EXPORT void RemoveIconGroup(unsigned short group);
 void FUN_0046d3a0(void);
 void FUN_0046d590(unsigned short val);
 int FUN_0046e920(struct IconNode *node);
-void FUN_0046d680(struct IconNode *node, struct Sprite *sprite);
+void SetIconSprite(struct IconNode *node, struct Sprite *sprite);
 LEGO_EXPORT struct IconNode *InsertIcon(short a1, short a2, int a3, struct Sprite *sprite);
 LEGO_EXPORT struct IconNode *LoadSpriteIcon(const char *filename, unsigned int param_2, short param_3, short param_4, int param_5);
 void FUN_0046dac0(void);
@@ -92,5 +92,5 @@ LEGO_EXPORT struct IconNode *AddGBarIcons(unsigned int param_1, unsigned int par
 unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons);
 LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *param_2);
 void FUN_0046f100(short param_1);
-void FUN_0046f890(void);
-void FUN_0046f920(void);
+void LoadGBarSprites(void);
+void UnloadGBarSprites(void);

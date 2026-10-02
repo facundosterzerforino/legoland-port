@@ -11,7 +11,7 @@
 #include "wndenv.h"
 
 // FUNCTION: LEGOLAND 0x00450f30
-int FUN_00450f30(char *cd_volume) {
+int FindCdDriveWithVolume(char *cd_volume) {
     DWORD drives;
     int result;
     DWORD bit;
@@ -28,7 +28,7 @@ int FUN_00450f30(char *cd_volume) {
     result = 0;
     drives = GetLogicalDrives();
     // STRING: LEGOLAND 0x004b8610
-    FUN_0047f870("Checking all drives (Mask = %d)", drives);
+    DebugTrace("Checking all drives (Mask = %d)", drives);
     FUN_0047f850();
     if (drives != 0) {
         bit = 1;
@@ -38,16 +38,16 @@ int FUN_00450f30(char *cd_volume) {
                 root_path[0] = (char)('A' + i);
                 if (GetDriveTypeA(root_path) == DRIVE_CDROM) {
                     // STRING: LEGOLAND 0x004b85f4
-                    FUN_0047f870("Getting Info on drive %s", root_path);
+                    DebugTrace("Getting Info on drive %s", root_path);
                     FUN_0047f850();
                     if (GetVolumeInformationA(root_path, volume_name, 256, &serial_number, &max_component_length, &fs_flags, fs_name, 256)) {
                         // STRING: LEGOLAND 0x004b85ec
                         if (strcmp(fs_name, "CDFS") == 0) {
                             if (cd_volume == NULL || strcmp(volume_name, cd_volume) == 0) {
                                 result = 1;
-                                strcpy(DAT_00813b04, root_path);
+                                strcpy(CdDrivePath, root_path);
                                 // STRING: LEGOLAND 0x004b85c8
-                                FUN_0047f870("Drive %s contains the correct CD", DAT_00813b04);
+                                DebugTrace("Drive %s contains the correct CD", CdDrivePath);
                                 FUN_0047f850();
                             }
                         }
@@ -63,7 +63,7 @@ int FUN_00450f30(char *cd_volume) {
 }
 
 // FUNCTION: LEGOLAND 0x004510e0
-int FUN_004510e0(char *cd_volume) {
+int IsCdVolumePresent(char *cd_volume) {
     int result;
     char root_path[4];
     char volume_name[256];
@@ -74,8 +74,8 @@ int FUN_004510e0(char *cd_volume) {
 
     strcpy(root_path, "c:\\");
     result = 0;
-    root_path[0] = DAT_00813b04[0];
-    toupper(DAT_00813b04[0]);
+    root_path[0] = CdDrivePath[0];
+    toupper(CdDrivePath[0]);
     if (GetVolumeInformationA(root_path, volume_name, 256, &serial_number, &max_component_length, &fs_flags, fs_name, 256)) {
         if (strcmp(fs_name, "CDFS") == 0) {
             if (cd_volume == NULL || strcmp(volume_name, cd_volume) == 0) {
@@ -105,7 +105,7 @@ void FUN_00451210(int param_1) {
         FUN_00451280(DAT_004b85c4, drive);
         FUN_00451410(DAT_004b85c4, drive);
         FUN_00451550(DAT_004b85c4, drive);
-        FUN_004514a0(DAT_004b85c4);
+        CloseDeviceHandle(DAT_004b85c4);
         DAT_004b85c4 = INVALID_HANDLE_VALUE;
     }
 }
@@ -183,14 +183,14 @@ int FUN_00451410(HANDLE h, int drive) {
 }
 
 // FUNCTION: LEGOLAND 0x00451480
-int FUN_00451480(void) {
+int OpenVWin32Device(void) {
     // STRING: LEGOLAND 0x004b8634
     HANDLE result = CreateFileA("\\\\.\\vwin32", 0, 0, NULL, 0, 0x4000000, NULL);
     return (int)result;
 }
 
 // FUNCTION: LEGOLAND 0x004514a0
-BOOL __stdcall FUN_004514a0(HANDLE param_1) { return CloseHandle(param_1); }
+BOOL __stdcall CloseDeviceHandle(HANDLE param_1) { return CloseHandle(param_1); }
 
 // FUNCTION: LEGOLAND 0x004514b0
 BOOL __stdcall FUN_004514b0(HANDLE h, int drive, int param_3, int param_4) {
@@ -242,19 +242,19 @@ BOOL __stdcall FUN_00451550(HANDLE h, int drive) {
 }
 
 // FUNCTION: LEGOLAND 0x004515e0
-int FUN_004515e0(int param_1) {
+int WaitForLegolandCd(int param_1) {
     char text[256];
     int minimised;
 
     minimised = 0;
     if (param_1 != 0) {
         // STRING: LEGOLAND 0x004b86d0
-        while (!FUN_00450f30("LEGOLAND")) {
+        while (!FindCdDriveWithVolume("LEGOLAND")) {
             if (!minimised) {
                 // STRING: LEGOLAND 0x004b86c0
-                FUN_0047f870("Minimising Game");
+                DebugTrace("Minimising Game");
                 FUN_0047f850();
-                FUN_0047fe70();
+                MinimizeGameWindow();
                 minimised = 1;
             }
             if (MessageBoxA(WNDENV_Gethwnd(),
@@ -263,39 +263,39 @@ int FUN_004515e0(int param_1) {
                     // STRING: LEGOLAND 0x004b86b4
                     "CD Missing", 0x50015) == IDCANCEL) {
                 // STRING: LEGOLAND 0x004b8670
-                FUN_0047f870("Maximising Game");
+                DebugTrace("Maximising Game");
                 FUN_0047f850();
-                FUN_0047fe80();
+                RestoreGameWindow();
                 return 0;
             }
         }
         if (minimised) {
-            FUN_0047f870("Maximising Game");
+            DebugTrace("Maximising Game");
             FUN_0047f850();
-            FUN_0047fe80();
+            RestoreGameWindow();
         }
         return 1;
     } else {
-        while (!FUN_004510e0("LEGOLAND")) {
+        while (!IsCdVolumePresent("LEGOLAND")) {
             if (!minimised) {
-                FUN_0047f870("Minimising Game");
+                DebugTrace("Minimising Game");
                 FUN_0047f850();
-                FUN_0047fe70();
+                MinimizeGameWindow();
                 minimised = 1;
             }
             // STRING: LEGOLAND 0x004b8640
-            sprintf(text, "Please insert the LEGOLAND CD-ROM into drive %s", DAT_00813b04);
+            sprintf(text, "Please insert the LEGOLAND CD-ROM into drive %s", CdDrivePath);
             if (MessageBoxA(WNDENV_Gethwnd(), text, "CD Missing", 0x50015) == IDCANCEL) {
-                FUN_0047f870("Maximising Game");
+                DebugTrace("Maximising Game");
                 FUN_0047f850();
-                FUN_0047fe80();
+                RestoreGameWindow();
                 return 0;
             }
         }
         if (minimised) {
-            FUN_0047f870("Maximising Game");
+            DebugTrace("Maximising Game");
             FUN_0047f850();
-            FUN_0047fe80();
+            RestoreGameWindow();
         }
         return 1;
     }

@@ -60,11 +60,11 @@ LEGO_EXPORT void AddPathSquare(struct Point *pos) {
     unsigned int x;
     unsigned int y;
 
-    if (FUN_00481790(pos)) {
+    if (FindBestNodeAtPoint(pos)) {
         return;
     }
 
-    node = FUN_00481730();
+    node = AddBestNode();
     x = pos->x;
     node->x_max = x;
     node->x_min = x;
@@ -80,15 +80,15 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
     struct BestNode *node;
     struct BestBox box;
 
-    found = FUN_00481790(pos);
+    found = FindBestNodeAtPoint(pos);
     if (found == NULL) {
         return;
     }
     box = found->box;
-    FUN_00481750(found);
+    RemoveBestNode(found);
 
     if (box.y_min < pos->y) {
-        node = FUN_00481730();
+        node = AddBestNode();
         node->y_min = box.y_min;
         node->y_max = pos->y - 1;
         node->x_min = box.x_min;
@@ -96,7 +96,7 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
         FUN_00481b10(node);
     }
     if (box.y_max > pos->y) {
-        node = FUN_00481730();
+        node = AddBestNode();
         node->y_min = pos->y + 1;
         node->y_max = box.y_max;
         node->x_min = box.x_min;
@@ -104,14 +104,14 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
         FUN_00481b10(node);
     }
     if (box.x_min < pos->x) {
-        node = FUN_00481730();
+        node = AddBestNode();
         node->y_min = node->y_max = pos->y;
         node->x_min = box.x_min;
         node->x_max = pos->x - 1;
         FUN_00481b10(node);
     }
     if (box.x_max > pos->x) {
-        node = FUN_00481730();
+        node = AddBestNode();
         node->y_min = node->y_max = pos->y;
         node->x_min = pos->x + 1;
         node->x_max = box.x_max;
@@ -710,7 +710,7 @@ void FUN_00482a40(struct Point *pos) {
         }
     }
 
-    found = FUN_00481790(pos);
+    found = FindBestNodeAtPoint(pos);
     if (found != NULL) {
         FUN_004829c0(found);
     }
@@ -719,7 +719,7 @@ void FUN_00482a40(struct Point *pos) {
 // FUNCTION: LEGOLAND 0x00482a80
 void FUN_00482a80(void) {
     DAT_0066b460.x = 0;
-    DAT_006661c4 = 0;
+    Entrance1Elem = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00482a90
@@ -731,19 +731,19 @@ void FUN_00482a90(void) {
         return;
     }
 
-    if (DAT_006661c4 == 0) {
-        DAT_006661c4 = ElemID("ENTRANCE 1");
+    if (Entrance1Elem == 0) {
+        Entrance1Elem = ElemID("ENTRANCE 1");
     }
 
     match = (struct MatchResult *)GetFirstObjectMatching(
-        (Element *)DAT_006661c4);
-    obj = ((struct ElemInfo *)DAT_006661c4)->obj;
+        (Element *)Entrance1Elem);
+    obj = ((struct ElemInfo *)Entrance1Elem)->obj;
 
     DAT_0066b460.x = match->field_4 + obj->field_3c - 1;
     DAT_0066b460.y = ((obj->field_48 + obj->field_40) / 2) + match->field_5;
 }
 
 // FUNCTION: LEGOLAND 0x00482b00
-struct Point *FUN_00482b00(void) {
+struct Point *GetEntrance1Point(void) {
     return &DAT_0066b460;
 }

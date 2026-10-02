@@ -81,9 +81,9 @@ LEGO_EXPORT void SetStandardCallbacks(struct CallbackTable *table);
 LEGO_EXPORT int LoadObjectLibrary(void *obj, const char *name);
 void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info);
 void FUN_00481170(void);
-void *FUN_00481720(void);
+void *GetBestNodeList(void);
 LEGO_EXPORT void SetEditObject(struct EditObject *obj);
-struct BestNode *FUN_00481730(void);
+struct BestNode *AddBestNode(void);
 struct BestBox {
     int x_min;
     int y_min;
@@ -107,9 +107,9 @@ struct BestNode {
     unsigned int field_1c;
     unsigned int field_20;
 };
-void FUN_00481750(struct BestNode *node);
+void RemoveBestNode(struct BestNode *node);
 typedef struct BestNode BestNode;
-struct BestNode *FUN_00481790(struct Point *pos);
+struct BestNode *FindBestNodeAtPoint(struct Point *pos);
 void FUN_004819a0(int *param_1);
 struct BestNode *FUN_004817d0(int *param_1);
 void FUN_00481b10(struct BestNode *node);

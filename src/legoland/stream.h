@@ -28,14 +28,14 @@ struct KLIBAUDIO_Object {
     void *vtable;
 };
 
-int FUN_004989b0(void);
+int SpeechFillSoundBuffer(void);
 void FUN_00498100(void);
-void FUN_00498120(void);
-int FUN_00498630(const char *param_1);
-void FUN_00498870(void);
-int FUN_004988c0(void);
-int FUN_00498920(void);
+void SpeechRewindToData(void);
+int SpeechLoadWavFile(const char *param_1);
+void SpeechResetBuffers(void);
+int SpeechStop(void);
+int SpeechCloseFile(void);
 int FUN_00498b00(void);
-int FUN_00498b40(void);
+int SpeechStreamUpdate(void);
 int FUN_00498cf0(void);
-void FUN_00498900(unsigned int param_1);
+void SpeechSetVolume(unsigned int param_1);

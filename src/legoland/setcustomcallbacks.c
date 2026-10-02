@@ -52,22 +52,22 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         _stricmp(head->name, "FOUNTAIN 3") == 0) {
         iface->cb_98 = FUN_004529e0;
         iface->cb_9c = RemoveSoundObject;
-        iface->cb_ac = FUN_004529c0;
-        FUN_00452990(head);
+        iface->cb_ac = KillFountainSFX;
+        LoadFountainSFX(head);
     }
     // STRING: LEGOLAND 0x004b8a34
     else if (_stricmp(head->name, "crystal power station") == 0) {
         iface->cb_98 = FUN_00452b20;
         iface->cb_9c = RemoveSoundObject;
-        iface->cb_ac = FUN_00452ab0;
-        FUN_00452a80(head);
+        iface->cb_ac = KillPowerStationSFX;
+        LoadPowerStationSFX(head);
     }
     // STRING: LEGOLAND 0x004b8a20
     else if (_stricmp(head->name, "small power station") == 0) {
         iface->cb_98 = FUN_00452ad0;
         iface->cb_9c = RemoveSoundObject;
-        iface->cb_ac = FUN_00452ab0;
-        FUN_00452a80(head);
+        iface->cb_ac = KillPowerStationSFX;
+        LoadPowerStationSFX(head);
     }
     // STRING: LEGOLAND 0x004b8a14
     else if (_stricmp(head->name, "Dino Big") == 0 ||
@@ -77,8 +77,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         _stricmp(head->name, "Dino Mini") == 0) {
         iface->cb_98 = FUN_00452bc0;
         iface->cb_9c = RemoveSoundObject;
-        iface->cb_ac = FUN_00452ba0;
-        FUN_00452b70(head);
+        iface->cb_ac = KillDinoSFX;
+        LoadDinoSFX(head);
     }
     // STRING: LEGOLAND 0x004b89e4
     else if (_stricmp("DRIVING SCHOOL PUMPS", head->name) == 0) {
@@ -97,8 +97,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a8 = FUN_00405bd0;
         iface->cb_a0 = FUN_00405ad0;
         iface->cb_b0 = FUN_00405b10;
-        iface->cb_bc = FUN_00405e70;
-        iface->cb_b8 = FUN_00406070;
+        iface->cb_bc = DrivingSchool_Save;
+        iface->cb_b8 = DrivingSchool_Load;
         iface->cb_ac = FUN_00405460;
         iface->cb_c0 = FUN_00406050;
     }
@@ -133,7 +133,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0043ced0;
         iface->cb_a8 = FUN_0043cf00;
         iface->cb_b0 = FUN_0043d0b0;
-        iface->cb_ac = FUN_0043d1c0;
+        iface->cb_ac = KillGShedMatteSprite;
         iface->cb_a0 = FUN_0043d210;
     } else if (_stricmp("MECHANICS HUT", head->name) == 0) {
         iface->cb_a4 = FUN_0043d250;
@@ -142,7 +142,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0043d2c0;
         iface->cb_a8 = FUN_0043d2f0;
         iface->cb_b0 = FUN_0043d580;
-        iface->cb_ac = FUN_0043d730;
+        iface->cb_ac = KillMechHutMaskSprite;
         iface->cb_a0 = FUN_0043d780;
     }
     // STRING: LEGOLAND 0x004b8990
@@ -155,8 +155,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0042c4a0;
         iface->cb_98 = FUN_0042c520;
         iface->cb_a0 = FUN_0042c550;
-        iface->cb_b8 = FUN_0042c600;
-        iface->cb_bc = FUN_0042c590;
+        iface->cb_b8 = Carousel_Load;
+        iface->cb_bc = Carousel_Save;
     }
     // STRING: LEGOLAND 0x004b8984
     else if (_stricmp("BALLOONZ", head->name) == 0) {
@@ -168,8 +168,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_b0 = FUN_0042b2e0;
         iface->cb_ac = FUN_0042b9d0;
         iface->cb_a0 = FUN_0042b2a0;
-        iface->cb_bc = FUN_0042ba80;
-        iface->cb_b8 = FUN_0042baf0;
+        iface->cb_bc = SaveBalloonNodes;
+        iface->cb_b8 = Balloonz_Load;
     }
     // STRING: LEGOLAND 0x004b8970
     else if (_stricmp("EARTH SLIDE RIDE", head->name) == 0) {
@@ -180,8 +180,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_b0 = FUN_0042d070;
         iface->cb_9c = FUN_0042d270;
         iface->cb_98 = FUN_0042d2c0;
-        iface->cb_bc = FUN_0042d2f0;
-        iface->cb_b8 = FUN_0042d400;
+        iface->cb_bc = EarthSlideRide_Save;
+        iface->cb_b8 = EarthSlideRide_Load;
     }
     // STRING: LEGOLAND 0x004b8964
     else if (_stricmp("CASTLE BBQ", head->name) == 0) {
@@ -239,8 +239,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0042efb0;
         iface->cb_ac = FUN_0042f720;
         iface->cb_b0 = FUN_0042f4c0;
-        iface->cb_bc = FUN_004322a0;
-        iface->cb_b8 = FUN_00432310;
+        iface->cb_bc = Restaurant1_Save;
+        iface->cb_b8 = Restaurant1_Load;
     }
     // STRING: LEGOLAND 0x004b8900
     else if (_stricmp("RESTAURANT 2", head->name) == 0) {
@@ -251,8 +251,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0042fa40;
         iface->cb_a0 = FUN_004304a0;
         iface->cb_ac = FUN_00431120;
-        iface->cb_bc = FUN_00432390;
-        iface->cb_b8 = FUN_00432400;
+        iface->cb_bc = Restaurant2_Save;
+        iface->cb_b8 = Restaurant2_Load;
         iface->cb_b0 = FUN_00430b10;
     }
     // STRING: LEGOLAND 0x004b88f4
@@ -275,11 +275,11 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     }
     // STRING: LEGOLAND 0x004b83dc
     else if (_stricmp("SHARK CAFE BROLLY", head->name) == 0) {
-        iface->cb_a4 = FUN_0042e460;
+        iface->cb_a4 = LoadBrollyImages;
         iface->cb_8c = FUN_0042e4c0;
         iface->cb_98 = FUN_0042e500;
         iface->cb_a0 = FUN_0042e560;
-        iface->cb_ac = FUN_0042e4b0;
+        iface->cb_ac = UnloadBrollyImages;
     } else if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
         iface->cb_a4 = FUN_0041b830;
         iface->cb_8c = FUN_0041b880;
@@ -297,8 +297,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_0041a530;
         iface->cb_a8 = FUN_0041a720;
         iface->cb_b0 = FUN_0041abd0;
-        iface->cb_bc = FUN_0041acf0;
-        iface->cb_b8 = FUN_0041aee0;
+        iface->cb_bc = BoatingSchool_Save;
+        iface->cb_b8 = BoatingSchool_Load;
         iface->cb_c0 = FUN_0041b100;
     }
     // STRING: LEGOLAND 0x004b5354
@@ -328,14 +328,14 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_9c = FUN_00435470;
         iface->cb_a8 = FUN_00435750;
         iface->cb_b0 = FUN_00435bd0;
-        iface->cb_bc = FUN_00435c70;
-        iface->cb_b8 = FUN_00435ec0;
+        iface->cb_bc = JungleCruise_Save;
+        iface->cb_b8 = JungleCruise_Load;
         iface->cb_c0 = FUN_00436160;
     }
     // STRING: LEGOLAND 0x004b88b8
     else if (_stricmp("JUNGLE CRUISE MONKEY TREE", head->name) == 0) {
         iface->cb_a4 = FUN_00433ca0;
-        iface->cb_ac = FUN_00433cd0;
+        iface->cb_ac = KillBrijMaskSprite;
         iface->cb_8c = FUN_00433ce0;
         iface->cb_90 = FUN_00433d90;
         iface->cb_94 = FUN_00433fa0;
@@ -346,7 +346,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     // STRING: LEGOLAND 0x004b889c
     else if (_stricmp("JUNGLE CRUISE MONKEY FISH", head->name) == 0) {
         iface->cb_a4 = FUN_00434080;
-        iface->cb_ac = FUN_004340b0;
+        iface->cb_ac = KillMFish2Sprite;
         iface->cb_8c = FUN_004340c0;
         iface->cb_90 = FUN_00434330;
         iface->cb_94 = FUN_00434650;
@@ -355,22 +355,22 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a0 = FUN_00434740;
     }
 
-    FUN_00403080(head, iface);
-    FUN_00410d60(head, iface);
-    FUN_00405110(head, iface);
-    FUN_004068b0(head, iface);
-    FUN_004078f0(head, iface);
-    FUN_00416e50(head, iface);
-    FUN_00403bb0(head, iface);
+    CastleLevel1_GetInterfaces(head, iface);
+    LogFlume_GetInterfaces(head, iface);
+    CoptersRide(head, iface);
+    FortGetInterfaces(head, iface);
+    GoldRush_GetInterfaces(head, iface);
+    Temple_GetInterfaces(head, iface);
+    Catapult_GetInterfaces(head, iface);
     Joust_GetInterfaces(head, iface);
     TempleSlide_GetInterfaces(head, iface);
     SpiderRide(head, iface);
-    FUN_00415030(head, iface);
-    FUN_00418c80(head, iface);
+    SafariRideGetInterfaces(head, iface);
+    WaterWorksGetInterfaces(head, iface);
     FUN_004329c0(head, iface);
-    FUN_0043a400(head, iface);
+    ShopsGetInterfaces(head, iface);
     SpaceTowerRide(head, iface);
-    FUN_0043c760(head, iface);
-    FUN_0043e220(head, iface);
+    SpinningBarrelsGetInterfaces(head, iface);
+    PlaneRide_GetInterfaces(head, iface);
     FUN_004254d0(head, iface);
 }

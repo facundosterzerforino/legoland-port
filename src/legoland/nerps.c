@@ -165,7 +165,7 @@ unsigned int FUN_0046a170(struct NerpsArg *arg) {
 unsigned int FUN_0046a190(struct NerpsArg *arg) {
     int i;
 
-    FUN_00457870(0);
+    SetBricksLimited(0);
     i = 0;
     if ((int)arg->field_1c > 0) {
         do {
@@ -177,7 +177,7 @@ unsigned int FUN_0046a190(struct NerpsArg *arg) {
             i++;
         } while (i < (int)arg->field_1c);
     }
-    FUN_00457870(1);
+    SetBricksLimited(1);
     return 1;
 }
 
@@ -709,7 +709,7 @@ unsigned int FUN_0046ab70(struct LoopArg *arg) {
 // FUNCTION: LEGOLAND 0x0046abc0
 int FUN_0046abc0(unsigned int param_1) {
     /* param_1 is a RewardArg* carried as unsigned int (table callback ABI) */
-    return FUN_00469ae0((struct RewardArg *)param_1);
+    return ProcessUnimplementedReward((struct RewardArg *)param_1);
 }
 
 // FUNCTION: LEGOLAND 0x0046abd0
@@ -852,7 +852,7 @@ unsigned int FUN_0046ae20(void) {
 
 // FUNCTION: LEGOLAND 0x0046ae30
 int FUN_0046ae30(unsigned int param_1) {
-    return FUN_00469ae0((struct RewardArg *)param_1);
+    return ProcessUnimplementedReward((struct RewardArg *)param_1);
 }
 
 // FUNCTION: LEGOLAND 0x0046ae40
@@ -891,7 +891,7 @@ unsigned int FUN_0046aec0(struct NerpsArg *arg) {
     int current;
     int target;
 
-    current = FUN_00499550();
+    current = GetGardenerCount();
     target = arg->field_1c;
     if (0 < target) {
         if (target <= current) {
@@ -912,7 +912,7 @@ unsigned int FUN_0046af10(struct NerpsArg *arg) {
     int current;
     int target;
 
-    current = FUN_00499560();
+    current = GetMechanicCount();
     target = arg->field_1c;
     if (0 < target) {
         if (target <= current) {
@@ -1046,7 +1046,7 @@ unsigned int FUN_0046b130(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046b180
 unsigned int FUN_0046b180(struct NerpsArg *arg) {
     if (arg->field_1c == 3) {
-        if (EditMode.unk0 == 1 && EditMode.unk8 == DAT_007fd624) {
+        if (EditMode.unk0 == 1 && EditMode.unk8 == PathControlObject) {
             return 1;
         }
     } else if (EditMode.unk0 == arg->field_1c) {
@@ -1061,7 +1061,7 @@ unsigned int FUN_0046b180(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046b1e0
 int FUN_0046b1e0(unsigned int param_1) {
-    return FUN_00469b00((struct RewardArg *)param_1);
+    return ProcessUnimplementedObjective((struct RewardArg *)param_1);
 }
 
 // FUNCTION: LEGOLAND 0x0046b1f0
@@ -1122,7 +1122,7 @@ void FUN_0046b290(void) {
             } else {
                 DAT_00668784 = next;
             }
-            FUN_00468940(node);
+            FreeObjectiveEvent(node);
             node = prev;
         }
         prev = node;
@@ -1222,7 +1222,7 @@ void FUN_0046b2d0(void) {
     }
     for (;;) {
         if ((DAT_00668610 & 0x10) != 0) {
-            FUN_00482b20(1);
+            UpdatePathLinks(1);
         }
         DAT_00668794 = GetGameTimer();
         while (node != NULL) {
@@ -1237,7 +1237,7 @@ void FUN_0046b2d0(void) {
                             } else {
                                 DAT_00668784 = node->next;
                             }
-                            FUN_00468940(node);
+                            FreeObjectiveEvent(node);
                             node = prev;
                         } else {
                             node->flags_10 |= 0x80;
@@ -1283,7 +1283,7 @@ void FUN_0046b2d0(void) {
                     } else {
                         DAT_00668784 = next;
                     }
-                    FUN_00468940(node);
+                    FreeObjectiveEvent(node);
                     node = prev;
                 }
                 prev = node;
@@ -1345,10 +1345,10 @@ struct WrapperNode {
 // FUNCTION: LEGOLAND 0x0046b520
 void FUN_0046b520(struct WrapperNode *node) {
     if (node->field_c != NULL) {
-        FUN_00468970(node->field_c);
+        FreeObjectiveEventList(node->field_c);
     }
     if (node->field_10 != NULL) {
-        FUN_00468970(node->field_10);
+        FreeObjectiveEventList(node->field_10);
     }
     if (node->field_8 != NULL) {
         free(node->field_8);
@@ -1431,7 +1431,7 @@ void FUN_0046b610(struct TimedNode *node, struct TimedList *list) {
 }
 
 // FUNCTION: LEGOLAND 0x0046b630
-void FUN_0046b630(struct ObjectiveEvent *node, struct EventList *list) {
+void InsertObjectiveEventAtHead(struct ObjectiveEvent *node, struct EventList *list) {
     struct ObjectiveEvent *head;
 
     head = list->head;
@@ -1468,7 +1468,7 @@ void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
     if (ctx->field_8 != 0) {
-        node = FUN_00468910(1, 2);
+        node = AllocObjectiveEvent(1, 2);
         FUN_00468b40(node, ctx->field_8, param_2);
         if (param_2 == 0) {
             ctx->field_8 = 0;
@@ -1510,322 +1510,322 @@ unsigned int FUN_0046b760(void) {
 void FUN_0046b790(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(2, 1);
+    node = AllocObjectiveEvent(2, 1);
     node->field_4 = param_1;
     node->flags_10 = 0;
     node->field_14 = param_2;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b7f0
 void FUN_0046b7f0(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(4, 1);
+    node = AllocObjectiveEvent(4, 1);
     node->flags_10 = 0;
     node->field_4 = param_1;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b820
 void FUN_0046b820(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(5, 1);
+    node = AllocObjectiveEvent(5, 1);
     node->flags_10 = 0;
     node->field_1c = param_1;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b850
 void FUN_0046b850(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(6, 1);
+    node = AllocObjectiveEvent(6, 1);
     node->flags_10 = 0;
     node->field_1c = param_1;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b880
 void FUN_0046b880(unsigned int param_1, unsigned int *param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(7, 1);
+    node = AllocObjectiveEvent(7, 1);
     node->field_4 = param_1;
     node->field_20 = param_2[0];
     node->field_24 = param_2[1];
     node->field_18 = param_3;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b8c0
 void FUN_0046b8c0(struct Vec4 *param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(8, 1);
+    node = AllocObjectiveEvent(8, 1);
     node->vec_28 = *param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b900
 void FUN_0046b900(struct Vec4 *param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(9, 1);
+    node = AllocObjectiveEvent(9, 1);
     node->vec_28 = *param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b940
 void FUN_0046b940(struct Vec4 *param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xa, 1);
+    node = AllocObjectiveEvent(0xa, 1);
     node->vec_28 = *param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b980
 void FUN_0046b980(struct Vec4 *param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xb, 1);
+    node = AllocObjectiveEvent(0xb, 1);
     node->vec_28 = *param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b9c0
 void FUN_0046b9c0(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xc, 1);
+    node = AllocObjectiveEvent(0xc, 1);
     FUN_00468b40(node, param_1, 1);
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046b9f0
 void FUN_0046b9f0(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xd, 1);
+    node = AllocObjectiveEvent(0xd, 1);
     FUN_00468b40(node, param_1, 1);
     node->field_1c = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046ba30
 void FUN_0046ba30(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xe, 1);
+    node = AllocObjectiveEvent(0xe, 1);
     FUN_00468b40(node, param_1, 1);
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046ba60
 void FUN_0046ba60(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0xf, 1);
+    node = AllocObjectiveEvent(0xf, 1);
     node->field_1c = param_1;
     node->field_14 = param_2;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046ba90
 void FUN_0046ba90(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x18, 1);
+    node = AllocObjectiveEvent(0x18, 1);
     node->field_18 = param_1;
     node->field_1c = param_2;
     node->field_14 = param_3;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bad0
 void FUN_0046bad0(unsigned int param_1, unsigned int param_2, unsigned int *param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x10, 1);
+    node = AllocObjectiveEvent(0x10, 1);
     node->field_1c = param_2;
     node->field_20 = param_3[0];
     node->field_24 = param_3[1];
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bb10
 void FUN_0046bb10(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x11, 1);
+    node = AllocObjectiveEvent(0x11, 1);
     node->field_1c = param_1;
     node->field_14 = param_2;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bb40
 void FUN_0046bb40(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x12, 1);
+    node = AllocObjectiveEvent(0x12, 1);
     node->field_4 = param_1;
     node->field_14 = param_2;
     node->field_1c = param_3;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bb80
 void FUN_0046bb80(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x13, 1);
+    node = AllocObjectiveEvent(0x13, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bbb0
 void FUN_0046bbb0(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x14, 1);
+    node = AllocObjectiveEvent(0x14, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bbe0
 void FUN_0046bbe0(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x15, 1);
+    node = AllocObjectiveEvent(0x15, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bc10
 void FUN_0046bc10(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x16, 1);
+    node = AllocObjectiveEvent(0x16, 1);
     node->flags_10 = 0;
     node->field_1c = param_1;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bc40
 void FUN_0046bc40(void) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x20, 1);
+    node = AllocObjectiveEvent(0x20, 1);
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bc60
 void FUN_0046bc60(void) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1f, 1);
+    node = AllocObjectiveEvent(0x1f, 1);
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bc80
 void FUN_0046bc80(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x19, 1);
+    node = AllocObjectiveEvent(0x19, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bcb0
 void FUN_0046bcb0(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1a, 1);
+    node = AllocObjectiveEvent(0x1a, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bce0
 void FUN_0046bce0(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1b, 1);
+    node = AllocObjectiveEvent(0x1b, 1);
     node->field_1c = param_2;
     node->field_14 = param_1;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bd10
 void FUN_0046bd10(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1c, 1);
+    node = AllocObjectiveEvent(0x1c, 1);
     FUN_00468b40(node, param_1, 1);
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bd40
 void FUN_0046bd40(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1d, 1);
+    node = AllocObjectiveEvent(0x1d, 1);
     FUN_00468b40(node, param_1, 1);
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bd70
 void FUN_0046bd70(unsigned int param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x1e, 1);
+    node = AllocObjectiveEvent(0x1e, 1);
     node->field_1c = param_1;
     node->field_14 = param_2;
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bda0
 void FUN_0046bda0(unsigned int *param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x17, 1);
+    node = AllocObjectiveEvent(0x17, 1);
     node->field_20 = param_1[0];
     node->field_24 = param_1[1];
     node->flags_10 = 0;
-    FUN_0046b630(node, (struct EventList *)DAT_0066879c);
+    InsertObjectiveEventAtHead(node, (struct EventList *)DAT_0066879c);
 }
 
 // FUNCTION: LEGOLAND 0x0046bdd0
 void FUN_0046bdd0(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x21, 1);
+    node = AllocObjectiveEvent(0x21, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->flags_10 = param_1;
@@ -1836,7 +1836,7 @@ void FUN_0046bdd0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046be00(unsigned char param_1, unsigned int param_2, unsigned int *param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x22, 1);
+    node = AllocObjectiveEvent(0x22, 1);
     node->field_4 = param_2;
     node->field_20 = param_3[0];
     node->field_24 = param_3[1];
@@ -1848,7 +1848,7 @@ void FUN_0046be00(unsigned char param_1, unsigned int param_2, unsigned int *par
 void FUN_0046be40(unsigned char param_1, unsigned int param_2, unsigned int param_3, struct Vec4 *param_4) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x23, 1);
+    node = AllocObjectiveEvent(0x23, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->vec_28 = *param_4;
@@ -1860,7 +1860,7 @@ void FUN_0046be40(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046be90(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x24, 1);
+    node = AllocObjectiveEvent(0x24, 1);
     node->field_4 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -1870,7 +1870,7 @@ void FUN_0046be90(unsigned char param_1, unsigned int param_2) {
 void FUN_0046bec0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x25, 1);
+    node = AllocObjectiveEvent(0x25, 1);
     node->field_4 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -1880,7 +1880,7 @@ void FUN_0046bec0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046bef0(unsigned char param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x26, 1);
+    node = AllocObjectiveEvent(0x26, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->field_14 = param_4;
@@ -1892,7 +1892,7 @@ void FUN_0046bef0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046bf30(unsigned char param_1, struct Vec4 *param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x27, 1);
+    node = AllocObjectiveEvent(0x27, 1);
     node->vec_28 = *param_2;
     node->field_14 = param_3;
     node->flags_10 = param_1;
@@ -1903,7 +1903,7 @@ void FUN_0046bf30(unsigned char param_1, struct Vec4 *param_2, unsigned int para
 void FUN_0046bf80(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x28, 1);
+    node = AllocObjectiveEvent(0x28, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->flags_10 = param_1;
@@ -1914,7 +1914,7 @@ void FUN_0046bf80(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046bfb0(unsigned char param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x29, 1);
+    node = AllocObjectiveEvent(0x29, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->field_14 = param_4;
@@ -1926,7 +1926,7 @@ void FUN_0046bfb0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046bff0(unsigned char param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2a, 1);
+    node = AllocObjectiveEvent(0x2a, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->field_14 = param_4;
@@ -1938,7 +1938,7 @@ void FUN_0046bff0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c030(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2b, 1);
+    node = AllocObjectiveEvent(0x2b, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->flags_10 = param_1;
@@ -1949,7 +1949,7 @@ void FUN_0046c030(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c060(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2c, 1);
+    node = AllocObjectiveEvent(0x2c, 1);
     node->field_4 = param_2;
     node->field_18 = param_3;
     node->flags_10 = param_1;
@@ -1960,7 +1960,7 @@ void FUN_0046c060(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c090(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2d, 1);
+    node = AllocObjectiveEvent(0x2d, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -1970,7 +1970,7 @@ void FUN_0046c090(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c0c0(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2e, 1);
+    node = AllocObjectiveEvent(0x2e, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->flags_10 = param_1;
@@ -1981,7 +1981,7 @@ void FUN_0046c0c0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c0f0(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x2f, 1);
+    node = AllocObjectiveEvent(0x2f, 1);
     node->field_4 = param_2;
     node->field_1c = param_3;
     node->flags_10 = param_1;
@@ -1992,7 +1992,7 @@ void FUN_0046c0f0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c120(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x30, 1);
+    node = AllocObjectiveEvent(0x30, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2002,7 +2002,7 @@ void FUN_0046c120(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c150(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x31, 1);
+    node = AllocObjectiveEvent(0x31, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2012,7 +2012,7 @@ void FUN_0046c150(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c180(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x32, 1);
+    node = AllocObjectiveEvent(0x32, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2022,7 +2022,7 @@ void FUN_0046c180(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c1b0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x33, 1);
+    node = AllocObjectiveEvent(0x33, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2032,7 +2032,7 @@ void FUN_0046c1b0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c1e0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x34, 1);
+    node = AllocObjectiveEvent(0x34, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2042,7 +2042,7 @@ void FUN_0046c1e0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c210(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x35, 1);
+    node = AllocObjectiveEvent(0x35, 1);
     node->field_14 = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2052,7 +2052,7 @@ void FUN_0046c210(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c240(unsigned char param_1, struct Vec4 *param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x37, 1);
+    node = AllocObjectiveEvent(0x37, 1);
     node->vec_28 = *param_2;
     node->field_14 = param_3;
     node->flags_10 = param_1;
@@ -2063,7 +2063,7 @@ void FUN_0046c240(unsigned char param_1, struct Vec4 *param_2, unsigned int para
 void FUN_0046c290(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x38, 1);
+    node = AllocObjectiveEvent(0x38, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2073,7 +2073,7 @@ void FUN_0046c290(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c2c0(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x39, 1);
+    node = AllocObjectiveEvent(0x39, 1);
     node->field_1c = param_2;
     node->field_14 = param_3;
     node->flags_10 = param_1;
@@ -2084,7 +2084,7 @@ void FUN_0046c2c0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c2f0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3a, 1);
+    node = AllocObjectiveEvent(0x3a, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2094,7 +2094,7 @@ void FUN_0046c2f0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c320(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3b, 1);
+    node = AllocObjectiveEvent(0x3b, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2104,7 +2104,7 @@ void FUN_0046c320(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c350(unsigned char param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3c, 1);
+    node = AllocObjectiveEvent(0x3c, 1);
     node->field_14 = param_3;
     node->field_1c = param_2;
     node->field_18 = param_4;
@@ -2116,7 +2116,7 @@ void FUN_0046c350(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c390(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3d, 1);
+    node = AllocObjectiveEvent(0x3d, 1);
     node->field_1c = param_2;
     node->field_14 = param_3;
     node->flags_10 = param_1;
@@ -2127,7 +2127,7 @@ void FUN_0046c390(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c3c0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3e, 1);
+    node = AllocObjectiveEvent(0x3e, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2137,7 +2137,7 @@ void FUN_0046c3c0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c3f0(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x3f, 1);
+    node = AllocObjectiveEvent(0x3f, 1);
     node->field_1c = param_2;
     node->field_14 = param_3;
     node->flags_10 = param_1;
@@ -2148,7 +2148,7 @@ void FUN_0046c3f0(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c420(unsigned char param_1, unsigned int param_2, unsigned int param_3) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x40, 1);
+    node = AllocObjectiveEvent(0x40, 1);
     node->field_1c = param_3;
     node->field_14 = param_2;
     node->flags_10 = param_1;
@@ -2159,7 +2159,7 @@ void FUN_0046c420(unsigned char param_1, unsigned int param_2, unsigned int para
 void FUN_0046c450(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x41, 1);
+    node = AllocObjectiveEvent(0x41, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2169,7 +2169,7 @@ void FUN_0046c450(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c480(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x42, 1);
+    node = AllocObjectiveEvent(0x42, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2179,7 +2179,7 @@ void FUN_0046c480(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c4b0(unsigned char param_1, unsigned int param_2) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x43, 1);
+    node = AllocObjectiveEvent(0x43, 1);
     node->field_1c = param_2;
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
@@ -2189,7 +2189,7 @@ void FUN_0046c4b0(unsigned char param_1, unsigned int param_2) {
 void FUN_0046c510(unsigned char param_1) {
     struct ObjectiveEvent *node;
 
-    node = FUN_00468910(0x45, 1);
+    node = AllocObjectiveEvent(0x45, 1);
     node->flags_10 = param_1;
     FUN_0046b610((struct TimedNode *)node, (struct TimedList *)DAT_0066879c);
 }
@@ -2240,11 +2240,11 @@ void FUN_0046c580(struct AppendArg10 *arg) {
 
 // FUNCTION: LEGOLAND 0x0046c5c0
 void FUN_0046c5c0(void) {
-    FUN_00468970(DAT_00668728);
+    FreeObjectiveEventList(DAT_00668728);
     DAT_00668728 = NULL;
-    FUN_00468970(DAT_00668724);
+    FreeObjectiveEventList(DAT_00668724);
     DAT_00668724 = NULL;
-    FUN_00468970(DAT_00668784);
+    FreeObjectiveEventList(DAT_00668784);
     DAT_00668784 = NULL;
     FUN_0046b560((struct WrapperNode *)DAT_00668798);
     DAT_00668798 = NULL;
@@ -2339,7 +2339,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
 
     head = NULL;
     prev = NULL;
-    node = FUN_00468910((unsigned int)prev, (int)prev);
+    node = AllocObjectiveEvent((unsigned int)prev, (int)prev);
     while (SaveGameRead(node, 0x44) != 0) {
         if ((unsigned int)node->next == 0xffffffff) {
             free(node);
@@ -2357,7 +2357,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
         str = (char *)FUN_0046c680();
         if (DAT_006687a0 != 0) {
             free(node);
-            FUN_00468970(head);
+            FreeObjectiveEventList(head);
             return NULL;
         }
         if (str != NULL) {
@@ -2371,8 +2371,8 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
             node->flags_10 |= 0x20;
         }
         if (DAT_006687a0 != 0) {
-            FUN_00468940(node);
-            FUN_00468970(head);
+            FreeObjectiveEvent(node);
+            FreeObjectiveEventList(head);
             return NULL;
         }
         if (head == NULL) {
@@ -2381,16 +2381,16 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
             prev->next = node;
         }
         prev = node;
-        node = FUN_00468910(0, 0);
+        node = AllocObjectiveEvent(0, 0);
     }
     free(node);
-    FUN_00468970(head);
+    FreeObjectiveEventList(head);
     DAT_006687a0++;
     return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x0046c920
-unsigned int FUN_0046c920(void) {
+unsigned int SaveScripts(void) {
     struct NerpsListNode *node;
     int scratch;
     int i;
@@ -2460,7 +2460,7 @@ unsigned int FUN_0046cb20(void) {
     if (DAT_00810140 != 0) {
         UnloadSaveGameMap();
     } else {
-        FUN_004629e0();
+        UnloadBaseMap();
     }
     FUN_004689a0();
     FUN_0046c5c0();
@@ -2470,7 +2470,7 @@ unsigned int FUN_0046cb20(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046cb60
-unsigned int FUN_0046cb60(void) {
+unsigned int LoadScripts(void) {
     struct NerpsListNode *node;
     struct NerpsListNode *prev;
     int i;

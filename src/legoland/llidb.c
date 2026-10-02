@@ -24,7 +24,7 @@
 
 #define LLIDB_PAGE(id) ((id) >> 8)
 #define LLIDB_SLOT(id) ((id) & 0xff)
-#define LLIDB_ELEM(id) (&DAT_006691a8[LLIDB_PAGE(id)][LLIDB_SLOT(id)])
+#define LLIDB_ELEM(id) (&LLIDB_Pages[LLIDB_PAGE(id)][LLIDB_SLOT(id)])
 
 struct ILFTable {
     unsigned char pad_0[4];
@@ -130,23 +130,23 @@ LEGO_EXPORT int LLIDB_LoadICM(void) {
         _close(fd2);
         return 0;
     }
-    _read(fd, &DAT_006691a4, 4);
-    DAT_006691a0 = (DAT_006691a4 + 0xff) & 0xffffff00;
-    DAT_006691a8 = malloc((DAT_006691a0 >> 8) * 4);
-    for (page = 0; page < (DAT_006691a0 >> 8); page++) {
-        DAT_006691a8[page] = malloc(0x100 * sizeof(struct Element));
+    _read(fd, &LLIDB_ElementCount, 4);
+    LLIDB_Capacity = (LLIDB_ElementCount + 0xff) & 0xffffff00;
+    LLIDB_Pages = malloc((LLIDB_Capacity >> 8) * 4);
+    for (page = 0; page < (LLIDB_Capacity >> 8); page++) {
+        LLIDB_Pages[page] = malloc(0x100 * sizeof(struct Element));
     }
-    remaining = DAT_006691a4;
-    for (page = 0; page < (DAT_006691a0 >> 8); page++, remaining -= 0x100) {
+    remaining = LLIDB_ElementCount;
+    for (page = 0; page < (LLIDB_Capacity >> 8); page++, remaining -= 0x100) {
         if (remaining >= 0x100) {
             n = 0x100;
         } else {
             n = remaining;
         }
-        _read(fd, DAT_006691a8[page], n * sizeof(struct Element));
+        _read(fd, LLIDB_Pages[page], n * sizeof(struct Element));
     }
-    remaining = DAT_006691a4;
-    for (page = 0; page < (DAT_006691a0 >> 8); page++, remaining -= 0x100) {
+    remaining = LLIDB_ElementCount;
+    for (page = 0; page < (LLIDB_Capacity >> 8); page++, remaining -= 0x100) {
         if (remaining >= 0x100) {
             n = 0x100;
         } else if (remaining <= 0) {
@@ -155,44 +155,44 @@ LEGO_EXPORT int LLIDB_LoadICM(void) {
             n = remaining;
         }
         for (i = 0; i < n; i++) {
-            DAT_006691a8[page][i].flags &= ~0xa;
+            LLIDB_Pages[page][i].flags &= ~0xa;
             _read(fd, &len, 4);
             if (len == 0) {
-                DAT_006691a8[page][i].name = NULL;
+                LLIDB_Pages[page][i].name = NULL;
             } else {
-                DAT_006691a8[page][i].name = malloc(len + 1);
-                DAT_006691a8[page][i].name[len] = '\0';
-                _read(fd, DAT_006691a8[page][i].name, len);
+                LLIDB_Pages[page][i].name = malloc(len + 1);
+                LLIDB_Pages[page][i].name[len] = '\0';
+                _read(fd, LLIDB_Pages[page][i].name, len);
             }
             _read(fd, &len, 4);
             if (len == 0) {
-                DAT_006691a8[page][i].path = NULL;
+                LLIDB_Pages[page][i].path = NULL;
             } else {
-                DAT_006691a8[page][i].path = malloc(len + 1);
-                DAT_006691a8[page][i].path[len] = '\0';
-                _read(fd, DAT_006691a8[page][i].path, len);
+                LLIDB_Pages[page][i].path = malloc(len + 1);
+                LLIDB_Pages[page][i].path[len] = '\0';
+                _read(fd, LLIDB_Pages[page][i].path, len);
             }
-            DAT_006691a8[page][i].flags &= ~1;
-            DAT_006691a8[page][i].field_10 = 0;
+            LLIDB_Pages[page][i].flags &= ~1;
+            LLIDB_Pages[page][i].field_10 = 0;
         }
     }
     _close(fd);
     // STRING: LEGOLAND 0x004bc114
     e = ElemID("LANGUAGE");
     if (e != NULL) {
-        strcpy(DAT_004bc0ec, e->path);
+        strcpy(LanguageName, e->path);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0047b2d0
 LEGO_EXPORT unsigned int LLIDB_GetCount(void) {
-    return DAT_006691a4;
+    return LLIDB_ElementCount;
 }
 
 // FUNCTION: LEGOLAND 0x0047b2e0
 LEGO_EXPORT int LLIDB_GetElement(unsigned int index, struct Element **output) {
-    if (index < DAT_006691a4) {
+    if (index < LLIDB_ElementCount) {
         if (output != NULL) {
             *output = LLIDB_ELEM(index);
         }
@@ -217,7 +217,7 @@ LEGO_EXPORT int LLIDB_FindElement(const char *name, unsigned int *out, unsigned 
             return LLIDB_ERR_NOTFOUND;
         }
     } else {
-        for (i = 0; i < DAT_006691a4; i++) {
+        for (i = 0; i < LLIDB_ElementCount; i++) {
             if (_stricmp(name, LLIDB_ELEM(i)->name) == 0) {
                 if (out != NULL) {
                     *out = (unsigned int)LLIDB_ELEM(i);
@@ -259,7 +259,7 @@ LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, unsigned int *out, unsi
             return LLIDB_ERR_NOTFOUND;
         }
     } else {
-        for (i = 0; i < DAT_006691a4; i++) {
+        for (i = 0; i < LLIDB_ElementCount; i++) {
             if (data == LLIDB_ELEM(i)->data) {
                 if (out != NULL) {
                     *out = (unsigned int)LLIDB_ELEM(i);
@@ -284,11 +284,11 @@ LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, unsigned int *out, unsi
 LEGO_EXPORT void LLIDB_ClearOnLevel(void) {
     unsigned int i = 0;
 
-    if (DAT_006691a4 > 0) {
+    if (LLIDB_ElementCount > 0) {
         do {
             LLIDB_ELEM(i)->flags &= ~LLIDB_FLAG_LEVEL;
             i++;
-        } while (i < DAT_006691a4);
+        } while (i < LLIDB_ElementCount);
     }
 }
 
@@ -298,14 +298,14 @@ unsigned int FUN_0047b500(unsigned int param_1) {
     unsigned int page;
     unsigned int count;
 
-    if (param_1 < DAT_006691a4) {
-        count = DAT_006691a4;
+    if (param_1 < LLIDB_ElementCount) {
+        count = LLIDB_ElementCount;
         page = param_1 >> 8;
         slot = param_1 & 0xff;
         if (page <= count >> 8) {
             do {
                 if (slot == 0xffffffff) {
-                    DAT_006691a8[page - 1][0xff] = DAT_006691a8[page][0];
+                    LLIDB_Pages[page - 1][0xff] = LLIDB_Pages[page][0];
                     slot = 0;
                 } else if ((int)slot >= 0xfe) {
                     slot = 0xffffffff;
@@ -313,16 +313,16 @@ unsigned int FUN_0047b500(unsigned int param_1) {
                     continue;
                 }
                 do {
-                    struct Element *arr = DAT_006691a8[page];
+                    struct Element *arr = LLIDB_Pages[page];
                     arr[slot] = arr[slot + 1];
                     slot++;
                 } while ((int)slot < 0xfe);
-                count = DAT_006691a4;
+                count = LLIDB_ElementCount;
                 slot = 0xffffffff;
                 page++;
             } while (page <= count >> 8);
         }
-        DAT_006691a4 = count - 1;
+        LLIDB_ElementCount = count - 1;
         return 0;
     }
     return (unsigned int)LLIDB_ERR_NOTFOUND;
@@ -332,13 +332,13 @@ unsigned int FUN_0047b500(unsigned int param_1) {
 unsigned int FUN_0047b5a0(void) {
     unsigned int capacity;
 
-    if (((DAT_006691a0 ^ DAT_006691a4) & 0xffffff00) == 0) {
-        capacity = (DAT_006691a4 + 0x100) & 0xffffff00;
-        DAT_006691a0 = capacity;
-        DAT_006691a8 = (struct Element **)realloc(DAT_006691a8, (capacity >> 8) * 4);
-        DAT_006691a8[(DAT_006691a0 >> 8) - 1] = (struct Element *)malloc(0x1400);
+    if (((LLIDB_Capacity ^ LLIDB_ElementCount) & 0xffffff00) == 0) {
+        capacity = (LLIDB_ElementCount + 0x100) & 0xffffff00;
+        LLIDB_Capacity = capacity;
+        LLIDB_Pages = (struct Element **)realloc(LLIDB_Pages, (capacity >> 8) * 4);
+        LLIDB_Pages[(LLIDB_Capacity >> 8) - 1] = (struct Element *)malloc(0x1400);
     }
-    return DAT_006691a4;
+    return LLIDB_ElementCount;
 }
 
 // FUNCTION: LEGOLAND 0x0047b610
@@ -368,28 +368,28 @@ LEGO_EXPORT unsigned int LLIDB_RegisterNewElement(const char *param_1, const cha
     slot_off = (index & 0xff) * 20;
 
     copy = (char *)malloc(strlen(param_1) + 1);
-    *(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off) = copy;
-    strcpy(*(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off), param_1);
+    *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off) = copy;
+    strcpy(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off), param_1);
 
     if (param_2 == NULL) {
         copy = (char *)malloc(1);
-        *(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 4) = copy;
-        *(*(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 4)) = '\0';
+        *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4) = copy;
+        *(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4)) = '\0';
     } else {
         copy = (char *)malloc(strlen(param_2) + 1);
-        *(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 4) = copy;
-        strcpy(*(char **)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 4), param_2);
+        *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4) = copy;
+        strcpy(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4), param_2);
     }
 
-    *(unsigned int *)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 8) = param_3 & LLIDB_TYPE_MASK;
-    *(unsigned int *)(*(char **)(page_off + (unsigned int)DAT_006691a8) + slot_off + 0x10) = 0;
+    *(unsigned int *)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 8) = param_3 & LLIDB_TYPE_MASK;
+    *(unsigned int *)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 0x10) = 0;
 
-    DAT_006691a4++;
+    LLIDB_ElementCount++;
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0047b7b0
-void FUN_0047b7b0(int param_1) {
+void ShowLLIDBError(int param_1) {
     // STRING: LEGOLAND 0x004bc208
     const char *title = "LEGOLAND Installation & Configuration Manager";
     switch (param_1) {
@@ -424,13 +424,13 @@ void FUN_0047b7b0(int param_1) {
 LEGO_EXPORT unsigned int LLIDB_RegisterNewElementB(const char *param_1, const char *param_2, unsigned int param_3) {
     unsigned int result = LLIDB_RegisterNewElement(param_1, param_2, param_3);
     if (result != 0) {
-        FUN_0047b7b0(result);
+        ShowLLIDBError(result);
     }
     return result;
 }
 
 // FUNCTION: LEGOLAND 0x0047b890
-INT_PTR CALLBACK FUN_0047b890(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+INT_PTR CALLBACK SelectElementDlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     HWND list;
     int count;
     unsigned int i;
@@ -458,9 +458,9 @@ INT_PTR CALLBACK FUN_0047b890(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         col.cx = 180;
         SendMessageA(list, LVM_INSERTCOLUMN, 2, (LPARAM)&col);
         list = GetDlgItem(hwnd, 0x441);
-        for (i = 0; i < DAT_006691a4; i++) {
+        for (i = 0; i < LLIDB_ElementCount; i++) {
             LLIDB_GetElement(i, &elem);
-            if (elem != NULL && (DAT_007fdb88 & elem->flags) != 0) {
+            if (elem != NULL && (SelectElementMask & elem->flags) != 0) {
                 item.mask = LVIF_TEXT | LVIF_PARAM;
                 item.iItem = count;
                 item.iSubItem = 0;
@@ -522,16 +522,16 @@ INT_PTR CALLBACK FUN_0047b890(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         switch (LOWORD(wparam)) {
         case IDOK:
             list = GetDlgItem(hwnd, 0x441);
-            DAT_007fdca0 = SendMessageA(list, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-            if (DAT_007fdca0 == -1) {
+            SelectedElementIndex = SendMessageA(list, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+            if (SelectedElementIndex == -1) {
                 EndDialog(hwnd, 0);
                 return 0;
             }
             item.mask = LVIF_PARAM;
-            item.iItem = DAT_007fdca0;
+            item.iItem = SelectedElementIndex;
             item.iSubItem = 0;
             SendMessageA(list, LVM_GETITEM, 0, (LPARAM)&item);
-            DAT_007fdca0 = item.lParam;
+            SelectedElementIndex = item.lParam;
             EndDialog(hwnd, 1);
             break;
         case IDCANCEL:
@@ -550,14 +550,14 @@ INT_PTR CALLBACK FUN_0047b890(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 LEGO_EXPORT int LLIDB_SelectElement(unsigned int mask, struct Element **output) {
     INT_PTR result;
 
-    DAT_007fdb88 = mask;
-    result = DialogBoxParamA((HINSTANCE)WNDENV_GethInstance(), MAKEINTRESOURCEA(0x75), GetDesktopWindow(), FUN_0047b890, 0);
+    SelectElementMask = mask;
+    result = DialogBoxParamA((HINSTANCE)WNDENV_GethInstance(), MAKEINTRESOURCEA(0x75), GetDesktopWindow(), SelectElementDlgProc, 0);
     if (result != -1) {
         if (result != 1) {
             return LLIDB_ERR_CANCELED;
         }
         if (output != NULL) {
-            LLIDB_GetElement(DAT_007fdca0, output);
+            LLIDB_GetElement(SelectedElementIndex, output);
         }
         return 0;
     }
@@ -578,31 +578,31 @@ LEGO_EXPORT int LLIDB_SaveICM(void) {
     if (fd == -1) {
         return LLIDB_ERR_ICMWRITE;
     }
-    _write(fd, &DAT_006691a4, 4);
-    remaining = DAT_006691a4;
-    for (page = 0; page < (DAT_006691a0 >> 8); page++) {
+    _write(fd, &LLIDB_ElementCount, 4);
+    remaining = LLIDB_ElementCount;
+    for (page = 0; page < (LLIDB_Capacity >> 8); page++) {
         if (remaining >= 0x100) {
             n = 0x100;
         } else {
             n = remaining;
         }
-        _write(fd, DAT_006691a8[page], n * sizeof(struct Element));
+        _write(fd, LLIDB_Pages[page], n * sizeof(struct Element));
         remaining -= 0x100;
     }
-    remaining = DAT_006691a4;
-    for (page = 0; page < (DAT_006691a0 >> 8); page++, remaining -= 0x100) {
+    remaining = LLIDB_ElementCount;
+    for (page = 0; page < (LLIDB_Capacity >> 8); page++, remaining -= 0x100) {
         if (remaining >= 0x100) {
             n = 0x100;
         } else {
             n = remaining;
         }
         for (i = 0; i < n; i++) {
-            len = mystrlen(DAT_006691a8[page][i].name);
+            len = mystrlen(LLIDB_Pages[page][i].name);
             _write(fd, &len, 4);
-            _write(fd, DAT_006691a8[page][i].name, len);
-            len = mystrlen(DAT_006691a8[page][i].path);
+            _write(fd, LLIDB_Pages[page][i].name, len);
+            len = mystrlen(LLIDB_Pages[page][i].path);
             _write(fd, &len, 4);
-            _write(fd, DAT_006691a8[page][i].path, len);
+            _write(fd, LLIDB_Pages[page][i].path, len);
         }
     }
     _close(fd);
@@ -612,25 +612,25 @@ LEGO_EXPORT int LLIDB_SaveICM(void) {
 // FUNCTION: LEGOLAND 0x0047be00
 LEGO_EXPORT int LLIDB_CloseICM(void) {
     unsigned int chunk;
-    unsigned int remaining = DAT_006691a4;
+    unsigned int remaining = LLIDB_ElementCount;
     unsigned int i;
     unsigned int n;
 
-    for (chunk = 0; chunk < (DAT_006691a0 >> 8); chunk++, remaining -= 0x100) {
+    for (chunk = 0; chunk < (LLIDB_Capacity >> 8); chunk++, remaining -= 0x100) {
         n = remaining >= 0x100 ? 0x100 : remaining;
         for (i = 0; i < n; i++) {
-            if (DAT_006691a8[chunk][i].name != NULL) {
-                free(DAT_006691a8[chunk][i].name);
+            if (LLIDB_Pages[chunk][i].name != NULL) {
+                free(LLIDB_Pages[chunk][i].name);
             }
-            if (DAT_006691a8[chunk][i].path != NULL) {
-                free(DAT_006691a8[chunk][i].path);
+            if (LLIDB_Pages[chunk][i].path != NULL) {
+                free(LLIDB_Pages[chunk][i].path);
             }
         }
     }
-    for (i = 0; i < (DAT_006691a0 >> 8); i++) {
-        free(DAT_006691a8[i]);
+    for (i = 0; i < (LLIDB_Capacity >> 8); i++) {
+        free(LLIDB_Pages[i]);
     }
-    free(DAT_006691a8);
+    free(LLIDB_Pages);
     return 0;
 }
 
@@ -680,7 +680,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     int i;
     int j;
 
-    DAT_00813a10 = 0;
+    DebugAllocatedBytes = 0;
     // STRING: LEGOLAND 0x004bc39c
     sprintf(filename, "Objdesc\\%s", head->name);
     file = RES_OpenFile(filename);
@@ -779,7 +779,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             }
         } else {
             // STRING: LEGOLAND 0x004bc37c
-            FUN_0047f870("Class %s has no sprite name.", *(char **)obj->cleanup_arg);
+            DebugTrace("Class %s has no sprite name.", *(char **)obj->cleanup_arg);
             obj->sprite_0 = NULL;
         }
     } else {
@@ -794,7 +794,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         obj->sprite_1 = (struct ODFSprite *)LoadSprite(name, 4);
     } else {
         // STRING: LEGOLAND 0x004bc360
-        FUN_0047f870("Class %s has no icon name.", *(char **)obj->cleanup_arg);
+        DebugTrace("Class %s has no icon name.", *(char **)obj->cleanup_arg);
         obj->sprite_1 = NULL;
     }
     if (obj->sprite_1 == NULL) {
@@ -818,7 +818,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         }
     } else {
         // STRING: LEGOLAND 0x004bc328
-        FUN_0047f870("Class %s has no build anim name.", *(char **)obj->cleanup_arg);
+        DebugTrace("Class %s has no build anim name.", *(char **)obj->cleanup_arg);
         obj->sprite_2 = NULL;
     }
 
@@ -838,7 +838,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             RES_ReadFile(file, &size, 4);
             RES_ReadFile(file, name, size);
             name[size] = '\0';
-            if (i == 0 || _stricmp(DAT_004bc0ec, name) == 0) {
+            if (i == 0 || _stricmp(LanguageName, name) == 0) {
                 if (obj->data_78 != NULL) {
                     free(obj->data_78);
                 }
@@ -884,7 +884,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             obj->callback(obj->cleanup_arg);
         }
         // STRING: LEGOLAND 0x004bc2ec
-        FUN_0047f870("Class %s has OC_USEDLL attribute and DLL failed to load.", *(char **)obj->cleanup_arg);
+        DebugTrace("Class %s has OC_USEDLL attribute and DLL failed to load.", *(char **)obj->cleanup_arg);
     }
 
     if ((obj->flags & LLIDB_FLAG_NODATA) != 0) {
@@ -906,7 +906,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
 }
 
 // FUNCTION: LEGOLAND 0x0047c6a0
-void FUN_0047c6a0(struct LLIDBHead *head) {
+void LLIDB_UnLoadODF(struct LLIDBHead *head) {
     struct ODFObject *obj = (struct ODFObject *)head->data;
     struct ODFObject *node;
 
@@ -1161,7 +1161,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
 }
 
 // FUNCTION: LEGOLAND 0x0047cdd0
-void FUN_0047cdd0(struct SpriteManager *param_1) {
+void LLIDB_UnLoadTSF(struct SpriteManager *param_1) {
     struct SpriteManager *si = (struct SpriteManager *)param_1->data_c;
     int i;
 
@@ -1234,7 +1234,7 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
 }
 
 // FUNCTION: LEGOLAND 0x0047cf80
-void FUN_0047cf80(struct LLIDBHead *head) {
+void LLIDB_UnLoadTSM(struct LLIDBHead *head) {
     unsigned int *base = (unsigned int *)head->data;
     unsigned int *entry = base;
     int sentinel = base[1];
@@ -1442,13 +1442,13 @@ LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle) {
     switch (flags & LLIDB_TYPE_MASK) {
     case LLIDB_TYPE_ODF:
     case LLIDB_TYPE_ODF_DLL:
-        FUN_0047c6a0(head);
+        LLIDB_UnLoadODF(head);
         break;
     case LLIDB_TYPE_TSM:
-        FUN_0047cf80(head);
+        LLIDB_UnLoadTSM(head);
         break;
     case LLIDB_TYPE_TSF:
-        FUN_0047cdd0((struct SpriteManager *)head);
+        LLIDB_UnLoadTSF((struct SpriteManager *)head);
         break;
     case LLIDB_TYPE_ILF:
         LLIDB_FreeILFTable((struct ILFTable *)head->data);
@@ -1461,14 +1461,14 @@ LEGO_EXPORT int LLSStop(unsigned int handle) {
     struct LLSNode *cur;
     struct LLSNode *prev;
 
-    cur = DAT_006691ac;
+    cur = LLSPlayList;
     prev = NULL;
     while (cur != NULL) {
         if (cur->lls == (struct LLS *)handle) {
             if (prev != NULL) {
                 prev->next = cur->next;
             } else {
-                DAT_006691ac = DAT_006691ac->next;
+                LLSPlayList = LLSPlayList->next;
             }
             free(cur);
             return 1;
@@ -1483,7 +1483,7 @@ LEGO_EXPORT int LLSStop(unsigned int handle) {
 // The original breaks into the debugger (`__asm int 3`, which also gives it an
 // ebp frame) when frame_count > 1000; that cannot be written in pure C.
 LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
-    struct LLSNode *node = DAT_006691ac;
+    struct LLSNode *node = LLSPlayList;
 
     if (param_1 == NULL || param_1->frame_count <= 1) {
         return;
@@ -1497,8 +1497,8 @@ LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
     node = malloc(sizeof(struct LLSNode));
     node->lls = param_1;
     node->param = param_2;
-    node->next = DAT_006691ac;
-    DAT_006691ac = node;
+    node->next = LLSPlayList;
+    LLSPlayList = node;
 }
 
 // FUNCTION: LEGOLAND 0x0047d580
@@ -1538,7 +1538,7 @@ LEGO_EXPORT void LLSSetDelay(struct LLS *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d610
-void FUN_0047d610(struct LLS *param_1) {
+void LLSAdvanceFrame(struct LLS *param_1) {
     param_1->frame++;
     if (param_1->frame >= param_1->frame_count) {
         param_1->frame = 0;
@@ -1551,7 +1551,7 @@ LEGO_EXPORT void LLSAuto(void) {
     struct LLSNode *next;
     struct LLS *lls;
 
-    node = DAT_006691ac;
+    node = LLSPlayList;
     while (node != NULL) {
         lls = node->lls;
         next = node->next;
@@ -1617,10 +1617,10 @@ LEGO_EXPORT void LLS555To565(struct LLSImage *param_1) {
 
 // FUNCTION: LEGOLAND 0x0047d730
 LEGO_EXPORT unsigned int SaveGameRead(void *buffer, unsigned int count) {
-    return _read(DAT_006691b0, buffer, count) == count;
+    return _read(SaveFileHandle, buffer, count) == count;
 }
 
 // FUNCTION: LEGOLAND 0x0047d760
 LEGO_EXPORT unsigned int SaveGameWrite(void *buffer, unsigned int count) {
-    return (unsigned int)_write(DAT_006691b0, buffer, count) == count;
+    return (unsigned int)_write(SaveFileHandle, buffer, count) == count;
 }

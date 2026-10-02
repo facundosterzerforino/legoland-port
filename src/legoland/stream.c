@@ -15,8 +15,8 @@ unsigned int FUN_00497f60(void) {
     int head;
     int tail;
 
-    head = DAT_0079a7dc;
-    tail = DAT_0079a7d8;
+    head = SpeechRawWritePos;
+    tail = SpeechRawReadPos;
     if (head >= tail) {
         if (tail == 0) {
             return 0xffff - head;
@@ -27,12 +27,12 @@ unsigned int FUN_00497f60(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00497f90
-int FUN_00497f90(void) {
+int SpeechRawContiguousBytes(void) {
     int head;
     int tail;
 
-    head = DAT_0079a7dc;
-    tail = DAT_0079a7d8;
+    head = SpeechRawWritePos;
+    tail = SpeechRawReadPos;
     if (head < tail) {
         head = 0x10000;
     }
@@ -44,13 +44,13 @@ int FUN_00497fb0(void) {
     int used;
     int limit;
 
-    limit = DAT_0079a7e4[0];
-    used = (DAT_0079a7dc - DAT_0079a7d8) & 0xffff;
+    limit = SpeechChunkByteCounts[0];
+    used = (SpeechRawWritePos - SpeechRawReadPos) & 0xffff;
     if (limit == 0) {
-        memcpy(DAT_0079a7e4, &DAT_0079a7e4[1], 0x13 * sizeof(unsigned int));
-        DAT_0079a7e4[19] = 0;
-        if (DAT_0079a7e0 != 0) {
-            DAT_0079a7e0--;
+        memcpy(SpeechChunkByteCounts, &SpeechChunkByteCounts[1], 0x13 * sizeof(unsigned int));
+        SpeechChunkByteCounts[19] = 0;
+        if (SpeechChunkIndex != 0) {
+            SpeechChunkIndex--;
         }
     }
     if (used <= limit) {
@@ -60,13 +60,13 @@ int FUN_00497fb0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498000
-void FUN_00498000(void) {
+void SpeechFillRawBuffer(void) {
     int n;
     int r;
     unsigned int idx;
     unsigned char mask;
 
-    if (DAT_007cacac == 0) {
+    if (SpeechBytesRemaining == 0) {
         return;
     }
     n = FUN_00497f60();
@@ -76,25 +76,25 @@ void FUN_00498000(void) {
     mask = 4;
     while (n != 0) {
         while (n != 0) {
-            if (n > (int)DAT_007cacac) {
-                r = _read(DAT_007caca8, &DAT_0079ac20[DAT_0079a7dc], DAT_007cacac);
+            if (n > (int)SpeechBytesRemaining) {
+                r = _read(SpeechFileHandle, &SpeechRawBuffer[SpeechRawWritePos], SpeechBytesRemaining);
             } else {
-                r = _read(DAT_007caca8, &DAT_0079ac20[DAT_0079a7dc], n);
+                r = _read(SpeechFileHandle, &SpeechRawBuffer[SpeechRawWritePos], n);
             }
-            idx = DAT_0079a7e0;
+            idx = SpeechChunkIndex;
             if (r != -1) {
-                DAT_007cacac -= r;
-                DAT_0079a7e4[idx] += r;
-                DAT_0079a7dc = (DAT_0079a7dc + r) & 0xffff;
+                SpeechBytesRemaining -= r;
+                SpeechChunkByteCounts[idx] += r;
+                SpeechRawWritePos = (SpeechRawWritePos + r) & 0xffff;
             }
             if (r < n) {
-                if (!(DAT_0079a83c & mask)) {
-                    DAT_0079a7e0 = idx + 1;
+                if (!(SpeechFlags & mask)) {
+                    SpeechChunkIndex = idx + 1;
                     return;
                 }
-                if (DAT_007cacac == 0) {
+                if (SpeechBytesRemaining == 0) {
                     FUN_00498100();
-                    DAT_0079a7e0++;
+                    SpeechChunkIndex++;
                 }
             }
             n -= r;
@@ -105,18 +105,18 @@ void FUN_00498000(void) {
 
 // FUNCTION: LEGOLAND 0x00498100
 void FUN_00498100(void) {
-    FUN_00498120();
-    DAT_0079a83c |= 8;
+    SpeechRewindToData();
+    SpeechFlags |= 8;
 }
 
 // FUNCTION: LEGOLAND 0x00498120
-void FUN_00498120(void) {
-    _lseek(DAT_007caca8, DAT_007cacb4, 0);
-    DAT_007cacac = DAT_0079ac04;
+void SpeechRewindToData(void) {
+    _lseek(SpeechFileHandle, SpeechDataOffset, 0);
+    SpeechBytesRemaining = SpeechDataSize;
 }
 
 // FUNCTION: LEGOLAND 0x00498150
-int FUN_00498150(unsigned char *dst, int count) {
+int SpeechReadRawBuffer(unsigned char *dst, int count) {
     int avail;
     int chunk;
     int n;
@@ -124,7 +124,7 @@ int FUN_00498150(unsigned char *dst, int count) {
     avail = FUN_00497fb0();
     n = count;
     if (n > avail) {
-        FUN_00498000();
+        SpeechFillRawBuffer();
         avail = FUN_00497fb0();
         if (n > avail) {
             n = avail;
@@ -133,18 +133,18 @@ int FUN_00498150(unsigned char *dst, int count) {
     count = n;
     if (n != 0) {
         do {
-            chunk = FUN_00497f90();
+            chunk = SpeechRawContiguousBytes();
             if (chunk > n) {
                 chunk = n;
             }
-            memcpy(dst, &DAT_0079ac20[DAT_0079a7d8], chunk);
+            memcpy(dst, &SpeechRawBuffer[SpeechRawReadPos], chunk);
             n -= chunk;
             dst += chunk;
-            DAT_0079a7d8 = (DAT_0079a7d8 + chunk) & 0xffff;
-            DAT_0079a7e4[0] -= chunk;
+            SpeechRawReadPos = (SpeechRawReadPos + chunk) & 0xffff;
+            SpeechChunkByteCounts[0] -= chunk;
         } while (n != 0);
     }
-    FUN_00498000();
+    SpeechFillRawBuffer();
     return count;
 }
 
@@ -153,8 +153,8 @@ unsigned int FUN_004981e0(void) {
     int head;
     int tail;
 
-    head = DAT_0079a838;
-    tail = DAT_0079a834;
+    head = SpeechPcmWritePos;
+    tail = SpeechPcmReadPos;
     if (head >= tail) {
         if (tail == 0) {
             return 0x1ffff - head;
@@ -165,12 +165,12 @@ unsigned int FUN_004981e0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498210
-int FUN_00498210(void) {
+int SpeechPcmContiguousBytes(void) {
     int head;
     int tail;
 
-    head = DAT_0079a838;
-    tail = DAT_0079a834;
+    head = SpeechPcmWritePos;
+    tail = SpeechPcmReadPos;
     if (head < tail) {
         head = 0x20000;
     }
@@ -178,68 +178,68 @@ int FUN_00498210(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498230
-unsigned int FUN_00498230(void) {
-    return (DAT_0079a838 - DAT_0079a834) & 0x1ffff;
+unsigned int SpeechPcmUsedBytes(void) {
+    return (SpeechPcmWritePos - SpeechPcmReadPos) & 0x1ffff;
 }
 
 // FUNCTION: LEGOLAND 0x00498250
-void FUN_00498250(void) {
+void SpeechFillPcmBuffer(void) {
     int n;
     int chunk;
     int len;
 
-    FUN_00498000();
+    SpeechFillRawBuffer();
     n = FUN_004981e0();
     while (n != 0) {
         while (n != 0) {
-            chunk = DAT_007caca4 - DAT_007aac24;
+            chunk = SpeechConvertedSize - SpeechConvertedUsed;
             if (chunk == 0) {
                 if (n != 0) {
-                    len = DAT_0079a7e4[0];
-                    if (len >= DAT_007caca0) {
-                        len = DAT_007caca0;
+                    len = SpeechChunkByteCounts[0];
+                    if (len >= SpeechAcmSrcSize) {
+                        len = SpeechAcmSrcSize;
                     }
-                    DAT_007aac40.cbSrcLength = len;
-                    FUN_00498150(DAT_0079ac0c, len);
-                    acmStreamConvert(DAT_007cacb8, &DAT_007aac40, 0x10);
-                    DAT_007aac24 = 0;
-                    DAT_007caca4 = DAT_007aac40.cbDstLengthUsed;
-                    if (DAT_007aac40.cbDstLengthUsed < n) {
-                        memcpy(&DAT_007aaca0[DAT_0079a838], DAT_0079ac08, DAT_007aac40.cbDstLengthUsed);
-                        DAT_007aac24 = DAT_007aac40.cbDstLengthUsed;
-                        DAT_0079a838 += DAT_007aac40.cbDstLengthUsed;
+                    SpeechAcmHeader.cbSrcLength = len;
+                    SpeechReadRawBuffer(SpeechAcmSrcBuffer, len);
+                    acmStreamConvert(SpeechAcmStream, &SpeechAcmHeader, 0x10);
+                    SpeechConvertedUsed = 0;
+                    SpeechConvertedSize = SpeechAcmHeader.cbDstLengthUsed;
+                    if (SpeechAcmHeader.cbDstLengthUsed < n) {
+                        memcpy(&SpeechPcmBuffer[SpeechPcmWritePos], SpeechAcmDstBuffer, SpeechAcmHeader.cbDstLengthUsed);
+                        SpeechConvertedUsed = SpeechAcmHeader.cbDstLengthUsed;
+                        SpeechPcmWritePos += SpeechAcmHeader.cbDstLengthUsed;
                         return;
                     }
-                    memcpy(&DAT_007aaca0[DAT_0079a838], DAT_0079ac08, n);
-                    DAT_007aac24 = n;
-                    DAT_0079a838 = (DAT_0079a838 + n) & 0x1ffff;
+                    memcpy(&SpeechPcmBuffer[SpeechPcmWritePos], SpeechAcmDstBuffer, n);
+                    SpeechConvertedUsed = n;
+                    SpeechPcmWritePos = (SpeechPcmWritePos + n) & 0x1ffff;
                 }
                 break;
             }
             if (n < chunk) {
                 chunk = n;
             }
-            memcpy(&DAT_007aaca0[DAT_0079a838], DAT_0079ac08 + DAT_007aac24, chunk);
-            DAT_0079a838 = (DAT_0079a838 + chunk) & 0x1ffff;
+            memcpy(&SpeechPcmBuffer[SpeechPcmWritePos], SpeechAcmDstBuffer + SpeechConvertedUsed, chunk);
+            SpeechPcmWritePos = (SpeechPcmWritePos + chunk) & 0x1ffff;
             n -= chunk;
-            DAT_007aac24 += chunk;
+            SpeechConvertedUsed += chunk;
         }
         n = FUN_004981e0();
     }
-    FUN_00498000();
+    SpeechFillRawBuffer();
 }
 
 // FUNCTION: LEGOLAND 0x004983a0
-int FUN_004983a0(unsigned char *dst, int count) {
+int SpeechReadPcmBuffer(unsigned char *dst, int count) {
     int avail;
     int chunk;
     int n;
 
-    avail = FUN_00498230();
+    avail = SpeechPcmUsedBytes();
     n = count;
     if (n > avail) {
-        FUN_00498250();
-        avail = FUN_00498230();
+        SpeechFillPcmBuffer();
+        avail = SpeechPcmUsedBytes();
         if (n > avail) {
             n = avail;
         }
@@ -247,68 +247,68 @@ int FUN_004983a0(unsigned char *dst, int count) {
     count = n;
     if (n != 0) {
         do {
-            chunk = FUN_00498210();
+            chunk = SpeechPcmContiguousBytes();
             if (chunk > n) {
                 chunk = n;
             }
-            memcpy(dst, &DAT_007aaca0[DAT_0079a834], chunk);
+            memcpy(dst, &SpeechPcmBuffer[SpeechPcmReadPos], chunk);
             n -= chunk;
             dst += chunk;
-            DAT_0079a834 = (DAT_0079a834 + chunk) & 0x1ffff;
+            SpeechPcmReadPos = (SpeechPcmReadPos + chunk) & 0x1ffff;
         } while (n != 0);
     }
-    FUN_00498250();
+    SpeechFillPcmBuffer();
     return count;
 }
 
 // FUNCTION: LEGOLAND 0x00498420
-int FUN_00498420(void) {
+int SpeechParseWavHeader(void) {
     unsigned int size;
     unsigned int tag;
     unsigned int *p;
 
-    _lseek(DAT_007caca8, 0, 0);
-    if (_read(DAT_007caca8, &tag, 4) != 4) {
+    _lseek(SpeechFileHandle, 0, 0);
+    if (_read(SpeechFileHandle, &tag, 4) != 4) {
         return 0;
     }
     if (tag != 0x46464952) {
         return 0;
     }
-    if (_read(DAT_007caca8, &size, 4) != 4) {
+    if (_read(SpeechFileHandle, &size, 4) != 4) {
         return 0;
     }
-    if (_read(DAT_007caca8, &tag, 4) != 4) {
+    if (_read(SpeechFileHandle, &tag, 4) != 4) {
         return 0;
     }
     if (tag != 0x45564157) {
         return 0;
     }
-    if (_read(DAT_007caca8, &tag, 4) != 4) {
+    if (_read(SpeechFileHandle, &tag, 4) != 4) {
         return 0;
     }
-    if (_read(DAT_007caca8, &size, 4) != 4) {
+    if (_read(SpeechFileHandle, &size, 4) != 4) {
         return 0;
     }
     if (size < 0x12) {
-        DAT_007cacb0 = malloc(0x12);
+        SpeechSourceFormat = malloc(0x12);
     } else {
-        DAT_007cacb0 = malloc(size);
+        SpeechSourceFormat = malloc(size);
     }
-    if (_read(DAT_007caca8, DAT_007cacb0, size) != (int)size) {
+    if (_read(SpeechFileHandle, SpeechSourceFormat, size) != (int)size) {
         return 0;
     }
     if (size <= 0x12) {
-        *(short *)((char *)DAT_007cacb0 + 0x10) = 0;
+        *(short *)((char *)SpeechSourceFormat + 0x10) = 0;
     }
-    while (_read(DAT_007caca8, &tag, 4) == 4) {
+    while (_read(SpeechFileHandle, &tag, 4) == 4) {
         if (tag == 0x61746164) {
             break;
         }
-        if (_read(DAT_007caca8, &size, 4) != 4) {
+        if (_read(SpeechFileHandle, &size, 4) != 4) {
             return 0;
         }
         p = (unsigned int *)malloc(size);
-        if (_read(DAT_007caca8, p, size) != (int)size) {
+        if (_read(SpeechFileHandle, p, size) != (int)size) {
             free(p);
             return 0;
         }
@@ -317,164 +317,164 @@ int FUN_00498420(void) {
     if (tag != 0x61746164) {
         return 0;
     }
-    if (_read(DAT_007caca8, &DAT_0079ac04, 4) != 4) {
+    if (_read(SpeechFileHandle, &SpeechDataSize, 4) != 4) {
         return 0;
     }
-    DAT_007cacb4 = _tell(DAT_007caca8);
+    SpeechDataOffset = _tell(SpeechFileHandle);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00498630
-int FUN_00498630(const char *param_1) {
+int SpeechLoadWavFile(const char *param_1) {
     char path[0x400];
     unsigned int out_size;
 
-    if (DAT_007988c0 != 0) {
+    if (SoundAvailable != 0) {
         // STRING: LEGOLAND 0x004bfeec
         strcpy(path, "speech\\");
         strcat(path, param_1);
-        if (DAT_0079a84c == 0) {
-            DAT_007caca8 = _open(path, 0x8000);
-            if (DAT_007caca8 == -1) {
+        if (SpeechState == 0) {
+            SpeechFileHandle = _open(path, 0x8000);
+            if (SpeechFileHandle == -1) {
                 // STRING: LEGOLAND 0x004bfee4
-                sprintf(path, "%s%s%s", DAT_00813b04, "speech\\", param_1);
-                DAT_007caca8 = _open(path, 0x8000);
-                if (DAT_007caca8 == -1) {
+                sprintf(path, "%s%s%s", CdDrivePath, "speech\\", param_1);
+                SpeechFileHandle = _open(path, 0x8000);
+                if (SpeechFileHandle == -1) {
                     return 0;
                 }
             }
-            if (FUN_00498420() != 0) {
-                FUN_00498120();
-                DAT_007caca0 = DAT_007cacb0->nBlockAlign * 10;
-                DAT_0079ac0c = malloc(DAT_007caca0);
-                DAT_0079ac08 = NULL;
-                DAT_007cacc0.wFormatTag = 1;
-                DAT_007cacc0.nChannels = DAT_007cacb0->nChannels;
-                DAT_007cacc0.nSamplesPerSec = DAT_007cacb0->nSamplesPerSec;
-                DAT_007cacc0.wBitsPerSample = 16;
-                DAT_007cacc0.nBlockAlign = DAT_007cacc0.nChannels * 2;
-                DAT_007cacc0.nAvgBytesPerSec = DAT_007cacc0.nBlockAlign * DAT_007cacc0.nSamplesPerSec;
-                DAT_007cacc0.cbSize = 0;
-                acmStreamOpen(&DAT_007cacb8, NULL, DAT_007cacb0, &DAT_007cacc0, NULL, 0, 0, 4);
-                acmStreamSize(DAT_007cacb8, DAT_007caca0, &out_size, 0);
-                DAT_0079ac08 = malloc(out_size);
-                DAT_007aac40.cbStruct = 0x54;
-                DAT_007aac40.fdwStatus = 0;
-                DAT_007aac40.pbSrc = DAT_0079ac0c;
-                DAT_007aac40.cbSrcLength = DAT_007caca0;
-                DAT_007aac40.pbDst = DAT_0079ac08;
-                DAT_007aac40.cbDstLength = out_size;
-                acmStreamPrepareHeader(DAT_007cacb8, &DAT_007aac40, 0);
-                DAT_0079a848 = KLIBAUDIO_CreateAVISoundBuffer(&DAT_007cacc0, 0xa000);
-                ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->func_3c(DAT_0079a848, DAT_0079a7d0);
-                DAT_0079a84c = 1;
-                FUN_00498870();
+            if (SpeechParseWavHeader() != 0) {
+                SpeechRewindToData();
+                SpeechAcmSrcSize = SpeechSourceFormat->nBlockAlign * 10;
+                SpeechAcmSrcBuffer = malloc(SpeechAcmSrcSize);
+                SpeechAcmDstBuffer = NULL;
+                SpeechPcmFormat.wFormatTag = 1;
+                SpeechPcmFormat.nChannels = SpeechSourceFormat->nChannels;
+                SpeechPcmFormat.nSamplesPerSec = SpeechSourceFormat->nSamplesPerSec;
+                SpeechPcmFormat.wBitsPerSample = 16;
+                SpeechPcmFormat.nBlockAlign = SpeechPcmFormat.nChannels * 2;
+                SpeechPcmFormat.nAvgBytesPerSec = SpeechPcmFormat.nBlockAlign * SpeechPcmFormat.nSamplesPerSec;
+                SpeechPcmFormat.cbSize = 0;
+                acmStreamOpen(&SpeechAcmStream, NULL, SpeechSourceFormat, &SpeechPcmFormat, NULL, 0, 0, 4);
+                acmStreamSize(SpeechAcmStream, SpeechAcmSrcSize, &out_size, 0);
+                SpeechAcmDstBuffer = malloc(out_size);
+                SpeechAcmHeader.cbStruct = 0x54;
+                SpeechAcmHeader.fdwStatus = 0;
+                SpeechAcmHeader.pbSrc = SpeechAcmSrcBuffer;
+                SpeechAcmHeader.cbSrcLength = SpeechAcmSrcSize;
+                SpeechAcmHeader.pbDst = SpeechAcmDstBuffer;
+                SpeechAcmHeader.cbDstLength = out_size;
+                acmStreamPrepareHeader(SpeechAcmStream, &SpeechAcmHeader, 0);
+                SpeechSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(&SpeechPcmFormat, 0xa000);
+                ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->func_3c(SpeechSoundBuffer, SpeechVolume);
+                SpeechState = 1;
+                SpeechResetBuffers();
                 return 1;
             }
-            _close(DAT_007caca8);
+            _close(SpeechFileHandle);
         }
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00498870
-void FUN_00498870(void) {
-    DAT_0079a7d8 = 0;
-    DAT_0079a7dc = 0;
-    DAT_0079a7e0 = 0;
-    memset(DAT_0079a7e4, 0, sizeof(DAT_0079a7e4));
-    DAT_0079a834 = 0;
-    DAT_0079a838 = 0;
-    DAT_0079a840 = 0;
+void SpeechResetBuffers(void) {
+    SpeechRawReadPos = 0;
+    SpeechRawWritePos = 0;
+    SpeechChunkIndex = 0;
+    memset(SpeechChunkByteCounts, 0, sizeof(SpeechChunkByteCounts));
+    SpeechPcmReadPos = 0;
+    SpeechPcmWritePos = 0;
+    SpeechPageIndex = 0;
     DAT_0079a844 = 0;
-    DAT_007caca4 = 0;
-    DAT_007aac24 = 0;
+    SpeechConvertedSize = 0;
+    SpeechConvertedUsed = 0;
 }
 // FUNCTION: LEGOLAND 0x004988c0
-int FUN_004988c0(void) {
-    if (DAT_0079a84c == 0 || DAT_0079a84c == 1) {
+int SpeechStop(void) {
+    if (SpeechState == 0 || SpeechState == 1) {
         return 0;
     }
-    ((struct KLIBAUDIO_Stop *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->func_48(DAT_0079a848);
-    FUN_00498870();
-    FUN_00498120();
-    DAT_0079a84c = 1;
+    ((struct KLIBAUDIO_Stop *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->func_48(SpeechSoundBuffer);
+    SpeechResetBuffers();
+    SpeechRewindToData();
+    SpeechState = 1;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00498900
-void FUN_00498900(unsigned int param_1) {
-    DAT_0079a7d0 = param_1;
-    if (DAT_0079a848 != NULL) {
-        ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->func_3c(DAT_0079a848, param_1);
+void SpeechSetVolume(unsigned int param_1) {
+    SpeechVolume = param_1;
+    if (SpeechSoundBuffer != NULL) {
+        ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->func_3c(SpeechSoundBuffer, param_1);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00498920
-int FUN_00498920(void) {
-    if (DAT_0079a84c == 0) {
+int SpeechCloseFile(void) {
+    if (SpeechState == 0) {
         return 0;
     }
-    FUN_004988c0();
-    acmStreamUnprepareHeader(DAT_007cacb8, &DAT_007aac40, 0);
-    acmStreamClose(DAT_007cacb8, 0);
-    _close(DAT_007caca8);
-    KLIBAUDIO_DestroyAVISoundBuffer((struct AVISoundBuffer *)DAT_0079a848);
-    DAT_0079a848 = NULL;
-    free(DAT_0079ac0c);
-    free(DAT_0079ac08);
-    free(DAT_007cacb0);
-    DAT_0079a84c = 0;
+    SpeechStop();
+    acmStreamUnprepareHeader(SpeechAcmStream, &SpeechAcmHeader, 0);
+    acmStreamClose(SpeechAcmStream, 0);
+    _close(SpeechFileHandle);
+    KLIBAUDIO_DestroyAVISoundBuffer((struct AVISoundBuffer *)SpeechSoundBuffer);
+    SpeechSoundBuffer = NULL;
+    free(SpeechAcmSrcBuffer);
+    free(SpeechAcmDstBuffer);
+    free(SpeechSourceFormat);
+    SpeechState = 0;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x004989b0
-int FUN_004989b0(void) {
+int SpeechFillSoundBuffer(void) {
     unsigned char buf[0x1000];
     void *ptr1;
     unsigned int size1;
     int n;
 
-    if (DAT_0079a84c == 2 || DAT_0079a84c == 0) {
+    if (SpeechState == 2 || SpeechState == 0) {
         return 0;
     }
-    ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->Stop(DAT_0079a848);
-    ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->SetPos(DAT_0079a848, 0);
-    DAT_0079a840 = 0;
-    if (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->Lock(DAT_0079a848, 0, 0xa000, &ptr1, &size1, NULL, NULL, 0) == 0) {
-        if (DAT_0079a840 < 10) {
+    ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->Stop(SpeechSoundBuffer);
+    ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->SetPos(SpeechSoundBuffer, 0);
+    SpeechPageIndex = 0;
+    if (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->Lock(SpeechSoundBuffer, 0, 0xa000, &ptr1, &size1, NULL, NULL, 0) == 0) {
+        if (SpeechPageIndex < 10) {
             do {
-                n = FUN_004983a0(buf, 0x1000);
-                memcpy((unsigned char *)ptr1 + DAT_0079a840 * 0x1000, buf, n);
+                n = SpeechReadPcmBuffer(buf, 0x1000);
+                memcpy((unsigned char *)ptr1 + SpeechPageIndex * 0x1000, buf, n);
                 if (n < 0x1000) {
-                    memset((unsigned char *)ptr1 + DAT_0079a840 * 0x1000 + n, 0, 0x1000 - n);
+                    memset((unsigned char *)ptr1 + SpeechPageIndex * 0x1000 + n, 0, 0x1000 - n);
                 }
                 if (n != 0) {
                     DAT_0079a844++;
                 }
-                DAT_0079a840++;
-            } while (DAT_0079a840 < 10);
+                SpeechPageIndex++;
+            } while (SpeechPageIndex < 10);
         }
-        DAT_0079a840 = 0;
-        ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->Unlock(DAT_0079a848, ptr1, size1, NULL, 0);
+        SpeechPageIndex = 0;
+        ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->Unlock(SpeechSoundBuffer, ptr1, size1, NULL, 0);
     }
-    DAT_0079a84c = 2;
+    SpeechState = 2;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00498b00
 int FUN_00498b00(void) {
-    if (DAT_0079a84c == 0 || DAT_0079a84c == 3) {
+    if (SpeechState == 0 || SpeechState == 3) {
         return 0;
     }
-    FUN_004989b0();
-    ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->func_30(DAT_0079a848, 0, 0, 1);
-    DAT_0079a84c = 3;
+    SpeechFillSoundBuffer();
+    ((struct KLIBAUDIO_Vtbl *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->func_30(SpeechSoundBuffer, 0, 0, 1);
+    SpeechState = 3;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00498b40
-int FUN_00498b40(void) {
+int SpeechStreamUpdate(void) {
     unsigned char buf[0x1000];
     void *ptr1;
     int play;
@@ -482,19 +482,19 @@ int FUN_00498b40(void) {
     unsigned int write;
     int n;
 
-    if (DAT_0079a84c == 0 || DAT_0079a84c == 1) {
+    if (SpeechState == 0 || SpeechState == 1) {
         return 0;
     }
-    if (DAT_0079a84c == 2) {
-        FUN_00498250();
+    if (SpeechState == 2) {
+        SpeechFillPcmBuffer();
         return 0;
     }
-    if (!(((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->GetCurrentPosition(DAT_0079a848, &play, &write) != 0 || play < DAT_0079a840 * 0x1000 || play >= (DAT_0079a840 + 1) * 0x1000)) {
+    if (!(((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->GetCurrentPosition(SpeechSoundBuffer, &play, &write) != 0 || play < SpeechPageIndex * 0x1000 || play >= (SpeechPageIndex + 1) * 0x1000)) {
         return 1;
     }
     do {
-        if (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->Lock(DAT_0079a848, DAT_0079a840 * 0x1000, 0x1000, &ptr1, &size1, NULL, NULL, 0) == 0) {
-            n = FUN_004983a0(buf, size1);
+        if (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->Lock(SpeechSoundBuffer, SpeechPageIndex * 0x1000, 0x1000, &ptr1, &size1, NULL, NULL, 0) == 0) {
+            n = SpeechReadPcmBuffer(buf, size1);
             if (n == 0x1000) {
                 memcpy(ptr1, buf, 0x1000);
                 DAT_0079a844++;
@@ -505,22 +505,22 @@ int FUN_00498b40(void) {
                     DAT_0079a844++;
                 }
             }
-            ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->Unlock(DAT_0079a848, ptr1, size1, NULL, 0);
-            DAT_0079a840++;
-            if (DAT_0079a840 >= 10) {
-                DAT_0079a840 = 0;
+            ((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->Unlock(SpeechSoundBuffer, ptr1, size1, NULL, 0);
+            SpeechPageIndex++;
+            if (SpeechPageIndex >= 10) {
+                SpeechPageIndex = 0;
             }
         }
         DAT_0079a844--;
         if (DAT_0079a844 == 0) {
-            FUN_004988c0();
+            SpeechStop();
             return 0;
         }
-    } while (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)DAT_0079a848)->vtable)->GetCurrentPosition(DAT_0079a848, &play, &write) != 0 || play < DAT_0079a840 * 0x1000 || play >= (DAT_0079a840 + 1) * 0x1000);
+    } while (((struct KLIBAUDIO_Buf *)((struct KLIBAUDIO_Object *)SpeechSoundBuffer)->vtable)->GetCurrentPosition(SpeechSoundBuffer, &play, &write) != 0 || play < SpeechPageIndex * 0x1000 || play >= (SpeechPageIndex + 1) * 0x1000);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00498cf0
 int FUN_00498cf0(void) {
-    return DAT_0079a84c == 3;
+    return SpeechState == 3;
 }

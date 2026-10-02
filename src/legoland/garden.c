@@ -33,20 +33,20 @@ struct GardenTable {
 };
 
 // FUNCTION: LEGOLAND 0x00432480
-void FUN_00432480(struct GardenLayer *arg0) {
+void LoadHedgeImages(struct GardenLayer *arg0) {
     struct GardenInner *temp = arg0->field_c;
     DAT_0081cd08 = temp;
     temp->field_1c |= 0x404;
     // STRING: LEGOLAND 0x004b7114
-    if (LLIDB_FindElement("HEDGE IMAGES", &DAT_0061615c, 0) != 0) {
+    if (LLIDB_FindElement("HEDGE IMAGES", &HedgeImagesHandle, 0) != 0) {
         return;
     }
-    DAT_0061614c = (unsigned int)LLIDB_LoadData((void *)DAT_0061615c); /* TODO: fold — LLIDB_LoadData handle stored as uint global */
+    HedgeImagesData = (unsigned int)LLIDB_LoadData((void *)HedgeImagesHandle); /* TODO: fold — LLIDB_LoadData handle stored as uint global */
 }
 
 // FUNCTION: LEGOLAND 0x004324c0
-void FUN_004324c0(void) {
-    LLIDB_UnLoadData(DAT_0061615c);
+void UnloadHedgeImages(void) {
+    LLIDB_UnLoadData(HedgeImagesHandle);
 }
 
 // FUNCTION: LEGOLAND 0x004324d0
@@ -155,7 +155,7 @@ struct RideSpriteInfo *FUN_00432810(int unused, TileId tile) {
     int i;
 
     i = Get_UserFlags(tile.pos.x << 8, tile.pos.y << 8) & 0xffff;
-    t = (struct GardenTable *)DAT_0061614c;
+    t = (struct GardenTable *)HedgeImagesData;
     DAT_0082c6a0.sprite = (void *)t->a[(unsigned char)i];
     DAT_0082c6a0.x = t->b[(unsigned char)i] >> 1;
     DAT_0082c6a0.y = t->c[(unsigned char)i] >> 1;
@@ -163,20 +163,20 @@ struct RideSpriteInfo *FUN_00432810(int unused, TileId tile) {
 }
 
 // FUNCTION: LEGOLAND 0x00432870
-void FUN_00432870(struct GardenLayer *param) {
+void LoadFlowerImages(struct GardenLayer *param) {
     struct GardenInner *temp = param->field_c;
     DAT_0081cd04 = temp;
     temp->field_1c |= 0x404;
     // STRING: LEGOLAND 0x004b7124
-    if (LLIDB_FindElement("FLOWERS 1", &DAT_00616150, 0) != 0) {
+    if (LLIDB_FindElement("FLOWERS 1", &FlowerImagesHandle, 0) != 0) {
         return;
     }
-    DAT_00616158 = (unsigned int)LLIDB_LoadData((void *)DAT_00616150);
+    FlowerImagesData = (unsigned int)LLIDB_LoadData((void *)FlowerImagesHandle);
 }
 
 // FUNCTION: LEGOLAND 0x004328b0
-void FUN_004328b0(void) {
-    LLIDB_UnLoadData(DAT_00616150);
+void UnloadFlowerImages(void) {
+    LLIDB_UnLoadData(FlowerImagesHandle);
 }
 
 // FUNCTION: LEGOLAND 0x004328c0
@@ -194,9 +194,9 @@ void FUN_00432900(int param_1, int *param_2) {
     packed.pos.x = param_2[0];
     packed.pos.y = param_2[1];
     AddObjectToMap(param_1, packed, 0);
-    if (DAT_00616158 != 0) {
+    if (FlowerImagesData != 0) {
         int r = rand();
-        Set_UserFlags(param_2[0] << 8, param_2[1] << 8, (unsigned short)(r % *(int *)(DAT_00616158 + 4)));
+        Set_UserFlags(param_2[0] << 8, param_2[1] << 8, (unsigned short)(r % *(int *)(FlowerImagesData + 4)));
     }
 }
 
@@ -206,7 +206,7 @@ struct RideSpriteInfo *FUN_00432960(int unused, TileId tile) {
     int i;
 
     i = Get_UserFlags(tile.pos.x << 8, tile.pos.y << 8) & 0xffff;
-    t = (struct GardenTable *)DAT_00616158;
+    t = (struct GardenTable *)FlowerImagesData;
     DAT_0082c6a0.sprite = (void *)t->a[(unsigned char)i];
     DAT_0082c6a0.x = t->b[(unsigned char)i] >> 1;
     DAT_0082c6a0.y = t->c[(unsigned char)i] >> 1;
@@ -217,20 +217,20 @@ struct RideSpriteInfo *FUN_00432960(int unused, TileId tile) {
 void FUN_004329c0(struct ClassNode *head, struct CallbackTable *iface) {
     // STRING: LEGOLAND 0x004b7138
     if (strcmp(head->name, "HEDGE") == 0) {
-        iface->cb_a4 = FUN_00432480;
+        iface->cb_a4 = LoadHedgeImages;
         iface->cb_8c = FUN_004324d0;
         iface->cb_98 = FUN_004325e0;
         iface->cb_9c = FUN_00432700;
         iface->cb_a0 = FUN_00432810;
-        iface->cb_ac = FUN_004324c0;
+        iface->cb_ac = UnloadHedgeImages;
         return;
     }
     // STRING: LEGOLAND 0x004b7130
     if (strcmp(head->name, "FLOWERS") == 0) {
-        iface->cb_a4 = FUN_00432870;
+        iface->cb_a4 = LoadFlowerImages;
         iface->cb_8c = FUN_004328c0;
         iface->cb_98 = FUN_00432900;
         iface->cb_a0 = FUN_00432960;
-        iface->cb_ac = FUN_004328b0;
+        iface->cb_ac = UnloadFlowerImages;
     }
 }

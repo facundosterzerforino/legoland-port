@@ -41,36 +41,36 @@ unsigned int FUN_004700c0(void *object) {
 }
 
 // FUNCTION: LEGOLAND 0x004700f0
-void *FUN_004700f0(void) {
-    return DAT_007fdff0;
+void *GetWorkerOnMouse(void) {
+    return WorkerOnMouse;
 }
 
 // FUNCTION: LEGOLAND 0x00470100
-void FUN_00470100(unsigned int type, Bloke *worker) {
+void PickUpWorker(unsigned int type, Bloke *worker) {
     // STRING: LEGOLAND 0x004ba9ec
     DBPrintf("Picking up worker (%x) Workorder = %x\n", worker, worker->order);
-    DAT_007fdff0 = worker;
+    WorkerOnMouse = worker;
     DAT_007fdffc = type;
     worker->field_e = 0xd;
-    DAT_007fdff4 = DAT_007fdff0->pos.x;
-    DAT_007fdff8 = DAT_007fdff0->pos.y;
-    DAT_007fdff0->field_72 = 5;
+    WorkerOldX = WorkerOnMouse->pos.x;
+    WorkerOldY = WorkerOnMouse->pos.y;
+    WorkerOnMouse->field_72 = 5;
     DAT_00668954 = 1;
     if (DAT_007fdffc == 0x307) {
-        ClearAGardenersWorkList(DAT_007fdff0);
-        NewLongTermAction(DAT_007fdff0, 0x18);
-        ClearAGardenersWorkList(DAT_007fdff0);
+        ClearAGardenersWorkList(WorkerOnMouse);
+        NewLongTermAction(WorkerOnMouse, 0x18);
+        ClearAGardenersWorkList(WorkerOnMouse);
     } else {
-        ClearAMechanicsWorkList(DAT_007fdff0);
-        NewLongTermAction(DAT_007fdff0, 0x19);
-        ClearAMechanicsWorkList(DAT_007fdff0);
+        ClearAMechanicsWorkList(WorkerOnMouse);
+        NewLongTermAction(WorkerOnMouse, 0x19);
+        ClearAMechanicsWorkList(WorkerOnMouse);
     }
     worker->order = 0;
-    DAT_007fdff0->order = 0;
+    WorkerOnMouse->order = 0;
     if (DAT_007fdffc == 0x307) {
-        NewLongTermAction(DAT_007fdff0, 0x18);
+        NewLongTermAction(WorkerOnMouse, 0x18);
     } else {
-        NewLongTermAction(DAT_007fdff0, 0x19);
+        NewLongTermAction(WorkerOnMouse, 0x19);
     }
 }
 
@@ -80,21 +80,21 @@ LEGO_EXPORT void SetWorkersPositionAtMouse(void) {
     struct WorkerInner *inner;
     unsigned int pt[2];
 
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     worker->var_e = 13;
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     inner = worker->inner;
     inner->pos.x = DAT_00813a44.x;
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     inner = worker->inner;
     inner->pos.y = DAT_00813a44.y;
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     inner = worker->inner;
     AdjustBlokePosition(&inner->pos);
     ScreenToMapRef((unsigned int)&DAT_00813a44, pt, 0);
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     worker->var_68 = pt[0] << 8;
-    worker = DAT_007fdff0;
+    worker = WorkerOnMouse;
     worker->var_6c = pt[1] << 8;
 }
 
@@ -112,29 +112,29 @@ int FUN_00470270(void) {
         elem = NULL;
     }
     ride = elem->field_0->ride;
-    if (ride->element == (Element *)DAT_007fdfb0 && DAT_007fdffc == 0x307) {
-        PutWorkerOnRide(DAT_007fdff0, elem);
-        DAT_007fdff0->pos.x = (ride->x + x) << 8;
-        DAT_007fdff0->dest.x = DAT_007fdff0->pos.x;
-        DAT_007fdff0->pos.y = (ride->y + y) << 8;
-        DAT_007fdff0->dest.y = DAT_007fdff0->pos.y;
-        DAT_007fdff0->action = 5;
-        DAT_007fdff0->param_action = 100;
+    if (ride->element == (Element *)PottingShedHandle && DAT_007fdffc == 0x307) {
+        PutWorkerOnRide(WorkerOnMouse, elem);
+        WorkerOnMouse->pos.x = (ride->x + x) << 8;
+        WorkerOnMouse->dest.x = WorkerOnMouse->pos.x;
+        WorkerOnMouse->pos.y = (ride->y + y) << 8;
+        WorkerOnMouse->dest.y = WorkerOnMouse->pos.y;
+        WorkerOnMouse->action = 5;
+        WorkerOnMouse->param_action = 100;
         PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
         return 1;
     }
-    if (ride->element == (Element *)DAT_007fdfb4 && DAT_007fdffc == 0x308) {
-        PutWorkerOnRide(DAT_007fdff0, elem);
-        DAT_007fdff0->pos.x = ((ride->x + x) << 8) + 0x80;
-        DAT_007fdff0->dest.x = DAT_007fdff0->pos.x;
-        DAT_007fdff0->pos.y = (ride->y + y) << 8;
-        DAT_007fdff0->dest.y = DAT_007fdff0->pos.y;
-        DAT_007fdff0->action = 5;
-        DAT_007fdff0->param_action = 100;
+    if (ride->element == (Element *)MechanicsHutHandle && DAT_007fdffc == 0x308) {
+        PutWorkerOnRide(WorkerOnMouse, elem);
+        WorkerOnMouse->pos.x = ((ride->x + x) << 8) + 0x80;
+        WorkerOnMouse->dest.x = WorkerOnMouse->pos.x;
+        WorkerOnMouse->pos.y = (ride->y + y) << 8;
+        WorkerOnMouse->dest.y = WorkerOnMouse->pos.y;
+        WorkerOnMouse->action = 5;
+        WorkerOnMouse->param_action = 100;
         PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
         return 1;
     }
-    return ride->element == (Element *)DAT_007fdfb8;
+    return ride->element == (Element *)PathControlHandle;
 }
 
 // FUNCTION: LEGOLAND 0x00470410
@@ -279,18 +279,18 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
                     }
                 }
                 if (DAT_007fdffc == 0x307) {
-                    DAT_007fdff0->pos.x = (x << 8) + 0x80;
-                    DAT_007fdff0->pos.y = (pt[1] << 8) + 0x80;
-                    result = SetGardenerWorkOrderAtPostion(DAT_007fdff0, pt[0], pt[1]);
+                    WorkerOnMouse->pos.x = (x << 8) + 0x80;
+                    WorkerOnMouse->pos.y = (pt[1] << 8) + 0x80;
+                    result = SetGardenerWorkOrderAtPostion(WorkerOnMouse, pt[0], pt[1]);
                 } else {
                     if (isOrder) {
-                        DAT_007fdff0->pos.x = ((order->step_x + x) << 8) + 0x80;
-                        DAT_007fdff0->pos.y = ((pt[1] - order->step_y) << 8) + 0x80;
+                        WorkerOnMouse->pos.x = ((order->step_x + x) << 8) + 0x80;
+                        WorkerOnMouse->pos.y = ((pt[1] - order->step_y) << 8) + 0x80;
                     } else {
-                        DAT_007fdff0->pos.x = (x << 8) + 0x80;
-                        DAT_007fdff0->pos.y = (pt[1] << 8) + 0x80;
+                        WorkerOnMouse->pos.x = (x << 8) + 0x80;
+                        WorkerOnMouse->pos.y = (pt[1] << 8) + 0x80;
                     }
-                    result = SetMechanicsOrderAtPostion(DAT_007fdff0, pt[0], pt[1]);
+                    result = SetMechanicsOrderAtPostion(WorkerOnMouse, pt[0], pt[1]);
                 }
                 if (result == 0) {
                     break;
@@ -314,24 +314,24 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
 
 // FUNCTION: LEGOLAND 0x004708c0
 LEGO_EXPORT void RenderWorkerOnMouse(void) {
-    RenderBlokeIn3D((struct Bloke *)DAT_007fdff0);
+    RenderBlokeIn3D((struct Bloke *)WorkerOnMouse);
 }
 
 // FUNCTION: LEGOLAND 0x004708d0
 LEGO_EXPORT void ResetWorkersOldCoords(void) {
     struct Bloke *bloke;
 
-    bloke = DAT_007fdff0;
+    bloke = WorkerOnMouse;
     if (bloke != NULL) {
-        bloke->pos.x = DAT_007fdff4;
-        bloke = DAT_007fdff0;
-        bloke->pos.y = DAT_007fdff8;
-        bloke = DAT_007fdff0;
+        bloke->pos.x = WorkerOldX;
+        bloke = WorkerOnMouse;
+        bloke->pos.y = WorkerOldY;
+        bloke = WorkerOnMouse;
         bloke->field_50 = 0;
         if (DAT_007fdffc == 0x307) {
-            NewLongTermAction(DAT_007fdff0, 0x10);
+            NewLongTermAction(WorkerOnMouse, 0x10);
         } else {
-            NewLongTermAction(DAT_007fdff0, 0x11);
+            NewLongTermAction(WorkerOnMouse, 0x11);
         }
         ResetMoveAWorkerStruct();
     }
@@ -340,7 +340,7 @@ LEGO_EXPORT void ResetWorkersOldCoords(void) {
 // FUNCTION: LEGOLAND 0x00470930
 LEGO_EXPORT void ResetMoveAWorkerStruct(void) {
     DAT_00668954 = 0;
-    DAT_007fdff0 = NULL;
+    WorkerOnMouse = NULL;
     DAT_007fdffc = 0;
 }
 
@@ -348,36 +348,36 @@ LEGO_EXPORT void ResetMoveAWorkerStruct(void) {
 void FUN_00470950(void *a, void *b) {
     unsigned int temp_val, temp_val2;
 
-    if (!DAT_00668938) {
+    if (!PUOKSprite) {
         // STRING: LEGOLAND 0x004baa70
-        DAT_00668938 = LoadSprite("PU_OK.lls", 4);
+        PUOKSprite = LoadSprite("PU_OK.lls", 4);
     }
-    if (!DAT_00668934) {
+    if (!PUOKOnSprite) {
         // STRING: LEGOLAND 0x004baa64
-        DAT_00668934 = LoadSprite("PU_OKON.lls", 4);
+        PUOKOnSprite = LoadSprite("PU_OKON.lls", 4);
     }
-    if (!DAT_0066893c) {
+    if (!CBCloseSprite) {
         // STRING: LEGOLAND 0x004baa54
-        DAT_0066893c = LoadSprite("CB_Close.lls", 4);
+        CBCloseSprite = LoadSprite("CB_Close.lls", 4);
     }
-    if (!DAT_00668940) {
+    if (!CBCloseOnSprite) {
         // STRING: LEGOLAND 0x004baa44
-        DAT_00668940 = LoadSprite("CB_CloseON.lls", 4);
+        CBCloseOnSprite = LoadSprite("CB_CloseON.lls", 4);
     }
-    if (!DAT_00668904) {
+    if (!CBBGLeftSprite) {
         // STRING: LEGOLAND 0x004baa34
-        DAT_00668904 = LoadSprite("CB_BGleft.lls", 4);
+        CBBGLeftSprite = LoadSprite("CB_BGleft.lls", 4);
     }
-    if (!DAT_00668908) {
+    if (!CBBGCentreSprite) {
         // STRING: LEGOLAND 0x004baa24
-        DAT_00668908 = LoadSprite("CB_BGCentre.lls", 4);
+        CBBGCentreSprite = LoadSprite("CB_BGCentre.lls", 4);
     }
-    if (!DAT_0066890c) {
+    if (!CBBGRightSprite) {
         // STRING: LEGOLAND 0x004baa14
-        DAT_0066890c = LoadSprite("CB_BGRight.lls", 4);
+        CBBGRightSprite = LoadSprite("CB_BGRight.lls", 4);
     }
 
-    DAT_007fdea8 = InsertIcon(0, 0, 0x2c3, DAT_00668938);
+    DAT_007fdea8 = InsertIcon(0, 0, 0x2c3, PUOKSprite);
     DAT_007fdea8->string_id = 0x74;
     DAT_007fdea8->string = GetString(0x74);
     DAT_007fdea8->flags |= 0x2000;
@@ -387,7 +387,7 @@ void FUN_00470950(void *a, void *b) {
     DAT_007fdea8->flags = temp_val2;
     DAT_007fdea8->event_handler = a;
 
-    DAT_007fe000 = InsertIcon(0, 0, 0x2c3, DAT_0066893c);
+    DAT_007fe000 = InsertIcon(0, 0, 0x2c3, CBCloseSprite);
     DAT_007fe000->string_id = 0x75;
     DAT_007fe000->string = GetString(0x75);
     DAT_007fe000->flags |= 0x2000;
@@ -399,33 +399,33 @@ void FUN_00470950(void *a, void *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00470b00
-void FUN_00470b00(void) {
-    if (DAT_00668938) {
-        KillSprite(DAT_00668938);
-        DAT_00668938 = NULL;
+void KillPUOKAndCBSprites(void) {
+    if (PUOKSprite) {
+        KillSprite(PUOKSprite);
+        PUOKSprite = NULL;
     }
-    if (DAT_00668934) {
-        KillSprite(DAT_00668934);
-        DAT_00668934 = NULL;
+    if (PUOKOnSprite) {
+        KillSprite(PUOKOnSprite);
+        PUOKOnSprite = NULL;
     }
-    if (DAT_00668940) {
-        KillSprite(DAT_00668940);
-        DAT_00668940 = NULL;
+    if (CBCloseOnSprite) {
+        KillSprite(CBCloseOnSprite);
+        CBCloseOnSprite = NULL;
     }
-    if (DAT_0066893c) {
-        KillSprite(DAT_0066893c);
-        DAT_0066893c = NULL;
+    if (CBCloseSprite) {
+        KillSprite(CBCloseSprite);
+        CBCloseSprite = NULL;
     }
-    if (DAT_00668904) {
-        KillSprite(DAT_00668904);
-        DAT_00668904 = NULL;
+    if (CBBGLeftSprite) {
+        KillSprite(CBBGLeftSprite);
+        CBBGLeftSprite = NULL;
     }
-    if (DAT_00668908) {
-        KillSprite(DAT_00668908);
-        DAT_00668908 = NULL;
+    if (CBBGCentreSprite) {
+        KillSprite(CBBGCentreSprite);
+        CBBGCentreSprite = NULL;
     }
-    if (DAT_0066890c) {
-        KillSprite(DAT_0066890c);
-        DAT_0066890c = NULL;
+    if (CBBGRightSprite) {
+        KillSprite(CBBGRightSprite);
+        CBBGRightSprite = NULL;
     }
 }

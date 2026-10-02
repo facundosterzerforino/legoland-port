@@ -5,4 +5,4 @@
 struct ClassNode;
 struct CallbackTable;
 
-void FUN_004078f0(struct ClassNode *str, struct CallbackTable *module);
+void GoldRush_GetInterfaces(struct ClassNode *str, struct CallbackTable *module);

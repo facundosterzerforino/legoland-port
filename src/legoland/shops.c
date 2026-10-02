@@ -86,7 +86,7 @@ void FUN_00439200(struct MapObject *obj) {
     DAT_0081cb3c = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b751c
-    DAT_0081cb18 = LoadSprite("Lego Shop 1 Matte.LLS", 1);
+    LegoShop1MatteSprite = LoadSprite("Lego Shop 1 Matte.LLS", 1);
     LoadMoneySFX();
 }
 
@@ -169,9 +169,9 @@ void FUN_004393a0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004393e0
-void FUN_004393e0(void) {
-    if (DAT_0081cb18 != 0) {
-        KillSprite(DAT_0081cb18);
+void UnloadLegoShop1MatteSpriteAndMoneySFX(void) {
+    if (LegoShop1MatteSprite != 0) {
+        KillSprite(LegoShop1MatteSprite);
     }
     KillMoneySFX();
 }
@@ -193,7 +193,7 @@ void FUN_00439400(struct ShopObject *obj, unsigned int param2, unsigned int para
     if (count != 0) {
         struct Point q = GetScreenCoordsForObject((unsigned char *)ride, building);
         struct Coords *coords = (struct Coords *)&q;
-        PrintSprite(DAT_0081cb18, coords->x, coords->y, param1, (int *)node);
+        PrintSprite(LegoShop1MatteSprite, coords->x, coords->y, param1, (int *)node);
     }
 }
 
@@ -289,14 +289,14 @@ void FUN_004396d0(struct MapObject *obj) {
     DAT_0081cb4c = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7534
-    DAT_0081cb20 = LoadSprite("Lego Shop 2 Matte.LLS", 1);
+    LegoShop2MatteSprite = LoadSprite("Lego Shop 2 Matte.LLS", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00439700
-void FUN_00439700(void) {
-    if (DAT_0081cb20 != 0) {
-        KillSprite(DAT_0081cb20);
+void UnloadLegoShop2MatteSpriteAndMoneySFX(void) {
+    if (LegoShop2MatteSprite != 0) {
+        KillSprite(LegoShop2MatteSprite);
     }
     KillMoneySFX();
 }
@@ -366,7 +366,7 @@ void FUN_00439760(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     off = GetRenderOffsetForLayer(shop->layer, 0);
     pos = GetScreenCoordsForObject((unsigned char *)tile, shop);
     AdjustOffsetForViewMode(&off);
-    PrintSprite(DAT_0081cb20, pos.x + off.x, pos.y + off.y, param_6, 0);
+    PrintSprite(LegoShop2MatteSprite, pos.x + off.x, pos.y + off.y, param_6, 0);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 1) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -521,9 +521,9 @@ void FUN_00439c20(struct MapObject *obj) {
     DAT_0081cb40 = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7564
-    DAT_0081cb48 = LoadSprite("LegMediaShopMask1.LLS", 1);
+    LegMediaShopMask1Sprite = LoadSprite("LegMediaShopMask1.LLS", 1);
     // STRING: LEGOLAND 0x004b754c
-    DAT_0081cb50 = LoadSprite("LegMediaShopMask2.LLS", 1);
+    LegMediaShopMask2Sprite = LoadSprite("LegMediaShopMask2.LLS", 1);
     LoadMoneySFX();
 }
 
@@ -548,9 +548,9 @@ void FUN_00439c90(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x00439ce0
-void FUN_00439ce0(void) {
-    KillSprite(DAT_0081cb48);
-    KillSprite(DAT_0081cb50);
+void UnloadLegMediaShopMaskSpritesAndMoneySFX(void) {
+    KillSprite(LegMediaShopMask1Sprite);
+    KillSprite(LegMediaShopMask2Sprite);
     KillMoneySFX();
 }
 
@@ -601,7 +601,7 @@ void FUN_00439d40(struct ShopObject *obj, unsigned int param2, unsigned int para
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb50, pos.x, pos.y, param1, 0);
+    PrintSprite(LegMediaShopMask2Sprite, pos.x, pos.y, param1, 0);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 0) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -617,7 +617,7 @@ void FUN_00439d40(struct ShopObject *obj, unsigned int param2, unsigned int para
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb48, pos.x, pos.y, param1, 0);
+    PrintSprite(LegMediaShopMask1Sprite, pos.x, pos.y, param1, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00439ef0
@@ -732,13 +732,13 @@ void FUN_0043a0f0(struct MapObject *obj) {
     DAT_0081cb44 = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b757c
-    DAT_0081cb28 = LoadSprite("Explorers Institute Matte.LLS", 1);
+    ExplorersInstituteMatteSprite = LoadSprite("Explorers Institute Matte.LLS", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x0043a120
-void FUN_0043a120(void) {
-    KillSprite(DAT_0081cb28);
+void UnloadExplorersInstituteMatteSpriteAndMoneySFX(void) {
+    KillSprite(ExplorersInstituteMatteSprite);
     KillMoneySFX();
 }
 
@@ -767,7 +767,7 @@ void FUN_0043a180(struct ShopObject *obj, unsigned int param2, unsigned int para
     if (count != 0) {
         struct Point q = GetScreenCoordsForObject((unsigned char *)ride, building);
         struct Coords *coords = (struct Coords *)&q;
-        PrintSprite(DAT_0081cb28, coords->x, coords->y, param1, (int *)node);
+        PrintSprite(ExplorersInstituteMatteSprite, coords->x, coords->y, param1, (int *)node);
     }
 }
 
@@ -853,7 +853,7 @@ void FUN_0043a3d0(struct ShopRideObject *obj, TileId tile, void *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a400
-void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci) {
+void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b75fc
     if (_stricmp("GENERAL STORE", name->name) == 0) {
         ci->cb_a4 = FUN_004375d0;
@@ -915,7 +915,7 @@ void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b75c4
     if (_stricmp("EXPLORERS INSTITUTE", name->name) == 0) {
         ci->cb_a4 = FUN_0043a0f0;
-        ci->cb_ac = FUN_0043a120;
+        ci->cb_ac = UnloadExplorersInstituteMatteSpriteAndMoneySFX;
         ci->cb_8c = FUN_0043a140;
         ci->cb_a0 = FUN_0043a390;
         ci->cb_a8 = FUN_0043a1e0;
@@ -928,7 +928,7 @@ void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = FUN_00439200;
         ci->cb_98 = FUN_00439320;
         ci->cb_9c = FUN_00439350;
-        ci->cb_ac = FUN_004393e0;
+        ci->cb_ac = UnloadLegoShop1MatteSpriteAndMoneySFX;
         ci->cb_8c = FUN_004393a0;
         ci->cb_a0 = FUN_0043a390;
         ci->cb_a8 = FUN_00439460;
@@ -938,7 +938,7 @@ void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b75ac
     if (_stricmp("LEGO SHOP 2", name->name) == 0) {
         ci->cb_a4 = FUN_004396d0;
-        ci->cb_ac = FUN_00439700;
+        ci->cb_ac = UnloadLegoShop2MatteSpriteAndMoneySFX;
         ci->cb_8c = FUN_00439720;
         ci->cb_a0 = FUN_0043a390;
         ci->cb_a8 = FUN_00439950;
@@ -951,7 +951,7 @@ void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = FUN_00439c20;
         ci->cb_98 = FUN_00439c60;
         ci->cb_9c = FUN_00439c90;
-        ci->cb_ac = FUN_00439ce0;
+        ci->cb_ac = UnloadLegMediaShopMaskSpritesAndMoneySFX;
         ci->cb_8c = FUN_00439d00;
         ci->cb_a0 = FUN_0043a390;
         ci->cb_a8 = FUN_00439ef0;

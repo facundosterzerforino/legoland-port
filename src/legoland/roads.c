@@ -449,7 +449,7 @@ void FUN_00413a10(struct LLIDB_Head *head) {
     DAT_0082c684 = head->callbacks;
     // STRING: LEGOLAND 0x004b4c94
     if (LLIDB_FindElement("DSCHOOL LIGHTS", (unsigned int *)handle, 0) == 0) {
-        DAT_0082c680 = LLIDB_LoadData(head);
+        DrivingSchoolLightsData = LLIDB_LoadData(head);
     }
     // STRING: LEGOLAND 0x004b4c80
     if (LLIDB_FindElement("TILES FOR DSCHOOL", (unsigned int *)handle, 0) == 0) {
@@ -786,37 +786,37 @@ void FUN_00414440(void) {
             continue;
         }
         GetTileDimensions(&w, &h);
-        pt.x = DAT_0082c680->off_x[ia & 0xff] >> 1;
-        pt.y = DAT_0082c680->off_y[ia & 0xff] >> 1;
+        pt.x = DrivingSchoolLightsData->off_x[ia & 0xff] >> 1;
+        pt.y = DrivingSchoolLightsData->off_y[ia & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
         ref.x = e->x;
         ref.y = e->y;
         GetTileBounds(&ref, b);
-        SortSprite(DAT_0082c680->sprites[ia & 0xff], b[0] + pt.x, b[1] + pt.y, b[1] - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ia & 0xff], b[0] + pt.x, b[1] + pt.y, b[1] - lpConfig->field_22, 0, 0);
 
         ref.x = e->x + 3;
         ref.y = e->y;
         GetTileBounds(&ref, b);
-        pt.x = DAT_0082c680->off_x[id & 0xff] >> 1;
-        pt.y = DAT_0082c680->off_y[id & 0xff] >> 1;
+        pt.x = DrivingSchoolLightsData->off_x[id & 0xff] >> 1;
+        pt.y = DrivingSchoolLightsData->off_y[id & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DAT_0082c680->sprites[id & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[id & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
 
         ref.x = e->x + 3;
         ref.y = e->y + 3;
         GetTileBounds(&ref, b);
-        pt.x = DAT_0082c680->off_x[ib & 0xff] >> 1;
-        pt.y = DAT_0082c680->off_y[ib & 0xff] >> 1;
+        pt.x = DrivingSchoolLightsData->off_x[ib & 0xff] >> 1;
+        pt.y = DrivingSchoolLightsData->off_y[ib & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DAT_0082c680->sprites[ib & 0xff], b[0] + pt.x, b[1] + pt.y, b[3] - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ib & 0xff], b[0] + pt.x, b[1] + pt.y, b[3] - lpConfig->field_22, 0, 0);
 
         ref.x = e->x;
         ref.y = e->y + 3;
         GetTileBounds(&ref, b);
-        pt.x = DAT_0082c680->off_x[ic & 0xff] >> 1;
-        pt.y = DAT_0082c680->off_y[ic & 0xff] >> 1;
+        pt.x = DrivingSchoolLightsData->off_x[ic & 0xff] >> 1;
+        pt.y = DrivingSchoolLightsData->off_y[ic & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DAT_0082c680->sprites[ic & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ic & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
     }
 }
 

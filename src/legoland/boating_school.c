@@ -121,12 +121,12 @@ void FUN_00418fe0(int param_1) {
             by = (dx + dy) * th2 >> 9;
             sx = (ride->field_4 - ride->field_8) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
             sy = (ride->field_4 + ride->field_8) * (th >> 1) - (ScrollY >> 8);
-            off.x = DAT_0082c65c->offset_x[ride->field_29c[DAT_004cc08c] & 0xff] >> 1;
-            off.y = DAT_0082c65c->offset_y[ride->field_29c[DAT_004cc08c] & 0xff] >> 1;
+            off.x = BoatingSchoolBoats->offset_x[ride->field_29c[DAT_004cc08c] & 0xff] >> 1;
+            off.y = BoatingSchoolBoats->offset_y[ride->field_29c[DAT_004cc08c] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
             ride->field_14 = lpConfig->field_20 + bx + off.x + sx;
             ride->field_18 = lpConfig->field_22 + by + off.y + sy;
-            PrintSprite(DAT_0082c65c->sprites[ride->field_29c[DAT_004cc08c] & 0xff], ride->field_14, ride->field_18, 0, 0);
+            PrintSprite(BoatingSchoolBoats->sprites[ride->field_29c[DAT_004cc08c] & 0xff], ride->field_14, ride->field_18, 0, 0);
             if (ride->field_3ec != 0) {
                 person = (int)Find3DPersonFromBloke(ride->field_3ec);
                 *(float *)(person + 0x44) = ((float)(int)ride->field_29c[DAT_004cc08c] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
@@ -140,7 +140,7 @@ void FUN_00418fe0(int param_1) {
                 *(int *)(person + 0x1c) = seat.x + off.x;
                 *(int *)(person + 0x20) = seat.y + off.y;
                 IP_RenderBlokeIn3DNow((struct Bloke *)ride->field_3ec);
-                PrintSprite(DAT_0082c65c->sprites[(ride->field_29c[DAT_004cc08c] + 0x30) & 0xff], ride->field_14, ride->field_18, 0, 0);
+                PrintSprite(BoatingSchoolBoats->sprites[(ride->field_29c[DAT_004cc08c] + 0x30) & 0xff], ride->field_14, ride->field_18, 0, 0);
             }
         }
         if (ride->field_3e4 == 0x10 && ride->field_3e8 == 2 && DAT_004cc08c == 0x4f && param_1 != 0 && ride->field_3ec != 0) {
@@ -544,20 +544,20 @@ void FUN_00419d10(Element *obj) {
     DAT_0082c658->layer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b5334
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
-        DAT_0082adf4 = (struct TileMap *)LLIDB_LoadData((void *)handle);
+        BoatingSchoolTileMapping = (struct TileMap *)LLIDB_LoadData((void *)handle);
     }
     // STRING: LEGOLAND 0x004b531c
     if (LLIDB_FindElement("BOATING SCHOOL BOATS", &handle, 0) == 0) {
-        DAT_0082c65c = (struct SpriteSet *)LLIDB_LoadData((void *)handle);
+        BoatingSchoolBoats = (struct SpriteSet *)LLIDB_LoadData((void *)handle);
     }
-    for (i = 0; i < DAT_0082c65c->count; i++) {
-        sprite = DAT_0082c65c->sprites[i & 0xff];
+    for (i = 0; i < BoatingSchoolBoats->count; i++) {
+        sprite = BoatingSchoolBoats->sprites[i & 0xff];
         LLSPlay((struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite), *(unsigned int *)((char *)sprite + 8));
     }
     // STRING: LEGOLAND 0x004b530c
-    DAT_0082adfc = LoadSprite("bs_hullmask.lls", 1);
+    BoatingSchoolHullMaskSprite = LoadSprite("bs_hullmask.lls", 1);
     // STRING: LEGOLAND 0x004b52fc
-    DAT_0082c654 = LoadSprite("bs_railm.lls", 1);
+    BoatingSchoolRailmSprite = LoadSprite("bs_railm.lls", 1);
     lls = GetLLSForSprite((struct SpriteLLS *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct LayerContainer *)DAT_0082c658->layer, 5)));
     LLSStop(lls);
     LLSSetFrame((struct LLS *)lls, *(short *)(lls + 0x10));
@@ -582,8 +582,8 @@ void FUN_00419ef0(void) {
     struct PathNode *path;
 
     Kill_FXList(PTR_s_Boat_Noise_wav, 2);
-    for (i = 0; i < DAT_0082c65c->count; i++) {
-        sprite = DAT_0082c65c->sprites[(unsigned char)i];
+    for (i = 0; i < BoatingSchoolBoats->count; i++) {
+        sprite = BoatingSchoolBoats->sprites[(unsigned char)i];
         LLSStop(GetLLSForSprite((struct SpriteLLS *)sprite));
     }
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
@@ -605,8 +605,8 @@ void FUN_00419ef0(void) {
         free(DAT_004d823c);
         DAT_004d823c = path;
     }
-    KillSprite(DAT_0082adfc);
-    KillSprite(DAT_0082c654);
+    KillSprite(BoatingSchoolHullMaskSprite);
+    KillSprite(BoatingSchoolRailmSprite);
 }
 
 // FUNCTION: LEGOLAND 0x0041a000
@@ -653,20 +653,20 @@ void FUN_0041a040(struct EditObject *obj, int *coords) {
     for (y = DAT_004cc078.v[1]; y <= DAT_004cc078.v[3]; y++) {
         for (x = DAT_004cc078.v[0]; x <= DAT_004cc078.v[2]; x++) {
             if (x == DAT_004cc078.v[0]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 9);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 9);
             } else if (x == DAT_004cc078.v[2]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 0xc);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 0xc);
             } else {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles);
             }
         }
     }
-    SetMapTile(coords[0] + DAT_004cc078.v[2], coords[1] + DAT_004cc078.v[1], *DAT_0082adf4->tiles + 8);
-    SetMapTile(coords[0] + DAT_004cc078.v[2], coords[1] + DAT_004cc078.v[3], *DAT_0082adf4->tiles + 7);
-    SetMapTile(coords[0] + 4 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[3], *DAT_0082adf4->tiles + 4);
-    SetMapTile(coords[0] + 4 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[1], *DAT_0082adf4->tiles + 1);
-    SetMapTile(coords[0] + 5 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[3], *DAT_0082adf4->tiles + 0xb);
-    SetMapTile(coords[0] + 5 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[1], *DAT_0082adf4->tiles + 10);
+    SetMapTile(coords[0] + DAT_004cc078.v[2], coords[1] + DAT_004cc078.v[1], *BoatingSchoolTileMapping->tiles + 8);
+    SetMapTile(coords[0] + DAT_004cc078.v[2], coords[1] + DAT_004cc078.v[3], *BoatingSchoolTileMapping->tiles + 7);
+    SetMapTile(coords[0] + 4 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[3], *BoatingSchoolTileMapping->tiles + 4);
+    SetMapTile(coords[0] + 4 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[1], *BoatingSchoolTileMapping->tiles + 1);
+    SetMapTile(coords[0] + 5 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[3], *BoatingSchoolTileMapping->tiles + 0xb);
+    SetMapTile(coords[0] + 5 + DAT_004cc078.v[0], coords[1] + DAT_004cc078.v[1], *BoatingSchoolTileMapping->tiles + 10);
 }
 
 // FUNCTION: LEGOLAND 0x0041a2f0
@@ -965,9 +965,9 @@ void FUN_0041abd0(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0082c658->layer, 3);
     AdjustOffsetForViewMode(&offset);
     lls = (short *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer((struct LayerContainer *)DAT_0082c658->layer, 3));
-    hull = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_0082adfc);
+    hull = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)BoatingSchoolHullMaskSprite);
     LLSSetFrame(hull, *lls);
-    PrintSprite(DAT_0082adfc, pos.x + offset.x, pos.y + offset.y, clip, 0);
+    PrintSprite(BoatingSchoolHullMaskSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
     for (; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->param_action != 2) {
             IP_RenderBlokeIn3DNow(node->rider);
@@ -977,11 +977,11 @@ void FUN_0041abd0(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     offset.x += 0x71;
     offset.y += 0xac;
     AdjustOffsetForViewMode(&offset);
-    PrintSprite(DAT_0082c654, pos.x + offset.x, pos.y + offset.y, clip, 0);
+    PrintSprite(BoatingSchoolRailmSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
 }
 
 // FUNCTION: LEGOLAND 0x0041acf0
-int FUN_0041acf0(void) {
+int BoatingSchool_Save(void) {
     struct BoatRideNode *score;
     struct BoatRideNode *scoreCur;
     struct PathNode *path;
@@ -1045,7 +1045,7 @@ int FUN_0041acf0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041aee0
-int FUN_0041aee0(void) {
+int BoatingSchool_Load(void) {
     struct BoatRideNode *score;
     struct BoatRideNode *prevScore;
     struct PathNode *path;
@@ -1182,8 +1182,8 @@ LEGO_EXPORT void GetInterface(struct ClassNode *head, struct CallbackTable *ifac
         cb[4] = FUN_0041a530;
         cb[6] = FUN_0041a720;
         cb[9] = FUN_0041abd0;
-        cb[0xc] = FUN_0041acf0;
-        cb[0xb] = FUN_0041aee0;
+        cb[0xc] = BoatingSchool_Save;
+        cb[0xb] = BoatingSchool_Load;
         cb[0xd] = FUN_0041b100;
         return;
     }
@@ -1237,22 +1237,22 @@ void FUN_0041b2a0(struct EditObject *obj, int *coords) {
     for (y = ride->footprint.v[1]; y <= ride->footprint.v[3]; y++) {
         for (x = ride->footprint.v[0]; x <= ride->footprint.v[2]; x++) {
             if (x == ride->footprint.v[0]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 9);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 9);
             } else if (x == ride->footprint.v[2]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 0xc);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 0xc);
             } else if (y == ride->footprint.v[1]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 10);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 10);
             } else if (y == ride->footprint.v[3]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles + 0xb);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles + 0xb);
             } else {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0082adf4->tiles);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMapping->tiles);
             }
         }
     }
-    SetMapTile(ride->footprint.v[0] + coords[0], ride->footprint.v[1] + coords[1], *DAT_0082adf4->tiles + 5);
-    SetMapTile(coords[0] + ride->footprint.v[2], ride->footprint.v[1] + coords[1], *DAT_0082adf4->tiles + 8);
-    SetMapTile(ride->footprint.v[0] + coords[0], ride->footprint.v[3] + coords[1], *DAT_0082adf4->tiles + 6);
-    SetMapTile(coords[0] + ride->footprint.v[2], ride->footprint.v[3] + coords[1], *DAT_0082adf4->tiles + 7);
+    SetMapTile(ride->footprint.v[0] + coords[0], ride->footprint.v[1] + coords[1], *BoatingSchoolTileMapping->tiles + 5);
+    SetMapTile(coords[0] + ride->footprint.v[2], ride->footprint.v[1] + coords[1], *BoatingSchoolTileMapping->tiles + 8);
+    SetMapTile(ride->footprint.v[0] + coords[0], ride->footprint.v[3] + coords[1], *BoatingSchoolTileMapping->tiles + 6);
+    SetMapTile(coords[0] + ride->footprint.v[2], ride->footprint.v[3] + coords[1], *BoatingSchoolTileMapping->tiles + 7);
     source.field_8 = coords[0];
     source.type = 2;
     source.field_c = coords[1];
@@ -1471,31 +1471,31 @@ void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3) {
         }
         if ((mask & 8) != 0 && (mask & 1) != 0 &&
             (other = (int)FUN_0041c890(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
-            SetMapTile(param_1 - 3, param_2 - 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 2, param_2 - 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 3, param_2 - 2, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 2, param_2 - 2, *DAT_0082adf4->tiles);
+            SetMapTile(param_1 - 3, param_2 - 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 2, param_2 - 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 3, param_2 - 2, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 2, param_2 - 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 8) != 0 && (mask & 4) != 0 &&
             (other = (int)FUN_0041c890(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
-            SetMapTile(param_1 - 3, param_2 + 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 2, param_2 + 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 3, param_2 + 2, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 - 2, param_2 + 2, *DAT_0082adf4->tiles);
+            SetMapTile(param_1 - 3, param_2 + 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 2, param_2 + 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 3, param_2 + 2, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 - 2, param_2 + 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 2) != 0 && (mask & 1) != 0 &&
             (other = (int)FUN_0041c890(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
-            SetMapTile(param_1 + 3, param_2 - 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 2, param_2 - 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 3, param_2 - 2, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 2, param_2 - 2, *DAT_0082adf4->tiles);
+            SetMapTile(param_1 + 3, param_2 - 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 2, param_2 - 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 3, param_2 - 2, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 2, param_2 - 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 2) != 0 && (mask & 4) != 0 &&
             (other = (int)FUN_0041c890(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
-            SetMapTile(param_1 + 3, param_2 + 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 2, param_2 + 3, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 3, param_2 + 2, *DAT_0082adf4->tiles);
-            SetMapTile(param_1 + 2, param_2 + 2, *DAT_0082adf4->tiles);
+            SetMapTile(param_1 + 3, param_2 + 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 2, param_2 + 3, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 3, param_2 + 2, *BoatingSchoolTileMapping->tiles);
+            SetMapTile(param_1 + 2, param_2 + 2, *BoatingSchoolTileMapping->tiles);
         }
     }
 }
@@ -1780,7 +1780,7 @@ void FUN_0041c4c0(int x, int y, int mask, unsigned short *owner) {
             elem->field_10 = 2;
             elem->field_0 = DAT_0082adf0->element;
             *(unsigned short *)&elem->field_4 = tile.id;
-            SetMapTile(pt.x, pt.y, *DAT_0082adf4[DAT_004b53d4[mask * 25 + row * 5 + col] >> 8].tiles + (unsigned char)DAT_004b53d4[mask * 25 + row * 5 + col]);
+            SetMapTile(pt.x, pt.y, *BoatingSchoolTileMapping[DAT_004b53d4[mask * 25 + row * 5 + col] >> 8].tiles + (unsigned char)DAT_004b53d4[mask * 25 + row * 5 + col]);
         }
     }
 }

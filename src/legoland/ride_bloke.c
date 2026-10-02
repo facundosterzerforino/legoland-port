@@ -924,18 +924,18 @@ void FUN_00402550(struct BlokeSprite *arg) {
 
     switch (arg->var_c3) {
     case 1:
-        SetOverridePalette(DAT_0082c6bc);
+        SetOverridePalette(DSchoolBluePalette);
         break;
     case 2:
-        SetOverridePalette(DAT_0082c6b8);
+        SetOverridePalette(DSchoolYellowPalette);
         break;
     case 3:
-        SetOverridePalette(DAT_0082c690);
+        SetOverridePalette(DSchoolRedPalette);
         break;
     }
 
     SetOverrideFrame(arg->var_b9 + 16);
-    PrintSprite(DAT_00830f94, arg->var_8, arg->var_c, 0, 0);
+    PrintSprite(DSCarSprite, arg->var_8, arg->var_c, 0, 0);
     ClearOverrideFrame();
     ClearOverridePalette();
 }
@@ -1041,25 +1041,25 @@ void FUN_00402780(struct NewBloke *b) {
     GetTileDimensions(&w2, &h2);
     sx = r.p.lo - ((w2 + 1) >> 1) - (ScrollX >> 8);
     sy = r.p.hi - (ScrollY >> 8);
-    off.x = DAT_00830f9c->x[b->f_b8] >> 1;
-    off.y = DAT_00830f9c->y[b->f_b8] >> 1;
+    off.x = DSchoolBlueCarData->x[b->f_b8] >> 1;
+    off.y = DSchoolBlueCarData->y[b->f_b8] >> 1;
     AdjustOffsetForViewMode(&off);
     b->sx = lpConfig->field_20 + off.x + sx;
     b->sy = lpConfig->field_22 + off.y + sy;
     key = h2 + sy;
     switch (b->f_c3) {
     case 1:
-        SetOverridePalette((unsigned int)DAT_0082c6bc);
+        SetOverridePalette((unsigned int)DSchoolBluePalette);
         break;
     case 2:
-        SetOverridePalette((unsigned int)DAT_0082c6b8);
+        SetOverridePalette((unsigned int)DSchoolYellowPalette);
         break;
     case 3:
-        SetOverridePalette((unsigned int)DAT_0082c690);
+        SetOverridePalette((unsigned int)DSchoolRedPalette);
         break;
     }
     SetOverrideFrame(b->f_b9 = b->f_b8);
-    SortSpriteWithCallback(DAT_00830f94, b->sx, b->sy, key, 0, (unsigned int)FUN_00402550, (unsigned int)b, &cfg);
+    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (unsigned int)FUN_00402550, (unsigned int)b, &cfg);
     ClearOverridePalette();
     ClearOverrideFrame();
     b->bloke->pos.x = sx;

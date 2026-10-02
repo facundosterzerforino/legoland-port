@@ -140,12 +140,12 @@ void FUN_00432d00(int param_1) {
             dy = (a + b) * th2 >> 9;
             baseX = ((int)ride->field_4 - (int)ride->field_8) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
             baseY = ((int)ride->field_4 + (int)ride->field_8) * (th >> 1) - (ScrollY >> 8);
-            off.x = DAT_0081cd00->offset_x[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
-            off.y = DAT_0081cd00->offset_y[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
+            off.x = JungleCruiseBoats->offset_x[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
+            off.y = JungleCruiseBoats->offset_y[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
             ride->field_14 = lpConfig->field_20 + dx + off.x + baseX;
             ride->field_18 = lpConfig->field_22 + dy + off.y + baseY;
-            PrintSprite(DAT_0081cd00->sprites[ride->field_29c[DAT_00629c54] & 0xff], ride->field_14, ride->field_18, 0, 0);
+            PrintSprite(JungleCruiseBoats->sprites[ride->field_29c[DAT_00629c54] & 0xff], ride->field_14, ride->field_18, 0, 0);
             off.x = lpConfig->field_20 + dx + baseX;
             off.y = lpConfig->field_22 + dy + baseY;
             AdjustBlokePosition((struct Point *)&off);
@@ -186,7 +186,7 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 2) {
-                        sprite = DAT_0081cd00->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x10 : ride->field_29c[DAT_00629c54] + 0x20) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x10 : ride->field_29c[DAT_00629c54] + 0x20) & 0xff];
                         PrintSprite(sprite, ride->field_14, ride->field_18, 0, 0);
                     }
                 }
@@ -227,7 +227,7 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 1) {
-                        sprite = DAT_0081cd00->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x20 : ride->field_29c[DAT_00629c54] + 0x10) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x20 : ride->field_29c[DAT_00629c54] + 0x10) & 0xff];
                         PrintSprite(sprite, ride->field_14, ride->field_18, 0, 0);
                     }
                 }
@@ -626,12 +626,12 @@ void FUN_00433ca0(Element *obj) {
     DAT_0081cb70 = ride;
     ride->flags |= 0x400;
     // STRING: LEGOLAND 0x004b720c
-    DAT_0081cb68 = LoadSprite("brijmask.lls", 1);
+    BrijMaskSprite = LoadSprite("brijmask.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x00433cd0
-void FUN_00433cd0(void) {
-    KillSprite(DAT_0081cb68);
+void KillBrijMaskSprite(void) {
+    KillSprite(BrijMaskSprite);
 }
 
 // FUNCTION: LEGOLAND 0x00433ce0
@@ -788,12 +788,12 @@ void FUN_00434080(Element *obj) {
     DAT_0081cb74 = ride;
     ride->flags |= 0x400;
     // STRING: LEGOLAND 0x004b721c
-    DAT_0081cb6c = LoadSprite("mfish2.lls", 1);
+    MFish2Sprite = LoadSprite("mfish2.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x004340b0
-void FUN_004340b0(void) {
-    KillSprite(DAT_0081cb6c);
+void KillMFish2Sprite(void) {
+    KillSprite(MFish2Sprite);
 }
 
 // FUNCTION: LEGOLAND 0x004340c0
@@ -832,22 +832,22 @@ void FUN_00434100(struct EditObject *obj, int *coords) {
     for (y = DAT_0081cb74->footprint.v[1]; y <= DAT_0081cb74->footprint.v[3]; y++) {
         for (x = DAT_0081cb74->footprint.v[0]; x <= DAT_0081cb74->footprint.v[2]; x++) {
             if (x == DAT_0081cb74->footprint.v[0]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 9);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 9);
             } else if (x == DAT_0081cb74->footprint.v[2]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 0xc);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xc);
             } else if (y == DAT_0081cb74->footprint.v[1]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 10);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 10);
             } else if (y == DAT_0081cb74->footprint.v[3]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 0xb);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xb);
             } else {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles);
             }
         }
     }
-    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *DAT_0081cb58->tiles + 5);
-    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *DAT_0081cb58->tiles + 8);
-    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *DAT_0081cb58->tiles + 6);
-    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *DAT_0081cb58->tiles + 7);
+    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 5);
+    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 8);
+    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 6);
+    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 7);
 }
 
 // FUNCTION: LEGOLAND 0x00434330
@@ -988,9 +988,9 @@ struct RideSpriteInfo *FUN_00434740(Element *obj, short param_2) {
     }
 
     if (node->field_4 != 0) {
-        fish_lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_0081cb6c);
+        fish_lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)MFish2Sprite);
         LLSSetFrame(fish_lls, *lls);
-        DAT_0082c6a0.sprite = DAT_0081cb6c;
+        DAT_0082c6a0.sprite = MFish2Sprite;
     } else {
         DAT_0082c6a0.sprite = ride->layer;
     }
@@ -1063,17 +1063,17 @@ void FUN_00434cb0(Element *obj) {
     DAT_0081cb60->flags |= 0x20;
     DAT_0081cb60->layer->flags |= 0x2000;
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
-        DAT_0081cb58 = (struct TileMap *)LLIDB_LoadData((void *)handle);
+        BoatingSchoolTileMap = (struct TileMap *)LLIDB_LoadData((void *)handle);
     }
     if (LLIDB_FindElement("JUNGLE CRUISE BOATS", &handle, 0) == 0) {
-        DAT_0081cd00 = (struct SpriteSet *)LLIDB_LoadData((void *)handle);
+        JungleCruiseBoats = (struct SpriteSet *)LLIDB_LoadData((void *)handle);
     }
-    for (i = 0; i < DAT_0081cd00->count; i++) {
-        sprite = DAT_0081cd00->sprites[(unsigned char)i];
+    for (i = 0; i < JungleCruiseBoats->count; i++) {
+        sprite = JungleCruiseBoats->sprites[(unsigned char)i];
         LLSPlay((struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite), *(unsigned int *)((char *)sprite + 8));
     }
     // STRING: LEGOLAND 0x004b72b8
-    DAT_0081cb5c = LoadSprite("jungmask.lls", 1);
+    JungMaskSprite = LoadSprite("jungmask.lls", 1);
     DAT_00629c40 = DAT_0081cb60->footprint;
     DAT_004b7260 = DAT_004b7230;
     DAT_004b7260.v[1] += DAT_00629c40.v[1];
@@ -1100,8 +1100,8 @@ void FUN_00434e50(Element *obj) {
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
         LLIDB_UnLoadData(handle);
     }
-    for (i = 0; i < DAT_0081cd00->count; i++) {
-        sprite = DAT_0081cd00->sprites[(unsigned char)i];
+    for (i = 0; i < JungleCruiseBoats->count; i++) {
+        sprite = JungleCruiseBoats->sprites[(unsigned char)i];
         LLSStop(GetLLSForSprite((struct SpriteLLS *)sprite));
     }
     // STRING: LEGOLAND 0x004b72c8
@@ -1121,7 +1121,7 @@ void FUN_00434e50(Element *obj) {
         free(DAT_0062fd2c);
         DAT_0062fd2c = path;
     }
-    KillSprite(DAT_0081cb5c);
+    KillSprite(JungMaskSprite);
 }
 
 // FUNCTION: LEGOLAND 0x00434f50
@@ -1172,11 +1172,11 @@ void FUN_00434f90(struct EditObject *obj, int *coords) {
     for (y = DAT_00629c40.v[1]; y <= DAT_00629c40.v[3]; y++) {
         for (x = DAT_00629c40.v[0]; x <= DAT_00629c40.v[2] - 1; x++) {
             if (x == DAT_00629c40.v[0]) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 9);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 9);
             } else if (x == DAT_00629c40.v[2] - 1) {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles + 0xc);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xc);
             } else {
-                SetMapTile(coords[0] + x, coords[1] + y, *DAT_0081cb58->tiles);
+                SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles);
             }
         }
     }
@@ -1537,13 +1537,13 @@ void FUN_00435bd0(int param_1, unsigned int param_2, unsigned int param_3, short
     }
     coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
     lls1 = (short *)GetLLSForSprite((struct SpriteLLS *)DAT_0081cb60->layer);
-    lls2 = GetLLSForSprite((struct SpriteLLS *)DAT_0081cb5c);
+    lls2 = GetLLSForSprite((struct SpriteLLS *)JungMaskSprite);
     LLSSetFrame((struct LLS *)lls2, *lls1);
-    PrintSprite(DAT_0081cb5c, coords.x, coords.y, param_6, 0);
+    PrintSprite(JungMaskSprite, coords.x, coords.y, param_6, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00435c70
-int FUN_00435c70(void) {
+int JungleCruise_Save(void) {
     struct JungleScore *score;
     struct JungleScore *scoreCur;
     struct JunglePath *path;
@@ -1621,7 +1621,7 @@ int FUN_00435c70(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00435ec0
-int FUN_00435ec0(void) {
+int JungleCruise_Load(void) {
     struct JungleScore *score;
     struct JungleScore *prevScore;
     struct JunglePath *path;
@@ -1951,31 +1951,31 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
         }
         if ((mask & 8) != 0 && (mask & 1) != 0 &&
             (other = (int)FUN_004371b0(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
-            SetMapTile(param_1 - 3, param_2 - 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 2, param_2 - 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 3, param_2 - 2, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 2, param_2 - 2, *DAT_0081cb58->tiles);
+            SetMapTile(param_1 - 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 8) != 0 && (mask & 4) != 0 &&
             (other = (int)FUN_004371b0(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
-            SetMapTile(param_1 - 3, param_2 + 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 2, param_2 + 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 3, param_2 + 2, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 - 2, param_2 + 2, *DAT_0081cb58->tiles);
+            SetMapTile(param_1 - 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 3, param_2 + 2, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 - 2, param_2 + 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 1) != 0 &&
             (other = (int)FUN_004371b0(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
-            SetMapTile(param_1 + 3, param_2 - 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 2, param_2 - 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 3, param_2 - 2, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 2, param_2 - 2, *DAT_0081cb58->tiles);
+            SetMapTile(param_1 + 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 4) != 0 &&
             (other = (int)FUN_004371b0(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
-            SetMapTile(param_1 + 3, param_2 + 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 2, param_2 + 3, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 3, param_2 + 2, *DAT_0081cb58->tiles);
-            SetMapTile(param_1 + 2, param_2 + 2, *DAT_0081cb58->tiles);
+            SetMapTile(param_1 + 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 3, param_2 + 2, *BoatingSchoolTileMap->tiles);
+            SetMapTile(param_1 + 2, param_2 + 2, *BoatingSchoolTileMap->tiles);
         }
     }
 }
@@ -2130,7 +2130,7 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
             elem->field_10 = 2;
             elem->field_0 = DAT_0081cb54->element;
             *(unsigned short *)&elem->field_4 = tile.id;
-            SetMapTile(pt.x, pt.y, *DAT_0081cb58[DAT_004b72e4[mask * 25 + row * 5 + col] >> 8].tiles + (unsigned char)DAT_004b72e4[mask * 25 + row * 5 + col]);
+            SetMapTile(pt.x, pt.y, *BoatingSchoolTileMap[DAT_004b72e4[mask * 25 + row * 5 + col] >> 8].tiles + (unsigned char)DAT_004b72e4[mask * 25 + row * 5 + col]);
         }
     }
 }

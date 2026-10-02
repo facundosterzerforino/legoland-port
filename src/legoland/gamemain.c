@@ -62,7 +62,7 @@ struct QueryNode {
 };
 
 // FUNCTION: LEGOLAND 0x00477680
-int FUN_00477680(int a, int b) {
+int IsInMapBounds(int a, int b) {
     unsigned short limit;
 
     if (a < 0) {
@@ -308,7 +308,7 @@ void FUN_004779d0(struct Point *p) {
         QueryClass->method_94((unsigned int *)elem, &pos);
         if (tile->flags & 0x20) {
             if (QueryClass->field_1c & 0x200000) {
-                FUN_00450c00(t);
+                RemoveObjectFromBuildList(t);
                 FUN_0045e850((struct ObjNode *)elem, &pos.x);
                 IncrementObjectCount((struct ObjectCount *)QueryClass);
                 RemoveObjectFromMap(t);
@@ -370,7 +370,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
         } else {
             pos.x = cur->field_8;
             pos.y = cur->field_c - 1;
-            if (FUN_00477680(pos.x, pos.y)) {
+            if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 if (nb->field_10 != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
@@ -399,7 +399,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
             }
             pos.x = cur->field_8 + 1;
             pos.y = cur->field_c;
-            if (FUN_00477680(pos.x, pos.y)) {
+            if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
                 if (nb->field_10 != -1) {
@@ -429,7 +429,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
             }
             pos.x = cur->field_8;
             pos.y = cur->field_c + 1;
-            if (FUN_00477680(pos.x, pos.y)) {
+            if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
                 if (nb->field_10 != -1) {
@@ -459,7 +459,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
             }
             pos.x = cur->field_8 - 1;
             pos.y = cur->field_c;
-            if (FUN_00477680(pos.x, pos.y)) {
+            if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
                 if (nb->field_10 != -1) {
@@ -512,7 +512,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
 }
 
 // FUNCTION: LEGOLAND 0x00478110
-int FUN_00478110(char *str, const char *delims, char **out) {
+int TokenizeString(char *str, const char *delims, char **out) {
     int count = 0;
     char *p;
     int n;
@@ -553,7 +553,7 @@ int FUN_00478110(char *str, const char *delims, char **out) {
 }
 
 // FUNCTION: LEGOLAND 0x004781b0
-int FUN_004781b0(const char *param_1, const void *param_2, int param_3) {
+int FindStringNoCase(const char *param_1, const void *param_2, int param_3) {
     int i;
 
     for (i = 0; i < param_3; i++) {
@@ -564,7 +564,7 @@ int FUN_004781b0(const char *param_1, const void *param_2, int param_3) {
     return -1;
 }
 // FUNCTION: LEGOLAND 0x004781f0
-int FUN_004781f0(const char *name, struct ScriptCommand *commands, int count, int flags) {
+int ParseScriptFile(const char *name, struct ScriptCommand *commands, int count, int flags) {
     char path[256];
     struct ResFile *file;
     int result;
@@ -575,7 +575,7 @@ int FUN_004781f0(const char *name, struct ScriptCommand *commands, int count, in
     file = RES_OpenFile(path);
     if (file != NULL) {
         strncpy(DAT_00668fd0, name, 128);
-        result = FUN_00478280(file, commands, count, flags);
+        result = ParseScriptResFile(file, commands, count, flags);
         RES_CloseFile(file);
         return result;
     }
@@ -583,7 +583,7 @@ int FUN_004781f0(const char *name, struct ScriptCommand *commands, int count, in
 }
 
 // FUNCTION: LEGOLAND 0x00478280
-int FUN_00478280(struct ResFile *file, struct ScriptCommand *commands, int count, int flags) {
+int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int count, int flags) {
     char line[1024];
     char *tokens[20];
     char *p;
@@ -600,16 +600,16 @@ int FUN_00478280(struct ResFile *file, struct ScriptCommand *commands, int count
     // STRING: LEGOLAND 0x004bbdcc
     if (strcmp(cmd->name, "none") == 0)
         deflt = cmd->fn;
-    while (FUN_00489e60(file, line, 1024)) {
+    while (ReadResFileLine(file, line, 1024)) {
         DAT_00668fcc++;
-        FUN_004663f0();
+        DrawWatchSprite();
         p = strchr(line, '#');
         if (p)
             *p = 0;
         // STRING: LEGOLAND 0x004bc098
-        ntok = FUN_00478110(line, " ,;:(){}\xa0\n\t", tokens);
+        ntok = TokenizeString(line, " ,;:(){}\xa0\n\t", tokens);
         if (ntok) {
-            FUN_00499300(tokens[0]);
+            UppercaseStringAndGetLength(tokens[0]);
             found = 0;
             for (i = 0; i < count; i++, cmd++) {
                 if (strcmp(tokens[0], cmd->name) == 0) {
@@ -674,7 +674,7 @@ void FUN_004784c0(void) {
     FUN_00476050();
     FUN_00490610(DAT_004d8bb0);
     FUN_00463560();
-    FUN_00482b10();
+    ResetPathUpdateTimer();
     FUN_00459960();
 
     MapStats.field_174 = 1000;

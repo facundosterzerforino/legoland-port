@@ -5,4 +5,4 @@
 struct CallbackTable;
 struct ClassNode;
 
-void FUN_00416e50(struct ClassNode *str, struct CallbackTable *obj);
+void Temple_GetInterfaces(struct ClassNode *str, struct CallbackTable *obj);

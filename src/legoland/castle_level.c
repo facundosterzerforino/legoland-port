@@ -20,7 +20,7 @@
 void FUN_00402ca0(Element *obj) {
     struct Ride *ride = obj->ride;
 
-    DAT_004c10dc = ride;
+    CastleLevelRide = ride;
     if (ride != NULL) {
         ride->flags |= 0x20;
     }
@@ -28,13 +28,13 @@ void FUN_00402ca0(Element *obj) {
         ride->layer->flags |= 0x2000;
     }
     // STRING: LEGOLAND 0x004b4078
-    DAT_004c10e4 = LoadSprite("Castle Matte.lls", 1);
+    CastleLevelMatteSprite = LoadSprite("Castle Matte.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x00402ce0
-void FUN_00402ce0(void) {
-    if (DAT_004c10e4 != 0) {
-        KillSprite(DAT_004c10e4);
+void KillCastleLevelMatteSprite(void) {
+    if (CastleLevelMatteSprite != 0) {
+        KillSprite(CastleLevelMatteSprite);
     }
 }
 
@@ -53,11 +53,11 @@ void FUN_00402d00(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004c10e8);
-    if (DAT_004c10e4 != NULL) {
+    if (CastleLevelMatteSprite != NULL) {
         pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
         offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)ride->layer, 2);
         AdjustOffsetForViewMode(&offset);
-        PrintSprite(DAT_004c10e4, pos.x + offset.x, pos.y + offset.y, clip, 0);
+        PrintSprite(CastleLevelMatteSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
     }
 }
 
@@ -164,7 +164,7 @@ void FUN_00402dc0(Element *obj) {
 // FUNCTION: LEGOLAND 0x00402ff0
 void FUN_00402ff0(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_004c10dc;
+    EditMode.unk8 = CastleLevelRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->field_3c);
 }
@@ -181,11 +181,11 @@ void FUN_00403060(unsigned int param1, unsigned int param2) {
 }
 
 // FUNCTION: LEGOLAND 0x00403080
-void FUN_00403080(struct ClassNode *name, struct CallbackTable *ci) {
+void CastleLevel1_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b408c
     if (_stricmp("CASTLE LEVEL 1", name->name) == 0) {
         ci->cb_a4 = FUN_00402ca0;
-        ci->cb_ac = FUN_00402ce0;
+        ci->cb_ac = KillCastleLevelMatteSprite;
         ci->cb_8c = FUN_00402ff0;
         ci->cb_98 = FUN_00403060;
         ci->cb_9c = FUN_00403030;

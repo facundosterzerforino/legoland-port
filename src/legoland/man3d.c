@@ -98,22 +98,22 @@ LEGO_EXPORT void UnloadPos(struct Position *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f810
-void FUN_0043f810(struct Person *person) {
+void AddPersonToList(struct Person *person) {
     person->prev = 0;
     person->next = 0;
-    if (DAT_00655a3c != 0) {
-        person->next = DAT_00655a3c;
-        ((struct Person *)DAT_00655a3c)->prev = person;
+    if (PersonListHead != 0) {
+        person->next = PersonListHead;
+        ((struct Person *)PersonListHead)->prev = person;
     }
-    DAT_00655a3c = person;
+    PersonListHead = person;
 }
 
 // FUNCTION: LEGOLAND 0x0043f840
-void FUN_0043f840(struct Person *person) {
+void RemovePersonFromList(struct Person *person) {
     if (person->prev != 0) {
         person->prev->next = person->next;
     } else {
-        DAT_00655a3c = person->next;
+        PersonListHead = person->next;
     }
     if (person->next != 0) {
         person->next->prev = person->prev;
@@ -121,7 +121,7 @@ void FUN_0043f840(struct Person *person) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f870
-void FUN_0043f870(struct Person *person) {
+void FreePerson(struct Person *person) {
     if (person->field_50 != 0) {
         free(person->field_50);
     }
@@ -132,7 +132,7 @@ void FUN_0043f870(struct Person *person) {
 LEGO_EXPORT struct Person *Find3DPersonFromBloke(struct Bloke *bloke) {
     struct Person *person;
 
-    person = DAT_00655a3c;
+    person = PersonListHead;
     if (person == 0) {
         return 0;
     }
@@ -181,7 +181,7 @@ struct Person *FUN_0043f8c0(struct Bloke *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f970
-void FUN_0043f970(void *buffer) {
+void RelocateLocData(void *buffer) {
     struct Person *p = buffer;
 
     p->field_2c = p->field_2c + (unsigned int)p;
@@ -189,7 +189,7 @@ void FUN_0043f970(void *buffer) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f990
-void *FUN_0043f990(const char *param_1, const char *param_2) {
+void *LoadLocFile(const char *param_1, const char *param_2) {
     char path[256];
     struct ResFile *file;
     unsigned int size;
@@ -204,7 +204,7 @@ void *FUN_0043f990(const char *param_1, const char *param_2) {
         if (buffer != 0) {
             RES_ReadFile(file, buffer, size);
             RES_CloseFile(file);
-            FUN_0043f970(buffer);
+            RelocateLocData(buffer);
             return buffer;
         }
     }
@@ -334,7 +334,7 @@ void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x0043fde0
-void FUN_0043fde0(struct Mesh *mesh) {
+void FreeMesh(struct Mesh *mesh) {
     int count;
     int i;
 
@@ -386,7 +386,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
             __asm {fldcw word ptr[DAT_004b7abc]} FUN_00440a30(person);
             __asm { fldcw word ptr [DAT_00638358] }
             if (DAT_007feb14 != 0) {
-                if (DAT_00668954 != 0 && person->bloke == FUN_004700f0()) {
+                if (DAT_00668954 != 0 && person->bloke == GetWorkerOnMouse()) {
                     return;
                 }
                 switch (person->field_8) {
@@ -562,7 +562,7 @@ LEGO_EXPORT void Control3DPeople(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004402d0
-void *FUN_004402d0(const char *param_1, const char *param_2) {
+void *Load3DDataFile(const char *param_1, const char *param_2) {
     char path[256];
     struct ResFile *file;
     unsigned int size;
@@ -587,105 +587,105 @@ LEGO_EXPORT void InitMan(void) {
     // STRING: LEGOLAND 0x004b7bb0
     const char *proj = "NewProject.txt";
 
-    FUN_00485fc0((DAT_00668088 == 2) + 5);
+    FUN_00485fc0((DisplayPixelFormat == 2) + 5);
     ctx = FUN_00443710();
     // STRING: LEGOLAND 0x004b7cdc
-    DAT_0081c8c0 = FUN_0043f990("NewProject.loc", "visitor");
-    ((unsigned int *)DAT_0081c8c0)[1] = ctx;
+    VisitorLocData = LoadLocFile("NewProject.loc", "visitor");
+    ((unsigned int *)VisitorLocData)[1] = ctx;
     // STRING: LEGOLAND 0x004b7cec
-    FUN_00443720(DAT_0081c8c0, "visitor");
+    LoadTextureBitmaps(VisitorLocData, "visitor");
     // STRING: LEGOLAND 0x004b7cc4
-    DAT_0062fed4[1] = FUN_0043fa80("WomanWalk.WomanWalk.3d", "visitor", ctx);
+    WomanMeshes[1] = FUN_0043fa80("WomanWalk.WomanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7cac
-    DAT_0062fed4[0] = FUN_0043fa80("WomanSit.WomanSit.3d", "visitor", ctx);
+    WomanMeshes[0] = FUN_0043fa80("WomanSit.WomanSit.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c94
-    DAT_0062fed4[2] = FUN_0043fa80("WomanWave.WomanWave.3d", "visitor", ctx);
+    WomanMeshes[2] = FUN_0043fa80("WomanWave.WomanWave.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c78
-    DAT_0062fed4[3] = FUN_0043fa80("WomanStand.WomanStand.3d", "visitor", ctx);
+    WomanMeshes[3] = FUN_0043fa80("WomanStand.WomanStand.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c5c
-    DAT_0062fed4[5] = FUN_0043fa80("WomanPanWalk.WomPanWalk.3d", "visitor", ctx);
+    WomanMeshes[5] = FUN_0043fa80("WomanPanWalk.WomPanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c44
-    DAT_0062fed4[4] = FUN_0043fa80("WomanPan.WomanPan.3d", "visitor", ctx);
+    WomanMeshes[4] = FUN_0043fa80("WomanPan.WomanPan.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c30
-    DAT_0062febc[1] = FUN_0043fa80("ManWalk.ManWalk.3d", "visitor", ctx);
+    ManMeshes[1] = FUN_0043fa80("ManWalk.ManWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c1c
-    DAT_0062febc[0] = FUN_0043fa80("ManSit.ManSit.3d", "visitor", ctx);
+    ManMeshes[0] = FUN_0043fa80("ManSit.ManSit.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c08
-    DAT_0062febc[2] = FUN_0043fa80("ManWave.ManWave.3d", "visitor", ctx);
+    ManMeshes[2] = FUN_0043fa80("ManWave.ManWave.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bf0
-    DAT_0062febc[3] = FUN_0043fa80("ManStand.ManStand.3d", "visitor", ctx);
+    ManMeshes[3] = FUN_0043fa80("ManStand.ManStand.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bd4
-    DAT_0062febc[5] = FUN_0043fa80("ManPanWalk.ManPanWalk.3d", "visitor", ctx);
+    ManMeshes[5] = FUN_0043fa80("ManPanWalk.ManPanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bc0
-    DAT_0062febc[4] = FUN_0043fa80("ManPan.ManPan.3d", "visitor", ctx);
+    ManMeshes[4] = FUN_0043fa80("ManPan.ManPan.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7ba4
     FUN_00442980("altman.txt", proj, "visitor", 0, ctx);
     // STRING: LEGOLAND 0x004b7b94
     FUN_00442980("altwoman.txt", proj, "visitor", 1, ctx);
-    DAT_00630100 = FUN_004402d0("visitor", "altman.txt");
-    DAT_0062feac = FUN_004402d0("visitor", "altwoman.txt");
+    AltManFileData = Load3DDataFile("visitor", "altman.txt");
+    AltWomanFileData = Load3DDataFile("visitor", "altwoman.txt");
     ctx = FUN_00443710();
     // STRING: LEGOLAND 0x004b7b80
-    DAT_0081c8c8 = FUN_0043f990("geoff.loc", "geoff");
-    ((unsigned int *)DAT_0081c8c8)[1] = ctx;
+    GeoffLocData = LoadLocFile("geoff.loc", "geoff");
+    ((unsigned int *)GeoffLocData)[1] = ctx;
     // STRING: LEGOLAND 0x004b7b8c
-    FUN_00443720(DAT_0081c8c8, "geoff");
+    LoadTextureBitmaps(GeoffLocData, "geoff");
     // STRING: LEGOLAND 0x004b7b68
-    DAT_0062feb0[0] = FUN_0043fa80("geofWalk.GeofWalk.3d", "geoff", ctx);
+    GeoffMeshes[0] = FUN_0043fa80("geofWalk.GeofWalk.3d", "geoff", ctx);
     // STRING: LEGOLAND 0x004b7b50
-    DAT_0062feb0[1] = FUN_0043fa80("GeofPour.GeofPour.3d", "geoff", ctx);
+    GeoffMeshes[1] = FUN_0043fa80("GeofPour.GeofPour.3d", "geoff", ctx);
     ctx = FUN_00443710();
     // STRING: LEGOLAND 0x004b7b3c
-    DAT_0081c8c4 = FUN_0043f990("tracy.loc", "tracy");
-    ((unsigned int *)DAT_0081c8c4)[1] = ctx;
+    TracyLocData = LoadLocFile("tracy.loc", "tracy");
+    ((unsigned int *)TracyLocData)[1] = ctx;
     // STRING: LEGOLAND 0x004b7b48
-    FUN_00443720(DAT_0081c8c4, "tracy");
+    LoadTextureBitmaps(TracyLocData, "tracy");
     // STRING: LEGOLAND 0x004b7b24
-    DAT_0062fef4 = FUN_0043fa80("TracyWalk.TraceWalk.3d", "tracy", ctx);
+    TracyWalkMesh = FUN_0043fa80("TracyWalk.TraceWalk.3d", "tracy", ctx);
 }
 
 // FUNCTION: LEGOLAND 0x004405a0
 LEGO_EXPORT void UnInitMan(void) {
     void **p;
 
-    if (DAT_0081c8c0 != 0) {
-        free(DAT_0081c8c0);
+    if (VisitorLocData != 0) {
+        free(VisitorLocData);
     }
-    if (DAT_0081c8c8 != 0) {
-        free(DAT_0081c8c8);
+    if (GeoffLocData != 0) {
+        free(GeoffLocData);
     }
-    if (DAT_0081c8c4 != 0) {
-        free(DAT_0081c8c4);
+    if (TracyLocData != 0) {
+        free(TracyLocData);
     }
-    if (DAT_00630100 != 0) {
-        free(DAT_00630100);
+    if (AltManFileData != 0) {
+        free(AltManFileData);
     }
-    if (DAT_0062feac != 0) {
-        free(DAT_0062feac);
+    if (AltWomanFileData != 0) {
+        free(AltWomanFileData);
     }
-    p = DAT_0062febc;
+    p = ManMeshes;
     do {
         if (*p != 0) {
-            FUN_0043fde0(*p);
+            FreeMesh(*p);
         }
         p++;
-    } while ((int)p < (int)DAT_0062fed4);
-    p = DAT_0062fed4;
+    } while ((int)p < (int)WomanMeshes);
+    p = WomanMeshes;
     do {
         if (*p != 0) {
-            FUN_0043fde0(*p);
+            FreeMesh(*p);
         }
         p++;
     } while ((int)p < (int)DAT_0062feec);
-    p = DAT_0062feb0;
+    p = GeoffMeshes;
     do {
         if (*p != 0) {
-            FUN_0043fde0(*p);
+            FreeMesh(*p);
         }
         p++;
     } while ((int)p < (int)DAT_0062feb8);
-    if (DAT_0062fef4 != 0) {
-        FUN_0043fde0(DAT_0062fef4);
+    if (TracyWalkMesh != 0) {
+        FreeMesh(TracyWalkMesh);
     }
     FUN_00442c70();
     FUN_00486250();
@@ -700,7 +700,7 @@ LEGO_EXPORT void Add3DBlokeToList(struct Bloke *bloke, unsigned int param_2) {
     person = FUN_0043f8c0(bloke, param_2);
     bloke->person = person;
     if (person != 0) {
-        FUN_0043f810(person);
+        AddPersonToList(person);
         FUN_004401b0(person, bloke);
         BlokeWalkAnim(bloke);
     }
@@ -721,16 +721,16 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
         switch (kind) {
         case 1:
             if (person->random == 0) {
-                base = DAT_0062febc;
+                base = ManMeshes;
             } else {
-                base = DAT_0062fed4;
+                base = WomanMeshes;
             }
             break;
         case 2:
-            base = DAT_0062feb0;
+            base = GeoffMeshes;
             break;
         case 3:
-            base = &DAT_0062fef4;
+            base = &TracyWalkMesh;
             break;
         }
         mesh = (struct Mesh *)base[anim];
@@ -739,13 +739,13 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
         }
         switch (person->field_8) {
         case 1:
-            context = DAT_0081c8c0;
+            context = VisitorLocData;
             break;
         case 2:
-            context = DAT_0081c8c8;
+            context = GeoffLocData;
             break;
         case 3:
-            context = DAT_0081c8c4;
+            context = TracyLocData;
             break;
         }
         {
@@ -773,16 +773,16 @@ LEGO_EXPORT struct Anim3D *GetBlokeAnim3D(struct Bloke *bloke) {
         switch (person->field_8) {
         case 1:
             if (person->random == 0) {
-                base = DAT_0062febc;
+                base = ManMeshes;
             } else {
-                base = DAT_0062fed4;
+                base = WomanMeshes;
             }
             break;
         case 2:
-            base = DAT_0062feb0;
+            base = GeoffMeshes;
             break;
         case 3:
-            base = &DAT_0062fef4;
+            base = &TracyWalkMesh;
             break;
         }
         result = (struct Anim3D *)base[person->field_88];
@@ -800,16 +800,16 @@ LEGO_EXPORT struct Anim3D *GetBlokeAnim3DFromPerson(struct Person *person) {
         switch (person->field_8) {
         case 1:
             if (person->random == 0) {
-                base = DAT_0062febc;
+                base = ManMeshes;
             } else {
-                base = DAT_0062fed4;
+                base = WomanMeshes;
             }
             break;
         case 2:
-            base = DAT_0062feb0;
+            base = GeoffMeshes;
             break;
         case 3:
-            base = &DAT_0062fef4;
+            base = &TracyWalkMesh;
             break;
         }
         result = (struct Anim3D *)base[person->field_88];

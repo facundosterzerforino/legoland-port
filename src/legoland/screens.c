@@ -60,7 +60,7 @@ struct ScreenConfig {
 #include "worker_mouse.h"
 
 // FUNCTION: LEGOLAND 0x004585c0
-void FUN_004585c0(void) {
+void CloseFrontEndScreen(void) {
     if (SPRITE_TitleScreenBk != NULL) {
         KillSprite(SPRITE_TitleScreenBk);
         SPRITE_TitleScreenBk = NULL;
@@ -95,9 +95,9 @@ LEGO_EXPORT void InitScreens(unsigned char param_1) {
     int id = (char)param_1;
 
     if (DAT_0080ff80.unk4 != (unsigned int)id) {
-        FUN_00498920();
+        SpeechCloseFile();
         DAT_006687b0 = 4;
-        FUN_004585c0();
+        CloseFrontEndScreen();
         DAT_0080ff80.unk0 = 0;
         switch (id) {
         case 0:
@@ -108,8 +108,8 @@ LEGO_EXPORT void InitScreens(unsigned char param_1) {
             InitTitleScreen();
             break;
         case 5:
-            DAT_00667c78 = 1;
-            FUN_00492830();
+            SamplesPaused = 1;
+            PauseAllSamples();
             InitOptionScreen();
             break;
         case 4:
@@ -123,8 +123,8 @@ LEGO_EXPORT void InitScreens(unsigned char param_1) {
             InitProgressScreen();
             break;
         case 7:
-            DAT_00667c78 = 1;
-            FUN_00492830();
+            SamplesPaused = 1;
+            PauseAllSamples();
             FUN_00490c70();
             break;
         case 8:
@@ -191,7 +191,7 @@ void RenderFrontEndScreen(unsigned char param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00458830
-void FUN_00458830(char *param_1) {
+void GetProductVersion(char *param_1) {
     DWORD size;
     DWORD handle;
     char *value;
@@ -208,15 +208,15 @@ void FUN_00458830(char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004588c0
-void FUN_004588c0(void) {
+void PrintTitleScreen1(void) {
     struct ScreenConfig *config;
     struct Sprite *sprite;
 
     config = (struct ScreenConfig *)lpConfig;
-    DAT_007fe020.left = 0;
-    DAT_007fe020.top = 0;
-    DAT_007fe020.right = config->width;
-    DAT_007fe020.bottom = config->height;
+    ScreenRect.left = 0;
+    ScreenRect.top = 0;
+    ScreenRect.right = config->width;
+    ScreenRect.bottom = config->height;
 
     // STRING: LEGOLAND 0x004b913c
     sprite = LoadSprite("TitleScreen1.lls", 0);
@@ -247,7 +247,7 @@ void FUN_00458940(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004589a0
-void FUN_004589a0(void) {
+void InitMouse(void) {
     unsigned int work[3];
 
     CONTROLLERBUFFER->field_0 = 0;
@@ -269,18 +269,18 @@ void FUN_004589a0(void) {
 void FUN_00458a50(void) {
     char buf[0x34];
 
-    if (DAT_00667c7c == 0) {
+    if (MapLoaded == 0) {
         QueryClass = 0;
-        DAT_0079a8d0 = 0;
-        FUN_00499380();
+        CastlePlacedFlag = 0;
+        PauseGameTimer();
         FUN_00499410();
         FUN_0047f810();
         // STRING: LEGOLAND 0x004b9150
         sprintf(buf, "objlist%d.txt", lpConfig->field_28);
-        FUN_00457870(0);
+        SetBricksLimited(0);
         ResetMapAI();
         DAT_00667c4c = FUN_0047afb0(buf);
-        FUN_00457870(1);
+        SetBricksLimited(1);
         AllocBlokeCounters(lpConfig->field_1a);
         FUN_00458940();
         FUN_00489ee0();
@@ -288,39 +288,39 @@ void FUN_00458a50(void) {
         UpdateMenu();
         FUN_00490600(1);
         FUN_004911c0(DAT_0066861c, 0);
-        DAT_00667c7c = 1;
-        FUN_004993c0();
+        MapLoaded = 1;
+        ResumeGameTimer();
         FUN_0048a800();
     }
 }
 
 // FUNCTION: LEGOLAND 0x00458b20
 void FUN_00458b20(void) {
-    if (DAT_00667c7c != 0) {
+    if (MapLoaded != 0) {
         FUN_00481170();
         FUN_0046fb40(0xd2);
         DelObjectList();
         FreeBlokeCounters();
-        FUN_0048a040();
+        FreeAllObjectClassInstances();
         DAT_00667cd8 = 1;
         FUN_0046cb20();
         DAT_00667cd8 = 0;
-        FUN_00457870(0);
+        SetBricksLimited(0);
         FUN_00489ee0();
-        FUN_00483090();
-        FUN_004714e0();
+        DestroyAllBlokes();
+        RemoveAllNewObjects();
         ResetInfoStruct();
         ClearBuildObjList();
         FUN_0049cfc0();
         FUN_00474ed0();
-        FUN_00457870(1);
+        SetBricksLimited(1);
         GamePad = (GamePad & 0xffff00ff) | (((GamePad >> 8) & 0xeb) << 8);
-        DAT_00667c7c = 0;
+        MapLoaded = 0;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00458bb0
-void FUN_00458bb0(unsigned int param_1) { DAT_00667c7c = param_1; }
+void SetMapLoaded(unsigned int param_1) { MapLoaded = param_1; }
 
 // FUNCTION: LEGOLAND 0x00458bc0
 void FUN_00458bc0(void) {
@@ -334,7 +334,7 @@ void FUN_00458be0(void) {
     int slot = ((struct ScreenConfig *)lpConfig)->slot;
 
     if (slot < 0xf) {
-        DAT_0080ffa0.flags[4 + slot] = 1;
+        CurrentProfile.flags[4 + slot] = 1;
     }
     FUN_0048a750();
     UpDateCurrentProfile();
@@ -344,10 +344,10 @@ void FUN_00458be0(void) {
 int FUN_00458c00(void) {
     char path[256];
 
-    FUN_00498b40();
+    SpeechStreamUpdate();
     if (DAT_008119bc != 0) {
-        FUN_00499380();
-        FUN_00492830();
+        PauseGameTimer();
+        PauseAllSamples();
         DAT_006687bc = 0;
         GamePad = GamePad & 0xffffffdf;
         DAT_006687c0 = 0;
@@ -356,7 +356,7 @@ int FUN_00458c00(void) {
         DisableSidePanelIcons();
         DAT_008119bc = 0;
     } else if (DAT_0080ff70 != 0) {
-        FUN_00492850();
+        ResumeAllSamples();
         DAT_006687bc = 0;
         GamePad = GamePad | 0x20;
         DAT_006687c0 = 0;
@@ -364,23 +364,23 @@ int FUN_00458c00(void) {
         FUN_00474880();
         EnableSidePanelIcons();
         DAT_0080ff70 = 0;
-        FUN_004993c0();
+        ResumeGameTimer();
     } else if (DAT_00667c64 != 0) {
-        FUN_00499380();
+        PauseGameTimer();
         FUN_00499410();
         FUN_0047f810();
         DAT_006687bc = 0;
         DAT_006687c0 = 0;
-        DAT_0079a8d0 = 0;
-        DAT_00667c78 = 1;
-        FUN_00492830();
+        CastlePlacedFlag = 0;
+        SamplesPaused = 1;
+        PauseAllSamples();
         if (DAT_00667c80 != 0) {
             DeletePlayableSamples(0);
-            sprintf(path, "%s\\%dsave%d.sav", "profiles", DAT_0080ffa0.field_43, *(unsigned int *)&DAT_0080ffa0.field_44 & 0xff);
-            FUN_00466360(0, 0);
+            sprintf(path, "%s\\%dsave%d.sav", "profiles", CurrentProfile.field_43, *(unsigned int *)&CurrentProfile.field_44 & 0xff);
+            LoadWatchSprite(0, 0);
             LoadGame(path);
             DAT_00667c80 = 0;
-            FUN_004663c0();
+            UnloadWatchSprite();
             InitGameInterface(0);
             FUN_00474880();
         } else {
@@ -392,7 +392,7 @@ int FUN_00458c00(void) {
         MapStats.field_3a0 = 0;
         EditMode.unk4 = 3;
         FUN_00474880();
-        FUN_004993c0();
+        ResumeGameTimer();
     }
 
     switch (EditMode.unk4) {
@@ -401,9 +401,9 @@ int FUN_00458c00(void) {
         InitScreens(DAT_0080ff80.unk8 & 0xff);
         break;
     case 3:
-        if (DAT_00667c78 != 0) {
-            FUN_00492850();
-            DAT_00667c78 = 0;
+        if (SamplesPaused != 0) {
+            ResumeAllSamples();
+            SamplesPaused = 0;
         }
         FUN_00458ee0();
         break;
@@ -421,11 +421,11 @@ int FUN_00458c00(void) {
         DAT_00667c40 = "SFX";
         FUN_004969d0();
         ReadGameButtons();
-        DAT_008119a4 = DAT_008119a4 + 1;
+        FrameCounter = FrameCounter + 1;
         if (MapStats.field_3a0 != 0 && EditMode.unk4 == 3) {
             if (MapStats.field_3ac != 0) {
                 SetPointer(0);
-                FUN_004771f0(DAT_008100c0, 1, 1);
+                PlayMovie(DAT_008100c0, 1, 1);
                 MapStats.field_3ac = 0;
                 SetPointer(5);
             }
@@ -493,7 +493,7 @@ void FUN_00458ee0(void) {
     }
     saved_value = Hover.ptr;
     saved_action = Hover.data.value;
-    PrintSprite(DAT_00668e68, Hover.type, saved_value, saved_action, frame.outgoing);
+    PrintSprite(InterfaceBgSprite, Hover.type, saved_value, saved_action, frame.outgoing);
     FUN_0046f100(0x2c3);
     FUN_0046ee00();
     // STRING: LEGOLAND 0x004b91b0
@@ -606,8 +606,8 @@ void FUN_00458ee0(void) {
     }
     PopRenderingStatus();
     if (MapStats.field_194 != 0) {
-        if (FUN_00474070() != 0 && FUN_00474080() != 0) {
-            FUN_004632b0();
+        if (IsLeftShiftDown() != 0 && IsRightShiftDown() != 0) {
+            PrintCapacityStats();
         }
     }
     RenderingComplete();
@@ -629,7 +629,7 @@ void FUN_00459360(void) {
     PushRenderingStatusAndLockVideoSurface();
     DrawMapScreen();
     SetPointer(5);
-    PrintSprite(DAT_00668e68, 0, 0, 0, &hit_info.field_0);
+    PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit_info.field_0);
     FUN_0046ee00();
     RenderIcons();
     CheckFocussedIcon();
@@ -672,7 +672,7 @@ void FUN_00459360(void) {
 void FUN_004594e0(void) {
     switch (EditMode.unk4) {
     case 2:
-        FUN_004585c0();
+        CloseFrontEndScreen();
         break;
     default:
         break;
@@ -684,12 +684,12 @@ void FUN_004594f0(void) {
     int i;
 
     for (i = 0; i < 68; i = i + 1) {
-        ((unsigned int *)&DAT_0080ffa0)[i] = 0;
+        ((unsigned int *)&CurrentProfile)[i] = 0;
     }
 
-    DAT_0080ffa0.field_24 = 0x4b;
-    DAT_0080ffa0.field_28 = 0x64;
-    DAT_0080ffa0.field_2c = 0x4b;
+    CurrentProfile.field_24 = 0x4b;
+    CurrentProfile.field_28 = 0x64;
+    CurrentProfile.field_2c = 0x4b;
 }
 
 // FUNCTION: LEGOLAND 0x00459520
@@ -702,73 +702,73 @@ void FUN_00459520(void) {
     FUN_004594f0();
     InitSoundSystem();
     SetMusicGrooveLevel(1);
-    FUN_00492c60();
+    SuspendMusicThread();
     SetupControllers();
     LLIDB_ClearOnLevel();
-    FUN_004589a0();
+    InitMouse();
     SetPointer(0);
     ProcessSystemEvents();
     // STRING: LEGOLAND 0x004b9200
-    FUN_004771f0("lmi.avi", 0, 1);
-    FUN_004588c0();
-    FUN_00492c80();
-    FUN_00466360(0, 0);
+    PlayMovie("lmi.avi", 0, 1);
+    PrintTitleScreen1();
+    ResumeMusicThread();
+    LoadWatchSprite(0, 0);
 
     while (DAT_007988bc == 0) {
         PeekMessageA(&msg, NULL, 0, 0, 0);
         Sleep(100);
-        FUN_004663f0();
+        DrawWatchSprite();
     }
 
-    FUN_0046f890();
+    LoadGBarSprites();
     LoadWorkerInterfaceGFX();
     LoadBubbleHelpGFX();
     InitialiseBlokes();
     InitGameMap();
     SetPointer(0);
     // STRING: LEGOLAND 0x004b91f4
-    FUN_004771f0("Intro.avi", 1, 0);
+    PlayMovie("Intro.avi", 1, 0);
     FUN_00492ca0(0);
     SetPointer(5);
-    DAT_008119a4 = 0;
+    FrameCounter = 0;
     Load_Interface_ControlIcons();
-    FUN_004663f0();
+    DrawWatchSprite();
     Load_Interface_ThemeIcons();
     FreeTileSpace(0, 0x800);
     EditMode.unk4 = 3;
     LoadMapTiles();
-    FUN_004663f0();
+    DrawWatchSprite();
     InitMan();
-    FUN_004663f0();
+    DrawWatchSprite();
     CreateObjectClasses();
-    FUN_004663f0();
+    DrawWatchSprite();
     FUN_00458bc0();
-    FUN_004663f0();
+    DrawWatchSprite();
     // STRING: LEGOLAND 0x004b91e8
     ir50 = LoadLibraryA("Ir50_32.dll");
-    FUN_004663f0();
-    FUN_00444090();
-    FUN_004663f0();
-    FUN_004663c0();
-    FUN_00492c80();
+    DrawWatchSprite();
+    LoadAdvisorAnims();
+    DrawWatchSprite();
+    UnloadWatchSprite();
+    ResumeMusicThread();
     while (FUN_00458c00() != 0) {
     }
     FUN_004594e0();
-    FUN_00498920();
+    SpeechCloseFile();
     if (SPRITE_TitleScreenBk != NULL) {
         KillSprite(SPRITE_TitleScreenBk);
         SPRITE_TitleScreenBk = NULL;
     }
-    FUN_00451f40();
-    FUN_0046f920();
-    FUN_00454a10();
-    FUN_00482ec0();
+    FreeControllers();
+    UnloadGBarSprites();
+    UnloadBubbleHelpGFX();
+    FreeBlokePool();
     KillGameMap();
     UnLoad_Interface_ControlIcons();
     UnLoad_Interface_ThemeIcons();
-    FUN_0045ac20();
+    UnloadMapTiles();
     UnInitMan();
-    FUN_00444150();
+    FreeAdvisorAnims();
     FreeLibrary(ir50);
     FreeBlokeCounters();
     KillHelp();

@@ -163,7 +163,7 @@ static const struct ObjClassAlias ObjClassAliasTable[] = {
 };
 
 // FUNCTION: LEGOLAND 0x004809d0
-void FUN_004809d0(struct ElemView *cls) {
+void LoadObjectClassAliasElements(struct ElemView *cls) {
     const char *const *slot;
     char *token;
     char *semicolon;
@@ -227,7 +227,7 @@ LEGO_EXPORT unsigned int LoadObjectClass(struct ElemView *cls) {
     if (result != 0) {
         cls->flags |= 0x4;
     }
-    FUN_004809d0(cls);
+    LoadObjectClassAliasElements(cls);
     return result;
 }
 
@@ -820,12 +820,12 @@ LEGO_EXPORT void SetEditObject(struct EditObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00481720
-void *FUN_00481720(void) {
+void *GetBestNodeList(void) {
     return DAT_0066b44c;
 }
 
 // FUNCTION: LEGOLAND 0x00481730
-struct BestNode *FUN_00481730(void) {
+struct BestNode *AddBestNode(void) {
     struct BestNode *node;
 
     node = (struct BestNode *)malloc(0x24);
@@ -837,7 +837,7 @@ struct BestNode *FUN_00481730(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00481750
-void FUN_00481750(struct BestNode *node) {
+void RemoveBestNode(struct BestNode *node) {
     struct BestNode *current;
 
     if (DAT_0066b44c == node) {
@@ -855,7 +855,7 @@ void FUN_00481750(struct BestNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00481790
-struct BestNode *FUN_00481790(struct Point *pos) {
+struct BestNode *FindBestNodeAtPoint(struct Point *pos) {
     struct BestNode *node;
 
     node = DAT_0066b44c;
@@ -904,7 +904,7 @@ void FUN_00481810(int *param_1) {
     if ((int)pos.x <= param_1[2]) {
         out = DAT_0066a45c;
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.x = found->x_max;
@@ -922,7 +922,7 @@ void FUN_00481810(int *param_1) {
     if ((int)pos.x <= param_1[2]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.x = found->x_max;
@@ -940,7 +940,7 @@ void FUN_00481810(int *param_1) {
     if ((int)pos.y <= param_1[3]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.y = found->y_max;
@@ -958,7 +958,7 @@ void FUN_00481810(int *param_1) {
     if ((int)pos.y <= param_1[3]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.y = found->y_max;
@@ -986,7 +986,7 @@ void FUN_004819a0(int *param_1) {
     if ((int)pos.x <= param_1[2]) {
         out = DAT_0066a45c;
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.x = found->x_max;
@@ -1002,7 +1002,7 @@ void FUN_004819a0(int *param_1) {
     if ((int)pos.x <= param_1[2]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.x = found->x_max;
@@ -1018,7 +1018,7 @@ void FUN_004819a0(int *param_1) {
     if ((int)pos.y <= param_1[3]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.y = found->y_max;
@@ -1034,7 +1034,7 @@ void FUN_004819a0(int *param_1) {
     if ((int)pos.y <= param_1[3]) {
         out = &DAT_0066a45c[count];
         do {
-            found = FUN_00481790(&pos);
+            found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.y = found->y_max;
@@ -1087,7 +1087,7 @@ void FUN_00481b10(struct BestNode *node) {
         }
         ((struct BestNode *)DAT_0066a45c[i])->x_min = node->x_min;
     merged:
-        FUN_00481750(node);
+        RemoveBestNode(node);
         node = DAT_0066a45c[i];
     }
 }

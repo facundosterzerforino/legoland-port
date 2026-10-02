@@ -76,129 +76,129 @@ LEGO_EXPORT void InitPopUpInfo(void) {
         puVar3 = puVar3 + 1;
     }
     // STRING: LEGOLAND 0x004b89ac
-    if (LLIDB_FindElement("POTTING SHED", &DAT_007fdfb0, 0) != 0) {
+    if (LLIDB_FindElement("POTTING SHED", &PottingShedHandle, 0) != 0) {
         exit(1);
     }
     // STRING: LEGOLAND 0x004b899c
-    if (LLIDB_FindElement("MECHANICS HUT", &DAT_007fdfb4, 0) != 0) {
+    if (LLIDB_FindElement("MECHANICS HUT", &MechanicsHutHandle, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("PATH CONTROL", &DAT_007fdfb8, 0) != 0) {
+    if (LLIDB_FindElement("PATH CONTROL", &PathControlHandle, 0) != 0) {
         exit(1);
     }
     // STRING: LEGOLAND 0x004b83d0
-    if (LLIDB_FindElement("ENTRANCE 1", &DAT_007fdfbc, 0) != 0) {
+    if (LLIDB_FindElement("ENTRANCE 1", &Entrance1Handle, 0) != 0) {
         exit(1);
     }
-    if (DAT_00668958 == NULL) {
-        DAT_00668958 = (struct Sprite *)1;
+    if (PopUpSpritesLoaded == NULL) {
+        PopUpSpritesLoaded = (struct Sprite *)1;
         // STRING: LEGOLAND 0x004baca4
-        DAT_006688e0 = LoadSprite("PU_BGMain.lls", 4);
+        PuBgMainSprite = LoadSprite("PU_BGMain.lls", 4);
         // STRING: LEGOLAND 0x004bac90
-        DAT_006688e4 = LoadSprite("PU_BGCentreTop.lls", 4);
+        PuBgCentreTopSprite = LoadSprite("PU_BGCentreTop.lls", 4);
         // STRING: LEGOLAND 0x004bac7c
-        DAT_006688e8 = LoadSprite("PU_BGRightTop.lls", 4);
+        PuBgRightTopSprite = LoadSprite("PU_BGRightTop.lls", 4);
         // STRING: LEGOLAND 0x004bac68
-        DAT_006688ec = LoadSprite("PU_BGLeftMid.lls", 4);
+        PuBgLeftMidSprite = LoadSprite("PU_BGLeftMid.lls", 4);
         // STRING: LEGOLAND 0x004bac54
-        DAT_006688f0 = LoadSprite("PU_BGCentreMid.lls", 4);
+        PuBgCentreMidSprite = LoadSprite("PU_BGCentreMid.lls", 4);
         // STRING: LEGOLAND 0x004bac40
-        DAT_006688f4 = LoadSprite("PU_BGRightMid.lls", 4);
+        PuBgRightMidSprite = LoadSprite("PU_BGRightMid.lls", 4);
         // STRING: LEGOLAND 0x004bac2c
-        DAT_006688f8 = LoadSprite("PU_BGLeftBtm.lls", 4);
+        PuBgLeftBtmSprite = LoadSprite("PU_BGLeftBtm.lls", 4);
         // STRING: LEGOLAND 0x004bac18
-        DAT_006688fc = LoadSprite("Pu_BGCentreBtm.lls", 4);
+        PuBgCentreBtmSprite = LoadSprite("Pu_BGCentreBtm.lls", 4);
         // STRING: LEGOLAND 0x004bac04
-        DAT_00668900 = LoadSprite("PU_BGRightBtm.lls", 4);
+        PuBgRightBtmSprite = LoadSprite("PU_BGRightBtm.lls", 4);
         // STRING: LEGOLAND 0x004babf4
-        DAT_00668910 = LoadSprite("NewPopMock.lls", 4);
+        NewPopMockSprite = LoadSprite("NewPopMock.lls", 4);
         // STRING: LEGOLAND 0x004babe0
-        DAT_007fe004 = LoadSprite("ObjectRepairOK.lls", 4);
+        ObjectRepairOkSprite = LoadSprite("ObjectRepairOK.lls", 4);
         // STRING: LEGOLAND 0x004babcc
-        DAT_007fdeb0 = LoadSprite("ObjectNoRepair1.lls", 4);
+        ObjectNoRepair1Sprite = LoadSprite("ObjectNoRepair1.lls", 4);
         // STRING: LEGOLAND 0x004babb4
-        DAT_00668914 = LoadSprite("PU_DeleteObjectON.lls", 4);
+        PuDeleteObjectOnSprite = LoadSprite("PU_DeleteObjectON.lls", 4);
         // STRING: LEGOLAND 0x004baba0
-        DAT_00668918 = LoadSprite("PU_DeleteObject.lls", 4);
+        PuDeleteObjectSprite = LoadSprite("PU_DeleteObject.lls", 4);
         // STRING: LEGOLAND 0x004bab8c
-        DAT_0066891c = LoadSprite("PU_ClosePopUpON.lls", 4);
+        PuClosePopUpOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
         // STRING: LEGOLAND 0x004bab78
-        DAT_00668920 = LoadSprite("PU_ClosePopUp.lls", 4);
+        PuClosePopUpSprite = LoadSprite("PU_ClosePopUp.lls", 4);
         // STRING: LEGOLAND 0x004bab60
-        DAT_00668944 = LoadSprite("PU_AddGardenerON.lls", 4);
+        PuAddGardenerOnSprite = LoadSprite("PU_AddGardenerON.lls", 4);
         // STRING: LEGOLAND 0x004bab4c
-        DAT_00668948 = LoadSprite("PU_AddGardener.lls", 4);
+        PuAddGardenerSprite = LoadSprite("PU_AddGardener.lls", 4);
         // STRING: LEGOLAND 0x004bab34
-        DAT_0066894c = LoadSprite("PU_AddMechanicsON.lls", 4);
+        PuAddMechanicsOnSprite = LoadSprite("PU_AddMechanicsON.lls", 4);
         // STRING: LEGOLAND 0x004bab20
-        DAT_00668950 = LoadSprite("PU_AddMechanics.lls", 4);
+        PuAddMechanicsSprite = LoadSprite("PU_AddMechanics.lls", 4);
         // STRING: LEGOLAND 0x004bab10
-        DAT_00668928 = LoadSprite("NextIcon.lls", 4);
+        NextIconSprite = LoadSprite("NextIcon.lls", 4);
         // STRING: LEGOLAND 0x004bab00
-        DAT_00668924 = LoadSprite("NextIconOn.lls", 4);
+        NextIconOnSprite = LoadSprite("NextIconOn.lls", 4);
         // STRING: LEGOLAND 0x004baaf0
-        DAT_00668930 = LoadSprite("PrevIcon.lls", 4);
+        PrevIconSprite = LoadSprite("PrevIcon.lls", 4);
         // STRING: LEGOLAND 0x004baae0
-        DAT_0066892c = LoadSprite("PrevIconOn.lls", 4);
+        PrevIconOnSprite = LoadSprite("PrevIconOn.lls", 4);
         // STRING: LEGOLAND 0x004baad4
-        DAT_007fdfc8 = LoadSprite("i_sad.lls", 0);
+        ISadSprite = LoadSprite("i_sad.lls", 0);
         // STRING: LEGOLAND 0x004baac8
-        DAT_007fdfe4 = LoadSprite("i_norm.lls", 0);
+        INormSprite = LoadSprite("i_norm.lls", 0);
         // STRING: LEGOLAND 0x004baabc
-        DAT_007fe018 = LoadSprite("i_happy.lls", 0);
+        IHappySprite = LoadSprite("i_happy.lls", 0);
         // STRING: LEGOLAND 0x004baaac
-        DAT_007fdfd0 = LoadSprite("i_hungry.lls", 0);
+        IHungrySprite = LoadSprite("i_hungry.lls", 0);
         // STRING: LEGOLAND 0x004baa9c
-        DAT_007fe008 = LoadSprite("i_peckish.lls", 0);
+        IPeckishSprite = LoadSprite("i_peckish.lls", 0);
         // STRING: LEGOLAND 0x004baa90
-        DAT_007fdeac = LoadSprite("i_full.lls", 0);
+        IFullSprite = LoadSprite("i_full.lls", 0);
     }
-    DAT_007fdfe0 = InsertIcon(0, 0, 0x2c3, DAT_00668948);
-    DAT_007fdfe0->string_id = 0x6e;
-    DAT_007fdfe0->string = GetString(0x6e);
-    DAT_007fdfe0->flags |= 0x2000;
-    DAT_007fdfe0->flags |= 0x4002;
-    DAT_007fdfe0->flags |= 0x400;
-    DAT_007fdfe0->event_handler = (void *)FUN_004733f0;
-    DAT_007fdea4 = InsertIcon(0, 0, 0x2c3, DAT_00668950);
-    DAT_007fdea4->string_id = 0x6f;
-    DAT_007fdea4->string = GetString(0x6f);
-    DAT_007fdea4->flags |= 0x2000;
-    DAT_007fdea4->flags |= 0x4002;
-    DAT_007fdea4->flags |= 0x400;
-    DAT_007fdea4->event_handler = (void *)FUN_00473460;
-    DAT_007fdfdc = InsertIcon(0, 0, 0x2c3, DAT_00668918);
-    DAT_007fdfdc->string_id = 0x70;
-    DAT_007fdfdc->string = GetString(0x70);
-    DAT_007fdfdc->flags |= 0x2000;
-    DAT_007fdfdc->flags |= 0x4002;
-    DAT_007fdfdc->flags |= 0x400;
-    DAT_007fdfdc->event_handler = (void *)FUN_004731a0;
-    DAT_007fdfc0 = InsertIcon(0, 0, 0x2c3, DAT_00668920);
-    DAT_007fdfc0->string_id = 0x73;
-    DAT_007fdfc0->string = GetString(0x73);
-    DAT_007fdfc0->flags |= 0x2000;
-    DAT_007fdfc0->flags |= 0x4002;
-    DAT_007fdfc0->flags |= 0x400;
-    DAT_007fdfc0->event_handler = (void *)FUN_004730f0;
-    DAT_007fdfc4 = InsertIcon(0, 0, 0x2c3, DAT_00668928);
-    DAT_007fdfc4->string_id = 0x88e;
-    DAT_007fdfc4->string = GetString(0x88e);
-    DAT_007fdfc4->flags |= 0x2000;
-    DAT_007fdfc4->flags |= 0x4002;
-    DAT_007fdfc4->flags |= 0x400;
-    DAT_007fdfc4->event_handler = (void *)FUN_00473360;
-    DAT_007fdfe8 = InsertIcon(0, 0, 0x2c3, DAT_00668930);
-    DAT_007fdfe8->string_id = 0x88f;
-    DAT_007fdfe8->string = GetString(0x88f);
-    DAT_007fdfe8->flags |= 0x2000;
-    DAT_007fdfe8->flags |= 0x4002;
-    DAT_007fdfe8->flags |= 0x400;
-    DAT_007fdfe8->event_handler = (void *)FUN_004733b0;
+    AddGardenerIcon = InsertIcon(0, 0, 0x2c3, PuAddGardenerSprite);
+    AddGardenerIcon->string_id = 0x6e;
+    AddGardenerIcon->string = GetString(0x6e);
+    AddGardenerIcon->flags |= 0x2000;
+    AddGardenerIcon->flags |= 0x4002;
+    AddGardenerIcon->flags |= 0x400;
+    AddGardenerIcon->event_handler = (void *)FUN_004733f0;
+    AddMechanicsIcon = InsertIcon(0, 0, 0x2c3, PuAddMechanicsSprite);
+    AddMechanicsIcon->string_id = 0x6f;
+    AddMechanicsIcon->string = GetString(0x6f);
+    AddMechanicsIcon->flags |= 0x2000;
+    AddMechanicsIcon->flags |= 0x4002;
+    AddMechanicsIcon->flags |= 0x400;
+    AddMechanicsIcon->event_handler = (void *)FUN_00473460;
+    DeleteObjectIcon = InsertIcon(0, 0, 0x2c3, PuDeleteObjectSprite);
+    DeleteObjectIcon->string_id = 0x70;
+    DeleteObjectIcon->string = GetString(0x70);
+    DeleteObjectIcon->flags |= 0x2000;
+    DeleteObjectIcon->flags |= 0x4002;
+    DeleteObjectIcon->flags |= 0x400;
+    DeleteObjectIcon->event_handler = (void *)FUN_004731a0;
+    ClosePopUpIcon = InsertIcon(0, 0, 0x2c3, PuClosePopUpSprite);
+    ClosePopUpIcon->string_id = 0x73;
+    ClosePopUpIcon->string = GetString(0x73);
+    ClosePopUpIcon->flags |= 0x2000;
+    ClosePopUpIcon->flags |= 0x4002;
+    ClosePopUpIcon->flags |= 0x400;
+    ClosePopUpIcon->event_handler = (void *)FUN_004730f0;
+    NextPopUpIcon = InsertIcon(0, 0, 0x2c3, NextIconSprite);
+    NextPopUpIcon->string_id = 0x88e;
+    NextPopUpIcon->string = GetString(0x88e);
+    NextPopUpIcon->flags |= 0x2000;
+    NextPopUpIcon->flags |= 0x4002;
+    NextPopUpIcon->flags |= 0x400;
+    NextPopUpIcon->event_handler = (void *)FUN_00473360;
+    PrevPopUpIcon = InsertIcon(0, 0, 0x2c3, PrevIconSprite);
+    PrevPopUpIcon->string_id = 0x88f;
+    PrevPopUpIcon->string = GetString(0x88f);
+    PrevPopUpIcon->flags |= 0x2000;
+    PrevPopUpIcon->flags |= 0x4002;
+    PrevPopUpIcon->flags |= 0x400;
+    PrevPopUpIcon->event_handler = (void *)FUN_004733b0;
     // STRING: LEGOLAND 0x004baa7c
-    DAT_007fdfd8 = LoadSpriteIcon("PU_CornerMask.lls", 4, 0, 0, 0x2c3);
-    DAT_007fdfd8->flags |= 0x400;
-    DAT_007fdfcc = InsertIcon(0, 0, 0x2c3, DAT_00668918);
+    PuCornerMaskIcon = LoadSpriteIcon("PU_CornerMask.lls", 4, 0, 0, 0x2c3);
+    PuCornerMaskIcon->flags |= 0x400;
+    DAT_007fdfcc = InsertIcon(0, 0, 0x2c3, PuDeleteObjectSprite);
     DAT_007fdfcc->string_id = 0xa1;
     DAT_007fdfcc->string = GetString(0xa1);
     DAT_007fdfcc->flags |= 0x2000;
@@ -209,157 +209,157 @@ LEGO_EXPORT void InitPopUpInfo(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00471170
-int FUN_00471170(void) {
-    if (DAT_00668958 != NULL) {
-        DAT_00668958 = NULL;
+int UnloadPopUpSprites(void) {
+    if (PopUpSpritesLoaded != NULL) {
+        PopUpSpritesLoaded = NULL;
 
-        if (DAT_006688e0 != NULL) {
-            KillSprite(DAT_006688e0);
-            DAT_006688e0 = NULL;
+        if (PuBgMainSprite != NULL) {
+            KillSprite(PuBgMainSprite);
+            PuBgMainSprite = NULL;
         }
-        if (DAT_006688e4 != NULL) {
-            KillSprite(DAT_006688e4);
-            DAT_006688e4 = NULL;
+        if (PuBgCentreTopSprite != NULL) {
+            KillSprite(PuBgCentreTopSprite);
+            PuBgCentreTopSprite = NULL;
         }
-        if (DAT_006688e8 != NULL) {
-            KillSprite(DAT_006688e8);
-            DAT_006688e8 = NULL;
+        if (PuBgRightTopSprite != NULL) {
+            KillSprite(PuBgRightTopSprite);
+            PuBgRightTopSprite = NULL;
         }
-        if (DAT_006688f0 != NULL) {
-            KillSprite(DAT_006688f0);
-            DAT_006688f0 = NULL;
+        if (PuBgCentreMidSprite != NULL) {
+            KillSprite(PuBgCentreMidSprite);
+            PuBgCentreMidSprite = NULL;
         }
-        if (DAT_006688ec != NULL) {
-            KillSprite(DAT_006688ec);
-            DAT_006688ec = NULL;
+        if (PuBgLeftMidSprite != NULL) {
+            KillSprite(PuBgLeftMidSprite);
+            PuBgLeftMidSprite = NULL;
         }
-        if (DAT_006688f4 != NULL) {
-            KillSprite(DAT_006688f4);
-            DAT_006688f4 = NULL;
+        if (PuBgRightMidSprite != NULL) {
+            KillSprite(PuBgRightMidSprite);
+            PuBgRightMidSprite = NULL;
         }
-        if (DAT_006688f8 != NULL) {
-            KillSprite(DAT_006688f8);
-            DAT_006688f8 = NULL;
+        if (PuBgLeftBtmSprite != NULL) {
+            KillSprite(PuBgLeftBtmSprite);
+            PuBgLeftBtmSprite = NULL;
         }
-        if (DAT_006688fc != NULL) {
-            KillSprite(DAT_006688fc);
-            DAT_006688fc = NULL;
+        if (PuBgCentreBtmSprite != NULL) {
+            KillSprite(PuBgCentreBtmSprite);
+            PuBgCentreBtmSprite = NULL;
         }
-        if (DAT_00668900 != NULL) {
-            KillSprite(DAT_00668900);
-            DAT_00668900 = NULL;
+        if (PuBgRightBtmSprite != NULL) {
+            KillSprite(PuBgRightBtmSprite);
+            PuBgRightBtmSprite = NULL;
         }
-        if (DAT_007fe004 != NULL) {
-            KillSprite(DAT_007fe004);
-            DAT_007fe004 = NULL;
+        if (ObjectRepairOkSprite != NULL) {
+            KillSprite(ObjectRepairOkSprite);
+            ObjectRepairOkSprite = NULL;
         }
-        if (DAT_007fdeb0 != NULL) {
-            KillSprite(DAT_007fdeb0);
-            DAT_007fdeb0 = NULL;
+        if (ObjectNoRepair1Sprite != NULL) {
+            KillSprite(ObjectNoRepair1Sprite);
+            ObjectNoRepair1Sprite = NULL;
         }
-        if (DAT_00668914 != NULL) {
-            KillSprite(DAT_00668914);
-            DAT_00668914 = NULL;
+        if (PuDeleteObjectOnSprite != NULL) {
+            KillSprite(PuDeleteObjectOnSprite);
+            PuDeleteObjectOnSprite = NULL;
         }
-        if (DAT_00668918 != NULL) {
-            KillSprite(DAT_00668918);
-            DAT_00668918 = NULL;
+        if (PuDeleteObjectSprite != NULL) {
+            KillSprite(PuDeleteObjectSprite);
+            PuDeleteObjectSprite = NULL;
         }
-        if (DAT_0066891c != NULL) {
-            KillSprite(DAT_0066891c);
-            DAT_0066891c = NULL;
+        if (PuClosePopUpOnSprite != NULL) {
+            KillSprite(PuClosePopUpOnSprite);
+            PuClosePopUpOnSprite = NULL;
         }
-        if (DAT_00668920 != NULL) {
-            KillSprite(DAT_00668920);
-            DAT_00668920 = NULL;
+        if (PuClosePopUpSprite != NULL) {
+            KillSprite(PuClosePopUpSprite);
+            PuClosePopUpSprite = NULL;
         }
-        if (DAT_00668928 != NULL) {
-            KillSprite(DAT_00668928);
-            DAT_00668928 = NULL;
+        if (NextIconSprite != NULL) {
+            KillSprite(NextIconSprite);
+            NextIconSprite = NULL;
         }
-        if (DAT_00668924 != NULL) {
-            KillSprite(DAT_00668924);
-            DAT_00668924 = NULL;
+        if (NextIconOnSprite != NULL) {
+            KillSprite(NextIconOnSprite);
+            NextIconOnSprite = NULL;
         }
-        if (DAT_00668930 != NULL) {
-            KillSprite(DAT_00668930);
-            DAT_00668930 = NULL;
+        if (PrevIconSprite != NULL) {
+            KillSprite(PrevIconSprite);
+            PrevIconSprite = NULL;
         }
-        if (DAT_0066892c != NULL) {
-            KillSprite(DAT_0066892c);
-            DAT_0066892c = NULL;
+        if (PrevIconOnSprite != NULL) {
+            KillSprite(PrevIconOnSprite);
+            PrevIconOnSprite = NULL;
         }
-        if (DAT_00668944 != NULL) {
-            KillSprite(DAT_00668944);
-            DAT_00668944 = NULL;
+        if (PuAddGardenerOnSprite != NULL) {
+            KillSprite(PuAddGardenerOnSprite);
+            PuAddGardenerOnSprite = NULL;
         }
-        if (DAT_00668948 != NULL) {
-            KillSprite(DAT_00668948);
-            DAT_00668948 = NULL;
+        if (PuAddGardenerSprite != NULL) {
+            KillSprite(PuAddGardenerSprite);
+            PuAddGardenerSprite = NULL;
         }
-        if (DAT_0066894c != NULL) {
-            KillSprite(DAT_0066894c);
-            DAT_0066894c = NULL;
+        if (PuAddMechanicsOnSprite != NULL) {
+            KillSprite(PuAddMechanicsOnSprite);
+            PuAddMechanicsOnSprite = NULL;
         }
-        if (DAT_00668950 != NULL) {
-            KillSprite(DAT_00668950);
-            DAT_00668950 = NULL;
+        if (PuAddMechanicsSprite != NULL) {
+            KillSprite(PuAddMechanicsSprite);
+            PuAddMechanicsSprite = NULL;
         }
-        if (DAT_007fdfc8 != NULL) {
-            KillSprite(DAT_007fdfc8);
-            DAT_007fdfc8 = NULL;
+        if (ISadSprite != NULL) {
+            KillSprite(ISadSprite);
+            ISadSprite = NULL;
         }
-        if (DAT_007fdfe4 != NULL) {
-            KillSprite(DAT_007fdfe4);
-            DAT_007fdfe4 = NULL;
+        if (INormSprite != NULL) {
+            KillSprite(INormSprite);
+            INormSprite = NULL;
         }
-        if (DAT_007fe018 != NULL) {
-            KillSprite(DAT_007fe018);
-            DAT_007fe018 = NULL;
+        if (IHappySprite != NULL) {
+            KillSprite(IHappySprite);
+            IHappySprite = NULL;
         }
-        if (DAT_007fdfd0 != NULL) {
-            KillSprite(DAT_007fdfd0);
-            DAT_007fdfd0 = NULL;
+        if (IHungrySprite != NULL) {
+            KillSprite(IHungrySprite);
+            IHungrySprite = NULL;
         }
-        if (DAT_007fe008 != NULL) {
-            KillSprite(DAT_007fe008);
-            DAT_007fe008 = NULL;
+        if (IPeckishSprite != NULL) {
+            KillSprite(IPeckishSprite);
+            IPeckishSprite = NULL;
         }
-        if (DAT_007fdeac != NULL) {
-            KillSprite(DAT_007fdeac);
-            DAT_007fdeac = NULL;
+        if (IFullSprite != NULL) {
+            KillSprite(IFullSprite);
+            IFullSprite = NULL;
         }
-        FUN_00470b00();
+        KillPUOKAndCBSprites();
     }
 }
 
 // FUNCTION: LEGOLAND 0x00471450
 LEGO_EXPORT int UnLoad_PopUpInfo(void) {
     RemoveIconGroup(0x2c3);
-    return FUN_00471170();
+    return UnloadPopUpSprites();
 }
 
 // FUNCTION: LEGOLAND 0x00471470
 void FUN_00471470(void) {
-    DAT_007fdfdc->event_handler = NULL;
-    DAT_007fdfe0->event_handler = NULL;
-    DAT_007fdea4->event_handler = NULL;
+    DeleteObjectIcon->event_handler = NULL;
+    AddGardenerIcon->event_handler = NULL;
+    AddMechanicsIcon->event_handler = NULL;
     DAT_007fdfcc->event_handler = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004714a0
 void FUN_004714a0(void) {
-    DAT_007fdfdc->event_handler = (void *)FUN_004731a0;
-    DAT_007fdfc0->event_handler = (void *)FUN_004730f0;
-    DAT_007fdfe0->event_handler = (void *)FUN_004733f0;
-    DAT_007fdea4->event_handler = (void *)FUN_00473460;
+    DeleteObjectIcon->event_handler = (void *)FUN_004731a0;
+    ClosePopUpIcon->event_handler = (void *)FUN_004730f0;
+    AddGardenerIcon->event_handler = (void *)FUN_004733f0;
+    AddMechanicsIcon->event_handler = (void *)FUN_00473460;
     DAT_007fdfcc->event_handler = (void *)FUN_004734d0;
 }
 
 // FUNCTION: LEGOLAND 0x004714e0
-void FUN_004714e0(void) {
-    while (DAT_007fded4.count != 0) {
-        FUN_00471ca0(DAT_007fded4.objs[0]);
+void RemoveAllNewObjects(void) {
+    while (NewObjects.count != 0) {
+        RemoveNewObject(NewObjects.objs[0]);
     }
 }
 
@@ -395,27 +395,27 @@ LEGO_EXPORT void StopFollowingBloke(void) {
 
 // FUNCTION: LEGOLAND 0x00471580
 LEGO_EXPORT void DisableInfoPopUPIcons(void) {
-    DAT_007fdfdc->flags |= 0x400;
-    DAT_007fdfc0->flags |= 0x400;
-    DAT_007fdfd8->flags |= 0x400;
+    DeleteObjectIcon->flags |= 0x400;
+    ClosePopUpIcon->flags |= 0x400;
+    PuCornerMaskIcon->flags |= 0x400;
     DAT_007fdea8->flags |= 0x400;
     DAT_007fe000->flags |= 0x400;
-    DAT_007fdfe0->flags |= 0x400;
-    DAT_007fdea4->flags |= 0x400;
+    AddGardenerIcon->flags |= 0x400;
+    AddMechanicsIcon->flags |= 0x400;
     DAT_007fdfcc->flags |= 0x400;
-    DAT_007fdfc4->flags |= 0x400;
-    DAT_007fdfe8->flags |= 0x400;
+    NextPopUpIcon->flags |= 0x400;
+    PrevPopUpIcon->flags |= 0x400;
 }
 
 // FUNCTION: LEGOLAND 0x00471610
 void FUN_00471610(void) {
-    FUN_0046d680((struct IconNode *)DAT_007fdfdc, DAT_00668918);
-    FUN_0046d680((struct IconNode *)DAT_007fdfe8, DAT_00668930);
-    FUN_0046d680((struct IconNode *)DAT_007fdfc4, DAT_00668928);
-    FUN_0046d680((struct IconNode *)DAT_007fdfc0, DAT_00668920);
-    FUN_0046d680((struct IconNode *)DAT_007fdfe0, DAT_00668948);
-    FUN_0046d680((struct IconNode *)DAT_007fdea4, DAT_00668950);
-    FUN_0046d680((struct IconNode *)DAT_007fdfcc, DAT_00668918);
+    SetIconSprite((struct IconNode *)DeleteObjectIcon, PuDeleteObjectSprite);
+    SetIconSprite((struct IconNode *)PrevPopUpIcon, PrevIconSprite);
+    SetIconSprite((struct IconNode *)NextPopUpIcon, NextIconSprite);
+    SetIconSprite((struct IconNode *)ClosePopUpIcon, PuClosePopUpSprite);
+    SetIconSprite((struct IconNode *)AddGardenerIcon, PuAddGardenerSprite);
+    SetIconSprite((struct IconNode *)AddMechanicsIcon, PuAddMechanicsSprite);
+    SetIconSprite((struct IconNode *)DAT_007fdfcc, PuDeleteObjectSprite);
 }
 
 // FUNCTION: LEGOLAND 0x004716a0
@@ -547,7 +547,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
         if (t.type == 0x307) {
             if (*(short *)((char *)t.ptr + 0xc) != 5) {
                 PlayInstanceOfSample(DAT_004b92e4, 0, 1, 0);
-                FUN_00470100(0x307, t.ptr);
+                PickUpWorker(0x307, t.ptr);
                 ResetInfoStruct();
                 return;
             }
@@ -557,21 +557,21 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
                 DAT_007fdfa8 = 1;
                 return;
             }
-            if (((unsigned int)t.ptr != DAT_007fdfb8) && ((unsigned int)t.ptr != DAT_007fdfbc)) {
+            if (((unsigned int)t.ptr != PathControlHandle) && ((unsigned int)t.ptr != Entrance1Handle)) {
                 DAT_007fdf7c = *(unsigned int *)((char *)t.ptr + 0xc);
                 DAT_007fdf84 = iVar4;
-                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == DAT_007fdfb0) {
+                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == PottingShedHandle) {
                     DAT_007fdfa0 = 0;
                     DAT_007fdf9c = 10;
                     param_4 = iVar4[4];
                     param_5 = iVar4[5];
-                    if (FUN_0049a120() == 0) {
+                    if (BuyGardener() == 0) {
                         return;
                     }
                     GenerateGardener(&param_4, 1);
                     return;
                 }
-                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) != DAT_007fdfb4) {
+                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) != MechanicsHutHandle) {
                     DAT_007fdf9c = 0x103;
                     return;
                 }
@@ -579,7 +579,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
                 DAT_007fdf9c = 0x14;
                 param_4 = iVar4[4];
                 param_5 = iVar4[5];
-                if (FUN_0049a160() == 0) {
+                if (BuyMechanic() == 0) {
                     return;
                 }
                 GenerateMechanic(&param_4, 1);
@@ -606,10 +606,10 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
                 iVar5 = (int)GameMap[iVar2] + iVar5 * 0x14;
             }
             *(unsigned short *)(iVar5 + 0xc) = *(unsigned short *)(iVar5 + 0xc) & 0xbfff;
-            FUN_00499eb0(iVar4);
+            FreeMechanicWorkOrder(iVar4);
         }
         PlayInstanceOfSample(DAT_004b9308, 0, 1, 0);
-        FUN_00470100(0x308, t.ptr);
+        PickUpWorker(0x308, t.ptr);
     }
     ResetInfoStruct();
 }
@@ -617,24 +617,24 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
 // FUNCTION: LEGOLAND 0x00471bf0
 void FUN_00471bf0(void) {
     if (DAT_007fdfa0 != 2) {
-        DAT_007fded4.current = 0;
-        DAT_007fded4.count = 0;
+        NewObjects.current = 0;
+        NewObjects.count = 0;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00471c10
-void FUN_00471c10(struct NewObjInfo *param_1) {
+void AddNewObjectIcon(struct NewObjInfo *param_1) {
     struct Sprite *sprite;
     char local_200[512];
 
-    if ((int)DAT_007fded4.count < 0x14) {
+    if ((int)NewObjects.count < 0x14) {
         // STRING: LEGOLAND 0x004bacd8
         sprintf(local_200, "NewObjIcons\\%s.bmp", *param_1->name);
         sprite = LoadSprite(local_200, 0);
-        DAT_007fded4.sprites[DAT_007fded4.count] = sprite;
-        if (DAT_007fded4.sprites[DAT_007fded4.count] != NULL) {
-            DAT_007fded4.objs[DAT_007fded4.count] = param_1;
-            DAT_007fded4.count = DAT_007fded4.count + 1;
+        NewObjects.sprites[NewObjects.count] = sprite;
+        if (NewObjects.sprites[NewObjects.count] != NULL) {
+            NewObjects.objs[NewObjects.count] = param_1;
+            NewObjects.count = NewObjects.count + 1;
             return;
         }
         // STRING: LEGOLAND 0x004bacb4
@@ -643,7 +643,7 @@ void FUN_00471c10(struct NewObjInfo *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00471ca0
-void FUN_00471ca0(void *param) {
+void RemoveNewObject(void *param) {
     struct Sprite **puVar2;
     int iVar3;
     int iVar4;
@@ -651,16 +651,16 @@ void FUN_00471ca0(void *param) {
     struct Sprite **puVar6;
     int iVar7;
 
-    if (0 < (int)DAT_007fded4.count) {
-        puVar6 = DAT_007fded4.sprites;
-        iVar5 = DAT_007fded4.count;
+    if (0 < (int)NewObjects.count) {
+        puVar6 = NewObjects.sprites;
+        iVar5 = NewObjects.count;
         iVar7 = 1;
         do {
             if (param == ((void **)puVar6)[-0x14]) {
                 if (*puVar6 != NULL) {
                     KillSprite(*puVar6);
                     *puVar6 = NULL;
-                    iVar5 = DAT_007fded4.count;
+                    iVar5 = NewObjects.count;
                 }
                 puVar2 = puVar6;
                 iVar3 = iVar7;
@@ -671,14 +671,14 @@ void FUN_00471ca0(void *param) {
                         *puVar2 = puVar2[1];
                         ((void **)puVar2)[-0x14] = ((void **)puVar2)[-0x13];
                         puVar2 = puVar2 + 1;
-                        iVar4 = DAT_007fded4.count;
-                    } while (iVar3 < DAT_007fded4.count);
+                        iVar4 = NewObjects.count;
+                    } while (iVar3 < NewObjects.count);
                 }
                 iVar5 = iVar4 + -1;
-                if (iVar5 <= DAT_007fded4.current) {
-                    DAT_007fded4.current = iVar4 + -2;
+                if (iVar5 <= NewObjects.current) {
+                    NewObjects.current = iVar4 + -2;
                 }
-                DAT_007fded4.count = iVar5;
+                NewObjects.count = iVar5;
                 if ((iVar5 == 0) && (DAT_007fdfa0 == 2)) {
                     DAT_007fdfa0 = 0;
                 }
@@ -691,7 +691,7 @@ void FUN_00471ca0(void *param) {
 
 // FUNCTION: LEGOLAND 0x00471d40
 void FUN_00471d40(void) {
-    if (DAT_007fded4.count != 0) {
+    if (NewObjects.count != 0) {
         ResetInfoStruct();
         DAT_007fdfa0 = 2;
     }
@@ -699,8 +699,8 @@ void FUN_00471d40(void) {
 
 // FUNCTION: LEGOLAND 0x00471d60
 void FUN_00471d60(void) {
-    FUN_0046d680((struct IconNode *)DAT_007fdea8, DAT_00668938);
-    FUN_0046d680((struct IconNode *)DAT_007fe000, DAT_0066893c);
+    SetIconSprite((struct IconNode *)DAT_007fdea8, PUOKSprite);
+    SetIconSprite((struct IconNode *)DAT_007fe000, CBCloseSprite);
 }
 
 // FUNCTION: LEGOLAND 0x00471d90
@@ -723,13 +723,13 @@ void FUN_00471d90(void) {
     ctx.field_8 = 0;
     ctx.flags = 1;
     iVar1 = DAT_007fded0 + 0x48 + iVar5;
-    PrintSprite(DAT_00668904, DAT_007fdecc, iVar1, 0, (int *)&ctx);
+    PrintSprite(CBBGLeftSprite, DAT_007fdecc, iVar1, 0, (int *)&ctx);
     iVar6 = iVar6 + 0x7a;
     for (; uVar4 > 0; uVar4 = uVar4 - 1) {
-        PrintSprite(DAT_00668908, iVar6, iVar1, 0, (int *)&ctx);
+        PrintSprite(CBBGCentreSprite, iVar6, iVar1, 0, (int *)&ctx);
         iVar6 = iVar6 + 0x20;
     }
-    PrintSprite(DAT_0066890c, iVar6, iVar1, 0, (int *)&ctx);
+    PrintSprite(CBBGRightSprite, iVar6, iVar1, 0, (int *)&ctx);
     DAT_007fdea8->flags = DAT_007fdea8->flags & 0xfffffbff;
     iVar6 = iVar6 + 0x4e;
     DAT_007fdea8->x = (short)iVar6 - 0x4b;
@@ -770,38 +770,38 @@ void FUN_00471f10(void) {
     ctx.flags = 1;
     ctx.field_8 = 0;
     uVar4 = *(unsigned int *)&DAT_007fdfac & 0xff;
-    PrintSprite(DAT_006688e0, DAT_007fdecc, DAT_007fded0, 0, (int *)&ctx);
+    PrintSprite(PuBgMainSprite, DAT_007fdecc, DAT_007fded0, 0, (int *)&ctx);
     iVar6 = iVar1 + 0xbc;
     iVar7 = iVar6;
     for (uVar3 = uVar4; uVar3 > 0; uVar3 = uVar3 - 1) {
-        PrintSprite(DAT_006688e4, iVar7, iVar2, 0, (int *)&ctx);
+        PrintSprite(PuBgCentreTopSprite, iVar7, iVar2, 0, (int *)&ctx);
         iVar7 = iVar7 + 0x20;
     }
-    PrintSprite(DAT_006688e8, iVar7, iVar2, 0, (int *)&ctx);
+    PrintSprite(PuBgRightTopSprite, iVar7, iVar2, 0, (int *)&ctx);
     if (uVar4 != 0) {
         iVar7 = iVar2 + 99;
         local_1c = uVar4;
         do {
-            PrintSprite(DAT_006688ec, iVar1, iVar7, 0, (int *)&ctx);
+            PrintSprite(PuBgLeftMidSprite, iVar1, iVar7, 0, (int *)&ctx);
             uVar3 = uVar4;
             iVar5 = iVar6;
             do {
-                PrintSprite(DAT_006688f0, iVar5, iVar7, 0, (int *)&ctx);
+                PrintSprite(PuBgCentreMidSprite, iVar5, iVar7, 0, (int *)&ctx);
                 iVar5 = iVar5 + 0x20;
                 uVar3 = uVar3 - 1;
             } while (uVar3 != 0);
-            PrintSprite(DAT_006688f4, iVar5, iVar7, 0, (int *)&ctx);
+            PrintSprite(PuBgRightMidSprite, iVar5, iVar7, 0, (int *)&ctx);
             iVar7 = iVar7 + 0x14;
             local_1c = local_1c - 1;
         } while (local_1c != 0);
     }
     iVar7 = iVar2 + 99 + uVar4 * 0x14;
-    PrintSprite(DAT_00668900, iVar1, iVar7, 0, (int *)&ctx);
+    PrintSprite(PuBgRightBtmSprite, iVar1, iVar7, 0, (int *)&ctx);
     for (; uVar4 > 0; uVar4 = uVar4 - 1) {
-        PrintSprite(DAT_006688fc, iVar6, iVar7, 0, (int *)&ctx);
+        PrintSprite(PuBgCentreBtmSprite, iVar6, iVar7, 0, (int *)&ctx);
         iVar6 = iVar6 + 0x20;
     }
-    PrintSprite(DAT_006688f8, iVar6, iVar7, 0, (int *)&ctx);
+    PrintSprite(PuBgLeftBtmSprite, iVar6, iVar7, 0, (int *)&ctx);
 }
 
 // FUNCTION: LEGOLAND 0x00472090
@@ -809,7 +809,7 @@ void FUN_00472090(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004720a0
-void FUN_004720a0(void) {
+void DrawNewObjectPopup(void) {
     short sVar2;
     short sVar3;
     short sVar4;
@@ -821,62 +821,62 @@ void FUN_004720a0(void) {
     ctx.node = 0;
     ctx.flags = 1;
     ctx.field_8 = 0;
-    PrintSprite(DAT_00668910, 0xbe, 0x28, 0, (int *)&ctx);
-    DAT_007fdfe8->flags = DAT_007fdfe8->flags & 0xfffffbff;
-    DAT_007fdfe8->x = 0xc1;
-    DAT_007fdfe8->y = 0x46;
-    sVar2 = DAT_007fdfc0->field_10;
-    sVar3 = DAT_00668910->width;
-    DAT_007fdfc4->flags = DAT_007fdfc4->flags & 0xfffffbff;
-    DAT_007fdfc4->x = (sVar3 - sVar2) + 0xbb;
-    DAT_007fdfc4->y = 0x46;
-    sVar2 = DAT_00668910->width;
-    sVar3 = DAT_00668910->height;
-    sVar4 = DAT_007fdfc0->field_12;
-    DAT_007fdfc0->flags = DAT_007fdfc0->flags & 0xfffffbff;
-    DAT_007fdfc0->x = (sVar2 - DAT_007fdfc0->field_10) + 0xbb;
-    DAT_007fdfc0->y = (sVar3 - sVar4) + 0x25;
+    PrintSprite(NewPopMockSprite, 0xbe, 0x28, 0, (int *)&ctx);
+    PrevPopUpIcon->flags = PrevPopUpIcon->flags & 0xfffffbff;
+    PrevPopUpIcon->x = 0xc1;
+    PrevPopUpIcon->y = 0x46;
+    sVar2 = ClosePopUpIcon->field_10;
+    sVar3 = NewPopMockSprite->width;
+    NextPopUpIcon->flags = NextPopUpIcon->flags & 0xfffffbff;
+    NextPopUpIcon->x = (sVar3 - sVar2) + 0xbb;
+    NextPopUpIcon->y = 0x46;
+    sVar2 = NewPopMockSprite->width;
+    sVar3 = NewPopMockSprite->height;
+    sVar4 = ClosePopUpIcon->field_12;
+    ClosePopUpIcon->flags = ClosePopUpIcon->flags & 0xfffffbff;
+    ClosePopUpIcon->x = (sVar2 - ClosePopUpIcon->field_10) + 0xbb;
+    ClosePopUpIcon->y = (sVar3 - sVar4) + 0x25;
     PushRenderingStatusAndUnlockVideoSurface();
-    if (DAT_007fded4.count == 1) {
+    if (NewObjects.count == 1) {
         // STRING: LEGOLAND 0x004bad04
         sprintf(local_80, "You have a new object");
     } else {
         // STRING: LEGOLAND 0x004bacec
-        sprintf(local_80, "You have %d new objects", DAT_007fded4.count);
+        sprintf(local_80, "You have %d new objects", NewObjects.count);
     }
-    FUN_00455e50(local_80, 0xc1, 0x30, DAT_00668910->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
-    obj = (struct NewObjInfo *)DAT_007fded4.objs[DAT_007fded4.current];
-    FUN_00455e50(obj->field_78, 0xc1, 0x4b, DAT_00668910->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
-    obj = (struct NewObjInfo *)DAT_007fded4.objs[DAT_007fded4.current];
+    FUN_00455e50(local_80, 0xc1, 0x30, NewPopMockSprite->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
+    obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
+    FUN_00455e50(obj->field_78, 0xc1, 0x4b, NewPopMockSprite->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
+    obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     FUN_00455e50(obj->field_80, 0x13e, 0x68, 0xfc, 0x77, 2, 0x10, 0xff0000, 0xffffff);
-    obj = (struct NewObjInfo *)DAT_007fded4.objs[DAT_007fded4.current];
+    obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     sprintf(local_80, "%d", obj->field_26);
     FUN_00455e50(local_80, 0xf0, 0xd1, 0x43, 0x12, 2, 1, 0xff0000, 0xffffff);
     PopRenderingStatus();
-    PrintSprite(DAT_007fded4.sprites[DAT_007fded4.current], 0xc4, 100, 0, 0);
-    if (((unsigned int)(int)DAT_007fdfc0->field_10 <= (unsigned int)(DAT_00813a44.x - DAT_007fdfc0->x)) ||
-        ((unsigned int)(int)DAT_007fdfc0->field_12 <= (unsigned int)(DAT_00813a44.y - DAT_007fdfc0->y))) {
-        FUN_0046d680((struct IconNode *)DAT_007fdfc0, DAT_00668920);
+    PrintSprite(NewObjects.sprites[NewObjects.current], 0xc4, 100, 0, 0);
+    if (((unsigned int)(int)ClosePopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - ClosePopUpIcon->x)) ||
+        ((unsigned int)(int)ClosePopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - ClosePopUpIcon->y))) {
+        SetIconSprite((struct IconNode *)ClosePopUpIcon, PuClosePopUpSprite);
     }
-    if (((unsigned int)(int)DAT_007fdfc4->field_10 <= (unsigned int)(DAT_00813a44.x - DAT_007fdfc4->x)) ||
-        ((unsigned int)(int)DAT_007fdfc4->field_12 <= (unsigned int)(DAT_00813a44.y - DAT_007fdfc4->y))) {
-        FUN_0046d680((struct IconNode *)DAT_007fdfc4, DAT_00668928);
+    if (((unsigned int)(int)NextPopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - NextPopUpIcon->x)) ||
+        ((unsigned int)(int)NextPopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - NextPopUpIcon->y))) {
+        SetIconSprite((struct IconNode *)NextPopUpIcon, NextIconSprite);
     }
-    if (((unsigned int)(int)DAT_007fdfe8->field_10 <= (unsigned int)(DAT_00813a44.x - DAT_007fdfe8->x)) ||
-        ((unsigned int)(int)DAT_007fdfe8->field_12 <= (unsigned int)(DAT_00813a44.y - DAT_007fdfe8->y))) {
-        FUN_0046d680((struct IconNode *)DAT_007fdfe8, DAT_00668930);
+    if (((unsigned int)(int)PrevPopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - PrevPopUpIcon->x)) ||
+        ((unsigned int)(int)PrevPopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - PrevPopUpIcon->y))) {
+        SetIconSprite((struct IconNode *)PrevPopUpIcon, PrevIconSprite);
     }
-    if (DAT_007fded4.current == 0) {
-        uVar5 = DAT_007fdfe8->flags | 0x400;
+    if (NewObjects.current == 0) {
+        uVar5 = PrevPopUpIcon->flags | 0x400;
     } else {
-        uVar5 = DAT_007fdfe8->flags & 0xfffffbff;
+        uVar5 = PrevPopUpIcon->flags & 0xfffffbff;
     }
-    DAT_007fdfe8->flags = uVar5;
-    if (DAT_007fded4.current == (int)(DAT_007fded4.count + -1)) {
-        DAT_007fdfc4->flags = DAT_007fdfc4->flags | 0x400;
+    PrevPopUpIcon->flags = uVar5;
+    if (NewObjects.current == (int)(NewObjects.count + -1)) {
+        NextPopUpIcon->flags = NextPopUpIcon->flags | 0x400;
         return;
     }
-    DAT_007fdfc4->flags = DAT_007fdfc4->flags & 0xfffffbff;
+    NextPopUpIcon->flags = NextPopUpIcon->flags & 0xfffffbff;
 }
 
 // FUNCTION: LEGOLAND 0x004723f0
@@ -952,7 +952,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     GetNearestColour(0xda, 0xc6, 0x96);
     DAT_0066895c = 0;
     if (DAT_007fdfa0 == 2) {
-        FUN_004720a0();
+        DrawNewObjectPopup();
         return;
     }
     if (EditMode.unk0 != 0) {
@@ -1003,7 +1003,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     case 0x14:
         sprintf(buf_a, (char *)DAT_004b8bbc, ride->name);
         // STRING: LEGOLAND 0x004bad2c
-        sprintf(buf_b, "%s : %d", GetString(0x93), FUN_00499560());
+        sprintf(buf_b, "%s : %d", GetString(0x93), GetMechanicCount());
         // STRING: LEGOLAND 0x004bad1c
         sprintf(tmp, "\n%s %d\n%s %d", GetString(0x76), GetObjRepairCost(ride, DAT_007fdf84[0x11]), GetString(0x77), GetObjSalvageValue(ride, DAT_007fdf84[0x11]));
         strcat(buf_b, tmp);
@@ -1014,7 +1014,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         break;
     case 0xa:
         sprintf(buf_a, (char *)DAT_004b8bbc, ride->name);
-        sprintf(buf_b, "%s : %d", GetString(0x91), FUN_00499550());
+        sprintf(buf_b, "%s : %d", GetString(0x91), GetGardenerCount());
         sprintf(tmp, "\n%s %d\n%s %d", GetString(0x76), GetObjRepairCost(ride, DAT_007fdf84[0x11]), GetString(0x77), GetObjSalvageValue(ride, DAT_007fdf84[0x11]));
         strcat(buf_b, tmp);
         add_gardener = 1;
@@ -1098,7 +1098,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     }
     PopRenderingStatus();
     if (DAT_007fdf9c == 0x306) {
-        mood = FUN_00482d30(bloke);
+        mood = GetBlokeMood(bloke);
         hunger = FUN_0044eb10(bloke);
         left = x + 0xc;
         right = size * 32 + x + 0xb0;
@@ -1111,20 +1111,20 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         FUN_00455e50(GetString(0x8f), (right + left) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
         if (mood == 3) {
             mid -= 0x20;
-            PrintSprite(DAT_007fdfc8, width / 4 + left - 0x20, mid, 0, 0);
+            PrintSprite(ISadSprite, width / 4 + left - 0x20, mid, 0, 0);
         } else if (mood == 2) {
             mid -= 0x20;
-            PrintSprite(DAT_007fe018, width / 4 + left - 0x20, mid, 0, 0);
+            PrintSprite(IHappySprite, width / 4 + left - 0x20, mid, 0, 0);
         } else {
             mid -= 0x20;
-            PrintSprite(DAT_007fdfe4, width / 4 + left - 0x20, mid, 0, 0);
+            PrintSprite(INormSprite, width / 4 + left - 0x20, mid, 0, 0);
         }
         if (hunger == 0) {
-            PrintSprite(DAT_007fdeac, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IFullSprite, right - width / 4 - 0x20, mid, 0, 0);
         } else if (hunger == 1) {
-            PrintSprite(DAT_007fe008, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IPeckishSprite, right - width / 4 - 0x20, mid, 0, 0);
         } else {
-            PrintSprite(DAT_007fdfd0, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IHungrySprite, right - width / 4 - 0x20, mid, 0, 0);
         }
     }
     if (repairable != 0 || DAT_0066895c != 0) {
@@ -1132,8 +1132,8 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
             frac = (float)DAT_007fdf84[0x11] / ride->durability;
         } else {
             entry_index = 0;
-            for (entry = DAT_006664f8;; entry++, entry_index++) {
-                if ((int)&entry->coords >= (int)&DAT_006670fc) {
+            for (entry = BuildObjArray;; entry++, entry_index++) {
+                if ((int)&entry->coords >= (int)&ButtonRepeatDelay) {
                     return;
                 }
                 if (entry->coords.id == (unsigned short)DAT_007fdec0.data.value) {
@@ -1143,7 +1143,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
             if (entry_index >= 0x100) {
                 return;
             }
-            frac = (float)DAT_006664f8[entry_index].elapsed / GetBuildTime((struct Ride *)DAT_007fdf7c);
+            frac = (float)BuildObjArray[entry_index].elapsed / GetBuildTime((struct Ride *)DAT_007fdf7c);
             if (frac == 1.0f) {
                 DAT_007fdec0.type = 0x103;
                 PopUpInfoSetUp(DAT_007fdec0, DAT_007fdecc, DAT_007fded0);
@@ -1158,10 +1158,10 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     }
     icon_x = size * 32 + x + 0xc8;
     icon_y = y + (size * 5 + 0x1e) * 4;
-    DAT_007fdfc0->flags = DAT_007fdfc0->flags & 0xfffffbff;
-    DAT_007fdfc0->x = icon_x - 0x27;
-    DAT_007fdfc0->y = icon_y;
-    last_x = DAT_007fdfc0->x;
+    ClosePopUpIcon->flags = ClosePopUpIcon->flags & 0xfffffbff;
+    ClosePopUpIcon->x = icon_x - 0x27;
+    ClosePopUpIcon->y = icon_y;
+    last_x = ClosePopUpIcon->x;
     if (show_close != 0) {
         DAT_007fdfcc->flags = DAT_007fdfcc->flags & 0xfffffbff;
         DAT_007fdfcc->x = icon_x - 0x4e;
@@ -1170,41 +1170,41 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     }
     if (can_delete != 0) {
         if (FUN_004723f0() != 0) {
-            DAT_007fdfdc->flags = DAT_007fdfdc->flags & 0xfffffbff;
-            DAT_007fdfdc->x = icon_x - 0x4e;
-            DAT_007fdfdc->y = icon_y;
-            last_x = DAT_007fdfdc->x;
+            DeleteObjectIcon->flags = DeleteObjectIcon->flags & 0xfffffbff;
+            DeleteObjectIcon->x = icon_x - 0x4e;
+            DeleteObjectIcon->y = icon_y;
+            last_x = DeleteObjectIcon->x;
         }
     }
     if (add_gardener != 0) {
-        DAT_007fdfe0->flags = DAT_007fdfe0->flags & 0xfffffbff;
-        DAT_007fdfe0->y = icon_y;
+        AddGardenerIcon->flags = AddGardenerIcon->flags & 0xfffffbff;
+        AddGardenerIcon->y = icon_y;
         if (can_delete != 0) {
-            DAT_007fdfe0->x = icon_x - 0x75;
+            AddGardenerIcon->x = icon_x - 0x75;
         } else {
-            DAT_007fdfe0->x = icon_x - 0x4e;
+            AddGardenerIcon->x = icon_x - 0x4e;
         }
-        last_x = DAT_007fdfe0->x;
+        last_x = AddGardenerIcon->x;
     }
     if (add_mechanic != 0) {
-        DAT_007fdea4->flags = DAT_007fdea4->flags & 0xfffffbff;
-        DAT_007fdea4->y = icon_y;
+        AddMechanicsIcon->flags = AddMechanicsIcon->flags & 0xfffffbff;
+        AddMechanicsIcon->y = icon_y;
         if (can_delete != 0) {
-            DAT_007fdea4->x = icon_x - 0x75;
+            AddMechanicsIcon->x = icon_x - 0x75;
         } else {
-            DAT_007fdea4->x = icon_x - 0x4e;
+            AddMechanicsIcon->x = icon_x - 0x4e;
         }
-        last_x = DAT_007fdea4->x;
+        last_x = AddMechanicsIcon->x;
     }
-    DAT_007fdfd8->x = last_x;
-    DAT_007fdfd8->y = icon_y;
-    DAT_007fdfd8->flags = DAT_007fdfd8->flags & 0xfffffbff;
+    PuCornerMaskIcon->x = last_x;
+    PuCornerMaskIcon->y = icon_y;
+    PuCornerMaskIcon->flags = PuCornerMaskIcon->flags & 0xfffffbff;
     if (DAT_007fdfa4 != 0) {
-        left_bound = DAT_007fdfc0->x;
+        left_bound = ClosePopUpIcon->x;
     } else {
-        left_bound = DAT_007fdfd8->x;
+        left_bound = PuCornerMaskIcon->x;
     }
-    if (DAT_007fdfc0->x + 0x24 < DAT_00813a44.x || DAT_00813a44.x < left_bound) {
+    if (ClosePopUpIcon->x + 0x24 < DAT_00813a44.x || DAT_00813a44.x < left_bound) {
         FUN_00471610();
     }
     if (icon_y + 0x1b < DAT_00813a44.y || DAT_00813a44.y < icon_y) {
@@ -1221,11 +1221,11 @@ unsigned char FUN_004730f0(void *param1, unsigned char param2, unsigned int para
     FUN_00471610();
 
     if (param1) {
-        FUN_0046d680(param1, DAT_0066891c);
+        SetIconSprite(param1, PuClosePopUpOnSprite);
     }
 
     if (param2 & 0x2) {
-        FUN_004714e0();
+        RemoveAllNewObjects();
         ResetInfoStruct();
     }
 
@@ -1262,7 +1262,7 @@ unsigned int FUN_00473160(void) {
 // FUNCTION: LEGOLAND 0x004731a0
 unsigned char FUN_004731a0(void *param_1, unsigned char param_2) {
     FUN_00471610();
-    FUN_0046d680(param_1, DAT_00668914);
+    SetIconSprite(param_1, PuDeleteObjectOnSprite);
     if ((param_2 & 2) != 0) {
         FUN_00471470();
         DAT_007fdfa4 = 1;
@@ -1280,7 +1280,7 @@ unsigned char FUN_004731e0(void *param_1, unsigned char flags) {
     unsigned int v;
 
     FUN_00471d60();
-    FUN_0046d680(param_1, DAT_00668934);
+    SetIconSprite(param_1, PUOKOnSprite);
     if ((flags & 2) != 0) {
         v = DAT_007fdec0.data.value & 0xffff;
         saved_class = QueryClass;
@@ -1310,7 +1310,7 @@ unsigned char FUN_004731e0(void *param_1, unsigned char flags) {
 // FUNCTION: LEGOLAND 0x00473310
 unsigned char FUN_00473310(void *param1, unsigned char param2) {
     FUN_00471d60();
-    FUN_0046d680(param1, DAT_00668940);
+    SetIconSprite(param1, CBCloseOnSprite);
 
     if (param2 & 0x2) {
         DAT_007fdea8->flags |= 0x400;
@@ -1326,11 +1326,11 @@ unsigned char FUN_00473310(void *param1, unsigned char param2) {
 unsigned char FUN_00473360(void *arg1, unsigned char flags, unsigned int arg3, unsigned int arg4) {
     FUN_00471d60();
     if (arg1) {
-        FUN_0046d680(arg1, DAT_00668924);
+        SetIconSprite(arg1, NextIconOnSprite);
     }
     if (flags & 2) {
-        if (DAT_007fded4.current < (int)(DAT_007fded4.count - 1)) {
-            DAT_007fded4.current++;
+        if (NewObjects.current < (int)(NewObjects.count - 1)) {
+            NewObjects.current++;
         } else {
             ResetInfoStruct();
         }
@@ -1341,11 +1341,11 @@ unsigned char FUN_00473360(void *arg1, unsigned char flags, unsigned int arg3, u
 // FUNCTION: LEGOLAND 0x004733b0
 unsigned char FUN_004733b0(void *arg0, unsigned char flags) {
     FUN_00471d60();
-    FUN_0046d680(arg0, DAT_0066892c);
+    SetIconSprite(arg0, PrevIconOnSprite);
 
     if (flags & 0x2) {
-        if (DAT_007fded4.current > 0) {
-            DAT_007fded4.current--;
+        if (NewObjects.current > 0) {
+            NewObjects.current--;
         }
     }
 
@@ -1357,12 +1357,12 @@ unsigned char FUN_004733f0(void *param_1, unsigned char param_2) {
     unsigned int local_8[2];
 
     FUN_00471610();
-    if (DAT_0079a8bc < 0xf) {
-        FUN_0046d680(param_1, DAT_00668944);
+    if (GardenerCount < 0xf) {
+        SetIconSprite(param_1, PuAddGardenerOnSprite);
         if ((param_2 & 2) != 0) {
             local_8[0] = DAT_007fdf84[4];
             local_8[1] = DAT_007fdf84[5];
-            if (FUN_0049a120() != 0) {
+            if (BuyGardener() != 0) {
                 GenerateGardener(local_8, 1);
             }
         }
@@ -1375,12 +1375,12 @@ unsigned char FUN_00473460(void *param_1, unsigned char param_2) {
     unsigned int local_8[2];
 
     FUN_00471610();
-    if (DAT_0079a8cc < 0xf) {
-        FUN_0046d680(param_1, DAT_0066894c);
+    if (MechanicCount < 0xf) {
+        SetIconSprite(param_1, PuAddMechanicsOnSprite);
         if ((param_2 & 2) != 0) {
             local_8[0] = DAT_007fdf84[4];
             local_8[1] = DAT_007fdf84[5];
-            if (FUN_0049a160() != 0) {
+            if (BuyMechanic() != 0) {
                 GenerateMechanic(local_8, 1);
             }
         }
@@ -1391,7 +1391,7 @@ unsigned char FUN_00473460(void *param_1, unsigned char param_2) {
 // FUNCTION: LEGOLAND 0x004734d0
 unsigned char FUN_004734d0(void *param_1, unsigned char param_2) {
     FUN_00471610();
-    FUN_0046d680(param_1, DAT_00668914);
+    SetIconSprite(param_1, PuDeleteObjectOnSprite);
     if ((param_2 & 2) != 0) {
         if (DAT_007fdf9c == 0x10b) {
             SetObjRectFlags(DAT_007fdf80->field_4, &DAT_007fdf80->field_8, 0);
@@ -1457,7 +1457,7 @@ void FUN_00473680(int param_1, int param_2, char *param_3, unsigned int param_4,
 
 // FUNCTION: LEGOLAND 0x004736e0
 void FUN_004736e0(void) {
-    FUN_00470b00();
+    KillPUOKAndCBSprites();
     DAT_00668d68 = 0;
 }
 
@@ -1475,17 +1475,17 @@ void FUN_004736f0(void) {
         ctx.node = 0;
         ctx.flags = 1;
         ctx.field_8 = 0;
-        PrintSprite(DAT_00668904, iVar3, iVar1, 0, (int *)&ctx);
+        PrintSprite(CBBGLeftSprite, iVar3, iVar1, 0, (int *)&ctx);
         iVar3 = iVar3 + 0x7a;
         iVar2 = 0;
         if (0 < DAT_00668964) {
             do {
-                PrintSprite(DAT_00668908, iVar3, iVar1, 0, (int *)&ctx);
+                PrintSprite(CBBGCentreSprite, iVar3, iVar1, 0, (int *)&ctx);
                 iVar3 = iVar3 + 0x20;
                 iVar2 = iVar2 + 1;
             } while (iVar2 < DAT_00668964);
         }
-        PrintSprite(DAT_0066890c, iVar3, iVar1, 0, (int *)&ctx);
+        PrintSprite(CBBGRightSprite, iVar3, iVar1, 0, (int *)&ctx);
         iVar3 = iVar3 + 0x4e;
         DAT_007fdea8->flags = DAT_007fdea8->flags & 0xfffffbff;
         DAT_007fdea8->x = (short)(iVar3 - 0x4b);

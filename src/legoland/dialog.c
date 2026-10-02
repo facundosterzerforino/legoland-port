@@ -88,7 +88,7 @@ int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (
         y = 0;
         for (i = 0; i < n; i++) {
             items[i].top = y;
-            tw = FUN_004551a0(names[i], 2, itemW);
+            tw = MeasureTextHeight(names[i], 2, itemW);
             if (tw < 8) {
                 tw = 8;
             } else if (tw < 0) {

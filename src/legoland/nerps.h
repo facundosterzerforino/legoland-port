@@ -104,5 +104,5 @@ void FUN_0046c510(unsigned char param_1);
 void FUN_0046c5c0(void);
 unsigned int FUN_0046cb20(void);
 void FUN_0046ce00(void);
-unsigned int FUN_0046c920(void);
-unsigned int FUN_0046cb60(void);
+unsigned int SaveScripts(void);
+unsigned int LoadScripts(void);

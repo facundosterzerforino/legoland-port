@@ -16,34 +16,34 @@
 LEGO_EXPORT int AddObjectToBuildList(struct ObjClass *obj, TileId coords) {
     int i;
 
-    if (DAT_006670f8 >= 256) {
+    if (BuildObjCount >= 256) {
         return 0;
     }
     for (i = 0; i < 256; i++) {
-        if (DAT_006664f8[i].ride == NULL) {
+        if (BuildObjArray[i].ride == NULL) {
             break;
         }
     }
     if (i >= 256) {
         return 0;
     }
-    DAT_006664f8[i].ride = (struct Ride *)obj;
-    DAT_006664f8[i].coords = coords;
-    DAT_006664f8[i].elapsed = 0;
-    DAT_006670f8++;
+    BuildObjArray[i].ride = (struct Ride *)obj;
+    BuildObjArray[i].coords = coords;
+    BuildObjArray[i].elapsed = 0;
+    BuildObjCount++;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00450c00
-void FUN_00450c00(TileId coords) {
+void RemoveObjectFromBuildList(TileId coords) {
     int i;
     BuildObj *b;
 
     i = 0;
-    for (b = DAT_006664f8; (int)&b->coords < (int)&DAT_006670fc; b++, i++) {
+    for (b = BuildObjArray; (int)&b->coords < (int)&ButtonRepeatDelay; b++, i++) {
         if (b->coords.id == coords.id) {
-            DAT_006670f8--;
-            DAT_006664f8[i].ride = NULL;
+            BuildObjCount--;
+            BuildObjArray[i].ride = NULL;
             return;
         }
     }
@@ -71,14 +71,14 @@ LEGO_EXPORT void ProcessBuildingTimes(void) {
     int i;
 
     for (i = 0; i < 256; i++) {
-        if (DAT_006664f8[i].ride != NULL) {
-            DAT_006664f8[i].elapsed++;
-            if (DAT_006664f8[i].elapsed >= GetBuildTime(DAT_006664f8[i].ride)) {
-                DAT_006670f8--;
-                ObjectIsBuilt((struct ObjClass *)DAT_006664f8[i].ride, DAT_006664f8[i].coords);
-                DAT_006664f8[i].ride = NULL;
+        if (BuildObjArray[i].ride != NULL) {
+            BuildObjArray[i].elapsed++;
+            if (BuildObjArray[i].elapsed >= GetBuildTime(BuildObjArray[i].ride)) {
+                BuildObjCount--;
+                ObjectIsBuilt((struct ObjClass *)BuildObjArray[i].ride, BuildObjArray[i].coords);
+                BuildObjArray[i].ride = NULL;
             } else {
-                ObjectIsBuilding((struct ObjClass *)DAT_006664f8[i].ride, DAT_006664f8[i].coords);
+                ObjectIsBuilding((struct ObjClass *)BuildObjArray[i].ride, BuildObjArray[i].coords);
             }
         }
     }
@@ -95,7 +95,7 @@ LEGO_EXPORT int GetBuildAnimFrame(Ride *ride, TileId coords) {
     LLS *lls;
 
     i = 0;
-    for (b = DAT_006664f8; (int)&b->coords < (int)&DAT_006670fc; b++, i++) {
+    for (b = BuildObjArray; (int)&b->coords < (int)&ButtonRepeatDelay; b++, i++) {
         if (b->coords.id == coords.id) {
             break;
         }
@@ -116,7 +116,7 @@ LEGO_EXPORT int GetBuildAnimFrame(Ride *ride, TileId coords) {
         }
         frames = lls->frame_count;
     }
-    frame = DAT_006664f8[i].elapsed * frames / GetBuildTime(ride);
+    frame = BuildObjArray[i].elapsed * frames / GetBuildTime(ride);
     if (frame >= frames) {
         frame = frames - 1;
     }
@@ -154,12 +154,12 @@ LEGO_EXPORT void DoBuildEffects(Ride *ride, TileId coords) {
         w = cx - x + 33;
         h = cy - y + 6;
         i = 0;
-        for (o = DAT_006664f8; (int)&o->coords < (int)&DAT_006670fc; o++, i++) {
+        for (o = BuildObjArray; (int)&o->coords < (int)&ButtonRepeatDelay; o++, i++) {
             if (o->coords.id == coords.id) {
                 if (i < 256) {
                     RenderBlock(x, y, w, h, 0);
                     RenderBox(x, y, w, h, GetNearestColour(255, 255, 255));
-                    RenderBlock(x + 1, y + 1, DAT_006664f8[i].elapsed * (w - 2) / GetBuildTime(ride), h - 2, GetNearestColour(0, 255, 0));
+                    RenderBlock(x + 1, y + 1, BuildObjArray[i].elapsed * (w - 2) / GetBuildTime(ride), h - 2, GetNearestColour(0, 255, 0));
                 }
                 return;
             }
@@ -172,6 +172,6 @@ LEGO_EXPORT void ClearBuildObjList(void) {
     int i;
 
     for (i = 0; i < 256; i++) {
-        DAT_006664f8[i].ride = NULL;
+        BuildObjArray[i].ride = NULL;
     }
 }

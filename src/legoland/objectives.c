@@ -143,7 +143,7 @@ void FUN_004688f0(int index, unsigned char param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00468910
-struct ObjectiveEvent *FUN_00468910(unsigned int type, int sort_key) {
+struct ObjectiveEvent *AllocObjectiveEvent(unsigned int type, int sort_key) {
     struct ObjectiveEvent *event;
 
     event = (struct ObjectiveEvent *)calloc(1, 0x44);
@@ -157,7 +157,7 @@ struct ObjectiveEvent *FUN_00468910(unsigned int type, int sort_key) {
 }
 
 // FUNCTION: LEGOLAND 0x00468940
-void FUN_00468940(struct ObjectiveEvent *event) {
+void FreeObjectiveEvent(struct ObjectiveEvent *event) {
     if (event->flags_10 & 0x20) {
         if (event->field_8 != 0) {
             free((void *)event->field_8);
@@ -167,12 +167,12 @@ void FUN_00468940(struct ObjectiveEvent *event) {
 }
 
 // FUNCTION: LEGOLAND 0x00468970
-void FUN_00468970(struct ObjectiveEvent *event) {
+void FreeObjectiveEventList(struct ObjectiveEvent *event) {
     if (event != NULL) {
         if (event->next != NULL) {
-            FUN_00468970(event->next);
+            FreeObjectiveEventList(event->next);
         }
-        FUN_00468940(event);
+        FreeObjectiveEvent(event);
     }
 }
 
@@ -273,7 +273,7 @@ struct ObjectiveEvent *FUN_00468bb0(const char *format, ...) {
     struct ObjectiveEvent *event;
     va_list args;
 
-    event = FUN_00468910(0, 1);
+    event = AllocObjectiveEvent(0, 1);
     if (event != NULL) {
         va_start(args, format);
         vsprintf(DAT_0066820c, format, args);
@@ -293,15 +293,15 @@ void FUN_00468c00(void) {
         at = strchr((char *)event->field_8, 0x40);
         if (at != NULL) {
             *at = 0;
-            FUN_00498920();
-            FUN_00498630(at + 1);
+            SpeechCloseFile();
+            SpeechLoadWavFile(at + 1);
             FUN_00498b00();
             FUN_0046d3a0();
         }
         if (DisplayAdvisorHelp((char *)event->field_8, event->type == 0, 0) != 0) {
             FUN_00444070(5, 0);
             DAT_00668724 = DAT_00668724->next;
-            FUN_00468940(event);
+            FreeObjectiveEvent(event);
         }
     }
 }
@@ -338,7 +338,7 @@ void FUN_00468c80(struct ObjectiveEvent *event) {
 struct ObjectiveEvent *FUN_00468cd0(unsigned int type, int sort_key) {
     struct ObjectiveEvent *event;
 
-    event = FUN_00468910(type, sort_key);
+    event = AllocObjectiveEvent(type, sort_key);
     if (event != NULL) {
         event->timestamp = GetGameTimer();
     }
@@ -752,7 +752,7 @@ void FUN_004693b0(unsigned int type) {
             } else {
                 DAT_00668728 = next;
             }
-            FUN_00468940(node);
+            FreeObjectiveEvent(node);
         } else {
             prev = node;
         }
@@ -971,7 +971,7 @@ void FUN_00469900(struct NerpsArg *object, unsigned int a, unsigned int b) {
                 obj->flags = (flags & 0xfffeffff) | 2;
                 FUN_0048a6e0((struct ClippedObject *)obj);
                 if (a != 0) {
-                    FUN_00471c10(obj->info);
+                    AddNewObjectIcon(obj->info);
                 }
             } else {
                 // STRING: LEGOLAND 0x004ba6e4
@@ -983,7 +983,7 @@ void FUN_00469900(struct NerpsArg *object, unsigned int a, unsigned int b) {
 }
 
 // FUNCTION: LEGOLAND 0x00469980
-void FUN_00469980(struct ThemeQueryArg *arg) {
+void CountObjectTheme(struct ThemeQueryArg *arg) {
     struct ThemeData *theme;
     unsigned int id;
 
@@ -991,28 +991,28 @@ void FUN_00469980(struct ThemeQueryArg *arg) {
     // STRING: LEGOLAND 0x004ba748
     if (LLIDB_FindElement("LEGOLAND THEME", &id, 0) == 0) {
         if (theme->theme_id == id) {
-            DAT_007fe114++;
+            LegolandCommonThemeCount++;
             return;
         }
         // STRING: LEGOLAND 0x004ba738
         if (LLIDB_FindElement("COMMON THEME", &id, 0) == 0 && theme->theme_id == id) {
-            DAT_007fe114++;
+            LegolandCommonThemeCount++;
             return;
         }
     }
     // STRING: LEGOLAND 0x004ba728
     if (LLIDB_FindElement("WESTERN THEME", &id, 0) == 0 && theme->theme_id == id) {
-        DAT_007fe115++;
+        WesternThemeCount++;
         return;
     }
     // STRING: LEGOLAND 0x004ba718
     if (LLIDB_FindElement("CASTLE THEME", &id, 0) == 0 && theme->theme_id == id) {
-        DAT_007fe116++;
+        CastleThemeCount++;
         return;
     }
     // STRING: LEGOLAND 0x004ba704
     if (LLIDB_FindElement("ADVENTURERS THEME", &id, 0) == 0 && theme->theme_id == id) {
-        DAT_007fe117++;
+        AdventurersThemeCount++;
     }
 }
 
@@ -1024,7 +1024,7 @@ void FUN_00469a80(struct NerpsArg *object) {
         flags = ((struct ObjectiveEvent *)object)->field_8;
         if (flags & 1) {
             ((struct ObjectiveEvent *)object)->field_8 = (flags & 0xfffffffd) | 0x10000;
-            FUN_00469980((struct ThemeQueryArg *)object);
+            CountObjectTheme((struct ThemeQueryArg *)object);
         }
     }
     DAT_0066871c = 1;
@@ -1044,14 +1044,14 @@ void FUN_00469ab0(struct NerpsArg *object) {
 }
 
 // FUNCTION: LEGOLAND 0x00469ae0
-int FUN_00469ae0(struct RewardArg *arg) {
+int ProcessUnimplementedReward(struct RewardArg *arg) {
     // STRING: LEGOLAND 0x004ba758
     DBPrintf("Processing unimplemented reward [ Type = %d ]\n", arg->reward_type);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b00
-int FUN_00469b00(struct RewardArg *arg) {
+int ProcessUnimplementedObjective(struct RewardArg *arg) {
     // STRING: LEGOLAND 0x004ba788
     DBPrintf("Processing unimplemented objective [ Type = %d ]\n", arg->reward_type);
     return 1;
@@ -1082,13 +1082,13 @@ int FUN_00469b70(struct ObjectiveEvent *event) {
 
 // FUNCTION: LEGOLAND 0x00469b90
 int FUN_00469b90(struct ObjectiveEvent *event) {
-    FUN_00457900(GetBrickCount() + event->field_1c);
+    SetBrickCount(GetBrickCount() + event->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469bb0
 int FUN_00469bb0(struct ObjectiveEvent *event) {
-    FUN_00457900(event->field_1c);
+    SetBrickCount(event->field_1c);
     return 1;
 }
 
@@ -1100,14 +1100,14 @@ void FUN_00469bd0(unsigned int a, void *b) {
 
     object = (struct PlaceObject *)a;
     cls = object->cls;
-    FUN_00457870(0);
+    SetBricksLimited(0);
     GetTileCentre((struct Point *)b, &centre.x);
     EditCursor.field_1404 = centre.x;
     EditCursor.field_1408 = centre.y;
     cls->method_90(a, &centre, 0x8f8);
     FUN_0045d770(&EditCursor);
     PutObjOnMap(object->cls, a, (struct Point *)&EditCursor.field_1404);
-    FUN_00457870(1);
+    SetBricksLimited(1);
 }
 
 // FUNCTION: LEGOLAND 0x00469c40
@@ -1238,16 +1238,16 @@ int FUN_00469f20(struct MapRectArg *arg) {
 
 // FUNCTION: LEGOLAND 0x00469f70
 int FUN_00469f70(struct RewardArg *arg) {
-    return FUN_00469ae0(arg);
+    return ProcessUnimplementedReward(arg);
 }
 
 // FUNCTION: LEGOLAND 0x00469f80
 int FUN_00469f80(struct RewardArg *arg) {
-    FUN_00499380();
+    PauseGameTimer();
     SetPointer(0);
     FUN_00496e60(1, 0xf);
-    FUN_004771f0(arg->field_8, 1, 1);
-    FUN_004993c0();
+    PlayMovie(arg->field_8, 1, 1);
+    ResumeGameTimer();
     FUN_0046ce20();
     FUN_0046b760();
     return 1;
@@ -1277,5 +1277,5 @@ int FUN_00469fc0(struct RewardArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a030
 int FUN_0046a030(struct RewardArg *arg) {
-    return FUN_00469ae0(arg);
+    return ProcessUnimplementedReward(arg);
 }

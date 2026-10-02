@@ -212,18 +212,18 @@ void FUN_0042e2a0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e460
-void FUN_0042e460(struct EateryObj *obj) {
+void LoadBrollyImages(struct EateryObj *obj) {
     DAT_0081cd38 = obj->fx_c;
     DAT_0081cd38->flags_1c |= 0x400;
     // STRING: LEGOLAND 0x004b6ec8
-    if (LLIDB_FindElement("BROLLY IMAGES", &DAT_0061613c, 0) == 0) {
-        DAT_00616140 = (struct BrollyData *)LLIDB_LoadData((void *)DAT_0061613c);
+    if (LLIDB_FindElement("BROLLY IMAGES", &BrollyImagesHandle, 0) == 0) {
+        BrollyImagesData = (struct BrollyData *)LLIDB_LoadData((void *)BrollyImagesHandle);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042e4b0
-void FUN_0042e4b0(void) {
-    LLIDB_UnLoadData(DAT_0061613c);
+void UnloadBrollyImages(void) {
+    LLIDB_UnLoadData(BrollyImagesHandle);
 }
 
 // FUNCTION: LEGOLAND 0x0042e4c0
@@ -241,9 +241,9 @@ void FUN_0042e500(int param_1, unsigned char *param_2) {
     id.pos.x = param_2[0];
     id.pos.y = param_2[4];
     AddObjectToMap(param_1, id, 0);
-    if (DAT_00616140 != NULL) {
+    if (BrollyImagesData != NULL) {
         int r = rand();
-        Set_UserFlags(*(int *)param_2 << 8, *(int *)(param_2 + 4) << 8, (unsigned short)(r % DAT_00616140->count_4));
+        Set_UserFlags(*(int *)param_2 << 8, *(int *)(param_2 + 4) << 8, (unsigned short)(r % BrollyImagesData->count_4));
     }
 }
 
@@ -251,9 +251,9 @@ void FUN_0042e500(int param_1, unsigned char *param_2) {
 struct RideSpriteInfo *FUN_0042e560(int param_1, unsigned int param_2) {
     unsigned char *b = (unsigned char *)&param_2;
     int idx = ((unsigned short)Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xff) * 4;
-    DAT_0082c6a0.sprite = *(int *)((char *)DAT_00616140->table_8 + idx);
-    DAT_0082c6a0.x = *(int *)((char *)DAT_00616140->table_c + idx) >> 1;
-    DAT_0082c6a0.y = *(int *)((char *)DAT_00616140->table_10 + idx) >> 1;
+    DAT_0082c6a0.sprite = *(int *)((char *)BrollyImagesData->table_8 + idx);
+    DAT_0082c6a0.x = *(int *)((char *)BrollyImagesData->table_c + idx) >> 1;
+    DAT_0082c6a0.y = *(int *)((char *)BrollyImagesData->table_10 + idx) >> 1;
     DAT_0082c6a0.field_10 = 0;
     return &DAT_0082c6a0;
 }
@@ -734,15 +734,15 @@ void FUN_0042f030(struct EateryObj *obj) {
     DAT_0081cd2c = (unsigned int)((struct EateryFX *)DAT_0081cd40)->inner_64;
     ((struct EateryInner *)DAT_0081cd2c)->flags_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b6f2c
-    DAT_0081cd28 = LoadSprite("RestMask_Main.lls", 1);
+    RestMaskMainSprite = LoadSprite("RestMask_Main.lls", 1);
     // STRING: LEGOLAND 0x004b6f14
-    DAT_0081cd8c = LoadSprite("RestMaskLevel1aa.lls", 1);
+    RestMaskLevel1aaSprite = LoadSprite("RestMaskLevel1aa.lls", 1);
     // STRING: LEGOLAND 0x004b6f00
-    DAT_0081cd88 = LoadSprite("RestMaskLevel1.lls", 1);
+    RestMaskLevel1Sprite = LoadSprite("RestMaskLevel1.lls", 1);
     // STRING: LEGOLAND 0x004b6eec
-    DAT_0081cd94 = LoadSprite("RestMaskLevel2.lls", 1);
+    RestMaskLevel2Sprite = LoadSprite("RestMaskLevel2.lls", 1);
     // STRING: LEGOLAND 0x004b6ed8
-    DAT_0081cd90 = LoadSprite("RestMaskLevel3.lls", 1);
+    RestMaskLevel3Sprite = LoadSprite("RestMaskLevel3.lls", 1);
     HideLayer((struct LayerOwner *)DAT_0081cd2c, 1);
     StopLayerPlaying(DAT_0081cd2c, 1);
     LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_0081cd2c, 1), 0);
@@ -941,23 +941,23 @@ void FUN_0042f4c0(int param_1, unsigned int param_2, unsigned int param_3, short
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x37) == 1) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd8c, param_2, param_3, param_6, 0);
+            PrintSprite(RestMaskLevel1aaSprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x37) == 2) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd88, param_2, param_3, param_6, 0);
+            PrintSprite(RestMaskLevel1Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x37) == 3) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd94, param_2, param_3, param_6, 0);
+            PrintSprite(RestMaskLevel2Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x37) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd90, param_2, param_3, param_6, 0);
+            PrintSprite(RestMaskLevel3Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x37) == 5) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd28, param_2, param_3, param_6, 0);
+            PrintSprite(RestMaskMainSprite, param_2, param_3, param_6, 0);
         }
     }
     state = FUN_0042ef40((unsigned short *)param_4);
@@ -977,11 +977,11 @@ void FUN_0042f4c0(int param_1, unsigned int param_2, unsigned int param_3, short
 
 // FUNCTION: LEGOLAND 0x0042f720
 void FUN_0042f720(void) {
-    KillSprite(DAT_0081cd28);
-    KillSprite(DAT_0081cd8c);
-    KillSprite(DAT_0081cd88);
-    KillSprite(DAT_0081cd94);
-    KillSprite(DAT_0081cd90);
+    KillSprite(RestMaskMainSprite);
+    KillSprite(RestMaskLevel1aaSprite);
+    KillSprite(RestMaskLevel1Sprite);
+    KillSprite(RestMaskLevel2Sprite);
+    KillSprite(RestMaskLevel3Sprite);
     KillMoneySFX();
 }
 
@@ -994,13 +994,13 @@ void FUN_0042f770(struct EateryObj *obj) {
     DAT_00616118 = (unsigned int)((struct EateryFX *)DAT_0081cd30)->inner_64;
     ((struct EateryInner *)DAT_00616118)->flags_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b6f70
-    DAT_0081cd34 = LoadSprite("R2Fdoor_m.lls", 1);
+    R2FdoormSprite = LoadSprite("R2Fdoor_m.lls", 1);
     // STRING: LEGOLAND 0x004b6f60
-    DAT_0081cd48 = LoadSprite("R2Fdoor_m1.lls", 1);
+    R2Fdoorm1Sprite = LoadSprite("R2Fdoor_m1.lls", 1);
     // STRING: LEGOLAND 0x004b6f50
-    DAT_0081cd84 = LoadSprite("R2Bdoor_m.lls", 1);
+    R2BdoormSprite = LoadSprite("R2Bdoor_m.lls", 1);
     // STRING: LEGOLAND 0x004b6f40
-    DAT_0081cd20 = LoadSprite("R2Tower_m.lls", 1);
+    R2TowermSprite = LoadSprite("R2Tower_m.lls", 1);
     HideLayer((struct LayerOwner *)DAT_00616118, 0);
     StopLayerPlaying(DAT_00616118, 0);
     LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 0), 0);
@@ -1721,21 +1721,21 @@ void FUN_00430b10(int param_1, unsigned int param_2, unsigned int param_3, short
         for (i = 0; i < count; i = i + 1) {
             if (*(char *)(blokes[i] + 0x60) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
         }
-        PrintSprite(DAT_0081cd48, off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite(R2Fdoorm1Sprite, off.x + sx, off.y + sy, param_6, (int *)&cfg);
     } else if (s18 == 2) {
         if (f11 != 0) {
             for (i = 0; i < count; i = i + 1) {
                 if (*(char *)(blokes[i] + 0x60) == 0xc) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
             }
-            PrintSprite(DAT_0081cd84, sx, f3c / 2 + sy, param_6, (int *)&cfg);
+            PrintSprite(R2BdoormSprite, sx, f3c / 2 + sy, param_6, (int *)&cfg);
         }
-        PrintSprite(DAT_0081cd20, sx, sy, param_6, (int *)&cfg);
+        PrintSprite(R2TowermSprite, sx, sy, param_6, (int *)&cfg);
         for (i = 0; i < count; i = i + 1) {
             if (*(char *)(blokes[i] + 0x60) == 6) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
         }
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 6);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_0081cd34, off.x + sx, f38 / 2 + sy, param_6, (int *)&cfg);
+        PrintSprite(R2FdoormSprite, off.x + sx, f38 / 2 + sy, param_6, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 3), c9);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
         AdjustOffsetForViewMode(&off);
@@ -1761,11 +1761,11 @@ void FUN_00430b10(int param_1, unsigned int param_2, unsigned int param_3, short
         for (i = 0; i < count; i = i + 1) {
             if (*(char *)(blokes[i] + 0x60) == 0xf) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
         }
-        PrintSprite(DAT_0081cd84, sx, off.y + sy, param_6, (int *)&cfg);
-        PrintSprite(DAT_0081cd20, sx, sy, param_6, (int *)&cfg);
+        PrintSprite(R2BdoormSprite, sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite(R2TowermSprite, sx, sy, param_6, (int *)&cfg);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 2);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_0081cd34, off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite(R2FdoormSprite, off.x + sx, off.y + sy, param_6, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(DAT_00616118, 3), c9);
         off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616118, 3);
         AdjustOffsetForViewMode(&off);
@@ -1789,10 +1789,10 @@ void FUN_00430b10(int param_1, unsigned int param_2, unsigned int param_3, short
 void FUN_00431120(void) {
     Kill_FXList(OCTOPUS_SFX, 3);
     KillMoneySFX();
-    KillSprite(DAT_0081cd34);
-    KillSprite(DAT_0081cd84);
-    KillSprite(DAT_0081cd20);
-    KillSprite(DAT_0081cd48);
+    KillSprite(R2FdoormSprite);
+    KillSprite(R2BdoormSprite);
+    KillSprite(R2TowermSprite);
+    KillSprite(R2Fdoorm1Sprite);
 }
 
 // FUNCTION: LEGOLAND 0x00431170
@@ -1869,55 +1869,55 @@ void FUN_00431300(struct EateryObj *obj) {
     inner = DAT_0081cd1c->inner_64;
     inner->flags_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b7100
-    DAT_0081cd60 = LoadSprite("OctTentA.lls", 1);
+    OctTentASprite = LoadSprite("OctTentA.lls", 1);
     // STRING: LEGOLAND 0x004b70f0
-    DAT_0081cd64 = LoadSprite("OctTentB.lls", 1);
+    OctTentBSprite = LoadSprite("OctTentB.lls", 1);
     // STRING: LEGOLAND 0x004b70e0
-    DAT_0081cd68 = LoadSprite("OctTentC.lls", 1);
+    OctTentCSprite = LoadSprite("OctTentC.lls", 1);
     // STRING: LEGOLAND 0x004b70d0
-    DAT_0081cd6c = LoadSprite("OctTentD.lls", 1);
+    OctTentDSprite = LoadSprite("OctTentD.lls", 1);
     // STRING: LEGOLAND 0x004b70c0
-    DAT_0081cd70 = LoadSprite("OctTentE.lls", 1);
+    OctTentESprite = LoadSprite("OctTentE.lls", 1);
     // STRING: LEGOLAND 0x004b70b0
-    DAT_0081cd74 = LoadSprite("OctTentF.lls", 1);
+    OctTentFSprite = LoadSprite("OctTentF.lls", 1);
     // STRING: LEGOLAND 0x004b70a0
-    DAT_0081cd78 = LoadSprite("OctTentG.lls", 1);
+    OctTentGSprite = LoadSprite("OctTentG.lls", 1);
     // STRING: LEGOLAND 0x004b7090
-    DAT_0081cd7c = LoadSprite("OctTentH.lls", 1);
+    OctTentHSprite = LoadSprite("OctTentH.lls", 1);
     // STRING: LEGOLAND 0x004b7080
-    DAT_0081cd80 = LoadSprite("OctoKiosk.lls", 1);
+    OctoKioskSprite = LoadSprite("OctoKiosk.lls", 1);
     // STRING: LEGOLAND 0x004b7070
-    DAT_0081cda0 = LoadSprite("OctTabAA.lls", 1);
+    OctTabAASprite = LoadSprite("OctTabAA.lls", 1);
     // STRING: LEGOLAND 0x004b7060
-    DAT_0081cda4 = LoadSprite("OctTabAB.lls", 1);
+    OctTabABSprite = LoadSprite("OctTabAB.lls", 1);
     // STRING: LEGOLAND 0x004b7050
-    DAT_0081cda8 = LoadSprite("OctTabBA.lls", 1);
+    OctTabBASprite = LoadSprite("OctTabBA.lls", 1);
     // STRING: LEGOLAND 0x004b7040
-    DAT_0081cdac = LoadSprite("OctTabBB.lls", 1);
+    OctTabBBSprite = LoadSprite("OctTabBB.lls", 1);
     // STRING: LEGOLAND 0x004b7030
-    DAT_0081cdb0 = LoadSprite("OctTabCA.lls", 1);
+    OctTabCASprite = LoadSprite("OctTabCA.lls", 1);
     // STRING: LEGOLAND 0x004b7020
-    DAT_0081cdb4 = LoadSprite("OctTabCB.lls", 1);
+    OctTabCBSprite = LoadSprite("OctTabCB.lls", 1);
     // STRING: LEGOLAND 0x004b7010
-    DAT_0081cdb8 = LoadSprite("OctTabDA.lls", 1);
+    OctTabDASprite = LoadSprite("OctTabDA.lls", 1);
     // STRING: LEGOLAND 0x004b7000
-    DAT_0081cdbc = LoadSprite("OctTabDB.lls", 1);
+    OctTabDBSprite = LoadSprite("OctTabDB.lls", 1);
     // STRING: LEGOLAND 0x004b6ff0
-    DAT_0081cdc0 = LoadSprite("OctTabEA.lls", 1);
+    OctTabEASprite = LoadSprite("OctTabEA.lls", 1);
     // STRING: LEGOLAND 0x004b6fe0
-    DAT_0081cdc4 = LoadSprite("OctTabEB.lls", 1);
+    OctTabEBSprite = LoadSprite("OctTabEB.lls", 1);
     // STRING: LEGOLAND 0x004b6fd0
-    DAT_0081cdc8 = LoadSprite("OctTabFA.lls", 1);
+    OctTabFASprite = LoadSprite("OctTabFA.lls", 1);
     // STRING: LEGOLAND 0x004b6fc0
-    DAT_0081cdcc = LoadSprite("OctTabFB.lls", 1);
+    OctTabFBSprite = LoadSprite("OctTabFB.lls", 1);
     // STRING: LEGOLAND 0x004b6fb0
-    DAT_0081cdd0 = LoadSprite("OctTabGA.lls", 1);
+    OctTabGASprite = LoadSprite("OctTabGA.lls", 1);
     // STRING: LEGOLAND 0x004b6fa0
-    DAT_0081cdd4 = LoadSprite("OctTabGB.lls", 1);
+    OctTabGBSprite = LoadSprite("OctTabGB.lls", 1);
     // STRING: LEGOLAND 0x004b6f90
-    DAT_0081cdd8 = LoadSprite("OctTabHA.lls", 1);
+    OctTabHASprite = LoadSprite("OctTabHA.lls", 1);
     // STRING: LEGOLAND 0x004b6f80
-    DAT_0081cddc = LoadSprite("OctTabHB.lls", 1);
+    OctTabHBSprite = LoadSprite("OctTabHB.lls", 1);
     LoadMoneySFX();
 }
 
@@ -1929,80 +1929,80 @@ void FUN_004314f0(unsigned int param_1, struct UserFlagsArg *param_2) {
 
 // FUNCTION: LEGOLAND 0x00431520
 void FUN_00431520(void) {
-    if (DAT_0081cd60) {
-        KillSprite(DAT_0081cd60);
+    if (OctTentASprite) {
+        KillSprite(OctTentASprite);
     }
-    if (DAT_0081cd64) {
-        KillSprite(DAT_0081cd64);
+    if (OctTentBSprite) {
+        KillSprite(OctTentBSprite);
     }
-    if (DAT_0081cd68) {
-        KillSprite(DAT_0081cd68);
+    if (OctTentCSprite) {
+        KillSprite(OctTentCSprite);
     }
-    if (DAT_0081cd6c) {
-        KillSprite(DAT_0081cd6c);
+    if (OctTentDSprite) {
+        KillSprite(OctTentDSprite);
     }
-    if (DAT_0081cd70) {
-        KillSprite(DAT_0081cd70);
+    if (OctTentESprite) {
+        KillSprite(OctTentESprite);
     }
-    if (DAT_0081cd74) {
-        KillSprite(DAT_0081cd74);
+    if (OctTentFSprite) {
+        KillSprite(OctTentFSprite);
     }
-    if (DAT_0081cd78) {
-        KillSprite(DAT_0081cd78);
+    if (OctTentGSprite) {
+        KillSprite(OctTentGSprite);
     }
-    if (DAT_0081cd7c) {
-        KillSprite(DAT_0081cd7c);
+    if (OctTentHSprite) {
+        KillSprite(OctTentHSprite);
     }
-    if (DAT_0081cd80) {
-        KillSprite(DAT_0081cd80);
+    if (OctoKioskSprite) {
+        KillSprite(OctoKioskSprite);
     }
-    if (DAT_0081cda0) {
-        KillSprite(DAT_0081cda0);
+    if (OctTabAASprite) {
+        KillSprite(OctTabAASprite);
     }
-    if (DAT_0081cda4) {
-        KillSprite(DAT_0081cda4);
+    if (OctTabABSprite) {
+        KillSprite(OctTabABSprite);
     }
-    if (DAT_0081cda8) {
-        KillSprite(DAT_0081cda8);
+    if (OctTabBASprite) {
+        KillSprite(OctTabBASprite);
     }
-    if (DAT_0081cdac) {
-        KillSprite(DAT_0081cdac);
+    if (OctTabBBSprite) {
+        KillSprite(OctTabBBSprite);
     }
-    if (DAT_0081cdb0) {
-        KillSprite(DAT_0081cdb0);
+    if (OctTabCASprite) {
+        KillSprite(OctTabCASprite);
     }
-    if (DAT_0081cdb4) {
-        KillSprite(DAT_0081cdb4);
+    if (OctTabCBSprite) {
+        KillSprite(OctTabCBSprite);
     }
-    if (DAT_0081cdb8) {
-        KillSprite(DAT_0081cdb8);
+    if (OctTabDASprite) {
+        KillSprite(OctTabDASprite);
     }
-    if (DAT_0081cdbc) {
-        KillSprite(DAT_0081cdbc);
+    if (OctTabDBSprite) {
+        KillSprite(OctTabDBSprite);
     }
-    if (DAT_0081cdc0) {
-        KillSprite(DAT_0081cdc0);
+    if (OctTabEASprite) {
+        KillSprite(OctTabEASprite);
     }
-    if (DAT_0081cdc4) {
-        KillSprite(DAT_0081cdc4);
+    if (OctTabEBSprite) {
+        KillSprite(OctTabEBSprite);
     }
-    if (DAT_0081cdc8) {
-        KillSprite(DAT_0081cdc8);
+    if (OctTabFASprite) {
+        KillSprite(OctTabFASprite);
     }
-    if (DAT_0081cdcc) {
-        KillSprite(DAT_0081cdcc);
+    if (OctTabFBSprite) {
+        KillSprite(OctTabFBSprite);
     }
-    if (DAT_0081cdd0) {
-        KillSprite(DAT_0081cdd0);
+    if (OctTabGASprite) {
+        KillSprite(OctTabGASprite);
     }
-    if (DAT_0081cdd4) {
-        KillSprite(DAT_0081cdd4);
+    if (OctTabGBSprite) {
+        KillSprite(OctTabGBSprite);
     }
-    if (DAT_0081cdd8) {
-        KillSprite(DAT_0081cdd8);
+    if (OctTabHASprite) {
+        KillSprite(OctTabHASprite);
     }
-    if (DAT_0081cddc) {
-        KillSprite(DAT_0081cddc);
+    if (OctTabHBSprite) {
+        KillSprite(OctTabHBSprite);
     }
     KillMoneySFX();
 }
@@ -2234,25 +2234,25 @@ void FUN_00431d00(int param_1, unsigned int param_2, unsigned int param_3, unsig
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 2) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd70, DAT_0081cdc0, DAT_0081cdc4, buckets[14], buckets[15], buckets[12], buckets[13], param_6);
+    FUN_00431c50(param_2, param_3, OctTentESprite, OctTabEASprite, OctTabEBSprite, buckets[14], buckets[15], buckets[12], buckets[13], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 3) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd74, DAT_0081cdc8, DAT_0081cdcc, buckets[17], buckets[18], buckets[16], buckets[19], param_6);
+    FUN_00431c50(param_2, param_3, OctTentFSprite, OctTabFASprite, OctTabFBSprite, buckets[17], buckets[18], buckets[16], buckets[19], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 5) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 6) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd6c, DAT_0081cdb8, DAT_0081cdbc, buckets[10], buckets[11], buckets[8], buckets[9], param_6);
+    FUN_00431c50(param_2, param_3, OctTentDSprite, OctTabDASprite, OctTabDBSprite, buckets[10], buckets[11], buckets[8], buckets[9], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 7) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd68, DAT_0081cdb0, DAT_0081cdb4, buckets[4], buckets[7], buckets[5], buckets[6], param_6);
+    FUN_00431c50(param_2, param_3, OctTentCSprite, OctTabCASprite, OctTabCBSprite, buckets[4], buckets[7], buckets[5], buckets[6], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 8) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
@@ -2262,42 +2262,42 @@ void FUN_00431d00(int param_1, unsigned int param_2, unsigned int param_3, unsig
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 10) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    PrintSprite(DAT_0081cd80, param_2, param_3, param_6, 0);
+    PrintSprite(OctoKioskSprite, param_2, param_3, param_6, 0);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0xb) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0xc) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd78, DAT_0081cdd0, DAT_0081cdd4, buckets[21], buckets[22], buckets[20], buckets[23], param_6);
+    FUN_00431c50(param_2, param_3, OctTentGSprite, OctTabGASprite, OctTabGBSprite, buckets[21], buckets[22], buckets[20], buckets[23], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0xd) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0xe) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd7c, DAT_0081cdd8, DAT_0081cddc, buckets[24], buckets[25], buckets[26], buckets[27], param_6);
+    FUN_00431c50(param_2, param_3, OctTentHSprite, OctTabHASprite, OctTabHBSprite, buckets[24], buckets[25], buckets[26], buckets[27], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0xf) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0x10) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd64, DAT_0081cda8, DAT_0081cdac, buckets[0], buckets[3], buckets[1], buckets[2], param_6);
+    FUN_00431c50(param_2, param_3, OctTentBSprite, OctTabBASprite, OctTabBBSprite, buckets[0], buckets[3], buckets[1], buckets[2], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0x11) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0x12) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
-    FUN_00431c50(param_2, param_3, DAT_0081cd60, DAT_0081cda0, DAT_0081cda4, buckets[28], buckets[29], buckets[30], buckets[31], param_6);
+    FUN_00431c50(param_2, param_3, OctTentASprite, OctTabAASprite, OctTabABSprite, buckets[28], buckets[29], buckets[30], buckets[31], param_6);
     for (i = 0; i < count; i = i + 1) {
         if (*(char *)(blokes[i] + 0x37) == 0x13) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004322a0
-int FUN_004322a0(void) {
+int Restaurant1_Save(void) {
     unsigned int one = 1;
     unsigned int zero = 0;
     struct BrollyNode *node = DAT_00616144;
@@ -2314,7 +2314,7 @@ int FUN_004322a0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432310
-int FUN_00432310(void) {
+int Restaurant1_Load(void) {
     unsigned int count;
     struct BrollyNode *prev = NULL;
     struct BrollyNode *node;
@@ -2344,7 +2344,7 @@ int FUN_00432310(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432390
-int FUN_00432390(void) {
+int Restaurant2_Save(void) {
     unsigned int one = 1;
     unsigned int zero = 0;
     struct SaveBlock *node = DAT_00616148;
@@ -2361,7 +2361,7 @@ int FUN_00432390(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432400
-int FUN_00432400(void) {
+int Restaurant2_Load(void) {
     unsigned int count;
     struct SaveBlock *current;
     struct SaveBlock *prev = NULL;

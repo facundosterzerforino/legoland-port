@@ -190,7 +190,7 @@ struct BlokeSave {
 typedef void (*BlokeAction)(Bloke *bloke);
 
 /* Low-level AI handlers (PTR_FUN_004bd34c). */
-void FUN_004838a0(Bloke *bloke);
+void LogBlokeRethinking(Bloke *bloke);
 void FUN_004838c0(Bloke *bloke);
 void FUN_00483ef0(Bloke *bloke);
 void FUN_00484090(Bloke *bloke);
@@ -218,22 +218,22 @@ LEGO_EXPORT BNVPath *NewBNVPath(struct BinVFile *file, unsigned int param_2, cha
 LEGO_EXPORT int UpdateBlokeFromBNVPath(Bloke *bloke, BNVPath *path);
 LEGO_EXPORT int BNVPath_GetDFrame(BNVPath *path);
 LEGO_EXPORT void BNVPath_SetDFrame(Bloke *bloke, BNVPath *path, int frame);
-Point FUN_004831a0(unsigned char dir, short dist);
+Point GetOffsetInDir(unsigned char dir, short dist);
 LEGO_EXPORT Point GetTileInDir(Point pos, unsigned char dir);
 LEGO_EXPORT int OverNewTile(struct Bloke *bloke, unsigned int x, unsigned int y);
-void FUN_00482b10(void);
-void FUN_00482b20(int force);
+void ResetPathUpdateTimer(void);
+void UpdatePathLinks(int force);
 int FUN_00482b60(Point *pos);
 struct Person;
 LEGO_EXPORT char *GetVisitorName(Bloke *bloke);
 int FUN_00482cb0(Bloke *bloke);
 struct BlokeNameView;
-void FUN_00482c60(Bloke *bloke);
+void RandomiseBlokeName(Bloke *bloke);
 int FUN_00482df0(Bloke *bloke, int index, int mul);
-int FUN_00482d30(Bloke *bloke);
+int GetBlokeMood(Bloke *bloke);
 void FUN_00482d60(unsigned int index, int value);
 void FUN_00482d70(void);
-void FUN_00483090(void);
+void DestroyAllBlokes(void);
 LEGO_EXPORT Bloke *MakeBloke(int param_1);
 LEGO_EXPORT Bloke *NewBlokeWOList(int type);
 LEGO_EXPORT Bloke *NewBloke(void);
@@ -244,6 +244,6 @@ struct MapRect;
 struct BinVFile;
 struct BinVObject;
 struct Vertex;
-void FUN_00482ec0(void);
+void FreeBlokePool(void);
 LEGO_EXPORT void InitialiseBlokes(void);
 LEGO_EXPORT void RenderPeople(void);

@@ -33,25 +33,25 @@ LEGO_EXPORT char *GetGFXFName(const char *name, unsigned char type, char *out) {
     switch (type) {
     case 0:
         // STRING: LEGOLAND 0x004b7a90
-        sprintf(result, "%s%s", DAT_004b81c0, name);
+        sprintf(result, "%s%s", GraphicsPath, name);
         break;
     case 1:
-        sprintf(result, "%s%s", DAT_004b81c8, name);
+        sprintf(result, "%s%s", GraphicsSmallPath, name);
         break;
     case 2:
         sprintf(result, "%s%s", DAT_004b81c4, name);
         break;
     case 3:
-        sprintf(result, "%s%s", DAT_004b81c8, name);
+        sprintf(result, "%s%s", GraphicsSmallPath, name);
         break;
     case 5:
-        sprintf(result, "%s%s", DAT_004b81cc, name);
+        sprintf(result, "%s%s", MasksPath, name);
         break;
     case 6:
-        sprintf(result, "%s%s", DAT_004b81d0, name);
+        sprintf(result, "%s%s", MasksSmallPath, name);
         break;
     case 4:
-        sprintf(result, "%s%s", DAT_004b81d4, name);
+        sprintf(result, "%s%s", IconsPath, name);
         break;
     case 7:
         // STRING: LEGOLAND 0x004b8278
@@ -59,10 +59,10 @@ LEGO_EXPORT char *GetGFXFName(const char *name, unsigned char type, char *out) {
         break;
     case 8:
         // STRING: LEGOLAND 0x004b826c
-        sprintf(result, "%s%s.MDL", DAT_004b81d8, name);
+        sprintf(result, "%s%s.MDL", ModelsPath, name);
         break;
     case 9:
-        sprintf(result, "%s%s", DAT_004b81d8, name);
+        sprintf(result, "%s%s", ModelsPath, name);
         break;
     }
     return result;
@@ -100,7 +100,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
         }
         if (file == NULL) {
             // STRING: LEGOLAND 0x004b82d0
-            FUN_0047f870("Failed to load (%s)", path);
+            DebugTrace("Failed to load (%s)", path);
             // STRING: LEGOLAND 0x004b82b8
             DBPrintf("Failed to load (%s)\n", path);
             return 0;
@@ -121,7 +121,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
             image->field_14 = 3;
         }
         image->data = lls;
-        if (DAT_00668088 == 2) {
+        if (DisplayPixelFormat == 2) {
             LLS555To565((struct LLSImage *)lls);
         }
         return 1;
@@ -130,12 +130,12 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
     file = RES_OpenFile(path);
     if (file == NULL) {
         // STRING: LEGOLAND 0x004b82a0
-        FUN_0047f870("Failed to load (%s). ", path);
+        DebugTrace("Failed to load (%s). ", path);
         DBPrintf("Failed to load (%s)\n", path);
         return 0;
     }
     // STRING: LEGOLAND 0x004b828c
-    FUN_0047f870("Loading BMP (%s)", path);
+    DebugTrace("Loading BMP (%s)", path);
     RES_ReadFile(file, header, 0xe);
     offbits = *(unsigned int *)(header + 0xa);
     pixel_offset = RES_GetFilePointer(file) + 0x28;
@@ -196,7 +196,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
         lut = (unsigned char *)malloc(0x208);
         image->aux = lut;
         entry = (unsigned char *)palette + 1;
-        if (DAT_00668088 == 2) {
+        if (DisplayPixelFormat == 2) {
             for (i = 4; i < 0x204; i += 2) {
                 *(unsigned short *)((unsigned char *)image->aux + i - 2) = (unsigned short)(((((entry[1] & 0xf8) << 5) | (entry[0] & 0xfc)) << 3) | (entry[-1] >> 3));
                 entry += 4;
@@ -222,7 +222,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
         return 0;
     }
     out = (unsigned short *)image->data + (image->height - 1) * image->width;
-    if (DAT_00668088 == 2) {
+    if (DisplayPixelFormat == 2) {
         for (i = 0; i < image->height; i++) {
             unsigned char *src = pixels;
             unsigned short *dst = out;
@@ -280,26 +280,26 @@ LEGO_EXPORT void LoadColourTable(void) {
         entry++;
     } while ((int)src < (int)&DAT_00813b20[0x301]);
 
-    RES_ReadFile(file, DAT_00814020, 0x8000);
+    RES_ReadFile(file, ColourLookupTable, 0x8000);
 
     ddraw = DDRAWENV.ddraw2;
-    ddraw->lpVtbl->CreatePalette(ddraw, 0x44, entries, (LPDIRECTDRAWPALETTE *)&DAT_00668084, NULL);
-    surface = (LPDIRECTDRAWSURFACE)DAT_00668070;
-    surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DAT_00668084);
+    ddraw->lpVtbl->CreatePalette(ddraw, 0x44, entries, (LPDIRECTDRAWPALETTE *)&DDPalette, NULL);
+    surface = (LPDIRECTDRAWSURFACE)PrimarySurface;
+    surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DDPalette);
     RES_CloseFile(file);
 }
 
 // FUNCTION: LEGOLAND 0x0044e670
 LEGO_EXPORT void ResendPalette(void) {
-    if (DAT_00668088 == 0) {
-        LPDIRECTDRAWSURFACE surface = (LPDIRECTDRAWSURFACE)DAT_00668070;
-        surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DAT_00668084);
+    if (DisplayPixelFormat == 0) {
+        LPDIRECTDRAWSURFACE surface = (LPDIRECTDRAWSURFACE)PrimarySurface;
+        surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DDPalette);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0044e690
 LEGO_EXPORT unsigned int GetTransparentColour(void) {
-    switch (DAT_00668088) {
+    switch (DisplayPixelFormat) {
     case 0:
         return 0xfe;
     case 1:
@@ -314,13 +314,13 @@ LEGO_EXPORT unsigned int GetTransparentColour(void) {
 // FUNCTION: LEGOLAND 0x0044e6c0
 LEGO_EXPORT unsigned int GetNearestColour(int r, int g, int b) {
     unsigned int color;
-    switch (DAT_00668088) {
+    switch (DisplayPixelFormat) {
     case 0:
         color = (r & 0xf8) << 5;
         color |= (g & 0xf8);
         color <<= 2;
         color |= (b >> 3) & 0x1f;
-        return DAT_00814020[color];
+        return ColourLookupTable[color];
     case 1:
         color = (r & 0xf8) << 5;
         color |= (g & 0xf8);

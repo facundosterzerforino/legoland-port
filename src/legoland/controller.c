@@ -12,7 +12,7 @@
 
 // FUNCTION: LEGOLAND 0x00451e70
 LEGO_EXPORT int SetupControllers(void) {
-    if (DAT_00667104 != 0) {
+    if (ControllersInitialized != 0) {
         return 1;
     }
     CONTROLLERBUFFER = malloc(sizeof(struct CtrlBuffer));
@@ -35,17 +35,17 @@ LEGO_EXPORT int SetupControllers(void) {
     DAT_00813a6c = 1;
     DAT_00813a70 = 1;
     if (CONTROLLERBUFFER != NULL) {
-        DAT_00667104 = 1;
+        ControllersInitialized = 1;
         return 1;
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00451f40
-void FUN_00451f40(void) {
-    if (DAT_00667104 != 0) {
+void FreeControllers(void) {
+    if (ControllersInitialized != 0) {
         free(CONTROLLERBUFFER);
-        DAT_00667104 = 0;
+        ControllersInitialized = 0;
     }
 }
 
@@ -247,14 +247,14 @@ LEGO_EXPORT void ReadGameButtons(void) {
         DAT_00667108 = 0;
     }
     if (pressed != 0) {
-        DAT_0066710c = GetTickCount();
-        DAT_006670fc = 200;
+        ButtonRepeatLastTick = GetTickCount();
+        ButtonRepeatDelay = 200;
     }
     now = GetTickCount();
-    if (now - DAT_0066710c > DAT_006670fc) {
+    if (now - ButtonRepeatLastTick > ButtonRepeatDelay) {
         saved = held;
-        DAT_0066710c = GetTickCount();
-        DAT_006670fc = 0x32;
+        ButtonRepeatLastTick = GetTickCount();
+        ButtonRepeatDelay = 0x32;
         repeat = held;
     } else {
         repeat = 0;
@@ -319,7 +319,7 @@ LEGO_EXPORT void ReadGameButtons(void) {
     if (lpConfig->field_1e != 0) {
         DAT_00813a44.x = CONTROLLERBUFFER->field_8;
         DAT_00813a44.y = CONTROLLERBUFFER->field_c;
-        if (DAT_00667c7c != 0) {
+        if (MapLoaded != 0) {
             scroll = FUN_00451f70();
             if ((GamePad & 0x1000) != 0 || FocussedIconPtr == 0) {
                 if (scroll == 0 && (GamePad & 0x20) != 0) {

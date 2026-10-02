@@ -11,7 +11,7 @@ struct Vec4 {
     unsigned int w;
 };
 
-/* Canonical objective-event node (~0x44 bytes), allocated by FUN_00468910.
+/* Canonical objective-event node (~0x44 bytes), allocated by AllocObjectiveEvent.
  * objectives.c owns the allocator and treats it as ObjectiveEvent; nerps.c
  * previously viewed the same object as EventNode/EventNodeVec. Unified here so
  * the boundary casts disappear. */
@@ -41,9 +41,9 @@ unsigned char FUN_00468890(int index, unsigned char value);
 char FUN_004688c0(int index);
 void FUN_004688e0(void);
 void FUN_004688f0(int index, unsigned char param_2);
-struct ObjectiveEvent *FUN_00468910(unsigned int type, int sort_key);
-void FUN_00468940(struct ObjectiveEvent *node);
-void FUN_00468970(struct ObjectiveEvent *node);
+struct ObjectiveEvent *AllocObjectiveEvent(unsigned int type, int sort_key);
+void FreeObjectiveEvent(struct ObjectiveEvent *node);
+void FreeObjectiveEventList(struct ObjectiveEvent *node);
 void FUN_004689a0(void);
 unsigned int FUN_004689f0(char *param_1, char *param_2, int param_3);
 void FUN_00468b00(struct ObjectiveEvent *node);
@@ -91,6 +91,6 @@ int FUN_00469f80(struct RewardArg *arg);
 int FUN_00469fc0(struct RewardArg *arg);
 int FUN_0046a030(struct RewardArg *arg);
 void FUN_00469ab0(struct NerpsArg *object);
-int FUN_00469ae0(struct RewardArg *arg);
-int FUN_00469b00(struct RewardArg *arg);
+int ProcessUnimplementedReward(struct RewardArg *arg);
+int ProcessUnimplementedObjective(struct RewardArg *arg);
 void FUN_00469900(struct NerpsArg *object, unsigned int a, unsigned int b);

@@ -20,10 +20,10 @@
 
 // FUNCTION: LEGOLAND 0x00441800
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport) {
-    DAT_0081c8d0 = viewport->left;
-    DAT_0081c8d8 = viewport->right;
-    DAT_0081c8d4 = viewport->top;
-    DAT_0081c8dc = viewport->bottom;
+    ViewportLeft = viewport->left;
+    ViewportRight = viewport->right;
+    ViewportTop = viewport->top;
+    ViewportBottom = viewport->bottom;
 }
 
 struct RenderListNode {
@@ -427,7 +427,7 @@ LEGO_EXPORT unsigned short *LoadPalette(unsigned int path) {
                 RES_ReadFile(file, &path, 1);
                 RES_ReadFile(file, &g, 1);
                 RES_ReadFile(file, &b, 1);
-                if (DAT_00668088 != 2) {
+                if (DisplayPixelFormat != 2) {
                     *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xf8)) << 2) | (b >> 3));
                 } else {
                     *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xfc)) << 3) | (b >> 3));
@@ -661,12 +661,12 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
             break;
         }
     }
-    z1.b2 = DAT_004b7ac0[a * 3];
-    z1.b1 = DAT_004b7ac0[a * 3 + 1];
-    z1.b0 = DAT_004b7ac0[a * 3 + 2];
-    z2.b2 = DAT_004b7ac0[b * 3];
-    z2.b1 = DAT_004b7ac0[b * 3 + 1];
-    z2.b0 = DAT_004b7ac0[b * 3 + 2];
+    z1.b2 = BlokeColours[a * 3];
+    z1.b1 = BlokeColours[a * 3 + 1];
+    z1.b0 = BlokeColours[a * 3 + 2];
+    z2.b2 = BlokeColours[b * 3];
+    z2.b1 = BlokeColours[b * 3 + 1];
+    z2.b0 = BlokeColours[b * 3 + 2];
     size = count * 36;
     mem = malloc(size);
     if (mem != 0) {
@@ -681,7 +681,7 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
 }
 
 // FUNCTION: LEGOLAND 0x004427e0
-char *FUN_004427e0(struct ResFile *param_1, char *param_2, int param_3) {
+char *RES_ReadLine(struct ResFile *param_1, char *param_2, int param_3) {
     struct ResFile *file = param_1;
     char *c = (char *)&param_1;
     int count = 0;
@@ -712,7 +712,7 @@ terminate:
 }
 
 // FUNCTION: LEGOLAND 0x00442860
-int FUN_00442860(char *param_1, char *param_2) {
+int FindIndexInStringList(char *param_1, char *param_2) {
     int index = 0;
 
     while (_stricmp(param_1, param_2) != 0) {
@@ -726,7 +726,7 @@ int FUN_00442860(char *param_1, char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004428c0
-unsigned char *FUN_004428c0(unsigned char *str, int count) {
+unsigned char *GetNthStringInList(unsigned char *str, int count) {
     unsigned char *result = str;
     if (count > 0) {
         do {
@@ -762,7 +762,7 @@ unsigned char *FUN_004428f0(char *param_1, int param_2, int param_3) {
     if (param_2 == 1) {
         pcVar4 = param_1;
     }
-    return FUN_004428c0((unsigned char *)pcVar4, param_3);
+    return GetNthStringInList((unsigned char *)pcVar4, param_3);
 }
 
 // FUNCTION: LEGOLAND 0x00442980
@@ -790,7 +790,7 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
     char c;
     int r;
 
-    data = (char *)FUN_004402d0(param_3, param_1);
+    data = (char *)Load3DDataFile(param_3, param_1);
     if (data != NULL) {
         name = data;
         p = data + strlen(data) + 1;
@@ -832,9 +832,9 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
     }
     file = RES_OpenFile(path);
     if (file != NULL) {
-        FUN_004427e0(file, line, 512);
-        FUN_004427e0(file, line, 512);
-        if (FUN_004427e0(file, line, 512) != NULL) {
+        RES_ReadLine(file, line, 512);
+        RES_ReadLine(file, line, 512);
+        if (RES_ReadLine(file, line, 512) != NULL) {
             do {
                 p = line;
                 dst = path;
@@ -852,15 +852,15 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
                     *out_b = idx;
                 }
                 if (count1 != 0) {
-                    r = FUN_00442860(list1, path);
+                    r = FindIndexInStringList(list1, path);
                     if (r != -1) arr1[r] = idx;
                 }
                 if (count2 != 0) {
-                    r = FUN_00442860(list2, path);
+                    r = FindIndexInStringList(list2, path);
                     if (r != -1) arr2[r] = idx;
                 }
                 idx++;
-            } while (FUN_004427e0(file, line, 512) != NULL);
+            } while (RES_ReadLine(file, line, 512) != NULL);
         }
     }
     RES_CloseFile(file);
@@ -953,14 +953,14 @@ struct Vec3 {
 };
 
 // FUNCTION: LEGOLAND 0x00442da0
-void FUN_00442da0(struct Vec3 *a, struct Vec3 *b, struct Vec3 *out) {
+void CrossProduct(struct Vec3 *a, struct Vec3 *b, struct Vec3 *out) {
     out->x = b->z * a->y - a->z * b->y;
     out->y = a->z * b->x - a->x * b->z;
     out->z = a->x * b->y - a->y * b->x;
 }
 
 // FUNCTION: LEGOLAND 0x00442de0
-float FUN_00442de0(struct Vec3 *param_1, struct Vec3 *param_2) {
+float DotProduct(struct Vec3 *param_1, struct Vec3 *param_2) {
     return param_1->z * param_2->z + param_1->y * param_2->y + param_1->x * param_2->x;
 }
 
@@ -976,11 +976,11 @@ LEGO_EXPORT int TMNegParity(float *param_1) {
     b.x = param_1[3];
     b.y = param_1[4];
     b.z = param_1[5];
-    FUN_00442da0(&a, &b, &cross);
+    CrossProduct(&a, &b, &cross);
     a.x = param_1[6];
     a.y = param_1[7];
     a.z = param_1[8];
-    if (FUN_00442de0(&cross, &a) < DAT_004ab4c8) {
+    if (DotProduct(&cross, &a) < DAT_004ab4c8) {
         return 1;
     }
     return 0;
@@ -989,7 +989,7 @@ LEGO_EXPORT int TMNegParity(float *param_1) {
 // FUNCTION: LEGOLAND 0x00442e90
 LEGO_EXPORT void RenderItems_New(void) {
     DAT_0062feec[0] = (unsigned int)&DAT_00630108;
-    DAT_00655a4c = 0;
+    RenderItemCount = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00442eb0
@@ -1044,7 +1044,7 @@ LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct Bloke
 unsigned int FUN_00442f50(void) {
     unsigned int result = DAT_0062feec[0];
     DAT_0062feec[0] = DAT_0062feec[0] + 16;
-    DAT_00655a4c = DAT_00655a4c + 1;
+    RenderItemCount = RenderItemCount + 1;
     return result;
 }
 
@@ -1124,7 +1124,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
 // FUNCTION: LEGOLAND 0x00443060
 LEGO_EXPORT void RenderItems2_New(void) {
     DAT_0062fef0 = (unsigned int)&DAT_00638218;
-    DAT_00655a50 = 0;
+    RenderItem2Count = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00443080
@@ -1174,7 +1174,7 @@ LEGO_EXPORT void RenderItem2_AddItem(struct RenderItemNode **head, unsigned int 
 unsigned int FUN_00443120(void) {
     unsigned int result = DAT_0062fef0;
     DAT_0062fef0 = DAT_0062fef0 + 16;
-    DAT_00655a50 = DAT_00655a50 + 1;
+    RenderItem2Count = RenderItem2Count + 1;
     return result;
 }
 
@@ -1205,10 +1205,10 @@ LEGO_EXPORT char *GetFaceTextureNameOfBloke(struct BlokeSex0 *param_1) {
     char *name;
     switch (inner->field_84) {
     case 0:
-        ptr = DAT_00630100;
+        ptr = AltManFileData;
         break;
     case 1:
-        ptr = DAT_0062feac;
+        ptr = AltWomanFileData;
         break;
     default:
         ptr = param_1;
@@ -1227,10 +1227,10 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
     char *name;
     switch (inner->field_84) {
     case 0:
-        ptr = DAT_00630100;
+        ptr = AltManFileData;
         break;
     case 1:
-        ptr = DAT_0062feac;
+        ptr = AltWomanFileData;
         break;
     default:
         ptr = param_1;
@@ -1243,22 +1243,22 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
 // FUNCTION: LEGOLAND 0x004431f0
 LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_8c;
-    return (DAT_004b7ac0[idx * 3] << 16) | (DAT_004b7ac0[idx * 3 + 1] << 8) | DAT_004b7ac0[idx * 3 + 2];
+    return (BlokeColours[idx * 3] << 16) | (BlokeColours[idx * 3 + 1] << 8) | BlokeColours[idx * 3 + 2];
 }
 
 // FUNCTION: LEGOLAND 0x00443220
 LEGO_EXPORT unsigned int GetArmColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_90;
-    return (DAT_004b7ac0[idx * 3] << 16) | (DAT_004b7ac0[idx * 3 + 1] << 8) | DAT_004b7ac0[idx * 3 + 2];
+    return (BlokeColours[idx * 3] << 16) | (BlokeColours[idx * 3 + 1] << 8) | BlokeColours[idx * 3 + 2];
 }
 
 // FUNCTION: LEGOLAND 0x00443250
-float FUN_00443250(float param_1) {
+float SinFloat(float param_1) {
     return (float)sin(param_1);
 }
 
 // FUNCTION: LEGOLAND 0x00443260
-float FUN_00443260(float param_1) {
+float CosFloat(float param_1) {
     return (float)cos(param_1);
 }
 
@@ -1279,8 +1279,8 @@ LEGO_EXPORT void MatrixMultiply(float *A, float *B, float *C) {
 
 // FUNCTION: LEGOLAND 0x00443360
 LEGO_EXPORT void BuildYRotationMatrix(float angle, float *out) {
-    float s = FUN_00443250(angle);
-    float c = FUN_00443260(angle);
+    float s = SinFloat(angle);
+    float c = CosFloat(angle);
     out[0] = c;
     out[6] = -s;
     out[1] = 0.0f;

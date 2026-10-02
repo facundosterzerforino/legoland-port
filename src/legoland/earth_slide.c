@@ -84,13 +84,13 @@ void FUN_0042ce50(struct EarthNode *node, struct EarthBlokeElem *elem) {
         memset(q, 0, sizeof(struct EarthQueue));
         q->elem = elem;
         *(unsigned char *)((char *)elem->bloke + 0x62) |= 0x40;
-        FUN_0042ce90(node, q);
+        EarthNodeAppendQueueEntry(node, q);
         node->field_18++;
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042ce90
-void FUN_0042ce90(struct EarthNode *p, struct EarthQueue *value) {
+void EarthNodeAppendQueueEntry(struct EarthNode *p, struct EarthQueue *value) {
     if (p->queue_head == NULL && p->queue_tail == NULL) {
         p->queue_head = value;
         p->queue_tail = value;
@@ -188,15 +188,15 @@ void FUN_0042d070(struct EarthRideObj *param_1, unsigned int param_2, unsigned i
     if (node != NULL) {
         cv = node->field_b;
         if (cv <= 0xa || 0xf <= cv) {
-            RenderUsingRin((struct RinRender *)DAT_006160d4, (int)cv, (struct ViewportEntry *)ride, param_4);
+            RenderUsingRin((struct RinRender *)EarthSlideRin, (int)cv, (struct ViewportEntry *)ride, param_4);
         }
         RenderBlokesNotInSeats((unsigned int)ride, (unsigned int)param_4);
         if (node->field_4 != 0) {
             coords = GetScreenCoordsForObject(param_4, ride);
-            PrintSprite(DAT_006160d8, coords.x, coords.y, param_6, 0);
+            PrintSprite(EarthSlideEntranceMatteSprite, coords.x, coords.y, param_6, 0);
         }
         coords = GetScreenCoordsForObject(param_4, ride);
-        PrintSprite(DAT_006160e0, coords.x, coords.y, param_6, 0);
+        PrintSprite(EarthSlideEntranceMatte2Sprite, coords.x, coords.y, param_6, 0);
     }
 }
 
@@ -212,24 +212,24 @@ void FUN_0042d100(struct EarthRideObj *param_1) {
     }
     DAT_006160e8 = NULL;
     // STRING: LEGOLAND 0x004b663c
-    DAT_006160e4 = LoadPos("3ddata\\earth.pos");
+    EarthPos = LoadPos("3ddata\\earth.pos");
     // STRING: LEGOLAND 0x004b6620
-    DAT_006160d4 = LoadRin("3ddata\\earthslide.rin", DAT_004b6638);
-    if (DAT_006160d4 != NULL) {
-        ((int *)DAT_006160d4)[0] = 0xffffff62;
-        ((int *)DAT_006160d4)[1] = 0xfffffffa;
-        ((int *)DAT_006160d4)[3] = 0;
+    EarthSlideRin = LoadRin("3ddata\\earthslide.rin", DAT_004b6638);
+    if (EarthSlideRin != NULL) {
+        ((int *)EarthSlideRin)[0] = 0xffffff62;
+        ((int *)EarthSlideRin)[1] = 0xfffffffa;
+        ((int *)EarthSlideRin)[3] = 0;
     }
-    if (DAT_006160e4 != NULL) {
-        *(int *)((char *)DAT_006160e4 + 0x14) = 0x53;
-        *(int *)((char *)DAT_006160e4 + 0x18) = 0xc4;
-        *(int *)((char *)DAT_006160e4 + 0x1c) = 3;
-        *(int *)((char *)DAT_006160e4 + 0x20) = 0x41;
+    if (EarthPos != NULL) {
+        *(int *)((char *)EarthPos + 0x14) = 0x53;
+        *(int *)((char *)EarthPos + 0x18) = 0xc4;
+        *(int *)((char *)EarthPos + 0x1c) = 3;
+        *(int *)((char *)EarthPos + 0x20) = 0x41;
     }
     // STRING: LEGOLAND 0x004b6600
-    DAT_006160d8 = LoadSprite("EarthSlide Entrance Matte.lls", 1);
+    EarthSlideEntranceMatteSprite = LoadSprite("EarthSlide Entrance Matte.lls", 1);
     // STRING: LEGOLAND 0x004b65e0
-    DAT_006160e0 = LoadSprite("EarthSlideEntranceMatte2.lls", 1);
+    EarthSlideEntranceMatte2Sprite = LoadSprite("EarthSlideEntranceMatte2.lls", 1);
     DAT_006160c8 = 0;
     DAT_006160cc = 0;
 }
@@ -237,10 +237,10 @@ void FUN_0042d100(struct EarthRideObj *param_1) {
 // FUNCTION: LEGOLAND 0x0042d1f0
 void FUN_0042d1f0(struct EarthRideObj *arg1) {
     DAT_006160d0 = (unsigned int)arg1->ride;
-    UnLoadRin(DAT_006160d4);
-    UnloadPos(DAT_006160e4);
-    KillSprite(DAT_006160d8);
-    KillSprite(DAT_006160e0);
+    UnLoadRin(EarthSlideRin);
+    UnloadPos(EarthPos);
+    KillSprite(EarthSlideEntranceMatteSprite);
+    KillSprite(EarthSlideEntranceMatte2Sprite);
 }
 
 // FUNCTION: LEGOLAND 0x0042d230
@@ -272,7 +272,7 @@ void FUN_0042d2c0(unsigned int param_1, unsigned char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d2f0
-int FUN_0042d2f0(void) {
+int EarthSlideRide_Save(void) {
     struct EarthNode *node;
     struct EarthQueue *q;
     int count;
@@ -295,7 +295,7 @@ int FUN_0042d2f0(void) {
             return 0;
         }
         for (q = node->queue_head; q != NULL; q = q->next) {
-            value = FUN_0042d3e0(*(struct EarthBlokeElem **)(DAT_006160d0 + 0xcc), q->elem);
+            value = CountEarthBlokeElemsUntil(*(struct EarthBlokeElem **)(DAT_006160d0 + 0xcc), q->elem);
             if (SaveGameWrite(&value, 4) == 0) {
                 return 0;
             }
@@ -306,7 +306,7 @@ int FUN_0042d2f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d3e0
-unsigned int FUN_0042d3e0(struct EarthBlokeElem *param_1, struct EarthBlokeElem *param_2) {
+unsigned int CountEarthBlokeElemsUntil(struct EarthBlokeElem *param_1, struct EarthBlokeElem *param_2) {
     unsigned int count = 0;
     struct EarthBlokeElem *node = param_1;
 
@@ -318,7 +318,7 @@ unsigned int FUN_0042d3e0(struct EarthBlokeElem *param_1, struct EarthBlokeElem 
 }
 
 // FUNCTION: LEGOLAND 0x0042d400
-int FUN_0042d400(void) {
+int EarthSlideRide_Load(void) {
     struct EarthNode *node;
     struct EarthNode *prev;
     struct EarthQueue *q;
@@ -360,7 +360,7 @@ int FUN_0042d400(void) {
             if (SaveGameRead(&value, 4) == 0) {
                 return 0;
             }
-            node->queue_tail->elem = FUN_0042d540(*(struct EarthBlokeElem **)(DAT_006160d0 + 0xcc), value);
+            node->queue_tail->elem = GetNthNextEarthBlokeElem(*(struct EarthBlokeElem **)(DAT_006160d0 + 0xcc), value);
         }
         if (node->queue_tail != NULL) {
             node->queue_tail->next = NULL;
@@ -374,7 +374,7 @@ int FUN_0042d400(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d540
-struct EarthBlokeElem *FUN_0042d540(struct EarthBlokeElem *param_1, unsigned int param_2) {
+struct EarthBlokeElem *GetNthNextEarthBlokeElem(struct EarthBlokeElem *param_1, unsigned int param_2) {
     struct EarthBlokeElem *result = param_1;
 
     while (param_2-- != 0) {
@@ -396,7 +396,7 @@ void FUN_0042d560(unsigned short *param_1) {
             nb = *(char *)((char *)param_1 + 0xb) + 1;
             *(int *)((char *)param_1 + 0x14) = 0;
             *(char *)((char *)param_1 + 0xb) = nb;
-            if (*(int *)((char *)DAT_006160d4 + 0x14) <= (int)nb) {
+            if (*(int *)((char *)EarthSlideRin + 0x14) <= (int)nb) {
                 flags = *(unsigned int *)((char *)param_1 + 0x10) & 0xfffffffe;
                 *(unsigned char *)((char *)param_1 + 0xb) = 0;
                 *(unsigned int *)((char *)param_1 + 0x10) = flags;
@@ -405,7 +405,7 @@ void FUN_0042d560(unsigned short *param_1) {
                 return;
             }
         }
-        Put3DBlokesOnRide((struct ViewportEntry *)DAT_006160d0, (unsigned char *)param_1, (int)*(char *)((char *)param_1 + 0xb), (int *)DAT_006160e4);
+        Put3DBlokesOnRide((struct ViewportEntry *)DAT_006160d0, (unsigned char *)param_1, (int)*(char *)((char *)param_1 + 0xb), (int *)EarthPos);
     }
     Put3DBlokesOnRide2((Element *)DAT_006160d0, (Element *)param_1);
 }
@@ -538,7 +538,7 @@ void FUN_0042d610(struct EarthRideObj *param_1) {
                 }
                 *(int *)((char *)bloke + 0x58) = 8;
                 *(char *)((char *)bloke + 0x60) += 1;
-                Put3DBlokesOnRide((struct ViewportEntry *)DAT_006160d0, (unsigned char *)node, (int)*(char *)((char *)node + 0xb), (int *)DAT_006160e4);
+                Put3DBlokesOnRide((struct ViewportEntry *)DAT_006160d0, (unsigned char *)node, (int)*(char *)((char *)node + 0xb), (int *)EarthPos);
                 break;
             case 8:
                 BlokeWalkAnim((struct Bloke *)bloke);

@@ -5,6 +5,6 @@
 struct ClassNode;
 struct CallbackTable;
 
-void FUN_0043a400(struct ClassNode *name, struct CallbackTable *ci);
+void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci);
 
 void FUN_00439950(struct Element *obj);

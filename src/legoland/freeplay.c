@@ -86,25 +86,25 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     // STRING: LEGOLAND 0x004beb34
     SPRITE_TitleScreenBk = LoadSprite("FreePlayScreenBK.lls", 0);
     // STRING: LEGOLAND 0x004beb24
-    DAT_007cb3b4 = LoadSprite("FP_Down1.lls", 4);
+    FreePlayDown1Sprite = LoadSprite("FP_Down1.lls", 4);
     // STRING: LEGOLAND 0x004beb14
-    DAT_007cb3ac = LoadSprite("FP_Down2.lls", 4);
+    FreePlayDown2Sprite = LoadSprite("FP_Down2.lls", 4);
     // STRING: LEGOLAND 0x004beb04
-    DAT_007cb3b0 = LoadSprite("FP_Down3.lls", 4);
+    FreePlayDown3Sprite = LoadSprite("FP_Down3.lls", 4);
     // STRING: LEGOLAND 0x004beaf4
-    DAT_007cb3a8 = LoadSprite("FP_Down4.lls", 4);
+    FreePlayDown4Sprite = LoadSprite("FP_Down4.lls", 4);
     // STRING: LEGOLAND 0x004beae8
-    DAT_007cb3c4 = LoadSprite("FP_Up1.lls", 4);
+    FreePlayUp1Sprite = LoadSprite("FP_Up1.lls", 4);
     // STRING: LEGOLAND 0x004beadc
-    DAT_007cb3c0 = LoadSprite("FP_Up2.lls", 4);
+    FreePlayUp2Sprite = LoadSprite("FP_Up2.lls", 4);
     // STRING: LEGOLAND 0x004bead0
-    DAT_007cb3cc = LoadSprite("FP_Up3.lls", 4);
+    FreePlayUp3Sprite = LoadSprite("FP_Up3.lls", 4);
     // STRING: LEGOLAND 0x004beac4
-    DAT_007cb3c8 = LoadSprite("FP_Up4.lls", 4);
+    FreePlayUp4Sprite = LoadSprite("FP_Up4.lls", 4);
     // STRING: LEGOLAND 0x004beab0
-    DAT_007cb398 = LoadSprite("FreePlay_Tick.lls", 4);
+    FreePlayTickSprite = LoadSprite("FreePlay_Tick.lls", 4);
     // STRING: LEGOLAND 0x004beaa0
-    DAT_007cb3d4 = LoadSprite("FP_Cover.lls", 4);
+    FreePlayCoverSprite = LoadSprite("FP_Cover.lls", 4);
 
     // STRING: LEGOLAND 0x004bea88
     icon = LoadSpriteIcon("GoBack_on_FreePlay.lls", 4, 0xd, 0x137, 7);
@@ -144,7 +144,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
         if ((elem->flags & 0x1) == 0) continue;
         elem->flags &= 0xfffcfff0;
         if ((elem->flags & 0xfff0) == 0x10 || (elem->flags & 0xfff0) == 0x1010) {
-            FUN_0047c6a0((struct LLIDBHead *)elem);
+            LLIDB_UnLoadODF((struct LLIDBHead *)elem);
         }
     }
 
@@ -168,7 +168,7 @@ void FUN_0048ab60(void) {
         return;
     }
     do {
-        FUN_004663f0();
+        DrawWatchSprite();
         if (node->field_18 == 1) {
             if (FUN_00478b20(node->field_1c) != 0) {
                 FUN_00469900((struct NerpsArg *)ElemID((const char *)node->field_1c), 0, 1);
@@ -185,24 +185,24 @@ void FUN_0048abb0(void) {
     QueryClass = 0;
     // STRING: LEGOLAND 0x004beb4c
     sprintf(buf, "FreePlayTest.txt");
-    FUN_00499380();
+    PauseGameTimer();
     FUN_00499410();
     FUN_0047f810();
-    DAT_0079a8d0 = 0;
+    CastlePlacedFlag = 0;
     ResetMapAI();
     DAT_00667c4c = FUN_0047afb0(buf);
-    FUN_00457870(0);
+    SetBricksLimited(0);
     FUN_0048ab60();
     AllocBlokeCounters(lpConfig->field_1a);
     FUN_00458940();
     MapStats.field_3a0 = 0;
     FUN_00489ee0();
     UpdateMenu();
-    FUN_004663c0();
+    UnloadWatchSprite();
     FUN_00490600(1);
     FUN_004911c0(DAT_0066861c, 0);
-    FUN_00458bb0(1);
-    FUN_004993c0();
+    SetMapLoaded(1);
+    ResumeGameTimer();
     UpdateSoundVols();
 }
 
@@ -213,9 +213,9 @@ unsigned char FUN_0048ac60(unsigned int param_1, unsigned int param_2) {
     }
 
     if (DAT_004bef9c != 0 && (param_2 & 0x2) != 0) {
-        DAT_0080ffa0.field_45 = 2;
-        FUN_00466360(0x127, 0x170);
-        FUN_00498920();
+        CurrentProfile.field_45 = 2;
+        LoadWatchSprite(0x127, 0x170);
+        SpeechCloseFile();
         DAT_006687b0 = 0x4;
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
         FUN_0048abb0();
@@ -225,7 +225,7 @@ unsigned char FUN_0048ac60(unsigned int param_1, unsigned int param_2) {
         EditMode.unk4 = 0x3;
         InitGameInterface(0x1);
         FUN_00474880();
-        DAT_0080ffa0.field_45 = 2;
+        CurrentProfile.field_45 = 2;
     }
     return 1;
 }
@@ -266,7 +266,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
     if (LLIDB_FindElement("WESTERN THEME", (unsigned int *)&western, 0) != 0) {
         exit(1);
     }
-    for (i = 0, p = DAT_0080ffa0.field_46; i < 200; i++, p++) {
+    for (i = 0, p = CurrentProfile.field_46; i < 200; i++, p++) {
         if (*p == 0) {
             continue;
         }
@@ -461,26 +461,26 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         return 0;
     }
     if (e == 0xc8) {
-        sprite = DAT_007cb3b4;
-        sprite2 = DAT_007cb3c4;
+        sprite = FreePlayDown1Sprite;
+        sprite2 = FreePlayUp1Sprite;
         list = DAT_007cb3d0;
     } else if (e == 0x1f4) {
-        sprite = DAT_007cb3ac;
-        sprite2 = DAT_007cb3c0;
+        sprite = FreePlayDown2Sprite;
+        sprite2 = FreePlayUp2Sprite;
         list = DAT_007cb3a4;
     } else if (e == 0x190) {
-        sprite = DAT_007cb3b0;
-        sprite2 = DAT_007cb3cc;
+        sprite = FreePlayDown3Sprite;
+        sprite2 = FreePlayUp3Sprite;
         list = DAT_007cb3b8;
     } else if (e == 0x12c) {
-        sprite = DAT_007cb3a8;
-        sprite2 = DAT_007cb3c8;
+        sprite = FreePlayDown4Sprite;
+        sprite2 = FreePlayUp4Sprite;
         list = DAT_007cb39c;
     } else {
         list = (struct PanelNode *)b;
     }
     if (list == NULL) {
-        InsertIcon(b - 3, 0x15, 7, DAT_007cb3d4);
+        InsertIcon(b - 3, 0x15, 7, FreePlayCoverSprite);
         return 0;
     }
     icon = AddGBarIcons((unsigned int)group, b, c, 1, d, a);
@@ -506,14 +506,14 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     group->field_18 = y;
     icon = FindIcon(a + 4);
     if (icon != NULL) {
-        FUN_0046d680(icon, sprite);
+        SetIconSprite(icon, sprite);
         icon->x -= 9;
         icon->string_id = 0x94;
         icon->string = GetString(0x94);
     }
     icon = FindIcon(a + 3);
     if (icon != NULL) {
-        FUN_0046d680(icon, sprite2);
+        SetIconSprite(icon, sprite2);
         icon->x -= 9;
         icon->string_id = 0x95;
         icon->string = GetString(0x95);
@@ -562,45 +562,45 @@ void FUN_0048b4a0(int arg) {
 
 // FUNCTION: LEGOLAND 0x0048b540
 LEGO_EXPORT void CleanUpFreePlay(void) {
-    if (DAT_007cb3b4) {
-        KillSprite(DAT_007cb3b4);
-        DAT_007cb3b4 = NULL;
+    if (FreePlayDown1Sprite) {
+        KillSprite(FreePlayDown1Sprite);
+        FreePlayDown1Sprite = NULL;
     }
-    if (DAT_007cb3ac) {
-        KillSprite(DAT_007cb3ac);
-        DAT_007cb3ac = NULL;
+    if (FreePlayDown2Sprite) {
+        KillSprite(FreePlayDown2Sprite);
+        FreePlayDown2Sprite = NULL;
     }
-    if (DAT_007cb3b0) {
-        KillSprite(DAT_007cb3b0);
-        DAT_007cb3b0 = NULL;
+    if (FreePlayDown3Sprite) {
+        KillSprite(FreePlayDown3Sprite);
+        FreePlayDown3Sprite = NULL;
     }
-    if (DAT_007cb3a8) {
-        KillSprite(DAT_007cb3a8);
-        DAT_007cb3a8 = NULL;
+    if (FreePlayDown4Sprite) {
+        KillSprite(FreePlayDown4Sprite);
+        FreePlayDown4Sprite = NULL;
     }
-    if (DAT_007cb3c4) {
-        KillSprite(DAT_007cb3c4);
-        DAT_007cb3c4 = NULL;
+    if (FreePlayUp1Sprite) {
+        KillSprite(FreePlayUp1Sprite);
+        FreePlayUp1Sprite = NULL;
     }
-    if (DAT_007cb3c0) {
-        KillSprite(DAT_007cb3c0);
-        DAT_007cb3c0 = NULL;
+    if (FreePlayUp2Sprite) {
+        KillSprite(FreePlayUp2Sprite);
+        FreePlayUp2Sprite = NULL;
     }
-    if (DAT_007cb3cc) {
-        KillSprite(DAT_007cb3cc);
-        DAT_007cb3cc = NULL;
+    if (FreePlayUp3Sprite) {
+        KillSprite(FreePlayUp3Sprite);
+        FreePlayUp3Sprite = NULL;
     }
-    if (DAT_007cb3c8) {
-        KillSprite(DAT_007cb3c8);
-        DAT_007cb3c8 = NULL;
+    if (FreePlayUp4Sprite) {
+        KillSprite(FreePlayUp4Sprite);
+        FreePlayUp4Sprite = NULL;
     }
-    if (DAT_007cb398) {
-        KillSprite(DAT_007cb398);
-        DAT_007cb398 = NULL;
+    if (FreePlayTickSprite) {
+        KillSprite(FreePlayTickSprite);
+        FreePlayTickSprite = NULL;
     }
-    if (DAT_007cb3d4) {
-        KillSprite(DAT_007cb3d4);
-        DAT_007cb3d4 = NULL;
+    if (FreePlayCoverSprite) {
+        KillSprite(FreePlayCoverSprite);
+        FreePlayCoverSprite = NULL;
     }
     FUN_0046fb40(0xc8);
     FUN_0046fb40(0x12c);
@@ -621,10 +621,10 @@ void FUN_0048b6c0(void) {
 void FUN_0048b6d0(void) {
     int i;
 
-    DAT_0080ffa0.flags[4] = 1;
+    CurrentProfile.flags[4] = 1;
     for (i = 0; i < 15; i++) {
-        if (DAT_0080ffa0.flags[4 + i] != 0) {
-            DAT_0080ffa0.flags[4 + i] = 1;
+        if (CurrentProfile.flags[4 + i] != 0) {
+            CurrentProfile.flags[4 + i] = 1;
             DAT_007cb394 = i;
         }
     }

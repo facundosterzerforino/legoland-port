@@ -32,7 +32,7 @@ void FUN_0046ce20(void) {
     DAT_007fe040 &= ~0x3;
     FUN_00476000();
     FUN_00444070(0, 0);
-    FUN_004988c0();
+    SpeechStop();
 }
 
 // FUNCTION: LEGOLAND 0x0046ce60
@@ -186,7 +186,7 @@ void FUN_0046d110(void) {
             DAT_004b9f88 = 0;
             DAT_006687ac = 0;
             DAT_007fe920 = GetTickCount();
-            FUN_00498920();
+            SpeechCloseFile();
             if (DAT_004b9f8c != 0xffffffff) {
                 switch (DAT_006687a4) {
                 case 0:
@@ -202,7 +202,7 @@ void FUN_0046d110(void) {
                     sprintf(buf, "%sz.wav", DAT_004b9f8c);
                     break;
                 }
-                FUN_00498630(buf);
+                SpeechLoadWavFile(buf);
                 FUN_00498b00();
             }
         }

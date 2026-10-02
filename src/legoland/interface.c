@@ -118,53 +118,53 @@ LEGO_EXPORT void Load_Interface_ControlIcons(void) {
     }
     DAT_00668ea4 = 1;
     // STRING: LEGOLAND 0x004bb3b4
-    DAT_00668e68 = LoadSprite("InterfaceBG.lls", 4);
+    InterfaceBgSprite = LoadSprite("InterfaceBG.lls", 4);
     // STRING: LEGOLAND 0x004bb3a4
-    DAT_00668e6c = LoadSprite("No_Energy.lls", 4);
+    NoEnergySprite = LoadSprite("No_Energy.lls", 4);
     // STRING: LEGOLAND 0x004bb394
-    DAT_00668e70 = LoadSprite("Bar_pointer.lls", 4);
+    BarPointerSprite = LoadSprite("Bar_pointer.lls", 4);
     // STRING: LEGOLAND 0x004bb37c
-    DAT_007fdcd0 = LoadSprite("IF_PathIconPressed.lls", 4);
+    IfPathIconPressedSprite = LoadSprite("IF_PathIconPressed.lls", 4);
     // STRING: LEGOLAND 0x004bb36c
-    DAT_007fdd50 = LoadSprite("IF_PathIcon.lls", 4);
+    IfPathIconSprite = LoadSprite("IF_PathIcon.lls", 4);
     // STRING: LEGOLAND 0x004bb354
-    DAT_007fdcd4 = LoadSprite("IF_QueryIconPressed.lls", 4);
+    IfQueryIconPressedSprite = LoadSprite("IF_QueryIconPressed.lls", 4);
     // STRING: LEGOLAND 0x004bb340
-    DAT_007fdd54 = LoadSprite("IF_Queryicon.lls", 4);
+    IfQueryiconSprite = LoadSprite("IF_Queryicon.lls", 4);
     // STRING: LEGOLAND 0x004bb324
-    DAT_007fdcd8 = LoadSprite("IF_EraserIconPressed.lls", 4);
+    IfEraserIconPressedSprite = LoadSprite("IF_EraserIconPressed.lls", 4);
     // STRING: LEGOLAND 0x004bb310
-    DAT_007fdd58 = LoadSprite("IF_EraserIcon.lls", 4);
+    IfEraserIconSprite = LoadSprite("IF_EraserIcon.lls", 4);
     // STRING: LEGOLAND 0x004bb2f8
-    DAT_007fdcdc = LoadSprite("IF_MapIconPressed.lls", 4);
+    IfMapIconPressedSprite = LoadSprite("IF_MapIconPressed.lls", 4);
     // STRING: LEGOLAND 0x004bb2e8
-    DAT_007fdd5c = LoadSprite("IF_Mapicon.lls", 4);
+    IfMapiconSprite = LoadSprite("IF_Mapicon.lls", 4);
     // STRING: LEGOLAND 0x004bb2cc
-    DAT_007fdce0 = LoadSprite("IF_OptionsIconPressed.lls", 4);
+    IfOptionsIconPressedSprite = LoadSprite("IF_OptionsIconPressed.lls", 4);
     // STRING: LEGOLAND 0x004bb2b8
-    DAT_007fdd60 = LoadSprite("IF_OptionsIcon.lls", 4);
+    IfOptionsIconSprite = LoadSprite("IF_OptionsIcon.lls", 4);
     // STRING: LEGOLAND 0x004bb29c
-    DAT_00668e74 = LoadSprite("Attract_Highlight_On.lls", 4);
+    AttractHighlightOnSprite = LoadSprite("Attract_Highlight_On.lls", 4);
     // STRING: LEGOLAND 0x004bb280
-    DAT_00668e78 = LoadSprite("Attract_Highlight_Off.lls", 4);
+    AttractHighlightOffSprite = LoadSprite("Attract_Highlight_Off.lls", 4);
     // STRING: LEGOLAND 0x004bb26c
-    DAT_00668e7c = LoadSprite("Attract_New_Off.lls", 4);
+    AttractNewOffSprite = LoadSprite("Attract_New_Off.lls", 4);
     // STRING: LEGOLAND 0x004bb258
-    DAT_00668e80 = LoadSprite("Attract_New_On.lls", 4);
+    AttractNewOnSprite = LoadSprite("Attract_New_On.lls", 4);
     // STRING: LEGOLAND 0x004bb240
-    DAT_00668e84 = LoadSprite("Side_ScrollDown_Lit.lls", 4);
+    SideScrollDownLitSprite = LoadSprite("Side_ScrollDown_Lit.lls", 4);
     // STRING: LEGOLAND 0x004bb228
-    DAT_00668e88 = LoadSprite("Side_ScrollUp_Lit.lls", 4);
+    SideScrollUpLitSprite = LoadSprite("Side_ScrollUp_Lit.lls", 4);
     // STRING: LEGOLAND 0x004bb218
-    DAT_00668e8c = LoadSprite("Link_Middle.lls", 4);
+    LinkMiddleSprite = LoadSprite("Link_Middle.lls", 4);
     // STRING: LEGOLAND 0x004bb208
-    DAT_00668e90 = LoadSprite("Link_Bottom.lls", 4);
+    LinkBottomSprite = LoadSprite("Link_Bottom.lls", 4);
     // STRING: LEGOLAND 0x004bb1f8
-    DAT_00668e94 = LoadSprite("BriefIcon2.lls", 4);
+    BriefIcon2Sprite = LoadSprite("BriefIcon2.lls", 4);
     // STRING: LEGOLAND 0x004bb1e8
-    DAT_00668e98 = LoadSprite("BriefIcon.lls", 4);
+    BriefIconSprite = LoadSprite("BriefIcon.lls", 4);
     // STRING: LEGOLAND 0x004bb1d8
-    DAT_00668ea0 = LoadSprite("ScriptEnd.lls", 4);
+    ScriptEndSprite = LoadSprite("ScriptEnd.lls", 4);
 }
 
 // FUNCTION: LEGOLAND 0x004743b0
@@ -172,54 +172,54 @@ LEGO_EXPORT void UnLoad_Interface_ControlIcons(void) {
     if (DAT_00668ea4 != 0) {
         memset(DAT_007fdd70, 0, sizeof(DAT_007fdd70));
         DAT_00668ea4 = 0;
-        KillSprite(DAT_00668e68);
-        DAT_00668e68 = NULL;
-        KillSprite(DAT_00668e6c);
-        DAT_00668e6c = NULL;
-        KillSprite(DAT_00668e70);
-        DAT_00668e70 = NULL;
-        KillSprite(DAT_007fdcd0);
-        DAT_007fdcd0 = NULL;
-        KillSprite(DAT_007fdd50);
-        DAT_007fdd50 = NULL;
-        KillSprite(DAT_007fdcd4);
-        DAT_007fdcd4 = NULL;
-        KillSprite(DAT_007fdd54);
-        DAT_007fdd54 = NULL;
-        KillSprite(DAT_007fdcd8);
-        DAT_007fdcd8 = NULL;
-        KillSprite(DAT_007fdd58);
-        DAT_007fdd58 = NULL;
-        KillSprite(DAT_007fdcdc);
-        DAT_007fdcdc = NULL;
-        KillSprite(DAT_007fdd5c);
-        DAT_007fdd5c = NULL;
-        KillSprite(DAT_007fdce0);
-        DAT_007fdce0 = NULL;
-        KillSprite(DAT_007fdd60);
-        DAT_007fdd60 = NULL;
-        KillSprite(DAT_00668e7c);
-        DAT_00668e7c = NULL;
-        KillSprite(DAT_00668e80);
-        DAT_00668e80 = NULL;
-        KillSprite(DAT_00668e74);
-        DAT_00668e74 = NULL;
-        KillSprite(DAT_00668e78);
-        DAT_00668e78 = NULL;
-        KillSprite(DAT_00668e84);
-        DAT_00668e84 = NULL;
-        KillSprite(DAT_00668e88);
-        DAT_00668e88 = NULL;
-        KillSprite(DAT_00668e8c);
-        DAT_00668e8c = NULL;
-        KillSprite(DAT_00668e90);
-        DAT_00668e90 = NULL;
-        KillSprite(DAT_00668e94);
-        DAT_00668e94 = NULL;
-        KillSprite(DAT_00668e98);
-        DAT_00668e98 = NULL;
-        KillSprite(DAT_00668ea0);
-        DAT_00668ea0 = NULL;
+        KillSprite(InterfaceBgSprite);
+        InterfaceBgSprite = NULL;
+        KillSprite(NoEnergySprite);
+        NoEnergySprite = NULL;
+        KillSprite(BarPointerSprite);
+        BarPointerSprite = NULL;
+        KillSprite(IfPathIconPressedSprite);
+        IfPathIconPressedSprite = NULL;
+        KillSprite(IfPathIconSprite);
+        IfPathIconSprite = NULL;
+        KillSprite(IfQueryIconPressedSprite);
+        IfQueryIconPressedSprite = NULL;
+        KillSprite(IfQueryiconSprite);
+        IfQueryiconSprite = NULL;
+        KillSprite(IfEraserIconPressedSprite);
+        IfEraserIconPressedSprite = NULL;
+        KillSprite(IfEraserIconSprite);
+        IfEraserIconSprite = NULL;
+        KillSprite(IfMapIconPressedSprite);
+        IfMapIconPressedSprite = NULL;
+        KillSprite(IfMapiconSprite);
+        IfMapiconSprite = NULL;
+        KillSprite(IfOptionsIconPressedSprite);
+        IfOptionsIconPressedSprite = NULL;
+        KillSprite(IfOptionsIconSprite);
+        IfOptionsIconSprite = NULL;
+        KillSprite(AttractNewOffSprite);
+        AttractNewOffSprite = NULL;
+        KillSprite(AttractNewOnSprite);
+        AttractNewOnSprite = NULL;
+        KillSprite(AttractHighlightOnSprite);
+        AttractHighlightOnSprite = NULL;
+        KillSprite(AttractHighlightOffSprite);
+        AttractHighlightOffSprite = NULL;
+        KillSprite(SideScrollDownLitSprite);
+        SideScrollDownLitSprite = NULL;
+        KillSprite(SideScrollUpLitSprite);
+        SideScrollUpLitSprite = NULL;
+        KillSprite(LinkMiddleSprite);
+        LinkMiddleSprite = NULL;
+        KillSprite(LinkBottomSprite);
+        LinkBottomSprite = NULL;
+        KillSprite(BriefIcon2Sprite);
+        BriefIcon2Sprite = NULL;
+        KillSprite(BriefIconSprite);
+        BriefIconSprite = NULL;
+        KillSprite(ScriptEndSprite);
+        ScriptEndSprite = NULL;
     }
 }
 
@@ -239,21 +239,21 @@ LEGO_EXPORT void Load_Interface_ThemeIcons(void) {
     }
     DAT_00668eb4 = 1;
     // STRING: LEGOLAND 0x004bb464
-    DAT_007fdcc0 = LoadSprite("legoland_themeON.lls", 4);
+    LegolandThemeOnSprite = LoadSprite("legoland_themeON.lls", 4);
     // STRING: LEGOLAND 0x004bb44c
-    DAT_007fdd40 = LoadSprite("legoland_themeOFF.lls", 4);
+    LegolandThemeOffSprite = LoadSprite("legoland_themeOFF.lls", 4);
     // STRING: LEGOLAND 0x004bb438
-    DAT_007fdcc8 = LoadSprite("castle_themeON.lls", 4);
+    CastleThemeOnSprite = LoadSprite("castle_themeON.lls", 4);
     // STRING: LEGOLAND 0x004bb424
-    DAT_007fdd48 = LoadSprite("castle_themeOFF.lls", 4);
+    CastleThemeOffSprite = LoadSprite("castle_themeOFF.lls", 4);
     // STRING: LEGOLAND 0x004bb410
-    DAT_007fdcc4 = LoadSprite("western_themeON.lls", 4);
+    WesternThemeOnSprite = LoadSprite("western_themeON.lls", 4);
     // STRING: LEGOLAND 0x004bb3f8
-    DAT_007fdd44 = LoadSprite("western_themeOFF.lls", 4);
+    WesternThemeOffSprite = LoadSprite("western_themeOFF.lls", 4);
     // STRING: LEGOLAND 0x004bb3e0
-    DAT_007fdccc = LoadSprite("adventurers_themeON.lls", 4);
+    AdventurersThemeOnSprite = LoadSprite("adventurers_themeON.lls", 4);
     // STRING: LEGOLAND 0x004bb3c4
-    DAT_007fdd4c = LoadSprite("adventurers_themeOFF.lls", 4);
+    AdventurersThemeOffSprite = LoadSprite("adventurers_themeOFF.lls", 4);
 }
 
 // FUNCTION: LEGOLAND 0x00474670
@@ -264,37 +264,37 @@ LEGO_EXPORT void UnLoad_Interface_ThemeIcons(void) {
         sprite = DAT_00668eb4;
         DAT_00668eb4 = 0;
         if (sprite != 0) {
-            if (DAT_007fdcc0 != 0) {
-                KillSprite(DAT_007fdcc0);
-                DAT_007fdcc0 = 0;
+            if (LegolandThemeOnSprite != 0) {
+                KillSprite(LegolandThemeOnSprite);
+                LegolandThemeOnSprite = 0;
             }
-            if (DAT_007fdd40 != 0) {
-                KillSprite(DAT_007fdd40);
-                DAT_007fdd40 = 0;
+            if (LegolandThemeOffSprite != 0) {
+                KillSprite(LegolandThemeOffSprite);
+                LegolandThemeOffSprite = 0;
             }
-            if (DAT_007fdcc8 != 0) {
-                KillSprite(DAT_007fdcc8);
-                DAT_007fdcc8 = 0;
+            if (CastleThemeOnSprite != 0) {
+                KillSprite(CastleThemeOnSprite);
+                CastleThemeOnSprite = 0;
             }
-            if (DAT_007fdd48 != 0) {
-                KillSprite(DAT_007fdd48);
-                DAT_007fdd48 = 0;
+            if (CastleThemeOffSprite != 0) {
+                KillSprite(CastleThemeOffSprite);
+                CastleThemeOffSprite = 0;
             }
-            if (DAT_007fdcc4 != 0) {
-                KillSprite(DAT_007fdcc4);
-                DAT_007fdcc4 = 0;
+            if (WesternThemeOnSprite != 0) {
+                KillSprite(WesternThemeOnSprite);
+                WesternThemeOnSprite = 0;
             }
-            if (DAT_007fdd44 != 0) {
-                KillSprite(DAT_007fdd44);
-                DAT_007fdd44 = 0;
+            if (WesternThemeOffSprite != 0) {
+                KillSprite(WesternThemeOffSprite);
+                WesternThemeOffSprite = 0;
             }
-            if (DAT_007fdccc != 0) {
-                KillSprite(DAT_007fdccc);
-                DAT_007fdccc = 0;
+            if (AdventurersThemeOnSprite != 0) {
+                KillSprite(AdventurersThemeOnSprite);
+                AdventurersThemeOnSprite = 0;
             }
-            if (DAT_007fdd4c != 0) {
-                KillSprite(DAT_007fdd4c);
-                DAT_007fdd4c = 0;
+            if (AdventurersThemeOffSprite != 0) {
+                KillSprite(AdventurersThemeOffSprite);
+                AdventurersThemeOffSprite = 0;
             }
         }
     }
@@ -304,16 +304,16 @@ LEGO_EXPORT void UnLoad_Interface_ThemeIcons(void) {
 void FUN_00474750(void) {
     if (DAT_004bb094 == 0) {
         DAT_004bb094 = 1;
-        FUN_0046d680((struct IconNode *)DAT_00668eb0, DAT_007fdd40);
+        SetIconSprite((struct IconNode *)DAT_00668eb0, LegolandThemeOffSprite);
     } else if (DAT_004bb098 == 0) {
         DAT_004bb098 = 1;
-        FUN_0046d680((struct IconNode *)DAT_00668eb0, DAT_007fdd48);
+        SetIconSprite((struct IconNode *)DAT_00668eb0, CastleThemeOffSprite);
     } else if (DAT_004bb09c == 0) {
         DAT_004bb09c = 1;
-        FUN_0046d680((struct IconNode *)DAT_00668eb0, DAT_007fdd44);
+        SetIconSprite((struct IconNode *)DAT_00668eb0, WesternThemeOffSprite);
     } else if (DAT_004bb0a0 == 0) {
         DAT_004bb0a0 = 1;
-        FUN_0046d680((struct IconNode *)DAT_00668eb0, DAT_007fdd4c);
+        SetIconSprite((struct IconNode *)DAT_00668eb0, AdventurersThemeOffSprite);
     }
 }
 
@@ -414,60 +414,60 @@ LEGO_EXPORT int InitGameInterface(int a) {
         DAT_00668ebc = 1;
         LLIDB_FindElement("PATH CONTROL", (unsigned int *)&element, 0);
         obj = element->obj;
-        DAT_007fd624 = obj;
-        icon = InsertIcon((short)DAT_004bb04c[8], (short)DAT_004bb04c[9], 0x93, DAT_007fdd50);
+        PathControlObject = obj;
+        icon = InsertIcon((short)DAT_004bb04c[8], (short)DAT_004bb04c[9], 0x93, IfPathIconSprite);
         icon->string = (char *)obj->field_7c;
         icon->string_id = 0xffffffff;
         icon->field_18 = 1;
-        icon->field_1c = DAT_007fdcd0;
-        icon->field_20p = DAT_007fdd50;
+        icon->field_1c = IfPathIconPressedSprite;
+        icon->field_20p = IfPathIconSprite;
         icon->field_8 = obj;
         icon->field_28 = (void *)RenderGBarSpriteIcon;
         icon->event_handler = (void *)FUN_00474fc0;
         icon->flags = (icon->flags & 0xfffffdff) | 0x300a;
 
-        icon = InsertIcon((short)DAT_004bb04c[10], (short)DAT_004bb04c[11], 0x93, DAT_007fdd54);
+        icon = InsertIcon((short)DAT_004bb04c[10], (short)DAT_004bb04c[11], 0x93, IfQueryiconSprite);
         icon->string_id = 0x5a;
         icon->string = GetString(0x5a);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_00475000;
         icon->field_18 = 2;
-        icon->field_1c = DAT_007fdcd4;
-        icon->field_20p = DAT_007fdd54;
+        icon->field_1c = IfQueryIconPressedSprite;
+        icon->field_20p = IfQueryiconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[12], (short)DAT_004bb04c[13], 0x93, DAT_007fdd58);
+        icon = InsertIcon((short)DAT_004bb04c[12], (short)DAT_004bb04c[13], 0x93, IfEraserIconSprite);
         icon->string_id = 0x5b;
         icon->string = GetString(0x5b);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_00475040;
         icon->field_18 = 3;
-        icon->field_1c = DAT_007fdcd8;
-        icon->field_20p = DAT_007fdd58;
+        icon->field_1c = IfEraserIconPressedSprite;
+        icon->field_20p = IfEraserIconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[14], (short)DAT_004bb04c[15], 0x93, DAT_007fdd5c);
+        icon = InsertIcon((short)DAT_004bb04c[14], (short)DAT_004bb04c[15], 0x93, IfMapiconSprite);
         icon->string_id = 0x5c;
         icon->string = GetString(0x5c);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_00475080;
         icon->field_18 = 4;
-        icon->field_1c = DAT_007fdcdc;
-        icon->field_20p = DAT_007fdd5c;
+        icon->field_1c = IfMapIconPressedSprite;
+        icon->field_20p = IfMapiconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[16], (short)DAT_004bb04c[17], 0x93, DAT_007fdd60);
+        icon = InsertIcon((short)DAT_004bb04c[16], (short)DAT_004bb04c[17], 0x93, IfOptionsIconSprite);
         icon->string_id = 0x5d;
         icon->string = GetString(0x5d);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_00475120;
-        icon->field_20p = DAT_007fdd60;
+        icon->field_20p = IfOptionsIconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[0], (short)DAT_004bb04c[1], 0x9a, DAT_007fdd40);
+        icon = InsertIcon((short)DAT_004bb04c[0], (short)DAT_004bb04c[1], 0x9a, LegolandThemeOffSprite);
         icon->string_id = 0x5e;
         icon->string = GetString(0x5e);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004751a0;
         DAT_007fdd70[0] = (struct InterfaceProfileObj *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[2], (short)DAT_004bb04c[3], 0x9a, DAT_007fdd44);
+        icon = InsertIcon((short)DAT_004bb04c[2], (short)DAT_004bb04c[3], 0x9a, WesternThemeOffSprite);
         DAT_00668e3c = icon;
         icon->string_id = 0x5f;
         icon->string = GetString(0x5f);
@@ -475,14 +475,14 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->event_handler = (void *)FUN_004754b0;
         DAT_007fdd70[1] = (struct InterfaceProfileObj *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[4], (short)DAT_004bb04c[5], 0x9a, DAT_007fdd48);
+        icon = InsertIcon((short)DAT_004bb04c[4], (short)DAT_004bb04c[5], 0x9a, CastleThemeOffSprite);
         icon->string_id = 0x60;
         icon->string = GetString(0x60);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004753a0;
         DAT_007fdd70[2] = (struct InterfaceProfileObj *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[6], (short)DAT_004bb04c[7], 0x9a, DAT_007fdd4c);
+        icon = InsertIcon((short)DAT_004bb04c[6], (short)DAT_004bb04c[7], 0x9a, AdventurersThemeOffSprite);
         icon->string_id = 0x61;
         icon->string = GetString(0x61);
         icon->flags |= 0x6002;
@@ -499,10 +499,10 @@ LEGO_EXPORT int InitGameInterface(int a) {
         bar->field_28 = (void *)RenderMoneyBar;
         bar->flags |= 0x400a;
 
-        icon = InsertIcon(0x19e, 0x179, 0x9a, DAT_00668e94);
+        icon = InsertIcon(0x19e, 0x179, 0x9a, BriefIcon2Sprite);
         icon->string_id = 0x24e;
         icon->string = GetString(0x24e);
-        icon->field_18p = DAT_00668e98;
+        icon->field_18p = BriefIconSprite;
         icon->flags |= 0x600a;
         icon->event_handler = (void *)FUN_00474f40;
         icon->field_28 = (void *)FUN_0046e040;
@@ -510,7 +510,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->flags |= 0x400;
         FUN_00491240(DAT_0066861c);
 
-        icon = InsertIcon(0x20a, 0x17a, 0x93, DAT_00668ea0);
+        icon = InsertIcon(0x20a, 0x17a, 0x93, ScriptEndSprite);
         icon->field_20p = NULL;
         icon->field_1c = NULL;
         icon->string_id = 0x24f;
@@ -521,7 +521,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         DAT_00668eb8 = (unsigned int)icon;
         if (a != 0) {
             FUN_0046b240(0);
-            if (DAT_0080ffa0.field_45 == 2) {
+            if (CurrentProfile.field_45 == 2) {
                 FUN_004748a0((void *)0);
             } else {
                 FUN_004748a0((void *)1);
@@ -530,7 +530,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
             FUN_0046b240(1);
         } else {
             FUN_0046b240(0);
-            if (DAT_0080ffa0.field_45 == 2) {
+            if (CurrentProfile.field_45 == 2) {
                 FUN_004748a0((void *)0);
             } else {
                 FUN_004748a0((void *)1);
@@ -539,10 +539,10 @@ LEGO_EXPORT int InitGameInterface(int a) {
         InitPopUpInfo();
     }
     FUN_00474590();
-    DAT_007fe114 = 0;
-    DAT_007fe117 = 0;
-    DAT_007fe116 = 0;
-    DAT_007fe115 = 0;
+    LegolandCommonThemeCount = 0;
+    AdventurersThemeCount = 0;
+    CastleThemeCount = 0;
+    WesternThemeCount = 0;
     ResetMoveAWorkerStruct();
     DAT_007fdd80 = 2;
     DAT_007fdd8c = 0x86;
@@ -649,7 +649,7 @@ unsigned char FUN_00475080(unsigned int a, unsigned char flags) {
         do {
             PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
             if (EditMode.unk4 != 1) {
-                FUN_00498920();
+                SpeechCloseFile();
                 DAT_00667c60 = EditMode.unk4;
                 EditMode.unk4 = 1;
                 GamePad = GamePad & 0xffffebff;
@@ -678,7 +678,7 @@ unsigned char FUN_00475120(unsigned int a, unsigned int flags, unsigned int c, u
             EditMode.unk4 = 2;
             DAT_0080ff80.unk4 = 0xffffffff;
             DAT_0080ff80.unk8 = 5;
-            FUN_00498920();
+            SpeechCloseFile();
             DAT_006687b0 = 4;
         }
     }
@@ -705,7 +705,7 @@ unsigned char FUN_004751a0(struct IconNode *param_1, unsigned char flags) {
                 if (result == 1) {
                     FUN_00474750();
                     DAT_00668eb0 = (unsigned int)param_1;
-                    FUN_0046d680(param_1, DAT_007fdcc0);
+                    SetIconSprite(param_1, LegolandThemeOnSprite);
                     DAT_004bb094 = 0;
                 } else {
                     DAT_004baff8 = saved_ff8;
@@ -743,7 +743,7 @@ unsigned char FUN_004752a0(struct IconNode *param_1, unsigned char flags) {
             if (result == 1) {
                 FUN_00474750();
                 DAT_00668eb0 = (unsigned int)param_1;
-                FUN_0046d680(param_1, DAT_007fdccc);
+                SetIconSprite(param_1, AdventurersThemeOnSprite);
                 DAT_004bb0a0 = 0;
                 return 1;
             }
@@ -780,7 +780,7 @@ unsigned char FUN_004753a0(struct IconNode *param_1, unsigned char flags) {
             if (result == 1) {
                 FUN_00474750();
                 DAT_00668eb0 = (unsigned int)param_1;
-                FUN_0046d680(param_1, DAT_007fdcc8);
+                SetIconSprite(param_1, CastleThemeOnSprite);
                 DAT_004bb098 = 0;
                 return 1;
             }
@@ -821,7 +821,7 @@ unsigned char FUN_004754b0(struct IconNode *param_1, unsigned char flags) {
             if (result == 1) {
                 FUN_00474750();
                 DAT_00668eb0 = (unsigned int)param_1;
-                FUN_0046d680(param_1, DAT_007fdcc4);
+                SetIconSprite(param_1, WesternThemeOnSprite);
                 DAT_004bb09c = 0;
                 return 1;
             }
@@ -1300,7 +1300,7 @@ void FUN_00476020(void) {}
 // FUNCTION: LEGOLAND 0x00476030
 void FUN_00476030(int index, unsigned int value) {
     if (index >= 0 && index < 9) {
-        DAT_007fdd00[index] = value;
+        ButtonFlashStates[index] = value;
     }
 }
 
@@ -1346,12 +1346,12 @@ void FUN_004760a0(void) {
         coords = DAT_004bb04c;
         i = 0;
         do {
-            if (DAT_007fdd00[i] != 0) {
+            if (ButtonFlashStates[i] != 0) {
                 if (GetBlink() != 0) {
-                    PrintSprite((&DAT_007fdcc0)[i], coords[0], coords[1], 0, 0);
+                    PrintSprite((&LegolandThemeOnSprite)[i], coords[0], coords[1], 0, 0);
                     played = 1;
                 } else {
-                    PrintSprite((&DAT_007fdd40)[i], coords[0], coords[1], 0, 0);
+                    PrintSprite((&LegolandThemeOffSprite)[i], coords[0], coords[1], 0, 0);
                 }
             }
             coords = coords + 2;
@@ -1372,7 +1372,7 @@ void FUN_00476140(int index, int value) {
     if (obj != NULL) {
         if (value != 0) {
             obj->flags &= 0xfffffbff;
-            DAT_0080ffa0.flags[index] = 1;
+            CurrentProfile.flags[index] = 1;
             UpDateCurrentProfile();
         } else {
             obj->flags |= 0x400;
@@ -1386,7 +1386,7 @@ void FUN_00476180(void) {
     struct ProfileObj **items;
     unsigned int counter;
 
-    flags = DAT_0080ffa0.flags;
+    flags = CurrentProfile.flags;
     items = (struct ProfileObj **)DAT_007fdd70;
     counter = 4;
     while (counter != 0) {
@@ -1432,17 +1432,17 @@ unsigned char FUN_00476240(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00476250
-void FUN_00476250(void) {
+void SaveResearchList(void) {
     struct InterfaceResearchNode *node;
     int count;
     int len;
 
     count = 0;
-    for (node = DAT_00668ed8; node != NULL; node = node->next) {
+    for (node = ResearchList; node != NULL; node = node->next) {
         count = count + 1;
     }
     SaveGameWrite(&count, 4);
-    node = DAT_00668ed8;
+    node = ResearchList;
     while (node != NULL) {
         len = strlen(((struct BuildObject *)node->data)->field_c4->name);
         SaveGameWrite(&len, 4);
@@ -1453,7 +1453,7 @@ void FUN_00476250(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004762f0
-void FUN_004762f0(void) {
+void LoadResearchList(void) {
     struct InterfaceResearchNode *node;
     struct BuildObject *obj;
     char buf[512];
@@ -1461,14 +1461,14 @@ void FUN_004762f0(void) {
     int len;
 
     node = NULL;
-    DAT_00668ed8 = NULL;
+    ResearchList = NULL;
     SaveGameRead(&count, 4);
     while (count--) {
         if (node != NULL) {
             node = node->next = (struct InterfaceResearchNode *)malloc(sizeof(struct InterfaceResearchNode));
         } else {
             node = (struct InterfaceResearchNode *)malloc(sizeof(struct InterfaceResearchNode));
-            DAT_00668ed8 = node;
+            ResearchList = node;
         }
         SaveGameRead(&len, 4);
         SaveGameRead(buf, len);
@@ -1489,9 +1489,9 @@ LEGO_EXPORT void CleanUpReseachList(void) {
     struct InterfaceResearchNode *node;
     struct InterfaceResearchNode *prev;
 
-    node = DAT_00668ed8;
+    node = ResearchList;
     if (node->field_8 == 0) {
-        DAT_00668ed8 = node->next;
+        ResearchList = node->next;
         free(node);
         return;
     }
@@ -1511,17 +1511,17 @@ LEGO_EXPORT void DeleteReseachList(void) {
     struct InterfaceResearchNode *current;
     struct InterfaceResearchNode *next;
 
-    current = DAT_00668ed8;
+    current = ResearchList;
     while (current != NULL) {
         next = current->next;
         free(current);
         current = next;
     }
-    DAT_00668ed8 = NULL;
+    ResearchList = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00476460
-struct MovieHandle *FUN_00476460(const char *filename) {
+struct MovieHandle *OpenAviMovie(const char *filename) {
     struct AviFileInfo file_info;
     struct AviStreamInfo stream_info;
     struct MovieHandle *handle;
@@ -1537,7 +1537,7 @@ struct MovieHandle *FUN_00476460(const char *filename) {
 
     video_stream = NULL;
     audio_stream = NULL;
-    if (DAT_00668f98 == 0) {
+    if (AviOpenCount == 0) {
         AVIFileInit();
     }
     if (AVIFileOpenA(&file, filename, 0, 0) == 0) {
@@ -1582,20 +1582,20 @@ struct MovieHandle *FUN_00476460(const char *filename) {
                 handle->file = file;
                 handle->audio_stream = audio_stream;
                 handle->video_stream = video_stream;
-                DAT_00668f98++;
+                AviOpenCount++;
                 return handle;
             }
         }
         AVIFileRelease(file);
     }
-    if (DAT_00668f98 == 0) {
+    if (AviOpenCount == 0) {
         AVIFileExit();
     }
     return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00476630
-void FUN_00476630(struct MovieHandle *h) {
+void CloseAviMovie(struct MovieHandle *h) {
     if (h->frame != NULL) {
         AVIStreamGetFrameClose(h->frame);
     }
@@ -1606,14 +1606,14 @@ void FUN_00476630(struct MovieHandle *h) {
         AVIStreamRelease(h->audio_stream);
     }
     free(h);
-    DAT_00668f98 = DAT_00668f98 - 1;
-    if (DAT_00668f98 == 0) {
+    AviOpenCount = AviOpenCount - 1;
+    if (AviOpenCount == 0) {
         AVIFileExit();
     }
 }
 
 // FUNCTION: LEGOLAND 0x00476680
-int FUN_00476680(void) {
+int GetPerformanceTime(void) {
     LARGE_INTEGER freq;
     LARGE_INTEGER count;
     unsigned int state;
@@ -1677,12 +1677,12 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
                     DAT_00668fb0 = 1;
                     break;
                 }
-                if ((DAT_007fdda0[0x39] & 0x80) != 0) {
+                if ((KeyboardState[0x39] & 0x80) != 0) {
                     break;
                 }
             } else {
                 ProcessSystemEvents();
-                if (((DAT_007fdda0[0x1d] | DAT_007fdda0[0x9d]) & 0x80) != 0 && (DAT_007fdda0[0x10] & 0x80) != 0) {
+                if (((KeyboardState[0x1d] | KeyboardState[0x9d]) & 0x80) != 0 && (KeyboardState[0x10] & 0x80) != 0) {
                     break;
                 }
             }
@@ -1698,12 +1698,12 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
             PopRenderingStatus();
             if (started == 0) {
                 if (audio != 0) {
-                    FUN_00476bf0(handle);
+                    StartMovieAudio(handle);
                 }
-                started = FUN_00476680();
+                started = GetPerformanceTime();
             }
             RenderingComplete();
-            frame_index = FUN_00476680();
+            frame_index = GetPerformanceTime();
             if ((unsigned int)((frame_index - started) * handle->field_4) / 1000 == target) {
                 frame_index = target + 1;
                 if (frame_index < (int)handle->field_0) {
@@ -1713,7 +1713,7 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
                 frame_index = -1;
             }
             while (target == prev) {
-                target = (unsigned int)((FUN_00476680() - started) * handle->field_4) / 1000;
+                target = (unsigned int)((GetPerformanceTime() - started) * handle->field_4) / 1000;
             }
             if (audio != 0) {
                 FUN_00476d20(target, prev);
@@ -1721,7 +1721,7 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
             prev = target;
         } while ((int)target < (int)handle->field_0);
     }
-    FUN_00476c90();
+    StopMovieAudio();
     do {
         ProcessSystemEvents();
         ReadGameButtons();
@@ -1815,7 +1815,7 @@ int FUN_00476910(struct MovieHandle *handle) {
 }
 
 // FUNCTION: LEGOLAND 0x00476bf0
-int FUN_00476bf0(struct MovieHandle *handle) {
+int StartMovieAudio(struct MovieHandle *handle) {
     unsigned int start;
     unsigned int len_start;
 
@@ -1835,7 +1835,7 @@ int FUN_00476bf0(struct MovieHandle *handle) {
 }
 
 // FUNCTION: LEGOLAND 0x00476c90
-int FUN_00476c90(void) {
+int StopMovieAudio(void) {
     if (DAT_00668f9c != 0) {
         DAT_00668f9c = 0;
         KLIBAUDIO_StopAVISoundBuffer(DAT_00668f48);
@@ -1977,7 +1977,7 @@ int FUN_00476d20(unsigned int param_1, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004771f0
-int FUN_004771f0(char *filename, unsigned int param_2, int param_3) {
+int PlayMovie(char *filename, unsigned int param_2, int param_3) {
     int rect[4];
     char path[0x80];
     struct MovieHandle *handle;
@@ -1993,30 +1993,30 @@ int FUN_004771f0(char *filename, unsigned int param_2, int param_3) {
         return 0;
     }
     if (lpConfig->field_40 == 0) {
-        FUN_00498920();
+        SpeechCloseFile();
         // STRING: LEGOLAND 0x004bb588
         strcpy(path, "FMV\\");
         DAT_006687b0 = 4;
         strcat(path, filename);
         // STRING: LEGOLAND 0x004bb56c
-        FUN_0047f870("Attempting to open Movie %s", path);
-        handle = FUN_00476460(path);
+        DebugTrace("Attempting to open Movie %s", path);
+        handle = OpenAviMovie(path);
         if (handle == NULL) {
-            strcpy(path, DAT_00813b04);
+            strcpy(path, CdDrivePath);
             strcat(path, filename);
-            FUN_0047f870("Attempting to open Movie %s", path);
-            handle = FUN_00476460(path);
+            DebugTrace("Attempting to open Movie %s", path);
+            handle = OpenAviMovie(path);
         }
         FUN_0047f850();
         if (handle != NULL) {
             // STRING: LEGOLAND 0x004bb554
-            FUN_0047f870("Movie openned OK (%s)", path);
+            DebugTrace("Movie openned OK (%s)", path);
             FUN_0047f850();
-            FUN_00492830();
+            PauseAllSamples();
             FUN_00492d80();
             PushRenderingStatusAndUnlockVideoSurface();
             // STRING: LEGOLAND 0x004bb538
-            FUN_0047f870("Attempting to play movie..");
+            DebugTrace("Attempting to play movie..");
             FUN_0047f850();
             // STRING: LEGOLAND 0x004bb528
             DBPrintf("Starting Movie\n");
@@ -2024,15 +2024,15 @@ int FUN_004771f0(char *filename, unsigned int param_2, int param_3) {
             // STRING: LEGOLAND 0x004bb518
             DBPrintf("Stopping Movie\n");
             // STRING: LEGOLAND 0x004bb508
-            FUN_0047f870("Stopping movie");
+            DebugTrace("Stopping movie");
             FUN_0047f850();
-            FUN_00476630(handle);
+            CloseAviMovie(handle);
             PopRenderingStatus();
             do {
                 ProcessSystemEvents();
                 ReadGameButtons();
             } while ((DAT_00813ad4 & 7) != 0);
-            FUN_00492850();
+            ResumeAllSamples();
             FUN_00492da0();
             return result;
         }

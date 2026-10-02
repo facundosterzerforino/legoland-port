@@ -33,7 +33,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
             }
         }
         if (MapStats.field_3a0 == 1 && (int)lpConfig->field_28 <= 0xf) {
-            DAT_0080ffa0.flags[3 + lpConfig->field_28] = 1;
+            CurrentProfile.flags[3 + lpConfig->field_28] = 1;
             UpDateCurrentProfile();
         }
     }
@@ -117,7 +117,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
                     icon->event_handler = (void *)FUN_0048bb60;
                     icon->flags |= 0x600a;
                 }
-            } else if (DAT_0080ffa0.flags[4 + i + 5] == 1) {
+            } else if (CurrentProfile.flags[4 + i + 5] == 1) {
                 icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite1);
                 if (icon) {
                     icon->string_id = DAT_004beb80.levels[i].id;
@@ -158,18 +158,18 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
         do {
             DAT_006687c0 = 0;
             DAT_006687bc = 0;
-            FUN_00498920();
+            SpeechCloseFile();
             DAT_006687b0 = 4;
             PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
             FUN_0048b770();
             if ((int)lpConfig->field_28 <= 0xf) {
-                FUN_00466360(0xfa, 0x181);
+                LoadWatchSprite(0xfa, 0x181);
                 DAT_00668e38 = 0;
                 InitGameInterface(1);
                 EditMode.unk4 = 3;
                 FUN_00474880();
                 FUN_00458a50();
-                FUN_004663c0();
+                UnloadWatchSprite();
                 DAT_00798660 = 0;
                 DAT_00798668 = 0;
             } else {
@@ -187,7 +187,7 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
 }
 
 // FUNCTION: LEGOLAND 0x0048bd00
-void FUN_0048bd00(void) {
+void LoadTutorialSprites(void) {
     struct ProgressEntry *e;
 
     e = &DAT_004beb80.tutorials[0];
@@ -237,7 +237,7 @@ void FUN_0048bde0(void) {
     SPRITE_TitleScreenBk = LoadSprite("TutorialBK.lls", 0);
     DAT_00798664 = 1;
     if (DAT_00798660 == 0) {
-        FUN_0048bd00();
+        LoadTutorialSprites();
         // STRING: LEGOLAND 0x004bef70
         icon = LoadSpriteIcon("Accept_on_Report.lls", 4, 0x20a, 0x16c, 0x23);
         icon->string_id = 0x262;
@@ -249,7 +249,7 @@ void FUN_0048bde0(void) {
         icon = LoadSpriteIcon("GoBack_on_Tut.lls", 4, 0x20a, 0xf5, 0x23);
         icon->string_id = 0x26;
         icon->string = GetString(0x26);
-        if (DAT_0080ffa0.flags[9] == 1) {
+        if (CurrentProfile.flags[9] == 1) {
             icon->string_id = 0x26c;
             icon->string = GetString(0x26c);
             icon->event_handler = (void *)FUN_0048c090;
@@ -269,7 +269,7 @@ void FUN_0048bde0(void) {
     do {
         if (i == lpConfig->field_28 - 1) {
             icon = InsertIcon(entry->x, entry->y, 0x1c, entry->sprite0);
-        } else if (DAT_0080ffa0.flags[4 + i] == 1) {
+        } else if (CurrentProfile.flags[4 + i] == 1) {
             icon = InsertIcon(entry->x, entry->y, 0x1c, entry->sprite1);
         } else {
             icon = 0;
@@ -293,17 +293,17 @@ unsigned char FUN_0048bf90(unsigned char *arg0, unsigned int arg1, unsigned int 
     if ((arg1 & 2) != 0) {
         DAT_006687c0 = 0;
         DAT_006687bc = 0;
-        FUN_00498920();
+        SpeechCloseFile();
         DAT_006687b0 = 4;
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
         FUN_0048bd70();
-        FUN_00466360(0x186, 0x18b);
+        LoadWatchSprite(0x186, 0x18b);
         DAT_00668e38 = 0;
         InitGameInterface(1);
         EditMode.unk4 = 3;
         FUN_00474880();
         FUN_00458a50();
-        FUN_004663c0();
+        UnloadWatchSprite();
         DAT_00798660 = 0;
         DAT_00798668 = 0;
     }
@@ -373,13 +373,13 @@ void FUN_0048c100(void) {
             rc.right = rc.left + 0x190;
             rc.bottom = rc.top + 0x16;
             if (i == (int)lpConfig->field_28 - 1) {
-                FUN_00454d80(text, 2, rc, 0);
-            } else if (DAT_0080ffa0.flags[4 + i] == 1) {
-                FUN_00454d80(text, 2, rc, 0x323232);
+                DrawTextOnRenderSurface(text, 2, rc, 0);
+            } else if (CurrentProfile.flags[4 + i] == 1) {
+                DrawTextOnRenderSurface(text, 2, rc, 0x323232);
             } else {
-                FUN_00454d80(text, 2, rc, 0xa0a0a0);
+                DrawTextOnRenderSurface(text, 2, rc, 0xa0a0a0);
             }
-            if (DAT_0080ffa0.flags[4 + i] == 1 && DAT_00813a44.x >= rc.left && DAT_00813a44.x < rc.right && DAT_00813a44.y >= rc.top && DAT_00813a44.y < rc.bottom) {
+            if (CurrentProfile.flags[4 + i] == 1 && DAT_00813a44.x >= rc.left && DAT_00813a44.x < rc.right && DAT_00813a44.y >= rc.top && DAT_00813a44.y < rc.bottom) {
                 Hover.type = 2;
                 Hover.ptr = (struct Bloke *)*mapping;
             }

@@ -429,7 +429,7 @@ static struct PathPair Flume_PathPairs1[5] = {{0, 0}, {0, 1}, {3, 0}, {0, 3}, {-
 struct PathTable DAT_004b47e8 = {5, Flume_PathPairs1};
 
 // GLOBAL: LEGOLAND 0x004b4768
-const char *DAT_004b4768[10] = {
+const char *LogFlumeTrackSpriteFiles[10] = {
     // STRING: LEGOLAND 0x004b48d4
     "fc1a_m.lls",
     // STRING: LEGOLAND 0x004b48c8
@@ -1439,72 +1439,72 @@ void FUN_0040a2e0(Element *elem) {
     DAT_004c2ae8 = (void *)FUN_00412100(&DAT_004b47b8);
     DAT_004c2af8 = (void *)FUN_00412100(&DAT_004b47e8);
     // STRING: LEGOLAND 0x004b49c8
-    DAT_004cbe74 = LoadSprite("lf_barrel.lls", 1);
+    LogFlumeBarrelSprite = LoadSprite("lf_barrel.lls", 1);
     // STRING: LEGOLAND 0x004b49b8
-    DAT_004cbe78 = LoadSprite("lf_barrel_m.lls", 1);
+    LogFlumeBarrelMSprite = LoadSprite("lf_barrel_m.lls", 1);
     // STRING: LEGOLAND 0x004b49a8
-    DAT_004cbe7c = LoadSprite("lf_barrel1.lls", 1);
+    LogFlumeBarrel1Sprite = LoadSprite("lf_barrel1.lls", 1);
     // STRING: LEGOLAND 0x004b4998
-    DAT_004cbe80 = LoadSprite("barrelmatte.lls", 1);
-    if (DAT_004cbe74 != NULL) {
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe74);
+    LogFlumeBarrelMatteSprite = LoadSprite("barrelmatte.lls", 1);
+    if (LogFlumeBarrelSprite != NULL) {
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeBarrelSprite);
         if (lls != NULL) {
-            LLSPlay(lls, (unsigned int)DAT_004cbe74->image);
+            LLSPlay(lls, (unsigned int)LogFlumeBarrelSprite->image);
         }
     }
     // STRING: LEGOLAND 0x004b4984
-    DAT_004cbe88 = LoadSprite("lf_enta1_matte2.lls", 1);
+    LogFlumeEnta1Matte2Sprite = LoadSprite("lf_enta1_matte2.lls", 1);
     // STRING: LEGOLAND 0x004b4978
-    DAT_004cbe8c = LoadSprite("lf_sign.lls", 1);
+    LogFlumeSignSprite = LoadSprite("lf_sign.lls", 1);
     // STRING: LEGOLAND 0x004b4964
-    DAT_004cbe98 = LoadSprite("lf_entrance1.lls", 1);
+    LogFlumeEntrance1Sprite = LoadSprite("lf_entrance1.lls", 1);
     // STRING: LEGOLAND 0x004b4950
-    DAT_004cbe90 = LoadSprite("lf_entrance2.lls", 1);
+    LogFlumeEntrance2Sprite = LoadSprite("lf_entrance2.lls", 1);
     // STRING: LEGOLAND 0x004b493c
-    DAT_004cbe94 = LoadSprite("lf_entrance3.lls", 1);
+    LogFlumeEntrance3Sprite = LoadSprite("lf_entrance3.lls", 1);
     // STRING: LEGOLAND 0x004b4930
-    DAT_004cbe4c = LoadSprite("enta3_m.lls", 1);
+    LogFlumeEnta3MSprite = LoadSprite("enta3_m.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0040a410
 void FUN_0040a410(void) {
     struct FlumeEntry *current;
 
-    if (DAT_004cbe4c) {
-        KillSprite(DAT_004cbe4c);
+    if (LogFlumeEnta3MSprite) {
+        KillSprite(LogFlumeEnta3MSprite);
     }
-    if (DAT_004cbe94) {
-        KillSprite(DAT_004cbe94);
+    if (LogFlumeEntrance3Sprite) {
+        KillSprite(LogFlumeEntrance3Sprite);
     }
-    if (DAT_004cbe90) {
-        KillSprite(DAT_004cbe90);
+    if (LogFlumeEntrance2Sprite) {
+        KillSprite(LogFlumeEntrance2Sprite);
     }
-    if (DAT_004cbe98) {
-        KillSprite(DAT_004cbe98);
+    if (LogFlumeEntrance1Sprite) {
+        KillSprite(LogFlumeEntrance1Sprite);
     }
-    if (DAT_004cbe8c) {
-        KillSprite(DAT_004cbe8c);
+    if (LogFlumeSignSprite) {
+        KillSprite(LogFlumeSignSprite);
     }
-    if (DAT_004cbe88) {
-        KillSprite(DAT_004cbe88);
+    if (LogFlumeEnta1Matte2Sprite) {
+        KillSprite(LogFlumeEnta1Matte2Sprite);
     }
-    if (DAT_004cbe74) {
-        KillSprite(DAT_004cbe74);
+    if (LogFlumeBarrelSprite) {
+        KillSprite(LogFlumeBarrelSprite);
     }
-    if (DAT_004cbe78) {
-        KillSprite(DAT_004cbe78);
+    if (LogFlumeBarrelMSprite) {
+        KillSprite(LogFlumeBarrelMSprite);
     }
     if (DAT_004c2af8) {
-        FUN_00412290(DAT_004c2af8);
+        FreeIfNotNull(DAT_004c2af8);
     }
     if (DAT_004c2ae8) {
-        FUN_00412290(DAT_004c2ae8);
+        FreeIfNotNull(DAT_004c2ae8);
     }
-    if (DAT_004cbe7c) {
-        KillSprite(DAT_004cbe7c);
+    if (LogFlumeBarrel1Sprite) {
+        KillSprite(LogFlumeBarrel1Sprite);
     }
-    if (DAT_004cbe80) {
-        KillSprite(DAT_004cbe80);
+    if (LogFlumeBarrelMatteSprite) {
+        KillSprite(LogFlumeBarrelMatteSprite);
     }
 
     current = DAT_004cbe84;
@@ -1786,7 +1786,7 @@ void FUN_0040abf0(Element *obj, TileId tile, struct Cursor *cursor_arg) {
                 cur = next;
             } while (next != NULL);
         }
-        FUN_00411ed0((struct Queue *)&entry->sub2);
+        FreeAllQueueNodes((struct Queue *)&entry->sub2);
         FUN_00408e80(entry);
         DAT_004cbe30->field_8++;
     }
@@ -1863,11 +1863,11 @@ void FUN_0040ae90(unsigned int param_1, int param_2, int param_3) {
     struct LLS *lls;
 
     if (slot->flags & 4) {
-        spriteA = DAT_004cbe80;
-        spriteB = DAT_004cbe7c;
+        spriteA = LogFlumeBarrelMatteSprite;
+        spriteB = LogFlumeBarrel1Sprite;
     } else {
-        spriteA = DAT_004cbe78;
-        spriteB = DAT_004cbe74;
+        spriteA = LogFlumeBarrelMSprite;
+        spriteB = LogFlumeBarrelSprite;
     }
     GetClipping(&saved);
     clip = saved;
@@ -2070,15 +2070,15 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe4c);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEnta3MSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
         pos = GetScreenCoordsForObject(tile, ride);
         off = GetRenderOffsetForLayer(ride->layer, 0);
         AdjustOffsetForViewMode(&off);
-        if (DAT_004cbe4c != NULL) {
-            PrintSprite(DAT_004cbe4c, pos.x + off.x, pos.y + off.y, clip, 0);
+        if (LogFlumeEnta3MSprite != NULL) {
+            PrintSprite(LogFlumeEnta3MSprite, pos.x + off.x, pos.y + off.y, clip, 0);
         }
     }
     {
@@ -2107,7 +2107,7 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
-    if (DAT_004cbe94 != NULL) {
+    if (LogFlumeEntrance3Sprite != NULL) {
         struct Point off;
         int frame;
         off.x = -100;
@@ -2121,11 +2121,11 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe94);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance3Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
-        PrintSprite(DAT_004cbe94, coords.x + off.x, coords.y + off.y, clip, 0);
+        PrintSprite(LogFlumeEntrance3Sprite, coords.x + off.x, coords.y + off.y, clip, 0);
     }
 
     RenderItems_New();
@@ -2139,7 +2139,7 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
-    if (DAT_004cbe98 != NULL) {
+    if (LogFlumeEntrance1Sprite != NULL) {
         struct Point off;
         int frame;
         off.x = 8;
@@ -2153,11 +2153,11 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe98);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance1Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
-        PrintSprite(DAT_004cbe98, coords.x + off.x, coords.y + off.y, clip, 0);
+        PrintSprite(LogFlumeEntrance1Sprite, coords.x + off.x, coords.y + off.y, clip, 0);
     }
 
     RenderItems_New();
@@ -2168,7 +2168,7 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
-    if (DAT_004cbe90 != NULL) {
+    if (LogFlumeEntrance2Sprite != NULL) {
         struct Point off;
         int frame;
         off.x = -100;
@@ -2182,11 +2182,11 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe90);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance2Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
-        PrintSprite(DAT_004cbe90, coords.x + off.x, coords.y + off.y, clip, 0);
+        PrintSprite(LogFlumeEntrance2Sprite, coords.x + off.x, coords.y + off.y, clip, 0);
     }
 
     RenderItems_New();
@@ -2200,7 +2200,7 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
-    if (DAT_004cbe8c != NULL) {
+    if (LogFlumeSignSprite != NULL) {
         struct Point off;
         int frame;
         off.x = -100;
@@ -2214,17 +2214,17 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe8c);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSignSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
-        PrintSprite(DAT_004cbe8c, coords.x + off.x, coords.y + off.y, clip, 0);
+        PrintSprite(LogFlumeSignSprite, coords.x + off.x, coords.y + off.y, clip, 0);
     }
-    if (DAT_004cbe88 != NULL) {
+    if (LogFlumeEnta1Matte2Sprite != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(ride->layer, 2);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_004cbe88, coords.x + off.x, coords.y + off.y, clip, 0);
+        PrintSprite(LogFlumeEnta1Matte2Sprite, coords.x + off.x, coords.y + off.y, clip, 0);
     }
 }
 
@@ -2419,7 +2419,7 @@ void FUN_0040be00(struct FlumeSlotSet *set) {
                 if (FUN_0040bb50(set, &slot)) {
                     item = NULL;
                     set->target = slot;
-                    if (FUN_00411e90((struct Queue *)set->queue)) {
+                    if (QueueHasNodes((struct Queue *)set->queue)) {
                         if (FUN_00411ea0((struct Queue *)set->queue)) {
                             set->flags |= 1;
                             FUN_00412060((struct Queue *)set->queue, (struct QueueItemMid **)&item);
@@ -2655,30 +2655,30 @@ void FUN_0040c350(Element *elem) {
     DAT_004cbe30->field_14 = 0;
     DAT_004c74f4 = elem;
     // STRING: LEGOLAND 0x004b4a0c
-    if (LLIDB_FindElement("LOG FLUME IMAGE LIST", &DAT_004c2afc, 0) == 0) {
-        DAT_004c2b68 = LLIDB_LoadData((void *)DAT_004c2afc);
+    if (LLIDB_FindElement("LOG FLUME IMAGE LIST", &LogFlumeImageListId, 0) == 0) {
+        LogFlumeImageList = LLIDB_LoadData((void *)LogFlumeImageListId);
     }
     // STRING: LEGOLAND 0x004b49f0
-    if (LLIDB_FindElement("LOG FLUME TRACK ENDY LIST", &DAT_004c2b10, 0) == 0) {
-        DAT_004cbe50 = LLIDB_LoadData((void *)DAT_004c2b10);
+    if (LLIDB_FindElement("LOG FLUME TRACK ENDY LIST", &LogFlumeTrackEndyListId, 0) == 0) {
+        LogFlumeTrackEndyList = LLIDB_LoadData((void *)LogFlumeTrackEndyListId);
     }
     FUN_004113d0();
     for (i = 0; i < 10; i++) {
-        DAT_004c2abc[i] = LoadSprite(DAT_004b4768[i], 1);
+        LogFlumeTrackSprites[i] = LoadSprite(LogFlumeTrackSpriteFiles[i], 1);
     }
     // STRING: LEGOLAND 0x004b49e4
-    DAT_004cbe1c = LoadSprite("fc1_m3.lls", 1);
+    LogFlumeFc1M3Sprite = LoadSprite("fc1_m3.lls", 1);
     // STRING: LEGOLAND 0x004b49d8
-    DAT_004c8d68 = LoadSprite("fc3_m3.lls", 1);
+    LogFlumeFc3M3Sprite = LoadSprite("fc3_m3.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0040c430
 void FUN_0040c430(void) {
     struct Sprite **ptr;
 
-    LLIDB_UnLoadData(DAT_004c2afc);
+    LLIDB_UnLoadData(LogFlumeImageListId);
 
-    ptr = DAT_004c2abc;
+    ptr = LogFlumeTrackSprites;
     while ((int)ptr < (int)&DAT_004c2ae4) {
         if (*ptr != NULL) {
             KillSprite(*ptr);
@@ -2686,14 +2686,14 @@ void FUN_0040c430(void) {
         ptr++;
     }
 
-    if (DAT_004cbe1c != NULL) {
-        KillSprite(DAT_004cbe1c);
+    if (LogFlumeFc1M3Sprite != NULL) {
+        KillSprite(LogFlumeFc1M3Sprite);
     }
-    if (DAT_004c8d68 != NULL) {
-        KillSprite(DAT_004c8d68);
+    if (LogFlumeFc3M3Sprite != NULL) {
+        KillSprite(LogFlumeFc3M3Sprite);
     }
 
-    LLIDB_UnLoadData(DAT_004c2b10);
+    LLIDB_UnLoadData(LogFlumeTrackEndyListId);
 }
 
 // FUNCTION: LEGOLAND 0x0040c4a0
@@ -2882,10 +2882,10 @@ struct RideSpriteInfo *FUN_0040c970(int unused, TileId tile) {
             return NULL;
         }
         idx = FUN_0040ad50((struct StateNode *)entry);
-        spr = DAT_004c2b68->sprites[(unsigned char)idx];
+        spr = LogFlumeImageList->sprites[(unsigned char)idx];
         DAT_004c74d8.sprite = spr;
-        DAT_004c74d8.x = DAT_004c2b68->offset_x[(unsigned char)idx] >> 1;
-        DAT_004c74d8.y = DAT_004c2b68->offset_y[(unsigned char)idx] >> 1;
+        DAT_004c74d8.x = LogFlumeImageList->offset_x[(unsigned char)idx] >> 1;
+        DAT_004c74d8.y = LogFlumeImageList->offset_y[(unsigned char)idx] >> 1;
         DAT_004c74d8.field_10 = 0;
         lls = GetLLSForSprite((struct SpriteLLS *)spr);
         if (lls != 0) {
@@ -2947,9 +2947,9 @@ int FUN_0040ca60(struct FlumeEntry *entry, int arg) {
     if (count != 0) {
         par = entry->parent8;
         pos = FUN_0040cfd0(entry);
-        spr = DAT_004cbe1c;
+        spr = LogFlumeFc1M3Sprite;
         if (entry->submode != 0) {
-            spr = DAT_004c8d68;
+            spr = LogFlumeFc3M3Sprite;
         }
         if (entry->submode == 0) {
             if (par->tile.pos.x != entry->tile.pos.x) {
@@ -2982,7 +2982,7 @@ int FUN_0040ca60(struct FlumeEntry *entry, int arg) {
         }
         idx = FUN_0040ad50((struct StateNode *)entry);
         pos = FUN_0040cfd0(entry);
-        spr = DAT_004c2abc[idx];
+        spr = LogFlumeTrackSprites[idx];
         if (spr != NULL) {
             PrintSprite(spr, pos.x, pos.y, 0, 0);
         }
@@ -2998,7 +2998,7 @@ void FUN_0040cc00(struct FlumeEntry *entry, int arg) {
     if (FUN_0040b390(entry)) {
         idx = FUN_0040ad50((struct StateNode *)entry);
         pos = FUN_0040cfd0(entry);
-        spr = DAT_004c2abc[idx];
+        spr = LogFlumeTrackSprites[idx];
         if (spr != NULL) {
             PrintSprite(spr, pos.x, pos.y, arg, 0);
         }
@@ -3041,9 +3041,9 @@ void FUN_0040cca0(struct StateNode *node) {
         idx = 3;
         break;
     }
-    spr = DAT_004cbe50->sprites[(unsigned char)idx];
-    off.x = DAT_004cbe50->offset_x[(unsigned char)idx] >> 1;
-    off.y = DAT_004cbe50->offset_y[(unsigned char)idx] >> 1;
+    spr = LogFlumeTrackEndyList->sprites[(unsigned char)idx];
+    off.x = LogFlumeTrackEndyList->offset_x[(unsigned char)idx] >> 1;
+    off.y = LogFlumeTrackEndyList->offset_y[(unsigned char)idx] >> 1;
     AdjustOffsetForViewMode(&off);
     if (spr != NULL) {
         PrintSprite(spr, pos.x + off.x, pos.y + off.y, 0, 0);
@@ -3203,8 +3203,8 @@ struct Point FUN_0040cfd0(struct FlumeEntry *entry) {
         entry->ride->field_14 = 0;
         pos = GetScreenCoordsForObject(&entry->tile, entry->ride);
         idx = FUN_0040ad50((struct StateNode *)entry);
-        off.x = DAT_004c2b68->offset_x[(unsigned char)idx] >> 1;
-        off.y = DAT_004c2b68->offset_y[(unsigned char)idx] >> 1;
+        off.x = LogFlumeImageList->offset_x[(unsigned char)idx] >> 1;
+        off.y = LogFlumeImageList->offset_y[(unsigned char)idx] >> 1;
         AdjustOffsetForViewMode(&off);
         pos.x += off.x;
         pos.y += off.y;
@@ -4160,12 +4160,12 @@ void FUN_0040e8b0(struct Obj *obj_ptr) {
     DAT_004c2b98 = (unsigned int)obj_ptr;
 
     // STRING: LEGOLAND 0x004b4a58
-    DAT_004c2b6c = LoadSprite("fc1_m1.lls", 1);
+    LogFlumeFc1M1Sprite = LoadSprite("fc1_m1.lls", 1);
     // STRING: LEGOLAND 0x004b4a4c
-    DAT_004c2b70 = LoadSprite("fc1_m2.lls", 1);
+    LogFlumeFc1M2Sprite = LoadSprite("fc1_m2.lls", 1);
 
-    DAT_004b47f8 = DAT_004c2b6c;
-    DAT_004b4804 = DAT_004c2b70;
+    DAT_004b47f8 = LogFlumeFc1M1Sprite;
+    DAT_004b4804 = LogFlumeFc1M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040e920
@@ -4187,7 +4187,7 @@ void FUN_0040e920(struct Obj *obj_ptr) {
 
     DAT_004cbe10 = obj_ptr;
     // STRING: LEGOLAND 0x004b4a64
-    DAT_004c8d2c = LoadSprite("fc2_m1.lls", 1);
+    LogFlumeFc2M1Sprite = LoadSprite("fc2_m1.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0040e970
@@ -4210,12 +4210,12 @@ void FUN_0040e970(struct Obj *obj_ptr) {
     DAT_004c8d50 = (unsigned int)obj_ptr;
 
     // STRING: LEGOLAND 0x004b4a7c
-    DAT_004cbe0c = LoadSprite("fc3_m1.lls", 1);
+    LogFlumeFc3M1Sprite = LoadSprite("fc3_m1.lls", 1);
     // STRING: LEGOLAND 0x004b4a70
-    DAT_004cbe08 = LoadSprite("fc3_m2.lls", 1);
+    LogFlumeFc3M2Sprite = LoadSprite("fc3_m2.lls", 1);
 
-    DAT_004b4818 = DAT_004cbe0c;
-    DAT_004b4824 = DAT_004cbe08;
+    DAT_004b4818 = LogFlumeFc3M1Sprite;
+    DAT_004b4824 = LogFlumeFc3M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040e9e0
@@ -4237,40 +4237,40 @@ void FUN_0040e9e0(struct Obj *obj_ptr) {
     }
 
     // STRING: LEGOLAND 0x004b4a88
-    DAT_004c8d70 = LoadSprite("fc4_m.lls", 1);
+    LogFlumeFc4MSprite = LoadSprite("fc4_m.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0040ea30
-void FUN_0040ea30(void) {
-    if (DAT_004c2b6c != 0) {
-        KillSprite(DAT_004c2b6c);
+void LogFlumeSpecialCorner1UnloadSprites(void) {
+    if (LogFlumeFc1M1Sprite != 0) {
+        KillSprite(LogFlumeFc1M1Sprite);
     }
-    if (DAT_004c2b70 != 0) {
-        KillSprite(DAT_004c2b70);
+    if (LogFlumeFc1M2Sprite != 0) {
+        KillSprite(LogFlumeFc1M2Sprite);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040ea60
-void FUN_0040ea60(void) {
-    if (DAT_004c8d2c != NULL) {
-        KillSprite(DAT_004c8d2c);
+void LogFlumeSpecialCorner2UnloadSprites(void) {
+    if (LogFlumeFc2M1Sprite != NULL) {
+        KillSprite(LogFlumeFc2M1Sprite);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040ea80
-void FUN_0040ea80(void) {
-    if (DAT_004cbe0c != NULL) {
-        KillSprite(DAT_004cbe0c);
+void LogFlumeSpecialCorner3UnloadSprites(void) {
+    if (LogFlumeFc3M1Sprite != NULL) {
+        KillSprite(LogFlumeFc3M1Sprite);
     }
-    if (DAT_004cbe08 != NULL) {
-        KillSprite(DAT_004cbe08);
+    if (LogFlumeFc3M2Sprite != NULL) {
+        KillSprite(LogFlumeFc3M2Sprite);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040eab0
-void FUN_0040eab0(void) {
-    if (DAT_004c8d70 != NULL) {
-        KillSprite(DAT_004c8d70);
+void LogFlumeSpecialCorner4UnloadSprites(void) {
+    if (LogFlumeFc4MSprite != NULL) {
+        KillSprite(LogFlumeFc4MSprite);
     }
 }
 
@@ -4373,11 +4373,11 @@ void FUN_0040edb0(Element *elem, unsigned int param_2, unsigned int param_3, Til
     if (lls != NULL) {
         frame = lls->frame;
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2b6c);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc1M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2b70);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc1M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -4405,13 +4405,13 @@ void FUN_0040ee60(Element *elem, unsigned int param_2, unsigned int param_3, Til
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c8d2c);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc2M1Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
         pos = GetScreenCoordsForObject(tile, ride);
-        if (DAT_004c8d2c != NULL) {
-            PrintSprite(DAT_004c8d2c, pos.x, pos.y, clip, 0);
+        if (LogFlumeFc2M1Sprite != NULL) {
+            PrintSprite(LogFlumeFc2M1Sprite, pos.x, pos.y, clip, 0);
         }
     }
     FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4431,11 +4431,11 @@ void FUN_0040ef00(Element *elem, unsigned int param_2, unsigned int param_3, Til
     if (lls != NULL) {
         frame = lls->frame;
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe0c);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc3M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe08);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc3M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -4464,13 +4464,13 @@ void FUN_0040efb0(Element *elem, unsigned int param_2, unsigned int param_3, Til
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c8d70);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc4MSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
         pos = GetScreenCoordsForObject(tile, ride);
-        if (DAT_004c8d70 != NULL) {
-            PrintSprite(DAT_004c8d70, pos.x, pos.y, clip, 0);
+        if (LogFlumeFc4MSprite != NULL) {
+            PrintSprite(LogFlumeFc4MSprite, pos.x, pos.y, clip, 0);
         }
         FUN_0040cd70((struct PairHolder *)entry, 1);
     }
@@ -4586,13 +4586,13 @@ void FUN_0040f3e0(struct Obj *obj_ptr) {
     }
 
     // STRING: LEGOLAND 0x004b4a94
-    DAT_004c1258 = LoadSprite("tunel_m.lls", 1);
+    LogFlumeTunelMSprite = LoadSprite("tunel_m.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0040f430
-void FUN_0040f430(void) {
-    if (DAT_004c1258 != NULL) {
-        KillSprite(DAT_004c1258);
+void LogFlumeTunnelUnloadSprites(void) {
+    if (LogFlumeTunelMSprite != NULL) {
+        KillSprite(LogFlumeTunelMSprite);
     }
 }
 
@@ -4606,17 +4606,17 @@ void FUN_0040f450(Element *elem, unsigned int param_2, unsigned int param_3, Til
 
     entry = FUN_00408ef0(tile);
     if (FUN_0040cdf0(tile)) {
-        if (DAT_004c1258 != NULL) {
+        if (LogFlumeTunelMSprite != NULL) {
             lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
             frame = lls != NULL ? lls->frame : frame;
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c1258);
+            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeTunelMSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
         }
         pos = FUN_0040cfd0(entry);
-        if (DAT_004c1258 != NULL) {
-            PrintSprite(DAT_004c1258, pos.x, pos.y, clip, 0);
+        if (LogFlumeTunelMSprite != NULL) {
+            PrintSprite(LogFlumeTunelMSprite, pos.x, pos.y, clip, 0);
         }
     }
     FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4742,14 +4742,14 @@ struct Sprite *FUN_0040f8b0(struct Obj *obj_ptr) {
     }
 
     // STRING: LEGOLAND 0x004b4aa0
-    DAT_004cbe14 = LoadSprite("csaw2_m.lls", 1);
-    return DAT_004cbe14;
+    LogFlumeCsaw2MSprite = LoadSprite("csaw2_m.lls", 1);
+    return LogFlumeCsaw2MSprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040f900
-void FUN_0040f900(void) {
-    if (DAT_004cbe14 != 0) {
-        KillSprite(DAT_004cbe14);
+void LogFlumeCsawUnloadSprites(void) {
+    if (LogFlumeCsaw2MSprite != 0) {
+        KillSprite(LogFlumeCsaw2MSprite);
     }
 }
 
@@ -4764,12 +4764,12 @@ void FUN_0040f920(Element *elem, unsigned int param_2, unsigned int param_3, Til
 
     entry = FUN_00408ef0(tile);
     if (FUN_0040cdf0(tile)) {
-        if (DAT_004cbe14 != NULL) {
+        if (LogFlumeCsaw2MSprite != NULL) {
             lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer(ride->layer, 1));
             if (lls != NULL) {
                 frame = lls->frame;
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004cbe14);
+            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeCsaw2MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -4777,8 +4777,8 @@ void FUN_0040f920(Element *elem, unsigned int param_2, unsigned int param_3, Til
         off = GetRenderOffsetForLayer(ride->layer, 1);
         pos = FUN_0040cfd0(entry);
         AdjustOffsetForViewMode(&off);
-        if (DAT_004cbe14 != NULL) {
-            PrintSprite(DAT_004cbe14, pos.x + off.x, pos.y + off.y, clip, 0);
+        if (LogFlumeCsaw2MSprite != NULL) {
+            PrintSprite(LogFlumeCsaw2MSprite, pos.x + off.x, pos.y + off.y, clip, 0);
         }
     }
     FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4928,20 +4928,20 @@ void FUN_0040ff30(struct Obj *obj_ptr) {
     }
 
     // STRING: LEGOLAND 0x004b4ab8
-    DAT_004c2a94 = LoadSprite("hup1_m1.lls", 1);
+    LogFlumeHup1M1Sprite = LoadSprite("hup1_m1.lls", 1);
     // STRING: LEGOLAND 0x004b4aac
-    DAT_004c2a98 = LoadSprite("hup1_m2.lls", 1);
-    DAT_004b4838 = DAT_004c2a94;
-    DAT_004b4850 = DAT_004c2a98;
+    LogFlumeHup1M2Sprite = LoadSprite("hup1_m2.lls", 1);
+    DAT_004b4838 = LogFlumeHup1M1Sprite;
+    DAT_004b4850 = LogFlumeHup1M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040ffa0
-void FUN_0040ffa0(void) {
-    if (DAT_004c2a94 != 0) {
-        KillSprite(DAT_004c2a94);
+void LogFlumeHoldUpUnloadSprites(void) {
+    if (LogFlumeHup1M1Sprite != 0) {
+        KillSprite(LogFlumeHup1M1Sprite);
     }
-    if (DAT_004c2a98 != 0) {
-        KillSprite(DAT_004c2a98);
+    if (LogFlumeHup1M2Sprite != 0) {
+        KillSprite(LogFlumeHup1M2Sprite);
     }
 }
 
@@ -4963,11 +4963,11 @@ void FUN_0040ffd0(Element *elem, unsigned int param_2, unsigned int param_3, Til
             frame = lls->frame;
         }
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2a94);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeHup1M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2a98);
+    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeHup1M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -5107,28 +5107,28 @@ struct Sprite *FUN_004103e0(struct Obj *obj_ptr) {
     }
 
     // STRING: LEGOLAND 0x004b4ae0
-    DAT_004c2af0 = LoadSprite("drop1_m.lls", 1);
+    LogFlumeDrop1MSprite = LoadSprite("drop1_m.lls", 1);
     // STRING: LEGOLAND 0x004b4ad4
-    DAT_004c2aec = LoadSprite("drop2_m.lls", 1);
+    LogFlumeDrop2MSprite = LoadSprite("drop2_m.lls", 1);
     // STRING: LEGOLAND 0x004b4ac4
-    DAT_004c2b64 = LoadSprite("lf_splash.lls", 1);
+    LogFlumeSplashSprite = LoadSprite("lf_splash.lls", 1);
 
-    return DAT_004c2b64;
+    return LogFlumeSplashSprite;
 }
 
 // FUNCTION: LEGOLAND 0x00410450
-void FUN_00410450(void) {
-    if (DAT_004c2b64 != 0) {
-        KillSprite(DAT_004c2b64);
-        DAT_004c2b64 = 0;
+void LogFlumeDropUnloadSprites(void) {
+    if (LogFlumeSplashSprite != 0) {
+        KillSprite(LogFlumeSplashSprite);
+        LogFlumeSplashSprite = 0;
     }
-    if (DAT_004c2af0 != 0) {
-        KillSprite(DAT_004c2af0);
-        DAT_004c2af0 = 0;
+    if (LogFlumeDrop1MSprite != 0) {
+        KillSprite(LogFlumeDrop1MSprite);
+        LogFlumeDrop1MSprite = 0;
     }
-    if (DAT_004c2aec != 0) {
-        KillSprite(DAT_004c2aec);
-        DAT_004c2aec = 0;
+    if (LogFlumeDrop2MSprite != 0) {
+        KillSprite(LogFlumeDrop2MSprite);
+        LogFlumeDrop2MSprite = 0;
     }
 }
 
@@ -5144,7 +5144,7 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
 
     entry = FUN_00408ef0(tile);
     if (FUN_0040cdf0(tile) && entry != NULL) {
-        if (DAT_004c2af0 != NULL && DAT_004c2aec != NULL) {
+        if (LogFlumeDrop1MSprite != NULL && LogFlumeDrop2MSprite != NULL) {
             frame = 0;
             sprite = GetSpriteForLayer(ride->layer, 0);
             if (sprite != NULL) {
@@ -5153,7 +5153,7 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
                     frame = lls->frame;
                 }
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2af0);
+            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeDrop1MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -5164,21 +5164,21 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
                     frame = lls->frame;
                 }
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2aec);
+            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeDrop2MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
         }
         pos = FUN_0040cfd0(entry);
-        if (DAT_004c2af0 != NULL) {
+        if (LogFlumeDrop1MSprite != NULL) {
             off = GetRenderOffsetForLayer(ride->layer, 0);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(DAT_004c2af0, pos.x + off.x, pos.y + off.y, clip, 0);
+            PrintSprite(LogFlumeDrop1MSprite, pos.x + off.x, pos.y + off.y, clip, 0);
         }
-        if (DAT_004c2aec != NULL) {
+        if (LogFlumeDrop2MSprite != NULL) {
             off = GetRenderOffsetForLayer(ride->layer, 1);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(DAT_004c2aec, pos.x + off.x, pos.y + off.y, clip, 0);
+            PrintSprite(LogFlumeDrop2MSprite, pos.x + off.x, pos.y + off.y, clip, 0);
         }
         if (entry->field_24 != NULL && (entry->field_24->flags & 2)) {
             pos = FUN_0040cfd0(entry);
@@ -5186,14 +5186,14 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
             off.x += DAT_004b4860.x;
             off.y += DAT_004b4860.y;
             AdjustOffsetForViewMode(&off);
-            if (DAT_004c2b64 != NULL) {
+            if (LogFlumeSplashSprite != NULL) {
                 frame = entry->field_24->i24;
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2b64);
+                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSplashSprite);
                 if (lls != NULL) {
                     LLSStop((unsigned int)lls);
                     LLSSetFrame(lls, frame);
                 }
-                PrintSprite(DAT_004c2b64, pos.x + off.x, pos.y + off.y, clip, 0);
+                PrintSprite(LogFlumeSplashSprite, pos.x + off.x, pos.y + off.y, clip, 0);
             }
         }
     }
@@ -5294,7 +5294,7 @@ int FUN_00410910(struct FlumeEntry *entry) {
 }
 
 // FUNCTION: LEGOLAND 0x00410930
-int FUN_00410930(void) {
+int LogFlumeEntrance_Save(void) {
     struct FlumeEntry *entry = DAT_004cbe84;
     int marker = 1;
     int end = 0;
@@ -5416,7 +5416,7 @@ void FUN_00410bb0(void *arg0, struct FlumeNode *arg1) {
 }
 
 // FUNCTION: LEGOLAND 0x00410c10
-int FUN_00410c10(void) {
+int LogFlumeEntrance_Load(void) {
     struct FlumeEntry *cur = NULL;
     struct FlumeNode *head;
     struct Queue queue;
@@ -5447,7 +5447,7 @@ int FUN_00410c10(void) {
         slot = cur->slots;
         for (i = 4; i != 0; i--) {
             slot->owner = (int)FUN_00410b60(cur->sub, slot->owner);
-            slot->busy = (int)FUN_00412470((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, slot->busy);
+            slot->busy = (int)GetNthNextQueueNode((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, slot->busy);
             slot++;
         }
         SaveGameRead(&marker, 4);
@@ -5456,7 +5456,7 @@ int FUN_00410c10(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00410d60
-void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
+void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl) {
     // STRING: LEGOLAND 0x004b4bb4
     if (_stricmp("LOG FLUME ENTRANCE", flume->name) == 0) {
         vtbl->cb_a4 = FUN_0040a2e0;
@@ -5468,8 +5468,8 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_a8 = FUN_0040bf70;
         vtbl->cb_b0 = FUN_0040b420;
         vtbl->cb_ac = FUN_0040a410;
-        vtbl->cb_bc = FUN_00410930;
-        vtbl->cb_b8 = FUN_00410c10;
+        vtbl->cb_bc = LogFlumeEntrance_Save;
+        vtbl->cb_b8 = LogFlumeEntrance_Load;
         vtbl->cb_c0 = FUN_004119c0;
         return;
     }
@@ -5497,7 +5497,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040e830;
         vtbl->cb_98 = FUN_0040ead0;
         vtbl->cb_9c = FUN_0040ec90;
-        vtbl->cb_ac = FUN_0040ea30;
+        vtbl->cb_ac = LogFlumeSpecialCorner1UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b6c
@@ -5510,7 +5510,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040e850;
         vtbl->cb_98 = FUN_0040eb40;
         vtbl->cb_9c = FUN_0040ecc0;
-        vtbl->cb_ac = FUN_0040ea60;
+        vtbl->cb_ac = LogFlumeSpecialCorner2UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b50
@@ -5523,7 +5523,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040e870;
         vtbl->cb_98 = FUN_0040ebb0;
         vtbl->cb_9c = FUN_0040ecf0;
-        vtbl->cb_ac = FUN_0040ea80;
+        vtbl->cb_ac = LogFlumeSpecialCorner3UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b34
@@ -5536,7 +5536,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040e890;
         vtbl->cb_98 = FUN_0040ec20;
         vtbl->cb_9c = FUN_0040ed20;
-        vtbl->cb_ac = FUN_0040eab0;
+        vtbl->cb_ac = LogFlumeSpecialCorner4UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b24
@@ -5549,7 +5549,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040fa50;
         vtbl->cb_98 = FUN_0040fa60;
         vtbl->cb_9c = FUN_0040fab0;
-        vtbl->cb_ac = FUN_0040f900;
+        vtbl->cb_ac = LogFlumeCsawUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b10
@@ -5562,7 +5562,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_0040f5a0;
         vtbl->cb_98 = FUN_0040f540;
         vtbl->cb_9c = FUN_0040f580;
-        vtbl->cb_ac = FUN_0040f430;
+        vtbl->cb_ac = LogFlumeTunnelUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b00
@@ -5575,7 +5575,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_00410730;
         vtbl->cb_98 = FUN_00410740;
         vtbl->cb_9c = FUN_00410790;
-        vtbl->cb_ac = FUN_00410450;
+        vtbl->cb_ac = LogFlumeDropUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4aec
@@ -5588,7 +5588,7 @@ void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl) {
         vtbl->cb_94 = FUN_00410100;
         vtbl->cb_98 = FUN_00410110;
         vtbl->cb_9c = FUN_00410160;
-        vtbl->cb_ac = FUN_0040ffa0;
+        vtbl->cb_ac = LogFlumeHoldUpUnloadSprites;
     }
 }
 
@@ -5941,7 +5941,7 @@ void FUN_00411810(struct FlumeMover *m) {
             if (owner != NULL && !(owner->flags & 2)) {
                 owner->flags |= 2;
                 owner->field_24 = 0;
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c2b64);
+                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSplashSprite);
                 if (lls != NULL) {
                     owner->field_28 = lls->frame_count;
                 }

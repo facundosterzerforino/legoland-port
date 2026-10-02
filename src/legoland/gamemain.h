@@ -6,7 +6,7 @@ struct Point;
 struct QueryNode;
 struct ResFile;
 
-int FUN_00477680(int a, int b);
+int IsInMapBounds(int a, int b);
 void FUN_004776c0(struct QueryNode *node);
 void FUN_004776e0(struct EventNode *node);
 struct GameMainNode *FUN_00477730(struct Point *ctx);
@@ -17,9 +17,9 @@ void FUN_00477790(struct EventNode *param_1);
 
 void FUN_004779d0(struct Point *p);
 void FUN_00477bd0(int x, int y, int a, int b);
-int FUN_004781b0(const char *param_1, const void *param_2, int param_3);
-int FUN_004781f0(const char *name, struct ScriptCommand *commands, int count, int flags);
-int FUN_00478280(struct ResFile *file, struct ScriptCommand *commands, int count, int flags);
+int FindStringNoCase(const char *param_1, const void *param_2, int param_3);
+int ParseScriptFile(const char *name, struct ScriptCommand *commands, int count, int flags);
+int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int count, int flags);
 void FUN_004784c0(void);
 void FUN_004785d0(char *param_1, unsigned int param_2);
 void FUN_00478610(unsigned int param_1);

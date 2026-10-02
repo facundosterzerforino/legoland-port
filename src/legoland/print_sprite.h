@@ -38,7 +38,7 @@ LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, u
 LEGO_EXPORT void SortSprite(struct Sprite *sprite, unsigned int x, unsigned int y, int key, unsigned int param_5, struct HitInfo *hit);
 LEGO_EXPORT void SortPerson(struct Person *person, unsigned int param_2, void *param_3);
 LEGO_EXPORT void SortClippedSprite(struct Sprite *sprite, unsigned int x, unsigned int y, int key, RECT *clip, unsigned int param_6, struct HitInfo *hit);
-void FUN_00485f00(struct Sprite *param_1, unsigned int param_2, unsigned int param_3);
+void PrintSpriteSimple(struct Sprite *param_1, unsigned int param_2, unsigned int param_3);
 void FUN_00485f20(void *ptr);
 void FUN_00485f30(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4);
 void FUN_00485fa0(void);

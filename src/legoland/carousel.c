@@ -19,7 +19,7 @@
 #include "tilemap.h"
 
 // FUNCTION: LEGOLAND 0x0042bbc0
-void FUN_0042bbc0(unsigned short *param_1) {
+void AddCarouselNode(unsigned short *param_1) {
     struct CarouselNode *node = (struct CarouselNode *)malloc(sizeof(struct CarouselNode));
     if (node != NULL) {
         unsigned int *fill = (unsigned int *)node;
@@ -29,22 +29,22 @@ void FUN_0042bbc0(unsigned short *param_1) {
             fill++;
         }
         node->id = *param_1;
-        node->next = DAT_006160c4;
-        DAT_006160c4 = node;
+        node->next = CarouselNodeList;
+        CarouselNodeList = node;
         FUN_0042c210(node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042bc00
-void FUN_0042bc00(struct CarouselNode *node) {
+void RemoveCarouselNode(struct CarouselNode *node) {
     struct CarouselNode *cur;
     struct CarouselNode *prev;
 
-    if (DAT_006160c4 == node) {
-        DAT_006160c4 = node->next;
+    if (CarouselNodeList == node) {
+        CarouselNodeList = node->next;
     } else {
-        cur = DAT_006160c4->next;
-        prev = DAT_006160c4;
+        cur = CarouselNodeList->next;
+        prev = CarouselNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -60,20 +60,20 @@ void FUN_0042bc00(struct CarouselNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0042bc40
-void FUN_0042bc40(void) {
-    while (DAT_006160c4 != NULL) {
-        FUN_0042bc00(DAT_006160c4);
+void FreeAllCarouselNodes(void) {
+    while (CarouselNodeList != NULL) {
+        RemoveCarouselNode(CarouselNodeList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042bc60
-struct CarouselNode *FUN_0042bc60(unsigned short *param_1) {
+struct CarouselNode *FindCarouselNode(unsigned short *param_1) {
     struct CarouselNode *node;
 
-    if (DAT_006160c4 != NULL) {
-        node = DAT_006160c4;
-        if (*param_1 == DAT_006160c4->id) {
-            return DAT_006160c4;
+    if (CarouselNodeList != NULL) {
+        node = CarouselNodeList;
+        if (*param_1 == CarouselNodeList->id) {
+            return CarouselNodeList;
         }
         while (1) {
             node = node->next;
@@ -134,21 +134,21 @@ void FUN_0042c280(struct CarouselRideObj *param_1) {
     DAT_00616078 = layer.x + -0x58;
     DAT_0061607c = layer.y + -0xcd;
     // STRING: LEGOLAND 0x004b65a4
-    DAT_006160b8 = LoadSprite("z_Carousel.lls", 1);
-    DAT_006160c0 = DAT_006160b8;
+    ZCarouselSprite = LoadSprite("z_Carousel.lls", 1);
+    DAT_006160c0 = ZCarouselSprite;
     // STRING: LEGOLAND 0x004b658c
-    DAT_00616080 = LoadBinV("Zbuffers\\CarouselOn.bnv");
-    DAT_00616090 = DAT_00616080;
+    CarouselOnBinV = LoadBinV("Zbuffers\\CarouselOn.bnv");
+    DAT_00616090 = CarouselOnBinV;
     // STRING: LEGOLAND 0x004b6574
-    DAT_0061608c = LoadBinV("Zbuffers\\Carousel.bnv");
-    DAT_00616094 = DAT_0061608c;
+    CarouselBinV = LoadBinV("Zbuffers\\Carousel.bnv");
+    DAT_00616094 = CarouselBinV;
     // STRING: LEGOLAND 0x004b6558
-    DAT_00616084 = LoadBinV("Zbuffers\\CarouselOff.bnv");
-    DAT_00616098 = DAT_00616084;
+    CarouselOffBinV = LoadBinV("Zbuffers\\CarouselOff.bnv");
+    DAT_00616098 = CarouselOffBinV;
     // STRING: LEGOLAND 0x004b653c
-    DAT_0061606c = LoadSprite("Carousel Entrance Matte.lls", 1);
+    CarouselEntranceMatteSprite = LoadSprite("Carousel Entrance Matte.lls", 1);
     // STRING: LEGOLAND 0x004b651c
-    DAT_00616070 = LoadSprite("Carousel Entrance Matte2.lls", 1);
+    CarouselEntranceMatte2Sprite = LoadSprite("Carousel Entrance Matte2.lls", 1);
     HideLayer(DAT_00616068, 2);
     StopLayerPlaying((unsigned int)DAT_00616068, 2);
     LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_00616068, 2), 0);
@@ -161,10 +161,10 @@ void FUN_0042c280(struct CarouselRideObj *param_1) {
 // FUNCTION: LEGOLAND 0x0042c3f0
 void FUN_0042c3f0(struct CarouselRideObj *input) {
     DAT_006160bc = input->ride;
-    KillSprite(DAT_0061606c);
-    KillSprite(DAT_00616070);
+    KillSprite(CarouselEntranceMatteSprite);
+    KillSprite(CarouselEntranceMatte2Sprite);
     KillSprite(DAT_006160c0);
-    FUN_0042bc40();
+    FreeAllCarouselNodes();
     Kill_FXList(CAROUSSEL_SFX, 2);
     FreeBinV(DAT_00616090);
     FreeBinV(DAT_00616094);
@@ -184,9 +184,9 @@ void FUN_0042c4a0(struct CarouselRideObj *param_1, TileId tile, unsigned int par
     struct CarouselNode *node;
     struct SampleParams params;
 
-    node = FUN_0042bc60(&tile.id);
+    node = FindCarouselNode(&tile.id);
     if (node != NULL) {
-        FUN_0042bc00(node);
+        RemoveCarouselNode(node);
     }
     StandardRemoveObject((unsigned int)param_1, tile, param_3);
     RemoveAllBlokesFromRide(param_1->ride, tile);
@@ -203,7 +203,7 @@ void FUN_0042c520(unsigned int param_1, unsigned char *param_2) {
     pair[0] = param_2[0];
     pair[1] = param_2[4];
     AddBasicObject(param_1, (unsigned int)param_2);
-    FUN_0042bbc0((unsigned short *)pair);
+    AddCarouselNode((unsigned short *)pair);
 }
 
 // FUNCTION: LEGOLAND 0x0042c550
@@ -219,8 +219,8 @@ struct RideSpriteInfo *FUN_0042c550(struct CarouselRideObj *param1, unsigned sho
 }
 
 // FUNCTION: LEGOLAND 0x0042c590
-int FUN_0042c590(void) {
-    struct CarouselNode *current = DAT_006160c4;
+int Carousel_Save(void) {
+    struct CarouselNode *current = CarouselNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
 
@@ -241,7 +241,7 @@ int FUN_0042c590(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042c600
-int FUN_0042c600(struct CarouselRideObj *param_1) {
+int Carousel_Load(struct CarouselRideObj *param_1) {
     struct CarouselRide *ride = param_1->ride;
     struct CarouselNode *node;
     struct CarouselNode *prev;
@@ -261,7 +261,7 @@ int FUN_0042c600(struct CarouselRideObj *param_1) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_006160c4 = node;
+            CarouselNodeList = node;
         }
         prev = node;
         if (SaveGameRead(&marker, 4) == 0) {
@@ -333,15 +333,15 @@ void FUN_0042c6d0(struct CarouselNode *node) {
             // STRING: LEGOLAND 0x004b4704
             sprintf(DAT_004b64d4, "%02d", *(unsigned char *)((char *)elem->bloke + 0x36));
             // STRING: LEGOLAND 0x004b64cc
-            SetBlokePositionFromBNV(DAT_0061608c, elem->bloke, "BlokeBox??", (int)(char)node->field_8, -1617853.25f, -1618109.0f, 0);
+            SetBlokePositionFromBNV(CarouselBinV, elem->bloke, "BlokeBox??", (int)(char)node->field_8, -1617853.25f, -1618109.0f, 0);
         }
     }
-    *(short *)**(int **)((char *)DAT_006160b8 + 8) = (short)(char)node->field_8;
+    *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)(char)node->field_8;
 }
 
 // FUNCTION: LEGOLAND 0x0042c800
 void FUN_0042c800(void) {
-    struct CarouselNode *current = DAT_006160c4;
+    struct CarouselNode *current = CarouselNodeList;
 
     while (current != NULL) {
         FUN_0042c6d0(current);
@@ -368,7 +368,7 @@ void FUN_0042c820(struct CarouselRideObj *param_1) {
         next = elem->next;
         blokepos = (int)elem->bloke;
         pos = (unsigned char *)&elem->id;
-        bloke = (int)FUN_0042bc60((unsigned short *)pos);
+        bloke = (int)FindCarouselNode((unsigned short *)pos);
         if (bloke == 0) {
             break;
         }
@@ -529,7 +529,7 @@ void FUN_0042bcf0(struct CarouselRideObj *param_1, unsigned int param_2, unsigne
     cVar5 = '\0';
     local_4c = 0x103;
     local_48 = (int)param_1;
-    bloke = (int)FUN_0042bc60(param_4);
+    bloke = (int)FindCarouselNode(param_4);
     if (bloke != 0) {
         struct Point sc = GetScreenCoordsForObject((unsigned char *)param_4, ride);
         iVar10 = sc.y;
@@ -554,7 +554,7 @@ void FUN_0042bcf0(struct CarouselRideObj *param_1, unsigned int param_2, unsigne
                 PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
                 local_54 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616068, 1);
                 AdjustOffsetForViewMode(&local_54);
-                PrintSprite(DAT_00616070, local_54.x + iVar6, local_54.y + iVar10, param_6, (int *)&local_4c);
+                PrintSprite(CarouselEntranceMatte2Sprite, local_54.x + iVar6, local_54.y + iVar10, param_6, (int *)&local_4c);
                 uVar7 = GetLLSForLayer((unsigned int)DAT_00616068, 2);
                 LLSSetFrame((struct LLS *)uVar7, (int)*(char *)(bloke + 8));
                 local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616068, 2);
@@ -606,7 +606,7 @@ void FUN_0042bcf0(struct CarouselRideObj *param_1, unsigned int param_2, unsigne
                         }
                     }
                 }
-                *(short *)**(int **)((char *)DAT_006160b8 + 8) = (short)*(char *)(bloke + 8);
+                *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)*(char *)(bloke + 8);
                 {
                     struct CarouselListElem *e;
                     int local_64, local_60;
@@ -633,7 +633,7 @@ void FUN_0042bcf0(struct CarouselRideObj *param_1, unsigned int param_2, unsigne
                 }
                 local_54 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_00616068, 1);
                 AdjustOffsetForViewMode(&local_54);
-                PrintSprite(DAT_0061606c, local_54.x + iVar6, local_54.y + iVar10, param_6, 0);
+                PrintSprite(CarouselEntranceMatteSprite, local_54.x + iVar6, local_54.y + iVar10, param_6, 0);
                 return;
             }
         }

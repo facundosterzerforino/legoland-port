@@ -53,13 +53,13 @@ LEGO_EXPORT void InitMapScreen(void) {
   if (DAT_00667c30 != 0) {
     return;
   }
-  DAT_00667c2c = CreateFunctionBasedSprite(
+  FullMapSprite = CreateFunctionBasedSprite(
       (int (*)(struct Sprite *))RenderFullMap, 0x280, 0x154);
-  if (DAT_00667c2c != NULL) {
+  if (FullMapSprite != NULL) {
     // STRING: LEGOLAND 0x004b90b4
-    DAT_00667c34 = LoadSprite("mapSpanner.lls", 0);
-    DAT_00667c2c->src_x = 0;
-    DAT_00667c2c->src_y = 0;
+    MapSpannerSprite = LoadSprite("mapSpanner.lls", 0);
+    FullMapSprite->src_x = 0;
+    FullMapSprite->src_y = 0;
   }
   FUN_004562c0();
   DAT_006687c0 = (unsigned int)FUN_00475080;
@@ -68,12 +68,12 @@ LEGO_EXPORT void InitMapScreen(void) {
 
 // FUNCTION: LEGOLAND 0x00456370
 LEGO_EXPORT void KillMapScreen(void) {
-  if (DAT_00667c2c != NULL) {
-    KillSprite(DAT_00667c2c);
-    DAT_00667c2c = NULL;
-    if (DAT_00667c34 != 0) {
-      KillSprite(DAT_00667c34);
-      DAT_00667c34 = 0;
+  if (FullMapSprite != NULL) {
+    KillSprite(FullMapSprite);
+    FullMapSprite = NULL;
+    if (MapSpannerSprite != 0) {
+      KillSprite(MapSpannerSprite);
+      MapSpannerSprite = 0;
     }
   }
   DAT_00667c30 = 0;
@@ -149,13 +149,13 @@ LEGO_EXPORT void DrawMapScreen(void) {
   struct MapMarker *m;
   int j;
 
-  PrintSprite(DAT_00667c2c, DAT_008139c8, DAT_008139cc, 0, 0);
-  if (DAT_008119a4 & 0x10) {
+  PrintSprite(FullMapSprite, DAT_008139c8, DAT_008139cc, 0, 0);
+  if (FrameCounter & 0x10) {
     for (row = DAT_008119c0; (int)row < (int)DAT_008138c0; row++) {
       m = *row;
       for (j = 0; j < 31; j++, m++) {
         if (m->x != 0 || m->y != 0) {
-          PrintSprite(DAT_00667c34, m->x, m->y, 0, 0);
+          PrintSprite(MapSpannerSprite, m->x, m->y, 0, 0);
         }
       }
     }

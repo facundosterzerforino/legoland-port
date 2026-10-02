@@ -71,22 +71,22 @@ void FUN_0043d880(void *param_1) {
     }
     memset(node, 0, 0x24);
     *(unsigned short *)node = *(unsigned short *)param_1;
-    ((unsigned int *)node)[8] = (unsigned int)DAT_0062fe9c;
-    DAT_0062fe9c = node;
+    ((unsigned int *)node)[8] = (unsigned int)PlaneRideNodeList;
+    PlaneRideNodeList = node;
     FUN_0043d9f0(node);
 }
 
 // FUNCTION: LEGOLAND 0x0043d8c0
-void FUN_0043d8c0(struct PlaneRideNode *node) {
+void RemovePlaneRideNode(struct PlaneRideNode *node) {
     struct PlaneRideNode *prev;
     struct PlaneRideNode *cur;
     struct SampleSource src;
 
-    if (DAT_0062fe9c == node) {
-        DAT_0062fe9c = node->next;
+    if (PlaneRideNodeList == node) {
+        PlaneRideNodeList = node->next;
     } else {
-        cur = DAT_0062fe9c->next;
-        prev = DAT_0062fe9c;
+        cur = PlaneRideNodeList->next;
+        prev = PlaneRideNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -106,15 +106,15 @@ void FUN_0043d8c0(struct PlaneRideNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d940
-void FUN_0043d940(void) {
-    while (DAT_0062fe9c != NULL) {
-        FUN_0043d8c0(DAT_0062fe9c);
+void RemoveAllPlaneRideNodes(void) {
+    while (PlaneRideNodeList != NULL) {
+        RemovePlaneRideNode(PlaneRideNodeList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0043d960
-unsigned int FUN_0043d960(TileId *arg) {
-    struct PlaneRideNode *cur = DAT_0062fe9c;
+unsigned int FindPlaneRideNode(TileId *arg) {
+    struct PlaneRideNode *cur = PlaneRideNodeList;
 
     if (cur != NULL) {
         do {
@@ -174,7 +174,7 @@ void FUN_0043da60(struct Element *element, unsigned int param_2, unsigned int pa
 
     ride = element->ride;
     r = ride->riders;
-    node = (struct PlaneRideNode *)FUN_0043d960(tile);
+    node = (struct PlaneRideNode *)FindPlaneRideNode(tile);
     if (node == NULL) {
         return;
     }
@@ -200,7 +200,7 @@ void FUN_0043da60(struct Element *element, unsigned int param_2, unsigned int pa
             off = GetRenderOffsetForLayer(ride->layer, 1);
             AdjustOffsetForViewMode(&off);
             PrintSprite(GetSpriteForLayer(ride->layer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
-            *(short *)*DAT_0081cae0->lls = node->b4;
+            *(short *)*ZoomerSprite->lls = node->b4;
             for (r = ride->riders; r != NULL; r = r->next) {
                 if (tile->id == r->tile.id) {
                     bloke = r->rider;
@@ -245,18 +245,18 @@ void FUN_0043dda0(Element *input) {
     DAT_0062fe7c = DAT_0062fe58->layer;
     DAT_0062fe7c->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b7a54
-    DAT_0062fe90 = LoadBinV("Zbuffers\\Zoomeride.bnv");
+    ZoomerideBinV = LoadBinV("Zbuffers\\Zoomeride.bnv");
     // STRING: LEGOLAND 0x004b7a3c
-    DAT_0062fe94 = LoadBinV("Zbuffers\\Zoomer0n.bnv");
+    Zoomer0nBinV = LoadBinV("Zbuffers\\Zoomer0n.bnv");
     // STRING: LEGOLAND 0x004b7a24
-    DAT_0062fe78 = LoadBinV("Zbuffers\\Zoomer0ff.bnv");
+    Zoomer0ffBinV = LoadBinV("Zbuffers\\Zoomer0ff.bnv");
     // STRING: LEGOLAND 0x004b7a14
-    DAT_0062fe98 = DAT_0081cae0 = LoadSprite("z_Zoomer.lls", 1);
+    DAT_0062fe98 = ZoomerSprite = LoadSprite("z_Zoomer.lls", 1);
     DAT_0081cae8 = -10;
     DAT_0081caec = -0x6b;
-    DAT_0062fe84[0] = DAT_0062fe90;
-    DAT_0062fe84[1] = DAT_0062fe94;
-    DAT_0062fe84[2] = DAT_0062fe78;
+    DAT_0062fe84[0] = ZoomerideBinV;
+    DAT_0062fe84[1] = Zoomer0nBinV;
+    DAT_0062fe84[2] = Zoomer0ffBinV;
     Load_FXList(DAT_004b79d0, 2);
     HideLayer(DAT_0062fe7c, 1);
     StopLayerPlaying(DAT_0062fe7c, 1);
@@ -270,19 +270,19 @@ void FUN_0043dda0(Element *input) {
 // FUNCTION: LEGOLAND 0x0043dee0
 void FUN_0043dee0(struct PlaneRideObject *input) {
     DAT_0062fe58 = (struct Ride *)input->field_c;
-    if (DAT_0081cae0) {
-        KillSprite(DAT_0081cae0);
+    if (ZoomerSprite) {
+        KillSprite(ZoomerSprite);
     }
-    if (DAT_0062fe90) {
-        FreeBinV(DAT_0062fe90);
+    if (ZoomerideBinV) {
+        FreeBinV(ZoomerideBinV);
     }
-    if (DAT_0062fe94) {
-        FreeBinV(DAT_0062fe94);
+    if (Zoomer0nBinV) {
+        FreeBinV(Zoomer0nBinV);
     }
-    if (DAT_0062fe78) {
-        FreeBinV(DAT_0062fe78);
+    if (Zoomer0ffBinV) {
+        FreeBinV(Zoomer0ffBinV);
     }
-    FUN_0043d940();
+    RemoveAllPlaneRideNodes();
     Kill_FXList(DAT_004b79d0, 2);
 }
 
@@ -296,9 +296,9 @@ void FUN_0043df50(void) {
 
 // FUNCTION: LEGOLAND 0x0043df90
 void FUN_0043df90(struct PlaneRideObject *a1, TileId a2, struct PlaneRideObject *a3) {
-    unsigned int temp = FUN_0043d960(&a2);
+    unsigned int temp = FindPlaneRideNode(&a2);
     if (temp != 0) {
-        FUN_0043d8c0((void *)temp);
+        RemovePlaneRideNode((void *)temp);
     }
     StandardRemoveObject((unsigned int)a1, a2, (unsigned int)a3);
     RemoveAllBlokesFromRide(a1->field_c, a2);
@@ -349,7 +349,7 @@ unsigned int FUN_0043e050(struct RideNode *rn, struct PlaneRideNode *node, signe
 
 // FUNCTION: LEGOLAND 0x0043e0a0
 LEGO_EXPORT int SaveZoomer(void) {
-    struct PlaneRideNode *current = DAT_0062fe9c;
+    struct PlaneRideNode *current = PlaneRideNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
 
@@ -433,7 +433,7 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_0062fe9c = node;
+            PlaneRideNodeList = node;
         }
         params.field_8 = ((unsigned char *)node)[0];
         params.field_0 = 2;
@@ -449,7 +449,7 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
     while (list != NULL) {
         car = list->field_10;
         if (car->field_30 != 0) {
-            car->field_2c = (&DAT_0062fe94)[car->field_30];
+            car->field_2c = (&Zoomer0nBinV)[car->field_30];
         } else {
             car->field_2c = NULL;
             list->field_10->field_30 = 0;
@@ -465,7 +465,7 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e220
-void FUN_0043e220(struct ClassNode *name, struct CallbackTable *iface) {
+void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface) {
     // STRING: LEGOLAND 0x004b7a6c
     if (_stricmp("PLANE RIDE", name->name) == 0) {
         iface->cb_a4 = FUN_0043dda0;
@@ -529,15 +529,15 @@ void FUN_0043e2b0(struct PlaneRideNode *node) {
         if (*(unsigned short *)node == r->tile.id && r->rider->field_35 == 1) {
             // STRING: LEGOLAND 0x004b4704
             sprintf(DAT_004b79bc + 6, "%02d", r->rider->field_36);
-            SetBlokePositionFromBNV(DAT_0062fe90, r->rider, DAT_004b79bc, node->b4, -1617706.75f, -1617948.625f, 0);
+            SetBlokePositionFromBNV(ZoomerideBinV, r->rider, DAT_004b79bc, node->b4, -1617706.75f, -1617948.625f, 0);
         }
     }
-    *(short *)*DAT_0081cae0->lls = (short)node->b4;
+    *(short *)*ZoomerSprite->lls = (short)node->b4;
 }
 
 // FUNCTION: LEGOLAND 0x0043e3f0
 void FUN_0043e3f0(void) {
-    struct PlaneRideNode *current = DAT_0062fe9c;
+    struct PlaneRideNode *current = PlaneRideNodeList;
 
     while (current != NULL) {
         FUN_0043e2b0(current);
@@ -563,7 +563,7 @@ void FUN_0043e410(struct Element *elem) {
         next = rn->next;
         bloke = rn->rider;
         pos = &rn->tile;
-        node = (struct PlaneRideNode *)FUN_0043d960(pos);
+        node = (struct PlaneRideNode *)FindPlaneRideNode(pos);
         if (node == NULL) {
             return;
         }

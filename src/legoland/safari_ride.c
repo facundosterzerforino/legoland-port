@@ -181,7 +181,7 @@ void FUN_00414b80(Element *obj, unsigned int param_2, unsigned int param_3, unsi
                 break;
             }
         }
-        *(short *)*DAT_0082c66c->lls = (short)sn->frame;
+        *(short *)*ZSafariSprite->lls = (short)sn->frame;
         if (found) {
             LLSSetFrame(GetLLSForLayer(DAT_004cbec8, 0), sn->frame);
             PrintSprite(GetSpriteForLayer(DAT_004cbec8, 0), pos.x, pos.y, clip, 0);
@@ -225,13 +225,13 @@ void FUN_00414d90(struct SafariObject *a1) {
     DAT_004cbec8 = DAT_004cbec4->layer;
     DAT_004cbec8->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b4d5c
-    DAT_004cbef4 = LoadBinV("Zbuffers\\Safarirun.bnv");
+    SafariRunBNV = LoadBinV("Zbuffers\\Safarirun.bnv");
     // STRING: LEGOLAND 0x004b4d44
     DAT_004cbf04[0] = LoadBinV("Zbuffers\\Safarion.bnv");
     // STRING: LEGOLAND 0x004b4d2c
-    DAT_004cbec0 = LoadBinV("Zbuffers\\Safarioff.bnv");
+    SafariOffBNV = LoadBinV("Zbuffers\\Safarioff.bnv");
     // STRING: LEGOLAND 0x004b4d1c
-    DAT_0082c66c = LoadSprite("z_Safari.lls", 1);
+    ZSafariSprite = LoadSprite("z_Safari.lls", 1);
     DAT_0082c670.x = 0;
     DAT_0082c670.y = -1;
     DAT_004cbee8 = -41;
@@ -239,10 +239,10 @@ void FUN_00414d90(struct SafariObject *a1) {
     HideLayer(DAT_004cbec8, 0);
     StopLayerPlaying(DAT_004cbec8, 0);
     LLSSetFrame(GetLLSForLayer(DAT_004cbec8, 0), 0);
-    DAT_004cbef8 = DAT_004cbef4;
+    DAT_004cbef8 = SafariRunBNV;
     DAT_004cbefc = DAT_004cbf04[0];
-    DAT_004cbf00 = DAT_004cbec0;
-    DAT_004cbf08 = DAT_0082c66c;
+    DAT_004cbf00 = SafariOffBNV;
+    DAT_004cbf08 = ZSafariSprite;
     Load_FXList(SAFARI_SFX, 1);
 }
 
@@ -316,7 +316,7 @@ unsigned int *FUN_00414ff0(struct SafariRoot *p1, unsigned short arg2) {
 }
 
 // FUNCTION: LEGOLAND 0x00415030
-void FUN_00415030(struct ClassNode *name, struct CallbackTable *interfaces) {
+void SafariRideGetInterfaces(struct ClassNode *name, struct CallbackTable *interfaces) {
     // STRING: LEGOLAND 0x004b4d74
     if (_stricmp("SAFARI RIDE", name->name) == 0) {
         interfaces->cb_a4 = FUN_00414d90;
@@ -392,10 +392,10 @@ void FUN_004150c0(struct SafariNode *node) {
         if (s->id == r->tile.id && r->rider->field_35 == 1) {
             // STRING: LEGOLAND 0x004b4704
             sprintf(DAT_004b4cac + 6, "%02d", r->rider->field_36 + 1);
-            SetBlokePositionFromBNV(DAT_004cbef4, r->rider, DAT_004b4cac, s->field_c, -1617787.0f, -1618006.0f, 0);
+            SetBlokePositionFromBNV(SafariRunBNV, r->rider, DAT_004b4cac, s->field_c, -1617787.0f, -1618006.0f, 0);
         }
     }
-    *(short *)*DAT_0082c66c->lls = (short)s->field_c;
+    *(short *)*ZSafariSprite->lls = (short)s->field_c;
     Put3DBlokesOnRide2((Element *)DAT_004cbec4, (Element *)node);
 }
 

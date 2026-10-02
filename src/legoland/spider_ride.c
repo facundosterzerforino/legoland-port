@@ -68,28 +68,28 @@ struct SlotArray {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004158f0
-int FUN_004158f0(TileId *key) {
+int AddSpiderNode(TileId *key) {
     struct SpiderNode *node = (struct SpiderNode *)malloc(0x30);
     if (node == NULL) {
         return;
     }
     memset(node, 0, 0x30);
     node->field_0 = key->id;
-    node->next = DAT_004cbf58;
-    DAT_004cbf58 = node;
+    node->next = SpiderNodeList;
+    SpiderNodeList = node;
     return FUN_00415a90(node);
 }
 
 // FUNCTION: LEGOLAND 0x00415930
-void FUN_00415930(struct SpiderNode *node) {
+void RemoveSpiderNode(struct SpiderNode *node) {
     struct SpiderNode *prev;
     struct SpiderNode *cur;
 
-    if (DAT_004cbf58 == node) {
-        DAT_004cbf58 = node->next;
+    if (SpiderNodeList == node) {
+        SpiderNodeList = node->next;
     } else {
-        cur = DAT_004cbf58->next;
-        prev = DAT_004cbf58;
+        cur = SpiderNodeList->next;
+        prev = SpiderNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -105,17 +105,17 @@ void FUN_00415930(struct SpiderNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00415990
-void FUN_00415990(void) {
-    struct SpiderNode *node = DAT_004cbf58;
+void FreeAllSpiderNodes(void) {
+    struct SpiderNode *node = SpiderNodeList;
     while (node != NULL) {
-        FUN_00415930(node);
-        node = DAT_004cbf58;
+        RemoveSpiderNode(node);
+        node = SpiderNodeList;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004159b0
-struct SpiderNode *FUN_004159b0(TileId *key) {
-    struct SpiderNode *cur = DAT_004cbf58;
+struct SpiderNode *FindSpiderNode(TileId *key) {
+    struct SpiderNode *cur = SpiderNodeList;
 
     if (cur != NULL) {
         do {
@@ -180,7 +180,7 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
     char i;
     unsigned short id;
 
-    state = FUN_004159b0(tile);
+    state = FindSpiderNode(tile);
     if (state == NULL) {
         return;
     }
@@ -205,8 +205,8 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
             PrintSprite(GetSpriteForLayer(DAT_004cbf28, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
             off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(DAT_004cbf1c, screen.x + off.x, screen.y + off.y, param_6, 0);
-            *(short *)*DAT_0082c668->lls = state->field_4;
+            PrintSprite(SpiderHutMask2Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
+            *(short *)*ZSpiderSprite->lls = state->field_4;
             for (elem = ride->riders; elem != NULL; elem = elem->next) {
                 Bloke *b;
                 if (tile->id == elem->tile.id && ((b = elem->rider)->flags & 0x80) != 0) {
@@ -234,7 +234,7 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
             }
             off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(DAT_004cbf14, screen.x + off.x, screen.y + off.y, param_6, 0);
+            PrintSprite(SpiderHutMask1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
             return;
         }
     }
@@ -256,23 +256,23 @@ void FUN_00415e80(struct CarNode *param_1) {
     DAT_004cbf28 = (struct Sprite *)((unsigned int *)DAT_004cbf20)[25];
     DAT_004cbf28->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b4ea0
-    DAT_004cbf10 = LoadBinV("Zbuffers\\spiderrun.bnv");
+    SpiderRunBinV = LoadBinV("Zbuffers\\spiderrun.bnv");
     // STRING: LEGOLAND 0x004b4e88
-    DAT_004cbf24 = LoadBinV("Zbuffers\\spideron.bnv");
+    SpiderOnBinV = LoadBinV("Zbuffers\\spideron.bnv");
     // STRING: LEGOLAND 0x004b4e70
-    DAT_004cbf18 = LoadBinV("Zbuffers\\spideroff.bnv");
+    SpiderOffBinV = LoadBinV("Zbuffers\\spideroff.bnv");
     // STRING: LEGOLAND 0x004b4e5c
-    DAT_004cbf14 = LoadSprite("SpiderHutMask1.lls", 1);
+    SpiderHutMask1Sprite = LoadSprite("SpiderHutMask1.lls", 1);
     // STRING: LEGOLAND 0x004b4e48
-    DAT_004cbf1c = LoadSprite("SpiderHutMask2.lls", 1);
+    SpiderHutMask2Sprite = LoadSprite("SpiderHutMask2.lls", 1);
     // STRING: LEGOLAND 0x004b4e38
-    DAT_0082c668 = LoadSprite("z_spider.lls", 1);
-    DAT_004cbf30[0] = DAT_004cbf10;
+    ZSpiderSprite = LoadSprite("z_spider.lls", 1);
+    DAT_004cbf30[0] = SpiderRunBinV;
     DAT_0082c660.x = -1;
     DAT_0082c660.y = 2;
-    DAT_004cbf38[1] = DAT_0082c668;
-    DAT_004cbf30[1] = DAT_004cbf24;
-    DAT_004cbf38[0] = DAT_004cbf18;
+    DAT_004cbf38[1] = ZSpiderSprite;
+    DAT_004cbf30[1] = SpiderOnBinV;
+    DAT_004cbf38[0] = SpiderOffBinV;
     HideLayer(DAT_004cbf28, 2);
     StopLayerPlaying(DAT_004cbf28, 2);
     LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 2), 0);
@@ -286,21 +286,21 @@ void FUN_00415e80(struct CarNode *param_1) {
 void FUN_00415fd0(struct CarNode *param_1) {
     DAT_004cbf20 = ((unsigned int *)param_1)[3];
 
-    if (DAT_0082c668 != NULL) {
-        KillSprite(DAT_0082c668);
+    if (ZSpiderSprite != NULL) {
+        KillSprite(ZSpiderSprite);
     }
-    if (DAT_004cbf10 != 0) {
-        FreeBinV(DAT_004cbf10);
+    if (SpiderRunBinV != 0) {
+        FreeBinV(SpiderRunBinV);
     }
-    if (DAT_004cbf24 != 0) {
-        FreeBinV(DAT_004cbf24);
+    if (SpiderOnBinV != 0) {
+        FreeBinV(SpiderOnBinV);
     }
-    if (DAT_004cbf18 != 0) {
-        FreeBinV(DAT_004cbf18);
+    if (SpiderOffBinV != 0) {
+        FreeBinV(SpiderOffBinV);
     }
-    KillSprite(DAT_004cbf14);
-    KillSprite(DAT_004cbf1c);
-    FUN_00415990();
+    KillSprite(SpiderHutMask1Sprite);
+    KillSprite(SpiderHutMask2Sprite);
+    FreeAllSpiderNodes();
     Kill_FXList(SpiderRide_SFX, 1);
 }
 
@@ -314,10 +314,10 @@ void FUN_00416060(void) {
 
 // FUNCTION: LEGOLAND 0x004160a0
 void FUN_004160a0(Element *obj, TileId tile, struct Cursor *cursor) {
-    struct SpiderNode *node = FUN_004159b0(&tile);
+    struct SpiderNode *node = FindSpiderNode(&tile);
 
     if (node != NULL) {
-        FUN_00415930(node);
+        RemoveSpiderNode(node);
     }
     FUN_00415a20(&tile);
     StandardRemoveObject(obj, tile, cursor);
@@ -331,7 +331,7 @@ void FUN_004160f0(Element *editObj, int *coords) {
     key.pos.x = coords[0];
     key.pos.y = coords[1];
     AddBasicObject(editObj, coords);
-    FUN_004158f0(&key);
+    AddSpiderNode(&key);
 }
 
 // FUNCTION: LEGOLAND 0x00416120
@@ -404,15 +404,15 @@ void FUN_004161f0(struct SpiderNode *node) {
     for (; r != NULL; r = r->next) {
         if (s->id == r->tile.id && r->rider->field_35 == 1) {
             sprintf(DAT_004b4d94.name + 6, "%02d", r->rider->field_36);
-            SetBlokePositionFromBNV(DAT_004cbf10, r->rider, DAT_004b4d94.name, s->field_4, -1617787.75f, -1618096.5f, 0);
+            SetBlokePositionFromBNV(SpiderRunBinV, r->rider, DAT_004b4d94.name, s->field_4, -1617787.75f, -1618096.5f, 0);
         }
     }
-    *(short *)*DAT_0082c668->lls = (short)s->field_4;
+    *(short *)*ZSpiderSprite->lls = (short)s->field_4;
 }
 
 // FUNCTION: LEGOLAND 0x00416310
 void FUN_00416310(void) {
-    struct SpiderNode *node = DAT_004cbf58;
+    struct SpiderNode *node = SpiderNodeList;
     while (node != NULL) {
         FUN_004161f0(node);
         node = node->next;
@@ -441,7 +441,7 @@ void FUN_00416330(Element *obj) {
         next = elem->next;
         bloke = elem->rider;
         tile = &elem->tile;
-        state = (struct SpiderState *)FUN_004159b0(tile);
+        state = (struct SpiderState *)FindSpiderNode(tile);
         if (state == NULL) {
             return;
         }
@@ -589,7 +589,7 @@ int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char cou
 
 // FUNCTION: LEGOLAND 0x00416880
 LEGO_EXPORT int SaveSpider(void) {
-    struct SpiderNode *node = DAT_004cbf58;
+    struct SpiderNode *node = SpiderNodeList;
     unsigned int one = 1;
     unsigned int zero = 0;
 
@@ -661,7 +661,7 @@ LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_004cbf58 = node;
+            SpiderNodeList = node;
         }
         prev = node;
         if (!SaveGameRead(&marker, 4)) {

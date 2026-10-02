@@ -29,7 +29,7 @@ struct CommandArgs {
 };
 
 // FUNCTION: LEGOLAND 0x004787b0
-int FUN_004787b0(char **pp_str) {
+int IsStringEmpty(char **pp_str) {
     if (strlen(*pp_str) == 0) {
         return 1;
     }
@@ -86,7 +86,7 @@ int FUN_00478890(struct CommandArgs *arg, int argc) {
     }
     if (argc == 1) {
         n1 = atoi((char *)arg->field_4);
-        DAT_004bb5b0 = n1 <= DAT_0080ffa0.field_20;
+        DAT_004bb5b0 = n1 <= CurrentProfile.field_20;
         return 1;
     }
     n1 = atoi((char *)arg->field_4);
@@ -94,7 +94,7 @@ int FUN_00478890(struct CommandArgs *arg, int argc) {
     if (n1 > n2) {
         return 0;
     }
-    if (DAT_0080ffa0.field_20 < n1 || (DAT_004bb5b0 = 1, DAT_0080ffa0.field_20 > n2)) {
+    if (CurrentProfile.field_20 < n1 || (DAT_004bb5b0 = 1, CurrentProfile.field_20 > n2)) {
         DAT_004bb5b0 = 0;
     }
     return 1;
@@ -255,7 +255,7 @@ int FUN_00478c60(struct CommandArgs *arg, int argc) {
             return 0;
         }
         if (DAT_00669054 == 1) {
-            FUN_00457900(atoi((char *)arg->field_4));
+            SetBrickCount(atoi((char *)arg->field_4));
             return 1;
         }
         FUN_0046b850(atoi((char *)arg->field_4));
@@ -1022,7 +1022,7 @@ int FUN_00479f30(struct CommandArgs *arg, int argc) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
             return 0;
         }
-        index = FUN_004781b0((char *)arg->field_4, &DAT_004bb5b4, 4);
+        index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5b4, 4);
         if (index == -1) {
             return 0;
         }
@@ -1166,7 +1166,7 @@ int FUN_0047a2f0(struct CommandArgs *arg, int argc) {
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 0) != 0) {
         if (argc != 0) {
-            index = FUN_004781b0((char *)arg->field_4, &DAT_004bb5c4, 5);
+            index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5c4, 5);
         } else {
             index = 0;
         }
@@ -1187,7 +1187,7 @@ int FUN_0047a360(struct CommandArgs *arg, int argc) {
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 0) != 0) {
         if (argc != 0) {
-            index = FUN_004781b0((char *)arg->field_4, &DAT_004bb5d8, 2);
+            index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5d8, 2);
         } else {
             index = 0;
         }
@@ -1208,7 +1208,7 @@ int FUN_0047a3d0(struct CommandArgs *arg, int argc) {
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) != 0) {
         if (argc != 0) {
-            index = FUN_004781b0((char *)arg->field_4, &DAT_004bb5e0, 5);
+            index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5e0, 5);
         }
         if (index != -1) {
             FUN_0046c4b0(DAT_00669050, index);
@@ -1428,7 +1428,7 @@ int FUN_0047a8e0(struct CommandArgs *arg, int argc) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
-        index = FUN_004781b0((char *)arg->field_4, &DAT_004bb5f4, 0xc);
+        index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5f4, 0xc);
         v = atoi(arg->field_8);
         if (index == -1) {
             return 0;
@@ -1467,9 +1467,9 @@ int FUN_0047a960(struct CommandArgs *arg, int argc) {
         // STRING: LEGOLAND 0x004bc0d8
         if (_stricmp((char *)arg->field_4, "HAPPY_VIS") == 0) {
             // STRING: LEGOLAND 0x004bc0cc
-            index = FUN_004781b0("Happpy_Vis", &DAT_004bb624, 0x19);
+            index = FindStringNoCase("Happpy_Vis", &DAT_004bb624, 0x19);
         } else {
-            index = FUN_004781b0((char *)arg->field_4, &DAT_004bb624, 0x19);
+            index = FindStringNoCase((char *)arg->field_4, &DAT_004bb624, 0x19);
         }
         if (index == -1) {
             return 0;
@@ -1503,7 +1503,7 @@ int FUN_0047aa90(struct CommandArgs *arg, int argc) {
         return 0;
     }
     n = atoi(arg->field_8);
-    r = FUN_004781b0((char *)arg->field_4, &DAT_004bb688, 13);
+    r = FindStringNoCase((char *)arg->field_4, &DAT_004bb688, 13);
     if (r == -1) {
         return 0;
     }
@@ -1522,7 +1522,7 @@ int FUN_0047ab00(struct CommandArgs *arg, int argc) {
     if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
         return 0;
     }
-    index = FUN_004781b0((char *)arg->field_4, &DAT_004bb6bc, 6);
+    index = FindStringNoCase((char *)arg->field_4, &DAT_004bb6bc, 6);
     value = atoi(arg->field_8);
     if (index == -1) {
         return 0;
@@ -1544,7 +1544,7 @@ int FUN_0047ab80(struct CommandArgs *arg, int argc) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
-        index = FUN_004781b0((char *)arg->field_4, &DAT_004bb6bc, 6);
+        index = FindStringNoCase((char *)arg->field_4, &DAT_004bb6bc, 6);
         v = atoi(arg->field_8);
         if (index == -1) {
             return 0;
@@ -1663,7 +1663,7 @@ int FUN_0047ae00(char **argv, int argc) {
             return 0;
         }
         for (i = 1; i <= argc; i++) {
-            index = FUN_004781b0(argv[i], &DAT_004bb6d4, 9);
+            index = FindStringNoCase(argv[i], &DAT_004bb6d4, 9);
             if (index != -1) {
                 mask |= 1 << index;
             } else {
@@ -1694,7 +1694,7 @@ int FUN_0047aea0(char **argv, int argc) {
             mask = 0xffffffff;
         }
         for (i = 1; i <= argc; i++) {
-            index = FUN_004781b0(argv[i], &DAT_004bb6d4, 9);
+            index = FindStringNoCase(argv[i], &DAT_004bb6d4, 9);
             if (index != -1) {
                 mask |= 1 << index;
             } else {
@@ -1742,7 +1742,7 @@ int FUN_0047afb0(const char *param_1) {
     FUN_00492980();
     LLIDB_ClearOnLevel();
     FUN_004784c0();
-    result = FUN_004781f0(param_1, DAT_004bb6f8, 0x5d, 0);
+    result = ParseScriptFile(param_1, DAT_004bb6f8, 0x5d, 0);
     FUN_00492990();
     v1 = (result >= 0) - 1;
     return v1 & 2;

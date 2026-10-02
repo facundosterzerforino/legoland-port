@@ -41,10 +41,10 @@ struct CopterNode {
 
 struct CopterChainNode;
 struct CopterSource;
-unsigned int FUN_00404f20(struct CopterChainNode *node, struct CopterSource *id);
-void FUN_00403e90(struct CopterNode *node);
-void FUN_004040f0(struct CopterNode *node, int index, unsigned int param_3);
+unsigned int CoptersFindChainIndex(struct CopterChainNode *node, struct CopterSource *id);
+void CoptersInitNode(struct CopterNode *node);
+void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3);
 void FUN_004049a0(struct CopterNode *node, int param);
 void FUN_00404630(struct CopterNode *node, int index);
 
-void FUN_00405110(struct ClassNode *name, struct CallbackTable *interfaces);
+void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces);

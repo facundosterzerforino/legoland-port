@@ -14,8 +14,8 @@
 typedef struct WorkOrder WorkOrder;
 
 /* A gardener's or mechanic's job: build (type 1) or repair (type 2) the object of
-   class `element` at `pos`. Gardener orders are listed at DAT_0079a8b0..b4, mechanic
-   orders at DAT_0079a8c0..c4. */
+   class `element` at `pos`. Gardener orders are listed at GardenerOrderHead..b4, mechanic
+   orders at MechanicOrderHead..c4. */
 struct WorkOrder {
     /* 0x00 */ WorkOrder *next;
     /* 0x04 */ Element *element;
@@ -108,9 +108,9 @@ LEGO_EXPORT void RemoveRepairOrderAT(Ride *ride, int x, int y);
 void FUN_0049b270(Ride *ride, TileId tile);
 LEGO_EXPORT void EraseMechanicOrder(WorkOrder *order);
 LEGO_EXPORT void EraseGardenerOrder(WorkOrder *order);
-void FUN_00499eb0(WorkOrder *order);
-int FUN_0049a120(void);
-int FUN_0049a160(void);
+void FreeMechanicWorkOrder(WorkOrder *order);
+int BuyGardener(void);
+int BuyMechanic(void);
 void FUN_0049cfc0(void);
 
 void FUN_0049cf00(struct MapRect *rect);
@@ -118,21 +118,21 @@ Bloke *FUN_00499c40(int *coords);
 void FUN_00499ac0(Bloke *worker, WorkOrder *order);
 WorkOrder *FUN_00499780(Element *element, int *coords, int mode);
 LEGO_EXPORT WorkOrder *AddRepairOrderForObject(Ride *ride, struct Point pos);
-int FUN_00499550(void);
-int FUN_00499560(void);
+int GetGardenerCount(void);
+int GetMechanicCount(void);
 LEGO_EXPORT void ClearAMechanicsWorkList(Bloke *value);
 LEGO_EXPORT void ClearAGardenersWorkList(Bloke *param);
 LEGO_EXPORT int SetGardenerWorkOrderAtPostion(Bloke *worker, int x, int y);
 LEGO_EXPORT int SetMechanicsOrderAtPostion(Bloke *worker, int x, int y);
 LEGO_EXPORT void ControlWorkers(void);
 LEGO_EXPORT void LoadWorkerInterfaceGFX(void);
-void FUN_0049c140(void);
-void FUN_0049c630(void);
-void FUN_0049cb20(void);
-void FUN_0049cd10(void);
-void FUN_0049c3c0(void);
-void FUN_0049c8b0(void);
-void FUN_0049cc10(void);
+void SaveGardeners(void);
+void SaveMechanics(void);
+void SaveGardenerOrders(void);
+void SaveMechanicOrders(void);
+void LoadGardeners(void);
+void LoadMechanics(void);
+void LoadGardenerOrders(void);
 void FUN_0049ce00(void);
 LEGO_EXPORT void RenderWorkers(void);
 LEGO_EXPORT void RenderWorkerInterfaceGFX(void);

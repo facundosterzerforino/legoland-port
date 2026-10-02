@@ -5,4 +5,4 @@
 struct CallbackTable;
 struct ClassNode;
 
-void FUN_004068b0(struct ClassNode *name, struct CallbackTable *ci);
+void FortGetInterfaces(struct ClassNode *name, struct CallbackTable *ci);

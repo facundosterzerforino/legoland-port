@@ -10,7 +10,7 @@
 LEGO_EXPORT unsigned int GetGameTimer(void) {
     unsigned int now;
 
-    if (DAT_0079a890 != 0) {
+    if (GameTimerPaused != 0) {
         now = DAT_0079a894;
     } else {
         now = GetTickCount();
@@ -22,10 +22,10 @@ LEGO_EXPORT unsigned int GetGameTimer(void) {
 unsigned int FUN_00499460(void) {
     unsigned int now;
 
-    if (DAT_0079a890 != 0) {
+    if (GameTimerPaused != 0) {
         now = DAT_0079a89c;
     } else {
-        now = DAT_008119a4;
+        now = FrameCounter;
     }
     return now - DAT_0079a8a0;
 }

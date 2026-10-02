@@ -4,7 +4,7 @@
 
 struct Bloke;
 
-/* Carousel ride node (one 0x2c allocation), head at DAT_006160c4. */
+/* Carousel ride node (one 0x2c allocation), head at CarouselNodeList. */
 struct CarouselNode {
     /* 0x00 */ struct CarouselNode *next;
     /* 0x04 */ unsigned short id;
@@ -48,10 +48,10 @@ struct CarouselRideObj {
     /* 0x0c */ struct CarouselRide *ride;
 };
 
-void FUN_0042bbc0(unsigned short *param_1);
-void FUN_0042bc00(struct CarouselNode *node);
-void FUN_0042bc40(void);
-struct CarouselNode *FUN_0042bc60(unsigned short *param_1);
+void AddCarouselNode(unsigned short *param_1);
+void RemoveCarouselNode(struct CarouselNode *node);
+void FreeAllCarouselNodes(void);
+struct CarouselNode *FindCarouselNode(unsigned short *param_1);
 void FUN_0042bc90(struct CarouselNode *node);
 void FUN_0042c210(struct CarouselNode *node);
 void FUN_0042c800(void);
@@ -64,6 +64,6 @@ void FUN_0042c460();
 void FUN_0042c4a0(struct CarouselRideObj *param_1, TileId tile, unsigned int param_3);
 void FUN_0042c520(unsigned int param_1, unsigned char *param_2);
 struct RideSpriteInfo *FUN_0042c550(struct CarouselRideObj *param1, unsigned short param2);
-int FUN_0042c590(void);
-int FUN_0042c600(struct CarouselRideObj *param_1);
+int Carousel_Save(void);
+int Carousel_Load(struct CarouselRideObj *param_1);
 void FUN_0042c820(struct CarouselRideObj *param_1);

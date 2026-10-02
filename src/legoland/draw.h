@@ -48,8 +48,8 @@ LEGO_EXPORT void ClearOverrideFrame(void);
 LEGO_EXPORT void ClearOverridePalette(void);
 void FUN_00465850(struct AviFrame *frame);
 void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3);
-void FUN_00466360(int a, int b);
-void FUN_004663c0(void);
+void LoadWatchSprite(int a, int b);
+void UnloadWatchSprite(void);
 LEGO_EXPORT void CommitCliprectToHardware(void);
 LEGO_EXPORT int RenderingComplete(void);
 LEGO_EXPORT void PushSetTarget(struct Sprite *sprite);
@@ -57,12 +57,12 @@ LEGO_EXPORT void PopTarget(void);
 LEGO_EXPORT int RecreateSprite(struct Sprite *sprite);
 void FUN_004687f0(const char *param_1);
 LEGO_EXPORT int CheckHostSystemGPU(void);
-int FUN_004661d0(void);
+int BlitFrameToWindow(void);
 void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off);
 LEGO_EXPORT void SoftPrint_Clear(void);
 LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint);
-void FUN_004663f0(void);
-int FUN_00463ef0(void);
+void DrawWatchSprite(void);
+int SetDisplayModeAndDetectPixelFormat(void);
 
 struct DrawLLS {
     short frame;

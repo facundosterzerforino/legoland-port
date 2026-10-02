@@ -73,8 +73,8 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
-    if (DAT_00616108 != NULL) {
-        PrintSprite(DAT_00616108, pos.x + off.x, pos.y + off.y, 0, 0);
+    if (EntranceMatte4Sprite != NULL) {
+        PrintSprite(EntranceMatte4Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
@@ -85,8 +85,8 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
-    if (DAT_00616104 != NULL) {
-        PrintSprite(DAT_00616104, pos.x + off.x, pos.y + off.y, 0, 0);
+    if (EntranceMatte3Sprite != NULL) {
+        PrintSprite(EntranceMatte3Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
@@ -97,8 +97,8 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
-    if (DAT_00616100 != NULL) {
-        PrintSprite(DAT_00616100, pos.x + off.x, pos.y + off.y, 0, 0);
+    if (EntranceMatte2Sprite != NULL) {
+        PrintSprite(EntranceMatte2Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
@@ -109,8 +109,8 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
-    if (DAT_006160fc != NULL) {
-        PrintSprite(DAT_006160fc, pos.x + off.x, pos.y + off.y, 0, 0);
+    if (EntranceMatte1Sprite != NULL) {
+        PrintSprite(EntranceMatte1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
@@ -124,8 +124,8 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
-    if (DAT_0061610c != NULL) {
-        PrintSprite(DAT_0061610c, pos.x + off.x, pos.y + off.y, 0, 0);
+    if (Booth1Sprite != NULL) {
+        PrintSprite(Booth1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 }
 
@@ -138,15 +138,15 @@ void FUN_0042de50(Element *param) {
     DAT_006160f0 = DAT_006160f4->layer;
     DAT_006160f0->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b66cc
-    DAT_006160fc = LoadSprite("entrance_matte1.lls", 1);
+    EntranceMatte1Sprite = LoadSprite("entrance_matte1.lls", 1);
     // STRING: LEGOLAND 0x004b66b8
-    DAT_00616100 = LoadSprite("entrance_matte2.lls", 1);
+    EntranceMatte2Sprite = LoadSprite("entrance_matte2.lls", 1);
     // STRING: LEGOLAND 0x004b66a4
-    DAT_00616104 = LoadSprite("entrance_matte3.lls", 1);
+    EntranceMatte3Sprite = LoadSprite("entrance_matte3.lls", 1);
     // STRING: LEGOLAND 0x004b6690
-    DAT_00616108 = LoadSprite("entrance_matte4.lls", 1);
+    EntranceMatte4Sprite = LoadSprite("entrance_matte4.lls", 1);
     // STRING: LEGOLAND 0x004b6684
-    DAT_0061610c = LoadSprite("booth1.lls", 1);
+    Booth1Sprite = LoadSprite("booth1.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0042def0
@@ -154,20 +154,20 @@ void FUN_0042def0(Element *param) {
     Kill_FXList(ENTRANCE_SFX, 1);
     KillMoneySFX();
     DAT_006160f4 = param->ride;
-    if (DAT_0061610c != 0) {
-        KillSprite(DAT_0061610c);
+    if (Booth1Sprite != 0) {
+        KillSprite(Booth1Sprite);
     }
-    if (DAT_006160fc != 0) {
-        KillSprite(DAT_006160fc);
+    if (EntranceMatte1Sprite != 0) {
+        KillSprite(EntranceMatte1Sprite);
     }
-    if (DAT_00616100 != 0) {
-        KillSprite(DAT_00616100);
+    if (EntranceMatte2Sprite != 0) {
+        KillSprite(EntranceMatte2Sprite);
     }
-    if (DAT_00616104 != 0) {
-        KillSprite(DAT_00616104);
+    if (EntranceMatte3Sprite != 0) {
+        KillSprite(EntranceMatte3Sprite);
     }
-    if (DAT_00616108 != 0) {
-        KillSprite(DAT_00616108);
+    if (EntranceMatte4Sprite != 0) {
+        KillSprite(EntranceMatte4Sprite);
     }
 }
 

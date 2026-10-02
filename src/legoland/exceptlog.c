@@ -37,12 +37,12 @@ int stackdump(void *exc_info, const char *filename) {
     char *dot;
     const char *kind;
 
-    if (DAT_00667528 == 0) {
-        DAT_00667528 = 1;
+    if (ExceptionReportStarted == 0) {
+        ExceptionReportStarted = 1;
         if (GetModuleFileNameA(NULL, path, 0x104) <= 0) {
             path[0] = 0;
         }
-        base = FUN_004548f0(path);
+        base = GetFileNameFromPath(path);
         lstrcpyA(progname, base);
         dot = strrchr(progname, '.');
         if (dot != NULL) {
@@ -62,15 +62,15 @@ int stackdump(void *exc_info, const char *filename) {
         ctx = ep->ContextRecord;
         if (VirtualQuery((LPCVOID)ctx->Eip, &mbi, sizeof(mbi))) {
             if (GetModuleFileNameA((HMODULE)mbi.AllocationBase, modpath, 0x104) > 0) {
-                modname = FUN_004548f0(modpath);
+                modname = GetFileNameFromPath(modpath);
             }
         }
         // STRING: LEGOLAND 0x004b8c2c
-        FUN_00454290(hFile, "%s caused %s in module %s at %04x:%08x.\r\n", progname, FUN_00454700(rec->ExceptionCode),
+        WriteFileFormatted(hFile, "%s caused %s in module %s at %04x:%08x.\r\n", progname, GetExceptionDescription(rec->ExceptionCode),
             modname, ctx->SegCs, ctx->Eip);
         // STRING: LEGOLAND 0x004b8c08
-        FUN_00454290(hFile, "Exception handler called in %s.\r\n", filename);
-        FUN_004545a0(hFile);
+        WriteFileFormatted(hFile, "Exception handler called in %s.\r\n", filename);
+        WriteErrorTimeAndSystemInfo(hFile);
         if (rec->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && rec->NumberParameters >= 2) {
             // STRING: LEGOLAND 0x004b8bfc
             kind = "Read from";
@@ -80,34 +80,34 @@ int stackdump(void *exc_info, const char *filename) {
             }
             // STRING: LEGOLAND 0x004b8bc0
             wsprintfA(tmp, "%s location %08x caused an access violation.\r\n", kind, rec->ExceptionInformation[1]);
-            FUN_00454290(hFile, (char *)DAT_004b8bbc, tmp);
+            WriteFileFormatted(hFile, (char *)DAT_004b8bbc, tmp);
         }
         // STRING: LEGOLAND 0x004b8bb8
-        FUN_00454290(hFile, "\r\n");
+        WriteFileFormatted(hFile, "\r\n");
         // STRING: LEGOLAND 0x004b8ba8
-        FUN_00454290(hFile, "Registers:\r\n");
+        WriteFileFormatted(hFile, "Registers:\r\n");
         // STRING: LEGOLAND 0x004b8b80
-        FUN_00454290(hFile, "EAX=%08x CS=%04x EIP=%08x EFLGS=%08x\r\n", ctx->Eax, ctx->SegCs, ctx->Eip, ctx->EFlags);
+        WriteFileFormatted(hFile, "EAX=%08x CS=%04x EIP=%08x EFLGS=%08x\r\n", ctx->Eax, ctx->SegCs, ctx->Eip, ctx->EFlags);
         // STRING: LEGOLAND 0x004b8b58
-        FUN_00454290(hFile, "EBX=%08x SS=%04x ESP=%08x EBP=%08x\r\n", ctx->Ebx, ctx->SegSs, ctx->Esp, ctx->Ebp);
+        WriteFileFormatted(hFile, "EBX=%08x SS=%04x ESP=%08x EBP=%08x\r\n", ctx->Ebx, ctx->SegSs, ctx->Esp, ctx->Ebp);
         // STRING: LEGOLAND 0x004b8b34
-        FUN_00454290(hFile, "ECX=%08x DS=%04x ESI=%08x FS=%04x\r\n", ctx->Ecx, ctx->SegDs, ctx->Esi, ctx->SegFs);
+        WriteFileFormatted(hFile, "ECX=%08x DS=%04x ESI=%08x FS=%04x\r\n", ctx->Ecx, ctx->SegDs, ctx->Esi, ctx->SegFs);
         // STRING: LEGOLAND 0x004b8b10
-        FUN_00454290(hFile, "EDX=%08x ES=%04x EDI=%08x GS=%04x\r\n", ctx->Edx, ctx->SegEs, ctx->Edi, ctx->SegGs);
+        WriteFileFormatted(hFile, "EDX=%08x ES=%04x EDI=%08x GS=%04x\r\n", ctx->Edx, ctx->SegEs, ctx->Edi, ctx->SegGs);
         // STRING: LEGOLAND 0x004b8afc
-        FUN_00454290(hFile, "Bytes at CS:EIP:\r\n");
+        WriteFileFormatted(hFile, "Bytes at CS:EIP:\r\n");
         ip = (unsigned char *)ctx->Eip;
         for (i = 0; i < DAT_004b8a88; i++) {
             __try {
                 // STRING: LEGOLAND 0x004b8af4
-                FUN_00454290(hFile, "%02x ", ip[i]);
+                WriteFileFormatted(hFile, "%02x ", ip[i]);
             } __except (1) {
                 // STRING: LEGOLAND 0x004b8af0
-                FUN_00454290(hFile, "?? ");
+                WriteFileFormatted(hFile, "?? ");
             }
         }
         // STRING: LEGOLAND 0x004b8ae0
-        FUN_00454290(hFile, "\r\nStack dump:\r\n");
+        WriteFileFormatted(hFile, "\r\nStack dump:\r\n");
         __try {
             sp = (DWORD *)ctx->Esp;
             /* original reads the stack base from fs:[4] (inline asm); not expressible in pure C */
@@ -129,24 +129,24 @@ int stackdump(void *exc_info, const char *filename) {
                 out += wsprintfA(out, "%08x%s", *sp, sep);
                 sp = next;
                 if (out > bufend) {
-                    FUN_00454290(hFile, (char *)DAT_004b8bbc, buf);
+                    WriteFileFormatted(hFile, (char *)DAT_004b8bbc, buf);
                     buf[0] = 0;
                     out = buf;
                 }
             }
-            FUN_00454290(hFile, (char *)DAT_004b8bbc, buf);
+            WriteFileFormatted(hFile, (char *)DAT_004b8bbc, buf);
         } __except (1) {
             // STRING: LEGOLAND 0x004b8aa0
-            FUN_00454290(hFile, "Exception encountered during stack dump.\r\n");
+            WriteFileFormatted(hFile, "Exception encountered during stack dump.\r\n");
         }
-        FUN_004542e0(hFile);
+        WriteModuleList(hFile);
         CloseHandle(hFile);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00454290
-void FUN_00454290(HANDLE file, const char *format, ...) {
+void WriteFileFormatted(HANDLE file, const char *format, ...) {
     DWORD written;
     char buffer[2000];
     va_list args;
@@ -157,7 +157,7 @@ void FUN_00454290(HANDLE file, const char *format, ...) {
 }
 
 // FUNCTION: LEGOLAND 0x004542e0
-void FUN_004542e0(HANDLE file) {
+void WriteModuleList(HANDLE file) {
     SYSTEM_INFO si;
     MEMORY_BASIC_INFORMATION mbi;
     DWORD pagesize;
@@ -166,7 +166,7 @@ void FUN_004542e0(HANDLE file) {
     DWORD prev = 0;
 
     // STRING: LEGOLAND 0x004b8c90
-    FUN_00454290(file, "\r\n\tModule list: names, addresses, sizes, time stamps and file times:\r\n");
+    WriteFileFormatted(file, "\r\n\tModule list: names, addresses, sizes, time stamps and file times:\r\n");
     GetSystemInfo(&si);
     pagesize = si.dwPageSize;
     limit = (0x40000000 / pagesize) << 2;
@@ -175,7 +175,7 @@ void FUN_004542e0(HANDLE file) {
             i += mbi.RegionSize / pagesize;
             if (mbi.State == MEM_COMMIT && (DWORD)mbi.AllocationBase > prev) {
                 prev = (DWORD)mbi.AllocationBase;
-                FUN_00454380(file, prev);
+                WriteModuleInfo(file, prev);
             }
         } else {
             i += 0x10000 / pagesize;
@@ -184,7 +184,7 @@ void FUN_004542e0(HANDLE file) {
 }
 
 // FUNCTION: LEGOLAND 0x00454380
-void FUN_00454380(HANDLE file, DWORD base) {
+void WriteModuleInfo(HANDLE file, DWORD base) {
     char path[MAX_PATH];
 
     __try {
@@ -209,12 +209,12 @@ void FUN_00454380(HANDLE file, DWORD base) {
                         if (GetFileTime(fh, NULL, NULL, &ftime)) {
                             // STRING: LEGOLAND 0x004b8d04
                             wsprintfA(buf, " - file date is ");
-                            FUN_00454500(buf + lstrlenA(buf), ftime);
+                            FormatLocalFileTime(buf + lstrlenA(buf), ftime);
                         }
                         CloseHandle(fh);
                     }
                     // STRING: LEGOLAND 0x004b8cd8
-                    FUN_00454290(file, "%s, loaded at 0x%08x - %d bytes - %08x%s\r\n", path, hinst, fsize,
+                    WriteFileFormatted(file, "%s, loaded at 0x%08x - %d bytes - %08x%s\r\n", path, hinst, fsize,
                         nthdr->FileHeader.TimeDateStamp, buf);
                 }
             }
@@ -224,7 +224,7 @@ void FUN_00454380(HANDLE file, DWORD base) {
 }
 
 // FUNCTION: LEGOLAND 0x00454500
-void FUN_00454500(char *buffer, FILETIME ft) {
+void FormatLocalFileTime(char *buffer, FILETIME ft) {
     WORD date;
     WORD time;
 
@@ -238,7 +238,7 @@ void FUN_00454500(char *buffer, FILETIME ft) {
 }
 
 // FUNCTION: LEGOLAND 0x004545a0
-void FUN_004545a0(HANDLE file) {
+void WriteErrorTimeAndSystemInfo(HANDLE file) {
     FILETIME ft;
     char timestr[100];
     char path[MAX_PATH];
@@ -250,9 +250,9 @@ void FUN_004545a0(HANDLE file) {
     DWORD csize;
 
     GetSystemTimeAsFileTime(&ft);
-    FUN_00454500(timestr, ft);
+    FormatLocalFileTime(timestr, ft);
     // STRING: LEGOLAND 0x004b8d9c
-    FUN_00454290(file, "Error occurred at %s.\r\n", timestr);
+    WriteFileFormatted(file, "Error occurred at %s.\r\n", timestr);
     if (GetModuleFileNameA(NULL, path, MAX_PATH) <= 0) {
         // STRING: LEGOLAND 0x004b8c88
         lstrcpyA(path, "Unknown");
@@ -266,20 +266,20 @@ void FUN_004545a0(HANDLE file) {
         lstrcpyA(computer, "Unknown");
     }
     // STRING: LEGOLAND 0x004b8d88
-    FUN_00454290(file, "%s (Version %s)\r\n", path, (char *)&DAT_0066752c);
+    WriteFileFormatted(file, "%s (Version %s)\r\n", path, (char *)&ProductVersionString);
     // STRING: LEGOLAND 0x004b8d6c
-    FUN_00454290(file, "Run by %s on machine %s.\r\n", user, computer);
+    WriteFileFormatted(file, "Run by %s on machine %s.\r\n", user, computer);
     GetSystemInfo(&si);
     // STRING: LEGOLAND 0x004b8d50
-    FUN_00454290(file, "%d processor(s), type %d.\r\n", si.dwNumberOfProcessors, si.dwProcessorType);
+    WriteFileFormatted(file, "%d processor(s), type %d.\r\n", si.dwNumberOfProcessors, si.dwProcessorType);
     ms.dwLength = sizeof(ms);
     GlobalMemoryStatus(&ms);
     // STRING: LEGOLAND 0x004b8d30
-    FUN_00454290(file, "%d MBytes physical memory.\r\n", (ms.dwTotalPhys + 0xfffff) >> 20);
+    WriteFileFormatted(file, "%d MBytes physical memory.\r\n", (ms.dwTotalPhys + 0xfffff) >> 20);
 }
 
 // FUNCTION: LEGOLAND 0x00454700
-const char *FUN_00454700(unsigned int code) {
+const char *GetExceptionDescription(unsigned int code) {
     struct ExceptionEntry table[24] = {
         // STRING: LEGOLAND 0x004b8fd8
         {0x40010005, "a Control-C"},
@@ -341,7 +341,7 @@ const char *FUN_00454700(unsigned int code) {
 }
 
 // FUNCTION: LEGOLAND 0x004548f0
-char *FUN_004548f0(char *path) {
+char *GetFileNameFromPath(char *path) {
     char *last_backslash = strrchr(path, '\\');
     if (last_backslash != NULL) {
         return last_backslash + 1;

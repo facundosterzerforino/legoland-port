@@ -27,88 +27,88 @@ struct BubbleGfx {
 LEGO_EXPORT void LoadBubbleHelpGFX(void) {
     void *element;
 
-    if (DAT_006675b4 != 0) {
+    if (BubbleHelpGFXLoaded != 0) {
         return;
     }
 
     // STRING: LEGOLAND 0x004b9064
     if (LLIDB_FindElement("SPEECH BUBBLE", (unsigned int *)&element, 0) == 0) {
-        DAT_00813a0c = LLIDB_LoadData(element);
+        SpeechBubbleData = LLIDB_LoadData(element);
     }
 
     DAT_008139e0 = 0;
     // STRING: LEGOLAND 0x004b9054
-    DAT_008139e4 = LoadSprite("mi_hungry.lls", 0);
+    MiHungrySprite = LoadSprite("mi_hungry.lls", 0);
     // STRING: LEGOLAND 0x004b9044
-    DAT_008139e8 = LoadSprite("mi_happy.lls", 0);
+    MiHappySprite = LoadSprite("mi_happy.lls", 0);
     // STRING: LEGOLAND 0x004b9038
-    DAT_008139ec = LoadSprite("mi_sad.lls", 0);
+    MiSadSprite = LoadSprite("mi_sad.lls", 0);
     // STRING: LEGOLAND 0x004b902c
-    DAT_008139f0 = LoadSprite("mi_home.lls", 0);
+    MiHomeSprite = LoadSprite("mi_home.lls", 0);
     // STRING: LEGOLAND 0x004b9020
-    DAT_008139f4 = LoadSprite("mi_eat.lls", 0);
+    MiEatSprite = LoadSprite("mi_eat.lls", 0);
     // STRING: LEGOLAND 0x004b9014
-    DAT_008139f8 = LoadSprite("great.lls", 0);
+    GreatSprite = LoadSprite("great.lls", 0);
     // STRING: LEGOLAND 0x004b7a78
-    DAT_008139fc = LoadSprite("poor.lls", 0);
+    PoorSprite = LoadSprite("poor.lls", 0);
     // STRING: LEGOLAND 0x004b9004
-    DAT_00813a00 = LoadSprite("favourite.lls", 0);
+    FavouriteSprite = LoadSprite("favourite.lls", 0);
     // STRING: LEGOLAND 0x004b8ff8
-    DAT_00813a04 = LoadSprite("opinion.lls", 0);
+    OpinionSprite = LoadSprite("opinion.lls", 0);
     // STRING: LEGOLAND 0x004b8fe8
-    DAT_00813a08 = LoadSprite("mi_bored.lls", 0);
+    MiBoredSprite = LoadSprite("mi_bored.lls", 0);
 
-    DAT_006675b4 = 1;
+    BubbleHelpGFXLoaded = 1;
 }
 
 // FUNCTION: LEGOLAND 0x00454a10
-void FUN_00454a10(void) {
+void UnloadBubbleHelpGFX(void) {
     unsigned int element;
 
-    if (DAT_006675b4 != 0) {
-        DAT_006675b4 = 0;
+    if (BubbleHelpGFXLoaded != 0) {
+        BubbleHelpGFXLoaded = 0;
         if (LLIDB_FindElement("SPEECH BUBBLE", &element, 0) == 0) {
             LLIDB_UnLoadData(element);
         }
-        if (DAT_008139e4 != 0) {
-            KillSprite(DAT_008139e4);
-            DAT_008139e4 = 0;
+        if (MiHungrySprite != 0) {
+            KillSprite(MiHungrySprite);
+            MiHungrySprite = 0;
         }
-        if (DAT_008139e8 != 0) {
-            KillSprite(DAT_008139e8);
-            DAT_008139e8 = 0;
+        if (MiHappySprite != 0) {
+            KillSprite(MiHappySprite);
+            MiHappySprite = 0;
         }
-        if (DAT_008139ec != 0) {
-            KillSprite(DAT_008139ec);
-            DAT_008139ec = 0;
+        if (MiSadSprite != 0) {
+            KillSprite(MiSadSprite);
+            MiSadSprite = 0;
         }
-        if (DAT_008139f0 != 0) {
-            KillSprite(DAT_008139f0);
-            DAT_008139f0 = 0;
+        if (MiHomeSprite != 0) {
+            KillSprite(MiHomeSprite);
+            MiHomeSprite = 0;
         }
-        if (DAT_008139f4 != 0) {
-            KillSprite(DAT_008139f4);
-            DAT_008139f4 = 0;
+        if (MiEatSprite != 0) {
+            KillSprite(MiEatSprite);
+            MiEatSprite = 0;
         }
-        if (DAT_008139f8 != 0) {
-            KillSprite(DAT_008139f8);
-            DAT_008139f8 = 0;
+        if (GreatSprite != 0) {
+            KillSprite(GreatSprite);
+            GreatSprite = 0;
         }
-        if (DAT_008139fc != 0) {
-            KillSprite(DAT_008139fc);
-            DAT_008139fc = 0;
+        if (PoorSprite != 0) {
+            KillSprite(PoorSprite);
+            PoorSprite = 0;
         }
-        if (DAT_00813a00 != 0) {
-            KillSprite(DAT_00813a00);
-            DAT_00813a00 = 0;
+        if (FavouriteSprite != 0) {
+            KillSprite(FavouriteSprite);
+            FavouriteSprite = 0;
         }
-        if (DAT_00813a04 != 0) {
-            KillSprite(DAT_00813a04);
-            DAT_00813a04 = 0;
+        if (OpinionSprite != 0) {
+            KillSprite(OpinionSprite);
+            OpinionSprite = 0;
         }
-        if (DAT_00813a08 != 0) {
-            KillSprite(DAT_00813a08);
-            DAT_00813a08 = 0;
+        if (MiBoredSprite != 0) {
+            KillSprite(MiBoredSprite);
+            MiBoredSprite = 0;
         }
     }
 }
@@ -176,7 +176,7 @@ LEGO_EXPORT void PrintLimitedText(int x, int y, int width, const char *text, int
 }
 
 // FUNCTION: LEGOLAND 0x00454d80
-void FUN_00454d80(char *text, int font, RECT rc, COLORREF color) {
+void DrawTextOnRenderSurface(char *text, int font, RECT rc, COLORREF color) {
     HRGN region;
     HDC hdc;
     HGDIOBJ old_region;
@@ -283,7 +283,7 @@ LEGO_EXPORT void PrintCentColref(COLORREF color, int cx, int y, int width, const
 }
 
 // FUNCTION: LEGOLAND 0x004551a0
-int FUN_004551a0(const char *text, int font, int width) {
+int MeasureTextHeight(const char *text, int font, int width) {
     RECT rc;
     HDC hdc;
 
@@ -381,7 +381,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         box.bottom = box.top + text_h;
         SelectObject(hdc, old_font);
         DeleteDC(hdc);
-        cell = FUN_00455bb0(text, box.right - box.left, text_h, font, 0x10, 0xd6dede, 0);
+        cell = CreateTextCell(text, box.right - box.left, text_h, font, 0x10, 0xd6dede, 0);
     } else {
         box.left = 0;
         box.top = 0;
@@ -389,7 +389,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         box.bottom = cell->height;
         text_h = cell->height;
     }
-    sprites = ((struct BubbleGfx *)DAT_00813a0c)->sprites;
+    sprites = ((struct BubbleGfx *)SpeechBubbleData)->sprites;
     cx = (short)sprites[0]->width;
     box_w = (rect[2] - cx) + rect[0] >> 1;
     if (box_w < cx || (cx = (unsigned int)lpConfig->field_0 - cx, cx < box_w)) {
@@ -453,7 +453,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     RenderBlock(left_corner_w + right4 + -1, width, 1, mid_h, 0);
     color = GetNearestColour(0xde, 0xde, 0xd6);
     RenderBlock(right4, width, left_corner_w + -1, mid_h, color);
-    FUN_00455ec0(cell, box.left, box.top);
+    PrintTextCell(cell, box.left, box.top);
     hit_left = left4;
     if (box.left <= (int)DAT_00813a44.x && (int)DAT_00813a44.x <= right4 && top4 <= (int)DAT_00813a44.y &&
         (int)DAT_00813a44.y <= bottom4) {
@@ -497,7 +497,7 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
             box.bottom = text_h + box.top;
             SelectObject(hdc, old_font);
             DeleteDC(hdc);
-            cell = FUN_00455bb0(text, box.right - box.left, text_h, font, 0x10, 0x96c6da, 0);
+            cell = CreateTextCell(text, box.right - box.left, text_h, font, 0x10, 0x96c6da, 0);
         } else {
             box.left = 0;
             box.top = 0;
@@ -536,21 +536,21 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
         RenderBlock(x8, y4, w - x8, 1, 0);
         RenderBlock(x8, x4, 1, h, 0);
         RenderBlock(w, x4, 1, h, 0);
-        FUN_00455ec0(cell, box.left, box.top);
+        PrintTextCell(cell, box.left, box.top);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00455a10
-struct TextCell *FUN_00455a10(struct Sprite *sprite, int *out_index) {
+struct TextCell *FindTextCellBySprite(struct Sprite *sprite, int *out_index) {
     int i;
-    struct TextCell *cell = DAT_006675c0;
+    struct TextCell *cell = TextCells;
 
-    for (i = 0; i < DAT_006675b8; i++, cell++) {
+    for (i = 0; i < TextCellCount; i++, cell++) {
         if (cell->sprite == sprite) {
             if (out_index != NULL) {
                 *out_index = i;
             }
-            return &DAT_006675c0[i];
+            return &TextCells[i];
         }
     }
     return NULL;
@@ -567,7 +567,7 @@ int FUN_00455a50(struct Sprite *sprite) {
     DDCOLORKEY ck;
     LPDIRECTDRAWSURFACE surface;
 
-    cell = FUN_00455a10(sprite, 0);
+    cell = FindTextCellBySprite(sprite, 0);
     if (cell != NULL) {
         rc.right = cell->width;
         rc.bottom = cell->height;
@@ -592,16 +592,16 @@ int FUN_00455a50(struct Sprite *sprite) {
 }
 
 // FUNCTION: LEGOLAND 0x00455bb0
-struct TextCell *FUN_00455bb0(char *name, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
+struct TextCell *CreateTextCell(char *name, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     struct TextCell *cell;
 
     // STRING: LEGOLAND 0x004b9080
-    DBPrintf("Creating Cell (%d) %s\n", DAT_006675b8, name);
-    if (DAT_006675b8 >= 0x32) {
-        FUN_00455f70(1);
+    DBPrintf("Creating Cell (%d) %s\n", TextCellCount, name);
+    if (TextCellCount >= 0x32) {
+        FlushTextCells(1);
     }
-    cell = &DAT_006675c0[DAT_006675b8];
-    DAT_006675b8++;
+    cell = &TextCells[TextCellCount];
+    TextCellCount++;
     cell->width = width;
     cell->height = height;
     cell->format = format;
@@ -616,14 +616,14 @@ struct TextCell *FUN_00455bb0(char *name, int width, int height, int font, unsig
 }
 
 // FUNCTION: LEGOLAND 0x00455c80
-struct TextCell *FUN_00455c80(char *name, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
+struct TextCell *FindTextCell(char *name, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     int i;
 
-    for (i = 0; i < DAT_006675b8; i++) {
-        if (DAT_006675c0[i].width == width && DAT_006675c0[i].height == height && DAT_006675c0[i].format == format &&
-            DAT_006675c0[i].bg_color == bg_color && DAT_006675c0[i].text_color == text_color && DAT_006675c0[i].font == font &&
-            strcmp(DAT_006675c0[i].name, name) == 0) {
-            return &DAT_006675c0[i];
+    for (i = 0; i < TextCellCount; i++) {
+        if (TextCells[i].width == width && TextCells[i].height == height && TextCells[i].format == format &&
+            TextCells[i].bg_color == bg_color && TextCells[i].text_color == text_color && TextCells[i].font == font &&
+            strcmp(TextCells[i].name, name) == 0) {
+            return &TextCells[i];
         }
     }
     return NULL;
@@ -632,25 +632,25 @@ struct TextCell *FUN_00455c80(char *name, int width, int height, int font, unsig
 // FUNCTION: LEGOLAND 0x00455d40
 struct TextCell *FUN_00455d40(const char *name, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     int i;
-    struct TextCell *cell = DAT_006675c0;
+    struct TextCell *cell = TextCells;
 
-    for (i = 0; i < DAT_006675b8; i++, cell++) {
+    for (i = 0; i < TextCellCount; i++, cell++) {
         if (cell->format == format && cell->bg_color == bg_color && cell->text_color == text_color && cell->font == font &&
             strcmp(cell->name, name) == 0) {
-            return &DAT_006675c0[i];
+            return &TextCells[i];
         }
     }
     return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00455de0
-struct TextCell *FUN_00455de0(char *name) {
+struct TextCell *FindTextCellByName(char *name) {
     int i;
-    struct TextCell *cell = DAT_006675c0;
+    struct TextCell *cell = TextCells;
 
-    for (i = 0; i < DAT_006675b8; i++, cell++) {
+    for (i = 0; i < TextCellCount; i++, cell++) {
         if (strcmp(cell->name, name) == 0) {
-            return &DAT_006675c0[i];
+            return &TextCells[i];
         }
     }
     return NULL;
@@ -660,48 +660,48 @@ struct TextCell *FUN_00455de0(char *name) {
 void FUN_00455e50(char *name, unsigned int x, unsigned int y, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     struct TextCell *cell;
 
-    cell = FUN_00455c80(name, width, height, font, format, bg_color, text_color);
+    cell = FindTextCell(name, width, height, font, format, bg_color, text_color);
     if (cell == NULL) {
-        cell = FUN_00455bb0(name, width, height, font, format, bg_color, text_color);
+        cell = CreateTextCell(name, width, height, font, format, bg_color, text_color);
     }
     PrintSprite(cell->sprite, x, y, 0, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00455ec0
-void FUN_00455ec0(struct TextCell *cell, unsigned int x, unsigned int y) {
+void PrintTextCell(struct TextCell *cell, unsigned int x, unsigned int y) {
     PrintSprite(cell->sprite, x, y, 0, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00455ee0
-void FUN_00455ee0(int index) {
+void DeleteTextCell(int index) {
     int i;
     struct TextCell *dst;
 
     // STRING: LEGOLAND 0x004b9098
-    DBPrintf("Deleting Cell (%d) %s\n", index, DAT_006675c0[index].name);
-    DAT_006675b8 = DAT_006675b8 - 1;
-    free(DAT_006675c0[index].name);
-    if (DAT_006675c0[index].sprite != NULL) {
-        KillSprite(DAT_006675c0[index].sprite);
-        DAT_006675c0[index].sprite = NULL;
+    DBPrintf("Deleting Cell (%d) %s\n", index, TextCells[index].name);
+    TextCellCount = TextCellCount - 1;
+    free(TextCells[index].name);
+    if (TextCells[index].sprite != NULL) {
+        KillSprite(TextCells[index].sprite);
+        TextCells[index].sprite = NULL;
     }
-    for (i = index; i < DAT_006675b8; i++) {
-        dst = &DAT_006675c0[i];
+    for (i = index; i < TextCellCount; i++) {
+        dst = &TextCells[i];
         *dst = dst[1];
     }
 }
 
 // FUNCTION: LEGOLAND 0x00455f70
-void FUN_00455f70(int evict_all) {
+void FlushTextCells(int evict_all) {
     int i;
-    struct TextCell *cell = DAT_006675c0;
+    struct TextCell *cell = TextCells;
 
-    for (i = 0; i < DAT_006675b8;) {
-        if (evict_all == 0 && DAT_008119a4 - cell->sprite->field_c <= 10) {
+    for (i = 0; i < TextCellCount;) {
+        if (evict_all == 0 && FrameCounter - cell->sprite->field_c <= 10) {
             i++;
             cell++;
         } else {
-            FUN_00455ee0(i);
+            DeleteTextCell(i);
         }
     }
 }
@@ -744,7 +744,7 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
             box.bottom = text_h + box.top;
             SelectObject(hdc, old_font);
             DeleteDC(hdc);
-            FUN_00455bb0((char *)text, box.right - box.left, text_h, font, 0x10, 0x96c6da, 0);
+            CreateTextCell((char *)text, box.right - box.left, text_h, font, 0x10, 0x96c6da, 0);
         } else {
             box.left = 0;
             box.top = 0;

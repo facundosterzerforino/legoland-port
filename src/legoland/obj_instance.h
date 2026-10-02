@@ -90,7 +90,7 @@ struct InstanceNode;
 LEGO_EXPORT void AddInstanceToList(struct InstanceNode *node);
 LEGO_EXPORT void RemoveInstanceFromList(struct InstanceNode *node);
 
-char *FUN_00489e60(struct ResFile *file, char *dest, int maxlen);
+char *ReadResFileLine(struct ResFile *file, char *dest, int maxlen);
 
 int FUN_00489f00(const struct Point *pos);
 int FUN_00489f50(const struct Point *pos);
@@ -100,7 +100,7 @@ unsigned short FUN_00489fd0(const struct Point *pos);
 LEGO_EXPORT struct ObjInstance *GetInstanceOfClass(struct Ride *ride, const TileId *tile);
 LEGO_EXPORT TileId GetObjectUID(struct Point *pos, struct Ride *ride);
 void FUN_00489ee0(void);
-void FUN_0048a040(void);
+void FreeAllObjectClassInstances(void);
 LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node);
 LEGO_EXPORT void RemoveAllBlokesFromRide(struct Ride *ride, TileId tile);
 LEGO_EXPORT int GetAllBlokesOffRide(struct Ride *ride, unsigned short uid);

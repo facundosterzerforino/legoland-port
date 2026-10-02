@@ -12,7 +12,7 @@ struct LLS {
 };
 typedef struct LLS LLS;
 
-/* An entry of the list of playing animations (DAT_006691ac), advanced by LLSAuto. */
+/* An entry of the list of playing animations (LLSPlayList), advanced by LLSAuto. */
 struct LLSNode {
     struct LLS *lls;
     struct LLSNode *next;
@@ -62,7 +62,7 @@ struct LLIDBHead;
 
 LEGO_EXPORT void LLS555To565(struct LLSImage *param_1);
 
-void FUN_0047c6a0(struct LLIDBHead *head);
+void LLIDB_UnLoadODF(struct LLIDBHead *head);
 
 LEGO_EXPORT void LLIDB_FreeILFTable(struct ILFTable *table);
 
@@ -81,7 +81,7 @@ LEGO_EXPORT void *LLIDB_LoadData(void *head);
 LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle);
 
 LEGO_EXPORT void LLSAuto(void);
-void FUN_0047d610(struct LLS *param_1);
+void LLSAdvanceFrame(struct LLS *param_1);
 LEGO_EXPORT int LLSStop(unsigned int handle);
 LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2);
 LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, unsigned int param_2);

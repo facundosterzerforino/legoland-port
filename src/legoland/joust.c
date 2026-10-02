@@ -83,13 +83,13 @@ struct JoustRoot {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00407970
-struct JoustNode *FUN_00407970(TileId *key) {
+struct JoustNode *AddJoustNode(TileId *key) {
     struct JoustNode *node = (struct JoustNode *)malloc(0x24);
 
     if (node != NULL) {
         memset(node, 0, 0x24);
         node->id.id = key->id;
-        node->next = DAT_004c1250;
+        node->next = JoustNodeList;
         node->busy = 0;
         node->x = 0;
         node->y = 0;
@@ -99,7 +99,7 @@ struct JoustNode *FUN_00407970(TileId *key) {
         node->frame = 0;
         node->field_1c = 0;
         node->field_20 = 0;
-        DAT_004c1250 = node;
+        JoustNodeList = node;
     }
     return node;
 }
@@ -111,12 +111,12 @@ void FUN_004079e0(Element *editObj, int *coords) {
     key.pos.x = (unsigned char)coords[0];
     key.pos.y = (unsigned char)coords[1];
     AddBasicObject(editObj, coords);
-    FUN_00407970(&key)->field_8 = 0;
+    AddJoustNode(&key)->field_8 = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00407a20
-struct JoustNode *FUN_00407a20(TileId *key) {
-    struct JoustNode *cur = DAT_004c1250;
+struct JoustNode *FindJoustNode(TileId *key) {
+    struct JoustNode *cur = JoustNodeList;
 
     if (cur != NULL) {
         do {
@@ -130,15 +130,15 @@ struct JoustNode *FUN_00407a20(TileId *key) {
 }
 
 // FUNCTION: LEGOLAND 0x00407a50
-void FUN_00407a50(struct JoustNode *node) {
+void RemoveJoustNode(struct JoustNode *node) {
     struct JoustNode *prev;
     struct JoustNode *cur;
 
-    if (DAT_004c1250 == node) {
-        DAT_004c1250 = node->next;
+    if (JoustNodeList == node) {
+        JoustNodeList = node->next;
     } else {
-        cur = DAT_004c1250->next;
-        prev = DAT_004c1250;
+        cur = JoustNodeList->next;
+        prev = JoustNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -154,9 +154,9 @@ void FUN_00407a50(struct JoustNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00407ab0
-void FUN_00407ab0(void) {
-    while (DAT_004c1250 != NULL) {
-        FUN_00407a50(DAT_004c1250);
+void FreeJoustNodeList(void) {
+    while (JoustNodeList != NULL) {
+        RemoveJoustNode(JoustNodeList);
     }
 }
 
@@ -170,14 +170,14 @@ void FUN_00407ad0(Element *editObj, TileId coords, struct Cursor *cursor) {
         unsigned int y;
     } source;
 
-    node = FUN_00407a20(&coords);
+    node = FindJoustNode(&coords);
     if (node != NULL) {
         source.kind = 2;
         source.x = node->id.pos.x;
         source.y = node->id.pos.y;
         UnSourceAndFadeAllSamplesFromSource(&source, -200);
         node->field_8 = 0;
-        FUN_00407a50(node);
+        RemoveJoustNode(node);
     }
     StandardRemoveObject(editObj, coords, cursor);
     RemoveAllBlokesFromRide(editObj->ride, coords);
@@ -191,15 +191,15 @@ void FUN_00407b50(struct JoustRoot *root) {
     DAT_004c1214 = (unsigned int)((struct JoustBlock *)DAT_004c121c)->field_64;
     ((struct JoustBlockData *)DAT_004c1214)->field_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b46f4
-    DAT_004c1244 = LoadSprite("Joust_fmask.lls", 1);
+    JoustFMaskSprite = LoadSprite("Joust_fmask.lls", 1);
     // STRING: LEGOLAND 0x004b46e0
-    DAT_004c1248 = LoadSprite("Joust_SpecR_m.lls", 1);
+    JoustSpecRMSprite = LoadSprite("Joust_SpecR_m.lls", 1);
     // STRING: LEGOLAND 0x004b46cc
-    DAT_004c124c = LoadSprite("Joust_SpecL_m.lls", 1);
+    JoustSpecLMSprite = LoadSprite("Joust_SpecL_m.lls", 1);
     // STRING: LEGOLAND 0x004b46c0
-    DAT_004c1240 = DAT_004c1210 = LoadSprite("z_joust.lls", 1);
+    DAT_004c1240 = ZJoustSprite = LoadSprite("z_joust.lls", 1);
     // STRING: LEGOLAND 0x004b46a8
-    DAT_004c1218 = LoadBinV("Zbuffers\\joustride.bnv");
+    JoustRideBnv = LoadBinV("Zbuffers\\joustride.bnv");
     HideLayer((struct Sprite *)DAT_004c1214, 1);
     StopLayerPlaying((struct Sprite *)DAT_004c1214, 1);
     LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_004c1214, 1), 0);
@@ -238,7 +238,7 @@ void FUN_00407c30(struct Element *elem) {
         next = node->next;
         b = node->rider;
         t = (unsigned char *)&node->tile;
-        jn = FUN_00407a20((TileId *)t);
+        jn = FindJoustNode((TileId *)t);
         if (jn == NULL) {
             return;
         }
@@ -250,7 +250,7 @@ void FUN_00407c30(struct Element *elem) {
         hb = jn->phase;
         f1c = jn->field_1c;
         f20 = jn->field_20;
-        (*DAT_004c1210->lls)->frame = jn->frame;
+        (*ZJoustSprite->lls)->frame = jn->frame;
         x = t[0] + ride->x;
         y = t[1] + ride->y;
         if (b->field_e == 0) {
@@ -309,26 +309,26 @@ void FUN_00407c30(struct Element *elem) {
                 b->person->field_30 = 1;
                 // STRING: LEGOLAND 0x004b4704
                 sprintf(name + 6, "%02d", b->field_44 + 1);
-                SetBlokePositionFromBNV(DAT_004c1218, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
+                SetBlokePositionFromBNV(JoustRideBnv, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
                 b->param_action++;
                 break;
             case 4:
                 h.c[b->field_44] = 2;
                 sprintf(name + 6, "%02d", b->field_44 + 1);
-                SetBlokePositionFromBNV(DAT_004c1218, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
+                SetBlokePositionFromBNV(JoustRideBnv, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
                 if (b->field_58++ > 0x96) {
                     b->param_action++;
                 }
                 break;
             case 5:
                 sprintf(name + 6, "%02d", b->field_44 + 1);
-                SetBlokePositionFromBNV(DAT_004c1218, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
+                SetBlokePositionFromBNV(JoustRideBnv, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
                 h.c[b->field_44] = 3;
                 b->param_action++;
                 break;
             case 6:
                 sprintf(name + 6, "%02d", b->field_44 + 1);
-                SetBlokePositionFromBNV(DAT_004c1218, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
+                SetBlokePositionFromBNV(JoustRideBnv, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
                 if (f20 != 0 && (char)FUN_00407c20(hb) == b->field_44) {
                     b->dest.x = (x + 2) << 8;
                     b->dest.y = (y << 8) - 0x100;
@@ -482,7 +482,7 @@ void FUN_00407c30(struct Element *elem) {
         jn->field_1c = f1c;
         jn->field_20 = f20;
     }
-    for (jn = DAT_004c1250; jn != NULL; jn = jn->next) {
+    for (jn = JoustNodeList; jn != NULL; jn = jn->next) {
         struct JoustPair s;
         char step = jn->phase;
         int busy = jn->busy;
@@ -572,7 +572,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
     {
         struct Bloke *riders[8] = {0};
         char n = 0;
-        node = FUN_00407a20(tile);
+        node = FindJoustNode(tile);
         if (node == NULL) {
             return;
         }
@@ -612,7 +612,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                 }
                 off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 0);
                 AdjustOffsetForViewMode(&off);
-                PrintSprite(DAT_004c1248, coords.x + off.x, coords.y + off.y, param_6, 0);
+                PrintSprite(JoustSpecRMSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 for (i = 0; i < n; i++) {
                     if (riders[i]->param_action == 0xc) {
                         IP_RenderBlokeIn3DNow(riders[i]);
@@ -635,7 +635,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                 }
                 off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 0);
                 AdjustOffsetForViewMode(&off);
-                PrintSprite(DAT_004c124c, coords.x + off.x, coords.y + off.y, param_6, 0);
+                PrintSprite(JoustSpecLMSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 for (i = 0; i < n; i++) {
                     if (riders[i]->param_action == 0x16) {
                         IP_RenderBlokeIn3DNow(riders[i]);
@@ -726,7 +726,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                 }
                 off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 1);
                 AdjustOffsetForViewMode(&off);
-                PrintSprite(DAT_004c1244, coords.x + off.x, coords.y + off.y, param_6, 0);
+                PrintSprite(JoustFMaskSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 return;
             }
         }
@@ -748,12 +748,12 @@ void FUN_00408bc0(void) {
 // FUNCTION: LEGOLAND 0x00408c00
 void FUN_00408c00(void) {
     Kill_FXList(JOUST_SFX, 1);
-    KillSprite(DAT_004c1244);
-    KillSprite(DAT_004c1248);
-    KillSprite(DAT_004c124c);
-    FreeBinV(DAT_004c1218);
+    KillSprite(JoustFMaskSprite);
+    KillSprite(JoustSpecRMSprite);
+    KillSprite(JoustSpecLMSprite);
+    FreeBinV(JoustRideBnv);
     KillSprite(DAT_004c1240);
-    FUN_00407ab0();
+    FreeJoustNodeList();
 }
 
 // FUNCTION: LEGOLAND 0x00408c50
@@ -771,7 +771,7 @@ unsigned int *FUN_00408c50(struct JoustRoot *param1, unsigned short param2) {
 
 // FUNCTION: LEGOLAND 0x00408c90
 LEGO_EXPORT int SaveJoust(void) {
-    struct JoustNode *current = DAT_004c1250;
+    struct JoustNode *current = JoustNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
 
@@ -833,7 +833,7 @@ LEGO_EXPORT int LoadJoust(struct JoustLoadArg *arg) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_004c1250 = node;
+            JoustNodeList = node;
         }
         node->field_8 = 0;
         prev = node;

@@ -14,16 +14,16 @@
 #endif
 
 // FUNCTION: LEGOLAND 0x00453cd0
-void FUN_00453cd0(char *text) {}
+void LogOutput(char *text) {}
 
 // FUNCTION: LEGOLAND 0x00453ce0
-void FUN_00453ce0(const char *format, ...) {
+void LogPrintf(const char *format, ...) {
     va_list argptr;
 
     va_start(argptr, format);
-    vsprintf(DAT_00667128, format, argptr);
+    vsprintf(LogBuffer, format, argptr);
     va_end(argptr);
-    FUN_00453cd0(DAT_00667128);
+    LogOutput(LogBuffer);
 }
 
 // FUNCTION: LEGOLAND 0x00453d10
@@ -39,7 +39,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 #endif
     __try {
-        FUN_00458830((char *)&DAT_0066752c);
+        GetProductVersion((char *)&ProductVersionString);
         result = wWinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
         // STRING: LEGOLAND 0x004b8a94
     } __except (stackdump((void *)GetExceptionInformation(), "main thread")) {

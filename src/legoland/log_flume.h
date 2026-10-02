@@ -30,7 +30,7 @@ struct Point FUN_0040cfd0(struct FlumeEntry *entry);
 
 int FUN_004119c0(Element *obj, int filter);
 
-void FUN_00410d60(struct ClassNode *flume, struct CallbackTable *vtbl);
+void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl);
 
 struct Cursor;
 void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first);

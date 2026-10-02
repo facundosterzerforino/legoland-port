@@ -80,7 +80,7 @@ static __inline struct MapElement *TileAt(int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x00411e30
-void FUN_00411e30(struct Queue *queue, struct QueueNode *node) {
+void QueueAppendNode(struct Queue *queue, struct QueueNode *node) {
     if (queue->head == NULL && queue->tail == NULL) {
         queue->head = node;
         queue->tail = node;
@@ -110,7 +110,7 @@ unsigned int FUN_00411e60(struct Queue *queue) {
 }
 
 // FUNCTION: LEGOLAND 0x00411e90
-unsigned int FUN_00411e90(struct Queue *queue) {
+unsigned int QueueHasNodes(struct Queue *queue) {
     return queue->head != NULL;
 }
 
@@ -127,17 +127,17 @@ int FUN_00411ea0(struct Queue *queue) {
 }
 
 // FUNCTION: LEGOLAND 0x00411ed0
-void FUN_00411ed0(struct Queue *queue) {
+void FreeAllQueueNodes(struct Queue *queue) {
     struct QueueNode *node = queue->head;
     while (node != NULL) {
-        FUN_00411f00(queue);
+        QueueUnlinkHead(queue);
         free(node);
         node = queue->head;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00411f00
-void FUN_00411f00(struct Queue *queue) {
+void QueueUnlinkHead(struct Queue *queue) {
     struct QueueNode *head = queue->head;
     if (head != NULL) {
         queue->head = head->next;
@@ -156,7 +156,7 @@ void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
         mid->field_8->field_62 |= 0x40;
         mid->field_8->field_38 = 0;
         mid->field_8->field_60++;
-        FUN_00411e30(queue, node);
+        QueueAppendNode(queue, node);
     }
 }
 
@@ -210,7 +210,7 @@ void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
         inner->field_62 &= ~0x40;
         inner->field_60++;
         *out = node->field_4;
-        FUN_00411f00(queue);
+        QueueUnlinkHead(queue);
         free(node);
     }
 }
@@ -284,7 +284,7 @@ int FUN_00412100(struct PathTable *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00412290
-void FUN_00412290(void *param_1) {
+void FreeIfNotNull(void *param_1) {
     if (param_1 != NULL) {
         free(param_1);
     }
@@ -374,7 +374,7 @@ void FUN_004123c0(struct QueueNode *start, struct Queue *queue) {
 }
 
 // FUNCTION: LEGOLAND 0x00412470
-struct QueueNode *FUN_00412470(struct QueueNode *node, int n) {
+struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n) {
     int i = n;
     while (i-- != 0) {
         node = node->next;
@@ -407,7 +407,7 @@ void FUN_00412490(struct QueueNode *start, struct Queue *queue) {
         }
         queue->tail->next = NULL;
         SaveGameRead(&idx, 4);
-        queue->tail->field_4 = (struct QueueItemMid *)FUN_00412470(start, idx);
+        queue->tail->field_4 = (struct QueueItemMid *)GetNthNextQueueNode(start, idx);
     }
 }
 
@@ -684,28 +684,28 @@ void FUN_00412680(int x, int y, int param_3, int param_4) {
     case 0:
         for (col = 0; col < 4; col++) {
             for (row = 0; row < 4; row++) {
-                SetMapTile(x + col, y + row, DAT_0082c67c[tiles[row * 4 + col] >> 8].base[0] + (tiles[row * 4 + col] & 0xff));
+                SetMapTile(x + col, y + row, DSchoolMappingData[tiles[row * 4 + col] >> 8].base[0] + (tiles[row * 4 + col] & 0xff));
             }
         }
         break;
     case 1:
         for (col = 0; col < 4; col++) {
             for (row = 0; row < 4; row++) {
-                SetMapTile(x + col, y + row, DAT_0082c67c[tiles[(3 - col) * 4 + row] >> 8].base[0] + (tiles[(3 - col) * 4 + row] & 0xff));
+                SetMapTile(x + col, y + row, DSchoolMappingData[tiles[(3 - col) * 4 + row] >> 8].base[0] + (tiles[(3 - col) * 4 + row] & 0xff));
             }
         }
         break;
     case 2:
         for (col = 0; col < 4; col++) {
             for (row = 0; row < 4; row++) {
-                SetMapTile(x + col, y + row, DAT_0082c67c[tiles[(3 - row) * 4 + (3 - col)] >> 8].base[0] + (tiles[(3 - row) * 4 + (3 - col)] & 0xff));
+                SetMapTile(x + col, y + row, DSchoolMappingData[tiles[(3 - row) * 4 + (3 - col)] >> 8].base[0] + (tiles[(3 - row) * 4 + (3 - col)] & 0xff));
             }
         }
         break;
     case 3:
         for (col = 0; col < 4; col++) {
             for (row = 0; row < 4; row++) {
-                SetMapTile(x + col, y + row, DAT_0082c67c[tiles[col * 4 + (3 - row)] >> 8].base[0] + (tiles[col * 4 + (3 - row)] & 0xff));
+                SetMapTile(x + col, y + row, DSchoolMappingData[tiles[col * 4 + (3 - row)] >> 8].base[0] + (tiles[col * 4 + (3 - row)] & 0xff));
             }
         }
         break;

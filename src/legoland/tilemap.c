@@ -112,11 +112,11 @@ LEGO_EXPORT unsigned int LoadMapTiles(void) {
     unsigned int row;
     unsigned int p;
 
-    if (DAT_00667c9c == 0) {
+    if (GameMapRawBlock == 0) {
         p = (unsigned int)calloc(0x14041f, 1);
         GameMap = (struct MapElement **)((p + 0x1f) & 0xffffffe0);
         row = (p + 0x41f) & 0xffffffe0;
-        DAT_00667c9c = (void *)p;
+        GameMapRawBlock = (void *)p;
         offset = 0;
         do {
             *(unsigned int *)((char *)GameMap + offset) = row;
@@ -139,41 +139,41 @@ LEGO_EXPORT unsigned int LoadMapTiles(void) {
     LLIDB_FindElement("NORMAL PATH TILES", &handle, 0);
     PathSprite = *(void **)(handle + 0xc);
     // STRING: LEGOLAND 0x004b9bc4
-    DAT_00667c8c = LoadSprite("arrow01.lls", 1);
+    Arrow01Sprite = LoadSprite("arrow01.lls", 1);
     // STRING: LEGOLAND 0x004b9bb8
-    DAT_00667c88 = LoadSprite("arrow02.lls", 1);
+    Arrow02Sprite = LoadSprite("arrow02.lls", 1);
     // STRING: LEGOLAND 0x004b9bac
-    DAT_00667c94 = LoadSprite("arrow03.lls", 1);
+    Arrow03Sprite = LoadSprite("arrow03.lls", 1);
     // STRING: LEGOLAND 0x004b9ba0
-    DAT_00667c90 = LoadSprite("arrow04.lls", 1);
+    Arrow04Sprite = LoadSprite("arrow04.lls", 1);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0045ac20
-unsigned int FUN_0045ac20(void) {
+unsigned int UnloadMapTiles(void) {
     unsigned int handle;
 
-    if (DAT_00667c9c != 0) {
-        free(DAT_00667c9c);
+    if (GameMapRawBlock != 0) {
+        free(GameMapRawBlock);
     }
     // STRING: LEGOLAND 0x004b9be4
     LLIDB_FindElement("MAPPING 1", &handle, 0);
     LLIDB_UnLoadData(handle);
-    if (DAT_00667c8c != 0) {
-        KillSprite(DAT_00667c8c);
-        DAT_00667c8c = 0;
+    if (Arrow01Sprite != 0) {
+        KillSprite(Arrow01Sprite);
+        Arrow01Sprite = 0;
     }
-    if (DAT_00667c88 != 0) {
-        KillSprite(DAT_00667c88);
-        DAT_00667c88 = 0;
+    if (Arrow02Sprite != 0) {
+        KillSprite(Arrow02Sprite);
+        Arrow02Sprite = 0;
     }
-    if (DAT_00667c94 != 0) {
-        KillSprite(DAT_00667c94);
-        DAT_00667c94 = 0;
+    if (Arrow03Sprite != 0) {
+        KillSprite(Arrow03Sprite);
+        Arrow03Sprite = 0;
     }
-    if (DAT_00667c90 != 0) {
-        KillSprite(DAT_00667c90);
-        DAT_00667c90 = 0;
+    if (Arrow04Sprite != 0) {
+        KillSprite(Arrow04Sprite);
+        Arrow04Sprite = 0;
     }
     return 1;
 }
@@ -396,7 +396,7 @@ LEGO_EXPORT void RenderView(void) {
     GetClipping(&clip);
     FUN_00460e00();
     PrintBackground(DAT_00667cd0, DAT_00667cd4);
-    if (EditMode.unk0 == 2 || (EditMode.unk0 == 1 && EditMode.unk8 == DAT_007fd624)) {
+    if (EditMode.unk0 == 2 || (EditMode.unk0 == 1 && EditMode.unk8 == PathControlObject)) {
         DAT_00667d40 = 1;
         DAT_00667d48 = (GetTickCount() & 0x100) ? 0xff : 0;
     } else {
@@ -1876,7 +1876,7 @@ void FUN_0045d770(struct Cursor *param_1) {
                     i = i + 1;
                 } while (i < DAT_00667d3c);
             }
-            DAT_0066b46c = 1;
+            PathUpdateNeeded = 1;
             y = chain->field_1414[1] + 1 + chain->field_1408;
             if (y <= chain->field_1408 + -1 + chain->field_1414[3]) {
                 do {
@@ -1892,7 +1892,7 @@ void FUN_0045d770(struct Cursor *param_1) {
                     y = y + 1;
                 } while (y <= chain->field_1408 + -1 + chain->field_1414[3]);
             }
-            DAT_0066b46c = 1;
+            PathUpdateNeeded = 1;
         }
     }
 }

@@ -60,7 +60,7 @@ struct Sample {
     struct SampleBuffer *buffer;
 };
 
-/* DirectMusic (DirectX 6) objects used by the interactive music thread (IMT, FUN_00492db0).
+/* DirectMusic (DirectX 6) objects used by the interactive music thread (IMT, MusicThreadProc).
  * MSVC6 ships no DirectMusic headers: these follow dmusici.h/dmusicc.h, typing only the
  * methods the game calls, at their vtable offsets. */
 struct DirectMusic;
@@ -204,13 +204,13 @@ struct DirectMusicComposer {
     struct DirectMusicComposerVtbl *vtable;
 };
 
-void *FUN_004921c0(void *data, WAVEFORMATEX *has, unsigned int *size);
+void *ConvertWaveToPcm16(void *data, WAVEFORMATEX *has, unsigned int *size);
 LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path);
 LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def);
 LEGO_EXPORT int PlaySample(struct Sample *sample, unsigned int looping, unsigned int oneshot);
 LEGO_EXPORT int PauseSingleSample(struct Sample *sample);
-void FUN_00492830(void);
-void FUN_00492850(void);
+void PauseAllSamples(void);
+void ResumeAllSamples(void);
 LEGO_EXPORT void DeletePlayableSamples(unsigned int param_1);
 LEGO_EXPORT int UpdateSoundVols(void);
 LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample);
@@ -225,9 +225,9 @@ void FUN_00492ce0(int param_1);
 BOOL FUN_00492d80(void);
 void FUN_00492da0(void);
 int FUN_00495a50(int param_1);
-int FUN_00495a10(void *hwnd);
-int FUN_00495b00(void);
+int StartMusicThread(void *hwnd);
+int ShutDownDirectMusic(void);
 LEGO_EXPORT void AdjustPSampleFreq(struct Sample *sample, unsigned int param_2);
-void FUN_00492c60(void);
-void FUN_00492c80(void);
+void SuspendMusicThread(void);
+void ResumeMusicThread(void);
 void FUN_00492ca0(int param_1);

@@ -9,7 +9,7 @@ struct Ride;
 
 LEGO_EXPORT int AddObjectToBuildList(struct ObjClass *obj, TileId coords);
 LEGO_EXPORT void ClearBuildObjList(void);
-void FUN_00450c00(TileId coords);
+void RemoveObjectFromBuildList(TileId coords);
 LEGO_EXPORT void ProcessBuildingTimes(void);
 LEGO_EXPORT int GetBuildTime(struct Ride *objClass);
 LEGO_EXPORT void DoBuildEffects(struct Ride *ride, TileId coords);

@@ -213,25 +213,25 @@ void FUN_00405370(struct DSHead *param_1) {
 
     DAT_0082c694 = param_1->field_c;
     if (LLIDB_FindElement("DSCHOOL MAPPING", (unsigned int *)&param_1, 0) == 0) {
-        DAT_0082c67c = LLIDB_LoadData(param_1);
+        DSchoolMappingData = LLIDB_LoadData(param_1);
     }
     if (LLIDB_FindElement("DSCHOOL BLUE CAR", (unsigned int *)&param_1, 0) == 0) {
-        DAT_00830f9c = LLIDB_LoadData(param_1);
+        DSchoolBlueCarData = LLIDB_LoadData(param_1);
     }
     DAT_0082c694->field_1c |= 0x420;
     Load_FXList(DRIVING_SCHOOL_SFX, 6);
     // STRING: LEGOLAND 0x004b4524
-    DAT_0082c6c0 = LoadSprite("DSchool Matte.lls", 1);
+    DSchoolMatteSprite = LoadSprite("DSchool Matte.lls", 1);
     // STRING: LEGOLAND 0x004b4510
-    DAT_0082c6bc = LoadPalette((unsigned int)".\\3ddata\\blu.col");
+    DSchoolBluePalette = LoadPalette((unsigned int)".\\3ddata\\blu.col");
     // STRING: LEGOLAND 0x004b44fc
-    DAT_0082c6b8 = LoadPalette((unsigned int)".\\3ddata\\yel.col");
+    DSchoolYellowPalette = LoadPalette((unsigned int)".\\3ddata\\yel.col");
     // STRING: LEGOLAND 0x004b44e8
-    DAT_0082c690 = LoadPalette((unsigned int)".\\3ddata\\red.col");
+    DSchoolRedPalette = LoadPalette((unsigned int)".\\3ddata\\red.col");
     // STRING: LEGOLAND 0x004b44d8
-    DAT_00830f94 = LoadSprite("ds_car&m.lls", 1);
-    if (DAT_00830f94 != NULL) {
-        lls = GetLLSForSprite((struct SpriteLLS *)DAT_00830f94);
+    DSCarSprite = LoadSprite("ds_car&m.lls", 1);
+    if (DSCarSprite != NULL) {
+        lls = GetLLSForSprite((struct SpriteLLS *)DSCarSprite);
         if (lls != 0) {
             LLSStop(lls);
         }
@@ -271,11 +271,11 @@ void FUN_00405460(void) {
     }
 
     Kill_FXList(DRIVING_SCHOOL_SFX, 6);
-    KillSprite(DAT_0082c6c0);
-    free(DAT_0082c6bc);
-    free(DAT_0082c6b8);
-    free(DAT_0082c690);
-    KillSprite(DAT_00830f94);
+    KillSprite(DSchoolMatteSprite);
+    free(DSchoolBluePalette);
+    free(DSchoolYellowPalette);
+    free(DSchoolRedPalette);
+    KillSprite(DSCarSprite);
     DAT_0082c694 = NULL;
 }
 
@@ -497,7 +497,7 @@ void FUN_00405b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     GetTileBounds(&ref, bounds);
-    if (DAT_0082c6c0 != NULL) {
+    if (DSchoolMatteSprite != NULL) {
         dx = ride->field_14;
         dy = ride->field_18;
         if (dx < 0) {
@@ -510,7 +510,7 @@ void FUN_00405b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         } else {
             dy = dy >> 1;
         }
-        PrintSprite(DAT_0082c6c0, bounds[0] + dx, bounds[1] + dy, clip, 0);
+        PrintSprite(DSchoolMatteSprite, bounds[0] + dx, bounds[1] + dy, clip, 0);
     }
 }
 
@@ -599,7 +599,7 @@ void FUN_00405bd0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00405e70
-int FUN_00405e70(void) {
+int DrivingSchool_Save(void) {
     struct CountNode *countNode;
     struct RideQueueEntry *queue;
     struct PumpNode *pump;
@@ -690,7 +690,7 @@ int FUN_00406050(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406070
-int FUN_00406070(void) {
+int DrivingSchool_Load(void) {
     struct CountNode *countPrev;
     struct CountNode *countNode;
     struct RideQueueEntry *queuePrev;

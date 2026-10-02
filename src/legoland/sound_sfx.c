@@ -52,7 +52,7 @@ struct AcmHeader {
 };
 
 // FUNCTION: LEGOLAND 0x004921c0
-void *FUN_004921c0(void *data, WAVEFORMATEX *has, unsigned int *size) {
+void *ConvertWaveToPcm16(void *data, WAVEFORMATEX *has, unsigned int *size) {
     WAVEFORMATEX *src = has;
     WAVEFORMATEX dst;
     struct AcmHeader hdr;
@@ -119,7 +119,7 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
     struct WaveBufferDesc desc;
     struct SampleDef *sample;
 
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return NULL;
     }
     file = RES_OpenFile(path);
@@ -162,7 +162,7 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
                         }
                         data = malloc(size);
                         if (RES_ReadFile(file, data, size) == size) {
-                            converted = FUN_004921c0(data, format, &size);
+                            converted = ConvertWaveToPcm16(data, format, &size);
                             if (converted != NULL) {
                                 data = converted;
                                 desc.dwSize = sizeof(desc);
@@ -170,7 +170,7 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
                                 desc.dwBufferBytes = size;
                                 desc.dwReserved = 0;
                                 desc.lpwfxFormat = format;
-                                if (((LPDIRECTSOUND)DAT_007cad40)->lpVtbl->CreateSoundBuffer((LPDIRECTSOUND)DAT_007cad40, (LPCDSBUFFERDESC)&desc, &buffer, NULL) == 0) {
+                                if (((LPDIRECTSOUND)DSound)->lpVtbl->CreateSoundBuffer((LPDIRECTSOUND)DSound, (LPCDSBUFFERDESC)&desc, &buffer, NULL) == 0) {
                                     if (buffer->lpVtbl->Lock(buffer, 0, 0, &locked, &lockedSize, NULL, NULL, 2) == 0) {
                                         memcpy(locked, converted, lockedSize);
                                         buffer->lpVtbl->Unlock(buffer, locked, lockedSize, NULL, 0);
@@ -218,7 +218,7 @@ LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def) {
     struct SampleDef *src = def;
     struct Sample *sample;
 
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (src == 0) {
@@ -228,8 +228,8 @@ LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def) {
         src = src->parent;
     }
     for (;;) {
-        if (((LPDIRECTSOUND)DAT_007cad40)
-                ->lpVtbl->DuplicateSoundBuffer((LPDIRECTSOUND)DAT_007cad40, (LPDIRECTSOUNDBUFFER)src->buffer,
+        if (((LPDIRECTSOUND)DSound)
+                ->lpVtbl->DuplicateSoundBuffer((LPDIRECTSOUND)DSound, (LPDIRECTSOUNDBUFFER)src->buffer,
                     (LPDIRECTSOUNDBUFFER *)&def) != 0) {
             break;
         }
@@ -249,7 +249,7 @@ LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def) {
 
 // FUNCTION: LEGOLAND 0x00492710
 LEGO_EXPORT int PlaySample(struct Sample *sample, unsigned int looping, unsigned int oneshot) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -284,8 +284,8 @@ LEGO_EXPORT int PlaySample(struct Sample *sample, unsigned int looping, unsigned
 }
 
 // FUNCTION: LEGOLAND 0x004927b0
-int FUN_004927b0(struct Sample *sample) {
-    if (DAT_007988c0 == 0) {
+int StopSampleBuffer(struct Sample *sample) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -302,17 +302,17 @@ int FUN_004927b0(struct Sample *sample) {
 }
 // FUNCTION: LEGOLAND 0x00492800
 LEGO_EXPORT int PauseSingleSample(struct Sample *sample) {
-    if ((sample->flags & 1) == 0 && FUN_004927b0(sample) != 0) {
+    if ((sample->flags & 1) == 0 && StopSampleBuffer(sample) != 0) {
         sample->flags |= 1;
         return 1;
     }
     return 0;
 }
 // FUNCTION: LEGOLAND 0x00492830
-void FUN_00492830(void) {
+void PauseAllSamples(void) {
     struct Sample *sample;
 
-    sample = DAT_007988cc;
+    sample = SampleListHead;
     if (sample != 0) {
         do {
             PauseSingleSample(sample);
@@ -322,10 +322,10 @@ void FUN_00492830(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00492850
-void FUN_00492850(void) {
+void ResumeAllSamples(void) {
     struct Sample *sample;
 
-    sample = DAT_007988cc;
+    sample = SampleListHead;
     if (sample != 0) {
         do {
             ResumeSinglyPausedSample(sample);
@@ -338,19 +338,19 @@ void FUN_00492850(void) {
 LEGO_EXPORT void Mute_SFX(void) {
     struct Sample *sample;
 
-    sample = DAT_007988cc;
+    sample = SampleListHead;
     if (sample != 0) {
         do {
-            FUN_004927b0(sample);
+            StopSampleBuffer(sample);
             sample = sample->next;
         } while (sample != 0);
     }
-    DAT_007988c4 = 1;
+    SfxMuted = 1;
 }
 
 // FUNCTION: LEGOLAND 0x004928a0
 int FUN_004928a0(struct Sample *sample) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -374,9 +374,9 @@ int FUN_004928a0(struct Sample *sample) {
 
 // FUNCTION: LEGOLAND 0x00492910
 LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample) {
-    if (DAT_007988c0 != 0 && sample != 0 && (sample->flags & 1) != 0) {
+    if (SoundAvailable != 0 && sample != 0 && (sample->flags & 1) != 0) {
         sample->flags &= 0xfffe;
-        if (DAT_007988c4 == 0) {
+        if (SfxMuted == 0) {
             FUN_004928a0(sample);
         }
         return 1;
@@ -388,12 +388,12 @@ LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample) {
 LEGO_EXPORT void UnMute_FX(void) {
     struct Sample *sample;
 
-    sample = DAT_007988cc;
+    sample = SampleListHead;
     while (sample != 0) {
         FUN_004928a0(sample);
         sample = sample->next;
     }
-    DAT_007988c4 = 0;
+    SfxMuted = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00492980
@@ -408,7 +408,7 @@ void FUN_00492990(void) {
 
 // FUNCTION: LEGOLAND 0x004929a0
 LEGO_EXPORT int SetSampleVolume(struct Sample *sample, int volume) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -425,7 +425,7 @@ LEGO_EXPORT int SetSampleVolume(struct Sample *sample, int volume) {
 
 // FUNCTION: LEGOLAND 0x004929e0
 LEGO_EXPORT int SetSamplePan(struct Sample *sample, int pan) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -441,7 +441,7 @@ LEGO_EXPORT int SetSamplePan(struct Sample *sample, int pan) {
 
 // FUNCTION: LEGOLAND 0x00492a20
 LEGO_EXPORT int SetSampleFrequency(struct Sample *sample, int frequency) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -454,10 +454,10 @@ LEGO_EXPORT int SetSampleFrequency(struct Sample *sample, int frequency) {
 }
 
 // FUNCTION: LEGOLAND 0x00492a60
-struct Sample *FUN_00492a60(struct Sample *sample) {
+struct Sample *GetSampleFrequency(struct Sample *sample) {
     struct SampleBuffer *buffer;
 
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -476,12 +476,12 @@ LEGO_EXPORT void AdjustPSampleFreq(struct Sample *sample, unsigned int param_2) 
     unsigned short range = (unsigned short)param_2;
     int percent = rand() % (range * 2) - range + 100;
 
-    SetSampleFrequency(sample, (int)FUN_00492a60(sample) * percent / 100);
+    SetSampleFrequency(sample, (int)GetSampleFrequency(sample) * percent / 100);
 }
 
 // FUNCTION: LEGOLAND 0x00492af0
 LEGO_EXPORT int SetSampleFade(struct Sample *sample, unsigned int fade) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     if (sample == 0) {
@@ -507,10 +507,10 @@ void FUN_00492b20(struct Sample *sample) {
 LEGO_EXPORT void KillPlayableSample(struct Sample *sample) {
     struct Sample *node;
 
-    if (DAT_007988cc == sample) {
-        DAT_007988cc = sample->next;
-    } else if (DAT_007988cc != 0) {
-        node = DAT_007988cc;
+    if (SampleListHead == sample) {
+        SampleListHead = sample->next;
+    } else if (SampleListHead != 0) {
+        node = SampleListHead;
         while (node != 0) {
             if (node->next == sample) {
                 node->next = sample->next;
@@ -528,7 +528,7 @@ LEGO_EXPORT void DeletePlayableSamples(unsigned int param_1) {
     struct Sample *previous;
     struct Sample *next;
 
-    current = DAT_007988cc;
+    current = SampleListHead;
     previous = 0;
     if (current == 0) {
         return;
@@ -539,7 +539,7 @@ LEGO_EXPORT void DeletePlayableSamples(unsigned int param_1) {
             if (previous != 0) {
                 previous->next = next;
             } else {
-                DAT_007988cc = next;
+                SampleListHead = next;
             }
             FUN_00492b20(current);
             current = next;
@@ -564,27 +564,27 @@ LEGO_EXPORT void DeleteSampleDef(struct SampleDef *def) {
 
 // FUNCTION: LEGOLAND 0x00492c20
 LEGO_EXPORT int KillSoundSampleSystem(void) {
-    if (DAT_007988c0 == 0) {
+    if (SoundAvailable == 0) {
         return 0;
     }
     DeletePlayableSamples(0);
-    ((struct DirectSoundObj *)DAT_007cad40)->vtable->Release(DAT_007cad40);
-    DAT_007cad40 = 0;
-    DAT_007988c0 = 0;
+    ((struct DirectSoundObj *)DSound)->vtable->Release(DSound);
+    DSound = 0;
+    SoundAvailable = 0;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00492c60
-void FUN_00492c60(void) {
-    if (DAT_004bf774 != 0) {
-        SuspendThread(DAT_0079a698);
+void SuspendMusicThread(void) {
+    if (MusicEnabled != 0) {
+        SuspendThread(MusicThread);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00492c80
-void FUN_00492c80(void) {
-    if (DAT_004bf774 != 0) {
-        ResumeThread(DAT_0079a698);
+void ResumeMusicThread(void) {
+    if (MusicEnabled != 0) {
+        ResumeThread(MusicThread);
     }
 }
 
@@ -659,13 +659,13 @@ void FUN_00492da0(void) {
 /* Creates segment n from the file IMT_LOAD read into memory, then frees the file. */
 #define IMT_GET(n, name) \
     DAT_0079a6b0++; \
-    desc.guidClass = DAT_004ab9f0; \
+    desc.guidClass = CLSID_DirectMusicSegment; \
     desc.dwSize = sizeof(desc); \
     desc.dwValidData = DMUS_OBJ_CLASS | DMUS_OBJ_NAME | DMUS_OBJ_MEMORY; \
     desc.llMemLength = DAT_0079a608[n]; \
     desc.pbMemData = DAT_00799c1c[n]; \
     wcscpy(desc.wszName, name); \
-    hr = DAT_007cacd8->vtable->GetObject(DAT_007cacd8, &desc, &DAT_004ab670, (void **)&DAT_00799230[n]); \
+    hr = DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicSegment, (void **)&DAT_00799230[n]); \
     if (hr != S_OK) { \
         DBPrintf(IMT_MSG_GET_FAILED, DAT_0079a6b0, hr, GetLastError()); \
     } \
@@ -676,7 +676,7 @@ void FUN_00492da0(void) {
  * FUN_00492d80 (DAT_0079a6a4, signalled through DAT_0079a6a0) and DirectMusic notifications.
  * Setup failures jump into one release chain, as in the original. */
 // FUNCTION: LEGOLAND 0x00492db0
-DWORD WINAPI FUN_00492db0(LPVOID param) {
+DWORD WINAPI MusicThreadProc(LPVOID param) {
     unsigned char groove;
     int beat = -1;
     struct DirectMusicPort *port = NULL;
@@ -696,22 +696,22 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
     int i;
     int k;
 
-    if (DAT_004bf774 == 0) {
+    if (MusicEnabled == 0) {
         DAT_007988bc = 1;
         return 0;
     }
     desc.dwSize = sizeof(desc);
     CoInitialize(NULL);
-    if (FAILED(CoCreateInstance(&CLSID_DirectMusicComposer, NULL, CLSCTX_INPROC, &IID_IDirectMusicComposer, (void **)&DAT_007cad44))) {
+    if (FAILED(CoCreateInstance(&CLSID_DirectMusicComposer, NULL, CLSCTX_INPROC, &IID_IDirectMusicComposer, (void **)&DMusicComposer))) {
         goto fail;
     }
-    if (FAILED(CoCreateInstance(&CLSID_DirectMusicPerformance, NULL, CLSCTX_INPROC, &IID_IDirectMusicPerformance, (void **)&DAT_007cacdc))) {
+    if (FAILED(CoCreateInstance(&CLSID_DirectMusicPerformance, NULL, CLSCTX_INPROC, &IID_IDirectMusicPerformance, (void **)&DMusicPerformance))) {
         goto release_composer;
     }
-    if (FAILED(DAT_007cacdc->vtable->Init(DAT_007cacdc, &music, DAT_007cad40, NULL))) {
+    if (FAILED(DMusicPerformance->vtable->Init(DMusicPerformance, &music, DSound, NULL))) {
         goto release_perf;
     }
-    music->vtable->CreatePort(music, &DAT_004acfd0, &params, &port, NULL);
+    music->vtable->CreatePort(music, &NullGuid, &params, &port, NULL);
     port->vtable->GetFormat(port, NULL, &formatSize, &bufferSize);
     format = malloc(formatSize < sizeof(WAVEFORMATEX) ? sizeof(WAVEFORMATEX) : formatSize);
     port->vtable->GetFormat(port, format, &formatSize, &bufferSize);
@@ -720,18 +720,18 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
     bufferDesc.dwBufferBytes = bufferSize;
     bufferDesc.dwReserved = 0;
     bufferDesc.lpwfxFormat = format;
-    if (IDirectSound_CreateSoundBuffer((LPDIRECTSOUND)DAT_007cad40, (LPCDSBUFFERDESC)&bufferDesc, (LPDIRECTSOUNDBUFFER *)&DAT_007cad4c, NULL) != DS_OK) {
+    if (IDirectSound_CreateSoundBuffer((LPDIRECTSOUND)DSound, (LPCDSBUFFERDESC)&bufferDesc, (LPDIRECTSOUNDBUFFER *)&DMusicSoundBuffer, NULL) != DS_OK) {
         goto fail;
     }
     free(format);
-    port->vtable->SetDirectSound(port, DAT_007cad40, DAT_007cad4c);
+    port->vtable->SetDirectSound(port, DSound, DMusicSoundBuffer);
     port->vtable->Activate(port, TRUE);
-    DAT_007cacdc->vtable->AddPort(DAT_007cacdc, port);
-    DAT_007cacdc->vtable->AssignPChannelBlock(DAT_007cacdc, 0, port, 1);
+    DMusicPerformance->vtable->AddPort(DMusicPerformance, port);
+    DMusicPerformance->vtable->AssignPChannelBlock(DMusicPerformance, 0, port, 1);
     if (port != NULL) {
         port->vtable->Release(port);
     }
-    if (FAILED(CoCreateInstance(&CLSID_DirectMusicLoader, NULL, CLSCTX_INPROC, &IID_IDirectMusicLoader, (void **)&DAT_007cacd8))) {
+    if (FAILED(CoCreateInstance(&CLSID_DirectMusicLoader, NULL, CLSCTX_INPROC, &IID_IDirectMusicLoader, (void **)&DMusicLoader))) {
         goto stop_perf;
     }
     UpdateSoundVols();
@@ -741,16 +741,16 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
         goto clear_loader;
     }
     // STRING: LEGOLAND 0x004bfda4
-    DAT_007cacd8->vtable->SetSearchDirectory(DAT_007cacd8, &DAT_004ab8b0, L"imusic", TRUE);
-    DAT_007cacd8->vtable->EnableCache(DAT_007cacd8, &DAT_004ab8b0, TRUE);
+    DMusicLoader->vtable->SetSearchDirectory(DMusicLoader, &GUID_DirectMusicAllTypes, L"imusic", TRUE);
+    DMusicLoader->vtable->EnableCache(DMusicLoader, &GUID_DirectMusicAllTypes, TRUE);
     // STRING: LEGOLAND 0x004bfd9c
-    if (DAT_007cacd8->vtable->ScanDirectory(DAT_007cacd8, &DAT_004ab9f0, L"sgt", NULL) == S_OK) {
+    if (DMusicLoader->vtable->ScanDirectory(DMusicLoader, &CLSID_DirectMusicSegment, L"sgt", NULL) == S_OK) {
         // STRING: LEGOLAND 0x004bfd94
-        if (DAT_007cacd8->vtable->ScanDirectory(DAT_007cacd8, &DAT_004ab980, L"sty", NULL) == S_OK) {
+        if (DMusicLoader->vtable->ScanDirectory(DMusicLoader, &CLSID_DirectMusicStyle, L"sty", NULL) == S_OK) {
             // STRING: LEGOLAND 0x004bfd84
             DBPrintf("Loading Styles\n");
-            for (i = 0; DAT_007cacd8->vtable->EnumObject(DAT_007cacd8, &DAT_004ab980, i, &desc) == S_OK; i++) {
-                DAT_007cacd8->vtable->GetObject(DAT_007cacd8, &desc, &DAT_004ab610, &DAT_007988d0[i]);
+            for (i = 0; DMusicLoader->vtable->EnumObject(DMusicLoader, &CLSID_DirectMusicStyle, i, &desc) == S_OK; i++) {
+                DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicStyle, &DAT_007988d0[i]);
             }
         }
         // STRING: LEGOLAND 0x004bfd70
@@ -875,17 +875,17 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
         // STRING: LEGOLAND 0x004bf894
         IMT_GET(33, L"wmtran2");
     }
-    DAT_007cacdc->vtable->SetNotificationHandle(DAT_007cacdc, DAT_0079a69c, 0);
-    DAT_007cacdc->vtable->AddNotificationType(DAT_007cacdc, &GUID_NOTIFICATION_MEASUREANDBEAT);
-    DAT_007cacdc->vtable->AddNotificationType(DAT_007cacdc, &GUID_NOTIFICATION_SEGMENT);
+    DMusicPerformance->vtable->SetNotificationHandle(DMusicPerformance, DAT_0079a69c, 0);
+    DMusicPerformance->vtable->AddNotificationType(DMusicPerformance, &GUID_NOTIFICATION_MEASUREANDBEAT);
+    DMusicPerformance->vtable->AddNotificationType(DMusicPerformance, &GUID_NOTIFICATION_SEGMENT);
     for (theme = 1; theme < 5; theme++) {
-        DAT_00799230[theme]->vtable->SetParam(DAT_00799230[theme], &GUID_Download, 0xffffffff, 0, 0, DAT_007cacdc);
+        DAT_00799230[theme]->vtable->SetParam(DAT_00799230[theme], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
         DAT_00799230[theme]->vtable->SetRepeats(DAT_00799230[theme], 0);
-        DAT_00799230[theme + 5]->vtable->SetParam(DAT_00799230[theme + 5], &GUID_Download, 0xffffffff, 0, 0, DAT_007cacdc);
+        DAT_00799230[theme + 5]->vtable->SetParam(DAT_00799230[theme + 5], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
         DAT_00799230[theme + 5]->vtable->SetRepeats(DAT_00799230[theme + 5], 0);
         for (k = 0; k < 5; k++) {
             if (k != theme) {
-                DAT_00799230[10 + theme * 5 + k]->vtable->SetParam(DAT_00799230[10 + theme * 5 + k], &GUID_Download, 0xffffffff, 0, 0, DAT_007cacdc);
+                DAT_00799230[10 + theme * 5 + k]->vtable->SetParam(DAT_00799230[10 + theme * 5 + k], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
                 DAT_00799230[10 + theme * 5 + k]->vtable->SetRepeats(DAT_00799230[10 + theme * 5 + k], 0);
             }
         }
@@ -906,23 +906,23 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
                     if (DAT_0079a6ac == DAT_0079a6a8) {
                         DAT_0079a6ac = DAT_0079a6a8;
                         groove = 0;
-                        DAT_007cacdc->vtable->SetGlobalParam(DAT_007cacdc, &GUID_PerfMasterGrooveLevel, &groove, 1);
-                        DAT_007cacdc->vtable->PlaySegment(DAT_007cacdc, DAT_00799230[DAT_0079a6ac + 5], 0x2000, 0, NULL);
+                        DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
+                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, DAT_00799230[DAT_0079a6ac + 5], 0x2000, 0, NULL);
                     } else {
                         groove = 1;
                         DAT_0079a6a4 = 5;
                         beat = -1;
-                        DAT_007cacdc->vtable->SetGlobalParam(DAT_007cacdc, &GUID_PerfMasterGrooveLevel, &groove, 1);
+                        DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
                     }
                     break;
                 case 3:
                     DAT_0079a6ac = DAT_0079a6a8;
                     groove = 0;
-                    DAT_007cacdc->vtable->SetGlobalParam(DAT_007cacdc, &GUID_PerfMasterGrooveLevel, &groove, 1);
-                    DAT_007cacdc->vtable->PlaySegment(DAT_007cacdc, DAT_00799230[DAT_0079a6ac], 0x2000, 0, NULL);
+                    DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
+                    DMusicPerformance->vtable->PlaySegment(DMusicPerformance, DAT_00799230[DAT_0079a6ac], 0x2000, 0, NULL);
                     break;
                 case 1:
-                    DAT_007cacdc->vtable->Stop(DAT_007cacdc, NULL, NULL, 0, 0);
+                    DMusicPerformance->vtable->Stop(DMusicPerformance, NULL, NULL, 0, 0);
                     break;
                 }
                 DAT_004bf778 = DAT_0079a6a4;
@@ -931,7 +931,7 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
         }
         if (WaitForSingleObject(DAT_0079a69c, 0) == WAIT_OBJECT_0) {
             ResetEvent(DAT_0079a69c);
-            while (DAT_007cacdc->vtable->GetNotificationPMsg(DAT_007cacdc, &msg) == S_OK) {
+            while (DMusicPerformance->vtable->GetNotificationPMsg(DMusicPerformance, &msg) == S_OK) {
                 if (IsEqualGUID(&msg->guidNotificationType, &GUID_NOTIFICATION_SEGMENT)) {
                     switch (msg->dwNotificationOption) {
                     case 4: /* DMUS_NOTIFICATION_SEGABORT */
@@ -966,9 +966,9 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
                 } else if (DAT_004bf778 == 7) {
                     if (msg->dwField1 == 3 && msg->dwField2 == 1) {
                         DAT_0079a6ac = DAT_0079a6a8;
-                        DAT_007cacdc->vtable->PlaySegment(DAT_007cacdc, DAT_00799230[DAT_0079a6ac + 5], 0x2000, 0, NULL);
+                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, DAT_00799230[DAT_0079a6ac + 5], 0x2000, 0, NULL);
                         groove = 0;
-                        DAT_007cacdc->vtable->SetGlobalParam(DAT_007cacdc, &GUID_PerfMasterGrooveLevel, &groove, 1);
+                        DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
                         DAT_004bf778 = 4;
                         // STRING: LEGOLAND 0x004bf7f0
                         DBPrintf("IMT_INTERACTIVE command\n");
@@ -980,26 +980,26 @@ DWORD WINAPI FUN_00492db0(LPVOID param) {
                     if (msg->dwField1 == 0 && DAT_004bf778 == 5) {
                         if (beat != 0) {
                             DAT_004bf778 = 6;
-                            DAT_007cacdc->vtable->PlaySegment(DAT_007cacdc, DAT_00799230[10 + DAT_0079a6ac * 5 + DAT_0079a6a8], 0x2000, 0, NULL);
+                            DMusicPerformance->vtable->PlaySegment(DMusicPerformance, DAT_00799230[10 + DAT_0079a6ac * 5 + DAT_0079a6a8], 0x2000, 0, NULL);
                         } else {
                             beat = 1;
                         }
                     }
                 }
-                DAT_007cacdc->vtable->FreePMsg(DAT_007cacdc, msg);
+                DMusicPerformance->vtable->FreePMsg(DMusicPerformance, msg);
             }
         }
     }
 clear_loader:
-    DAT_007cacd8->vtable->ClearCache(DAT_007cacd8, &DAT_004ab8b0);
-    DAT_007cacd8->vtable->Release(DAT_007cacd8);
+    DMusicLoader->vtable->ClearCache(DMusicLoader, &GUID_DirectMusicAllTypes);
+    DMusicLoader->vtable->Release(DMusicLoader);
 stop_perf:
-    DAT_007cacdc->vtable->Stop(DAT_007cacdc, NULL, NULL, 0, 0);
-    DAT_007cacdc->vtable->CloseDown(DAT_007cacdc);
+    DMusicPerformance->vtable->Stop(DMusicPerformance, NULL, NULL, 0, 0);
+    DMusicPerformance->vtable->CloseDown(DMusicPerformance);
 release_perf:
-    DAT_007cacdc->vtable->Release(DAT_007cacdc);
+    DMusicPerformance->vtable->Release(DMusicPerformance);
 release_composer:
-    DAT_007cad44->vtable->Release(DAT_007cad44);
+    DMusicComposer->vtable->Release(DMusicComposer);
 fail:
     DMusicInitialised = 0;
     DAT_007988bc = 1;
@@ -1007,9 +1007,9 @@ fail:
 }
 
 // FUNCTION: LEGOLAND 0x00495a10
-int FUN_00495a10(void *hwnd) {
-    if (DAT_004bf774 != 0) {
-        DAT_0079a698 = CreateThread(0, 0x4000, FUN_00492db0, 0, 0, (LPDWORD)&DAT_007cad48);
+int StartMusicThread(void *hwnd) {
+    if (MusicEnabled != 0) {
+        MusicThread = CreateThread(0, 0x4000, MusicThreadProc, 0, 0, (LPDWORD)&MusicThreadId);
         return 1;
     }
     DAT_007988bc = 1;
@@ -1030,30 +1030,30 @@ int FUN_00495a50(int param_1) {
 LEGO_EXPORT int UpdateSoundVols(void) {
     int vol;
 
-    if (DAT_007988c0 != 0) {
-        if (DAT_004bf774 != 0 && DMusicInitialised != 0) {
-            vol = FUN_00495a50(DAT_0080ffa0.field_28);
-            ((struct SampleBuffer *)DAT_007cad4c)->vtable->method_0x3c((struct SampleBuffer *)DAT_007cad4c, vol);
+    if (SoundAvailable != 0) {
+        if (MusicEnabled != 0 && DMusicInitialised != 0) {
+            vol = FUN_00495a50(CurrentProfile.field_28);
+            ((struct SampleBuffer *)DMusicSoundBuffer)->vtable->method_0x3c((struct SampleBuffer *)DMusicSoundBuffer, vol);
         }
-        DAT_007988a0 = FUN_00495a50(DAT_0080ffa0.field_2c);
+        DAT_007988a0 = FUN_00495a50(CurrentProfile.field_2c);
         FUN_004967b0();
-        FUN_00498900(FUN_00495a50(DAT_0080ffa0.field_24));
+        SpeechSetVolume(FUN_00495a50(CurrentProfile.field_24));
     }
     return 0;
 }
 // FUNCTION: LEGOLAND 0x00495b00
-int FUN_00495b00(void) {
-    if (DAT_004bf774 != 0 && DMusicInitialised != 0) {
-        TerminateThread(DAT_0079a698, 0);
+int ShutDownDirectMusic(void) {
+    if (MusicEnabled != 0 && DMusicInitialised != 0) {
+        TerminateThread(MusicThread, 0);
 
-        DAT_007cacd8->vtable->ClearCache(DAT_007cacd8, &DAT_004ab8b0);
-        DAT_007cacd8->vtable->Release(DAT_007cacd8);
+        DMusicLoader->vtable->ClearCache(DMusicLoader, &GUID_DirectMusicAllTypes);
+        DMusicLoader->vtable->Release(DMusicLoader);
 
-        DAT_007cacdc->vtable->Stop(DAT_007cacdc, NULL, NULL, 0, 0);
-        DAT_007cacdc->vtable->CloseDown(DAT_007cacdc);
-        DAT_007cacdc->vtable->Release(DAT_007cacdc);
+        DMusicPerformance->vtable->Stop(DMusicPerformance, NULL, NULL, 0, 0);
+        DMusicPerformance->vtable->CloseDown(DMusicPerformance);
+        DMusicPerformance->vtable->Release(DMusicPerformance);
 
-        DAT_007cad44->vtable->Release(DAT_007cad44);
+        DMusicComposer->vtable->Release(DMusicComposer);
 
         DMusicInitialised = 0;
     }

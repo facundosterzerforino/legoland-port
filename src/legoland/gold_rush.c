@@ -119,26 +119,26 @@ struct PathTable DAT_004b4608 = {5, Gold_PathPairs};
 static struct Point Gold_Points[3] = {{0x400, 0x60}, {0x400, 0x3d0}, {0x400, 0x700}};
 
 // FUNCTION: LEGOLAND 0x00406920
-void FUN_00406920(struct GoldNode *src) {
+void AddGoldWashNode(struct GoldNode *src) {
     struct GoldNode *node = (struct GoldNode *)malloc(0x2c);
     if (node != NULL) {
         memset(node, 0, 0x2c);
         node->key = src->key;
-        node->next = DAT_004c1204;
-        DAT_004c1204 = node;
+        node->next = GoldWashList;
+        GoldWashList = node;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00406960
-void FUN_00406960(struct GoldNode *node) {
+void RemoveGoldWashNode(struct GoldNode *node) {
     struct GoldNode *prev;
     struct GoldNode *cur;
 
-    if (DAT_004c1204 == node) {
-        DAT_004c1204 = node->next;
+    if (GoldWashList == node) {
+        GoldWashList = node->next;
     } else {
-        cur = DAT_004c1204->next;
-        prev = DAT_004c1204;
+        cur = GoldWashList->next;
+        prev = GoldWashList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -154,15 +154,15 @@ void FUN_00406960(struct GoldNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x004069c0
-void FUN_004069c0(void) {
-    while (DAT_004c1204 != NULL) {
-        FUN_00406960(DAT_004c1204);
+void FreeGoldWashList(void) {
+    while (GoldWashList != NULL) {
+        RemoveGoldWashNode(GoldWashList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004069e0
-void *FUN_004069e0(void *param) {
-    struct GoldNode *cur = DAT_004c1204;
+void *FindGoldWashNode(void *param) {
+    struct GoldNode *cur = GoldWashList;
 
     if (cur != NULL) {
         do {
@@ -189,33 +189,33 @@ void FUN_00406a10(struct GoldObj *obj) {
 
     DAT_004c11e4 = (struct Sprite *)FUN_00412100(&DAT_004b4608);
     // STRING: LEGOLAND 0x004b465c
-    DAT_004c11f8 = LoadSprite("goldwashmatte1.lls", 1);
+    GoldWashMatte1Sprite = LoadSprite("goldwashmatte1.lls", 1);
     // STRING: LEGOLAND 0x004b464c
-    DAT_004c11fc = LoadSprite("goldwash.lls", 1);
+    GoldWashSprite = LoadSprite("goldwash.lls", 1);
     // STRING: LEGOLAND 0x004b4638
-    DAT_004c1200 = LoadSprite("goldwashmatte2.lls", 1);
+    GoldWashMatte2Sprite = LoadSprite("goldwashmatte2.lls", 1);
     // STRING: LEGOLAND 0x004b4628
-    DAT_004c11f4 = LoadSprite("goldmask.lls", 1);
+    GoldMaskSprite = LoadSprite("goldmask.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x00406ab0
 void FUN_00406ab0(void) {
-    if (DAT_004c11f8 != NULL) {
-        KillSprite(DAT_004c11f8);
+    if (GoldWashMatte1Sprite != NULL) {
+        KillSprite(GoldWashMatte1Sprite);
     }
-    if (DAT_004c11fc != NULL) {
-        KillSprite(DAT_004c11fc);
+    if (GoldWashSprite != NULL) {
+        KillSprite(GoldWashSprite);
     }
-    if (DAT_004c1200 != NULL) {
-        KillSprite(DAT_004c1200);
+    if (GoldWashMatte2Sprite != NULL) {
+        KillSprite(GoldWashMatte2Sprite);
     }
-    if (DAT_004c11f4 != NULL) {
-        KillSprite(DAT_004c11f4);
+    if (GoldMaskSprite != NULL) {
+        KillSprite(GoldMaskSprite);
     }
     if (DAT_004c11e4 != NULL) {
-        FUN_00412290(DAT_004c11e4);
+        FreeIfNotNull(DAT_004c11e4);
     }
-    FUN_004069c0();
+    FreeGoldWashList();
 }
 
 // FUNCTION: LEGOLAND 0x00406b10
@@ -236,7 +236,7 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
-    if (DAT_004c11f4 != NULL) {
+    if (GoldMaskSprite != NULL) {
         struct Point off;
         frame = 0;
         spr = GetSpriteForLayer(DAT_004c11e8, 1);
@@ -246,13 +246,13 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
                 frame = *(short *)lls % 8;
             }
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_004c11f4);
+        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GoldMaskSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
         off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_004c11f4, pos.x + off.x, pos.y + off.y, clip, 0);
+        PrintSprite(GoldMaskSprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
     DAT_004c1208 = NULL;
@@ -262,11 +262,11 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
-    if (DAT_004c1200 != NULL) {
+    if (GoldWashMatte2Sprite != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_004c1200, pos.x + off.x, pos.y + off.y, clip, 0);
+        PrintSprite(GoldWashMatte2Sprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
     DAT_004c1208 = NULL;
@@ -276,11 +276,11 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
-    if (DAT_004c11f8 != NULL) {
+    if (GoldWashMatte1Sprite != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_004c11f8, pos.x + off.x, pos.y + off.y, clip, 0);
+        PrintSprite(GoldWashMatte1Sprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
     DAT_004c1208 = NULL;
@@ -300,7 +300,7 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 
 // FUNCTION: LEGOLAND 0x00406e90
 unsigned int FUN_00406e90(void *param) {
-    struct GoldArray *a = (struct GoldArray *)FUN_004069e0(param);
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(param);
     unsigned int i;
 
     if (a == NULL) {
@@ -316,7 +316,7 @@ unsigned int FUN_00406e90(void *param) {
 
 // FUNCTION: LEGOLAND 0x00406ec0
 void FUN_00406ec0(struct GoldItem *item, void *param2) {
-    struct GoldArray *a = (struct GoldArray *)FUN_004069e0(param2);
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(param2);
     unsigned int i;
 
     if (a == NULL) {
@@ -334,7 +334,7 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
 // FUNCTION: LEGOLAND 0x00406f00
 struct GoldArray *FUN_00406f00(struct GoldItem *item) {
     unsigned int idx = item->field_8->field_36;
-    struct GoldArray *a = (struct GoldArray *)FUN_004069e0(&item->field_c);
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->field_c);
 
     if (a != NULL) {
         a->field_14[idx] = 0;
@@ -556,7 +556,7 @@ void FUN_004075f0(struct GoldEditObject *editObj, struct Point *pos) {
     id.pos.y = (unsigned char)pos->y;
     ride = editObj->ride;
     AddBasicObject((Element *)editObj, (int *)pos);
-    FUN_00406920((struct GoldNode *)&id);
+    AddGoldWashNode((struct GoldNode *)&id);
 
     p.x = pos->x + ride->field_c - 1;
     p.y = pos->y + ride->field_10;
@@ -579,10 +579,10 @@ void FUN_004075f0(struct GoldEditObject *editObj, struct Point *pos) {
 void FUN_004076e0(struct GoldEditObject *editObj, TileId coords, struct Cursor *cursor) {
     int p[2];
     struct GoldRide *ride = editObj->ride;
-    void *found = FUN_004069e0(&coords);
+    void *found = FindGoldWashNode(&coords);
 
     if (found != NULL) {
-        FUN_00406960((struct GoldNode *)found);
+        RemoveGoldWashNode((struct GoldNode *)found);
     }
 
     StandardRemoveObject((Element *)editObj, coords, cursor);
@@ -613,7 +613,7 @@ LEGO_EXPORT int SaveGoldWash(void) {
 
     one = 1;
     zero = 0;
-    node = DAT_004c1204;
+    node = GoldWashList;
     while (node != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
@@ -644,7 +644,7 @@ LEGO_EXPORT int LoadGoldWash(void) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_004c1204 = node;
+            GoldWashList = node;
         }
         prev = node;
         if (!SaveGameRead(&count, 4)) {
@@ -655,7 +655,7 @@ LEGO_EXPORT int LoadGoldWash(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004078f0
-void FUN_004078f0(struct ClassNode *str, struct CallbackTable *module) {
+void GoldRush_GetInterfaces(struct ClassNode *str, struct CallbackTable *module) {
     // STRING: LEGOLAND 0x004b4670
     if (_stricmp("GOLD RUSH", str->name) == 0) {
         module->cb_a4 = FUN_00406a10;

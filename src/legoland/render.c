@@ -262,7 +262,7 @@ static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, uns
     int i;
 
     /* skip the lines above the clip rectangle */
-    n = (int)DAT_0081c8d4 - y;
+    n = (int)ViewportTop - y;
     if (n > 0 && yend - y > 0) {
         if (n > yend - y) {
             n = yend - y;
@@ -274,7 +274,7 @@ static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, uns
         }
         row += DAT_00701e58 * n;
     }
-    while (y < yend && y <= (int)DAT_0081c8dc) {
+    while (y < yend && y <= (int)ViewportBottom) {
         const struct PortEdge *lo;
         const struct PortEdge *hi;
         unsigned int s[PORT_NV];
@@ -302,15 +302,15 @@ static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, uns
         }
         x = (int)lo->v[0] >> 16;
         xend = (int)hi->v[0] >> 16;
-        if (x < (int)DAT_0081c8d0) {
-            n = (int)DAT_0081c8d0 - x;
-            x = (int)DAT_0081c8d0;
+        if (x < (int)ViewportLeft) {
+            n = (int)ViewportLeft - x;
+            x = (int)ViewportLeft;
             for (i = 1; i < nv; i++) {
                 s[i] += ds[i] * n;
             }
         }
         p = rowaddr + x * 2;
-        plimit = rowaddr + DAT_0081c8d8 * 2;
+        plimit = rowaddr + ViewportRight * 2;
         while (x < xend && p <= plimit) {
             zp = (unsigned int *)(DAT_00701e5c + (y << 9) + x * 4);
             if (s[1] >= *zp) {
@@ -614,7 +614,7 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     local.rect.right = w;
     local.rect.top = 0;
     local.rect.bottom = h;
-    DAT_007fea44 = GetTransparentColour();
+    StoredTransparentColour = GetTransparentColour();
     SoftPrint_Clear();
     FUN_00464ee0(param_2, &local.rect, local.off);
     FUN_00485fe0(param_2, param_4, param_5);
@@ -671,7 +671,7 @@ LEGO_EXPORT unsigned int RenderSprite(struct Sprite *sprite, int x, int y) {
         if (IntersectRect(&dst, &dst, &SPRITE_ClipRect) != 0) {
             int i;
             unsigned int *p;
-            sprite->field_c = DAT_008119a4;
+            sprite->field_c = FrameCounter;
             src.left = dst.left;
             src.top = dst.top;
             src.right = dst.right;
@@ -694,7 +694,7 @@ LEGO_EXPORT unsigned int RenderSprite(struct Sprite *sprite, int x, int y) {
         }
     } else {
         if (IntersectRect(&dst, &dst, &SPRITE_ClipRect) != 0) {
-            sprite->field_c = DAT_008119a4;
+            sprite->field_c = FrameCounter;
             src.left = dst.left;
             src.top = dst.top;
             src.right = dst.right;
@@ -720,7 +720,7 @@ LEGO_EXPORT unsigned int RenderSpriteX(struct Sprite *sprite, int x, int y, unsi
     src.bottom = (short)sprite->height;
     src.right = (short)sprite->width;
     if (IntersectRect(&dst, &dst, &SPRITE_ClipRect) != 0) {
-        sprite->field_c = DAT_008119a4;
+        sprite->field_c = FrameCounter;
         src.left = dst.left;
         src.top = dst.top;
         src.right = dst.right;
@@ -793,7 +793,7 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
         IntersectRect(&DAT_00668108, &clip, &SPRITE_ClipRect);
         off[0] = 0;
         off[1] = 0;
-        DAT_007fea44 = GetTransparentColour();
+        StoredTransparentColour = GetTransparentColour();
         DAT_0066809c.lpSurface = desc2.lpSurface;
         DAT_0066809c.dwWidth = (short)sprite->width;
         DAT_0066809c.dwHeight = (short)sprite->height;
@@ -810,7 +810,7 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
         FUN_00464ee0(sprite, &r2, off);
         IDirectDrawSurface_Unlock(DAT_0079861c, desc2.lpSurface);
     }
-    IDirectDrawSurface_SetClipper(renderEngine, DAT_00668080);
+    IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
     hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);
     for (;;) {
         if (hr != 0) {
@@ -824,8 +824,8 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
                 return 0;
             }
             MakeSprite(sprite);
-            if (IDirectDrawSurface_IsLost(DAT_00668070) == 0x887601c2) {
-                if (IDirectDrawSurface_Restore(DAT_00668070) != 0) {
+            if (IDirectDrawSurface_IsLost(PrimarySurface) == 0x887601c2) {
+                if (IDirectDrawSurface_Restore(PrimarySurface) != 0) {
                     break;
                 }
             }
@@ -869,7 +869,7 @@ LEGO_EXPORT unsigned int RenderBlock(int x, int y, int w, int h, unsigned int co
         return 1;
     }
     PushRenderingStatusAndUnlockVideoSurface();
-    ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->SetClipper((LPDIRECTDRAWSURFACE)renderEngine, (LPDIRECTDRAWCLIPPER)DAT_00668080);
+    ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->SetClipper((LPDIRECTDRAWSURFACE)renderEngine, (LPDIRECTDRAWCLIPPER)DDrawClipper);
     if (((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->Blt((LPDIRECTDRAWSURFACE)renderEngine, &dst, NULL, NULL, 0x1000400, &fx) == 0) {
         ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->SetClipper((LPDIRECTDRAWSURFACE)renderEngine, NULL);
         PopRenderingStatus();
@@ -922,7 +922,7 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
     if (!GetSprite((unsigned int *)&image, sprite)) {
         return 0;
     }
-    switch (DAT_00668088) {
+    switch (DisplayPixelFormat) {
     case 0:
         result = 0;
         break;

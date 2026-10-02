@@ -7,9 +7,9 @@ struct CallbackTable;
 struct Cursor;
 struct ClassNode;
 
-void FUN_00403080(struct ClassNode *name, struct CallbackTable *ci);
+void CastleLevel1_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci);
 void FUN_00402ca0(Element *obj);
-void FUN_00402ce0(void);
+void KillCastleLevelMatteSprite(void);
 void FUN_00402d00(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip);
 void FUN_00402dc0(Element *obj);
 void FUN_00402ff0(void);

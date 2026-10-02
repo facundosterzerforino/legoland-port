@@ -104,23 +104,23 @@ struct CopterLoadNode {
 // GLOBAL: LEGOLAND 0x004b4198
 static struct PathPair Copters_PathPairs0[6] = {{0, -1}, {1, 0}, {1, 0}, {1, 0}, {-1, -1}, {-1, -1}};
 // GLOBAL: LEGOLAND 0x004b41c8
-struct PathTable DAT_004b41c8 = {6, Copters_PathPairs0};
+struct PathTable CopterPathTable0 = {6, Copters_PathPairs0};
 // GLOBAL: LEGOLAND 0x004b41d0
 static struct PathPair Copters_PathPairs1[7] = {{0, -1}, {-1, 0}, {0, -1}, {0, -4}, {-3, -1}, {1, 0}, {1, 0}};
 // GLOBAL: LEGOLAND 0x004b4208
-struct PathTable DAT_004b4208 = {7, Copters_PathPairs1};
+struct PathTable CopterPathTable2 = {7, Copters_PathPairs1};
 // GLOBAL: LEGOLAND 0x004b4210
 static struct PathPair Copters_PathPairs2[6] = {{0, -1}, {-1, -1}, {2, -4}, {2, -2}, {-2, 0}, {0, -1}};
 // GLOBAL: LEGOLAND 0x004b4240
-struct PathTable DAT_004b4240 = {6, Copters_PathPairs2};
+struct PathTable CopterPathTable1 = {6, Copters_PathPairs2};
 // GLOBAL: LEGOLAND 0x004b4248
 static struct PathPair Copters_PathPairs3[5] = {{0, -1}, {4, -1}, {0, -1}, {-1, -1}, {-1, -2}};
 // GLOBAL: LEGOLAND 0x004b4270
-struct PathTable DAT_004b4270 = {5, Copters_PathPairs3};
+struct PathTable CopterPathTable3 = {5, Copters_PathPairs3};
 // GLOBAL: LEGOLAND 0x004b4278
 static struct PathPair Copters_PathPairs4[4] = {{0, -1}, {-1, -1}, {0, -1}, {0, -1}};
 // GLOBAL: LEGOLAND 0x004b4298
-struct PathTable DAT_004b4298 = {4, Copters_PathPairs4};
+struct PathTable CopterPathTable4 = {4, Copters_PathPairs4};
 
 // GLOBAL: LEGOLAND 0x004b4170
 static const char *Copters_LLSNames[10] = {
@@ -137,27 +137,27 @@ static const char *Copters_LLSNames[10] = {
 };
 
 // FUNCTION: LEGOLAND 0x00403c40
-void FUN_00403c40(struct CopterSource *src) {
+void CoptersAddNode(struct CopterSource *src) {
     struct CopterNode *node = (struct CopterNode *)malloc(sizeof(struct CopterNode));
     if (node != NULL) {
         memset(node, 0, sizeof(struct CopterNode));
         node->field_0 = src->field_0;
-        node->next = DAT_004c11b4;
-        DAT_004c11b4 = node;
+        node->next = CopterNodeList;
+        CopterNodeList = node;
     }
-    FUN_00403e90(node);
+    CoptersInitNode(node);
 }
 
 // FUNCTION: LEGOLAND 0x00403c80
-void FUN_00403c80(struct CopterNode *node) {
+void CoptersRemoveNode(struct CopterNode *node) {
     struct CopterNode *prev;
     struct CopterNode *cur;
 
-    if (DAT_004c11b4 == node) {
-        DAT_004c11b4 = node->next;
+    if (CopterNodeList == node) {
+        CopterNodeList = node->next;
     } else {
-        cur = DAT_004c11b4->next;
-        prev = DAT_004c11b4;
+        cur = CopterNodeList->next;
+        prev = CopterNodeList;
         while (cur != node) {
             prev = prev->next;
             if (prev == NULL) {
@@ -173,17 +173,17 @@ void FUN_00403c80(struct CopterNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00403ce0
-void FUN_00403ce0(void) {
-    while (DAT_004c11b4 != NULL) {
-        FUN_00403c80(DAT_004c11b4);
+void CoptersRemoveAllNodes(void) {
+    while (CopterNodeList != NULL) {
+        CoptersRemoveNode(CopterNodeList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00403d00
-struct CopterNode *FUN_00403d00(struct CopterSource *src) {
+struct CopterNode *CoptersFindNode(struct CopterSource *src) {
     struct CopterNode *node;
 
-    for (node = DAT_004c11b4; node != NULL; node = node->next) {
+    for (node = CopterNodeList; node != NULL; node = node->next) {
         if (src->field_0 == node->field_0) {
             return node;
         }
@@ -192,9 +192,9 @@ struct CopterNode *FUN_00403d00(struct CopterSource *src) {
 }
 
 // FUNCTION: LEGOLAND 0x00403d30
-int FUN_00403d30(struct CopterItem *item) {
+int CoptersQueueTableToIndex(struct CopterItem *item) {
     struct CopterSub *sub = item->field_8;
-    int *ptr = &DAT_004c1124[0];
+    int *ptr = &CopterQueueTables[0];
     int index = 0;
 
     while (1) {
@@ -203,7 +203,7 @@ int FUN_00403d30(struct CopterItem *item) {
         }
         ptr++;
         index++;
-        if ((int)ptr < (int)&DAT_004c113c) {
+        if ((int)ptr < (int)&CopterModelSprites) {
             continue;
         }
         index = -1;
@@ -215,14 +215,14 @@ int FUN_00403d30(struct CopterItem *item) {
 }
 
 // FUNCTION: LEGOLAND 0x00403d60
-void FUN_00403d60(struct CopterItem *item) {
+void CoptersIndexToQueueTable(struct CopterItem *item) {
     struct CopterSub *sub = item->field_8;
     int index = sub->field_50;
 
     if (index < 0 || index >= 6) {
         sub->field_50 = 0;
     } else {
-        sub->field_50 = DAT_004c1124[index];
+        sub->field_50 = CopterQueueTables[index];
     }
 }
 
@@ -232,32 +232,32 @@ void FUN_00403d90(struct CopterEditObject *param_1) {
     int i;
 
     ride = param_1->field_c;
-    DAT_004c1198 = ride;
+    ActiveCopterRide = ride;
     ride->field_1c |= 0x420;
-    DAT_004c1138 = ((struct CopterRide *)DAT_004c1198)->field_64;
-    ((struct CopterModel *)DAT_004c1138)->field_10 |= 0x2000;
+    CopterModelLayers = ((struct CopterRide *)ActiveCopterRide)->field_64;
+    ((struct CopterModel *)CopterModelLayers)->field_10 |= 0x2000;
     for (i = 0; i < 10; i++) {
-        DAT_004c113c[i] = LoadSprite(Copters_LLSNames[i], 1);
+        CopterModelSprites[i] = LoadSprite(Copters_LLSNames[i], 1);
     }
     // STRING: LEGOLAND 0x004b43d0
-    DAT_00830f98 = LoadPos("3ddata\\copters.pos");
-    DAT_004c1124[0] = FUN_00412100(&DAT_004b41c8);
-    DAT_004c1124[2] = FUN_00412100(&DAT_004b4208);
-    DAT_004c1124[1] = FUN_00412100(&DAT_004b4240);
-    DAT_004c1124[3] = FUN_00412100(&DAT_004b4270);
-    DAT_004c1124[4] = FUN_00412100(&DAT_004b4298);
+    CoptersPos = LoadPos("3ddata\\copters.pos");
+    CopterQueueTables[0] = FUN_00412100(&CopterPathTable0);
+    CopterQueueTables[2] = FUN_00412100(&CopterPathTable2);
+    CopterQueueTables[1] = FUN_00412100(&CopterPathTable1);
+    CopterQueueTables[3] = FUN_00412100(&CopterPathTable3);
+    CopterQueueTables[4] = FUN_00412100(&CopterPathTable4);
     DAT_004c1194 = &DAT_004c119c;
     DAT_004c1190 = &DAT_004c11a0;
     DAT_004c1164 = &DAT_004c11a4;
     DAT_004c1168 = &DAT_004c11a8;
     DAT_004c1188 = &DAT_004c11ac;
     // STRING: LEGOLAND 0x004b43bc
-    DAT_004c1120 = LoadSprite("cop_base Matte.lls", 1);
+    CopterBaseMatteSprite = LoadSprite("cop_base Matte.lls", 1);
     Load_FXList(Helicopter_SFX, 4);
 }
 
 // FUNCTION: LEGOLAND 0x00403e90
-void FUN_00403e90(struct CopterNode *node) {
+void CoptersInitNode(struct CopterNode *node) {
     unsigned int handle;
     struct LLS *lls;
     char frame;
@@ -267,7 +267,7 @@ void FUN_00403e90(struct CopterNode *node) {
     node->layer[1].field_10 = 2;
     node->layer[1].field_14 = 7;
     node->layer[1].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)DAT_004c1138, 3);
+    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 3);
     if (handle != 0) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
@@ -281,7 +281,7 @@ void FUN_00403e90(struct CopterNode *node) {
     node->layer[0].field_10 = 0;
     node->layer[0].field_14 = 6;
     node->layer[0].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)DAT_004c1138, 1);
+    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 1);
     if (handle != 0) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
@@ -295,7 +295,7 @@ void FUN_00403e90(struct CopterNode *node) {
     node->layer[2].field_10 = 4;
     node->layer[2].field_14 = 8;
     node->layer[2].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)DAT_004c1138, 0xb);
+    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 0xb);
     if (handle != 0) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
@@ -309,7 +309,7 @@ void FUN_00403e90(struct CopterNode *node) {
     node->layer[3].field_10 = 3;
     node->layer[3].field_14 = 5;
     node->layer[3].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)DAT_004c1138, 6);
+    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 6);
     if (handle != 0) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
@@ -323,7 +323,7 @@ void FUN_00403e90(struct CopterNode *node) {
     node->layer[4].field_10 = 1;
     node->layer[4].field_14 = 9;
     node->layer[4].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)DAT_004c1138, 7);
+    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 7);
     if (handle != 0) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
@@ -336,14 +336,14 @@ void FUN_00403e90(struct CopterNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00404040
-void FUN_00404040(void) {
+void CoptersUnload(void) {
     struct Sprite **current;
 
-    if (DAT_004c1120 != NULL) {
-        KillSprite(DAT_004c1120);
+    if (CopterBaseMatteSprite != NULL) {
+        KillSprite(CopterBaseMatteSprite);
     }
 
-    current = DAT_004c113c;
+    current = CopterModelSprites;
     while ((int)current < (int)&DAT_004c1164) {
         if (*current != NULL) {
             KillSprite(*current);
@@ -351,29 +351,29 @@ void FUN_00404040(void) {
         current++;
     }
 
-    if (DAT_004c1124[0] != 0) {
-        FUN_00412290((struct Sprite *)DAT_004c1124[0]);
+    if (CopterQueueTables[0] != 0) {
+        FreeIfNotNull((struct Sprite *)CopterQueueTables[0]);
     }
-    if (DAT_004c1124[1] != 0) {
-        FUN_00412290((struct Sprite *)DAT_004c1124[1]);
+    if (CopterQueueTables[1] != 0) {
+        FreeIfNotNull((struct Sprite *)CopterQueueTables[1]);
     }
-    if (DAT_004c1124[3] != 0) {
-        FUN_00412290((struct Sprite *)DAT_004c1124[3]);
+    if (CopterQueueTables[3] != 0) {
+        FreeIfNotNull((struct Sprite *)CopterQueueTables[3]);
     }
-    if (DAT_004c1124[4] != 0) {
-        FUN_00412290((struct Sprite *)DAT_004c1124[4]);
+    if (CopterQueueTables[4] != 0) {
+        FreeIfNotNull((struct Sprite *)CopterQueueTables[4]);
     }
-    if (DAT_004c1124[2] != 0) {
-        FUN_00412290((struct Sprite *)DAT_004c1124[2]);
+    if (CopterQueueTables[2] != 0) {
+        FreeIfNotNull((struct Sprite *)CopterQueueTables[2]);
     }
 
-    FUN_00403ce0();
+    CoptersRemoveAllNodes();
     Kill_FXList(Helicopter_SFX, 4);
-    UnloadPos(DAT_00830f98);
+    UnloadPos(CoptersPos);
 }
 
 // FUNCTION: LEGOLAND 0x004040f0
-void FUN_004040f0(struct CopterNode *node, int index, unsigned int param_3) {
+void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3) {
     struct CopterLayer *layer;
     struct LLS *lls;
     struct Point off;
@@ -390,25 +390,25 @@ void FUN_004040f0(struct CopterNode *node, int index, unsigned int param_3) {
         b = layer->field_8;
         a = layer->field_10;
     }
-    lls = GetLLSForLayer(DAT_004c1138, layer->field_8);
+    lls = GetLLSForLayer(CopterModelLayers, layer->field_8);
     if (lls != NULL) {
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
     }
-    lls = GetLLSForLayer(DAT_004c1138, layer->field_10);
+    lls = GetLLSForLayer(CopterModelLayers, layer->field_10);
     if (lls != NULL) {
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
     }
-    lls = GetLLSForLayer(DAT_004c1138, layer->field_c);
+    lls = GetLLSForLayer(CopterModelLayers, layer->field_c);
     if (lls != NULL) {
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
     }
-    sc = GetScreenCoordsForObject((TileId *)node, (struct Ride *)DAT_004c1198);
-    off = GetRenderOffsetForLayer(((struct Ride *)DAT_004c1198)->layer, b);
+    sc = GetScreenCoordsForObject((TileId *)node, (struct Ride *)ActiveCopterRide);
+    off = GetRenderOffsetForLayer(((struct Ride *)ActiveCopterRide)->layer, b);
     AdjustOffsetForViewMode(&off);
-    sprite = GetSpriteForLayer(((struct Ride *)DAT_004c1198)->layer, b);
+    sprite = GetSpriteForLayer(((struct Ride *)ActiveCopterRide)->layer, b);
     if (sprite != NULL) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
         if (lls != NULL) {
@@ -419,7 +419,7 @@ void FUN_004040f0(struct CopterNode *node, int index, unsigned int param_3) {
     if (layer->rider != NULL) {
         IP_RenderBlokeIn3DNow(layer->rider->rider);
     }
-    sprite = DAT_004c113c[a];
+    sprite = CopterModelSprites[a];
     if (sprite != NULL) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
         if (lls != NULL) {
@@ -430,12 +430,12 @@ void FUN_004040f0(struct CopterNode *node, int index, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00404290
-void FUN_00404290(Element *obj, int unused, int unused2, TileId *tile, int unused3, unsigned int clip) {
+void CoptersRender(Element *obj, int unused, int unused2, TileId *tile, int unused3, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct CopterNode *node;
     struct Point pos;
 
-    node = FUN_00403d00((struct CopterSource *)tile);
+    node = CoptersFindNode((struct CopterSource *)tile);
     if (node != NULL) {
         struct RideNode *rn;
         struct Point base;
@@ -449,8 +449,8 @@ void FUN_00404290(Element *obj, int unused, int unused2, TileId *tile, int unuse
         DAT_004c11a8 = NULL;
         DAT_004c11ac = NULL;
         DAT_004c11b0 = NULL;
-        base.y = node->field_1 + ((struct Ride *)DAT_004c1198)->y;
-        for (rn = ((struct Ride *)DAT_004c1198)->riders; rn != NULL; rn = rn->next) {
+        base.y = node->field_1 + ((struct Ride *)ActiveCopterRide)->y;
+        for (rn = ((struct Ride *)ActiveCopterRide)->riders; rn != NULL; rn = rn->next) {
             if ((rn->rider->flags & 0x80) == 0) {
                 key = rn->person->field_20;
                 d = base.y - (rn->rider->pos.y >> 8);
@@ -465,29 +465,29 @@ void FUN_00404290(Element *obj, int unused, int unused2, TileId *tile, int unuse
                 }
             }
         }
-        FUN_004040f0(node, 0, clip);
-        FUN_004040f0(node, 2, clip);
+        CoptersRenderLayer(node, 0, clip);
+        CoptersRenderLayer(node, 2, clip);
         RenderBlokeList((struct BlokeListHead *)DAT_004c1164);
         RenderBlokeList((struct BlokeListHead *)DAT_004c1190);
-        FUN_004040f0(node, 3, clip);
-        FUN_004040f0(node, 4, clip);
+        CoptersRenderLayer(node, 3, clip);
+        CoptersRenderLayer(node, 4, clip);
         RenderBlokeList((struct BlokeListHead *)DAT_004c1168);
         RenderBlokeList((struct BlokeListHead *)DAT_004c1188);
-        FUN_004040f0(node, 1, clip);
+        CoptersRenderLayer(node, 1, clip);
         RenderBlokeList((struct BlokeListHead *)DAT_004c1194);
     }
     pos = GetScreenCoordsForObject(tile, ride);
     {
         struct Point off = GetRenderOffsetForLayer(ride->layer, 0);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(DAT_004c1120, pos.x + off.x, pos.y + off.y, clip, 0);
+        PrintSprite(CopterBaseMatteSprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00404450
-void FUN_00404450(void) {
+void CoptersSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_004c1198;
+    EditMode.unk8 = ActiveCopterRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((unsigned char *)EditMode.unk8 + 0x3c);
 }
@@ -502,32 +502,32 @@ unsigned int *FUN_00404490(struct CopterEditObject *editobj, unsigned short uid)
     DAT_004c117c = uid;
     ride->field_64->field_10 |= 0x2000;
 
-    if (FUN_00403d00((struct CopterSource *)&uid) != 0) {
-        HideLayer(DAT_004c1138, 1);
-        HideLayer(DAT_004c1138, 2);
-        HideLayer(DAT_004c1138, 3);
-        HideLayer(DAT_004c1138, 0xa);
-        HideLayer(DAT_004c1138, 6);
-        HideLayer(DAT_004c1138, 5);
-        HideLayer(DAT_004c1138, 7);
-        HideLayer(DAT_004c1138, 8);
-        HideLayer(DAT_004c1138, 0xb);
-        HideLayer(DAT_004c1138, 4);
+    if (CoptersFindNode((struct CopterSource *)&uid) != 0) {
+        HideLayer(CopterModelLayers, 1);
+        HideLayer(CopterModelLayers, 2);
+        HideLayer(CopterModelLayers, 3);
+        HideLayer(CopterModelLayers, 0xa);
+        HideLayer(CopterModelLayers, 6);
+        HideLayer(CopterModelLayers, 5);
+        HideLayer(CopterModelLayers, 7);
+        HideLayer(CopterModelLayers, 8);
+        HideLayer(CopterModelLayers, 0xb);
+        HideLayer(CopterModelLayers, 4);
     }
 
     return (unsigned int *)&DAT_004c1170;
 }
 
 // FUNCTION: LEGOLAND 0x00404580
-void FUN_00404580(Element *obj, TileId tile, struct Cursor *cursor) {
+void CoptersRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     struct CopterSfxNode *node;
     struct SampleSource src;
     unsigned int x;
     unsigned int y;
 
-    node = (struct CopterSfxNode *)FUN_00403d00((struct CopterSource *)&tile);
+    node = (struct CopterSfxNode *)CoptersFindNode((struct CopterSource *)&tile);
     if (node != NULL) {
-        FUN_00403c80((struct CopterNode *)node);
+        CoptersRemoveNode((struct CopterNode *)node);
     }
     StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
@@ -540,20 +540,20 @@ void FUN_00404580(Element *obj, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x00404600
-void FUN_00404600(Element *obj, int *coords) {
+void CoptersAddObject(Element *obj, int *coords) {
     TileId tile;
 
     tile.pos.x = coords[0];
     tile.pos.y = coords[1];
     AddBasicObject(obj, coords);
-    FUN_00403c40((struct CopterSource *)&tile);
+    CoptersAddNode((struct CopterSource *)&tile);
 }
 
 // FUNCTION: LEGOLAND 0x00404630
 void FUN_00404630(struct CopterNode *node, int index) {
     /* Port [library:asm]: the original is inline asm (x87). Poses the rider of helicopter seat layer `index`: places
      * the rider's person at the seat's screen position plus the recorded animation offset, and sets the person's
-     * orientation from the current frame of the copters.pos animation (track `track` of DAT_00830f98). */
+     * orientation from the current frame of the copters.pos animation (track `track` of CoptersPos). */
     static const int src_col[3] = {0, 2, 1};
     static const int row_sign[3] = {1, -1, -1};
     static const int col_sign[3] = {-1, 1, 1};
@@ -571,7 +571,7 @@ void FUN_00404630(struct CopterNode *node, int index) {
     int i;
     int j;
 
-    screen = GetScreenCoordsForObject((TileId *)node, (struct Ride *)DAT_004c1198);
+    screen = GetScreenCoordsForObject((TileId *)node, (struct Ride *)ActiveCopterRide);
     if (layer->rider == NULL) {
         return;
     }
@@ -601,11 +601,11 @@ void FUN_00404630(struct CopterNode *node, int index) {
         y_bias = 0xe6;
         break;
     }
-    sprite_off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1138, sprite_layer);
-    sprite = GetSpriteForLayer((struct Sprite *)DAT_004c1138, sprite_layer);
+    sprite_off = GetRenderOffsetForLayer((struct Sprite *)CopterModelLayers, sprite_layer);
+    sprite = GetSpriteForLayer((struct Sprite *)CopterModelLayers, sprite_layer);
     AdjustOffsetForViewMode(&sprite_off);
     /* layer->field_4 is the current animation frame (a signed char) */
-    frame = &DAT_00830f98->entries[track][(signed char)layer->field_4];
+    frame = &CoptersPos->entries[track][(signed char)layer->field_4];
     seat_off.x = 0;
     seat_off.y = (int)frame->pos[1] + y_bias;
     AdjustOffsetForViewMode(&seat_off);
@@ -629,7 +629,7 @@ void FUN_00404630(struct CopterNode *node, int index) {
 }
 
 // FUNCTION: LEGOLAND 0x00404860
-void FUN_00404860(struct CopterNode *node, int index) {
+void CoptersAnimateLayer(struct CopterNode *node, int index) {
     struct CopterLayer *layer = &node->layer[index];
 
     if (layer->flags & 1) {
@@ -647,7 +647,7 @@ void FUN_00404860(struct CopterNode *node, int index) {
 }
 
 // FUNCTION: LEGOLAND 0x004048a0
-unsigned int FUN_004048a0(unsigned int param) {
+unsigned int CoptersResumeSample(unsigned int param) {
     ResumeSinglyPausedSample((struct Sample *)param);
     return 0;
 }
@@ -687,7 +687,7 @@ void FUN_004048b0(struct CopterSfxNode *node) {
     sample = PlayInstanceOfSample(fx->field_14, 1, 1, &params);
     PauseSingleSample(sample);
     AddSFX_Callback((struct CallbackEntry *)sample, 0xb54,
-        (unsigned int (*)(struct CallbackEntry *))FUN_004048a0);
+        (unsigned int (*)(struct CallbackEntry *))CoptersResumeSample);
 }
 
 // FUNCTION: LEGOLAND 0x004049a0
@@ -725,19 +725,19 @@ void FUN_004049a0(struct CopterNode *node, int param) {
 }
 
 // FUNCTION: LEGOLAND 0x00404a90
-void FUN_00404a90(struct CopterNode *node) {
+void CoptersUpdateNode(struct CopterNode *node) {
     node->field_c = node->field_c - 1;
     if (node->field_c < 0) {
         node->field_c = 2;
-        FUN_00404860(node, 1);
-        FUN_00404860(node, 0);
-        FUN_00404860(node, 2);
-        FUN_00404860(node, 3);
-        FUN_00404860(node, 4);
+        CoptersAnimateLayer(node, 1);
+        CoptersAnimateLayer(node, 0);
+        CoptersAnimateLayer(node, 2);
+        CoptersAnimateLayer(node, 3);
+        CoptersAnimateLayer(node, 4);
         if ((node->field_8 & 1) && !(node->layer[1].flags & 1) && !(node->layer[0].flags & 1) &&
             !(node->layer[2].flags & 1) && !(node->layer[3].flags & 1) &&
             !(node->layer[4].flags & 1)) {
-            if (GetAllBlokesOffRide(DAT_004c1198, node->field_0) != 0) {
+            if (GetAllBlokesOffRide(ActiveCopterRide, node->field_0) != 0) {
                 FUN_004049a0(node, 0);
             }
             return;
@@ -764,23 +764,23 @@ void FUN_00404a90(struct CopterNode *node) {
             }
         }
     }
-    Put3DBlokesOnRide2(DAT_004c1198, (Element *)node);
+    Put3DBlokesOnRide2(ActiveCopterRide, (Element *)node);
 }
 
 // FUNCTION: LEGOLAND 0x00404bc0
-void FUN_00404bc0(void) {
-    struct CopterNode *node = DAT_004c11b4;
+void CoptersUpdateNodes(void) {
+    struct CopterNode *node = CopterNodeList;
     if (node == NULL) {
         return;
     }
     do {
-        FUN_00404a90(node);
+        CoptersUpdateNode(node);
         node = node->next;
     } while (node != NULL);
 }
 
 // FUNCTION: LEGOLAND 0x00404be0
-void FUN_00404be0(struct Element *elem) {
+void CoptersUpdate(struct Element *elem) {
     unsigned int x;
     unsigned int y;
     struct Bloke *b;
@@ -792,12 +792,12 @@ void FUN_00404be0(struct Element *elem) {
     int spr;
     int spr2;
 
-    FUN_00404bc0();
+    CoptersUpdateNodes();
     node = ride->riders;
     while (node != NULL) {
         next = node->next;
         b = node->rider;
-        cn = FUN_00403d00((struct CopterSource *)&node->tile);
+        cn = CoptersFindNode((struct CopterSource *)&node->tile);
         if (cn == NULL) {
             break;
         }
@@ -808,7 +808,7 @@ void FUN_00404be0(struct Element *elem) {
             case 0:
                 b->flags |= 8;
                 link = (struct CopterChainNode *)node;
-                cn->layer[FUN_00404f20(link, (struct CopterSource *)&node->tile)].rider = node;
+                cn->layer[CoptersFindChainIndex(link, (struct CopterSource *)&node->tile)].rider = node;
                 cn->field_10++;
                 cn->field_14 = 0xb4;
                 b->field_58 = 0;
@@ -816,28 +816,28 @@ void FUN_00404be0(struct Element *elem) {
                 break;
             case 1:
                 link = (struct CopterChainNode *)node;
-                switch (FUN_00404f20(link, (struct CopterSource *)&node->tile)) {
+                switch (CoptersFindChainIndex(link, (struct CopterSource *)&node->tile)) {
                 case 0:
-                    spr = DAT_004c1124[2];
+                    spr = CopterQueueTables[2];
                     break;
                 case 1:
-                    spr = DAT_004c1124[0];
+                    spr = CopterQueueTables[0];
                     break;
                 case 2:
-                    spr = DAT_004c1124[1];
+                    spr = CopterQueueTables[1];
                     break;
                 case 3:
-                    spr = DAT_004c1124[3];
+                    spr = CopterQueueTables[3];
                     break;
                 case 4:
-                    spr = DAT_004c1124[4];
+                    spr = CopterQueueTables[4];
                     break;
                 }
                 FUN_004122d0((struct RideSlotArg *)spr, (struct RideSlot *)b);
-                FUN_00403d30((struct CopterItem *)link);
+                CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 2:
-                FUN_00412300((struct QueueTable *)DAT_004c1124[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
                 break;
             case 3:
             case 7:
@@ -863,28 +863,28 @@ void FUN_00404be0(struct Element *elem) {
                 break;
             case 8:
                 link = (struct CopterChainNode *)node;
-                switch (FUN_00404f20(link, (struct CopterSource *)&node->tile)) {
+                switch (CoptersFindChainIndex(link, (struct CopterSource *)&node->tile)) {
                 case 0:
-                    spr2 = DAT_004c1124[2];
+                    spr2 = CopterQueueTables[2];
                     break;
                 case 1:
-                    spr2 = DAT_004c1124[0];
+                    spr2 = CopterQueueTables[0];
                     break;
                 case 2:
-                    spr2 = DAT_004c1124[1];
+                    spr2 = CopterQueueTables[1];
                     break;
                 case 3:
-                    spr2 = DAT_004c1124[3];
+                    spr2 = CopterQueueTables[3];
                     break;
                 case 4:
-                    spr2 = DAT_004c1124[4];
+                    spr2 = CopterQueueTables[4];
                     break;
                 }
                 FUN_004122a0((struct RideSlotArg *)spr2, (struct RideSlot *)b);
-                FUN_00403d30((struct CopterItem *)link);
+                CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 9:
-                FUN_00412300((struct QueueTable *)DAT_004c1124[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
                 break;
             case 10:
                 b->dest.x = (x << 8) + 0x80;
@@ -909,11 +909,11 @@ void FUN_00404be0(struct Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x00404f20
-unsigned int FUN_00404f20(struct CopterChainNode *node, struct CopterSource *id) {
+unsigned int CoptersFindChainIndex(struct CopterChainNode *node, struct CopterSource *id) {
     struct CopterChainNode *cur;
     unsigned int idx = 0;
 
-    for (cur = ((struct CopterChainRide *)DAT_004c1198)->chain; cur != NULL; cur = cur->next) {
+    for (cur = ((struct CopterChainRide *)ActiveCopterRide)->chain; cur != NULL; cur = cur->next) {
         struct CopterSource *p = (struct CopterSource *)((char *)cur + 0xc);
         if (memcmp(p, id, 2) == 0) {
             if (cur == node) {
@@ -938,8 +938,8 @@ LEGO_EXPORT int Copters_Save(void) {
 
     one = 1;
     zero = 0;
-    node = DAT_004c11b4;
-    if (DAT_004c11b4 != NULL) {
+    node = CopterNodeList;
+    if (CopterNodeList != NULL) {
         while (node != NULL) {
             if (SaveGameWrite(&one, 4) == 0) {
                 return 0;
@@ -948,7 +948,7 @@ LEGO_EXPORT int Copters_Save(void) {
                 rider = node->layer[i].rider;
                 index = 0;
                 saved[i] = rider;
-                for (cur = ((struct Ride *)DAT_004c1198)->riders; cur != NULL; cur = cur->next) {
+                for (cur = ((struct Ride *)ActiveCopterRide)->riders; cur != NULL; cur = cur->next) {
                     if (cur == rider) {
                         break;
                     }
@@ -994,13 +994,13 @@ LEGO_EXPORT int Copters_Load(void) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_004c11b4 = (struct CopterNode *)node;
+            CopterNodeList = (struct CopterNode *)node;
         }
         prev = node;
 
         for (i = 6; i != 0; i--) {
             n = node->slots[6 - i].field_0;
-            chain = ((struct CopterChainRide *)DAT_004c1198)->chain;
+            chain = ((struct CopterChainRide *)ActiveCopterRide)->chain;
             if (n != 0) {
                 while (--n != 0) {
                     chain = chain->next;
@@ -1020,17 +1020,17 @@ LEGO_EXPORT int Copters_Load(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00405110
-void FUN_00405110(struct ClassNode *name, struct CallbackTable *interfaces) {
+void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces) {
     // STRING: LEGOLAND 0x004b43e4
     if (_stricmp("COPTERS", name->name) == 0) {
         interfaces->cb_a4 = FUN_00403d90;
-        interfaces->cb_8c = FUN_00404450;
-        interfaces->cb_98 = FUN_00404600;
-        interfaces->cb_9c = FUN_00404580;
-        interfaces->cb_a8 = FUN_00404be0;
+        interfaces->cb_8c = CoptersSetEditMode;
+        interfaces->cb_98 = CoptersAddObject;
+        interfaces->cb_9c = CoptersRemoveObject;
+        interfaces->cb_a8 = CoptersUpdate;
         interfaces->cb_a0 = FUN_00404490;
-        interfaces->cb_b0 = FUN_00404290;
-        interfaces->cb_ac = FUN_00404040;
+        interfaces->cb_b0 = CoptersRender;
+        interfaces->cb_ac = CoptersUnload;
         interfaces->cb_bc = Copters_Save;
         interfaces->cb_b8 = Copters_Load;
     }

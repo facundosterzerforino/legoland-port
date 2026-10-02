@@ -66,16 +66,16 @@ void FUN_004375d0(struct MapObject *obj) {
     DAT_0081cb30 = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74a4
-    DAT_0081cb08 = LoadSprite("G_Store Matte.LLS", 1);
+    GStoreMatteSprite = LoadSprite("G_Store Matte.LLS", 1);
     // STRING: LEGOLAND 0x004b7490
-    DAT_0081cb24 = LoadSprite("G_Store Matte2.LLS", 1);
+    GStoreMatte2Sprite = LoadSprite("G_Store Matte2.LLS", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00437610
 void FUN_00437610(void) {
-    KillSprite(DAT_0081cb08);
-    KillSprite(DAT_0081cb24);
+    KillSprite(GStoreMatteSprite);
+    KillSprite(GStoreMatte2Sprite);
     KillMoneySFX();
 }
 
@@ -121,7 +121,7 @@ void FUN_00437670(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb24, pos.x, pos.y, param_6, NULL);
+    PrintSprite(GStoreMatte2Sprite, pos.x, pos.y, param_6, NULL);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 0) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -167,7 +167,7 @@ void FUN_00437670(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb08, pos.x, pos.y, param_6, NULL);
+    PrintSprite(GStoreMatteSprite, pos.x, pos.y, param_6, NULL);
 }
 
 // FUNCTION: LEGOLAND 0x004378e0
@@ -314,13 +314,13 @@ void FUN_00437ba0(struct MapObject *obj) {
     DAT_0081cb14 = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74b8
-    DAT_0081cb38 = LoadSprite("Sherifshut Matte.LLS", 1);
+    SherifshutMatteSprite = LoadSprite("Sherifshut Matte.LLS", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00437bd0
 void FUN_00437bd0(void) {
-    KillSprite(DAT_0081cb38);
+    KillSprite(SherifshutMatteSprite);
     KillMoneySFX();
 }
 
@@ -348,7 +348,7 @@ void FUN_00437c30(struct MapObject *param_1, unsigned int param_2, unsigned int 
         } while (elem != NULL);
         if (count != 0) {
             coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
-            PrintSprite(DAT_0081cb38, coords.x, coords.y, param_6, NULL);
+            PrintSprite(SherifshutMatteSprite, coords.x, coords.y, param_6, NULL);
         }
     }
 }
@@ -543,7 +543,7 @@ void FUN_00438070(struct MapObject *obj) {
     DAT_0062fd40 = DAT_0081cb10->layer;
     DAT_0081cb10->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b74d0
-    DAT_0081cb0c = LoadSprite("JailCellMask.LLS", 1);
+    JailCellMaskSprite = LoadSprite("JailCellMask.LLS", 1);
     HideLayer(DAT_0062fd40, 1);
     StopLayerPlaying((unsigned int)DAT_0062fd40, 1);
     LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), 9);
@@ -551,7 +551,7 @@ void FUN_00438070(struct MapObject *obj) {
 
 // FUNCTION: LEGOLAND 0x004380f0
 void FUN_004380f0(void) {
-    KillSprite(DAT_0081cb0c);
+    KillSprite(JailCellMaskSprite);
     FUN_00438000();
 }
 
@@ -617,7 +617,7 @@ void FUN_00438150(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
         offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 0);
         AdjustOffsetForViewMode(&offset);
-        PrintSprite(DAT_0081cb0c, pos.x + offset.x, pos.y + offset.y, param_6, NULL);
+        PrintSprite(JailCellMaskSprite, pos.x + offset.x, pos.y + offset.y, param_6, NULL);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 0) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
@@ -842,13 +842,13 @@ void FUN_00438870(struct MapObject *obj) {
     DAT_0081cb2c = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74e4
-    DAT_0081cb34 = LoadSprite("Bank Matte.lls", 1);
+    BankMatteSprite = LoadSprite("Bank Matte.lls", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x004388a0
 void FUN_004388a0(void) {
-    KillSprite(DAT_0081cb34);
+    KillSprite(BankMatteSprite);
     KillMoneySFX();
 }
 
@@ -876,7 +876,7 @@ void FUN_00438900(struct MapObject *param_1, unsigned int param_2, unsigned int 
         } while (elem != NULL);
         if (count != 0) {
             coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
-            PrintSprite(DAT_0081cb34, coords.x, coords.y, param_6, NULL);
+            PrintSprite(BankMatteSprite, coords.x, coords.y, param_6, NULL);
         }
     }
 }
@@ -1000,16 +1000,16 @@ void FUN_00438c60(struct MapObject *obj) {
     DAT_0081cb1c = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7508
-    DAT_0081cb00 = LoadSprite("SaloonMatte1.LLS", 1);
+    SaloonMatte1Sprite = LoadSprite("SaloonMatte1.LLS", 1);
     // STRING: LEGOLAND 0x004b74f4
-    DAT_0081cb04 = LoadSprite("SaloonMatte2.LLS", 1);
+    SaloonMatte2Sprite = LoadSprite("SaloonMatte2.LLS", 1);
     LoadMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00438ca0
 void FUN_00438ca0(void) {
-    KillSprite(DAT_0081cb00);
-    KillSprite(DAT_0081cb04);
+    KillSprite(SaloonMatte1Sprite);
+    KillSprite(SaloonMatte2Sprite);
     KillMoneySFX();
 }
 
@@ -1055,7 +1055,7 @@ void FUN_00438d00(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb04, pos.x, pos.y, param_6, NULL);
+    PrintSprite(SaloonMatte2Sprite, pos.x, pos.y, param_6, NULL);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 2) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -1076,7 +1076,7 @@ void FUN_00438d00(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    PrintSprite(DAT_0081cb00, pos.x, pos.y, param_6, NULL);
+    PrintSprite(SaloonMatte1Sprite, pos.x, pos.y, param_6, NULL);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 0) {
             IP_RenderBlokeIn3DNow(blokes[i]);

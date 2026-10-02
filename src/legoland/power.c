@@ -8,21 +8,21 @@
 #include "sound_music.h"
 
 // FUNCTION: LEGOLAND 0x00452990
-void FUN_00452990(void) {
+void LoadFountainSFX(void) {
     unsigned int counter;
 
-    counter = DAT_00667114;
-    DAT_00667114++;
+    counter = FountainSFXRefCount;
+    FountainSFXRefCount++;
     if (counter == 0) {
-        Load_FXList(DAT_004b8710, 5);
+        Load_FXList(FountainSFX, 5);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004529c0
-void FUN_004529c0(void) {
-    DAT_00667114--;
-    if (DAT_00667114 == 0) {
-        Kill_FXList(DAT_004b8710, 5);
+void KillFountainSFX(void) {
+    FountainSFXRefCount--;
+    if (FountainSFXRefCount == 0) {
+        Kill_FXList(FountainSFX, 5);
     }
 }
 
@@ -33,7 +33,7 @@ void FUN_004529e0(unsigned int param_1, int *param_2) {
     params.field_8 = param_2[0];
     params.field_0 = 2;
     params.field_c = param_2[1];
-    PlayInstanceOfSample(*(void **)&DAT_004b8710[8], 1, 1, &params);
+    PlayInstanceOfSample(*(void **)&FountainSFX[8], 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452a30
@@ -48,21 +48,21 @@ LEGO_EXPORT void RemoveSoundObject(unsigned int a, unsigned int b, unsigned int 
 }
 
 // FUNCTION: LEGOLAND 0x00452a80
-void FUN_00452a80(void) {
+void LoadPowerStationSFX(void) {
     unsigned int counter;
 
-    counter = DAT_00667118;
-    DAT_00667118++;
+    counter = PowerStationSFXRefCount;
+    PowerStationSFXRefCount++;
     if (counter == 0) {
-        Load_FXList(DAT_004b8750, 2);
+        Load_FXList(PowerStationSFX, 2);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00452ab0
-void FUN_00452ab0(void) {
-    DAT_00667118--;
-    if (DAT_00667118 == 0) {
-        Kill_FXList(DAT_004b8750, 2);
+void KillPowerStationSFX(void) {
+    PowerStationSFXRefCount--;
+    if (PowerStationSFXRefCount == 0) {
+        Kill_FXList(PowerStationSFX, 2);
     }
 }
 
@@ -73,7 +73,7 @@ void FUN_00452ad0(unsigned int param_1, int *param_2) {
     params.field_8 = param_2[0];
     params.field_0 = 2;
     params.field_c = param_2[1];
-    PlayInstanceOfSample(*(void **)&DAT_004b8750[0x14], 1, 1, &params);
+    PlayInstanceOfSample(*(void **)&PowerStationSFX[0x14], 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452b20
@@ -83,24 +83,24 @@ void FUN_00452b20(unsigned int param_1, int *param_2) {
     params.field_8 = param_2[0];
     params.field_0 = 2;
     params.field_c = param_2[1];
-    PlayInstanceOfSample(*(void **)&DAT_004b8750[8], 1, 1, &params);
+    PlayInstanceOfSample(*(void **)&PowerStationSFX[8], 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452b70
-void FUN_00452b70(void) {
+void LoadDinoSFX(void) {
     unsigned int counter;
 
-    counter = DAT_0066711c;
-    DAT_0066711c++;
+    counter = DinoSFXRefCount;
+    DinoSFXRefCount++;
     if (counter == 0) {
         Load_FXList(DINO_SFX, 5);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00452ba0
-void FUN_00452ba0(void) {
-    DAT_0066711c--;
-    if (DAT_0066711c == 0) {
+void KillDinoSFX(void) {
+    DinoSFXRefCount--;
+    if (DinoSFXRefCount == 0) {
         Kill_FXList(DINO_SFX, 5);
     }
 }

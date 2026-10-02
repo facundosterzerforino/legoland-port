@@ -157,7 +157,7 @@ void FUN_0043be70(Element *obj, void *param_2, void *param_3, TileId *tile) {
         }
         off2 = GetRenderOffsetForLayer(DAT_0062fde0, 1);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(DAT_0062fdd0, screen.x + off2.x, screen.y + off2.y, 0, 0);
+        PrintSprite(SpinningBarrelsEntranceMatteSprite, screen.x + off2.x, screen.y + off2.y, 0, 0);
         LLSSetFrame(GetLLSForLayer(DAT_0062fde0, 2), state->field_20);
         off2 = GetRenderOffsetForLayer(DAT_0062fde0, 2);
         AdjustOffsetForViewMode(&off2);
@@ -174,7 +174,7 @@ void FUN_0043be70(Element *obj, void *param_2, void *param_3, TileId *tile) {
         }
         off2 = GetRenderOffsetForLayer(DAT_0062fde0, 1);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(DAT_0062fdcc, screen.x + off2.x, screen.y + off2.y, 0, 0);
+        PrintSprite(SpinningBarrelsEntranceMatte2Sprite, screen.x + off2.x, screen.y + off2.y, 0, 0);
     } else {
         LLSSetFrame(GetLLSForLayer(DAT_0062fde0, 3), state->field_8);
         off = GetRenderOffsetForLayer(DAT_0062fde0, 3);
@@ -217,13 +217,13 @@ void FUN_0043c340(struct Element *elem) {
     DAT_0062fde0 = DAT_0062fde4->layer;
     DAT_0062fde0->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b7960
-    DAT_0062fe04 = DAT_0062fe00[0] = LoadSprite("z_SpinningBarrels.lls", 1);
+    ZSpinningBarrelsSprite = DAT_0062fe00[0] = LoadSprite("z_SpinningBarrels.lls", 1);
     // STRING: LEGOLAND 0x004b7944
-    DAT_0062fdfc = DAT_0062fdf0[0] = LoadBinV("Zbuffers\\BoxBlokesOn1.bnv");
+    BoxBlokesOn1BNV = DAT_0062fdf0[0] = LoadBinV("Zbuffers\\BoxBlokesOn1.bnv");
     // STRING: LEGOLAND 0x004b7924
-    DAT_0062fde8 = DAT_0062fdf0[1] = LoadBinV("Zbuffers\\SpinningBarrels.bnv");
+    SpinningBarrelsBNV = DAT_0062fdf0[1] = LoadBinV("Zbuffers\\SpinningBarrels.bnv");
     // STRING: LEGOLAND 0x004b7908
-    DAT_0062fdc8 = DAT_0062fdf0[2] = LoadBinV("Zbuffers\\BoxBlokesOff.bnv");
+    BoxBlokesOffBNV = DAT_0062fdf0[2] = LoadBinV("Zbuffers\\BoxBlokesOff.bnv");
     HideLayer(DAT_0062fde0, 3);
     StopLayerPlaying(DAT_0062fde0, 3);
     LLSSetFrame(GetLLSForLayer(DAT_0062fde0, 3), 0);
@@ -234,9 +234,9 @@ void FUN_0043c340(struct Element *elem) {
     DAT_0062fdd8.x = layer.x - 103;
     DAT_0062fdd8.y = layer.y - 55;
     // STRING: LEGOLAND 0x004b78e4
-    DAT_0062fdd0 = LoadSprite("SpinningBarrelsEntranceMatte.lls", 1);
+    SpinningBarrelsEntranceMatteSprite = LoadSprite("SpinningBarrelsEntranceMatte.lls", 1);
     // STRING: LEGOLAND 0x004b78c0
-    DAT_0062fdcc = LoadSprite("SpinningBarrelsEntranceMatte2.lls", 1);
+    SpinningBarrelsEntranceMatte2Sprite = LoadSprite("SpinningBarrelsEntranceMatte2.lls", 1);
 }
 
 // FUNCTION: LEGOLAND 0x0043c490
@@ -289,17 +289,17 @@ unsigned int *FUN_0043c570(struct BarrelRoot *ride, unsigned short param2) {
 
 // FUNCTION: LEGOLAND 0x0043c5b0
 void FUN_0043c5b0(void) {
-    KillSprite(DAT_0062fdd0);
-    KillSprite(DAT_0062fdcc);
-    KillSprite(DAT_0062fe04);
-    if (DAT_0062fde8 != NULL) {
-        FreeBinV(DAT_0062fde8);
+    KillSprite(SpinningBarrelsEntranceMatteSprite);
+    KillSprite(SpinningBarrelsEntranceMatte2Sprite);
+    KillSprite(ZSpinningBarrelsSprite);
+    if (SpinningBarrelsBNV != NULL) {
+        FreeBinV(SpinningBarrelsBNV);
     }
-    if (DAT_0062fdfc != NULL) {
-        FreeBinV(DAT_0062fdfc);
+    if (BoxBlokesOn1BNV != NULL) {
+        FreeBinV(BoxBlokesOn1BNV);
     }
-    if (DAT_0062fdc8 != NULL) {
-        FreeBinV(DAT_0062fdc8);
+    if (BoxBlokesOffBNV != NULL) {
+        FreeBinV(BoxBlokesOffBNV);
     }
     FUN_0043c4d0();
 }
@@ -411,7 +411,7 @@ LEGO_EXPORT int LoadSBarrel(struct BarrelLoadArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c760
-void FUN_0043c760(struct ClassNode *str, struct CallbackTable *ride) {
+void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct CallbackTable *ride) {
     // STRING: LEGOLAND 0x004b7978
     if (_stricmp("SPINNING BARRELS RIDE", str->name) == 0) {
         ride->cb_a4 = FUN_0043c340;
@@ -473,7 +473,7 @@ void FUN_0043c7f0(struct BarrelNode *node) {
     for (; r != NULL; r = r->next) {
         if (node->field_4 == r->tile.id && r->rider->field_35 == 1) {
             sprintf(&DAT_004b78b4[8], "%02d", r->rider->field_36);
-            SetBlokePositionFromBNV(DAT_0062fde8, r->rider, DAT_004b78b4, node->field_8, -1617922.25f, -1618065.75f, 0);
+            SetBlokePositionFromBNV(SpinningBarrelsBNV, r->rider, DAT_004b78b4, node->field_8, -1617922.25f, -1618065.75f, 0);
         }
     }
     *(short *)*((struct Sprite *)DAT_0062fe00[0])->lls = (short)node->field_8;
@@ -542,7 +542,7 @@ void FUN_0043c950(struct Element *elem) {
                 iv13 >>= 9;
                 coords[0] = ((((unsigned int)lpConfig->field_20 - Get_XScroll()) + iv12) - DAT_0062fdd8.x / 2 - sc.x) * 2;
                 coords[1] = ((iv13 + ((unsigned int)lpConfig->field_22 - Get_YScroll())) - DAT_0062fdd8.y / 2 - sc.y) * 2;
-                bloke->person->sprite = DAT_0062fe04;
+                bloke->person->sprite = ZSpinningBarrelsSprite;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617922.25f, -1618065.75f);
                 bloke->field_35 = 0;
@@ -573,7 +573,7 @@ void FUN_0043c950(struct Element *elem) {
                 coords2[1] = bloke->screen_y * 2;
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                bloke->person->sprite = DAT_0062fe04;
+                bloke->person->sprite = ZSpinningBarrelsSprite;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617922.25f, -1618065.75f);
                 bloke->field_35 = 2;

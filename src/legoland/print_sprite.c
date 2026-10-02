@@ -278,14 +278,14 @@ LEGO_EXPORT unsigned int PrintScaledSprite(struct Sprite *sprite, int param_2, i
 
 // FUNCTION: LEGOLAND 0x004859b0
 LEGO_EXPORT void ClearPrintList(void) {
-    struct SortNode *node = DAT_0066b5a4;
+    struct SortNode *node = PrintListHead;
 
     while (node != NULL) {
         node = node->right;
     }
 
-    DAT_0066b5a8 = 0;
-    DAT_0066b5a4 = NULL;
+    PrintListBytesUsed = 0;
+    PrintListHead = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004859d0
@@ -297,7 +297,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
     void *obj;
     RECT saved_clip;
 
-    node = DAT_0066b5a4;
+    node = PrintListHead;
     saved_pal = GetOverridePalette();
     saved_frame = GetOverrideFrame();
     DAT_0066b5ac = 0;
@@ -342,14 +342,14 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
             }
         }
     }
-    DAT_0066b5a8 = 0;
-    DAT_0066b5a4 = NULL;
+    PrintListBytesUsed = 0;
+    PrintListHead = NULL;
     SetOverridePalette(saved_pal);
     SetOverrideFrame(saved_frame);
 }
 
 // FUNCTION: LEGOLAND 0x00485bd0
-void FUN_00485bd0(struct SortNode *node) {
+void InsertSortNode(struct SortNode *node) {
     struct SortNode *l;
 
     if (DAT_007fd600 == NULL) {
@@ -360,10 +360,10 @@ void FUN_00485bd0(struct SortNode *node) {
         // STRING: LEGOLAND 0x004bdd14
         DBPrintf("Oh no, Not enough RAM for sprite sort list\n");
     }
-    if (DAT_0066b5a4 == NULL) {
+    if (PrintListHead == NULL) {
         node->left = NULL;
         node->right = NULL;
-        DAT_0066b5a4 = node;
+        PrintListHead = node;
     } else {
         if (node->key < DAT_007fd600->key) {
             while (node->key < DAT_007fd600->key && DAT_007fd600->left != NULL) {
@@ -378,7 +378,7 @@ void FUN_00485bd0(struct SortNode *node) {
             l = DAT_007fd600->left;
             node->left = l;
             if (l == NULL) {
-                DAT_0066b5a4 = node;
+                PrintListHead = node;
             } else {
                 l->right = node;
             }
@@ -402,11 +402,11 @@ void FUN_00485bd0(struct SortNode *node) {
 
 // FUNCTION: LEGOLAND 0x00485cd0
 LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, unsigned int y, int key, unsigned int param_5, unsigned int param_6, unsigned int param_7, struct HitInfo *hit) {
-    unsigned int original = DAT_0066b5a8;
+    unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    DAT_0066b5a8 += 0x3c;
-    node = (struct SortNode *)&DAT_007cb600[original];
+    PrintListBytesUsed += 0x3c;
+    node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->x = x;
@@ -419,20 +419,20 @@ LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, u
     node->field_30 = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
-        FUN_00485bd0(node);
+        InsertSortNode(node);
         return;
     }
     node->hit.field_0 = 0x100;
-    FUN_00485bd0(node);
+    InsertSortNode(node);
 }
 
 // FUNCTION: LEGOLAND 0x00485d70
 LEGO_EXPORT void SortSprite(struct Sprite *sprite, unsigned int x, unsigned int y, int key, unsigned int param_5, struct HitInfo *hit) {
-    unsigned int original = DAT_0066b5a8;
+    unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    DAT_0066b5a8 += 0x3c;
-    node = (struct SortNode *)&DAT_007cb600[original];
+    PrintListBytesUsed += 0x3c;
+    node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->flags = 0;
@@ -443,33 +443,33 @@ LEGO_EXPORT void SortSprite(struct Sprite *sprite, unsigned int x, unsigned int 
     node->field_30 = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
-        FUN_00485bd0(node);
+        InsertSortNode(node);
         return;
     }
     node->hit.field_0 = 0x100;
-    FUN_00485bd0(node);
+    InsertSortNode(node);
 }
 
 // FUNCTION: LEGOLAND 0x00485e00
 LEGO_EXPORT void SortPerson(struct Person *person, unsigned int param_2, void *param_3) {
-    unsigned int original = DAT_0066b5a8;
+    unsigned int original = PrintListBytesUsed;
     struct SortNode *block;
 
-    DAT_0066b5a8 += 0x20;
-    block = (struct SortNode *)&DAT_007cb600[original];
+    PrintListBytesUsed += 0x20;
+    block = (struct SortNode *)&PrintListPool[original];
     block->key = param_2;
     block->flags = 0x2000;
     block->sprite = (struct Sprite *)person;
-    FUN_00485bd0(block);
+    InsertSortNode(block);
 }
 
 // FUNCTION: LEGOLAND 0x00485e40
 LEGO_EXPORT void SortClippedSprite(struct Sprite *sprite, unsigned int x, unsigned int y, int key, RECT *clip, unsigned int param_6, struct HitInfo *hit) {
-    unsigned int original = DAT_0066b5a8;
+    unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    DAT_0066b5a8 += 0x4c;
-    node = (struct SortNode *)&DAT_007cb600[original];
+    PrintListBytesUsed += 0x4c;
+    node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->x = x;
@@ -481,11 +481,11 @@ LEGO_EXPORT void SortClippedSprite(struct Sprite *sprite, unsigned int x, unsign
     node->field_40 = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
-        FUN_00485bd0(node);
+        InsertSortNode(node);
         return;
     }
     node->hit.field_0 = 0x100;
-    FUN_00485bd0(node);
+    InsertSortNode(node);
 }
 
 // FUNCTION: LEGOLAND 0x00485ef0
@@ -494,7 +494,7 @@ LEGO_EXPORT void ResetHitInfo(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00485f00
-void FUN_00485f00(struct Sprite *param_1, unsigned int param_2, unsigned int param_3) {
+void PrintSpriteSimple(struct Sprite *param_1, unsigned int param_2, unsigned int param_3) {
     PrintSprite(param_1, param_2, param_3, 0, 0);
 }
 

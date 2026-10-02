@@ -22,6 +22,6 @@ void FUN_00405940(Element *obj, TileId tile, unsigned int param_3);
 struct RideSpriteInfo *FUN_00405ad0(struct DSCarLayer *arg1, unsigned short arg2);
 void FUN_00405b10(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip);
 void FUN_00405bd0(Element *obj);
-int FUN_00405e70(void);
+int DrivingSchool_Save(void);
 int FUN_00406050(void);
-int FUN_00406070(void);
+int DrivingSchool_Load(void);

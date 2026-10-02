@@ -44,14 +44,14 @@ LEGO_EXPORT struct MidiFile *LoadMIDIFile(const char *filename) {
     midi = (struct MidiFile *)malloc(0x18);
     file = RES_OpenFile(filename);
     RES_ReadFile(file, &header, 4);
-    FUN_00480150(file, &chunkSize);
-    FUN_00480170(file, &formatType);
-    FUN_00480170(file, &midi->trackCount);
-    FUN_00480170(file, &division);
+    ReadBigEndianU32(file, &chunkSize);
+    ReadBigEndianU16(file, &formatType);
+    ReadBigEndianU16(file, &midi->trackCount);
+    ReadBigEndianU16(file, &division);
     midi->field_0 = division * 5 * 5 * 5 * 5 * 32;
     midi->trackArray = (void **)malloc(midi->trackCount * 4);
     for (i = 0; i < midi->trackCount; ++i) {
-        midi->trackArray[i] = FUN_004801a0(file);
+        midi->trackArray[i] = ReadMidiTrack(file);
         ((struct MidiTrack *)midi->trackArray[i])->parent = midi;
     }
     midi->field_4 = 0x100;
@@ -60,7 +60,7 @@ LEGO_EXPORT struct MidiFile *LoadMIDIFile(const char *filename) {
 }
 
 // FUNCTION: LEGOLAND 0x004802c0
-int FUN_004802c0(struct MidiTrack *track) {
+int ReadMidiVarLen(struct MidiTrack *track) {
     unsigned int value;
     unsigned int b;
 
@@ -76,7 +76,7 @@ int FUN_004802c0(struct MidiTrack *track) {
 }
 
 // FUNCTION: LEGOLAND 0x004802f0
-unsigned int FUN_004802f0(struct MidiTrack *track) {
+unsigned int ReadMidiEventStatus(struct MidiTrack *track) {
     unsigned int b;
 
     b = track->data[track->pos];
@@ -104,14 +104,14 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
     }
     for (;;) {
         if (track->field_1a != 0) {
-            track->field_14 += FUN_004802c0(track);
+            track->field_14 += ReadMidiVarLen(track);
             track->field_1a = 0;
         }
         if ((unsigned int)track->parent->field_8 >> 8 < (unsigned int)track->field_14) {
             return 1;
         }
         track->field_1a = 1;
-        ev = FUN_004802f0(track);
+        ev = ReadMidiEventStatus(track);
         switch (ev) {
         case 0xff2f:
             track->field_18 = 0;
@@ -143,7 +143,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
                 track->pos++;
                 ev |= track->data[track->pos] << 16;
                 track->pos++;
-                midiOutShortMsg((HMIDIOUT)DAT_007fd638, ev);
+                midiOutShortMsg((HMIDIOUT)MidiOutHandle, ev);
                 break;
             case 0xa0:
                 track->pos += 2;
@@ -151,7 +151,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
             case 0xc0:
                 ev |= track->data[track->pos] << 8;
                 track->pos++;
-                midiOutShortMsg((HMIDIOUT)DAT_007fd638, ev);
+                midiOutShortMsg((HMIDIOUT)MidiOutHandle, ev);
                 break;
             case 0xd0:
                 track->pos++;
@@ -171,8 +171,8 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
 }
 
 // FUNCTION: LEGOLAND 0x00480570
-void __stdcall FUN_00480570(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4, unsigned int p5) {
-    struct MidiFile *midi = (struct MidiFile *)DAT_007fd634;
+void __stdcall MidiTimerCallback(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4, unsigned int p5) {
+    struct MidiFile *midi = (struct MidiFile *)CurrentMidiFile;
     unsigned int busy = 0;
     int i;
 
@@ -191,7 +191,7 @@ void __stdcall FUN_00480570(unsigned int p1, unsigned int p2, unsigned int p3, u
 LEGO_EXPORT void PlayMIDI(struct MidiFile *midi) {
     int i;
 
-    DAT_007fd634 = midi;
+    CurrentMidiFile = midi;
     midi->field_8 = 0;
     midi->field_14 = 1;
     for (i = 0; i < midi->trackCount;) {
@@ -205,15 +205,15 @@ LEGO_EXPORT void PlayMIDI(struct MidiFile *midi) {
 
 // FUNCTION: LEGOLAND 0x00480630
 LEGO_EXPORT int InitMIDIManager(void) {
-    DAT_007fd634 = 0;
-    DAT_007fd630 = timeSetEvent(0x14, 0xa, (LPTIMECALLBACK)FUN_00480570, 0, 1);
-    midiOutOpen((LPHMIDIOUT)&DAT_007fd638, (UINT)-1, 0, 0, 0);
+    CurrentMidiFile = 0;
+    MidiTimerId = timeSetEvent(0x14, 0xa, (LPTIMECALLBACK)MidiTimerCallback, 0, 1);
+    midiOutOpen((LPHMIDIOUT)&MidiOutHandle, (UINT)-1, 0, 0, 0);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00480670
 LEGO_EXPORT void KillMIDIManager(void) {
-    DAT_007fd634 = 0;
-    timeKillEvent(DAT_007fd630);
-    midiOutClose((HMIDIOUT)DAT_007fd638);
+    CurrentMidiFile = 0;
+    timeKillEvent(MidiTimerId);
+    midiOutClose((HMIDIOUT)MidiOutHandle);
 }

@@ -11,7 +11,7 @@ struct Queue {
 
 unsigned int FUN_004123a0(struct QueueNode *start, struct QueueNode *stop);
 void FUN_004123c0(struct QueueNode *start, struct Queue *queue);
-struct QueueNode *FUN_00412470(struct QueueNode *node, int n);
+struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n);
 void FUN_00412490(struct QueueNode *start, struct Queue *queue);
 
 struct PathPair {
@@ -40,14 +40,14 @@ struct RideQueueEntry {
 };
 
 unsigned int FUN_00411e60(struct Queue *queue);
-unsigned int FUN_00411e90(struct Queue *queue);
+unsigned int QueueHasNodes(struct Queue *queue);
 int FUN_00411ea0(struct Queue *queue);
-void FUN_00411ed0(struct Queue *queue);
-void FUN_00411f00(struct Queue *queue);
+void FreeAllQueueNodes(struct Queue *queue);
+void QueueUnlinkHead(struct Queue *queue);
 struct QueueItemMid;
 void FUN_00412060(struct Queue *queue, struct QueueItemMid **out);
 void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_3);
-void FUN_00412290(void *param_1);
+void FreeIfNotNull(void *param_1);
 struct RideSlotArg;
 struct RideSlot;
 struct QueueTable;
