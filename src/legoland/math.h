@@ -33,10 +33,10 @@ struct Navigator {
 typedef struct Navigator Navigator;
 
 struct RectNode {
-    /* 0x00 */ int field_0;
-    /* 0x04 */ int field_4;
-    /* 0x08 */ int field_8;
-    /* 0x0c */ int field_c;
+    /* 0x00 */ int x0;
+    /* 0x04 */ int y0;
+    /* 0x08 */ int x1;
+    /* 0x0c */ int y1;
     /* 0x10 */ struct RectNode *next;
 };
 

@@ -39,6 +39,15 @@ describe how `main` works.
 - `./tools/verify` still works and is useful to see which functions a change touched, but a lower score is not
   a failure in this repo.
 - See `README.md` for status and `PORTING.md` for the order of work.
+- **Merging the decomp** (it renames functions, globals and struct fields all the time):
+  1. `git -C ~/legoland log port..main` to see what's new; pick the commit to merge (`NEW`).
+  2. In `~/legoland`: `python3 ~/wt/port/tools/decomp_renames.py <last merged decomp commit> NEW /tmp/ren.json`.
+  3. In `~/wt/port`: `python3 tools/resolve_rename_conflicts.py /tmp/ren.json --apply-only`, commit, then
+     `git merge NEW`. For conflicts: `git checkout --conflict=diff3 -- <file>` for each conflicted file, then
+     `python3 tools/resolve_rename_conflicts.py /tmp/ren.json` takes the decomp's side wherever the port only
+     renamed; anything left is a real port change to resolve by hand.
+  4. Fix what port-only code still calls by an old struct-field name (the build says where), regenerate
+     `python3 tools/gen_data.py`, build both presets, run `legoland.exe -port-selftest`.
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
   `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
 - **Publishing:** the local `port` branch is pushed to `main` of the `legoland-port` repo with `~/push-port.sh`

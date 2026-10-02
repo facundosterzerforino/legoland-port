@@ -36,9 +36,9 @@ struct ClipNode {
 // FUNCTION: LEGOLAND 0x0048a5c0
 LEGO_EXPORT void SetClipping(RECT *rect) {
     SPRITE_ClipRect.top = rect->top < 0 ? 0 : rect->top;
-    SPRITE_ClipRect.bottom = rect->bottom > (int)lpConfig->field_2 ? lpConfig->field_2 : rect->bottom;
+    SPRITE_ClipRect.bottom = rect->bottom > (int)lpConfig->screen_height ? lpConfig->screen_height : rect->bottom;
     SPRITE_ClipRect.left = rect->left < 0 ? 0 : rect->left;
-    SPRITE_ClipRect.right = rect->right > (int)lpConfig->field_0 ? lpConfig->field_0 : rect->right;
+    SPRITE_ClipRect.right = rect->right > (int)lpConfig->screen_width ? lpConfig->screen_width : rect->right;
 }
 
 // FUNCTION: LEGOLAND 0x0048a630

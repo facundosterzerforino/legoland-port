@@ -51,10 +51,10 @@ int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct
     }
     for (; node != NULL; node = node->next) {
         if (node->tile.id == tile.id) {
-            if (node->field_4 == score->start.pos.x && node->field_8 == score->start.pos.y) {
+            if (node->cur_x == score->start.pos.x && node->cur_y == score->start.pos.y) {
                 return 0;
             }
-            if (node->field_c == score->start.pos.x && node->field_10 == score->start.pos.y) {
+            if (node->next_x == score->start.pos.x && node->next_y == score->start.pos.y) {
                 return 0;
             }
             if (node->field_3e0 == 1) {
@@ -68,10 +68,10 @@ int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct
     }
     fresh->next = DAT_00616164;
     fresh->tile.id = tile.id;
-    fresh->field_4 = tile.pos.x;
-    fresh->field_8 = tile.pos.y + 5;
-    fresh->field_c = tile.pos.x;
-    fresh->field_10 = tile.pos.y + 5;
+    fresh->cur_x = tile.pos.x;
+    fresh->cur_y = tile.pos.y + 5;
+    fresh->next_x = tile.pos.x;
+    fresh->next_y = tile.pos.y + 5;
     fresh->field_3dc = 1;
     fresh->field_3e0 = 1;
     fresh->field_3e4 = (rand() & 0xf) + 4;
@@ -130,24 +130,24 @@ void FUN_00432d00(int param_1) {
     GetTileDimensions(&tw, &th);
     while (ride != NULL) {
         if (param_1 != 0 ? (ride->field_3e0 == 1 || ride->field_3e0 == 0x10 ||
-                               (ride->field_4 == ride->tile.pos.x && (int)ride->field_8 >= ride->tile.pos.y + 5))
+                               (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))
                          : !(ride->field_3e0 == 1 || ride->field_3e0 == 0x10 ||
-                               (ride->field_4 == ride->tile.pos.x && (int)ride->field_8 >= ride->tile.pos.y + 5))) {
+                               (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))) {
             b = ride->field_1c[DAT_00629c54 * 2 + 1];
             a = ride->field_1c[DAT_00629c54 * 2];
             GetTileDimensions(&tw2, &th2);
             dx = (a - b) * tw2 >> 9;
             dy = (a + b) * th2 >> 9;
-            baseX = ((int)ride->field_4 - (int)ride->field_8) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
-            baseY = ((int)ride->field_4 + (int)ride->field_8) * (th >> 1) - (ScrollY >> 8);
+            baseX = ((int)ride->cur_x - (int)ride->cur_y) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
+            baseY = ((int)ride->cur_x + (int)ride->cur_y) * (th >> 1) - (ScrollY >> 8);
             off.x = JungleCruiseBoats->offset_x[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
             off.y = JungleCruiseBoats->offset_y[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
-            ride->field_14 = lpConfig->field_20 + dx + off.x + baseX;
-            ride->field_18 = lpConfig->field_22 + dy + off.y + baseY;
-            PrintSprite(JungleCruiseBoats->sprites[ride->field_29c[DAT_00629c54] & 0xff], ride->field_14, ride->field_18, 0, 0);
-            off.x = lpConfig->field_20 + dx + baseX;
-            off.y = lpConfig->field_22 + dy + baseY;
+            ride->screen_x = lpConfig->view_x + dx + off.x + baseX;
+            ride->screen_y = lpConfig->view_y + dy + off.y + baseY;
+            PrintSprite(JungleCruiseBoats->sprites[ride->field_29c[DAT_00629c54] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
+            off.x = lpConfig->view_x + dx + baseX;
+            off.y = lpConfig->view_y + dy + baseY;
             AdjustBlokePosition((struct Point *)&off);
             if ((int)ride->field_29c[DAT_00629c54] >= 4 && (int)ride->field_29c[DAT_00629c54] < 12) {
                 for (row = 0; row < 3; row++) {
@@ -187,7 +187,7 @@ void FUN_00432d00(int param_1) {
                     }
                     if (row == 0 || row == 2) {
                         sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x10 : ride->field_29c[DAT_00629c54] + 0x20) & 0xff];
-                        PrintSprite(sprite, ride->field_14, ride->field_18, 0, 0);
+                        PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
             } else {
@@ -228,7 +228,7 @@ void FUN_00432d00(int param_1) {
                     }
                     if (row == 0 || row == 1) {
                         sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x20 : ride->field_29c[DAT_00629c54] + 0x10) & 0xff];
-                        PrintSprite(sprite, ride->field_14, ride->field_18, 0, 0);
+                        PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
             }
@@ -273,8 +273,8 @@ void FUN_004332f0(void) {
     struct JungleRide *cur;
 
     while (node != NULL) {
-        node->field_4 = node->field_c;
-        node->field_8 = node->field_10;
+        node->cur_x = node->next_x;
+        node->cur_y = node->next_y;
         if (node->field_3e0 == 0x10) {
             cur = node;
             node = FUN_004333e0(node);
@@ -308,7 +308,7 @@ void FUN_004332f0(void) {
 void FUN_004333b0(struct JungleRide *param_1) {
     FUN_00433840(param_1, param_1->field_3dc, 4);
     param_1->field_3e0 = 4;
-    param_1->field_10 = param_1->field_8 + 5;
+    param_1->next_y = param_1->cur_y + 5;
 }
 
 // FUNCTION: LEGOLAND 0x004333e0
@@ -344,7 +344,7 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         } while (i != 0);
     }
     if (param_1->field_3e4 != 3) {
-        param_1->field_10 = param_1->field_8 + 5;
+        param_1->next_y = param_1->cur_y + 5;
     }
     if (param_1->field_3e4 == 1) {
         p = &param_1->field_1c[0x9e];
@@ -374,13 +374,13 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     int step;
     int dir;
 
-    path = FUN_004371b0(ride->field_4, ride->field_8);
+    path = FUN_004371b0(ride->cur_x, ride->cur_y);
     for (; score != NULL; score = score->next) {
         if (path->owner.id == score->tile.id) {
             break;
         }
     }
-    mask = path->field_4;
+    mask = path->dir_mask;
     if (path->tile.id == score->start.id) {
         mask &= ~1;
     } else if (path->tile.id == score->end.id) {
@@ -388,29 +388,29 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         ride->field_3e4 = 3;
         FUN_00433840(ride, ride->field_3dc, 4);
         ride->field_3dc = 1;
-        ride->field_10 = ride->field_8 + 5;
+        ride->next_y = ride->cur_y + 5;
         return;
     }
     for (; other != NULL; other = other->next) {
         if (other == ride) {
             continue;
         }
-        if ((ride->field_4 == other->field_4 && ride->field_8 - 5 == other->field_8) || (ride->field_4 == other->field_c && ride->field_8 - 5 == other->field_10)) {
+        if ((ride->cur_x == other->cur_x && ride->cur_y - 5 == other->cur_y) || (ride->cur_x == other->next_x && ride->cur_y - 5 == other->next_y)) {
             mask &= ~1;
         }
-        if ((ride->field_4 + 5 == other->field_4 && ride->field_8 == other->field_8) || (ride->field_4 + 5 == other->field_c && ride->field_8 == other->field_10)) {
+        if ((ride->cur_x + 5 == other->cur_x && ride->cur_y == other->cur_y) || (ride->cur_x + 5 == other->next_x && ride->cur_y == other->next_y)) {
             mask &= ~2;
         }
-        if ((ride->field_4 == other->field_4 && ride->field_8 + 5 == other->field_8) || (ride->field_4 == other->field_c && ride->field_8 + 5 == other->field_10)) {
+        if ((ride->cur_x == other->cur_x && ride->cur_y + 5 == other->cur_y) || (ride->cur_x == other->next_x && ride->cur_y + 5 == other->next_y)) {
             mask &= ~4;
         }
-        if ((ride->field_4 - 5 == other->field_4 && ride->field_8 == other->field_8) || (ride->field_4 - 5 == other->field_c && ride->field_8 == other->field_10)) {
+        if ((ride->cur_x - 5 == other->cur_x && ride->cur_y == other->cur_y) || (ride->cur_x - 5 == other->next_x && ride->cur_y == other->next_y)) {
             mask &= ~8;
         }
     }
-    if (param_2 != 0 && path->field_18 != NULL) {
-        d.x = path->field_18->tile.pos.x - path->tile.pos.x;
-        d.y = path->field_18->tile.pos.y - path->tile.pos.y;
+    if (param_2 != 0 && path->parent != NULL) {
+        d.x = path->parent->tile.pos.x - path->tile.pos.x;
+        d.y = path->parent->tile.pos.y - path->tile.pos.y;
         if (d.y != 0) {
             if (d.x < 0) {
                 mask &= ~8;
@@ -459,26 +459,26 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     }
     switch (dir) {
     case 1:
-        ride->field_c = ride->field_4;
-        ride->field_10 = ride->field_8 - 5;
+        ride->next_x = ride->cur_x;
+        ride->next_y = ride->cur_y - 5;
         FUN_00433840(ride, ride->field_3dc, dir);
         ride->field_3dc = 4;
         break;
     case 2:
-        ride->field_c = ride->field_4 + 5;
-        ride->field_10 = ride->field_8;
+        ride->next_x = ride->cur_x + 5;
+        ride->next_y = ride->cur_y;
         FUN_00433840(ride, ride->field_3dc, dir);
         ride->field_3dc = 8;
         break;
     case 4:
-        ride->field_c = ride->field_4;
-        ride->field_10 = ride->field_8 + 5;
+        ride->next_x = ride->cur_x;
+        ride->next_y = ride->cur_y + 5;
         FUN_00433840(ride, ride->field_3dc, dir);
         ride->field_3dc = 1;
         break;
     case 8:
-        ride->field_c = ride->field_4 - 5;
-        ride->field_10 = ride->field_8;
+        ride->next_x = ride->cur_x - 5;
+        ride->next_y = ride->cur_y;
         FUN_00433840(ride, ride->field_3dc, dir);
         ride->field_3dc = 2;
         break;
@@ -678,8 +678,8 @@ void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
     n = 0;
     ride = obj->ride;
     memcpy(EditCursor.field_1414, &ride->footprint, 20);
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
-    mask = FUN_00436fb0(EditCursor.field_1404, EditCursor.field_1408, &owner);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
+    mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
         FUN_0045f480(&EditCursor, 0xe);
@@ -701,30 +701,30 @@ void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
     FUN_0045f460(&DAT_00622320[1]);
     FUN_0045f460(&DAT_00622320[2]);
     FUN_0045f460(&DAT_00622320[3]);
-    x = EditCursor.field_1404;
-    y = EditCursor.field_1408;
+    x = EditCursor.tile_x;
+    y = EditCursor.tile_y;
     DAT_00622320[0].field_1828 = 0x2034;
     DAT_00622320[1].field_1828 = 0x2034;
     DAT_00622320[2].field_1828 = 0x2034;
     DAT_00622320[3].field_1828 = 0x2034;
     if ((mask & 1) != 0) {
-        DAT_00622320[0].field_1404 = x;
-        DAT_00622320[0].field_1408 = y - 5;
+        DAT_00622320[0].tile_x = x;
+        DAT_00622320[0].tile_y = y - 5;
         n = 1;
     }
     if ((mask & 2) != 0) {
-        DAT_00622320[n].field_1404 = x + 5;
-        DAT_00622320[n].field_1408 = y;
+        DAT_00622320[n].tile_x = x + 5;
+        DAT_00622320[n].tile_y = y;
         n++;
     }
     if ((mask & 4) != 0) {
-        DAT_00622320[n].field_1404 = x;
-        DAT_00622320[n].field_1408 = y + 5;
+        DAT_00622320[n].tile_x = x;
+        DAT_00622320[n].tile_y = y + 5;
         n++;
     }
     if ((mask & 8) != 0) {
-        DAT_00622320[n].field_1404 = x - 5;
-        DAT_00622320[n].field_1408 = y;
+        DAT_00622320[n].tile_x = x - 5;
+        DAT_00622320[n].tile_y = y;
         n++;
     }
     if (n != 0) {
@@ -868,10 +868,10 @@ void FUN_00434330(Element *obj, unsigned int param_2, int *param_3) {
     owners[1].pos.y = 0;
     ride = obj->ride;
     memcpy(EditCursor.field_1414, &ride->footprint, sizeof(ride->footprint));
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     EditCursor.field_1830 = 0;
     for (; row < 2; row++) {
-        mask = FUN_00436fb0(EditCursor.field_1404, EditCursor.field_1408 - row * 5, &owners[row].id);
+        mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y - row * 5, &owners[row].id);
         if (row == 1 && owners[0].id != owners[1].id && owners[0].pos.x != 0) {
             return;
         }
@@ -900,23 +900,23 @@ void FUN_00434330(Element *obj, unsigned int param_2, int *param_3) {
             DAT_00616180[row * 4 + 2].field_1828 = 0x2034;
             DAT_00616180[row * 4 + 3].field_1828 = 0x2034;
             if ((mask & 1) != 0) {
-                DAT_00616180[n].field_1404 = EditCursor.field_1404;
-                DAT_00616180[n].field_1408 = EditCursor.field_1408 - (row * 5 + 5);
+                DAT_00616180[n].tile_x = EditCursor.tile_x;
+                DAT_00616180[n].tile_y = EditCursor.tile_y - (row * 5 + 5);
                 n++;
             }
             if ((mask & 2) != 0) {
-                DAT_00616180[n].field_1404 = EditCursor.field_1404 + 5;
-                DAT_00616180[n].field_1408 = EditCursor.field_1408 - row * 5;
+                DAT_00616180[n].tile_x = EditCursor.tile_x + 5;
+                DAT_00616180[n].tile_y = EditCursor.tile_y - row * 5;
                 n++;
             }
             if ((mask & 4) != 0) {
-                DAT_00616180[n].field_1404 = EditCursor.field_1404;
-                DAT_00616180[n].field_1408 = EditCursor.field_1408 - row * 5 + 5;
+                DAT_00616180[n].tile_x = EditCursor.tile_x;
+                DAT_00616180[n].tile_y = EditCursor.tile_y - row * 5 + 5;
                 n++;
             }
             if ((mask & 8) != 0) {
-                DAT_00616180[n].field_1404 = EditCursor.field_1404 - 5;
-                DAT_00616180[n].field_1408 = EditCursor.field_1408 - row * 5;
+                DAT_00616180[n].tile_x = EditCursor.tile_x - 5;
+                DAT_00616180[n].tile_y = EditCursor.tile_y - row * 5;
                 n++;
             }
             if (n != 0) {
@@ -944,7 +944,7 @@ void FUN_00434670(void *param_1, TileId tile, struct Cursor *param_3) {
 
     for (y = DAT_0081cb74->footprint.v[1]; y <= DAT_0081cb74->footprint.v[3]; y++) {
         for (x = DAT_0081cb74->footprint.v[0]; x <= DAT_0081cb74->footprint.v[2]; x++) {
-            RestoreBaseMap(param_3->field_1404 + x, param_3->field_1408 + y);
+            RestoreBaseMap(param_3->tile_x + x, param_3->tile_y + y);
         }
     }
     StandardRemoveObject((Element *)param_1, tile, param_3);
@@ -1013,8 +1013,8 @@ void FUN_00434b40(void *param_1, TileId tile, struct Cursor *param_3) {
     param_3->field_1414[0] = 0;
     param_3->field_1414[2] = 0;
     StandardRemoveObject((Element *)param_1, tile, param_3);
-    x = param_3->field_1404 - 6;
-    y = param_3->field_1408;
+    x = param_3->tile_x - 6;
+    y = param_3->tile_y;
     if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
         elem = &GameMap[y][x];
     } else {
@@ -1155,7 +1155,7 @@ void FUN_00434f90(struct EditObject *obj, int *coords) {
     score->field_8 = 0;
     score->field_c = 9999;
     score->field_10 = 0;
-    score->field_14 = 0;
+    score->bloke_count = 0;
     score->timer = 150;
     score->field_40 = 3;
     for (x = 0; x < 5; x++) {
@@ -1189,10 +1189,10 @@ void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
     DAT_00629c50 = &DAT_004b7278;
     DAT_004b7288 = &DAT_004b7260;
     DAT_004b7260.v[4] = 0;
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     FUN_0045f460(&EditCursor);
-    PathCursor.field_1404 = EditCursor.field_1404;
-    PathCursor.field_1408 = EditCursor.field_1408;
+    PathCursor.tile_x = EditCursor.tile_x;
+    PathCursor.tile_y = EditCursor.tile_y;
     PathCursor.field_1414[0] = EditCursor.field_1414[2] + 1;
     PathCursor.field_1414[1] = EditCursor.field_1414[1];
     PathCursor.field_1414[2] = PathCursor.field_1414[0];
@@ -1218,8 +1218,8 @@ void FUN_00435230(unsigned int param_1, struct Point *param_2) {
     memcpy(DAT_0082ae20.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
     for (; p1 != NULL; p1 = p1->next) {
         if (p1->owner.id == QueryObj.id) {
-            DAT_0082ae20.field_1404 = p1->tile.pos.x;
-            DAT_0082ae20.field_1408 = p1->tile.pos.y;
+            DAT_0082ae20.tile_x = p1->tile.pos.x;
+            DAT_0082ae20.tile_y = p1->tile.pos.y;
             FUN_0045f460(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
@@ -1228,8 +1228,8 @@ void FUN_00435230(unsigned int param_1, struct Point *param_2) {
     }
     for (; p2 != NULL; p2 = p2->next) {
         if (p2->owner == QueryObj.id) {
-            DAT_0082ae20.field_1404 = p2->tile.pos.x;
-            DAT_0082ae20.field_1408 = p2->tile.pos.y;
+            DAT_0082ae20.tile_x = p2->tile.pos.x;
+            DAT_0082ae20.tile_y = p2->tile.pos.y;
             FUN_0045f460(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
@@ -1239,8 +1239,8 @@ void FUN_00435230(unsigned int param_1, struct Point *param_2) {
     DAT_0082ae20.field_1414[1] -= 5;
     for (; p3 != NULL; p3 = p3->next) {
         if (p3->owner == QueryObj.id) {
-            DAT_0082ae20.field_1404 = p3->tile.pos.x;
-            DAT_0082ae20.field_1408 = p3->tile.pos.y;
+            DAT_0082ae20.tile_x = p3->tile.pos.x;
+            DAT_0082ae20.tile_y = p3->tile.pos.y;
             FUN_0045f460(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
@@ -1253,13 +1253,13 @@ void FUN_00435230(unsigned int param_1, struct Point *param_2) {
             DAT_0082ae20.field_1414[3] = 1;
             DAT_0082ae20.field_1414[0] = 0;
             DAT_0082ae20.field_1414[2] = 0;
-            DAT_0082ae20.field_1404 = p4->tile.pos.x;
-            DAT_0082ae20.field_1408 = p4->tile.pos.y;
+            DAT_0082ae20.tile_x = p4->tile.pos.x;
+            DAT_0082ae20.tile_y = p4->tile.pos.y;
             FUN_0045f460(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
-            DAT_0082ae20.field_1404 = DAT_0082ae20.field_1404 - 6;
+            DAT_0082ae20.tile_x = DAT_0082ae20.tile_x - 6;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
         }
@@ -1283,7 +1283,7 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
     StandardRemoveObject((Element *)obj, tile, cursor);
     for (y = DAT_00629c40.v[1]; y <= DAT_00629c40.v[3]; y++) {
         for (x = DAT_00629c40.v[0]; x <= DAT_00629c40.v[2] - 1; x++) {
-            RestoreBaseMap(cursor->field_1404 + x, cursor->field_1408 + y);
+            RestoreBaseMap(cursor->tile_x + x, cursor->tile_y + y);
         }
     }
     while (score->tile.id != tile.id) {
@@ -1301,8 +1301,8 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         path = DAT_0062fd2c;
         while (path != NULL) {
             if (path->owner.id == tile.id) {
-                DAT_0082ae20.field_1404 = path->tile.pos.x;
-                DAT_0082ae20.field_1408 = path->tile.pos.y;
+                DAT_0082ae20.tile_x = path->tile.pos.x;
+                DAT_0082ae20.tile_y = path->tile.pos.y;
                 FUN_00436f30(&fake, path->tile, &DAT_0082ae20);
                 path = DAT_0062fd2c;
             } else {
@@ -1313,13 +1313,13 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         thing = DAT_00629c2c;
         while (thing != NULL) {
             if (thing->owner == tile.id) {
-                savedX = cursor->field_1404;
-                savedY = cursor->field_1408;
-                cursor->field_1404 = thing->tile.pos.x;
-                cursor->field_1408 = thing->tile.pos.y;
+                savedX = cursor->tile_x;
+                savedY = cursor->tile_y;
+                cursor->tile_x = thing->tile.pos.x;
+                cursor->tile_y = thing->tile.pos.y;
                 FUN_00433fc0(&fake, thing->tile, cursor);
-                cursor->field_1404 = savedX;
-                cursor->field_1408 = savedY;
+                cursor->tile_x = savedX;
+                cursor->tile_y = savedY;
                 thing = DAT_00629c2c;
             } else {
                 thing = thing->next;
@@ -1329,13 +1329,13 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         fish = DAT_00629c30;
         while (fish != NULL) {
             if (fish->owner == tile.id) {
-                savedX = cursor->field_1404;
-                savedY = cursor->field_1408;
-                cursor->field_1404 = fish->tile.pos.x;
-                cursor->field_1408 = fish->tile.pos.y;
+                savedX = cursor->tile_x;
+                savedY = cursor->tile_y;
+                cursor->tile_x = fish->tile.pos.x;
+                cursor->tile_y = fish->tile.pos.y;
                 FUN_00434670(&fake, fish->tile, cursor);
-                cursor->field_1404 = savedX;
-                cursor->field_1408 = savedY;
+                cursor->tile_x = savedX;
+                cursor->tile_y = savedY;
                 fish = DAT_00629c30;
             } else {
                 fish = fish->next;
@@ -1345,13 +1345,13 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         thing = DAT_00629c34;
         while (thing != NULL) {
             if (thing->owner == tile.id) {
-                savedX = cursor->field_1404;
-                savedY = cursor->field_1408;
-                cursor->field_1404 = thing->tile.pos.x;
-                cursor->field_1408 = thing->tile.pos.y;
+                savedX = cursor->tile_x;
+                savedY = cursor->tile_y;
+                cursor->tile_x = thing->tile.pos.x;
+                cursor->tile_y = thing->tile.pos.y;
                 FUN_00434b40(&fake, thing->tile, cursor);
-                cursor->field_1404 = savedX;
-                cursor->field_1408 = savedY;
+                cursor->tile_x = savedX;
+                cursor->tile_y = savedY;
                 thing = DAT_00629c34;
             } else {
                 thing = thing->next;
@@ -1431,7 +1431,7 @@ void FUN_00435750(void) {
             }
         }
         bloke = node->rider;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -1444,12 +1444,12 @@ void FUN_00435750(void) {
                 }
             }
             if (i == 5) {
-                if (score->field_14 == 5 || score->blokes[4] != NULL) {
+                if (score->bloke_count == 5 || score->blokes[4] != NULL) {
                     RemoveBlokeFromRide(DAT_0081cb60, node);
                     break;
                 }
                 score->blokes[slot] = bloke;
-                score->field_14++;
+                score->bloke_count++;
             } else {
                 bloke = score->blokes[slot];
                 if (score->blokes[slot - 1] != NULL) {
@@ -1466,7 +1466,7 @@ void FUN_00435750(void) {
             bloke->dest.y = ((DAT_0081cb60->y + tile.pos.y) << 8) + DAT_004b7290[4 - slot].y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->field_73 = dir + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             break;
         case 1:
@@ -1477,7 +1477,7 @@ void FUN_00435750(void) {
                         bloke->pos.y = -9999;
                         score->seats[i] = bloke;
                         score->blokes[0] = NULL;
-                        score->field_14--;
+                        score->bloke_count--;
                         break;
                     }
                 }
@@ -1495,11 +1495,11 @@ void FUN_00435750(void) {
             ScreenToMapRef2(&pos, &map); /* [port] the original also pushed 0, which ScreenToMapRef2 never reads */
             bloke->flags &= 0xff7f;
             bloke->pos = map;
-            bloke->field_72 = 10;
+            bloke->dir = 10;
             bloke->dest.x = ((DAT_0081cb60->field_24 + tile.pos.x) << 8) - 0x180;
             bloke->dest.y = ((DAT_0081cb60->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -1508,7 +1508,7 @@ void FUN_00435750(void) {
             bloke->dest.x = ((DAT_0081cb60->field_24 + tile.pos.x) << 8) + 0x80;
             bloke->dest.y = ((DAT_0081cb60->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -1767,18 +1767,18 @@ void FUN_00436200(Element *obj, unsigned int param_2, unsigned int param_3) {
 
     n = 0;
     memcpy(EditCursor.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
-    mask = FUN_00436fb0(EditCursor.field_1404, EditCursor.field_1408, &owner);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
+    mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
         FUN_0045f480(&EditCursor, 0xe);
     } else {
         ValidateCursor(&EditCursor, (unsigned int)obj->ride);
         if (FUN_0045f4b0(&EditCursor) != 0) {
-            rect.x0 = EditCursor.field_1414[0] + EditCursor.field_1404;
-            rect.y0 = EditCursor.field_1414[1] + EditCursor.field_1408;
-            rect.x1 = EditCursor.field_1414[2] + EditCursor.field_1404;
-            rect.y1 = EditCursor.field_1414[3] + EditCursor.field_1408;
+            rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
+            rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
+            rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
+            rect.y1 = EditCursor.field_1414[3] + EditCursor.tile_y;
             result = CheckForPeople(&rect);
             if (result != -1) {
                 if (result != 1) {
@@ -1794,30 +1794,30 @@ void FUN_00436200(Element *obj, unsigned int param_2, unsigned int param_3) {
                     FUN_0045f460(&DAT_00629c58[1]);
                     FUN_0045f460(&DAT_00629c58[2]);
                     FUN_0045f460(&DAT_00629c58[3]);
-                    x = EditCursor.field_1404;
-                    y = EditCursor.field_1408;
+                    x = EditCursor.tile_x;
+                    y = EditCursor.tile_y;
                     DAT_00629c58[0].field_1828 = 0x2034;
                     DAT_00629c58[1].field_1828 = 0x2034;
                     DAT_00629c58[2].field_1828 = 0x2034;
                     DAT_00629c58[3].field_1828 = 0x2034;
                     if ((mask & 1) != 0) {
-                        DAT_00629c58[0].field_1404 = x;
-                        DAT_00629c58[0].field_1408 = y - 5;
+                        DAT_00629c58[0].tile_x = x;
+                        DAT_00629c58[0].tile_y = y - 5;
                         n = 1;
                     }
                     if ((mask & 2) != 0) {
-                        DAT_00629c58[n].field_1404 = x + 5;
-                        DAT_00629c58[n].field_1408 = y;
+                        DAT_00629c58[n].tile_x = x + 5;
+                        DAT_00629c58[n].tile_y = y;
                         n++;
                     }
                     if ((mask & 4) != 0) {
-                        DAT_00629c58[n].field_1404 = x;
-                        DAT_00629c58[n].field_1408 = y + 5;
+                        DAT_00629c58[n].tile_x = x;
+                        DAT_00629c58[n].tile_y = y + 5;
                         n++;
                     }
                     if ((mask & 8) != 0) {
-                        DAT_00629c58[n].field_1404 = x - 5;
-                        DAT_00629c58[n].field_1408 = y;
+                        DAT_00629c58[n].tile_x = x - 5;
+                        DAT_00629c58[n].tile_y = y;
                         n++;
                     }
                     if (n != 0) {
@@ -1877,7 +1877,7 @@ void FUN_00436470(unsigned int param_1, int *coords) {
     memcpy(&QueryClass->footprint, &DAT_004b7478, sizeof(DAT_004b7478));
     BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
-        if ((tile.pos.x == ride->field_4 && tile.pos.y == ride->field_8) || (tile.pos.x == ride->field_c && tile.pos.y == ride->field_10)) {
+        if ((tile.pos.x == ride->cur_x && tile.pos.y == ride->cur_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
             FUN_0045f480(&QueryCursor, 1);
             return;
         }
@@ -1943,7 +1943,7 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
         }
     }
     if (path != NULL) {
-        mask = path->field_4;
+        mask = path->dir_mask;
         if (path->tile.id == score->start.id) {
             mask = mask & 0xfffffffe;
         } else if (path->tile.id == score->end.id) {
@@ -2010,39 +2010,39 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
         FUN_00435470(&fake, tile, cursor);
         return;
     }
-    mask = FUN_00436fb0(cursor->field_1404, cursor->field_1408, &owner);
+    mask = FUN_00436fb0(cursor->tile_x, cursor->tile_y, &owner);
     FUN_00436f30(obj, tile, cursor);
     if ((mask & 1) != 0) {
-        y = cursor->field_1408 - 5;
-        x = cursor->field_1404;
+        y = cursor->tile_y - 5;
+        x = cursor->tile_x;
         dir = FUN_00436fb0(x, y, &other);
         FUN_00436dc0(x, y, dir, &owner);
         FUN_004367b0(x, y, &owner);
     }
     if ((mask & 2) != 0) {
-        x = cursor->field_1404 + 5;
-        y = cursor->field_1408;
+        x = cursor->tile_x + 5;
+        y = cursor->tile_y;
         dir = FUN_00436fb0(x, y, &other);
         FUN_00436dc0(x, y, dir, &owner);
         FUN_004367b0(x, y, &owner);
     }
     if ((mask & 4) != 0) {
-        y = cursor->field_1408 + 5;
-        x = cursor->field_1404;
+        y = cursor->tile_y + 5;
+        x = cursor->tile_x;
         dir = FUN_00436fb0(x, y, &other);
         FUN_00436dc0(x, y, dir, &owner);
         FUN_004367b0(x, y, &owner);
     }
     if ((mask & 8) != 0) {
-        x = cursor->field_1404 - 5;
-        y = cursor->field_1408;
+        x = cursor->tile_x - 5;
+        y = cursor->tile_y;
         dir = FUN_00436fb0(x, y, &other);
         FUN_00436dc0(x, y, dir, &owner);
         FUN_004367b0(x, y, &owner);
     }
     if ((mask & 1) != 0 && (mask & 8) != 0) {
-        x = cursor->field_1404 - 5;
-        y = cursor->field_1408 - 5;
+        x = cursor->tile_x - 5;
+        y = cursor->tile_y - 5;
         if (FUN_004371b0(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
@@ -2050,8 +2050,8 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
         }
     }
     if ((mask & 1) != 0 && (mask & 2) != 0) {
-        x = cursor->field_1404 + 5;
-        y = cursor->field_1408 - 5;
+        x = cursor->tile_x + 5;
+        y = cursor->tile_y - 5;
         if (FUN_004371b0(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
@@ -2059,8 +2059,8 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
         }
     }
     if ((mask & 4) != 0 && (mask & 8) != 0) {
-        x = cursor->field_1404 - 5;
-        y = cursor->field_1408 + 5;
+        x = cursor->tile_x - 5;
+        y = cursor->tile_y + 5;
         if (FUN_004371b0(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
@@ -2068,8 +2068,8 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
         }
     }
     if ((mask & 4) != 0 && (mask & 2) != 0) {
-        x = cursor->field_1404 + 5;
-        y = cursor->field_1408 + 5;
+        x = cursor->tile_x + 5;
+        y = cursor->tile_y + 5;
         if (FUN_004371b0(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
@@ -2107,12 +2107,12 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
             return;
         }
         node->next = DAT_0062fd2c;
-        node->field_18 = NULL;
+        node->parent = NULL;
         DAT_0062fd2c = node;
         FUN_00436130(*owner, 1);
     }
     node->tile = tile;
-    node->field_4 = mask;
+    node->dir_mask = mask;
     if (owner != NULL) {
         node->owner.id = *owner;
     }
@@ -2262,7 +2262,7 @@ int FUN_004371e0(int a, int b, int c, int d) {
 
     result = 0;
     for (node = DAT_0062fd2c; node != NULL; node = node->next) {
-        node->field_c = 0;
+        node->visited = 0;
     }
     node = FUN_004371b0(a, b);
     if (node == NULL) {
@@ -2289,17 +2289,17 @@ void FUN_00437260(int x, int y, int tx, int ty, TileId *owner, int *found) {
         *found = 1;
         return;
     }
-    node->field_c = 1;
-    if ((node->field_4 & 1) != 0 && (next = FUN_004371b0(x, y - 5)) != NULL && next->field_c == 0) {
+    node->visited = 1;
+    if ((node->dir_mask & 1) != 0 && (next = FUN_004371b0(x, y - 5)) != NULL && next->visited == 0) {
         FUN_00437260(x, y - 5, tx, ty, owner, found);
     }
-    if ((node->field_4 & 2) != 0 && (next = FUN_004371b0(x + 5, y)) != NULL && next->field_c == 0) {
+    if ((node->dir_mask & 2) != 0 && (next = FUN_004371b0(x + 5, y)) != NULL && next->visited == 0) {
         FUN_00437260(x + 5, y, tx, ty, owner, found);
     }
-    if ((node->field_4 & 4) != 0 && (next = FUN_004371b0(x, y + 5)) != NULL && next->field_c == 0) {
+    if ((node->dir_mask & 4) != 0 && (next = FUN_004371b0(x, y + 5)) != NULL && next->visited == 0) {
         FUN_00437260(x, y + 5, tx, ty, owner, found);
     }
-    if ((node->field_4 & 8) != 0 && (next = FUN_004371b0(x - 5, y)) != NULL && next->field_c == 0) {
+    if ((node->dir_mask & 8) != 0 && (next = FUN_004371b0(x - 5, y)) != NULL && next->visited == 0) {
         FUN_00437260(x - 5, y, tx, ty, owner, found);
     }
 }
@@ -2312,7 +2312,7 @@ void FUN_004373c0(unsigned short param_1) {
 
     for (node = DAT_0062fd2c; node != NULL; node = node->next) {
         if (node->owner.id == param_1) {
-            node->field_18 = NULL;
+            node->parent = NULL;
         }
     }
     while (score != NULL && score->tile.id != param_1) {
@@ -2320,7 +2320,7 @@ void FUN_004373c0(unsigned short param_1) {
     }
     node = FUN_004371b0(score->end.pos.x, score->end.pos.y);
     node->field_8 = 0;
-    node->field_14 = NULL;
+    node->bfs_next = NULL;
     DAT_0062fd30 = node;
     DAT_0062fd34 = NULL;
     do {
@@ -2339,33 +2339,33 @@ void FUN_00437440(short param_1) {
     struct JunglePath *n3;
     struct JunglePath *n4;
 
-    for (p = DAT_0062fd30; p != NULL; p = p->field_14) {
+    for (p = DAT_0062fd30; p != NULL; p = p->bfs_next) {
         n1 = FUN_004371b0(p->tile.pos.x, p->tile.pos.y - 5);
         n2 = FUN_004371b0(p->tile.pos.x + 5, p->tile.pos.y);
         n3 = FUN_004371b0(p->tile.pos.x, p->tile.pos.y + 5);
         n4 = FUN_004371b0(p->tile.pos.x - 5, p->tile.pos.y);
-        if (n1 != NULL && (short)n1->owner.id == param_1 && n1->field_18 == NULL) {
-            n1->field_18 = p;
+        if (n1 != NULL && (short)n1->owner.id == param_1 && n1->parent == NULL) {
+            n1->parent = p;
             n1->field_8 = p->field_8 + 1;
-            n1->field_14 = DAT_0062fd34;
+            n1->bfs_next = DAT_0062fd34;
             DAT_0062fd34 = n1;
         }
-        if (n2 != NULL && (short)n2->owner.id == param_1 && n2->field_18 == NULL) {
-            n2->field_18 = p;
+        if (n2 != NULL && (short)n2->owner.id == param_1 && n2->parent == NULL) {
+            n2->parent = p;
             n2->field_8 = p->field_8 + 1;
-            n2->field_14 = DAT_0062fd34;
+            n2->bfs_next = DAT_0062fd34;
             DAT_0062fd34 = n2;
         }
-        if (n3 != NULL && (short)n3->owner.id == param_1 && n3->field_18 == NULL) {
-            n3->field_18 = p;
+        if (n3 != NULL && (short)n3->owner.id == param_1 && n3->parent == NULL) {
+            n3->parent = p;
             n3->field_8 = p->field_8 + 1;
-            n3->field_14 = DAT_0062fd34;
+            n3->bfs_next = DAT_0062fd34;
             DAT_0062fd34 = n3;
         }
-        if (n4 != NULL && (short)n4->owner.id == param_1 && n4->field_18 == NULL) {
-            n4->field_18 = p;
+        if (n4 != NULL && (short)n4->owner.id == param_1 && n4->parent == NULL) {
+            n4->parent = p;
             n4->field_8 = p->field_8 + 1;
-            n4->field_14 = DAT_0062fd34;
+            n4->bfs_next = DAT_0062fd34;
             DAT_0062fd34 = n4;
         }
     }

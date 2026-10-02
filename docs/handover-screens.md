@@ -4,8 +4,8 @@
 
 | Address | Name | Final | Status |
 |---|---|---:|---|
-| 0x004585C0 | FUN_004585c0 | 100.00% | matched |
-| 0x004589A0 | FUN_004589a0 | 91.11% | parked-with-reason |
+| 0x004585C0 | CloseFrontEndScreen | 100.00% | matched |
+| 0x004589A0 | InitMouse | 91.11% | parked-with-reason |
 | 0x00458A50 | FUN_00458a50 | 100.00% | matched |
 | 0x00458EE0 | FUN_00458ee0 | 59.19% | parked-with-reason |
 | 0x00459360 | FUN_00459360 | 59.57% | parked-with-reason |
@@ -14,7 +14,7 @@
 
 ## Parked partials
 
-- **FUN_004589a0 (91.11%)** — Target is a small setup routine with the existing short
+- **InitMouse (91.11%)** — Target is a small setup routine with the existing short
   frame and ordered initialization/file-loading calls. Larger local reshuffles, explicit
   temporary variables, and alternate nesting did not improve it. Best hypothesis is one
   remaining MSVC6 scheduling/type distinction in the configuration and reset-call chain.

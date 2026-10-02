@@ -7,19 +7,19 @@ struct RideNode;
 
 struct BarrelNode {
     struct BarrelNode *next;
-    unsigned short field_4;
-    unsigned char field_6;
-    unsigned char field_7;
-    signed char field_8;
+    unsigned short tile_id;
+    unsigned char seated_count;
+    unsigned char leaving_count;
+    signed char frame;
     unsigned char pad_9[3];
-    unsigned int field_c;
-    unsigned char field_10;
+    unsigned int flags;
+    unsigned char cycles_left;
     unsigned char pad_11[3];
-    int field_14;
-    unsigned char field_18;
+    int frame_ticks;
+    unsigned char boarding_count;
     unsigned char pad_19[3];
-    unsigned int field_1c;
-    signed char field_20;
+    unsigned int boarding_timer;
+    signed char layer2_frame;
     signed char slots[0x34 - 0x21];
 };
 

@@ -131,16 +131,16 @@ void FUN_004051a0(short param_1) {
             e2 = NULL;
             e3 = NULL;
             e0 = NULL;
-        } else if (e0 != NULL && ((short)e0->field_8 != param_1 || e0->field_18 != NULL)) {
+        } else if (e0 != NULL && ((short)e0->id != param_1 || e0->field_18 != NULL)) {
             e0 = NULL;
         }
-        if (e1 != NULL && ((short)e1->field_8 != param_1 || e1->field_18 != NULL)) {
+        if (e1 != NULL && ((short)e1->id != param_1 || e1->field_18 != NULL)) {
             e1 = NULL;
         }
-        if (e2 != NULL && ((short)e2->field_8 != param_1 || e2->field_18 != NULL)) {
+        if (e2 != NULL && ((short)e2->id != param_1 || e2->field_18 != NULL)) {
             e2 = NULL;
         }
-        if (e3 != NULL && ((short)e3->field_8 != param_1 || e3->field_18 != NULL)) {
+        if (e3 != NULL && ((short)e3->id != param_1 || e3->field_18 != NULL)) {
             e3 = NULL;
         }
         if (e0 != NULL) {
@@ -186,7 +186,7 @@ void FUN_00405310(TileId tile) {
 
     cur = DAT_004cbeac;
     while (cur != NULL) {
-        if (cur->field_8 == tile.id) {
+        if (cur->id == tile.id) {
             cur->field_18 = NULL;
         }
         cur = cur->next;
@@ -315,8 +315,8 @@ void FUN_00405630(unsigned int param_1, int *coords) {
     node->next = (struct CountNode *)DAT_004c11bc;
     DAT_004c11bc = node;
     cursor = (struct Cursor *)EditCursor.field_1830;
-    x = cursor->field_1404;
-    y = cursor->field_1408;
+    x = cursor->tile_x;
+    y = cursor->tile_y;
 
     FUN_004132a0(tile, x - 3, y - 4, 6, 1);
     FUN_004132a0(tile, x + 1, y - 4, 0, 1);
@@ -348,28 +348,28 @@ void FUN_00405740(struct DSHead *param_1, unsigned int param_2, unsigned int par
     memcpy(EditCursor.field_1414, (char *)src + 0x3c, 20);
     EditCursor.field_1830 = 0;
     EditCursor.field_1828 = 0x4408;
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
 
     c694 = DAT_0082c694;
-    mapx = EditCursor.field_1404;
+    mapx = EditCursor.tile_x;
     memcpy(DAT_0082f760.field_1414, DAT_004b4440, 20);
     DAT_0082f760.field_1830 = 0;
-    mapy = EditCursor.field_1408;
+    mapy = EditCursor.tile_y;
     DAT_0082f760.field_1828 = 0x4108;
-    DAT_0082f760.field_1404 = c694->field_3c + mapx;
-    DAT_0082f760.field_1408 = c694->field_40 + mapy;
+    DAT_0082f760.tile_x = c694->field_3c + mapx;
+    DAT_0082f760.tile_y = c694->field_40 + mapy;
 
     memcpy(DAT_0082c6e0.field_1414, DAT_004b4458, 20);
     DAT_0082c6e0.field_1830 = 0;
     DAT_0082c6e0.field_1828 = 0x4208;
-    DAT_0082c6e0.field_1404 = c694->field_3c + mapx;
-    DAT_0082c6e0.field_1408 = c694->field_40 + mapy;
+    DAT_0082c6e0.tile_x = c694->field_3c + mapx;
+    DAT_0082c6e0.tile_y = c694->field_40 + mapy;
 
     memcpy(DAT_0082df20.field_1414, DAT_004b4470, 20);
     DAT_0082df20.field_1830 = 0;
     DAT_0082df20.field_1828 = 0x5008;
-    DAT_0082df20.field_1404 = c694->field_3c + mapx;
-    DAT_0082df20.field_1408 = c694->field_40 + mapy;
+    DAT_0082df20.tile_x = c694->field_3c + mapx;
+    DAT_0082df20.tile_y = c694->field_40 + mapy;
 
     ValidateCursor(&DAT_0082df20, (unsigned int)src);
     ValidateCursor(&DAT_0082c6e0, (unsigned int)src);
@@ -391,9 +391,9 @@ void FUN_004058a0(unsigned int param_1, unsigned int param_2) {
     memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
 
     while (node != NULL) {
-        if (node->field_8 == QueryObj.id) {
-            DAT_0082f760.field_1404 = node->x;
-            DAT_0082f760.field_1408 = node->y;
+        if (node->id == QueryObj.id) {
+            DAT_0082f760.tile_x = node->x;
+            DAT_0082f760.tile_y = node->y;
             FUN_0045f460(&DAT_0082f760);
             DAT_0082f760.field_1828 = 0x18;
             BuildCursorPtr(&DAT_0082f760, 0, 0);
@@ -433,15 +433,15 @@ void FUN_00405940(Element *obj, TileId tile, unsigned int param_3) {
 
     while (queue != NULL) {
         next = queue->next;
-        if (queue->field_8 == QueryObj.id) {
+        if (queue->id == QueryObj.id) {
             if (queue->field_14 & 0x10) {
                 queue->field_14 &= 0xef;
-                FUN_00413650(queue->field_8, queue->x, queue->y);
+                FUN_00413650(queue->id, queue->x, queue->y);
                 AddBricks(((struct DSObjClass *)DAT_0082c678)->field_26);
             }
-            DAT_0082f760.field_1404 = queue->x;
-            DAT_0082f760.field_1408 = queue->y;
-            StandardRemoveObject((Element *)((struct DSObjClass *)DAT_0082c684)->field_c4, *(TileId *)&queue->field_8, &DAT_0082f760);
+            DAT_0082f760.tile_x = queue->x;
+            DAT_0082f760.tile_y = queue->y;
+            StandardRemoveObject((Element *)((struct DSObjClass *)DAT_0082c684)->field_c4, *(TileId *)&queue->id, &DAT_0082f760);
             FUN_004133e0(queue->x, queue->y);
         }
         queue = next;
@@ -533,13 +533,13 @@ void FUN_00405bd0(Element *obj) {
     while (node != NULL) {
         bloke = node->rider;
         next = node->next;
-        if (bloke->field_e == 0) {
+        if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 bloke->dest.x = (node->tile.pos.x + ride->x) << 8;
                 bloke->dest.y = (node->tile.pos.y - 3 + ride->y) << 8;
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = move + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(move + 0x10) >> 5) + 3);
                 bloke->field_58 = (rand() & 7) + 1;
@@ -552,7 +552,7 @@ void FUN_00405bd0(Element *obj) {
                         res = FUN_00401ae0(node->tile.id, (int)bloke);
                         if (res == 0) {
                             source.type = 1;
-                            source.field_4 = bloke;
+                            source.bloke = bloke;
                             PlayInstanceOfSample(*(void **)(DRIVING_SCHOOL_SFX + 8), 0, 1, &source);
                             r = rand() % 4 + 1;
                             sample = PlayInstanceOfSample(((void **)(DRIVING_SCHOOL_SFX + 8))[r * 3], 1, 1, &source);
@@ -580,7 +580,7 @@ void FUN_00405bd0(Element *obj) {
                 bloke->dest.x = ((node->tile.pos.x + ride->x) << 8) + 0x80;
                 bloke->dest.y = ((node->tile.pos.y + ride->y) << 8) + 0x80;
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = move + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(move + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -589,7 +589,7 @@ void FUN_00405bd0(Element *obj) {
                 RemoveBlokeFromRide(ride, node);
                 bloke->flags &= 0xfff7;
                 source2.type = 1;
-                source2.field_4 = bloke;
+                source2.bloke = bloke;
                 KillAllSamplesFromSource(&source2);
                 break;
             }

@@ -78,8 +78,8 @@ struct Cursor {
     /* 0x0c8 */ unsigned char pad_c8[0xcc - 0xc8];
     /* 0x0cc */ void *field_cc;
     /* 0x0d0 */ unsigned char pad_d0[0x1404 - 0xd0];
-    int field_1404;
-    int field_1408;
+    int tile_x;
+    int tile_y;
     int field_140c;
     int field_1410;
     union {

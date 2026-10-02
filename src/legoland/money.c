@@ -36,8 +36,8 @@ LEGO_EXPORT void PlayMoneySFX(TileId *tile, int sfx, int a2) {
     void *def;
 
     config.field_0 = 2;
-    config.field_8 = tile->pos.x;
-    config.field_c = tile->pos.y;
+    config.x = tile->pos.x;
+    config.y = tile->pos.y;
     def = PTR_004b87b0[sfx * 3];
     PlayInstanceOfSample(def, a2, 1, &config);
 }
@@ -46,8 +46,8 @@ LEGO_EXPORT void PlayMoneySFX(TileId *tile, int sfx, int a2) {
 LEGO_EXPORT void StopMoneySFX(unsigned char *param_1) {
     struct SampleParams params;
     params.field_0 = 2;
-    params.field_8 = param_1[0];
-    params.field_c = param_1[1];
+    params.x = param_1[0];
+    params.y = param_1[1];
     UnSourceAndFadeAllSamplesFromSource(&params, -400);
 }
 

@@ -86,8 +86,8 @@ void FUN_00411b20(struct PumpNode *node) {
     cursor.footprint = ride->footprint;
     tile.pos.x = (unsigned char)node->var_4;
     tile.pos.y = (unsigned char)node->var_8;
-    cursor.field_1404 = node->var_4;
-    cursor.field_1408 = node->var_8;
+    cursor.tile_x = node->var_4;
+    cursor.tile_y = node->var_8;
     StandardRemoveObject(ride->element, tile, &cursor);
     FUN_00411ad0(node);
 }
@@ -166,7 +166,7 @@ void FUN_00411cd0(Element *obj, int *screen, unsigned int param_3) {
     ride = obj->ride;
     EditCursor.footprint = ride->footprint;
     EditCursor.field_1830 = 0;
-    ScreenToMapRef(screen, (int *)&EditCursor.field_1404, param_3);
+    ScreenToMapRef(screen, (int *)&EditCursor.tile_x, param_3);
     tile = FUN_00411dc0(&EditCursor);
     ValidateCursor(&EditCursor, (unsigned int)ride);
     if (GetBrickCount() < GetObjCost(ride)) {
@@ -177,8 +177,8 @@ void FUN_00411cd0(Element *obj, int *screen, unsigned int param_3) {
         EditCursor.next = &DAT_0082f760;
         memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 0x14);
         DAT_0082f760.field_1830 = 0;
-        DAT_0082f760.field_1404 = tile->var_c;
-        DAT_0082f760.field_1408 = tile->var_10;
+        DAT_0082f760.tile_x = tile->var_c;
+        DAT_0082f760.tile_y = tile->var_10;
         DAT_0082f760.field_1828 = 0x2034;
         return;
     }
@@ -191,15 +191,15 @@ struct PumpTile *FUN_00411dc0(struct Cursor *cursor) {
     struct PumpTile *tile;
     int y;
 
-    tile = (struct PumpTile *)FUN_004125f0(cursor->field_1404 + 1, cursor->field_1408);
+    tile = (struct PumpTile *)FUN_004125f0(cursor->tile_x + 1, cursor->tile_y);
     if (tile != NULL && tile->var_14 != 0) {
         tile = NULL;
     }
     y = 0;
     if (tile != NULL) {
-        cursor->field_1404 = tile->var_c - 1;
+        cursor->tile_x = tile->var_c - 1;
         y = tile->var_10 - ((struct Ride *)DAT_004cbe9c)->footprint.y0;
-        cursor->field_1408 = y;
+        cursor->tile_y = y;
         y = (int)tile;
     }
     return (struct PumpTile *)y;

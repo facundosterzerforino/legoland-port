@@ -440,11 +440,11 @@ LEGO_EXPORT void PrintProfileDetails(void) {
         show = 1;
         if ((icon->flags & 0x400) == 0 && (icon->field_20b & 1)) {
             if (DAT_00813a44.x >= icon->x - 0x18 && DAT_00813a44.x < icon->x && DAT_00813a44.y >= icon->slot * 0x26 + 0x86 &&
-                DAT_00813a44.y < icon->field_10 + icon->y) {
+                DAT_00813a44.y < icon->width + icon->y) {
                 Hover.type = 2;
                 Hover.ptr = (struct Bloke *)icon;
             }
-            if (CurrentProfile.field_43 == icon->slot) {
+            if (CurrentProfile.profile_slot == icon->slot) {
                 if (DeletePopUpShown != 0) {
                     SetIconSprite(icon, DAT_007986b8);
                     last = icon;
@@ -470,7 +470,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
             x = icon->x + 0x14;
             name = (char *)icon->field_18p;
             if (name != NULL && show) {
-                if (CurrentProfile.field_43 - 1 != icon->slot || (DeletePopUpShown == 0 && NewProfilePopUpShown == 0)) {
+                if (CurrentProfile.profile_slot - 1 != icon->slot || (DeletePopUpShown == 0 && NewProfilePopUpShown == 0)) {
                     if (sel) {
                         FUN_00455e50(name, x, y, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
                     } else {
@@ -487,7 +487,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
         FUN_00455e50(GetString(0x86), last->x + 0x14, last->y - 0x14, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
         UpdateProfileCheckBoxIcons();
     }
-    if (CurrentProfile.field_43 != 0 && DeletePopUpShown == 0) {
+    if (CurrentProfile.profile_slot != 0 && DeletePopUpShown == 0) {
         if (NewProfilePopUpShown != 0) {
             if (TempProfileHasName()) {
                 ((struct IconNode *)AcceptIcon)->flags &= ~0x400;
@@ -506,13 +506,13 @@ void FUN_0048d230(void) {
     struct ProfileNode *node = (struct ProfileNode *)ProfileListHead;
 
     while (node != NULL) {
-        if (node->slot == CurrentProfile.field_43) {
+        if (node->slot == CurrentProfile.profile_slot) {
             strcpy((char *)&CurrentProfile, node->data.name);
             CurrentProfile.field_20 = node->data.field_20;
-            CurrentProfile.field_44 = 0;
-            CurrentProfile.field_24 = node->data.field_28;
-            CurrentProfile.field_28 = node->data.field_2c;
-            CurrentProfile.field_2c = node->data.field_30;
+            CurrentProfile.save_slot = 0;
+            CurrentProfile.speech_volume = node->data.speech_volume;
+            CurrentProfile.music_volume = node->data.music_volume;
+            CurrentProfile.fx_volume = node->data.fx_volume;
             CurrentProfile.field_45 = 0;
             memcpy(&CurrentProfile.flags[4], &node->data.field_34, 15);
             memcpy(CurrentProfile.field_46, node->data.field_43, 200);
@@ -525,7 +525,7 @@ void FUN_0048d230(void) {
 
 // FUNCTION: LEGOLAND 0x0048d300
 unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
-    if (DeletePopUpShown == 0 && (arg_0 & 0x2) != 0 && ((((struct ProfileFlags *)AcceptIcon)->var_34 >> 8) & 0x4) == 0 && CurrentProfile.field_43 != 0) {
+    if (DeletePopUpShown == 0 && (arg_0 & 0x2) != 0 && ((((struct ProfileFlags *)AcceptIcon)->var_34 >> 8) & 0x4) == 0 && CurrentProfile.profile_slot != 0) {
         if (NewProfilePopUpShown != 0) {
             SaveProfileToDisk();
             DeleteProfileList();
@@ -545,7 +545,7 @@ unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
 // FUNCTION: LEGOLAND 0x0048d390
 unsigned char FUN_0048d390(struct Profile *profile, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 0x2) != 0) {
-        CurrentProfile.field_43 = profile->var_1c;
+        CurrentProfile.profile_slot = profile->var_1c;
         FUN_0048a800();
     }
     return 1;
@@ -555,7 +555,7 @@ unsigned char FUN_0048d390(struct Profile *profile, unsigned char param_2) {
 unsigned char SelectEmptyProfileSlotClick(struct Profile *profile, unsigned int param_2) {
     if (DAT_004bef9c != 0) {
         if (param_2 & 0x2) {
-            CurrentProfile.field_43 = profile->var_1c;
+            CurrentProfile.profile_slot = profile->var_1c;
             NewProfilePopUpShown = 1;
             InitNewProfilePoPUp(profile);
             DAT_004bef9c = 0;
@@ -567,11 +567,11 @@ unsigned char SelectEmptyProfileSlotClick(struct Profile *profile, unsigned int 
 // FUNCTION: LEGOLAND 0x0048d400
 unsigned char ConfirmDeleteProfileClick(unsigned int arg0, unsigned int arg1) {
     if (arg1 & 0x2) {
-        if (CurrentProfile.field_43) {
+        if (CurrentProfile.profile_slot) {
             CloseFontEndCheckBox();
             DeletePopUpShown = 0;
-            RemoveProfile(CurrentProfile.field_43);
-            CurrentProfile.field_43 = 0;
+            RemoveProfile(CurrentProfile.profile_slot);
+            CurrentProfile.profile_slot = 0;
             DAT_0080ff80.unk4 = 0xffffffff;
             DAT_0080ff80.unk8 = 0;
         }

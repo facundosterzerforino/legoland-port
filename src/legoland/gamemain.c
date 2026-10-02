@@ -307,7 +307,7 @@ void FUN_004779d0(struct Point *p) {
         pos.y = t.pos.y;
         QueryClass->method_94((unsigned int *)elem, &pos);
         if (tile->flags & 0x20) {
-            if (QueryClass->field_1c & 0x200000) {
+            if (QueryClass->flags & 0x200000) {
                 RemoveObjectFromBuildList(t);
                 FUN_0045e850((struct ObjNode *)elem, &pos.x);
                 IncrementObjectCount((struct ObjectCount *)QueryClass);
@@ -651,10 +651,10 @@ void FUN_004784c0(void) {
     DAT_00669098 = 0;
 
     lpConfig->field_30 = 0;
-    lpConfig->field_38 = 1;
-    lpConfig->field_34 = 1;
-    lpConfig->field_1a = 0xc8;
-    MapStats.capacity_max = lpConfig->field_1a;
+    lpConfig->gardeners_enabled = 1;
+    lpConfig->mechanics_enabled = 1;
+    lpConfig->max_blokes = 0xc8;
+    MapStats.capacity_max = lpConfig->max_blokes;
     MapStats.capacity_min = 0;
 
     FUN_004689a0();

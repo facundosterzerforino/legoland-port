@@ -17,8 +17,8 @@ struct ObjInstance;
 
 LEGO_EXPORT void RenderCursor(struct Cursor *cursor);
 struct OverlayParam {
-    unsigned int field_0;
-    unsigned int field_4;
+    unsigned int x;
+    unsigned int y;
     unsigned int field_8;
     unsigned int field_c;
     unsigned int field_10;

@@ -29,7 +29,7 @@ int FUN_00412100(struct PathTable *param_1);
 struct RideQueueEntry {
     /* 0x00 */ struct RideQueueEntry *next;
     /* 0x04 */ struct RideQueueEntry *field_4;
-    /* 0x08 */ unsigned short field_8;
+    /* 0x08 */ unsigned short id;
     /* 0x0a */ unsigned char pad_a[0x2];
     /* 0x0c */ int x;
     /* 0x10 */ int y;

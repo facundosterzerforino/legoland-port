@@ -250,18 +250,18 @@ void FUN_00458940(void) {
 void InitMouse(void) {
     unsigned int work[3];
 
-    CONTROLLERBUFFER->field_0 = 0;
-    CONTROLLERBUFFER->field_4 = 0;
-    CONTROLLERBUFFER->field_8 = 0;
-    CONTROLLERBUFFER->field_c = 0;
-    CONTROLLERBUFFER->field_10 = 0;
-    CONTROLLERBUFFER->field_14 = 0;
-    CONTROLLERBUFFER->field_8 = lpConfig->field_0 >> 1;
-    CONTROLLERBUFFER->field_c = lpConfig->field_2 >> 1;
+    CONTROLLERBUFFER->prev_x = 0;
+    CONTROLLERBUFFER->prev_y = 0;
+    CONTROLLERBUFFER->x = 0;
+    CONTROLLERBUFFER->y = 0;
+    CONTROLLERBUFFER->delta_x = 0;
+    CONTROLLERBUFFER->delta_y = 0;
+    CONTROLLERBUFFER->x = lpConfig->screen_width >> 1;
+    CONTROLLERBUFFER->y = lpConfig->screen_height >> 1;
     SystemParametersInfoA(3, 0, work, 0);
-    CONTROLLERBUFFER->field_1c = work[0];
-    CONTROLLERBUFFER->field_20 = work[1];
-    CONTROLLERBUFFER->field_24 = work[2];
+    CONTROLLERBUFFER->mouse_threshold1 = work[0];
+    CONTROLLERBUFFER->mouse_threshold2 = work[1];
+    CONTROLLERBUFFER->mouse_accel = work[2];
     SetPointer(5);
 }
 
@@ -276,12 +276,12 @@ void FUN_00458a50(void) {
         FUN_00499410();
         FUN_0047f810();
         // STRING: LEGOLAND 0x004b9150
-        sprintf(buf, "objlist%d.txt", lpConfig->field_28);
+        sprintf(buf, "objlist%d.txt", lpConfig->level);
         SetBricksLimited(0);
         ResetMapAI();
         DAT_00667c4c = FUN_0047afb0(buf);
         SetBricksLimited(1);
-        AllocBlokeCounters(lpConfig->field_1a);
+        AllocBlokeCounters(lpConfig->max_blokes);
         FUN_00458940();
         FUN_00489ee0();
         MapStats.field_3a0 = 0;
@@ -376,7 +376,7 @@ int FUN_00458c00(void) {
         PauseAllSamples();
         if (DAT_00667c80 != 0) {
             DeletePlayableSamples(0);
-            sprintf(path, "%s\\%dsave%d.sav", "profiles", CurrentProfile.field_43, *(unsigned int *)&CurrentProfile.field_44 & 0xff);
+            sprintf(path, "%s\\%dsave%d.sav", "profiles", CurrentProfile.profile_slot, *(unsigned int *)&CurrentProfile.save_slot & 0xff);
             LoadWatchSprite(0, 0);
             LoadGame(path);
             DAT_00667c80 = 0;
@@ -526,7 +526,7 @@ void FUN_00458ee0(void) {
                     query_class = QueryClass;
                     if (query_class != NULL) {
                         HTBubbleHelp(&frame.help_rect, query_class->name, 2);
-                        class_data = query_class->field_c4;
+                        class_data = query_class->element;
                         FUN_0046d340(*class_data);
                     }
                     break;
@@ -582,7 +582,7 @@ void FUN_00458ee0(void) {
             query_class = QueryClass;
             if (query_class != NULL) {
                 HTBubbleHelp(&frame.help_rect, query_class->name, 2);
-                class_data = query_class->field_c4;
+                class_data = query_class->element;
                 FUN_0046d340(*class_data);
             }
         }
@@ -623,13 +623,13 @@ void FUN_00459360(void) {
     int ticks;
 
     var_4 = 1;
-    hit_info.field_0 = 0;
+    hit_info.type = 0;
     hit_info.field_4 = 0;
     ResetHitInfo();
     PushRenderingStatusAndLockVideoSurface();
     DrawMapScreen();
     SetPointer(5);
-    PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit_info.field_0);
+    PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit_info.type);
     FUN_0046ee00();
     RenderIcons();
     CheckFocussedIcon();
@@ -687,9 +687,9 @@ void FUN_004594f0(void) {
         ((unsigned int *)&CurrentProfile)[i] = 0;
     }
 
-    CurrentProfile.field_24 = 0x4b;
-    CurrentProfile.field_28 = 0x64;
-    CurrentProfile.field_2c = 0x4b;
+    CurrentProfile.speech_volume = 0x4b;
+    CurrentProfile.music_volume = 0x64;
+    CurrentProfile.fx_volume = 0x4b;
 }
 
 // FUNCTION: LEGOLAND 0x00459520

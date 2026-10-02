@@ -8,7 +8,7 @@ struct Person;
 struct Sprite;
 struct Element;
 struct HitInfo {
-    int field_0;
+    int type;
     union {
         int field_4;
         struct Element *element;

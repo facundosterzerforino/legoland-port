@@ -158,14 +158,14 @@ void FUN_0043a820(struct AnimEntry *param_1, struct SpaceTowerRideNode *param_2)
     char dir;
 
     bloke = param_2->bloke;
-    base = FUN_0043a7a0((struct AnimLayout *)DAT_004b7758[bloke->field_50].field_4, bloke->field_4a, bloke->field_38);
+    base = FUN_0043a7a0((struct AnimLayout *)DAT_004b7758[bloke->field_50].anim_layout, bloke->field_4a, bloke->field_38);
     ride = (struct SpaceTowerRide *)DAT_0062fd74;
     base.x += (param_2->coord.x + ride->field_c) << 8;
     base.y += (param_2->coord.y + ride->field_10) << 8;
     bloke->dest.x = base.x;
     bloke->dest.y = base.y;
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-    bloke->field_e = 7;
+    bloke->low_level_action = 7;
     bloke->field_73 = dir + 0x10;
     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
     param_2->bloke->field_38++;
@@ -178,7 +178,7 @@ void FUN_0043a8c0(struct SpaceTowerRideNode *param_1) {
     struct AnimEntry *entry;
 
     bloke = param_1->bloke;
-    layout = (struct AnimLayout *)DAT_004b7758[bloke->field_50].field_4;
+    layout = (struct AnimLayout *)DAT_004b7758[bloke->field_50].anim_layout;
     entry = layout->entries[bloke->field_4a];
     if ((int)bloke->field_4a >= layout->count) {
         bloke->param_action = bloke->param_action + '\x01';
@@ -426,7 +426,7 @@ int FUN_0043ad00(unsigned char *param_1, int param_2) {
     GetTileDimensions(&w, &h);
     p.y = ((p.y + p.x) * h) >> 9;
     Get_XScroll();
-    return lpConfig->field_22 - (short)Get_YScroll() + p.y;
+    return lpConfig->view_y - (short)Get_YScroll() + p.y;
 }
 
 // FUNCTION: LEGOLAND 0x0043ad90
@@ -508,7 +508,7 @@ void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned 
         for (; node != NULL; node = node->next) {
             if (memcmp(&node->id, param_4, 2) == 0) {
                 bloke = node->bloke;
-                if ((bloke->flags & 0x80) == 0 && DAT_004b7758[bloke->field_50].field_4 == &DAT_004b7750) {
+                if ((bloke->flags & 0x80) == 0 && DAT_004b7758[bloke->field_50].anim_layout == &DAT_004b7750) {
                     IP_RenderBlokeIn3DNow(bloke);
                 }
             }
@@ -522,7 +522,7 @@ void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned 
         for (; node != NULL; node = node->next) {
             if (memcmp(&node->id, param_4, 2) == 0) {
                 bloke = node->bloke;
-                if ((bloke->flags & 0x80) == 0 && DAT_004b7758[bloke->field_50].field_4 == &DAT_004b76b8) {
+                if ((bloke->flags & 0x80) == 0 && DAT_004b7758[bloke->field_50].anim_layout == &DAT_004b76b8) {
                     IP_RenderBlokeIn3DNow(bloke);
                 }
             }
@@ -803,7 +803,7 @@ void FUN_0043b810(struct SpaceTowerCar *param_1) {
             AdjustBlokePosition((struct Point *)&pos);
             person = node->person;
             SetPersonPosition(person, pos.x, pos.y);
-            SetPersonDirection(person, DAT_004b7798[idx].field_10);
+            SetPersonDirection(person, DAT_004b7798[idx].direction);
         }
     }
 }
@@ -897,7 +897,7 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
         tile = (TileId *)&node->id;
         y = tile->pos.y;
         ride_y = ride->field_10 + y;
-        if (bloke->field_e == 0) {
+        if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 obj->var_4++;
@@ -909,7 +909,7 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
                 bloke->dest.y = ride_y;
                 bloke->dest.x = ride_x;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -924,9 +924,9 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
                 bloke->dest.x = (DAT_004b77e8[seat].x + x) << 8;
                 bloke->dest.y = (DAT_004b77e8[seat].y + node->coord.y) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (char)DAT_004b7798[seat >> 1].field_10);
+                NewDirForAction(bloke, (char)DAT_004b7798[seat >> 1].direction);
                 bloke->param_action++;
                 break;
             case 4:
@@ -957,7 +957,7 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
                 bloke->dest.x = (((signed char)ride->field_24 + x) << 8) + 0x80;
                 bloke->dest.y = (((signed char)ride->field_25 + tile->pos.y) << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;

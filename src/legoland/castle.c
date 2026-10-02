@@ -4782,8 +4782,8 @@ int FUN_00423760(struct VideoArg *arg) {
     if (result == 0) {
         return 0;
     }
-    DAT_004b5b20 = arg->field_c;
-    DAT_004b5b28 = arg->field_0 >> 1;
+    DAT_004b5b20 = arg->bits;
+    DAT_004b5b28 = arg->pitch >> 1;
     return 1;
 }
 
@@ -5032,7 +5032,7 @@ void FUN_00423db0(void) {
 void FUN_00423de0(void) {
     unsigned int v0 = DAT_00829bf8;
     memcpy(&DAT_00829a80, (void *)(v0 + 0x3c), 20);
-    DAT_00829a80.field_10 = &DAT_0060f914[1];
+    DAT_00829a80.next = &DAT_0060f914[1];
     ((unsigned int *)&DAT_0060f914[0].next)[DAT_00610a08 * 9] = 0;
 }
 
@@ -5053,7 +5053,7 @@ void FUN_00423e20(void) {
     struct LSub *tail;
 
     DAT_00829a80 = *(struct EditFootPrint *)(DAT_00829bf8 + 0x3c);
-    DAT_00829a80.field_10 = &DAT_0060f914[1];
+    DAT_00829a80.next = &DAT_0060f914[1];
     DAT_0060f914[DAT_00610a08].next = 0;
     tail = &DAT_0060f914[DAT_00610a08];
     if (DAT_00829ae0 == 2) {
@@ -5249,7 +5249,7 @@ void FUN_00424280(struct Element *param_1, int param_2, unsigned int param_3) {
 
     FUN_00423de0();
     SetEditCursorFootPrint(&DAT_00829a80);
-    ScreenToMapRef((int *)param_2, (int *)&EditCursor.field_1404, param_3);
+    ScreenToMapRef((int *)param_2, (int *)&EditCursor.tile_x, param_3);
     EditCursor.field_1830 = 0;
     cursor = FUN_0045f540(&EditCursor);
     if (cursor != NULL) {
@@ -5305,8 +5305,8 @@ void FUN_00424440(unsigned int param_1, unsigned int param_2) {
     x = DAT_00829ae8[0];
     memcpy(QueryCursor.field_1414, &DAT_00829a80, 20);
     y = DAT_00829ae8[1];
-    QueryCursor.field_1404 = x;
-    QueryCursor.field_1408 = y;
+    QueryCursor.tile_x = x;
+    QueryCursor.tile_y = y;
     // STRING: LEGOLAND 0x004b5b7c
     if ((void *)QueryClass != ElemID("CASTLE_DUMMY")->data) {
         FUN_0045f460(&QueryCursor);
@@ -5324,8 +5324,8 @@ void FUN_004244b0(unsigned int param_1, TileId param_2, unsigned int param_3) {
     if (DAT_00610a04 != 0) {
         tile.pos.x = DAT_00829ae8[0];
         tile.pos.y = DAT_00829ae8[1];
-        cursor.field_1404 = tile.pos.x;
-        cursor.field_1408 = tile.pos.y;
+        cursor.tile_x = tile.pos.x;
+        cursor.tile_y = tile.pos.y;
         cursor.footprint = *(struct Footprint *)(DAT_00829bf8 + 0x3c);
         cursor.field_1414[4] = 0;
         FUN_00424ab0((struct CastleSub *)&DAT_00829ae0);
@@ -5370,8 +5370,8 @@ void FUN_00424620(short *param_1) {
     for (i = 0; i < (int)DAT_00610a08; i++) {
         tile.pos.x = ((short *)&DAT_0060f914[0].next)[i * 18 + 2] + param_1[0];
         tile.pos.y = ((short *)&DAT_0060f914[0].next)[i * 18 + 3] + param_1[1];
-        cursor.field_1404 = tile.pos.x;
-        cursor.field_1408 = tile.pos.y;
+        cursor.tile_x = tile.pos.x;
+        cursor.tile_y = tile.pos.y;
         cursor.footprint = *(struct Footprint *)(DAT_00829c34 + 0x3c);
         cursor.field_1414[4] = 0;
         FUN_0041edb0(DAT_00829c00, tile, (unsigned int)&cursor);
@@ -5887,17 +5887,17 @@ void FUN_004251c0(Element *obj) {
         switch (bloke->param_action) {
         case 0:
             bloke->flags |= 8;
-            if (bloke->field_e == 0) {
+            if (bloke->low_level_action == 0) {
                 bloke->dest.x = (x - 8) << 8;
                 bloke->dest.y = (y - 1) << 8;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
             }
             break;
         case 1:
-            if (bloke->field_e == 0) {
+            if (bloke->low_level_action == 0) {
                 bloke->param_action = 0x10;
             }
             break;
@@ -5906,17 +5906,17 @@ void FUN_004251c0(Element *obj) {
             bloke->param_action = 0x20;
             break;
         case 0x21:
-            if (bloke->field_e == 0) {
+            if (bloke->low_level_action == 0) {
                 bloke->dest.x = (x << 8) + 0x80;
                 bloke->dest.y = (y << 8) + 0x80;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
             }
             break;
         case 0x22:
-            if (bloke->field_e == 0) {
+            if (bloke->low_level_action == 0) {
                 bloke->param_action = 0x40;
             }
             break;
@@ -6243,8 +6243,8 @@ void FUN_00425e20(void) {
     a[2] = DAT_008299bc.m[1][0];
     a[3] = DAT_008299bc.m[1][1];
     FUN_00425de0(a);
-    pt.x = (lpConfig->field_10 >> 1) + lpConfig->field_20;
-    pt.y = (lpConfig->field_12 >> 1) + lpConfig->field_22;
+    pt.x = (lpConfig->view_width >> 1) + lpConfig->view_x;
+    pt.y = (lpConfig->view_height >> 1) + lpConfig->view_y;
     DAT_008299bc.m[0][3] = (float)pt.x;
     DAT_008299bc.m[1][3] = (float)pt.y;
     ScreenToMapRef(&pt.x, &ref.x, 0);
@@ -6261,10 +6261,10 @@ void FUN_00425e20(void) {
     DAT_008299a0[1] = dy * a[3] + dx * a[2];
     DAT_008299a0[0] += (float)ref.x * FLOAT_004ab45c;
     DAT_008299a0[1] += (float)ref.y * FLOAT_004ab45c;
-    DAT_008299ac = lpConfig->field_20;
-    DAT_008299b0 = lpConfig->field_22;
-    DAT_008299b4 = lpConfig->field_10 + lpConfig->field_20;
-    DAT_008299b8 = lpConfig->field_12 + lpConfig->field_22;
+    DAT_008299ac = lpConfig->view_x;
+    DAT_008299b0 = lpConfig->view_y;
+    DAT_008299b4 = lpConfig->view_width + lpConfig->view_x;
+    DAT_008299b8 = lpConfig->view_height + lpConfig->view_y;
     Mat4Identity(m.m);
     m.m[0][3] = -DAT_008299a0[0];
     m.m[1][3] = -DAT_008299a0[1];
@@ -6286,10 +6286,10 @@ void FUN_00426000(int flag) {
     DAT_008299bc = *src;
     DAT_008299bc.m[0][3] = 0.0f;
     DAT_008299bc.m[1][3] = 0.0f;
-    DAT_008299ac = lpConfig->field_20;
-    DAT_008299b0 = lpConfig->field_22;
-    DAT_008299b4 = lpConfig->field_10 + lpConfig->field_20;
-    DAT_008299b8 = lpConfig->field_12 + lpConfig->field_22;
+    DAT_008299ac = lpConfig->view_x;
+    DAT_008299b0 = lpConfig->view_y;
+    DAT_008299b4 = lpConfig->view_width + lpConfig->view_x;
+    DAT_008299b8 = lpConfig->view_height + lpConfig->view_y;
     DAT_008299a0[0] = 0.0f;
     DAT_008299a0[1] = 0.0f;
     DAT_008299a0[2] = 0.0f;
@@ -7463,13 +7463,13 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
 
     EditCursor.footprint = *fp;
     EditCursor.field_1830 = 0;
-    ScreenToMapRef((int *)x, (int *)&EditCursor.field_1404, y);
+    ScreenToMapRef((int *)x, (int *)&EditCursor.tile_x, y);
     if (DAT_00829ae0 != 2) {
         bit = 1;
         for (i = 0; i <= 3; i++) {
-            if ((bit & DAT_00829b8c) && EditCursor.field_1404 - DAT_00829b90[i][0] >= -1 && EditCursor.field_1404 - DAT_00829b90[i][0] <= 1 && (int)EditCursor.field_1408 - DAT_00829b90[i][1] >= -1 && (int)EditCursor.field_1408 - DAT_00829b90[i][1] <= 1) {
-                EditCursor.field_1404 = DAT_00829b90[i][0];
-                EditCursor.field_1408 = DAT_00829b90[i][1];
+            if ((bit & DAT_00829b8c) && EditCursor.tile_x - DAT_00829b90[i][0] >= -1 && EditCursor.tile_x - DAT_00829b90[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829b90[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829b90[i][1] <= 1) {
+                EditCursor.tile_x = DAT_00829b90[i][0];
+                EditCursor.tile_y = DAT_00829b90[i][1];
                 found = 1;
                 break;
             }
@@ -7478,9 +7478,9 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         if (!found) {
             bit = 1;
             for (i = 0; i <= 3; i++) {
-                if ((bit & DAT_00829ba4) && EditCursor.field_1404 - DAT_00829ba8[i][0] >= -1 && EditCursor.field_1404 - DAT_00829ba8[i][0] <= 1 && (int)EditCursor.field_1408 - DAT_00829ba8[i][1] >= -1 && (int)EditCursor.field_1408 - DAT_00829ba8[i][1] <= 1) {
-                    EditCursor.field_1404 = DAT_00829ba8[i][0];
-                    EditCursor.field_1408 = DAT_00829ba8[i][1];
+                if ((bit & DAT_00829ba4) && EditCursor.tile_x - DAT_00829ba8[i][0] >= -1 && EditCursor.tile_x - DAT_00829ba8[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829ba8[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829ba8[i][1] <= 1) {
+                    EditCursor.tile_x = DAT_00829ba8[i][0];
+                    EditCursor.tile_y = DAT_00829ba8[i][1];
                     found = 1;
                     break;
                 }
@@ -7494,8 +7494,8 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
                 DefaultCursor(&DAT_0081ce00[n]);
                 DAT_0081ce00[n].next = EditCursor.next;
                 EditCursor.next = &DAT_0081ce00[n];
-                DAT_0081ce00[n].field_1404 = DAT_00829b90[i][0];
-                DAT_0081ce00[n].field_1408 = DAT_00829b90[i][1];
+                DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
+                DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
                 DAT_0081ce00[n].footprint = *fp;
                 DAT_0081ce00[n].field_1828 = 0x2032;
                 FUN_0045f460(&DAT_0081ce00[n]);
@@ -7509,8 +7509,8 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
                 DefaultCursor(&DAT_0081ce00[n]);
                 DAT_0081ce00[n].next = EditCursor.next;
                 EditCursor.next = &DAT_0081ce00[n];
-                DAT_0081ce00[n].field_1404 = DAT_00829ba8[i][0];
-                DAT_0081ce00[n].field_1408 = DAT_00829ba8[i][1];
+                DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
+                DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
                 DAT_0081ce00[n].footprint = *fp;
                 DAT_0081ce00[n].field_1828 = 0x2032;
                 FUN_0045f460(&DAT_0081ce00[n]);
@@ -7520,8 +7520,8 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         }
         {
             struct Int16Pair pair;
-            pair.x = (unsigned short)EditCursor.field_1404;
-            pair.y = (unsigned short)EditCursor.field_1408;
+            pair.x = (unsigned short)EditCursor.tile_x;
+            pair.y = (unsigned short)EditCursor.tile_y;
             key = FUN_00427c00((unsigned int)obj);
             if (key == 0) {
                 key = (unsigned int)DAT_004b5d20;
@@ -7542,7 +7542,7 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
                     mask = &DAT_00829ba4;
                 }
                 if (bit & *mask) {
-                    if (EditCursor.field_1404 == c->field_1404 && EditCursor.field_1408 == c->field_1408) {
+                    if (EditCursor.tile_x == c->tile_x && EditCursor.tile_y == c->tile_y) {
                         FUN_0045f460(&EditCursor);
                         return;
                     }
@@ -7684,11 +7684,11 @@ void FUN_00427b20(Element *obj, int x, unsigned int y) {
     struct LookupResult *result;
 
     SetEditCursorFootPrint(&obj->ride->footprint);
-    ScreenToMapRef((int *)x, (int *)&EditCursor.field_1404, y);
+    ScreenToMapRef((int *)x, (int *)&EditCursor.tile_x, y);
     ValidateCursor(&EditCursor, (unsigned int)obj->data);
     EditCursor.field_1828 |= 8;
-    tile.a = (unsigned short)EditCursor.field_1404;
-    tile.b = (unsigned short)EditCursor.field_1408;
+    tile.a = (unsigned short)EditCursor.tile_x;
+    tile.b = (unsigned short)EditCursor.tile_y;
     result = FUN_0041d3b0(DAT_004b5d20, (unsigned int)&tile);
     if (result->field_0 != 0) {
         FUN_0045f460(&EditCursor);
@@ -7786,7 +7786,7 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
 
     SetEditCursorFootPrint(&ride->footprint);
     EditCursor.field_1830 = 0;
-    ScreenToMapRef((int *)x, (int *)&EditCursor.field_1404, y);
+    ScreenToMapRef((int *)x, (int *)&EditCursor.tile_x, y);
     n = 0;
     bit = 1;
     for (i = 0; i <= 3; i++) {
@@ -7794,8 +7794,8 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].field_1404 = DAT_00829b90[i][0];
-            DAT_0081ce00[n].field_1408 = DAT_00829b90[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
             DAT_0081ce00[n].footprint = ride->footprint;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7809,8 +7809,8 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].field_1404 = DAT_00829ba8[i][0];
-            DAT_0081ce00[n].field_1408 = DAT_00829ba8[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
             DAT_0081ce00[n].footprint = ride->footprint;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7819,8 +7819,8 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
         bit <<= 1;
     }
     ValidateCursor(&EditCursor, (unsigned int)obj->data);
-    pair.a = (unsigned short)EditCursor.field_1404;
-    pair.b = (unsigned short)EditCursor.field_1408;
+    pair.a = (unsigned short)EditCursor.tile_x;
+    pair.b = (unsigned short)EditCursor.tile_y;
     EditCursor.field_1828 |= 8;
     key = FUN_00427c00((unsigned int)obj);
     if (key != 0) {
@@ -7963,7 +7963,7 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
 
     SetEditCursorFootPrint(fp);
     EditCursor.field_1830 = 0;
-    ScreenToMapRef((int *)x, (int *)&EditCursor.field_1404, y);
+    ScreenToMapRef((int *)x, (int *)&EditCursor.tile_x, y);
     n = 0;
     bit = 1;
     for (i = 0; i <= 3; i++) {
@@ -7971,8 +7971,8 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].field_1404 = DAT_00829b90[i][0];
-            DAT_0081ce00[n].field_1408 = DAT_00829b90[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
             DAT_0081ce00[n].footprint = *fp;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7986,8 +7986,8 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].field_1404 = DAT_00829ba8[i][0];
-            DAT_0081ce00[n].field_1408 = DAT_00829ba8[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
             DAT_0081ce00[n].footprint = *fp;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7996,8 +7996,8 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
         bit <<= 1;
     }
     ValidateCursor(&EditCursor, (unsigned int)obj->data);
-    pair.a = (unsigned short)EditCursor.field_1404;
-    pair.b = (unsigned short)EditCursor.field_1408;
+    pair.a = (unsigned short)EditCursor.tile_x;
+    pair.b = (unsigned short)EditCursor.tile_y;
     EditCursor.field_1828 |= 8;
     key = FUN_00427c00((unsigned int)obj);
     if (key != 0) {

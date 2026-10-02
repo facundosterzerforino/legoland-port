@@ -30,9 +30,9 @@ void KillFountainSFX(void) {
 void FUN_004529e0(unsigned int param_1, int *param_2) {
     struct SampleParams params;
     AddBasicObject(param_1, (unsigned int)param_2);
-    params.field_8 = param_2[0];
+    params.x = param_2[0];
     params.field_0 = 2;
-    params.field_c = param_2[1];
+    params.y = param_2[1];
     PlayInstanceOfSample(*(void **)&FountainSFX[8], 1, 1, &params);
 }
 
@@ -42,8 +42,8 @@ LEGO_EXPORT void RemoveSoundObject(unsigned int a, unsigned int b, unsigned int 
     struct SampleParams params;
     StandardRemoveObject(a, *(TileId *)&b, c);
     params.field_0 = 2;
-    params.field_8 = bb[0];
-    params.field_c = bb[1];
+    params.x = bb[0];
+    params.y = bb[1];
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 
@@ -70,9 +70,9 @@ void KillPowerStationSFX(void) {
 void FUN_00452ad0(unsigned int param_1, int *param_2) {
     struct SampleParams params;
     AddBasicObject(param_1, (unsigned int)param_2);
-    params.field_8 = param_2[0];
+    params.x = param_2[0];
     params.field_0 = 2;
-    params.field_c = param_2[1];
+    params.y = param_2[1];
     PlayInstanceOfSample(*(void **)&PowerStationSFX[0x14], 1, 1, &params);
 }
 
@@ -80,9 +80,9 @@ void FUN_00452ad0(unsigned int param_1, int *param_2) {
 void FUN_00452b20(unsigned int param_1, int *param_2) {
     struct SampleParams params;
     AddBasicObject(param_1, (unsigned int)param_2);
-    params.field_8 = param_2[0];
+    params.x = param_2[0];
     params.field_0 = 2;
-    params.field_c = param_2[1];
+    params.y = param_2[1];
     PlayInstanceOfSample(*(void **)&PowerStationSFX[8], 1, 1, &params);
 }
 
@@ -111,8 +111,8 @@ void FUN_00452bc0(unsigned int param_1, int *param_2) {
     unsigned int r;
     AddBasicObject(param_1, (unsigned int)param_2);
     params.field_0 = 2;
-    params.field_8 = param_2[0];
-    params.field_c = param_2[1];
+    params.x = param_2[0];
+    params.y = param_2[1];
     r = (unsigned int)rand() % 5;
     PlayInstanceOfSample(PTR_004b8770[r * 3], 1, 1, &params);
 }

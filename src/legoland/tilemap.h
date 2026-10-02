@@ -9,7 +9,7 @@ struct Point;
 struct PathFootprint;
 struct Cursor;
 
-LEGO_EXPORT unsigned short RestoreBaseMap(int tile_x, int row_y);
+LEGO_EXPORT void RestoreBaseMap(int tile_x, int row_y);
 LEGO_EXPORT void AdjustTileRFFlags(int *param_1);
 void FUN_0045d770(struct Cursor *param_1);
 LEGO_EXPORT void GetTileBounds(struct Point *ref, int *out);

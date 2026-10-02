@@ -1,7 +1,7 @@
 #pragma once
 
 struct NerpsListNode {
-    struct NerpsListNode *field_0;
+    struct NerpsListNode *next;
     unsigned int field_4;
     unsigned int field_8;
     unsigned int field_c;

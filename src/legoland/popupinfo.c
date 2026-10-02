@@ -810,32 +810,20 @@ void FUN_00472090(void) {
 
 // FUNCTION: LEGOLAND 0x004720a0
 void DrawNewObjectPopup(void) {
-    short sVar2;
-    short sVar3;
-    short sVar4;
-    unsigned int uVar5;
     struct NewObjInfo *obj;
-    struct PrintCtx ctx;
+    struct PrintCtx ctx = {1, 0, 0};
     char local_80[128];
 
-    ctx.node = 0;
-    ctx.flags = 1;
-    ctx.field_8 = 0;
     PrintSprite(NewPopMockSprite, 0xbe, 0x28, 0, (int *)&ctx);
     PrevPopUpIcon->flags = PrevPopUpIcon->flags & 0xfffffbff;
     PrevPopUpIcon->x = 0xc1;
     PrevPopUpIcon->y = 0x46;
-    sVar2 = ClosePopUpIcon->field_10;
-    sVar3 = NewPopMockSprite->width;
     NextPopUpIcon->flags = NextPopUpIcon->flags & 0xfffffbff;
-    NextPopUpIcon->x = (sVar3 - sVar2) + 0xbb;
+    NextPopUpIcon->x = NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb;
     NextPopUpIcon->y = 0x46;
-    sVar2 = NewPopMockSprite->width;
-    sVar3 = NewPopMockSprite->height;
-    sVar4 = ClosePopUpIcon->field_12;
     ClosePopUpIcon->flags = ClosePopUpIcon->flags & 0xfffffbff;
-    ClosePopUpIcon->x = (sVar2 - ClosePopUpIcon->field_10) + 0xbb;
-    ClosePopUpIcon->y = (sVar3 - sVar4) + 0x25;
+    ClosePopUpIcon->x = NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb;
+    ClosePopUpIcon->y = NewPopMockSprite->height - ClosePopUpIcon->height + 0x25;
     PushRenderingStatusAndUnlockVideoSurface();
     if (NewObjects.count == 1) {
         // STRING: LEGOLAND 0x004bad04
@@ -844,9 +832,9 @@ void DrawNewObjectPopup(void) {
         // STRING: LEGOLAND 0x004bacec
         sprintf(local_80, "You have %d new objects", NewObjects.count);
     }
-    FUN_00455e50(local_80, 0xc1, 0x30, NewPopMockSprite->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
+    FUN_00455e50(local_80, 0xc1, 0x30, NewPopMockSprite->width + 0xbb - 0xc1, 0x14, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
-    FUN_00455e50(obj->field_78, 0xc1, 0x4b, NewPopMockSprite->width + -6, 0x14, 2, 5, 0xff0000, 0xffffff);
+    FUN_00455e50(obj->field_78, 0xc1, 0x4b, NewPopMockSprite->width + 0xbb - 0xc1, 0x14, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     FUN_00455e50(obj->field_80, 0x13e, 0x68, 0xfc, 0x77, 2, 0x10, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
@@ -854,24 +842,23 @@ void DrawNewObjectPopup(void) {
     FUN_00455e50(local_80, 0xf0, 0xd1, 0x43, 0x12, 2, 1, 0xff0000, 0xffffff);
     PopRenderingStatus();
     PrintSprite(NewObjects.sprites[NewObjects.current], 0xc4, 100, 0, 0);
-    if (((unsigned int)(int)ClosePopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - ClosePopUpIcon->x)) ||
-        ((unsigned int)(int)ClosePopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - ClosePopUpIcon->y))) {
+    if (((unsigned int)(int)ClosePopUpIcon->width <= (unsigned int)(DAT_00813a44.x - ClosePopUpIcon->x)) ||
+        ((unsigned int)(int)ClosePopUpIcon->height <= (unsigned int)(DAT_00813a44.y - ClosePopUpIcon->y))) {
         SetIconSprite((struct IconNode *)ClosePopUpIcon, PuClosePopUpSprite);
     }
-    if (((unsigned int)(int)NextPopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - NextPopUpIcon->x)) ||
-        ((unsigned int)(int)NextPopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - NextPopUpIcon->y))) {
+    if (((unsigned int)(int)NextPopUpIcon->width <= (unsigned int)(DAT_00813a44.x - NextPopUpIcon->x)) ||
+        ((unsigned int)(int)NextPopUpIcon->height <= (unsigned int)(DAT_00813a44.y - NextPopUpIcon->y))) {
         SetIconSprite((struct IconNode *)NextPopUpIcon, NextIconSprite);
     }
-    if (((unsigned int)(int)PrevPopUpIcon->field_10 <= (unsigned int)(DAT_00813a44.x - PrevPopUpIcon->x)) ||
-        ((unsigned int)(int)PrevPopUpIcon->field_12 <= (unsigned int)(DAT_00813a44.y - PrevPopUpIcon->y))) {
+    if (((unsigned int)(int)PrevPopUpIcon->width <= (unsigned int)(DAT_00813a44.x - PrevPopUpIcon->x)) ||
+        ((unsigned int)(int)PrevPopUpIcon->height <= (unsigned int)(DAT_00813a44.y - PrevPopUpIcon->y))) {
         SetIconSprite((struct IconNode *)PrevPopUpIcon, PrevIconSprite);
     }
     if (NewObjects.current == 0) {
-        uVar5 = PrevPopUpIcon->flags | 0x400;
+        PrevPopUpIcon->flags = PrevPopUpIcon->flags | 0x400;
     } else {
-        uVar5 = PrevPopUpIcon->flags & 0xfffffbff;
+        PrevPopUpIcon->flags = PrevPopUpIcon->flags & 0xfffffbff;
     }
-    PrevPopUpIcon->flags = uVar5;
     if (NewObjects.current == (int)(NewObjects.count + -1)) {
         NextPopUpIcon->flags = NextPopUpIcon->flags | 0x400;
         return;
@@ -893,10 +880,10 @@ int FUN_004723f0(void) {
     local_8[0] = v & 0xff;
     local_8[1] = v >> 8;
     cls = *(struct ObjClass **)((char *)DAT_007fdec0.ptr + 0xc);
-    QueryCursor.field_1408 = v >> 8;
+    QueryCursor.tile_y = v >> 8;
     QueryClass = cls;
-    QueryCursor.field_1404 = v & 0xff;
-    cls->method_94(cls->field_c4, local_8);
+    QueryCursor.tile_x = v & 0xff;
+    cls->method_94(cls->element, local_8);
     BuildCursorPtr(&QueryCursor, 0, 0);
     FUN_0045f4b0(&QueryCursor);
     memcpy(&QueryCursor, &local_cursor, sizeof(struct Cursor));
@@ -1288,17 +1275,17 @@ unsigned char FUN_004731e0(void *param_1, unsigned char flags) {
         local_8[0] = v & 0xff;
         local_8[1] = v >> 8;
         cls = *(struct ObjClass **)((char *)DAT_007fdec0.ptr + 0xc);
-        QueryCursor.field_1408 = local_8[1];
+        QueryCursor.tile_y = local_8[1];
         QueryObj.pos.y = (unsigned char)local_8[1];
         QueryClass = cls;
-        QueryCursor.field_1404 = local_8[0];
+        QueryCursor.tile_x = local_8[0];
         QueryObj.pos.x = (unsigned char)local_8[0];
-        cls->method_94(cls->field_c4, local_8);
+        cls->method_94(cls->element, local_8);
         BuildCursorPtr(&QueryCursor, 0, 0);
         if ((int)FUN_0045f4b0(&QueryCursor) != 0) {
             FUN_0045d3d0(QueryClass, local_8);
             cls = QueryClass;
-            RemObjFromMap(cls, cls->field_c4, QueryObj, &QueryCursor);
+            RemObjFromMap(cls, cls->element, QueryObj, &QueryCursor);
         }
         memcpy(&QueryCursor, &local_cursor, sizeof(struct Cursor));
         QueryClass = saved_class;

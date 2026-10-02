@@ -31,15 +31,15 @@ struct BNVPath {
     /* 0x00 */ struct BinVFile *file;
     /* 0x04 */ unsigned int field_4;
     /* 0x08 */ char name[0x14];
-    /* 0x1c */ float field_1c;
-    /* 0x20 */ float field_20;
+    /* 0x1c */ float z_scale;
+    /* 0x20 */ float z_origin;
     /* 0x24 */ float x;
     /* 0x28 */ float y;
     /* 0x2c */ unsigned char pad_2c[0x30 - 0x2c];
     /* 0x30 */ float dx;
     /* 0x34 */ float dy;
     /* 0x38 */ unsigned char pad_38[0x3c - 0x38];
-    /* 0x3c */ float field_3c;
+    /* 0x3c */ float z_skew;
     /* 0x40 */ unsigned int frame_index;
     /* 0x44 */ unsigned int field_44;
 };
@@ -55,8 +55,8 @@ struct Bloke {
     unsigned char pad_9[0x1];
     unsigned short prev_param;
     unsigned short action;
-    unsigned short field_e;
-    unsigned short field_10;
+    unsigned short low_level_action;
+    unsigned short pending_action;
     unsigned char pad_12[0x14 - 0x12];
     struct Element *target; /* class of the ride/shop the bloke is heading for */
     struct Element *last_ride; /* class of the last ride the bloke went on */
@@ -100,22 +100,22 @@ struct Bloke {
     unsigned char field_64;
     unsigned char pad_65[0x68 - 0x65];
     Point pos;
-    unsigned short field_70;
-    unsigned char field_72;
+    unsigned short height;
+    unsigned char dir;
     unsigned char field_73;
-    unsigned char field_74;
+    unsigned char frame;
     unsigned char field_75;
     unsigned char pad_76[0x78 - 0x76];
     short field_78;
-    short field_7a;
+    short mood;
     unsigned short field_7c;
     unsigned char field_7e;
-    unsigned char field_7f;
+    unsigned char speed;
     unsigned char field_80;
     unsigned char field_81;
     unsigned char field_82;
-    unsigned char field_83;
-    unsigned char field_84;
+    unsigned char first_name_index;
+    unsigned char last_name_index;
     unsigned char pad_85[0x88 - 0x85];
     struct Element *favourite_attraction_0;
     struct Element *favourite_attraction_1;
@@ -128,8 +128,8 @@ typedef struct Bloke Bloke;
 /* The 0x124-byte save-game record of a visitor and its Person (scratch buffer DAT_007fda60). */
 struct BlokeSave {
     /* 0x00 */ unsigned short action;
-    /* 0x02 */ unsigned short field_e;
-    /* 0x04 */ unsigned short field_10;
+    /* 0x02 */ unsigned short low_level_action;
+    /* 0x04 */ unsigned short pending_action;
     /* 0x06 */ unsigned char pad_6[0x8 - 0x6];
     /* 0x08 */ int target; /* index into the save game's element list, or -1 */
     /* 0x0c */ int last_ride;
@@ -145,20 +145,20 @@ struct BlokeSave {
     /* 0x58 */ unsigned char field_64;
     /* 0x59 */ unsigned char pad_59[1];
     /* 0x5a */ short field_78;
-    /* 0x5c */ short field_7a;
+    /* 0x5c */ short mood;
     /* 0x5e */ unsigned short field_7c;
     /* 0x60 */ unsigned char field_7e;
-    /* 0x61 */ unsigned char field_7f;
+    /* 0x61 */ unsigned char speed;
     /* 0x62 */ unsigned char field_80;
     /* 0x63 */ unsigned char field_81;
     /* 0x64 */ unsigned char field_82;
     /* 0x65 */ unsigned char pad_65[3];
     /* 0x68 */ int favourite[4]; /* indices into the save game's element list */
     /* 0x78 */ Point pos;
-    /* 0x80 */ unsigned short field_70;
-    /* 0x82 */ unsigned char field_72;
+    /* 0x80 */ unsigned short height;
+    /* 0x82 */ unsigned char dir;
     /* 0x83 */ unsigned char field_73;
-    /* 0x84 */ unsigned char field_74;
+    /* 0x84 */ unsigned char frame;
     /* 0x85 */ unsigned char field_75;
     /* 0x86 */ unsigned char pad_86[2];
     /* 0x88 */ Navigator nav;

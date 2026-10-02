@@ -93,13 +93,13 @@ void FUN_0042bc90(struct CarouselNode *node) {
     struct SampleParams params;
 
     params.field_0 = 2;
-    node->field_7 = node->field_6;
+    node->leaving_count = node->seated_count;
     node->flags = node->flags & 0xffffbfff | 1;
-    node->field_6 = 0;
-    node->field_14 = 0;
-    params.field_8 = *(unsigned char *)((char *)node + 4);
-    params.field_c = *(unsigned char *)((char *)node + 5);
-    node->field_8 = 1;
+    node->seated_count = 0;
+    node->frame_ticks = 0;
+    params.x = *(unsigned char *)((char *)node + 4);
+    params.y = *(unsigned char *)((char *)node + 5);
+    node->frame = 1;
     PlayInstanceOfSample(*(void **)(CAROUSSEL_SFX + 8), 1, 1, &params);
 }
 
@@ -108,16 +108,16 @@ void FUN_0042c210(struct CarouselNode *node) {
     int r;
     struct SampleParams params;
 
-    node->field_14 = 0;
-    node->field_8 = 0;
+    node->frame_ticks = 0;
+    node->frame = 0;
     r = rand() % 2;
-    node->field_18 = 0;
-    node->field_10 = (char)r + '\x03';
-    node->field_6 = 0;
+    node->boarding_count = 0;
+    node->cycles_left = (char)r + '\x03';
+    node->seated_count = 0;
     node->flags = node->flags & 0xffffbffe;
     params.field_0 = 2;
-    params.field_8 = *(unsigned char *)((char *)node + 4);
-    params.field_c = *(unsigned char *)((char *)node + 5);
+    params.x = *(unsigned char *)((char *)node + 4);
+    params.y = *(unsigned char *)((char *)node + 5);
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 
@@ -190,8 +190,8 @@ void FUN_0042c4a0(struct CarouselRideObj *param_1, TileId tile, unsigned int par
     }
     StandardRemoveObject((unsigned int)param_1, tile, param_3);
     RemoveAllBlokesFromRide(param_1->ride, tile);
-    params.field_8 = tile.pos.x;
-    params.field_c = tile.pos.y;
+    params.x = tile.pos.x;
+    params.y = tile.pos.y;
     params.field_0 = 2;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
@@ -294,10 +294,10 @@ void FUN_0042c6d0(struct CarouselNode *node) {
     if ((flags & 1) != 0) {
         int v;
         unsigned char f10;
-        v = node->field_14 + 1;
-        node->field_14 = v;
-        f10 = node->field_10;
-        v = node->field_14;
+        v = node->frame_ticks + 1;
+        node->frame_ticks = v;
+        f10 = node->cycles_left;
+        v = node->frame_ticks;
         if (f10 == 0) {
             if (GetAllBlokesOffRide((struct Ride *)DAT_006160bc, node->id) == 0) {
                 return;
@@ -307,25 +307,25 @@ void FUN_0042c6d0(struct CarouselNode *node) {
         }
         if (2 <= v) {
             char cVar4;
-            node->field_14 = 0;
-            cVar4 = ++node->field_8;
+            node->frame_ticks = 0;
+            cVar4 = ++node->frame;
             if (cVar4 >= '@') {
-                node->field_8 = 0;
-                node->field_10 = f10 - 1;
+                node->frame = 0;
+                node->cycles_left = f10 - 1;
             }
         }
     } else if ((flags & 0x4000) != 0) {
-        if ((char)node->field_6 == (char)node->field_18) {
+        if ((char)node->seated_count == (char)node->boarding_count) {
             node->flags = flags & 0xffffbfff;
             FUN_0042bc90(node);
             return;
         }
-    } else if (node->field_6 != 0) {
-        if (node->field_1c == 0) {
+    } else if (node->seated_count != 0) {
+        if (node->boarding_timer == 0) {
             node->flags = flags | 0x4000;
             Ride_SetFlagToNotLetAnyoneOn((unsigned char *)&node->id);
         } else {
-            node->field_1c = node->field_1c - 1;
+            node->boarding_timer = node->boarding_timer - 1;
         }
     }
     for (; elem != NULL; elem = elem->next) {
@@ -333,10 +333,10 @@ void FUN_0042c6d0(struct CarouselNode *node) {
             // STRING: LEGOLAND 0x004b4704
             sprintf(DAT_004b64d4, "%02d", *(unsigned char *)((char *)elem->bloke + 0x36));
             // STRING: LEGOLAND 0x004b64cc
-            SetBlokePositionFromBNV(CarouselBinV, elem->bloke, "BlokeBox??", (int)(char)node->field_8, -1617853.25f, -1618109.0f, 0);
+            SetBlokePositionFromBNV(CarouselBinV, elem->bloke, "BlokeBox??", (int)(char)node->frame, -1617853.25f, -1618109.0f, 0);
         }
     }
-    *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)(char)node->field_8;
+    *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)(char)node->frame;
 }
 
 // FUNCTION: LEGOLAND 0x0042c800
@@ -402,8 +402,8 @@ void FUN_0042c820(struct CarouselRideObj *param_1) {
                     iVar12 = (iVar10b - iVar10) * local_30;
                     sVar8 = Get_XScroll();
                     sVar9 = Get_YScroll();
-                    local_18 = (((((unsigned int)lpConfig->field_20 - (int)sVar8) + (iVar12 >> 9)) - DAT_00616078 / 2) - coords.x) * 2;
-                    local_14 = ((((iVar13 >> 9) + ((unsigned int)lpConfig->field_22 - (int)sVar9)) - DAT_0061607c / 2) - coords.y) * 2;
+                    local_18 = (((((unsigned int)lpConfig->view_x - (int)sVar8) + (iVar12 >> 9)) - DAT_00616078 / 2) - coords.x) * 2;
+                    local_14 = ((((iVar13 >> 9) + ((unsigned int)lpConfig->view_y - (int)sVar9)) - DAT_0061607c / 2) - coords.y) * 2;
                 }
                 *(struct Sprite **)(*(int *)(blokepos + 4) + 0x2c) = DAT_006160c0;
                 *(unsigned int *)(*(int *)(blokepos + 4) + 0x30) = 1;

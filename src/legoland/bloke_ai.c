@@ -23,8 +23,8 @@
 LEGO_EXPORT void NewLongTermAction(Bloke *bloke, unsigned short action) {
     bloke->action = action;
     bloke->param_action = 0;
-    bloke->field_10 = 0;
-    bloke->field_e = 0;
+    bloke->pending_action = 0;
+    bloke->low_level_action = 0;
     bloke->field_1c = 0;
     DoHighLevelAI(bloke);
 }
@@ -138,9 +138,9 @@ LEGO_EXPORT void InitBlokeAI(Bloke *bloke) {
         Entrance1Elem = ElemID("ENTRANCE 1");
     }
     DAT_006661bc++;
-    bloke->field_7f = Rand_Tween(12, 24);
+    bloke->speed = Rand_Tween(12, 24);
     bloke->field_78 = Rand_Max(MapStats.total_tiles);
-    bloke->field_7a = Rand_Tween(10, 50);
+    bloke->mood = Rand_Tween(10, 50);
     bloke->field_7e = Rand_Tween(0, 140) - 0x14;
     bloke->field_80 = Rand_Tween(5, 10);
     bloke->field_7c = Rand_Tween(0, DAT_004b8334[1]);
@@ -172,8 +172,8 @@ void FUN_0044ea50(void) {
         bloke = MakeBloke(0);
         if (bloke != NULL) {
             DAT_006661c8 = 0;
-            bloke->field_72 = rand() & 7;
-            bloke->field_74 = rand() & 7;
+            bloke->dir = rand() & 7;
+            bloke->frame = rand() & 7;
             bloke->field_75 = 1;
             InitBlokeAI(bloke);
         }
@@ -182,7 +182,7 @@ void FUN_0044ea50(void) {
 
 // FUNCTION: LEGOLAND 0x0044eab0
 int FUN_0044eab0(Bloke *bloke) {
-    return bloke->field_78 - bloke->field_7a / 2 > MapStats.total_tiles * 2;
+    return bloke->field_78 - bloke->mood / 2 > MapStats.total_tiles * 2;
 }
 
 // FUNCTION: LEGOLAND 0x0044eae0
@@ -266,8 +266,8 @@ void FUN_0044ebf0(Bloke *bloke) {
         bloke->pos.x = bloke->dest.x + DAT_004b8318.x;
         bloke->pos.y = bloke->dest.y + DAT_004b8318.y;
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-        bloke->field_e = 7;
-        bloke->field_72 = (dir >> 5) + 3;
+        bloke->low_level_action = 7;
+        bloke->dir = (dir >> 5) + 3;
         bloke->param_action++;
         break;
     case 1:
@@ -323,7 +323,7 @@ void FUN_0044ed70(Bloke *bloke) {
         case -3:
         case -1:
         case 0:
-            bloke->field_e = 4;
+            bloke->low_level_action = 4;
             bloke->param_action = 2;
             if (++bloke->field_82 == 8) {
                 bloke->param_action = 5;
@@ -333,11 +333,11 @@ void FUN_0044ed70(Bloke *bloke) {
         case 2:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if (bloke->field_64 != 0) {
-                bloke->field_e = 4;
+                bloke->low_level_action = 4;
                 bloke->param_action = 2;
                 return;
             }
@@ -346,11 +346,11 @@ void FUN_0044ed70(Bloke *bloke) {
         case 1:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if (bloke->field_64 != 0) {
-                bloke->field_e = 4;
+                bloke->low_level_action = 4;
                 bloke->param_action = 2;
                 return;
             }
@@ -371,7 +371,7 @@ void FUN_0044ed70(Bloke *bloke) {
         case 2:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 0xb;
+            bloke->low_level_action = 0xb;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             bloke->param_action = (bloke->field_64 & 1) ? 6 : 10;
@@ -379,7 +379,7 @@ void FUN_0044ed70(Bloke *bloke) {
         case 1:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 0xb;
+            bloke->low_level_action = 0xb;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if ((bloke->field_64 & 1) != 0) {
@@ -388,7 +388,7 @@ void FUN_0044ed70(Bloke *bloke) {
             }
             break;
         case 0:
-            bloke->field_e = 4;
+            bloke->low_level_action = 4;
             bloke->param_action = 6;
             return;
         }
@@ -397,7 +397,7 @@ void FUN_0044ed70(Bloke *bloke) {
         // STRING: LEGOLAND 0x004b8424
         sprintf(msg, "Wandering...");
         FUN_0044ed00(msg);
-        bloke->field_e = 4;
+        bloke->low_level_action = 4;
         bloke->param_action = 5;
         return;
     case 10:
@@ -416,17 +416,17 @@ void FUN_0044ed70(Bloke *bloke) {
         bloke->dest.x = (object->field_4 + ride->footprint.x1 + 6) << 8;
         bloke->dest.y = (object->field_5 + ride->footprint.y0 + 8) << 8;
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-        bloke->field_e = 7;
+        bloke->low_level_action = 7;
         bloke->field_73 = dir;
         NewDirForAction(bloke, (dir >> 5) + 3);
         bloke->param_action++;
         break;
     case 12:
-        RateBlokeOnLeaving(bloke->field_7a);
+        RateBlokeOnLeaving(bloke->mood);
         bloke->dest.x += DAT_004b8328.x;
         bloke->dest.y += DAT_004b8328.y;
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-        bloke->field_e = 7;
+        bloke->low_level_action = 7;
         bloke->field_73 = dir;
         NewDirForAction(bloke, (dir >> 5) + 3);
         bloke->param_action++;
@@ -441,7 +441,7 @@ void FUN_0044ed70(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x0044f170
 void FUN_0044f170(Bloke *bloke) {
-    bloke->field_e = 4;
+    bloke->low_level_action = 4;
 }
 
 // FUNCTION: LEGOLAND 0x0044f180
@@ -607,8 +607,8 @@ int FUN_0044f4a0(Bloke *bloke, Ride *ride, int wait) {
             bloke->field_58 = wait;
             node->person = bloke->person;
             bloke->flags |= 0x20;
-            bloke->field_e = 0;
-            bloke->field_10 = 0;
+            bloke->low_level_action = 0;
+            bloke->pending_action = 0;
             bloke->field_35 = 0;
             if (ride == Entrance1Elem->data) {
                 object = GetFirstObjectMatching(Entrance1Elem);
@@ -698,7 +698,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 1:
         switch (SuggestNextMove(&bloke->pos, &bloke->goal, &out)) {
         case -2:
-            bloke->field_e = 10;
+            bloke->low_level_action = 10;
             return;
         case -3:
         case -1:
@@ -721,26 +721,26 @@ void FUN_0044f610(Bloke *bloke) {
                     // STRING: LEGOLAND 0x004b8424
                     sprintf(msg, "Wandering...");
                     FUN_0044ed00(msg);
-                    bloke->field_e = 4;
+                    bloke->low_level_action = 4;
                     bloke->param_action++;
                     return;
                 }
                 ox = object->field_4;
                 oy = object->field_5;
                 if (ox == x && oy == y) {
-                    bloke->field_e = 4;
+                    bloke->low_level_action = 4;
                     return;
                 }
                 bloke->goal.x = ((ride->x + ox) << 8) + 0x80;
                 bloke->goal.y = ((ride->y + oy) << 8) + 0x80;
                 return;
             }
-            bloke->field_e = 4;
+            bloke->low_level_action = 4;
             return;
         case 2:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             bloke->param_action = bloke->field_64 != 0 ? 0 : 10;
@@ -748,7 +748,7 @@ void FUN_0044f610(Bloke *bloke) {
         case 1:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             bloke->param_action = bloke->field_64 == 0;
@@ -759,7 +759,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 3:
         sprintf(msg, "Wandering...");
         FUN_0044ed00(msg);
-        bloke->field_e = 4;
+        bloke->low_level_action = 4;
         bloke->param_action++;
         return;
     case 4:
@@ -773,7 +773,7 @@ void FUN_0044f610(Bloke *bloke) {
         case 2:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 0xb;
+            bloke->low_level_action = 0xb;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             bloke->param_action = (bloke->field_64 & 1) ? 6 : 10;
@@ -781,7 +781,7 @@ void FUN_0044f610(Bloke *bloke) {
         case 1:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 0xb;
+            bloke->low_level_action = 0xb;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if ((bloke->field_64 & 1) != 0) {
@@ -790,7 +790,7 @@ void FUN_0044f610(Bloke *bloke) {
             }
             break;
         case 0:
-            bloke->field_e = 4;
+            bloke->low_level_action = 4;
             bloke->param_action = 6;
             return;
         }
@@ -798,7 +798,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 6:
         sprintf(msg, "Wandering...");
         FUN_0044ed00(msg);
-        bloke->field_e = 4;
+        bloke->low_level_action = 4;
         bloke->param_action = 5;
         return;
     case 10:
@@ -895,11 +895,11 @@ void FUN_0044fe10(Bloke *bloke) {
 
     switch (bloke->param_action) {
     case 0:
-        to.x = DAT_0066b460.x << 8;
-        to.y = DAT_0066b460.y << 8;
+        to.x = Entrance1Point.x << 8;
+        to.y = Entrance1Point.y << 8;
         bloke->dest = to;
         dir = CalcMoveLine(bloke->pos, to, &bloke->nav) + 0x10;
-        bloke->field_e = 0xf;
+        bloke->low_level_action = 0xf;
         bloke->field_73 = dir;
         NewDirForAction(bloke, (dir >> 5) + 3);
         bloke->param_action++;
@@ -941,17 +941,17 @@ void FUN_0044fe80(Bloke *bloke) {
     case 1:
         switch (SuggestNextMove(&bloke->pos, &bloke->goal, &out)) {
         case -2:
-            bloke->field_e = 10;
+            bloke->low_level_action = 10;
             return;
         case -3:
         case -1:
         case 0:
-            bloke->field_e = 4;
+            bloke->low_level_action = 4;
             return;
         case 2:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if (bloke->field_64 == 0) {
@@ -962,7 +962,7 @@ void FUN_0044fe80(Bloke *bloke) {
         case 1:
             bloke->dest = out;
             dir = CalcMoveLine(bloke->pos, out, &bloke->nav) + 0x10;
-            bloke->field_e = 6;
+            bloke->low_level_action = 6;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             if (bloke->field_64 == 0) {
@@ -993,7 +993,7 @@ void FUN_0044fe80(Bloke *bloke) {
             bloke->dest.y = bloke->goal.y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
             bloke->field_73 = dir;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, 7);
             bloke->field_5c = 0;
             bloke->param_action++;
@@ -1029,7 +1029,7 @@ void FUN_0044fe80(Bloke *bloke) {
             bloke->dest.x = bloke->goal.x + 0x80;
             bloke->dest.y = bloke->goal.y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir;
             NewDirForAction(bloke, (dir >> 5) + 3);
             bloke->param_action++;
@@ -1071,7 +1071,7 @@ void FUN_00450250(Bloke *bloke) {
         }
         break;
     case 2:
-        bloke->field_e = 0xd;
+        bloke->low_level_action = 0xd;
         bloke->param_action++;
         return;
     case 3:
@@ -1098,7 +1098,7 @@ void FUN_00450330(Bloke *bloke) {
         bloke->param_action++;
         break;
     case 1:
-        bloke->field_e = 0xd;
+        bloke->low_level_action = 0xd;
         bloke->param_action++;
         return;
     case 2:
@@ -1127,33 +1127,33 @@ void FUN_004503a0(Bloke *bloke, Footprint *box) {
     oy = bloke->goal.y;
     if (tx > box->x1 + ox) {
         if (ty < box->y0 + oy) {
-            bloke->field_72 = 6;
+            bloke->dir = 6;
             return;
         }
         if (ty > box->y1 + oy) {
-            bloke->field_72 = 0;
+            bloke->dir = 0;
             return;
         }
-        bloke->field_72 = 7;
+        bloke->dir = 7;
         return;
     }
     if (tx < box->x0 + ox) {
         if (ty < box->y0 + oy) {
-            bloke->field_72 = 4;
+            bloke->dir = 4;
             return;
         }
         if (ty > box->y1 + oy) {
-            bloke->field_72 = 2;
+            bloke->dir = 2;
             return;
         }
-        bloke->field_72 = 3;
+        bloke->dir = 3;
         return;
     }
     if (ty < box->y0 + oy) {
-        bloke->field_72 = 5;
+        bloke->dir = 5;
         return;
     }
-    bloke->field_72 = 1;
+    bloke->dir = 1;
 }
 
 // FUNCTION: LEGOLAND 0x00450450
@@ -1247,7 +1247,7 @@ void FUN_00450530(Bloke *bloke) {
                         shops += cls->value >> GetBlokeCounter(cls, GetBlokeNum(bloke));
                         if ((bloke->flags & 0x20) == 0 && bloke->target != cls->element) {
                             chance = 15 / (GetBlokeCounter(cls, GetBlokeNum(bloke)) + 1);
-                            if (rand() % 100 < chance && bloke->field_e != 0xf) {
+                            if (rand() % 100 < chance && bloke->low_level_action != 0xf) {
                                 t.x = bloke->pos.x >> 8;
                                 t.y = bloke->pos.y >> 8;
                                 dx = abs(t.x - pos.x);
@@ -1273,7 +1273,7 @@ void FUN_00450530(Bloke *bloke) {
                             bloke->goal.x = food.x << 8;
                             bloke->goal.y = food.y << 8;
                             bloke->param_action = 1;
-                            bloke->field_e = 0;
+                            bloke->low_level_action = 0;
                             bloke->target = cls->element;
                         }
                         break;
@@ -1287,7 +1287,7 @@ void FUN_00450530(Bloke *bloke) {
                             bloke->goal.x = spot.x << 8;
                             bloke->goal.y = spot.y << 8;
                             bloke->param_action = 1;
-                            bloke->field_e = 0;
+                            bloke->low_level_action = 0;
                             bloke->target = cls->element;
                         }
                         break;
@@ -1327,7 +1327,7 @@ LEGO_EXPORT void ControlPeople(void) {
         }
         FUN_0044eb50(bloke);
         if ((bloke->flags & 0x20) != 0) {
-            if (bloke->field_e != 0) {
+            if (bloke->low_level_action != 0) {
                 DoLowLevelAI(bloke);
             }
         } else {
@@ -1336,10 +1336,10 @@ LEGO_EXPORT void ControlPeople(void) {
                 FUN_00482df0(bloke, 8, 1);
                 FUN_00450530(bloke);
             }
-            if (bloke->field_e == 0) {
+            if (bloke->low_level_action == 0) {
                 DoHighLevelAI(bloke);
             }
-            if (bloke->field_e != 0) {
+            if (bloke->low_level_action != 0) {
                 DoLowLevelAI(bloke);
             }
         }

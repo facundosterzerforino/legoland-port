@@ -34,9 +34,9 @@ LEGO_EXPORT void InitOptionScreen(void) {
     unsigned int x;
 
     PauseGameTimer();
-    DAT_007cb314 = (char)CurrentProfile.field_24;
-    DAT_007cb31c = (char)CurrentProfile.field_28;
-    DAT_007cb315 = (char)CurrentProfile.field_2c;
+    DAT_007cb314 = (char)CurrentProfile.speech_volume;
+    DAT_007cb31c = (char)CurrentProfile.music_volume;
+    DAT_007cb315 = (char)CurrentProfile.fx_volume;
 
     // STRING: LEGOLAND 0x004bf49c
     SPRITE_TitleScreenBk = LoadSprite("OptionScreenBK.lls", 0);
@@ -89,7 +89,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->flags |= flag_mask;
     icon->field_18s = 2;
 
-    x = FUN_0048eaf0(CurrentProfile.field_24);
+    x = FUN_0048eaf0(CurrentProfile.speech_volume);
     // STRING: LEGOLAND 0x004bf420
     icon = LoadSpriteIcon("VolMarkerSpeech.lls", 4, x, 0x33, 7);
     icon->string_id = 0x47;
@@ -115,7 +115,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->event_handler = (void *)OptionsUpIconHandler;
     icon->field_18s = 5;
 
-    x = FUN_0048eaf0(CurrentProfile.field_28);
+    x = FUN_0048eaf0(CurrentProfile.music_volume);
     // STRING: LEGOLAND 0x004bf3f8
     icon = LoadSpriteIcon("VolMarkerMusic.lls", 4, x, 0x77, 7);
     icon->string_id = 0x4a;
@@ -141,7 +141,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->flags |= flag_mask;
     icon->field_18s = 8;
 
-    x = FUN_0048eaf0(CurrentProfile.field_2c);
+    x = FUN_0048eaf0(CurrentProfile.fx_volume);
     // STRING: LEGOLAND 0x004bf3d4
     icon = LoadSpriteIcon("VolMarkerFX.lls", 4, x, 0xbb, 7);
     icon->string_id = 0x4d;
@@ -169,9 +169,9 @@ unsigned char FUN_0048ef10(unsigned int param_1, unsigned int param_2) {
 unsigned char FUN_0048ef40(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        CurrentProfile.field_24 = DAT_007cb314;
-        CurrentProfile.field_28 = DAT_007cb31c;
-        CurrentProfile.field_2c = DAT_007cb315;
+        CurrentProfile.speech_volume = DAT_007cb314;
+        CurrentProfile.music_volume = DAT_007cb31c;
+        CurrentProfile.fx_volume = DAT_007cb315;
         DAT_0080ff80.unk8 = 1;
     }
     return 1;
@@ -194,7 +194,7 @@ unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_
         SpeechCloseFile();
         DAT_006687b0 = 4;
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        if (CurrentProfile.field_44 != 0) {
+        if (CurrentProfile.save_slot != 0) {
             UpDateCurrentSaveSlotInfo();
         }
         DAT_00668e38 = 0;
@@ -409,9 +409,9 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                 }
                 switch ((int)(unsigned short)param_1->field_18s) {
                 case 2:
-                    if (CurrentProfile.field_24 != 0) {
-                        CurrentProfile.field_24--;
-                        result = FUN_0048eaf0(CurrentProfile.field_24);
+                    if (CurrentProfile.speech_volume != 0) {
+                        CurrentProfile.speech_volume--;
+                        result = FUN_0048eaf0(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
                         if (!DAT_006687b4 && !FUN_00498cf0()) {
                             FUN_0046d230(-2);
@@ -420,16 +420,16 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                     }
                     break;
                 case 5:
-                    if (CurrentProfile.field_28 != 0) {
-                        CurrentProfile.field_28--;
-                        result = FUN_0048eaf0(CurrentProfile.field_28);
+                    if (CurrentProfile.music_volume != 0) {
+                        CurrentProfile.music_volume--;
+                        result = FUN_0048eaf0(CurrentProfile.music_volume);
                         MusicVolumeMarkerIcon->x = (short)result;
                     }
                     break;
                 case 8:
-                    if (CurrentProfile.field_2c != 0) {
-                        CurrentProfile.field_2c--;
-                        result = FUN_0048eaf0(CurrentProfile.field_2c);
+                    if (CurrentProfile.fx_volume != 0) {
+                        CurrentProfile.fx_volume--;
+                        result = FUN_0048eaf0(CurrentProfile.fx_volume);
                         FxVolumeMarkerIcon->x = (short)result;
                     }
                     break;
@@ -469,9 +469,9 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                 }
                 switch ((int)(unsigned short)param_1->field_18s) {
                 case 1:
-                    if (CurrentProfile.field_24 < 0x64) {
-                        CurrentProfile.field_24++;
-                        result = FUN_0048eaf0(CurrentProfile.field_24);
+                    if (CurrentProfile.speech_volume < 0x64) {
+                        CurrentProfile.speech_volume++;
+                        result = FUN_0048eaf0(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
                         if (!DAT_006687b4 && !FUN_00498cf0()) {
                             FUN_0046d230(-2);
@@ -480,16 +480,16 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                     }
                     break;
                 case 4:
-                    if (CurrentProfile.field_28 < 0x64) {
-                        CurrentProfile.field_28++;
-                        result = FUN_0048eaf0(CurrentProfile.field_28);
+                    if (CurrentProfile.music_volume < 0x64) {
+                        CurrentProfile.music_volume++;
+                        result = FUN_0048eaf0(CurrentProfile.music_volume);
                         MusicVolumeMarkerIcon->x = (short)result;
                     }
                     break;
                 case 7:
-                    if (CurrentProfile.field_2c < 0x64) {
-                        CurrentProfile.field_2c++;
-                        result = FUN_0048eaf0(CurrentProfile.field_2c);
+                    if (CurrentProfile.fx_volume < 0x64) {
+                        CurrentProfile.fx_volume++;
+                        result = FUN_0048eaf0(CurrentProfile.fx_volume);
                         FxVolumeMarkerIcon->x = (short)result;
                     }
                     break;
@@ -534,17 +534,17 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
             result = FUN_0048eac0(param_1->x);
             switch ((unsigned int)(unsigned short)param_1->field_18s) {
             case 3:
-                CurrentProfile.field_24 = result;
+                CurrentProfile.speech_volume = result;
                 if (!DAT_006687b4 && !FUN_00498cf0()) {
                     FUN_0046d230(-2);
                 }
                 FUN_0046d230(param_1->string_id);
                 break;
             case 6:
-                CurrentProfile.field_28 = result;
+                CurrentProfile.music_volume = result;
                 break;
             case 9:
-                CurrentProfile.field_2c = result;
+                CurrentProfile.fx_volume = result;
                 break;
             }
             FUN_0046d110();

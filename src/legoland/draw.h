@@ -10,10 +10,10 @@ union RectPoints {
 };
 
 struct VideoArg {
-    /* 0x00 */ int field_0;
+    /* 0x00 */ int pitch;
     /* 0x04 */ int field_4;
     /* 0x08 */ int field_8;
-    /* 0x0c */ void *field_c;
+    /* 0x0c */ void *bits;
     /* 0x10 */ int field_10;
     /* 0x14 */ int field_14;
 };
@@ -61,6 +61,7 @@ int BlitFrameToWindow(void);
 void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off);
 LEGO_EXPORT void SoftPrint_Clear(void);
 LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint);
+LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *a, RECT *b, unsigned int param_4);
 void DrawWatchSprite(void);
 int SetDisplayModeAndDetectPixelFormat(void);
 

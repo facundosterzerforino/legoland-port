@@ -116,9 +116,11 @@ int FUN_00451280(HANDLE h, int drive) {
     unsigned char buf[8];
     int result;
     int i;
+    int drv;
 
     buf[1] = 0;
-    regs.reg_EBX = drive & 0xff;
+    drv = drive & 0xff;
+    regs.reg_EBX = drv;
     regs.reg_EDX = (DWORD)buf;
     buf[0] = 2;
     regs.reg_EAX = 0x440d;
@@ -135,7 +137,7 @@ int FUN_00451280(HANDLE h, int drive) {
     }
     i = 0;
     while (buf[1] > 0) {
-        regs.reg_EBX = drive & 0xff;
+        regs.reg_EBX = drv;
         regs.reg_EDX = (DWORD)buf;
         buf[0] = 1;
         regs.reg_EAX = 0x440d;

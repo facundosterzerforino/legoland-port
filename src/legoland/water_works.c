@@ -147,8 +147,8 @@ void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
     struct SampleParams params;
 
     params.field_0 = 2;
-    params.field_8 = src[0];
-    params.field_c = src[1];
+    params.x = src[0];
+    params.y = src[1];
     PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 8 + index * 0xc), looping, 1, &params);
 }
 
@@ -223,9 +223,9 @@ void FUN_00417c20(struct EditObject *editObj, int *coords) {
     struct SampleParams params;
 
     AddBasicObject(editObj, coords);
-    params.field_8 = coords[0];
+    params.x = coords[0];
     params.field_0 = 2;
-    params.field_c = coords[1];
+    params.y = coords[1];
     PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 0x14), 1, 1, &params);
 }
 
@@ -291,7 +291,7 @@ void FUN_00417dd0(struct WaterArg *arg, unsigned int a, unsigned int b) {
     context = arg->field_c;
     *(struct Footprint *)EditCursor.field_1414 = *(struct Footprint *)&context->field_3c;
     EditCursor.field_1830 = 0;
-    ScreenToMapRef(a, &EditCursor.field_1404, b);
+    ScreenToMapRef(a, &EditCursor.tile_x, b);
     ValidateCursor(&EditCursor, (unsigned int)context);
     if (FUN_00417c90() != 0) {
         return;
@@ -418,7 +418,7 @@ void FUN_00417f90(Element *obj) {
         next = rnode->next;
         rx = tile->pos.x + ride->x;
         ry = tile->pos.y + ride->y;
-        if (bloke->field_e == 0) {
+        if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 bloke->flags |= 8;
@@ -426,7 +426,7 @@ void FUN_00417f90(Element *obj) {
                 bloke->dest.x = rx * 0x100 + -0x80;
                 bloke->dest.y = ry;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
@@ -663,7 +663,7 @@ void FUN_004185c0(struct WaterArg *arg, unsigned int a, unsigned int b) {
     struct WaterContext *context;
 
     context = arg->field_c;
-    ScreenToMapRef(a, &EditCursor.field_1404, b);
+    ScreenToMapRef(a, &EditCursor.tile_x, b);
     *(struct Footprint *)EditCursor.field_1414 = *(struct Footprint *)&context->field_3c;
     EditCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, (unsigned int)context);
@@ -817,7 +817,7 @@ void FUN_00418950(struct WaterArg *arg, unsigned int a, unsigned int b) {
 
     context = arg->field_c;
     *(struct Footprint *)EditCursor.field_1414 = *(struct Footprint *)&context->field_3c;
-    ScreenToMapRef(a, &EditCursor.field_1404, b);
+    ScreenToMapRef(a, &EditCursor.tile_x, b);
     EditCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, (unsigned int)context);
     if (FUN_00417c90() != 0) {
@@ -832,9 +832,9 @@ void FUN_004189c0(struct EditObject *editObj, int *coords) {
     struct SampleParams params;
 
     AddBasicObject(editObj, coords);
-    params.field_8 = coords[0];
+    params.x = coords[0];
     params.field_0 = 2;
-    params.field_c = coords[1];
+    params.y = coords[1];
     PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 0x20), 1, 1, &params);
 }
 
@@ -850,7 +850,7 @@ void FUN_00418a30(struct CursorNode *arg, unsigned int a, unsigned int b) {
     data = arg->field_c;
     memcpy(EditCursor.field_1414, &data->field_3c, 5 * sizeof(unsigned int));
     EditCursor.field_1830 = 0;
-    ScreenToMapRef(a, &EditCursor.field_1404, b);
+    ScreenToMapRef(a, &EditCursor.tile_x, b);
     ValidateCursor(&EditCursor, (unsigned int)data);
     if (FUN_00417c90() != 0) {
         return;

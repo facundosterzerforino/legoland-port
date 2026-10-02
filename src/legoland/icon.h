@@ -13,8 +13,8 @@ struct IconNode {
     /* 0x08 */ void *field_8;
     /* 0x0c */ short x;
     /* 0x0e */ short y;
-    /* 0x10 */ short field_10;
-    /* 0x12 */ short field_12;
+    /* 0x10 */ short width;
+    /* 0x12 */ short height;
     /* 0x14 */ unsigned short id;
     /* 0x16 */ unsigned short field_16;
     /* 0x18 */ union {
@@ -41,7 +41,7 @@ struct IconNode {
         void *field_20p;
     };
     /* 0x24 */ void *field_24;
-    /* 0x28 */ void *field_28;
+    /* 0x28 */ void *render_func;
     /* 0x2c */ void *event_handler;
     /* 0x30 */ void *field_30;
     /* 0x34 */ unsigned int flags;

@@ -253,14 +253,14 @@ void FUN_00407c30(struct Element *elem) {
         (*ZJoustSprite->lls)->frame = jn->frame;
         x = t[0] + ride->x;
         y = t[1] + ride->y;
-        if (b->field_e == 0) {
+        if (b->low_level_action == 0) {
             switch (b->param_action) {
             case 0:
                 b->flags |= 8;
                 b->dest.x = (x + 1) << 8;
                 b->dest.y = (y << 8) - 0x100;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 b->field_58 = 0;
@@ -270,7 +270,7 @@ void FUN_00407c30(struct Element *elem) {
                     b->dest.x = (x + 2) << 8;
                     b->dest.y = (y << 8) - 0x100;
                     b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                    b->field_e = 7;
+                    b->low_level_action = 7;
                     NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                     b->param_action++;
                     busy = 1;
@@ -294,7 +294,7 @@ void FUN_00407c30(struct Element *elem) {
                     b->dest.x = (x + 1) << 8;
                     b->dest.y = (y - 3) << 8;
                     b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                    b->field_e = 7;
+                    b->low_level_action = 7;
                     NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                     b->field_44 = FUN_00407c20(hb);
                     h.c[b->field_44] = 1;
@@ -334,7 +334,7 @@ void FUN_00407c30(struct Element *elem) {
                     b->dest.y = (y << 8) - 0x100;
                     b->flags &= 0xff7f;
                     b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                    b->field_e = 7;
+                    b->low_level_action = 7;
                     b->person->field_2c = 0;
                     b->person->field_30 = 0;
                     NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
@@ -347,7 +347,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = x << 8;
                 b->dest.y = y << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 h.c[b->field_44] = 0;
                 b->param_action = 0x1e;
@@ -357,7 +357,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x100;
                 b->dest.y = (y << 8) - 0x100;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -365,7 +365,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x364;
                 b->dest.y = (y - 3) << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -373,13 +373,13 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x364;
                 b->dest.y = (y << 8) + b->field_36 * 200 - 0x638;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
             case 13:
             case 25:
-                b->field_72 = 3;
+                b->dir = 3;
                 if (b->field_58++ > 0x96) {
                     horses--;
                     flags.v[b->field_36] = 0;
@@ -390,7 +390,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x364;
                 b->dest.y = (y - 3) << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -398,7 +398,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = x << 8;
                 b->dest.y = y << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action = 0x1e;
                 break;
@@ -406,7 +406,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x100;
                 b->dest.y = (y << 8) - 0x100;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -414,7 +414,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x16a;
                 b->dest.y = (y - 2) << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -422,7 +422,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x16a;
                 b->dest.y = (y << 8) - 0xf46;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -430,7 +430,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x364;
                 b->dest.y = (y << 8) + b->field_36 * 200 - 0x102e;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -439,7 +439,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x364;
                 b->dest.y = (y << 8) - 0xf46;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -447,7 +447,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x16a;
                 b->dest.y = (y << 8) - 0xf46;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -455,7 +455,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = (x << 8) - 0x16a;
                 b->dest.y = (y - 2) << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
@@ -463,7 +463,7 @@ void FUN_00407c30(struct Element *elem) {
                 b->dest.x = x << 8;
                 b->dest.y = y << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action = 0x1e;
                 break;

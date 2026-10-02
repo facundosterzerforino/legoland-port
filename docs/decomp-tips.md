@@ -57,7 +57,7 @@
 
 ## Global Pointer vs Local Pointer
 - A local `struct IconNode *icon = InsertIcon(...)` forces MSVC6 to allocate a callee-saved register (ESI) to keep the pointer alive across subsequent calls, adding `push %esi` / `pop %esi` and shifting all ESP-relative parameter accesses by 4.
-- If the target asm has NO callee-saved register push and instead reloads from a global (`mov _DAT_xxx, %reg`) before every field access, use the global directly: `DAT_007986dc = InsertIcon(...); DAT_007986dc->string_id = 0x4e;`
+- If the target asm has NO callee-saved register push and instead reloads from a global (`mov _DAT_xxx, %reg`) before every field access, use the global directly: `PopUpCloseIcon = InsertIcon(...); PopUpCloseIcon->string_id = 0x4e;`
 - If the target DOES have `push %esi` and uses `%esi` as the pointer across field writes without reloading, then a local variable is correct.
 - The stack offset tells you which case: `param_1` at `[ESP+0x28]` (no extra pushes) vs `[ESP+0x2c]` (one callee-saved push).
 
@@ -114,7 +114,7 @@
 - Individual global access (`param[1] = DAT_xxx`) gives correct standalone symbol names but different register allocation.
 - This is a known limitation — some functions may not reach 100% if the original used individual globals but the register allocation only matches with struct copy semantics.
 
-## Do-While Loops and Post-Increment (FUN_00490680)
+## Do-While Loops and Post-Increment (ReadResourceLines)
 - `do {} while (buffer[pos++] != '\r' && pos < size);` (empty body, post-increment in subscript) generates load-inc-cmp: `mov (%eax,%esi,1),%bl; inc %eax; cmp $0xd,%bl`. This is what the original compiler emits.
 - `do { pos++; } while (buffer[pos-1] != '\r' && ...);` (separate increment) hoists `mov $0xd,%bl` BEFORE the loop and uses `cmp %bl,mem` inside -- completely different structure.
 - `buffer[pos-1] ^ '\r'` generates XOR opcode (0xF3) instead of CMP (0xFB) -- semantically equivalent but different bytes.
@@ -157,13 +157,13 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
 
 ## Globals Reloaded Everywhere
 - If the original reloads a global after every call or store even where nothing could alias it, try
-  declaring it `volatile` (DAT_006675b8, the text cell count, fixed four text.c functions). Check every
+  declaring it `volatile` (TextCellCount, the text cell count, fixed four text.c functions). Check every
   other user still matches — it is not always right (DAT_006687a0 got worse).
 
 ## COM Calls (DirectMusic/DirectSound)
 - Type the COM objects as `struct X { struct XVtbl *vtable; }` with `__stdcall` function pointers at the
   vtable offsets the asm uses (`call [ecx+0x4c]` = slot 0x13), and call `p->vtable->Method(p, ...)`; retype
-  the global that holds the object so no casts are needed. The music thread (FUN_00492db0) types the
+  the global that holds the object so no casts are needed. The music thread (MusicThreadProc) types the
   DirectMusic loader/performance/composer/port/segment this way in sound_sfx.h.
 - MSVC6's /O2 includes /Gf (string pooling): a literal repeated in a macro is emitted once. Annotate a shared
   message with `// STRING:` above a `#define NAME "..."` line and use NAME in the macro body.

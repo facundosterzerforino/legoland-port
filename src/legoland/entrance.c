@@ -25,7 +25,7 @@ void FUN_0042d970(TileId *tile, unsigned int arg) {
     config.field_0 = 1;
     config.field_4 = arg;
     PlayInstanceOfSample(*(void **)(ENTRANCE_SFX + 8), 0, 1, &config);
-    if (MapStats.field_170 != 0) {
+    if (MapStats.entrance_fee != 0) {
         PlayMoneySFX(tile, 1, 0);
     }
 }
@@ -194,7 +194,7 @@ void FUN_0042dfa0(Element *elem) {
         x0 = tile->pos.x + ride->footprint.x0;
         x1 = tile->pos.x + ride->footprint.x1 + 6;
         y = tile->pos.y + ride->footprint.y0;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -221,19 +221,19 @@ void FUN_0042dfa0(Element *elem) {
             }
             bloke->dest.y = table[bloke->field_3a] + (y << 8);
             bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
             break;
         case 0x32:
             bloke->param_action = 1;
             bloke->dest.x = (x1 - 3) << 8;
             bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
             break;
         case 1:
             if (bloke->field_36 == 1) {
-                AddBricks(MapStats.field_170);
+                AddBricks(MapStats.entrance_fee);
                 FUN_0042d970(&node->tile, (unsigned int)bloke);
                 table = ENTRANCE_DEST_RIGHT;
                 bloke->dest.x = (x0 << 8) - 0x80;
@@ -243,7 +243,7 @@ void FUN_0042dfa0(Element *elem) {
             }
             bloke->dest.y = table[bloke->field_3a] + (y << 8);
             bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
             bloke->param_action++;
             break;

@@ -13,12 +13,12 @@ struct JungleRide {
     /* 0x000 */ TileId tile;
     /* 0x002 */ unsigned char field_2;
     /* 0x003 */ unsigned char field_3;
-    /* 0x004 */ unsigned int field_4;
-    /* 0x008 */ unsigned int field_8;
-    /* 0x00c */ unsigned int field_c;
-    /* 0x010 */ unsigned int field_10;
-    /* 0x014 */ unsigned int field_14;
-    /* 0x018 */ unsigned int field_18;
+    /* 0x004 */ unsigned int cur_x;
+    /* 0x008 */ unsigned int cur_y;
+    /* 0x00c */ unsigned int next_x;
+    /* 0x010 */ unsigned int next_y;
+    /* 0x014 */ unsigned int screen_x;
+    /* 0x018 */ unsigned int screen_y;
     /* 0x01c */ int field_1c[0xa0];
     /* 0x29c */ unsigned int field_29c[0x50];
     /* 0x3dc */ unsigned int field_3dc;
@@ -36,7 +36,7 @@ struct JungleScore {
     /* 0x08 */ unsigned int field_8;
     /* 0x0c */ unsigned int field_c;
     /* 0x10 */ unsigned int field_10;
-    /* 0x14 */ unsigned int field_14;
+    /* 0x14 */ unsigned int bloke_count;
     /* 0x18 */ struct Bloke *blokes[5];
     /* 0x2c */ int timer;
     /* 0x30 */ struct Bloke *seats[3];
@@ -60,12 +60,12 @@ struct JungleObj {
 struct JunglePath {
     /* 0x00 */ TileId tile;
     /* 0x02 */ TileId owner;
-    /* 0x04 */ unsigned int field_4;
+    /* 0x04 */ unsigned int dir_mask;
     /* 0x08 */ unsigned int field_8;
-    /* 0x0c */ unsigned int field_c;
+    /* 0x0c */ unsigned int visited;
     /* 0x10 */ struct JunglePath *next;
-    /* 0x14 */ struct JunglePath *field_14;
-    /* 0x18 */ struct JunglePath *field_18;
+    /* 0x14 */ struct JunglePath *bfs_next;
+    /* 0x18 */ struct JunglePath *parent;
 };
 
 void FUN_00432ac0(void);

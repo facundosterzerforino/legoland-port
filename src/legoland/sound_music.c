@@ -518,10 +518,10 @@ int FUN_004965a0(struct Sample *sample, int x, int y) {
     int pan;
     int result;
 
-    x = x - (lpConfig->field_10 >> 1);
-    y = y - (lpConfig->field_12 >> 1);
+    x = x - (lpConfig->view_width >> 1);
+    y = y - (lpConfig->view_height >> 1);
     vol = FUN_00496570(x);
-    dim = lpConfig->field_10;
+    dim = lpConfig->view_width;
     if (x < -(int)dim >> 1) {
         x = x + (dim >> 1);
     } else if (x > (int)(dim >> 1)) {
@@ -529,7 +529,7 @@ int FUN_004965a0(struct Sample *sample, int x, int y) {
     } else {
         x = 0;
     }
-    dim = lpConfig->field_12;
+    dim = lpConfig->view_height;
     if (y < -(int)dim >> 1) {
         y = y + (dim >> 1);
     } else if (y > (int)(dim >> 1)) {
@@ -574,20 +574,20 @@ int FUN_004966a0(struct Sample *sample) {
     if (sample->active == 0) {
         return 0;
     }
-    switch (sample->field_c) {
+    switch (sample->source_type) {
     case 0:
         return FUN_00496660(sample);
     case 1:
-        obj = *(int **)(*(int **)&sample->field_10 + 1);
+        obj = *(int **)(*(int **)&sample->bloke + 1);
         coord[0] = obj[7];
         coord[1] = obj[8];
         break;
     case 2:
-        GetTileCentre((struct Point *)&sample->field_14, coord);
+        GetTileCentre((struct Point *)&sample->source_x, coord);
         break;
     case 3:
-        coord[0] = sample->field_14 - (ScrollX >> 8);
-        coord[1] = sample->field_18 - (ScrollY >> 8);
+        coord[0] = sample->source_x - (ScrollX >> 8);
+        coord[1] = sample->source_y - (ScrollY >> 8);
     }
     return FUN_004965a0(sample, coord[0], coord[1]);
 }
@@ -601,7 +601,7 @@ void FUN_00496760(void) {
         return;
     }
     for (sample = (struct Sample *)SampleListHead; sample != 0; sample = sample->next) {
-        if (sample->active != 0 && sample->field_c != 0 &&
+        if (sample->active != 0 && sample->source_type != 0 &&
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0 && (status & 1) != 0) {
             FUN_004966a0(sample);
         }
@@ -637,7 +637,7 @@ void UpdateSampleFades(void) {
             sample->buffer->vtable->method_0x18(sample->buffer, &vol) == 0) {
             vol = vol + sample->fade;
             // STRING: LEGOLAND 0x004bfddc
-            DBPrintf("Fading Sample (%s) (%x) to Vol %d\n", ((struct SampleDef *)sample->active)->field_10, sample, vol);
+            DBPrintf("Fading Sample (%s) (%x) to Vol %d\n", ((struct SampleDef *)sample->active)->name, sample, vol);
             if (vol >= 0) {
                 vol = 0;
                 sample->fade = 0;
@@ -647,7 +647,7 @@ void UpdateSampleFades(void) {
                 if ((sample->flags & 8) != 0) {
                     sample->buffer->vtable->method_0x48(sample->buffer);
                     // STRING: LEGOLAND 0x004bfdb4
-                    DBPrintf("\tStopping Sample for the kill %s (%x)\n", ((struct SampleDef *)sample->active)->field_10, sample);
+                    DBPrintf("\tStopping Sample for the kill %s (%x)\n", ((struct SampleDef *)sample->active)->name, sample);
                 }
             }
             sample->buffer->vtable->method_0x3c(sample->buffer, vol);
@@ -691,7 +691,7 @@ void AutoKillFinishedSamples(void) {
         if ((sample->flags & 8) != 0 && (sample->flags & 2) == 0 &&
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0 && ((status == 0) & 1)) {
             // STRING: LEGOLAND 0x004bfe14
-            DBPrintf("Autokilling Sample %s (%x)\n", ((struct SampleDef *)sample->active)->field_10, sample);
+            DBPrintf("Autokilling Sample %s (%x)\n", ((struct SampleDef *)sample->active)->name, sample);
             if (sample->active == *(unsigned int *)&JOUST_SFX[8]) {
                 // STRING: LEGOLAND 0x004bfe00
                 DBPrintf("Killing Joust FX\n");
@@ -729,7 +729,7 @@ LEGO_EXPORT unsigned int UnSourcePlayableSample(struct Sample *sample) {
     if (sample->active == 0) {
         return 0;
     }
-    sample->field_c = 0;
+    sample->source_type = 0;
     FUN_004966a0(sample);
     return 1;
 }
@@ -745,8 +745,8 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToBloke(struct Sample *sample, void
     if (sample->active == 0) {
         return 0;
     }
-    sample->field_c = 1;
-    sample->field_10 = bloke;
+    sample->source_type = 1;
+    sample->bloke = bloke;
     FUN_004966a0(sample);
     return 1;
 }
@@ -762,9 +762,9 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToMapRef(struct Sample *sample, uns
     if (sample->active == 0) {
         return 0;
     }
-    sample->field_14 = x;
-    sample->field_c = 2;
-    sample->field_18 = y;
+    sample->source_x = x;
+    sample->source_type = 2;
+    sample->source_y = y;
     FUN_004966a0(sample);
     return 1;
 }
@@ -780,9 +780,9 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToLevelXY(struct Sample *sample, un
     if (sample->active == 0) {
         return 0;
     }
-    sample->field_14 = x;
-    sample->field_c = 3;
-    sample->field_18 = y;
+    sample->source_x = x;
+    sample->source_type = 3;
+    sample->source_y = y;
     FUN_004966a0(sample);
     return 1;
 }
@@ -796,19 +796,19 @@ LEGO_EXPORT int CountSamplesFromSource(struct SampleParams *source) {
     if (SampleListHead != 0) {
         sample = (struct Sample *)SampleListHead;
         do {
-            if (sample->field_c == source->field_0) {
+            if (sample->source_type == source->field_0) {
                 switch (source->field_0) {
                 case 0:
                     count = count + 1;
                     break;
                 case 1:
-                    if (sample->field_10 == source->field_4) {
+                    if (sample->bloke == source->field_4) {
                         count = count + 1;
                     }
                     break;
                 case 2:
                 case 3:
-                    if (sample->field_14 == source->field_8 && sample->field_18 == source->field_c) {
+                    if (sample->source_x == source->x && sample->source_y == source->y) {
                         count = count + 1;
                     }
                 }
@@ -829,17 +829,17 @@ LEGO_EXPORT void KillAllSamplesFromSource(struct SampleSource *source) {
     prev = 0;
     for (sample = (struct Sample *)SampleListHead; sample != 0; sample = next) {
         next = sample->next;
-        if (sample->field_c == source->type) {
+        if (sample->source_type == source->type) {
             switch (source->type) {
             case 0:
                 matched = 1;
                 break;
             case 1:
-                matched = sample->field_10 == source->field_4;
+                matched = sample->bloke == source->bloke;
                 break;
             case 2:
             case 3:
-                matched = sample->field_14 == source->field_8 && sample->field_18 == source->field_c;
+                matched = sample->source_x == source->x && sample->source_y == source->y;
                 break;
             }
             if (matched) {
@@ -862,10 +862,10 @@ LEGO_EXPORT void UnSourceAndFadeSample(struct Sample *sample, unsigned int fade)
 
     sample->flags |= 8;
     sample->fade = fade;
-    sample->field_c = 0;
+    sample->source_type = 0;
     sample->buffer->vtable->method_0x18(sample->buffer, &vol);
     // STRING: LEGOLAND 0x004bfe58
-    DBPrintf("Fading out Sample %s (%x) [Current Vol = %d]\n", ((struct SampleDef *)sample->active)->field_10, sample, vol);
+    DBPrintf("Fading out Sample %s (%x) [Current Vol = %d]\n", ((struct SampleDef *)sample->active)->name, sample, vol);
     if ((sample->flags & 2) != 0) {
         sample->flags &= 0xfffd;
         // STRING: LEGOLAND 0x004bfe30
@@ -881,17 +881,17 @@ LEGO_EXPORT void UnSourceAndFadeAllSamplesFromSource(void *source, int fade) {
 
     src = (struct SampleSource *)source;
     for (sample = (struct Sample *)SampleListHead; sample != 0; sample = sample->next) {
-        if (sample->field_c == src->type) {
+        if (sample->source_type == src->type) {
             switch (src->type) {
             case 0:
                 matched = 1;
                 break;
             case 1:
-                matched = sample->field_10 == src->field_4;
+                matched = sample->bloke == src->bloke;
                 break;
             case 2:
             case 3:
-                matched = sample->field_14 == src->field_8 && sample->field_18 == src->field_c;
+                matched = sample->source_x == src->x && sample->source_y == src->y;
                 break;
             }
             if (matched) {
@@ -915,7 +915,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
         return 0;
     }
     if (config != 0) {
-        memcpy(&sample->field_c, &((struct SampleConfig *)config)->field_0, 16);
+        memcpy(&sample->source_type, &((struct SampleConfig *)config)->field_0, 16);
         FUN_004966a0(sample);
     } else {
         FUN_00496660(sample);
@@ -952,7 +952,7 @@ LEGO_EXPORT void Load_FXList(const unsigned char *list, int count) {
         sprintf(path, ".\\sfx\\%s", item->name);
         item->sample = CreateSampleFromWAV(path);
         if (item->sample != 0) {
-            item->sample->field_10 = item->name;
+            item->sample->name = item->name;
         } else {
             // STRING: LEGOLAND 0x004bfe88
             DBPrintf("Failed to load SFX %s\n", item->name);
@@ -985,17 +985,17 @@ void FUN_00496e60(int param_1, int param_2) {
     unsigned int start;
     unsigned int now;
 
-    savedC4 = CurrentProfile.field_24;
-    savedCC = CurrentProfile.field_2c;
-    while (CurrentProfile.field_2c > 0 || CurrentProfile.field_24 > 0) {
+    savedC4 = CurrentProfile.speech_volume;
+    savedCC = CurrentProfile.fx_volume;
+    while (CurrentProfile.fx_volume > 0 || CurrentProfile.speech_volume > 0) {
         start = GetTicks();
-        CurrentProfile.field_2c = CurrentProfile.field_2c - param_1;
-        if (CurrentProfile.field_2c <= 0) {
-            CurrentProfile.field_2c = 0;
+        CurrentProfile.fx_volume = CurrentProfile.fx_volume - param_1;
+        if (CurrentProfile.fx_volume <= 0) {
+            CurrentProfile.fx_volume = 0;
         }
-        CurrentProfile.field_24 = CurrentProfile.field_24 - param_1;
-        if (CurrentProfile.field_24 <= 0) {
-            CurrentProfile.field_24 = 0;
+        CurrentProfile.speech_volume = CurrentProfile.speech_volume - param_1;
+        if (CurrentProfile.speech_volume <= 0) {
+            CurrentProfile.speech_volume = 0;
         }
         UpdateSoundVols();
         now = GetTicks();
@@ -1006,7 +1006,7 @@ void FUN_00496e60(int param_1, int param_2) {
     PauseAllSamples();
     SpeechCloseFile();
     DAT_006687b0 = 4;
-    CurrentProfile.field_24 = savedC4;
-    CurrentProfile.field_2c = savedCC;
+    CurrentProfile.speech_volume = savedC4;
+    CurrentProfile.fx_volume = savedCC;
     UpdateSoundVols();
 }

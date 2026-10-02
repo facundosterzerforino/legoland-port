@@ -48,9 +48,9 @@ struct ProfileObj {
 
 // FUNCTION: LEGOLAND 0x004912e0
 LEGO_EXPORT void ResetTempProfile(void) {
-    DAT_007cad60.field_28 = 0x4b;
-    DAT_007cad60.field_2c = 0x4b;
-    DAT_007cad60.field_30 = 0x4b;
+    DAT_007cad60.speech_volume = 0x4b;
+    DAT_007cad60.music_volume = 0x4b;
+    DAT_007cad60.fx_volume = 0x4b;
     DAT_007cad60.name[0] = 0;
     DAT_007cad60.field_20 = 5;
     DAT_007cad60.name_len = 0;
@@ -166,18 +166,18 @@ LEGO_EXPORT char UpDateCurrentSaveSlotInfo(void) {
     void *stream;
 
     memset(&temp, 0, sizeof(struct ProfileData));
-    if (LoadDateIntoTempProfile(CurrentProfile.field_43, CurrentProfile.field_44 & 0xff) == 0) {
+    if (LoadDateIntoTempProfile(CurrentProfile.profile_slot, CurrentProfile.save_slot & 0xff) == 0) {
         return -1;
     }
     strcpy(temp.name, DAT_007cad60.name);
-    temp.field_28 = CurrentProfile.field_24;
-    temp.field_2c = CurrentProfile.field_28;
-    temp.field_30 = CurrentProfile.field_2c;
+    temp.speech_volume = CurrentProfile.speech_volume;
+    temp.music_volume = CurrentProfile.music_volume;
+    temp.fx_volume = CurrentProfile.fx_volume;
     temp.field_24 = CurrentProfile.field_45;
     if (Goto_ProfileDir() == 0) {
         return -1;
     }
-    sprintf(path, "profiles\\%dsave%d.sh", CurrentProfile.field_43, CurrentProfile.field_44 & 0xff);
+    sprintf(path, "profiles\\%dsave%d.sh", CurrentProfile.profile_slot, CurrentProfile.save_slot & 0xff);
     stream = fopen(path, "w+");
     if (stream == 0) {
         printf("\ncannot open output file");
@@ -199,9 +199,9 @@ LEGO_EXPORT char UpDateCurrentProfile(void) {
     memset(&temp, 0, sizeof(struct ProfileData));
     strcpy(temp.name, (char *)&CurrentProfile);
     temp.field_20 = CurrentProfile.field_20;
-    temp.field_28 = CurrentProfile.field_24;
-    temp.field_2c = CurrentProfile.field_28;
-    temp.field_30 = CurrentProfile.field_2c;
+    temp.speech_volume = CurrentProfile.speech_volume;
+    temp.music_volume = CurrentProfile.music_volume;
+    temp.fx_volume = CurrentProfile.fx_volume;
     temp.field_34 = *(int *)&CurrentProfile.flags[4];
     temp.field_38 = *(int *)&CurrentProfile.flags[8];
     temp.field_3c = *(int *)&CurrentProfile.flags[12];
@@ -212,7 +212,7 @@ LEGO_EXPORT char UpDateCurrentProfile(void) {
     if (Goto_ProfileDir() == 0) {
         return -1;
     }
-    sprintf(path, "profiles\\Profile%d.txt", CurrentProfile.field_43);
+    sprintf(path, "profiles\\Profile%d.txt", CurrentProfile.profile_slot);
     stream = fopen(path, "w+");
     if (stream == 0) {
         printf("\ncannot open output file");
@@ -238,9 +238,9 @@ int WriteProfileSlotToFile(int slot) {
     memset(&data, 0, sizeof(struct ProfileData));
     strcpy(data.name, node->data.name);
     data.field_20 = node->data.field_20;
-    data.field_28 = node->data.field_28;
-    data.field_2c = node->data.field_2c;
-    data.field_30 = node->data.field_30;
+    data.speech_volume = node->data.speech_volume;
+    data.music_volume = node->data.music_volume;
+    data.fx_volume = node->data.fx_volume;
     memcpy(&data.field_34, &node->data.field_34, 15);
     memcpy(data.field_43, node->data.field_43, 200);
     *(int *)&data.field_10b = *(int *)&node->data.field_10b;
@@ -267,7 +267,7 @@ LEGO_EXPORT char SaveProfileToDisk(void) {
     if (Goto_ProfileDir() == 0) {
         return -1;
     }
-    sprintf(path, "profiles\\Profile%d.txt", CurrentProfile.field_43);
+    sprintf(path, "profiles\\Profile%d.txt", CurrentProfile.profile_slot);
     stream = fopen(path, "w+");
     if (stream == 0) {
         printf("\ncannot open output file");
@@ -305,9 +305,9 @@ LEGO_EXPORT void AddNodeToProfileList(int load, struct ProfileData *data, char s
     if (load != 0) {
         strcpy(node->data.name, data->name);
         node->data.field_20 = data->field_20;
-        node->data.field_28 = data->field_28;
-        node->data.field_2c = data->field_2c;
-        node->data.field_30 = data->field_30;
+        node->data.speech_volume = data->speech_volume;
+        node->data.music_volume = data->music_volume;
+        node->data.fx_volume = data->fx_volume;
         node->slot = slot;
         node->has_header = 1;
         memcpy(&node->data.field_34, &data->field_34, 15);
@@ -495,7 +495,7 @@ char FUN_004920a0(unsigned int param1, unsigned char flags) {
         CloseFontEndCheckBox();
         DAT_0080ff80.unk4 = 0xffffffff;
         NewProfilePopUpShown = 0;
-        CurrentProfile.field_43 = 0;
+        CurrentProfile.profile_slot = 0;
     }
     return 1;
 }

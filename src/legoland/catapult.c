@@ -249,8 +249,8 @@ void FUN_00403430(struct CatapultItem *node) {
     node->field_8 = 1;
     node->field_d = 0;
     params.field_0 = 2;
-    params.field_8 = node->field_0;
-    params.field_c = node->field_1;
+    params.x = node->field_0;
+    params.y = node->field_1;
     PlayInstanceOfSample(((struct CatapultFX *)Catapult_SFX)->field_8[9], 0, 1, &params);
 }
 
@@ -277,8 +277,8 @@ void FUN_004034c0(unsigned char *data, unsigned int index) {
     data[index + 0x20] = 1;
     data[index + 0x24] = 0;
     params.field_0 = 2;
-    params.field_8 = data[0];
-    params.field_c = data[1];
+    params.x = data[0];
+    params.y = data[1];
     {
         int r = rand() % 3;
         PlayInstanceOfSample(fx->field_8[r * 3], 0, 1, &params);
@@ -322,7 +322,7 @@ void FUN_004035a0(struct CatapultNode *node) {
             continue;
         }
 
-        entry->rider->field_72 = 7;
+        entry->rider->dir = 7;
         entry->rider->field_58 = entry->rider->field_58 - 1;
         if (entry->rider->field_58 > 0) {
             continue;
@@ -389,7 +389,7 @@ void FUN_004036f0(const unsigned short *key, struct RideNode *entry, int x, int 
     bloke->dest.x = (x << 8) - (rand() % 2 ? 0x10 : -0x10) - 0xe0;
     bloke->dest.y = (y << 8) + (rand() % 2 ? 0x20 : -0x20) + DAT_004b40b4[slot];
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-    bloke->field_e = 7;
+    bloke->low_level_action = 7;
     bloke->field_73 = dir + 0x10;
     NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
     bloke->param_action++;
@@ -430,7 +430,7 @@ void FUN_00403820(struct Element *elem) {
         next = node->next;
         x = tile->pos.x + ride->x;
         y = tile->pos.y + ride->y;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -446,7 +446,7 @@ void FUN_00403820(struct Element *elem) {
             bloke->dest.x = (x << 8) + 0x80;
             bloke->dest.y = (y << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
             bloke->param_action++;

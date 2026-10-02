@@ -303,7 +303,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
     DAT_0066b5ac = 0;
     for (; node != NULL; node = node->right) {
         if ((node->flags & 1) != 0) {
-            if (node->field_28 < 0 || node->field_30 > (int)(unsigned int)lpConfig->field_0 || node->field_2c < 0 || node->field_34 > (int)(unsigned int)lpConfig->field_2) {
+            if (node->field_28 < 0 || node->field_30 > (int)(unsigned int)lpConfig->screen_width || node->field_2c < 0 || node->field_34 > (int)(unsigned int)lpConfig->screen_height) {
                 // STRING: LEGOLAND 0x004bdd0c
                 printf("error");
             }
@@ -314,7 +314,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 SetOverrideFrame(node->field_40);
                 PrintSprite(node->sprite, node->x, node->y, node->field_38, (int *)&node->hit);
                 ClearSpriteOverrides();
-                if (node->hit.field_0 == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
+                if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
                     (*(void (**)(void *, int, int, int *, int *, int))((char *)*(void **)((char *)obj + 0xc) + 0xb0))(obj, node->x, node->y, &node->hit.field_8, &node->field_28, node->field_38);
                 }
@@ -332,7 +332,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 SetOverrideFrame(node->field_30);
                 PrintSprite(node->sprite, node->x, node->y, node->field_28, (int *)&node->hit);
                 ClearSpriteOverrides();
-                if (node->hit.field_0 == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
+                if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
                     (*(void (**)(void *, int, int, int *, int, int))((char *)*(void **)((char *)obj + 0xc) + 0xb0))(obj, node->x, node->y, &node->hit.field_8, 0, node->field_28);
                 }
@@ -422,7 +422,7 @@ LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, u
         InsertSortNode(node);
         return;
     }
-    node->hit.field_0 = 0x100;
+    node->hit.type = 0x100;
     InsertSortNode(node);
 }
 
@@ -446,7 +446,7 @@ LEGO_EXPORT void SortSprite(struct Sprite *sprite, unsigned int x, unsigned int 
         InsertSortNode(node);
         return;
     }
-    node->hit.field_0 = 0x100;
+    node->hit.type = 0x100;
     InsertSortNode(node);
 }
 
@@ -484,7 +484,7 @@ LEGO_EXPORT void SortClippedSprite(struct Sprite *sprite, unsigned int x, unsign
         InsertSortNode(node);
         return;
     }
-    node->hit.field_0 = 0x100;
+    node->hit.type = 0x100;
     InsertSortNode(node);
 }
 

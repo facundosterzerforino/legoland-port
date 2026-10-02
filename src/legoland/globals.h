@@ -113,13 +113,13 @@ struct SpaceTowerCar;
 struct SpaceTowerLayout {
     /* 0x00 */ unsigned short field_0;
     /* 0x02 */ unsigned char pad_2[2];
-    /* 0x04 */ void *field_4;
+    /* 0x04 */ void *anim_layout;
 };
 
 struct SpaceTowerSeatData {
     /* 0x00 */ struct Point inner;
     /* 0x08 */ struct Point outer;
-    /* 0x10 */ int field_10;
+    /* 0x10 */ int direction;
 };
 
 /* An object under construction; on disk the class is saved as its LLIDB index. */
@@ -150,7 +150,7 @@ struct MapElement {
     /* 0x0c */ unsigned short flags;
     /* 0x0e */ unsigned char pad_e[0x10 - 0xe];
     /* 0x10 */ unsigned char field_10;
-    /* 0x11 */ unsigned char field_11;
+    /* 0x11 */ unsigned char durability_level;
     /* 0x12 */ unsigned short field_12;
 };
 
@@ -159,32 +159,32 @@ struct FMat4 {
 };
 
 struct LegoConfig {
-    /* 0x00 */ unsigned short field_0;
-    /* 0x02 */ unsigned short field_2;
-    /* 0x04 */ unsigned short field_4;
-    /* 0x06 */ unsigned short field_6;
-    /* 0x08 */ unsigned short field_8;
-    /* 0x0a */ unsigned short field_a;
-    /* 0x0c */ unsigned short field_c;
-    /* 0x0e */ unsigned short field_e;
-    /* 0x10 */ unsigned short field_10;
-    /* 0x12 */ unsigned short field_12;
+    /* 0x00 */ unsigned short screen_width;
+    /* 0x02 */ unsigned short screen_height;
+    /* 0x04 */ unsigned short scroll_border_x;
+    /* 0x06 */ unsigned short scroll_border_y;
+    /* 0x08 */ unsigned short scroll_accel_x;
+    /* 0x0a */ unsigned short scroll_accel_y;
+    /* 0x0c */ unsigned short scroll_max_x;
+    /* 0x0e */ unsigned short scroll_max_y;
+    /* 0x10 */ unsigned short view_width;
+    /* 0x12 */ unsigned short view_height;
     /* 0x14 */ unsigned short width;
     /* 0x16 */ unsigned short height;
     /* 0x18 */ unsigned short field_18;
-    /* 0x1a */ unsigned short field_1a;
+    /* 0x1a */ unsigned short max_blokes;
     /* 0x1c */ unsigned char field_1c;
     /* 0x1d */ unsigned char pad_1d[1];
     /* 0x1e */ unsigned short field_1e;
-    /* 0x20 */ unsigned short field_20;
-    /* 0x22 */ unsigned short field_22;
+    /* 0x20 */ unsigned short view_x;
+    /* 0x22 */ unsigned short view_y;
     /* 0x24 */ unsigned short field_24;
     /* 0x26 */ unsigned char pad_26[2];
-    /* 0x28 */ unsigned int field_28;
+    /* 0x28 */ unsigned int level;
     /* 0x2c */ unsigned int field_2c;
     /* 0x30 */ unsigned int field_30;
-    /* 0x34 */ unsigned int field_34;
-    /* 0x38 */ unsigned int field_38;
+    /* 0x34 */ unsigned int mechanics_enabled;
+    /* 0x38 */ unsigned int gardeners_enabled;
     /* 0x3c */ int field_3c;
     /* 0x40 */ unsigned int field_40;
 };
@@ -202,8 +202,8 @@ struct ColorLutEntry {
 };
 
 struct FreePlaySpriteSlot {
-    struct Sprite *field_0;
-    struct Sprite *field_4;
+    struct Sprite *sprite0;
+    struct Sprite *sprite1;
     unsigned char pad_8[0x14];
 };
 
@@ -370,7 +370,7 @@ struct NewObjTable {
 
 struct EditFootPrint {
     unsigned char data[16];
-    void *field_10;
+    void *next;
 };
 
 struct ProfileData {
@@ -380,9 +380,9 @@ struct ProfileData {
     /* 0x20 */ unsigned int field_20;
     /* 0x24 */ unsigned char field_24;
     /* 0x25 */ unsigned char gap_25[3];
-    /* 0x28 */ unsigned int field_28;
-    /* 0x2c */ unsigned int field_2c;
-    /* 0x30 */ unsigned int field_30;
+    /* 0x28 */ unsigned int speech_volume;
+    /* 0x2c */ unsigned int music_volume;
+    /* 0x30 */ unsigned int fx_volume;
     /* 0x34 */ unsigned int field_34;
     /* 0x38 */ unsigned int field_38;
     /* 0x3c */ unsigned int field_3c;
@@ -408,12 +408,12 @@ struct ScreenMode {
 struct ScreenState {
     /* 0x00 */ unsigned char gap_0[0x20];
     /* 0x20 */ unsigned int field_20;
-    /* 0x24 */ int field_24;
-    /* 0x28 */ int field_28;
-    /* 0x2c */ int field_2c;
+    /* 0x24 */ int speech_volume;
+    /* 0x28 */ int music_volume;
+    /* 0x2c */ int fx_volume;
     /* 0x30 */ unsigned char flags[0x13];
-    /* 0x43 */ unsigned char field_43;
-    /* 0x44 */ unsigned char field_44;
+    /* 0x43 */ unsigned char profile_slot;
+    /* 0x44 */ unsigned char save_slot;
     /* 0x45 */ unsigned char field_45;
     /* 0x46 */ unsigned char field_46[0xca];
 };
@@ -450,15 +450,15 @@ struct MapStats {
     /* 0x11c */ unsigned int capacity;
     /* 0x120 */ unsigned int capacity_max;
     /* 0x124 */ unsigned int capacity_min;
-    /* 0x128 */ int field_128;
-    /* 0x12c */ int field_12c;
-    /* 0x130 */ int field_130;
-    /* 0x134 */ int field_134;
-    /* 0x138 */ int field_138;
-    /* 0x13c */ int field_13c[13];
-    /* 0x170 */ int field_170;
+    /* 0x128 */ int mood_threshold0;
+    /* 0x12c */ int mood_threshold1;
+    /* 0x130 */ int mood_threshold2;
+    /* 0x134 */ int mood_threshold3;
+    /* 0x138 */ int mood_threshold4;
+    /* 0x13c */ int mood_delta[13];
+    /* 0x170 */ int entrance_fee;
     /* 0x174 */ unsigned int field_174;
-    /* 0x178 */ unsigned int field_178;
+    /* 0x178 */ unsigned int timer_minutes;
     /* 0x17c */ int field_17c;
     /* 0x180 */ unsigned int field_180;
     /* 0x184 */ unsigned int field_184;
@@ -474,14 +474,14 @@ struct MapStats {
     /* 0x3a4 */ unsigned int field_3a4;
     /* 0x3a8 */ unsigned int field_3a8;
     /* 0x3ac */ unsigned int field_3ac;
-    /* 0x3b0 */ char field_3b0[0x19];
-    /* 0x3c9 */ signed char field_3c9;
+    /* 0x3b0 */ char leave_ratings[0x19];
+    /* 0x3c9 */ signed char leave_rating_index;
     unsigned char pad_3ca[0x2];
     /* 0x3cc */ int field_3cc;
-    /* 0x3d0 */ int field_3d0;
-    /* 0x3d4 */ int field_3d4;
-    /* 0x3d8 */ unsigned int field_3d8;
-    /* 0x3dc */ int field_3dc;
+    /* 0x3d0 */ int power_supply;
+    /* 0x3d4 */ int power_demand;
+    /* 0x3d8 */ unsigned int unpowered_demand;
+    /* 0x3dc */ int unpowered_count;
     /* 0x3e0 */ int field_3e0[4];
 };
 
@@ -2858,7 +2858,7 @@ extern struct DirNode *DAT_0066b454;
 // 0x0066b458
 extern struct DirNode *DAT_0066b458;
 // 0x0066b460
-extern struct Point DAT_0066b460;
+extern struct Point Entrance1Point;
 // 0x0066b468
 extern int LastPathUpdateTime;
 // 0x0066b46c

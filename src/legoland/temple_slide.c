@@ -354,7 +354,7 @@ void FUN_00417430(Element *obj) {
         tile = &node->tile;
         x = ride->x + tile->pos.x;
         y = tile->pos.y + ride->y;
-        if (bloke->field_e == 0) {
+        if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 bloke->flags |= 8;
@@ -366,7 +366,7 @@ void FUN_00417430(Element *obj) {
                     bloke->dest.x = x;
                     bloke->dest.y = y;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                    bloke->field_e = 7;
+                    bloke->low_level_action = 7;
                     bloke->field_73 = dir + 0x10;
                     NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                     bloke->param_action++;
@@ -377,7 +377,7 @@ void FUN_00417430(Element *obj) {
                     bloke->dest.x = x;
                     bloke->dest.y = y;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                    bloke->field_e = 7;
+                    bloke->low_level_action = 7;
                     bloke->field_73 = dir + 0x10;
                     NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                     bloke->param_action = 3;
@@ -387,7 +387,7 @@ void FUN_00417430(Element *obj) {
                 bloke->dest.x = (ride->footprint.x0 + tile->pos.x + 4) << 8;
                 bloke->dest.y = (ride->footprint.y0 + tile->pos.y + 2) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
@@ -404,9 +404,9 @@ void FUN_00417430(Element *obj) {
                     cy >>= 9;
                 }
                 sx = Get_XScroll();
-                cx = (lpConfig->field_20 - sx) + tw;
+                cx = (lpConfig->view_x - sx) + tw;
                 sy = Get_YScroll();
-                cy = cy + (lpConfig->field_22 - sy);
+                cy = cy + (lpConfig->view_y - sy);
                 cx = cx - DAT_004cbfc8 / 2 - coords.x;
                 bloke->flags |= 0x80;
                 cy = cy - DAT_004cbfcc[0] / 2 - coords.y;
@@ -428,13 +428,13 @@ void FUN_00417430(Element *obj) {
                     free(bloke->path);
                     bloke->path = NULL;
                 }
-                BlokeSetFrame(bloke, bloke->field_74);
+                BlokeSetFrame(bloke, bloke->frame);
                 if (bloke->path != NULL) {
                     f = BNVPath_GetDFrame(bloke->path);
                     if (f == DAT_004b4f18[bloke->field_36]) {
                         BlokeWalkAnim(bloke);
-                        bloke->field_44 = bloke->field_7f;
-                        bloke->field_7f = 0x18;
+                        bloke->field_44 = bloke->speed;
+                        bloke->speed = 0x18;
                     } else if (f == DAT_004b4f1c[bloke->field_36]) {
                         bloke->field_35 = 1;
                         bloke->param_action = 5;
@@ -451,7 +451,7 @@ void FUN_00417430(Element *obj) {
                 bloke->flags &= 0xff7f;
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
-                bloke->field_7f = (unsigned char)bloke->field_44;
+                bloke->speed = (unsigned char)bloke->field_44;
                 switch (bloke->field_36) {
                 case 0:
                     dx = -0x280;
@@ -477,7 +477,7 @@ void FUN_00417430(Element *obj) {
                 bloke->dest.x = (x << 8) + 0x80;
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;

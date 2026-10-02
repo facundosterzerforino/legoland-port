@@ -72,7 +72,7 @@ void FUN_004149c0(struct SafariNode *param) {
     struct SafariNode *s = (struct SafariNode *)malloc(sizeof(struct SafariNode));
     if (s) {
         memset(s, 0, sizeof(struct SafariNode));
-        s->field_0 = param->field_0;
+        s->tile_id = param->tile_id;
         s->next = DAT_004cbf0c;
         DAT_004cbf0c = s;
         FUN_00414b10(s);
@@ -121,7 +121,7 @@ void *FUN_00414a80(struct SafariKey *key) {
 
     if (cur != NULL) {
         do {
-            if (memcmp(&cur->field_0, key, 2) == 0) {
+            if (memcmp(&cur->tile_id, key, 2) == 0) {
                 return cur;
             }
             cur = cur->next;
@@ -140,8 +140,8 @@ void FUN_00414ab0(struct SafariSample *a1) {
     a1->field_4 = 0;
     a1->field_c = 0;
     a1->field_1c = 0;
-    src.field_8 = a1->field_0;
-    src.field_c = a1->field_1;
+    src.x = a1->field_0;
+    src.y = a1->field_1;
     PlayInstanceOfSample(DAT_004b4cc0, 1, 1, &src);
 }
 
@@ -157,8 +157,8 @@ void FUN_00414b10(struct SafariNode *node) {
     a1->field_4 = 0;
     src.type = 2;
     a1->field_14 &= 0xFFFFBFFE;
-    src.field_8 = a1->field_0;
-    src.field_c = a1->field_1;
+    src.x = a1->field_0;
+    src.y = a1->field_1;
     UnSourceAndFadeAllSamplesFromSource(&src, -200);
 }
 
@@ -283,8 +283,8 @@ void FUN_00414f40(struct SafariEditObj *obj, TileId key, unsigned int coords, un
     RemoveAllBlokesFromRide((struct Ride *)obj->field_c, key);
 
     src.type = 2;
-    src.field_8 = key.pos.x;
-    src.field_c = key.pos.y;
+    src.x = key.pos.x;
+    src.y = key.pos.y;
     UnSourceAndFadeAllSamplesFromSource(&src, 0xffffff38);
 }
 
@@ -438,7 +438,7 @@ void FUN_00415220(Element *obj) {
         }
         y = ride->field_25 + tile->pos.y;
         x = ride->field_24 + tile->pos.x;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -457,8 +457,8 @@ void FUN_00415220(Element *obj) {
                 int py = bloke->pos.y;
                 int sx = ((px - py) * w) >> 9;
                 int sy = ((px + py) * h) >> 9;
-                coords[0] = ((unsigned short)lpConfig->field_20 - (short)Get_XScroll() + sx - DAT_0082c670.x / 2 - pos.x) * 2;
-                coords[1] = ((unsigned short)lpConfig->field_22 - (short)Get_YScroll() + sy - DAT_0082c670.y / 2 - pos.y) * 2;
+                coords[0] = ((unsigned short)lpConfig->view_x - (short)Get_XScroll() + sx - DAT_0082c670.x / 2 - pos.x) * 2;
+                coords[1] = ((unsigned short)lpConfig->view_y - (short)Get_YScroll() + sy - DAT_0082c670.y / 2 - pos.y) * 2;
             }
             bloke->person->sprite = DAT_004cbf08;
             bloke->person->field_30 = 1;
@@ -487,7 +487,7 @@ void FUN_00415220(Element *obj) {
                     bloke->field_54 = 0;
                 }
             }
-            BlokeSetFrame(bloke, bloke->field_74);
+            BlokeSetFrame(bloke, bloke->frame);
             break;
         case 5:
             bloke->flags |= 0x80;
@@ -532,7 +532,7 @@ void FUN_00415220(Element *obj) {
                     bloke->field_54 = 0;
                 }
             }
-            BlokeSetFrame(bloke, bloke->field_74);
+            BlokeSetFrame(bloke, bloke->frame);
             break;
         case 13:
             bloke->flags &= ~0x80;
@@ -546,7 +546,7 @@ void FUN_00415220(Element *obj) {
             bloke->dest.x = (x << 8) + 0x80;
             bloke->dest.y = (y << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
             bloke->param_action++;

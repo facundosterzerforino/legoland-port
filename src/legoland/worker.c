@@ -219,8 +219,8 @@ WorkOrder *FUN_00499830(Element *element, int *coords, int mode) {
         order->count = 0;
         for (cursor = &EditCursor; cursor != NULL; cursor = cursor->next) {
             if ((cursor->field_1828 & 0x3000) == 0) {
-                dx = cursor->field_1404 - order->pos.x;
-                dy = cursor->field_1408 - order->pos.y;
+                dx = cursor->tile_x - order->pos.x;
+                dy = cursor->tile_y - order->pos.y;
                 for (fp = &cursor->footprint; fp != NULL; fp = fp->next) {
                     order->footprints[order->count] = *fp;
                     order->footprints[order->count].x0 += dx;
@@ -242,7 +242,7 @@ WorkOrder *FUN_00499830(Element *element, int *coords, int mode) {
         } else {
             cell = NULL;
         }
-        level = cell->field_11;
+        level = cell->durability_level;
         cost = GetObjRepairCost(ride, level) / (float)(ride->durability - level);
         FUN_00499760(order, cost);
     }
@@ -516,10 +516,10 @@ void FUN_00499fb0(void) {
         do {
             current->field_5c++;
             next = current->next;
-            if (current->field_e == 0) {
+            if (current->low_level_action == 0) {
                 DoHighLevelAI(current);
             }
-            if (current->field_e != 0) {
+            if (current->low_level_action != 0) {
                 DoLowLevelAI(current);
             }
             UpdatePerson(current);
@@ -537,10 +537,10 @@ void FUN_0049a010(void) {
     while (node != 0) {
         Bloke *next = node->next;
         node->field_5c++;
-        if (node->field_e == 0) {
+        if (node->low_level_action == 0) {
             DoHighLevelAI(node);
         }
-        if (node->field_e != 0) {
+        if (node->low_level_action != 0) {
             DoLowLevelAI(node);
         }
         UpdatePerson(node);
@@ -641,11 +641,11 @@ LEGO_EXPORT Bloke *GenerateGardener(int *coords, int in_hut) {
     worker = NewBlokeWOList(2);
     cell = NULL;
     if (worker != NULL) {
-        worker->field_70 = 0;
-        worker->field_72 = 0;
-        worker->field_74 = 0;
+        worker->height = 0;
+        worker->dir = 0;
+        worker->frame = 0;
         worker->field_75 = 1;
-        worker->field_7f = 0x18;
+        worker->speed = 0x18;
         worker->next = GardenerList;
         GardenerList = worker;
         GardenerCount++;
@@ -710,11 +710,11 @@ LEGO_EXPORT Bloke *GenerateMechanic(int *coords, int in_hut) {
         return NULL;
     }
     worker = NewBlokeWOList(3);
-    worker->field_70 = 0;
-    worker->field_72 = 0;
-    worker->field_74 = 0;
+    worker->height = 0;
+    worker->dir = 0;
+    worker->frame = 0;
     worker->field_75 = 1;
-    worker->field_7f = 0x18;
+    worker->speed = 0x18;
     worker->next = MechanicList;
     worker->field_46 = 1;
     MechanicList = worker;
@@ -763,24 +763,24 @@ LEGO_EXPORT void RemoveAMechanic(Bloke *worker) {
 
 // FUNCTION: LEGOLAND 0x0049a480
 LEGO_EXPORT void Gardener_Idle(Bloke *worker) {
-    worker->field_e = 0xe;
+    worker->low_level_action = 0xe;
     FUN_00499d00(worker);
 }
 
 // FUNCTION: LEGOLAND 0x0049a4a0
 void FUN_0049a4a0(Bloke *worker) {
-    worker->field_e = 0xe;
+    worker->low_level_action = 0xe;
 }
 
 // FUNCTION: LEGOLAND 0x0049a4b0
 LEGO_EXPORT void Mechanic_Idle(Bloke *worker) {
-    worker->field_e = 0xe;
+    worker->low_level_action = 0xe;
     FUN_00499d30(worker);
 }
 
 // FUNCTION: LEGOLAND 0x0049a4d0
 void FUN_0049a4d0(Bloke *worker) {
-    worker->field_e = 0xe;
+    worker->low_level_action = 0xe;
 }
 
 // FUNCTION: LEGOLAND 0x0049a4e0
@@ -796,7 +796,7 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
         worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
-        worker->field_e = 0xc;
+        worker->low_level_action = 0xc;
         NewDirForAction(worker, (worker->field_73 >> 5) + 3);
         worker->param_action = 0xb;
         return;
@@ -812,13 +812,13 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
             worker->action = 0x10;
             worker->param_action = 100;
             worker->field_5c = 0x70;
-            worker->field_e = 4;
+            worker->low_level_action = 4;
             return;
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
@@ -828,7 +828,7 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
@@ -836,7 +836,7 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         return;
     case 0x6a:
         worker->field_5c = 0x70;
-        worker->field_e = 4;
+        worker->low_level_action = 4;
         worker->param_action = 100;
         return;
     case 0x6b:
@@ -885,7 +885,7 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
         worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
-        worker->field_e = 0xc;
+        worker->low_level_action = 0xc;
         NewDirForAction(worker, (worker->field_73 >> 5) + 3);
         worker->param_action = 0xb;
         return;
@@ -901,13 +901,13 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
             worker->action = 0x11;
             worker->param_action = 0x65;
             worker->field_5c = 0x70;
-            worker->field_e = 4;
+            worker->low_level_action = 4;
             return;
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
@@ -917,7 +917,7 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
@@ -925,7 +925,7 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
         return;
     case 0x6a:
         worker->field_5c = 0x70;
-        worker->field_e = 4;
+        worker->low_level_action = 4;
         worker->param_action = 0x65;
         return;
     case 0x6b:
@@ -977,7 +977,7 @@ LEGO_EXPORT int WorkOrderBuildObject(Element *element, Point *pos) {
     if (element == CastleObjElem && CastlePlacedFlag != 0) {
         return 0;
     }
-    if ((ride->flags & 0x200000) != 0 && lpConfig->field_38 != 0) {
+    if ((ride->flags & 0x200000) != 0 && lpConfig->gardeners_enabled != 0) {
         order = FUN_00499780(element, &pos->x, 1);
         result = order != NULL;
         if (result != 0) {
@@ -997,9 +997,9 @@ LEGO_EXPORT int WorkOrderBuildObject(Element *element, Point *pos) {
         result = BuildObject(element, &pos->x);
     }
     if (result != 0 && DAT_00667cd8 == 0) {
-        source.field_8 = pos->x;
+        source.x = pos->x;
         source.type = 2;
-        source.field_c = pos->y;
+        source.y = pos->y;
         PlayInstanceOfSample(DAT_004b9248, 0, 1, &source);
     }
     return result;
@@ -1124,20 +1124,20 @@ LEGO_EXPORT void RenderWorkerInterfaceGFX(void) {
 
 // FUNCTION: LEGOLAND 0x0049b0d0
 unsigned int FUN_0049b0d0(MapElement *tile, Ride *ride) {
-    tile->field_11 = tile->field_11 + 1;
+    tile->durability_level = tile->durability_level + 1;
 
-    if (tile->field_11 == (ride->durability >> 2)) {
+    if (tile->durability_level == (ride->durability >> 2)) {
         int result = FindObjectsPower(ride);
         tile->flags &= 0xfdff;
         if (result > 0) {
-            MapStats.field_3d0 += result;
-            if (MapStats.field_3d8) {
+            MapStats.power_supply += result;
+            if (MapStats.unpowered_demand) {
                 FUN_0045a060();
             }
         }
     }
 
-    return tile->field_11;
+    return tile->durability_level;
 }
 
 // FUNCTION: LEGOLAND 0x0049b130
@@ -1285,8 +1285,8 @@ MapElement *FUN_0049b350(Bloke *worker, int x, int y) {
             } else {
                 target = NULL;
             }
-            if (ride->durability != 0 && target->field_11 < ride->durability && (ride->flags & 0x400000) != 0 &&
-                lpConfig->field_34 != 0 && (target->flags & 0x4000) == 0) {
+            if (ride->durability != 0 && target->durability_level < ride->durability && (ride->flags & 0x400000) != 0 &&
+                lpConfig->mechanics_enabled != 0 && (target->flags & 0x4000) == 0) {
                 return target;
             }
         }
@@ -1371,9 +1371,9 @@ LEGO_EXPORT void ClearAGardenersWorkList(Bloke *param) {
 
 // FUNCTION: LEGOLAND 0x0049b580
 LEGO_EXPORT void RemoveRepairOrderAT(Ride *ride, int x, int y) {
-    if ((ride->flags & 0x200000) && (lpConfig->field_38 != 0)) {
+    if ((ride->flags & 0x200000) && (lpConfig->gardeners_enabled != 0)) {
         RemoveGardenersWorkOrderAt(x, y);
-    } else if ((ride->flags & 0x400000) && (lpConfig->field_34 != 0)) {
+    } else if ((ride->flags & 0x400000) && (lpConfig->mechanics_enabled != 0)) {
         RemoveMechanicsWorkOrderAt(x, y);
     } else {
         RemoveNoneWorkersRepairOrderAT(x, y);
@@ -1519,9 +1519,9 @@ LEGO_EXPORT void IterateNoneWorkersRepairOrders(void) {
             ride = tile->field_0->ride;
             DAT_00668610 |= 0x200;
             FUN_0049b0d0(tile, ride);
-            if (tile->field_11 >= ride->durability) {
+            if (tile->durability_level >= ride->durability) {
                 tile->flags &= 0xbfff;
-                tile->field_11 = ride->durability;
+                tile->durability_level = ride->durability;
                 FUN_0049b6e0(order);
             }
         } else {
@@ -1542,12 +1542,12 @@ LEGO_EXPORT WorkOrder *AddRepairOrderForObject(Ride *ride, struct Point pos) {
     } else {
         cell = NULL;
     }
-    level = cell->field_11;
+    level = cell->durability_level;
     rate = GetObjRepairCost(ride, level) / (float)(ride->durability - level);
-    if ((ride->flags & 0x200000) != 0 && lpConfig->field_38 != 0) {
+    if ((ride->flags & 0x200000) != 0 && lpConfig->gardeners_enabled != 0) {
         return FUN_00499780(ride->element, &pos.x, 2);
     }
-    if ((ride->flags & 0x400000) != 0 && lpConfig->field_34 != 0) {
+    if ((ride->flags & 0x400000) != 0 && lpConfig->mechanics_enabled != 0) {
         return FUN_00499830(ride->element, &pos.x, 2);
     }
     FUN_0049b690(&ride->footprint, &pos.x, rate);
@@ -1572,13 +1572,13 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
             worker->action = 0x10;
             worker->param_action = 0;
             worker->field_5c = 0x10;
-            worker->field_e = 4;
+            worker->low_level_action = 4;
             return;
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 6;
@@ -1588,7 +1588,7 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 6;
             return;
@@ -1596,13 +1596,13 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
         return;
     case 6:
         worker->field_5c = 0x70;
-        worker->field_e = 4;
+        worker->low_level_action = 4;
         worker->param_action = 0;
         return;
     case 7:
         worker->flags |= 0x108;
         BlokeSetAnim(worker, 1);
-        worker->field_72 = worker->order->walk_dir;
+        worker->dir = worker->order->walk_dir;
         worker->param_action++;
         return;
     case 8:
@@ -1615,7 +1615,7 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
     case 9:
         order = worker->order;
         worker->flags |= 8;
-        worker->field_72 = order->walk_dir;
+        worker->dir = order->walk_dir;
         x = order->pos.x;
         y = order->pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
@@ -1638,9 +1638,9 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
             ride = tile->field_0->ride;
             DAT_00668610 |= 0x200;
             FUN_0049b0d0(tile, ride);
-            if (tile->field_11 >= ride->durability) {
+            if (tile->durability_level >= ride->durability) {
                 tile->flags &= 0xbfff;
-                tile->field_11 = ride->durability;
+                tile->durability_level = ride->durability;
                 worker->param_action++;
             }
             return;
@@ -1674,7 +1674,7 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
         worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
-        worker->field_e = 0xc;
+        worker->low_level_action = 0xc;
         NewDirForAction(worker, (worker->field_73 >> 5) + 3);
         worker->param_action = 0xb;
         return;
@@ -1691,13 +1691,13 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
             worker->action = 0x11;
             worker->param_action = 0;
             worker->field_5c = 0x70;
-            worker->field_e = 4;
+            worker->low_level_action = 4;
             return;
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
@@ -1707,7 +1707,7 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
             worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
-            worker->field_e = 0xc;
+            worker->low_level_action = 0xc;
             NewDirForAction(worker, (worker->field_73 >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
@@ -1715,13 +1715,13 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
         return;
     case 0x6a:
         worker->field_5c = 0x70;
-        worker->field_e = 4;
+        worker->low_level_action = 4;
         worker->param_action = 100;
         return;
     case 0x6b:
         order = worker->order;
         worker->flags |= 8;
-        worker->field_72 = order->walk_dir;
+        worker->dir = order->walk_dir;
         x = order->pos.x;
         y = order->pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
@@ -1742,9 +1742,9 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
                 ride = tile->field_0->ride;
                 DAT_00668610 |= 0x200;
                 FUN_0049b0d0(tile, ride);
-                if (tile->field_11 >= ride->durability) {
+                if (tile->durability_level >= ride->durability) {
                     tile->flags &= 0xbfff;
-                    tile->field_11 = ride->durability;
+                    tile->durability_level = ride->durability;
                     worker->param_action++;
                 }
                 return;
@@ -1801,8 +1801,8 @@ void SaveGardeners(void) {
     }
     for (worker = GardenerList; worker != NULL; worker = worker->next) {
         rec.action = worker->action;
-        rec.field_e = worker->field_e;
-        rec.field_10 = worker->field_10;
+        rec.low_level_action = worker->low_level_action;
+        rec.pending_action = worker->pending_action;
         rec.field_1c = worker->field_1c;
         rec.field_20 = worker->field_20;
         rec.dest.x = worker->dest.x;
@@ -1814,22 +1814,22 @@ void SaveGardeners(void) {
         rec.param_action = worker->param_action;
         rec.flags = worker->flags;
         rec.field_64 = worker->field_64;
-        rec.field_7f = worker->field_7f;
+        rec.speed = worker->speed;
         rec.field_82 = worker->field_82;
         rec.pos.x = worker->pos.x;
         rec.pos.y = worker->pos.y;
-        rec.field_70 = worker->field_70;
-        rec.field_72 = worker->field_72;
+        rec.height = worker->height;
+        rec.dir = worker->dir;
         rec.field_73 = worker->field_73;
-        rec.field_74 = worker->field_74;
+        rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
         rec.person_8 = worker->person->field_8;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
-        rec.person_4c = worker->person->field_4c;
-        rec.anim = worker->person->field_88;
+        rec.person_4c = worker->person->frame;
+        rec.anim = worker->person->anim;
         rec.sort_id = worker->person->sort_id;
         memcpy(rec.m, worker->person->m, sizeof(rec.m));
         rec.prev_param = worker->prev_param;
@@ -1864,8 +1864,8 @@ void LoadGardeners(void) {
             return;
         }
         worker->action = rec.action;
-        worker->field_e = rec.field_e;
-        worker->field_10 = rec.field_10;
+        worker->low_level_action = rec.low_level_action;
+        worker->pending_action = rec.pending_action;
         worker->field_1c = rec.field_1c;
         worker->field_20 = rec.field_20;
         worker->dest.x = rec.dest.x;
@@ -1877,14 +1877,14 @@ void LoadGardeners(void) {
         worker->param_action = rec.param_action;
         worker->flags = rec.flags;
         worker->field_64 = rec.field_64;
-        worker->field_7f = rec.field_7f;
+        worker->speed = rec.speed;
         worker->field_82 = rec.field_82;
         worker->pos.x = rec.pos.x;
         worker->pos.y = rec.pos.y;
-        worker->field_70 = rec.field_70;
-        worker->field_72 = rec.field_72;
+        worker->height = rec.height;
+        worker->dir = rec.dir;
         worker->field_73 = rec.field_73;
-        worker->field_74 = rec.field_74;
+        worker->frame = rec.frame;
         worker->field_75 = rec.field_75;
         worker->nav = rec.nav;
         worker->person = malloc(sizeof(Person));
@@ -1894,8 +1894,8 @@ void LoadGardeners(void) {
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;
-        worker->person->field_4c = rec.person_4c;
-        worker->person->field_88 = 0xffffffff;
+        worker->person->frame = rec.person_4c;
+        worker->person->anim = 0xffffffff;
         worker->person->sort_id = rec.sort_id;
         memcpy(worker->person->m, rec.m, sizeof(rec.m));
         worker->prev_param = rec.prev_param;
@@ -1944,8 +1944,8 @@ void SaveMechanics(void) {
     }
     for (worker = MechanicList; worker != NULL; worker = worker->next) {
         rec.action = worker->action;
-        rec.field_e = worker->field_e;
-        rec.field_10 = worker->field_10;
+        rec.low_level_action = worker->low_level_action;
+        rec.pending_action = worker->pending_action;
         rec.field_1c = worker->field_1c;
         rec.field_20 = worker->field_20;
         rec.dest.x = worker->dest.x;
@@ -1957,22 +1957,22 @@ void SaveMechanics(void) {
         rec.param_action = worker->param_action;
         rec.flags = worker->flags;
         rec.field_64 = worker->field_64;
-        rec.field_7f = worker->field_7f;
+        rec.speed = worker->speed;
         rec.field_82 = worker->field_82;
         rec.pos.x = worker->pos.x;
         rec.pos.y = worker->pos.y;
-        rec.field_70 = worker->field_70;
-        rec.field_72 = worker->field_72;
+        rec.height = worker->height;
+        rec.dir = worker->dir;
         rec.field_73 = worker->field_73;
-        rec.field_74 = worker->field_74;
+        rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
         rec.person_8 = worker->person->field_8;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
-        rec.person_4c = worker->person->field_4c;
-        rec.anim = worker->person->field_88;
+        rec.person_4c = worker->person->frame;
+        rec.anim = worker->person->anim;
         rec.sort_id = worker->person->sort_id;
         memcpy(rec.m, worker->person->m, sizeof(rec.m));
         rec.prev_param = worker->prev_param;
@@ -2007,8 +2007,8 @@ void LoadMechanics(void) {
             return;
         }
         worker->action = rec.action;
-        worker->field_e = rec.field_e;
-        worker->field_10 = rec.field_10;
+        worker->low_level_action = rec.low_level_action;
+        worker->pending_action = rec.pending_action;
         worker->field_1c = rec.field_1c;
         worker->field_20 = rec.field_20;
         worker->dest.x = rec.dest.x;
@@ -2020,14 +2020,14 @@ void LoadMechanics(void) {
         worker->param_action = rec.param_action;
         worker->flags = rec.flags;
         worker->field_64 = rec.field_64;
-        worker->field_7f = rec.field_7f;
+        worker->speed = rec.speed;
         worker->field_82 = rec.field_82;
         worker->pos.x = rec.pos.x;
         worker->pos.y = rec.pos.y;
-        worker->field_70 = rec.field_70;
-        worker->field_72 = rec.field_72;
+        worker->height = rec.height;
+        worker->dir = rec.dir;
         worker->field_73 = rec.field_73;
-        worker->field_74 = rec.field_74;
+        worker->frame = rec.frame;
         worker->field_75 = rec.field_75;
         worker->nav = rec.nav;
         worker->person = malloc(sizeof(Person));
@@ -2037,8 +2037,8 @@ void LoadMechanics(void) {
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;
-        worker->person->field_4c = rec.person_4c;
-        worker->person->field_88 = 0xffffffff;
+        worker->person->frame = rec.person_4c;
+        worker->person->anim = 0xffffffff;
         worker->person->sort_id = rec.sort_id;
         memcpy(worker->person->m, rec.m, sizeof(rec.m));
         worker->prev_param = rec.prev_param;

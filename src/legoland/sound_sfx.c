@@ -1032,12 +1032,12 @@ LEGO_EXPORT int UpdateSoundVols(void) {
 
     if (SoundAvailable != 0) {
         if (MusicEnabled != 0 && DMusicInitialised != 0) {
-            vol = FUN_00495a50(CurrentProfile.field_28);
+            vol = FUN_00495a50(CurrentProfile.music_volume);
             ((struct SampleBuffer *)DMusicSoundBuffer)->vtable->method_0x3c((struct SampleBuffer *)DMusicSoundBuffer, vol);
         }
-        DAT_007988a0 = FUN_00495a50(CurrentProfile.field_2c);
+        DAT_007988a0 = FUN_00495a50(CurrentProfile.fx_volume);
         FUN_004967b0();
-        SpeechSetVolume(FUN_00495a50(CurrentProfile.field_24));
+        SpeechSetVolume(FUN_00495a50(CurrentProfile.speech_volume));
     }
     return 0;
 }

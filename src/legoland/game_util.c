@@ -272,13 +272,13 @@ int FUN_00478cd0(char **argv, int argc) {
             return 0;
         }
         if (DAT_00669054 == 1) {
-            out = &MapStats.field_128;
+            out = &MapStats.mood_threshold0;
             argv++;
             do {
                 *out = atoi(*argv);
                 argv++;
                 out++;
-            } while ((int)out < (int)MapStats.field_13c);
+            } while ((int)out < (int)MapStats.mood_delta);
         }
     }
     return 1;
@@ -307,8 +307,8 @@ int FUN_00478d30(int param_1, int param_2) {
         GetTileDimensions(&param_2, &param_1);
         local[0] = ((a - b) * param_2) >> 9;
         local[1] = ((a + b) * param_1) >> 9;
-        ScrollX = (local[0] - (lpConfig->field_0 >> 1)) << 8;
-        ScrollY = (local[1] - (lpConfig->field_2 >> 1)) << 8;
+        ScrollX = (local[0] - (lpConfig->screen_width >> 1)) << 8;
+        ScrollY = (local[1] - (lpConfig->screen_height >> 1)) << 8;
         return 1;
     }
     FUN_0046bda0((unsigned int *)local);
@@ -368,10 +368,10 @@ int FUN_00478f00(struct CommandArgs *arg, int argc) {
     v2 = atoi(arg->field_8);
     if (DAT_00669054 == 1) {
         if (v1 >= 0) {
-            lpConfig->field_38 = v1 != 0;
+            lpConfig->gardeners_enabled = v1 != 0;
         }
         if (v2 >= 0) {
-            lpConfig->field_34 = v2 != 0;
+            lpConfig->mechanics_enabled = v2 != 0;
         }
     } else {
         FUN_0046bb10(v1, v2);
@@ -1589,8 +1589,8 @@ int FUN_0047ac80(struct CommandArgs *arg, int argc) {
         if (FUN_004786c0((unsigned int)arg, argc, 1, 1) == 0) {
             return 0;
         }
-        lpConfig->field_1a = (unsigned short)atoi((char *)arg->field_4);
-        MapStats.capacity_max = lpConfig->field_1a;
+        lpConfig->max_blokes = (unsigned short)atoi((char *)arg->field_4);
+        MapStats.capacity_max = lpConfig->max_blokes;
         MapStats.capacity_min = 0;
     }
     return 1;
@@ -1643,7 +1643,7 @@ int FUN_0047ada0(struct CommandArgs *arg, int argc) {
         }
         v = atoi((char *)arg->field_4);
         if (DAT_00669054 == 1) {
-            MapStats.field_170 = v;
+            MapStats.entrance_fee = v;
             return 1;
         }
         FUN_0046bc10(v);

@@ -392,7 +392,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     sprites = ((struct BubbleGfx *)SpeechBubbleData)->sprites;
     cx = (short)sprites[0]->width;
     box_w = (rect[2] - cx) + rect[0] >> 1;
-    if (box_w < cx || (cx = (unsigned int)lpConfig->field_0 - cx, cx < box_w)) {
+    if (box_w < cx || (cx = (unsigned int)lpConfig->screen_width - cx, cx < box_w)) {
         box_w = cx;
     }
     cx = box_w;
@@ -405,7 +405,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         box.left = corner_w;
         box.right = box_w + corner_w;
     } else {
-        corner_w = (unsigned int)lpConfig->field_0 - corner_w;
+        corner_w = (unsigned int)lpConfig->screen_width - corner_w;
         if (corner_w <= box.right) {
             box.left = corner_w - box_w;
             box.right = corner_w;
@@ -508,15 +508,15 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
         cx = (rect->right + rect->left) >> 1;
         if (cx < 0) {
             cx = 0;
-        } else if (cx > (int)(unsigned int)lpConfig->field_0) {
-            cx = (unsigned int)lpConfig->field_0;
+        } else if (cx > (int)(unsigned int)lpConfig->screen_width) {
+            cx = (unsigned int)lpConfig->screen_width;
         }
         box.right = box.right - box.left;
         box.left = cx - (box.right >> 1);
         if (box.left < 0) {
             box.left = 0;
-        } else if ((((box.right + 1) >> 1) + cx) >= (int)(unsigned int)lpConfig->field_0) {
-            box.left = (unsigned int)lpConfig->field_0 - box.right;
+        } else if ((((box.right + 1) >> 1) + cx) >= (int)(unsigned int)lpConfig->screen_width) {
+            box.left = (unsigned int)lpConfig->screen_width - box.right;
         }
         box.right = box.right + box.left;
         if (rect->top < (box.bottom - box.top) + 8) {
@@ -755,15 +755,15 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
         cx = (rect->right + rect->left) >> 1;
         if (cx < 0) {
             cx = 0;
-        } else if ((int)(unsigned int)lpConfig->field_0 < cx) {
-            cx = (unsigned int)lpConfig->field_0;
+        } else if ((int)(unsigned int)lpConfig->screen_width < cx) {
+            cx = (unsigned int)lpConfig->screen_width;
         }
         box.right = box.right - box.left;
         box.left = cx - (box.right >> 1);
         if (box.left < 0) {
             box.left = 0;
-        } else if ((int)(unsigned int)lpConfig->field_0 <= (((box.right + 1) >> 1) + cx + mood_pad)) {
-            box.left = ((unsigned int)lpConfig->field_0 - box.right) - mood_pad;
+        } else if ((int)(unsigned int)lpConfig->screen_width <= (((box.right + 1) >> 1) + cx + mood_pad)) {
+            box.left = ((unsigned int)lpConfig->screen_width - box.right) - mood_pad;
         }
         half_mood = mood_pad / 2;
         box.right = half_mood + box.right + box.left;

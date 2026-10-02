@@ -16,7 +16,7 @@ struct EarthNode {
     /* 0x0c */ struct EarthNode *next;
     /* 0x10 */ unsigned int field_10;
     /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned char field_18;
+    /* 0x18 */ unsigned char queue_count;
     /* 0x19 */ unsigned char pad_19[0x1c - 0x19];
     /* 0x1c */ struct EarthQueue *queue_head;
     /* 0x20 */ struct EarthQueue *queue_tail;

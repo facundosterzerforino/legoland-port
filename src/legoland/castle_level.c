@@ -79,7 +79,7 @@ void FUN_00402dc0(Element *obj) {
         bloke = node->rider;
         x = node->tile.pos.x + ride->x;
         y = node->tile.pos.y + ride->y;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -88,7 +88,7 @@ void FUN_00402dc0(Element *obj) {
             bloke->dest.x = (x - 7) << 8;
             bloke->dest.y = (y << 8) - 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -113,14 +113,14 @@ void FUN_00402dc0(Element *obj) {
             bloke->dest.x = ((x - 7) << 8) + dx;
             bloke->dest.y = (y << 8) + dy - 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
         case 2:
             node->rider->field_58 = (rand() & 0x1f) + 0x10;
-            bloke->field_72 = rand() & 7;
+            bloke->dir = rand() & 7;
             bloke->field_3a = (rand() & 0xff) + 1;
             bloke->param_action++;
             break;
@@ -130,7 +130,7 @@ void FUN_00402dc0(Element *obj) {
             }
             if (--bloke->field_58 <= 0) {
                 bloke->field_58 = (rand() & 0x1f) + 0x10;
-                bloke->field_72 = rand() & 7;
+                bloke->dir = rand() & 7;
             }
             break;
         case 4:
@@ -138,7 +138,7 @@ void FUN_00402dc0(Element *obj) {
             to.y = (y << 8) - 0x80;
             bloke->dest = to;
             dir = CalcMoveLine(bloke->pos, to, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -148,7 +148,7 @@ void FUN_00402dc0(Element *obj) {
             to.y = (y << 8) + 0x80;
             bloke->dest = to;
             dir = CalcMoveLine(bloke->pos, to, &bloke->nav);
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;

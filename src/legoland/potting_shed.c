@@ -71,7 +71,7 @@ void FUN_0043cf00(Element *obj) {
     for (node = shed->riders; node != NULL; node = next) {
         bloke = node->rider;
         next = node->next;
-        if (bloke->field_e != 0) {
+        if (bloke->low_level_action != 0) {
             continue;
         }
         switch (bloke->param_action) {
@@ -80,7 +80,7 @@ void FUN_0043cf00(Element *obj) {
             bloke->dest.x += 0x900;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->field_73 = dir + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -95,7 +95,7 @@ void FUN_0043cf00(Element *obj) {
             bloke->dest.x -= 0x900;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->field_73 = dir + 0x10;
-            bloke->field_e = 7;
+            bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;

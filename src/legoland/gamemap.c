@@ -288,10 +288,10 @@ LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileI
     while (query != NULL) {
         if ((query->field_1828 & 0x1000) != 0) {
             if (query != NULL) {
-                for (blk.f4 = query->field_1414[1] + query->field_1408;
-                    blk.f4 <= (int)(query->field_1408 + query->field_1414[3]); blk.f4 = blk.f4 + 1) {
-                    for (blk.f0 = query->field_1404 + query->field_1414[0];
-                        blk.f0 <= (int)(query->field_1404 + query->field_1414[2]); blk.f0 = blk.f0 + 1) {
+                for (blk.f4 = query->field_1414[1] + query->tile_y;
+                    blk.f4 <= (int)(query->tile_y + query->field_1414[3]); blk.f4 = blk.f4 + 1) {
+                    for (blk.f0 = query->tile_x + query->field_1414[0];
+                        blk.f0 <= (int)(query->tile_x + query->field_1414[2]); blk.f0 = blk.f0 + 1) {
                         cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
                         cell->flags.word = cell->flags.word & 0xffe7;
                         cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
@@ -395,15 +395,15 @@ LEGO_EXPORT int FindObjectsPower(struct Ride *ride) {
 // FUNCTION: LEGOLAND 0x0045a000
 void FUN_0045a000(int power, MapElement *object) {
     object->flags &= 0xfeff;
-    MapStats.field_3d8 = MapStats.field_3d8 - power;
-    MapStats.field_3dc = MapStats.field_3dc - 1;
+    MapStats.unpowered_demand = MapStats.unpowered_demand - power;
+    MapStats.unpowered_count = MapStats.unpowered_count - 1;
 }
 
 // FUNCTION: LEGOLAND 0x0045a030
 void FUN_0045a030(int power, MapElement *object) {
     object->flags |= 0x100;
-    MapStats.field_3d8 = MapStats.field_3d8 + power;
-    MapStats.field_3dc = MapStats.field_3dc + 1;
+    MapStats.unpowered_demand = MapStats.unpowered_demand + power;
+    MapStats.unpowered_count = MapStats.unpowered_count + 1;
 }
 
 // FUNCTION: LEGOLAND 0x0045a060
@@ -416,9 +416,9 @@ void FUN_0045a060(void) {
     while (object != NULL) {
         if (object->flags & 0x100) {
             power = -FindObjectsPower(object->field_0->data);
-            if (MapStats.field_3d4 - (int)MapStats.field_3d8 + power <= MapStats.field_3d0) {
+            if (MapStats.power_demand - (int)MapStats.unpowered_demand + power <= MapStats.power_supply) {
                 FUN_0045a000(power, object);
-                if (MapStats.field_3d4 - (int)MapStats.field_3d8 == MapStats.field_3d0) {
+                if (MapStats.power_demand - (int)MapStats.unpowered_demand == MapStats.power_supply) {
                     return;
                 }
             }
@@ -436,7 +436,7 @@ void FUN_0045a0d0(void) {
             power = -FindObjectsPower(object->field_0->data);
             if (power > 0) {
                 FUN_0045a030(power, object);
-                if (MapStats.field_3d4 - (int)MapStats.field_3d8 <= MapStats.field_3d0) {
+                if (MapStats.power_demand - (int)MapStats.unpowered_demand <= MapStats.power_supply) {
                     break;
                 }
             }
@@ -454,8 +454,8 @@ LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos) {
     power = FindObjectsPower(((struct ClassNode *)classid)->iface);
     if (power != 0) {
         if (0 < power) {
-            MapStats.field_3d0 = MapStats.field_3d0 + power;
-            if (MapStats.field_3d8 != 0) {
+            MapStats.power_supply = MapStats.power_supply + power;
+            if (MapStats.unpowered_demand != 0) {
                 FUN_0045a060();
             }
             return;
@@ -466,19 +466,19 @@ LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos) {
             cell = (struct MapCell *)((char *)GameMap[pos->y] + pos->x * 0x14);
         }
         amount = abs(power);
-        MapStats.field_3d4 = MapStats.field_3d4 + amount;
-        if (MapStats.field_3d0 < MapStats.field_3d4 - (int)MapStats.field_3d8) {
-            MapStats.field_3d8 = MapStats.field_3d8 + amount;
-            MapStats.field_3dc = MapStats.field_3dc + 1;
+        MapStats.power_demand = MapStats.power_demand + amount;
+        if (MapStats.power_supply < MapStats.power_demand - (int)MapStats.unpowered_demand) {
+            MapStats.unpowered_demand = MapStats.unpowered_demand + amount;
+            MapStats.unpowered_count = MapStats.unpowered_count + 1;
             cell->flags.bytes[1] |= 1;
         } else {
             cell->flags.word = cell->flags.word & 0xfeff;
         }
-        if (MapStats.field_3d0 <= MapStats.field_3d4) {
+        if (MapStats.power_supply <= MapStats.power_demand) {
             MapStats.field_3cc = 0;
             return;
         }
-        MapStats.field_3cc = 100 - (MapStats.field_3d4 * 100) / MapStats.field_3d0;
+        MapStats.field_3cc = 100 - (MapStats.power_demand * 100) / MapStats.power_supply;
     }
 }
 
@@ -501,15 +501,15 @@ LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, TileId coords) {
                 cell = NULL;
             }
             if ((cell->flags.bytes[1] & 2) == 0) {
-                MapStats.field_3d0 = MapStats.field_3d0 - power;
-                if (MapStats.field_3d4 - (int)MapStats.field_3d8 > MapStats.field_3d0) {
+                MapStats.power_supply = MapStats.power_supply - power;
+                if (MapStats.power_demand - (int)MapStats.unpowered_demand > MapStats.power_supply) {
                     FUN_0045a0d0();
                 }
             }
         } else {
             amount = abs(power);
-            MapStats.field_3d4 = MapStats.field_3d4 - amount;
-            if (MapStats.field_3d8 != 0) {
+            MapStats.power_demand = MapStats.power_demand - amount;
+            if (MapStats.unpowered_demand != 0) {
                 x = coords.pos.x;
                 y = coords.pos.y;
                 if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
@@ -518,28 +518,28 @@ LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, TileId coords) {
                     cell = NULL;
                 }
                 if ((cell->flags.bytes[1] & 1) != 0) {
-                    MapStats.field_3d8 = MapStats.field_3d8 - amount;
-                    MapStats.field_3dc = MapStats.field_3dc + -1;
+                    MapStats.unpowered_demand = MapStats.unpowered_demand - amount;
+                    MapStats.unpowered_count = MapStats.unpowered_count + -1;
                 }
                 FUN_0045a060();
             }
         }
-        if (MapStats.field_3d0 <= MapStats.field_3d4) {
+        if (MapStats.power_supply <= MapStats.power_demand) {
             MapStats.field_3cc = 0;
             return;
         }
-        MapStats.field_3cc = 100 - (MapStats.field_3d4 * 100) / MapStats.field_3d0;
+        MapStats.field_3cc = 100 - (MapStats.power_demand * 100) / MapStats.power_supply;
     }
 }
 
 // FUNCTION: LEGOLAND 0x0045a390
 LEGO_EXPORT void DefaultCursor(struct Cursor *cursor) {
-    unsigned int saved_1404 = cursor->field_1404;
-    unsigned int saved_1408 = cursor->field_1408;
+    unsigned int saved_1404 = cursor->tile_x;
+    unsigned int saved_1408 = cursor->tile_y;
     memset(cursor, 0, 0x1834);
-    cursor->field_1404 = saved_1404;
+    cursor->tile_x = saved_1404;
     cursor->field_1828 = 0xc00;
-    cursor->field_1408 = saved_1408;
+    cursor->tile_y = saved_1408;
     FUN_0045f460(cursor);
 }
 

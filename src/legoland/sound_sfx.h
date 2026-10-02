@@ -11,7 +11,7 @@ struct SampleDef {
     /* 0x00 */ unsigned char pad_0[4];
     /* 0x04 */ int refcount;
     /* 0x08 */ unsigned char pad_8[0x10 - 0x8];
-    /* 0x10 */ void *field_10;
+    /* 0x10 */ void *name;
     /* 0x14 */ unsigned char pad_14[0x28 - 0x14];
     /* 0x28 */ struct SampleDef *parent;
     /* 0x2c */ struct SampleBuffer *buffer;
@@ -50,10 +50,10 @@ struct Sample {
     struct Sample *next;
     int refcount;
     unsigned int fade;
-    unsigned int field_c;
-    void *field_10;
-    unsigned int field_14;
-    unsigned int field_18;
+    unsigned int source_type;
+    void *bloke;
+    unsigned int source_x;
+    unsigned int source_y;
     unsigned short flags;
     unsigned char pad_1e[0x28 - 0x1e];
     struct SampleDef *active;

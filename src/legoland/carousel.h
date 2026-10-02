@@ -8,17 +8,17 @@ struct Bloke;
 struct CarouselNode {
     /* 0x00 */ struct CarouselNode *next;
     /* 0x04 */ unsigned short id;
-    /* 0x06 */ unsigned char field_6;
-    /* 0x07 */ unsigned char field_7;
-    /* 0x08 */ unsigned char field_8;
+    /* 0x06 */ unsigned char seated_count;
+    /* 0x07 */ unsigned char leaving_count;
+    /* 0x08 */ unsigned char frame;
     /* 0x09 */ unsigned char pad_9[0xc - 0x9];
     /* 0x0c */ unsigned int flags;
-    /* 0x10 */ unsigned char field_10;
+    /* 0x10 */ unsigned char cycles_left;
     /* 0x11 */ unsigned char pad_11[0x14 - 0x11];
-    /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned char field_18;
+    /* 0x14 */ unsigned int frame_ticks;
+    /* 0x18 */ unsigned char boarding_count;
     /* 0x19 */ unsigned char pad_19[0x1c - 0x19];
-    /* 0x1c */ unsigned int field_1c;
+    /* 0x1c */ unsigned int boarding_timer;
     /* 0x20 */ unsigned char slots[0x2c - 0x20];
 };
 

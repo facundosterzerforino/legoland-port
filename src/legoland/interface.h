@@ -24,14 +24,14 @@ struct InterfacePanel {
     /* 0x02 */ unsigned char pad_2[0x04 - 0x02];
     /* 0x04 */ int field_4;
     /* 0x08 */ struct IconNode *icon;
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
+    /* 0x0c */ int content_left;
+    /* 0x10 */ int content_top;
     /* 0x14 */ int field_14;
-    /* 0x18 */ int field_18;
-    /* 0x1c */ int field_1c;
-    /* 0x20 */ int field_20;
-    /* 0x24 */ int field_24;
-    /* 0x28 */ int field_28;
+    /* 0x18 */ int content_bottom;
+    /* 0x1c */ int clip_left;
+    /* 0x20 */ int clip_top;
+    /* 0x24 */ int clip_right;
+    /* 0x28 */ int clip_bottom;
 };
 
 void FUN_00474880(void);

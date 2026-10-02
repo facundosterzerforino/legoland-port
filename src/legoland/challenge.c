@@ -1137,10 +1137,10 @@ void FUN_00444d70(unsigned int *param_1, unsigned int *param_2, int *param_3) {
     }
     do {
         *param_1 += 1;
-        if (bloke->field_7a > MapStats.field_134) {
+        if (bloke->mood > MapStats.mood_threshold3) {
             *param_2 += 1;
         }
-        if (bloke->field_7a > MapStats.field_138) {
+        if (bloke->mood > MapStats.mood_threshold4) {
             *param_2 += 1;
         }
         value = FUN_0044eb10(bloke);
@@ -1337,14 +1337,14 @@ void FUN_00445100(void) {
 
     a = DAT_006660a8;
     x = DAT_00813a44.x;
-    if (x < a->x || x > a->field_10 + a->x || (y = DAT_00813a44.y, y < a->y || y > a->field_12 + a->y)) {
+    if (x < a->x || x > a->width + a->x || (y = DAT_00813a44.y, y < a->y || y > a->height + a->y)) {
         SetIconSprite(a, NextPageSprite);
     }
     x = DAT_00813a44.x;
     y = DAT_00813a44.y;
     b = DAT_006660ac;
-    if (x < b->x || x > b->field_10 + b->x ||
-        y < b->y || y > b->field_12 + b->y) {
+    if (x < b->x || x > b->width + b->x ||
+        y < b->y || y > b->height + b->y) {
         SetIconSprite(b, PreviousPageSprite);
     }
 }
@@ -2507,7 +2507,7 @@ LAB_00446b71:
                     break;
                 }
                 total = 1;
-                flatp = (int *)((int)DAT_00666058 <= (int)MapStats.field_3d0);
+                flatp = (int *)((int)DAT_00666058 <= (int)MapStats.power_supply);
                 if (flatp == (int *)0x0) {
                     flags = flags | 0x400000;
                 }
@@ -2523,7 +2523,7 @@ LAB_00446b71:
                     rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
                     rep[(iVar12 + 1) * 0x13 + 14] = 0;
                     rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                    rep[(iVar12 + 1) * 0x13 + 16] = MapStats.field_3d0;
+                    rep[(iVar12 + 1) * 0x13 + 16] = MapStats.power_supply;
                     rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666058;
                     rep[(iVar12 + 1) * 0x13 + 18] = DAT_0066605c;
                     rep[(iVar12 + 1) * 0x13 + 19] = 0;
@@ -5039,8 +5039,8 @@ void FUN_0044db20(void) {
 void FUN_0044db40(void) {
     unsigned int t;
 
-    if (MapStats.field_178 != 0) {
-        t = GetGameTimer() + MapStats.field_178 * 60000;
+    if (MapStats.timer_minutes != 0) {
+        t = GetGameTimer() + MapStats.timer_minutes * 60000;
     } else {
         t = 0;
     }
@@ -5049,7 +5049,7 @@ void FUN_0044db40(void) {
 
 // FUNCTION: LEGOLAND 0x0044db80
 void FUN_0044db80(void) {
-    MapStats.field_178 = 0;
+    MapStats.timer_minutes = 0;
     DAT_00666098 = 0;
 }
 

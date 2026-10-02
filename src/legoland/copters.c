@@ -272,8 +272,8 @@ void CoptersInitNode(struct CopterNode *node) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
             frame = (char)lls->frame_count;
-            node->layer[1].field_1c = frame;
-            node->layer[1].field_4 = frame - 1;
+            node->layer[1].frame_count = frame;
+            node->layer[1].frame = frame - 1;
         }
     }
     node->layer[0].field_8 = 2;
@@ -286,8 +286,8 @@ void CoptersInitNode(struct CopterNode *node) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
             frame = (char)lls->frame_count;
-            node->layer[0].field_1c = frame;
-            node->layer[0].field_4 = frame - 1;
+            node->layer[0].frame_count = frame;
+            node->layer[0].frame = frame - 1;
         }
     }
     node->layer[2].field_c = 0xb;
@@ -300,8 +300,8 @@ void CoptersInitNode(struct CopterNode *node) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
             frame = (char)lls->frame_count;
-            node->layer[2].field_1c = frame;
-            node->layer[2].field_4 = frame - 1;
+            node->layer[2].frame_count = frame;
+            node->layer[2].frame = frame - 1;
         }
     }
     node->layer[3].field_c = 6;
@@ -314,8 +314,8 @@ void CoptersInitNode(struct CopterNode *node) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
             frame = (char)lls->frame_count;
-            node->layer[3].field_1c = frame;
-            node->layer[3].field_4 = frame - 1;
+            node->layer[3].frame_count = frame;
+            node->layer[3].frame = frame - 1;
         }
     }
     node->layer[4].field_8 = 8;
@@ -328,8 +328,8 @@ void CoptersInitNode(struct CopterNode *node) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)handle);
         if (lls != NULL) {
             frame = (char)lls->frame_count;
-            node->layer[4].field_1c = frame;
-            node->layer[4].field_4 = frame - 1;
+            node->layer[4].frame_count = frame;
+            node->layer[4].frame = frame - 1;
         }
     }
     FUN_004049a0(node, 1);
@@ -412,7 +412,7 @@ void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3
     if (sprite != NULL) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
         if (lls != NULL) {
-            LLSSetFrame(lls, layer->field_4);
+            LLSSetFrame(lls, layer->frame);
         }
     }
     PrintSprite(sprite, sc.x + off.x, sc.y + off.y, param_3, NULL);
@@ -423,7 +423,7 @@ void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3
     if (sprite != NULL) {
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
         if (lls != NULL) {
-            LLSSetFrame(lls, layer->field_4);
+            LLSSetFrame(lls, layer->frame);
         }
         PrintSprite(sprite, sc.x + off.x, sc.y + off.y, param_3, NULL);
     }
@@ -534,8 +534,8 @@ void CoptersRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     x = node->field_0;
     y = node->field_1;
     src.type = 2;
-    src.field_8 = x;
-    src.field_c = y;
+    src.x = x;
+    src.y = y;
     UnSourceAndFadeAllSamplesFromSource(&src, -200);
 }
 
@@ -605,7 +605,7 @@ void FUN_00404630(struct CopterNode *node, int index) {
     sprite = GetSpriteForLayer((struct Sprite *)CopterModelLayers, sprite_layer);
     AdjustOffsetForViewMode(&sprite_off);
     /* layer->field_4 is the current animation frame (a signed char) */
-    frame = &CoptersPos->entries[track][(signed char)layer->field_4];
+    frame = &CoptersPos->entries[track][(signed char)layer->frame];
     seat_off.x = 0;
     seat_off.y = (int)frame->pos[1] + y_bias;
     AdjustOffsetForViewMode(&seat_off);
@@ -633,11 +633,11 @@ void CoptersAnimateLayer(struct CopterNode *node, int index) {
     struct CopterLayer *layer = &node->layer[index];
 
     if (layer->flags & 1) {
-        layer->field_4 = layer->field_4 + 1;
-        if (layer->field_4 < layer->field_1c) {
+        layer->frame = layer->frame + 1;
+        if (layer->frame < layer->frame_count) {
             return;
         }
-        layer->field_4 = 0;
+        layer->frame = 0;
         layer->field_1d = layer->field_1d - 1;
         if (layer->field_1d >= 0) {
             return;
@@ -673,14 +673,14 @@ void FUN_004048b0(struct CopterSfxNode *node) {
     node->layer[2].field_1d = 3;
     node->layer[3].field_1d = 3;
     node->layer[4].field_1d = 3;
-    node->layer[1].field_4 = 0;
-    node->layer[0].field_4 = 0;
-    node->layer[2].field_4 = 0;
-    node->layer[3].field_4 = 0;
-    node->layer[4].field_4 = 0;
+    node->layer[1].frame = 0;
+    node->layer[0].frame = 0;
+    node->layer[2].frame = 0;
+    node->layer[3].frame = 0;
+    node->layer[4].frame = 0;
 
-    params.field_8 = node->field_0;
-    params.field_c = node->field_1;
+    params.x = node->field_0;
+    params.y = node->field_1;
     params.field_0 = 2;
 
     PlayInstanceOfSample(fx->field_8, 0, 1, &params);
@@ -704,11 +704,11 @@ void FUN_004049a0(struct CopterNode *node, int param) {
     n->field_c = 0;
     n->field_10 = 0;
     n->field_2 = 0;
-    n->layer[1].field_4 = n->layer[1].field_1c - 1;
-    n->layer[0].field_4 = n->layer[0].field_1c - 1;
-    n->layer[2].field_4 = n->layer[2].field_1c - 1;
-    n->layer[3].field_4 = n->layer[3].field_1c - 1;
-    n->layer[4].field_4 = n->layer[4].field_1c - 1;
+    n->layer[1].frame = n->layer[1].frame_count - 1;
+    n->layer[0].frame = n->layer[0].frame_count - 1;
+    n->layer[2].frame = n->layer[2].frame_count - 1;
+    n->layer[3].frame = n->layer[3].frame_count - 1;
+    n->layer[4].frame = n->layer[4].frame_count - 1;
     n->layer[1].rider = 0;
     n->layer[0].rider = 0;
     n->layer[2].rider = 0;
@@ -716,9 +716,9 @@ void FUN_004049a0(struct CopterNode *node, int param) {
     n->layer[4].rider = 0;
     n->field_8 &= ~0x4001u;
     if (param == 0) {
-        params.field_8 = n->field_0;
+        params.x = n->field_0;
         params.field_0 = 2;
-        params.field_c = n->field_1;
+        params.y = n->field_1;
         UnSourceAndFadeAllSamplesFromSource(&params, -200);
         PlayInstanceOfSample(fx->field_20, 0, 1, &params);
     }
@@ -786,24 +786,28 @@ void CoptersUpdate(struct Element *elem) {
     struct Bloke *b;
     struct CopterNode *cn;
     struct CopterChainNode *link;
-    struct Ride *ride = elem->ride;
+    struct Ride *volatile ride = elem->ride;
     struct RideNode *next;
-    struct RideNode *node;
+    struct RideNode *volatile node;
+    TileId *tile;
+    struct RideNode *cur;
     int spr;
     int spr2;
 
     CoptersUpdateNodes();
     node = ride->riders;
     while (node != NULL) {
-        next = node->next;
-        b = node->rider;
-        cn = CoptersFindNode((struct CopterSource *)&node->tile);
+        cur = node;
+        next = cur->next;
+        b = cur->rider;
+        tile = &cur->tile;
+        cn = CoptersFindNode((struct CopterSource *)tile);
         if (cn == NULL) {
             break;
         }
-        x = node->tile.pos.x + ride->x;
-        y = node->tile.pos.y + ride->y;
-        if (b->field_e == 0) {
+        x = ride->x + tile->pos.x;
+        y = tile->pos.y + ride->y;
+        if (b->low_level_action == 0) {
             switch (b->param_action) {
             case 0:
                 b->flags |= 8;
@@ -817,11 +821,11 @@ void CoptersUpdate(struct Element *elem) {
             case 1:
                 link = (struct CopterChainNode *)node;
                 switch (CoptersFindChainIndex(link, (struct CopterSource *)&node->tile)) {
-                case 0:
-                    spr = CopterQueueTables[2];
-                    break;
                 case 1:
                     spr = CopterQueueTables[0];
+                    break;
+                case 0:
+                    spr = CopterQueueTables[2];
                     break;
                 case 2:
                     spr = CopterQueueTables[1];
@@ -837,7 +841,8 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 2:
-                FUN_00412300((struct QueueTable *)CopterQueueTables[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
+                spr = (int)FUN_004122f0((struct RideSlot *)b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[spr], x, y, b);
                 break;
             case 3:
             case 7:
@@ -846,7 +851,7 @@ void CoptersUpdate(struct Element *elem) {
             case 4:
                 b->param_action++;
                 cn->field_2++;
-                if ((short)cn->field_2 == ride->seats) {
+                if ((short)(signed char)cn->field_2 == ((struct Ride *)ActiveCopterRide)->seats) {
                     FUN_004048b0((struct CopterSfxNode *)cn);
                 }
                 break;
@@ -864,11 +869,11 @@ void CoptersUpdate(struct Element *elem) {
             case 8:
                 link = (struct CopterChainNode *)node;
                 switch (CoptersFindChainIndex(link, (struct CopterSource *)&node->tile)) {
-                case 0:
-                    spr2 = CopterQueueTables[2];
-                    break;
                 case 1:
                     spr2 = CopterQueueTables[0];
+                    break;
+                case 0:
+                    spr2 = CopterQueueTables[2];
                     break;
                 case 2:
                     spr2 = CopterQueueTables[1];
@@ -884,13 +889,14 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 9:
-                FUN_00412300((struct QueueTable *)CopterQueueTables[(int)FUN_004122f0((struct RideSlot *)b)], x, y, b);
+                spr = (int)FUN_004122f0((struct RideSlot *)b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[spr], x, y, b);
                 break;
             case 10:
                 b->dest.x = (x << 8) + 0x80;
                 b->dest.y = (y << 8) + 0x80;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
-                b->field_e = 7;
+                b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;

@@ -85,7 +85,7 @@ void FUN_0042ce50(struct EarthNode *node, struct EarthBlokeElem *elem) {
         q->elem = elem;
         *(unsigned char *)((char *)elem->bloke + 0x62) |= 0x40;
         EarthNodeAppendQueueEntry(node, q);
-        node->field_18++;
+        node->queue_count++;
     }
 }
 
@@ -174,7 +174,7 @@ void FUN_0042d040(struct EarthNode *list) {
         if (list->queue_tail == node) {
             list->queue_tail = NULL;
         }
-        list->field_18--;
+        list->queue_count--;
     }
 }
 
@@ -319,8 +319,8 @@ unsigned int CountEarthBlokeElemsUntil(struct EarthBlokeElem *param_1, struct Ea
 
 // FUNCTION: LEGOLAND 0x0042d400
 int EarthSlideRide_Load(void) {
-    struct EarthNode *node;
-    struct EarthNode *prev;
+    struct EarthNode *node = NULL;
+    struct EarthNode *next;
     struct EarthQueue *q;
     int flag;
     int count;
@@ -329,14 +329,14 @@ int EarthSlideRide_Load(void) {
     if (SaveGameRead(&flag, 4) == 0) {
         return 0;
     }
-    prev = NULL;
     while (flag != 0) {
-        if (prev == NULL) {
+        if (node == NULL) {
             node = (struct EarthNode *)malloc(sizeof(struct EarthNode));
             DAT_006160e8 = node;
         } else {
-            node = (struct EarthNode *)malloc(sizeof(struct EarthNode));
-            prev->next = node;
+            next = (struct EarthNode *)malloc(sizeof(struct EarthNode));
+            node->next = next;
+            node = next;
         }
         if (SaveGameRead(node, 0x24) == 0) {
             return 0;
@@ -346,8 +346,7 @@ int EarthSlideRide_Load(void) {
         }
         node->queue_head = NULL;
         node->queue_tail = NULL;
-        while (count != 0) {
-            count--;
+        while (count-- != 0) {
             if (node->queue_tail == NULL) {
                 q = (struct EarthQueue *)malloc(sizeof(struct EarthQueue));
                 node->queue_tail = q;
@@ -368,7 +367,6 @@ int EarthSlideRide_Load(void) {
         if (SaveGameRead(&flag, 4) == 0) {
             return 0;
         }
-        prev = node;
     }
     return 1;
 }
@@ -389,15 +387,14 @@ void FUN_0042d560(unsigned short *param_1) {
     unsigned int flags;
     char nb;
 
-    if ((*(unsigned int *)((char *)param_1 + 0x10) & 1) != 0) {
-        v14 = *(int *)((char *)param_1 + 0x14);
-        *(int *)((char *)param_1 + 0x14) = v14 + 1;
-        if (2 < v14 + 1) {
+    flags = *(unsigned int *)((char *)param_1 + 0x10);
+    if ((flags & 1) != 0) {
+        if ((v14 = ++*(int *)((char *)param_1 + 0x14)) > 2) {
             nb = *(char *)((char *)param_1 + 0xb) + 1;
             *(int *)((char *)param_1 + 0x14) = 0;
             *(char *)((char *)param_1 + 0xb) = nb;
-            if (*(int *)((char *)EarthSlideRin + 0x14) <= (int)nb) {
-                flags = *(unsigned int *)((char *)param_1 + 0x10) & 0xfffffffe;
+            if ((int)nb >= *(int *)((char *)EarthSlideRin + 0x14)) {
+                flags = flags & 0xfffffffe;
                 *(unsigned char *)((char *)param_1 + 0xb) = 0;
                 *(unsigned int *)((char *)param_1 + 0x10) = flags;
                 GetAllBlokesOffRide((struct Ride *)DAT_006160d0, *param_1);

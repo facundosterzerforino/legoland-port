@@ -262,17 +262,17 @@ LEGO_EXPORT void BasicObjectDCalcCursor(unsigned int param_1, struct Point *para
     QueryCursor.field_1828 = 8;
     if ((buf[3] & 0x8a0) != 0) {
         QueryCursor.field_1828 = 9;
-        QueryCursor.field_1404 = QueryObj.pos.x;
-        QueryCursor.field_1408 = QueryObj.pos.y;
+        QueryCursor.tile_x = QueryObj.pos.x;
+        QueryCursor.tile_y = QueryObj.pos.y;
     } else {
-        QueryCursor.field_1404 = param_2->x;
-        QueryCursor.field_1408 = param_2->y;
+        QueryCursor.tile_x = param_2->x;
+        QueryCursor.tile_y = param_2->y;
     }
-    if ((int)QueryCursor.field_1404 < 0 || (int)QueryCursor.field_1404 >= (int)config->width ||
-        (int)QueryCursor.field_1408 < 0 || (int)QueryCursor.field_1408 >= (int)config->height) {
+    if ((int)QueryCursor.tile_x < 0 || (int)QueryCursor.tile_x >= (int)config->width ||
+        (int)QueryCursor.tile_y < 0 || (int)QueryCursor.tile_y >= (int)config->height) {
         *(unsigned short *)&buf[3] = 0x40;
     } else {
-        memcpy(buf, &map[QueryCursor.field_1408][QueryCursor.field_1404], 20);
+        memcpy(buf, &map[QueryCursor.tile_y][QueryCursor.tile_x], 20);
     }
     if ((buf[3] & 0x40) != 0) {
         FUN_0045f480(&QueryCursor, 1);

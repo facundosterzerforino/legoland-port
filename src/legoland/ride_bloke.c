@@ -639,7 +639,7 @@ void FUN_00401c60(struct RideBloke *b) {
         next = b->next;
         ss.type = 1;
         b->fx->refcount++;
-        ss.field_4 = b->fx;
+        ss.bloke = b->fx;
         KillAllSamplesFromSource(&ss);
         free(b);
 
@@ -737,20 +737,20 @@ int FUN_00401f30(unsigned short id, struct PathPair *p, int dir) {
     }
     FUN_004808d0(&e->x, &pt.a, dir);
     q = FUN_004125a0(pt.a, pt.b);
-    if (q != NULL && q->field_8 == id && (q->field_14 & 0xf) != 6) {
+    if (q != NULL && q->id == id && (q->field_14 & 0xf) != 6) {
         FUN_004808d0(&q->x, &pt.a, dir);
         t1 = FUN_004125a0(pt.a, pt.b);
-        if (t1 != NULL && (t1->field_8 != id || (t1->field_14 & 0xf) == 6)) {
+        if (t1 != NULL && (t1->id != id || (t1->field_14 & 0xf) == 6)) {
             t1 = NULL;
         }
         FUN_004808d0(&q->x, &pt.a, (dir - 2) & 7);
         t2 = FUN_004125a0(pt.a, pt.b);
-        if (t2 != NULL && (t2->field_8 != id || (t2->field_14 & 0xf) == 6)) {
+        if (t2 != NULL && (t2->id != id || (t2->field_14 & 0xf) == 6)) {
             t2 = NULL;
         }
         FUN_004808d0(&q->x, &pt.a, (dir + 2) & 7);
         t3 = FUN_004125a0(pt.a, pt.b);
-        if (t3 != NULL && (t3->field_8 != id || (t3->field_14 & 0xf) == 6)) {
+        if (t3 != NULL && (t3->id != id || (t3->field_14 & 0xf) == 6)) {
             t3 = NULL;
         }
         if (t2 != NULL) {
@@ -802,7 +802,7 @@ int FUN_00402150(unsigned short id, struct PathPair *p, int dir) {
         if (q == NULL) {
             return FUN_00401f30(id, p, dir);
         }
-        if (q->field_8 != id) {
+        if (q->id != id) {
             return FUN_00401f30(id, p, dir);
         }
         if ((q->field_14 & 0xf) == 6) {
@@ -1029,7 +1029,7 @@ void FUN_00402780(struct NewBloke *b) {
     struct Person *person;
     struct Point *scr;
 
-    cfg.field_0 = 0x306;
+    cfg.type = 0x306;
     cfg.field_4 = b->owner;
     cfg.field_8 = 0;
     r.i = MapToPlayfieldInl(b->fx >> 8, b->fy >> 8);
@@ -1044,8 +1044,8 @@ void FUN_00402780(struct NewBloke *b) {
     off.x = DSchoolBlueCarData->x[b->f_b8] >> 1;
     off.y = DSchoolBlueCarData->y[b->f_b8] >> 1;
     AdjustOffsetForViewMode(&off);
-    b->sx = lpConfig->field_20 + off.x + sx;
-    b->sy = lpConfig->field_22 + off.y + sy;
+    b->sx = lpConfig->view_x + off.x + sx;
+    b->sy = lpConfig->view_y + off.y + sy;
     key = h2 + sy;
     switch (b->f_c3) {
     case 1:
@@ -1064,14 +1064,14 @@ void FUN_00402780(struct NewBloke *b) {
     ClearOverrideFrame();
     b->bloke->pos.x = sx;
     b->bloke->pos.y = sy;
-    b->bloke->field_72 = (b->f_b8 + 6) & 15;
+    b->bloke->dir = (b->f_b8 + 6) & 15;
     person = Find3DPersonFromBloke(b->bloke);
     person->sort_id = wp0.x;
     scr = &person->screen;
-    scr->x = lpConfig->field_20 + b->bloke->pos.x + 0x10;
-    scr->y = lpConfig->field_22 + b->bloke->pos.y + 8;
+    scr->x = lpConfig->view_x + b->bloke->pos.x + 0x10;
+    scr->y = lpConfig->view_y + b->bloke->pos.y + 8;
     AdjustBlokePosition(scr);
-    FUN_004025d0(person, b->bloke->field_72);
+    FUN_004025d0(person, b->bloke->dir);
     for (;;) {
         if (FUN_00402490((struct NearBloke *)b) != NULL) {
             b->f_c8 = b->f_c6 >> 1;

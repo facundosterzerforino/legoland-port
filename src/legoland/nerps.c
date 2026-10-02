@@ -92,7 +92,7 @@ void FUN_0046a040(unsigned int param_1, unsigned int param_2) {
         MapStats.field_190 = param_2;
         break;
     case 6:
-        MapStats.field_178 = param_2;
+        MapStats.timer_minutes = param_2;
         FUN_0044db40();
         break;
     case 7:
@@ -184,10 +184,10 @@ unsigned int FUN_0046a190(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046a1f0
 unsigned int FUN_0046a1f0(struct NerpsArg *arg) {
     if ((int)arg->field_1c >= 0) {
-        lpConfig->field_38 = (arg->field_1c != 0);
+        lpConfig->gardeners_enabled = (arg->field_1c != 0);
     }
     if ((int)arg->field_14 >= 0) {
-        lpConfig->field_34 = (arg->field_14 != 0);
+        lpConfig->mechanics_enabled = (arg->field_14 != 0);
     }
     return 1;
 }
@@ -240,8 +240,8 @@ unsigned int FUN_0046a230(struct NerpsArg *arg) {
         } else {
             tile = NULL;
         }
-        if (tile->field_11 > threshold) {
-            tile->field_11 = threshold;
+        if (tile->durability_level > threshold) {
+            tile->durability_level = threshold;
             FUN_00463460(tile, &pt);
             DAT_00668610 |= 0x200;
         }
@@ -275,13 +275,13 @@ unsigned int FUN_0046a350(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a370
 unsigned int FUN_0046a370(struct NerpsArg *arg) {
-    MapStats.field_170 = (short)arg->field_1c;
+    MapStats.entrance_fee = (short)arg->field_1c;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a390
 unsigned int FUN_0046a390(void) {
-    if (MapStats.field_178 == 0) {
+    if (MapStats.timer_minutes == 0) {
         FUN_0046b240(1);
     }
     return 1;
@@ -297,8 +297,8 @@ unsigned int FUN_0046a3b0(struct NerpsArg *arg) {
     v24 = arg->field_24;
     v20 = arg->field_20;
     GetTileDimensions(&dimX, &dimY);
-    ScrollX = (((v20 - v24) * dimX >> 9) - (lpConfig->field_10 >> 1)) * 0x100;
-    ScrollY = (((v20 + v24) * dimY >> 9) - (lpConfig->field_12 >> 1)) * 0x100;
+    ScrollX = (((v20 - v24) * dimX >> 9) - (lpConfig->view_width >> 1)) * 0x100;
+    ScrollY = (((v20 + v24) * dimY >> 9) - (lpConfig->view_height >> 1)) * 0x100;
     return 1;
 }
 
@@ -872,7 +872,7 @@ unsigned int FUN_0046ae70(struct NerpsArg *arg) {
     count = 0;
     bloke = FirstBloke;
     while (bloke != NULL) {
-        if (bloke->field_7a < (int)arg->field_14) {
+        if (bloke->mood < (int)arg->field_14) {
             bloke = bloke->next;
             continue;
         }
@@ -993,8 +993,8 @@ unsigned int FUN_0046afe0(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046b080
 unsigned int FUN_0046b080(struct NerpsArg *arg) {
-    if (MapStats.field_3dc > (int)arg->field_1c) {
-        FUN_004691e0(arg, MapStats.field_3dc - arg->field_1c, 0);
+    if (MapStats.unpowered_count > (int)arg->field_1c) {
+        FUN_004691e0(arg, MapStats.unpowered_count - arg->field_1c, 0);
         return 0;
     }
     return 1;
@@ -1329,7 +1329,7 @@ struct NerpsListNode *FUN_0046b4f0(unsigned int param_1) {
         node->field_4 = param_1;
         node->field_c = 0;
         node->field_10 = 0;
-        node->field_0 = NULL;
+        node->next = NULL;
     }
     return node;
 }
@@ -2428,7 +2428,7 @@ unsigned int SaveScripts(void) {
     if (FUN_0046c700(DAT_00668784) == 0) {
         return 0;
     }
-    for (node = (struct NerpsListNode *)DAT_00668798; node != NULL; node = node->field_0) {
+    for (node = (struct NerpsListNode *)DAT_00668798; node != NULL; node = node->next) {
         if (SaveGameWrite(&node->field_4, 4) == 0) {
             return 0;
         }
@@ -2552,7 +2552,7 @@ unsigned int LoadScripts(void) {
             return 0;
         }
         if (prev != NULL) {
-            prev->field_0 = node;
+            prev->next = node;
         } else {
             DAT_00668798 = node;
         }

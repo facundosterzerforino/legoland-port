@@ -88,7 +88,7 @@ struct Person {
         };
         Vector3 rotation;
     };
-    int field_4c;
+    int frame;
     void *field_50;
     unsigned int sort_id;
     union {
@@ -110,7 +110,7 @@ struct Person {
     unsigned int field_7c;
     unsigned int field_80;
     unsigned int random;
-    unsigned int field_88;
+    unsigned int anim;
     unsigned int field_8c;
     unsigned int field_90;
 };

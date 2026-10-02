@@ -6,7 +6,7 @@
 struct SafariListEntry;
 
 struct SafariNode {
-    unsigned short field_0;
+    unsigned short tile_id;
     unsigned char pad_2[2];
     int field_4;
     int field_8;

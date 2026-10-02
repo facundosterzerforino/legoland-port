@@ -55,8 +55,8 @@ typedef struct WorkerSave WorkerSave;
 /* The 0xdc-byte save-game record of a worker and its Person. */
 struct WorkerSave {
     /* 0x00 */ unsigned short action;
-    /* 0x02 */ unsigned short field_e;
-    /* 0x04 */ unsigned short field_10;
+    /* 0x02 */ unsigned short low_level_action;
+    /* 0x04 */ unsigned short pending_action;
     /* 0x06 */ unsigned char pad_6[0x10 - 0x06];
     /* 0x10 */ unsigned int field_1c;
     /* 0x14 */ int field_20;
@@ -68,14 +68,14 @@ struct WorkerSave {
     /* 0x55 */ unsigned char pad_55[1];
     /* 0x56 */ unsigned short flags;
     /* 0x58 */ unsigned char field_64;
-    /* 0x59 */ unsigned char field_7f;
+    /* 0x59 */ unsigned char speed;
     /* 0x5a */ unsigned char field_82;
     /* 0x5b */ unsigned char pad_5b[1];
     /* 0x5c */ Point pos;
-    /* 0x64 */ unsigned short field_70;
-    /* 0x66 */ unsigned char field_72;
+    /* 0x64 */ unsigned short height;
+    /* 0x66 */ unsigned char dir;
     /* 0x67 */ unsigned char field_73;
-    /* 0x68 */ unsigned char field_74;
+    /* 0x68 */ unsigned char frame;
     /* 0x69 */ unsigned char field_75;
     /* 0x6a */ unsigned char pad_6a[2];
     /* 0x6c */ Navigator nav;

@@ -31,7 +31,7 @@ void UpdatePathLinks(int force) {
     }
     LastPathUpdateTime = now;
     FUN_00482a90();
-    FUN_00482a40(&DAT_0066b460);
+    FUN_00482a40(&Entrance1Point);
 }
 
 // FUNCTION: LEGOLAND 0x00482b60
@@ -51,13 +51,13 @@ int FUN_00482b60(Point *pos) {
 LEGO_EXPORT char *GetVisitorName(Bloke *bloke) {
     char *name;
     if (bloke->person->random == 0) {
-        name = PTR_s_Aaron_004bcecc[bloke->field_83];
+        name = PTR_s_Aaron_004bcecc[bloke->first_name_index];
     } else {
-        name = PTR_s_Abbie_004bd018[bloke->field_83];
+        name = PTR_s_Abbie_004bd018[bloke->first_name_index];
     }
     strcpy(VisitorNameBuffer, name);
     strcat(VisitorNameBuffer, " ");
-    strcat(VisitorNameBuffer, PTR_s_Adams_004bd180[bloke->field_84]);
+    strcat(VisitorNameBuffer, PTR_s_Adams_004bd180[bloke->last_name_index]);
     return VisitorNameBuffer;
 }
 
@@ -67,13 +67,13 @@ void RandomiseBlokeName(Bloke *bloke) {
 
     if (bloke->person->random != 0) {
         roll = rand();
-        bloke->field_83 = roll % 0x5a;
+        bloke->first_name_index = roll % 0x5a;
     } else {
         roll = rand();
-        bloke->field_83 = roll % 0x53;
+        bloke->first_name_index = roll % 0x53;
     }
     roll = rand();
-    bloke->field_84 = roll % 0x6b;
+    bloke->last_name_index = roll % 0x6b;
 }
 
 // FUNCTION: LEGOLAND 0x00482cb0
@@ -87,59 +87,59 @@ int FUN_00482cb0(Bloke *bloke) {
     case 0xd:
         return 5;
     }
-    if (bloke->field_7a < MapStats.field_12c) {
+    if (bloke->mood < MapStats.mood_threshold1) {
         return 3;
     }
-    return bloke->field_7a < MapStats.field_134 ? 10 : 2;
+    return bloke->mood < MapStats.mood_threshold3 ? 10 : 2;
 }
 
 // FUNCTION: LEGOLAND 0x00482d30
 int GetBlokeMood(Bloke *bloke) {
-    if (bloke->field_7a < MapStats.field_12c) {
+    if (bloke->mood < MapStats.mood_threshold1) {
         return 3;
     }
-    return bloke->field_7a < MapStats.field_134 ? 10 : 2;
+    return bloke->mood < MapStats.mood_threshold3 ? 10 : 2;
 }
 
 // FUNCTION: LEGOLAND 0x00482d60
 void FUN_00482d60(unsigned int index, int value) {
-    MapStats.field_13c[index] = value;
+    MapStats.mood_delta[index] = value;
 }
 
 // FUNCTION: LEGOLAND 0x00482d70
 void FUN_00482d70(void) {
-    MapStats.field_13c[4] = 5;
-    MapStats.field_13c[5] = 5;
-    MapStats.field_13c[6] = 5;
-    MapStats.field_13c[0] = -100;
-    MapStats.field_13c[1] = -400;
-    MapStats.field_13c[2] = 33;
-    MapStats.field_13c[3] = 20;
-    MapStats.field_13c[7] = -200;
-    MapStats.field_13c[8] = -1600;
-    MapStats.field_13c[9] = 400;
-    MapStats.field_13c[10] = 100;
-    MapStats.field_13c[11] = 400;
-    MapStats.field_13c[12] = 100;
+    MapStats.mood_delta[4] = 5;
+    MapStats.mood_delta[5] = 5;
+    MapStats.mood_delta[6] = 5;
+    MapStats.mood_delta[0] = -100;
+    MapStats.mood_delta[1] = -400;
+    MapStats.mood_delta[2] = 33;
+    MapStats.mood_delta[3] = 20;
+    MapStats.mood_delta[7] = -200;
+    MapStats.mood_delta[8] = -1600;
+    MapStats.mood_delta[9] = 400;
+    MapStats.mood_delta[10] = 100;
+    MapStats.mood_delta[11] = 400;
+    MapStats.mood_delta[12] = 100;
 }
 
 // FUNCTION: LEGOLAND 0x00482df0
 int FUN_00482df0(Bloke *bloke, int index, int mul) {
-    int value = MapStats.field_13c[index] * mul / 100 + bloke->field_7a;
+    int value = MapStats.mood_delta[index] * mul / 100 + bloke->mood;
     if (value < -30000) {
         value = -30000;
     } else if (value > 30000) {
         value = 30000;
     }
-    bloke->field_7a = value;
-    return bloke->field_7a;
+    bloke->mood = value;
+    return bloke->mood;
 }
 
 // FUNCTION: LEGOLAND 0x00482e50
 void AllocateBlokePool(void) {
     int i;
-    BlokePool = malloc(lpConfig->field_1a * sizeof(Bloke));
-    for (i = 0; i < lpConfig->field_1a; i++) {
+    BlokePool = malloc(lpConfig->max_blokes * sizeof(Bloke));
+    for (i = 0; i < lpConfig->max_blokes; i++) {
         memset(&BlokePool[i], 0, sizeof(Bloke));
     }
 }
@@ -158,7 +158,7 @@ LEGO_EXPORT Bloke *NewBloke(void) {
     Bloke *bloke = NULL;
     int i;
 
-    for (i = 0; i < lpConfig->field_1a; i++) {
+    for (i = 0; i < lpConfig->max_blokes; i++) {
         if ((BlokePool[i].flags & 1) == 0) {
             bloke = &BlokePool[i];
             break;
@@ -220,7 +220,7 @@ LEGO_EXPORT void DestroyBloke(Bloke *bloke) {
         OutputDebugStringA("DestroyBloke: Badly linked list\n");
     }
     source.type = 1;
-    source.field_4 = bloke;
+    source.bloke = bloke;
     KillAllSamplesFromSource(&source);
     RemovePersonFromList(bloke->person);
     FreePerson(bloke->person);
@@ -302,9 +302,9 @@ LEGO_EXPORT void SetPathFlag(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00483240
 LEGO_EXPORT unsigned short DoPendingAction(Bloke *bloke) {
-    bloke->field_e = bloke->field_10;
-    bloke->field_10 = 0;
-    return bloke->field_e;
+    bloke->low_level_action = bloke->pending_action;
+    bloke->pending_action = 0;
+    return bloke->low_level_action;
 }
 
 // FUNCTION: LEGOLAND 0x00483260
@@ -318,10 +318,10 @@ void FUN_00483260(Bloke *bloke) {
     FXSpriteList *set;
 
     bloke->flags |= 8;
-    bloke->field_10 = bloke->field_e;
-    bloke->field_e = 9;
+    bloke->pending_action = bloke->low_level_action;
+    bloke->low_level_action = 9;
     bloke->field_20 = 0;
-    tile = GetTileInDir(bloke->pos, bloke->field_72);
+    tile = GetTileInDir(bloke->pos, bloke->dir);
     ux = tile.x;
     uy = tile.y;
     x = ux >> 8;
@@ -377,10 +377,10 @@ int FUN_00483300(Bloke *bloke, int x, int y) {
 // FUNCTION: LEGOLAND 0x004833d0
 LEGO_EXPORT int NewDirForAction(Bloke *bloke, unsigned char dir) {
     unsigned char masked = dir & 0x7;
-    if (bloke->field_72 != masked) {
-        bloke->field_10 = bloke->field_e;
+    if (bloke->dir != masked) {
+        bloke->pending_action = bloke->low_level_action;
         bloke->field_73 = masked;
-        bloke->field_e = 5;
+        bloke->low_level_action = 5;
         bloke->field_75 = 1;
         return 1;
     }
@@ -537,7 +537,7 @@ int FUN_004837a0(Bloke *bloke, unsigned int x, unsigned int y) {
 // FUNCTION: LEGOLAND 0x004837d0
 LEGO_EXPORT int CrossTileCentre(Bloke *bloke, unsigned int x, unsigned int y) {
     unsigned int delta;
-    switch (bloke->field_72) {
+    switch (bloke->dir) {
     case 0:
     case 1:
     case 4:
@@ -558,7 +558,7 @@ void AdvanceBlokeFrame(Bloke *bloke) {
     bloke->field_75 = bloke->field_75 - 1;
     if (bloke->field_75 == 0) {
         bloke->field_75 = 2;
-        bloke->field_74 = (bloke->field_74 + 1) & 7;
+        bloke->frame = (bloke->frame + 1) & 7;
     }
 }
 
@@ -568,14 +568,14 @@ void TurnTowardsTargetDir(Bloke *bloke) {
 
     if (--bloke->field_75 == 0) {
         bloke->field_75 = 3;
-        step = ((bloke->field_72 - bloke->field_73) & 4) ? 1 : -1;
-        bloke->field_72 = (step + bloke->field_72) & 7;
+        step = ((bloke->dir - bloke->field_73) & 4) ? 1 : -1;
+        bloke->dir = (step + bloke->dir) & 7;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00483890
 void FUN_00483890(Bloke *bloke) {
-    bloke->field_74 = 2;
+    bloke->frame = 2;
 }
 
 // FUNCTION: LEGOLAND 0x004838a0
@@ -595,10 +595,10 @@ void FUN_004838c0(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x004838e0
 void FUN_004838e0(Bloke *bloke) {
-    if (bloke->field_72 != bloke->field_73) {
+    if (bloke->dir != bloke->field_73) {
         TurnTowardsTargetDir(bloke);
     }
-    if (bloke->field_72 == bloke->field_73) {
+    if (bloke->dir == bloke->field_73) {
         bloke->field_75 = 1;
         DoPendingAction(bloke);
     }
@@ -624,7 +624,7 @@ LEGO_EXPORT int DoRndWalkPathTileAction(Bloke *bloke) {
             if ((rf & 8) != 0) {
                 paths = Get_Path_Directions(&tile, 0, 0);
                 dirs = ExcludeIsolatedDiags(paths);
-                dirs &= ~Dir_To_Bit(bloke->field_72 + 4);
+                dirs &= ~Dir_To_Bit(bloke->dir + 4);
                 dir = Bit_To_Dir(dirs);
                 bloke->flags |= 4;
                 return NewDirForAction(bloke, dir);
@@ -632,7 +632,7 @@ LEGO_EXPORT int DoRndWalkPathTileAction(Bloke *bloke) {
             if ((rf & 0x24) != 0) {
                 paths = Get_Path_Directions(&tile, 0, 0);
                 dirs = ExcludeIsolatedDiags(paths);
-                dirs &= ~(Dir_To_Bit(bloke->field_72 + 5) | Dir_To_Bit(bloke->field_72 + 4) | Dir_To_Bit(bloke->field_72 + 3));
+                dirs &= ~(Dir_To_Bit(bloke->dir + 5) | Dir_To_Bit(bloke->dir + 4) | Dir_To_Bit(bloke->dir + 3));
                 dir = Random_Dir_From_Bits(dirs);
                 bloke->flags |= 4;
                 return NewDirForAction(bloke, dir);
@@ -676,7 +676,7 @@ int FUN_00483b60(Bloke *bloke, unsigned int x, unsigned int y) {
             rf = GetCurrentRFFlags(pos->x, pos->y);
             if ((rf & 1) != 0 || ((mapFlags & 0x10) != 0 && (rf & 2) == 0)) {
                 if (FindBestNodeAtPoint(pos) != NULL) {
-                    bloke->field_e = 0;
+                    bloke->low_level_action = 0;
                     return 1;
                 }
             }
@@ -716,7 +716,7 @@ int FUN_00483c20(Bloke *bloke, Point pos) {
 
 // FUNCTION: LEGOLAND 0x00483d10
 void FUN_00483d10(Bloke *bloke) {
-    Point d = GetOffsetInDir(bloke->field_72, bloke->field_7f);
+    Point d = GetOffsetInDir(bloke->dir, bloke->speed);
 
     d.x += bloke->pos.x;
     d.y += bloke->pos.y;
@@ -729,7 +729,7 @@ void FUN_00483d10(Bloke *bloke) {
             }
         }
         if ((bloke->field_5c & 0x7f) == 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_5c = 0;
         }
     }
@@ -737,7 +737,7 @@ void FUN_00483d10(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00483d90
 void FUN_00483d90(Bloke *bloke) {
-    Point d = GetOffsetInDir(bloke->field_72, bloke->field_7f);
+    Point d = GetOffsetInDir(bloke->dir, bloke->speed);
 
     d.x += bloke->pos.x;
     d.y += bloke->pos.y;
@@ -751,7 +751,7 @@ void FUN_00483d90(Bloke *bloke) {
                 }
             }
             if ((bloke->field_5c & 0x7f) == 0) {
-                bloke->field_e = 0;
+                bloke->low_level_action = 0;
                 bloke->field_5c = 0;
             }
         }
@@ -766,11 +766,11 @@ void FUN_00483e20(Bloke *bloke) {
         short mapFlags = Get_MapFlags(bloke->pos.x, bloke->pos.y);
         short rf = GetCurrentRFFlags(bloke->pos.x, bloke->pos.y);
         if ((rf & 1) != 0 || ((mapFlags & 0x10) != 0 && (rf & 2) == 0)) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             return;
         }
     }
-    d = GetOffsetInDir(bloke->field_72, bloke->field_7f);
+    d = GetOffsetInDir(bloke->dir, bloke->speed);
     d.x += bloke->pos.x;
     d.y += bloke->pos.y;
     if (FUN_00483300(bloke, d.x, d.y) == 0) {
@@ -786,7 +786,7 @@ void FUN_00483e20(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00483ef0
 void FUN_00483ef0(Bloke *bloke) {
-    Point d = GetOffsetInDir(bloke->field_72, bloke->field_7f);
+    Point d = GetOffsetInDir(bloke->dir, bloke->speed);
     short rf;
     short mapFlags;
     short rf2;
@@ -806,12 +806,12 @@ void FUN_00483ef0(Bloke *bloke) {
                 (mapFlags = Get_MapFlags(bloke->pos.x, bloke->pos.y), rf2 = GetCurrentRFFlags(bloke->pos.x, bloke->pos.y),
                     (rf2 & 1) == 0 && ((mapFlags & 0x10) == 0 || (rf2 & 2) != 0))) &&
             (Get_MapFlags(bloke->pos.x, bloke->pos.y) & 0x10) == 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 2;
             return;
         }
         if ((rf & 0x24) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 4;
             return;
         }
@@ -822,7 +822,7 @@ void FUN_00483ef0(Bloke *bloke) {
             coords[1] = d.y >> 8;
             dirs = Get_Path_Directions(coords, 0, 0);
             dirs = ExcludeIsolatedDiags(dirs);
-            dirs = dirs & ~Dir_To_Bit(bloke->field_72 + 4);
+            dirs = dirs & ~Dir_To_Bit(bloke->dir + 4);
             dirs = Bit_To_Dir(dirs);
             NewDirForAction(bloke, dirs);
         }
@@ -834,7 +834,7 @@ void FUN_00483ef0(Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00484090
 void FUN_00484090(Bloke *bloke) {
-    Point d = GetOffsetInDir(bloke->field_72, bloke->field_7f);
+    Point d = GetOffsetInDir(bloke->dir, bloke->speed);
     Point next;
     short rf;
     short mapFlags;
@@ -849,24 +849,24 @@ void FUN_00484090(Bloke *bloke) {
         rf = GetCurrentRFFlags(bloke->pos.x, bloke->pos.y);
         if (bloke->pos.x < 0 || bloke->pos.x >= lpConfig->width * 0x100 || bloke->pos.y < 0 ||
             bloke->pos.y >= lpConfig->height * 0x100) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 2;
             return;
         }
         mapFlags = Get_MapFlags(bloke->pos.x, bloke->pos.y);
         rf2 = GetCurrentRFFlags(bloke->pos.x, bloke->pos.y);
         if ((rf2 & 1) == 0 && ((mapFlags & 0x10) == 0 || (rf2 & 2) != 0)) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 2;
             return;
         }
         if ((rf & 0x24) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 4;
             return;
         }
         if ((rf & 8) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             return;
         }
     }
@@ -895,14 +895,14 @@ void FUN_00484220(Bloke *bloke) {
     short mapFlags;
     short rf;
 
-    if (ReachedDestination(bloke, bloke->field_7f << 1) != 0) {
-        bloke->field_e = 0;
+    if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
+        bloke->low_level_action = 0;
         return;
     }
-    NavigMoveLine(&bloke->nav, bloke->field_7f, &target);
+    NavigMoveLine(&bloke->nav, bloke->speed, &target);
     if (FUN_004837a0(bloke, target.x, target.y) != 0) {
         if (HitObstacle(bloke, target.x, target.y) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 1;
             return;
         }
@@ -910,7 +910,7 @@ void FUN_00484220(Bloke *bloke) {
             target.y >= lpConfig->height * 0x100 ||
             (mapFlags = Get_MapFlags(target.x, target.y), rf = GetCurrentRFFlags(target.x, target.y),
                 (rf & 1) == 0 && ((mapFlags & 0x10) == 0 || (rf & 2) != 0))) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 2;
             return;
         }
@@ -927,26 +927,26 @@ void FUN_00484350(Bloke *bloke) {
     short rf;
 
     if ((bloke->flags & 2) != 0) {
-        bloke->field_e = 0;
+        bloke->low_level_action = 0;
         return;
     }
-    if (ReachedDestination(bloke, bloke->field_7f << 1) != 0) {
-        bloke->field_e = 0;
+    if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
+        bloke->low_level_action = 0;
         return;
     }
-    NavigMoveLine(&bloke->nav, bloke->field_7f, &target);
+    NavigMoveLine(&bloke->nav, bloke->speed, &target);
     if (FUN_004837a0(bloke, target.x, target.y) != 0) {
         if (HitObstacle(bloke, target.x, target.y) == 0) {
             if (target.x >= 0 && target.x < lpConfig->width * 0x100 && target.y >= 0 && target.y < lpConfig->height * 0x100) {
                 mapFlags = Get_MapFlags(target.x, target.y);
                 rf = GetCurrentRFFlags(target.x, target.y);
                 if ((rf & 1) != 0 || ((mapFlags & 0x10) != 0 && (rf & 2) == 0)) {
-                    bloke->field_e = 0;
+                    bloke->low_level_action = 0;
                     return;
                 }
             }
         } else {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             return;
         }
     }
@@ -958,14 +958,14 @@ void FUN_00484350(Bloke *bloke) {
 // FUNCTION: LEGOLAND 0x00484470
 void FUN_00484470(Bloke *bloke) {
     Point target;
-    if (ReachedDestination(bloke, bloke->field_7f << 1) != 0) {
-        bloke->field_e = 0;
+    if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
+        bloke->low_level_action = 0;
         return;
     }
-    NavigMoveLine(&bloke->nav, bloke->field_7f, &target);
+    NavigMoveLine(&bloke->nav, bloke->speed, &target);
     if (FUN_004837a0(bloke, target.x, target.y) != 0) {
         if (HitObstacle(bloke, target.x, target.y) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 1;
             return;
         }
@@ -978,14 +978,14 @@ void FUN_00484470(Bloke *bloke) {
 // FUNCTION: LEGOLAND 0x00484520
 void FUN_00484520(Bloke *bloke) {
     Point target;
-    if (ReachedDestination(bloke, bloke->field_7f << 1) != 0) {
-        bloke->field_e = 0;
+    if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
+        bloke->low_level_action = 0;
         return;
     }
-    NavigMoveLine(&bloke->nav, bloke->field_7f, &target);
+    NavigMoveLine(&bloke->nav, bloke->speed, &target);
     if (FUN_004837a0(bloke, target.x, target.y) != 0) {
         if (FUN_00483580(bloke, target.x, target.y) != 0) {
-            bloke->field_e = 0;
+            bloke->low_level_action = 0;
             bloke->field_64 |= 1;
             return;
         }
@@ -998,30 +998,30 @@ void FUN_00484520(Bloke *bloke) {
 // FUNCTION: LEGOLAND 0x004845d0
 void FUN_004845d0(Bloke *bloke) {
     Point target;
-    if (ReachedDestination(bloke, bloke->field_7f << 1) != 0) {
+    if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
         DoPendingAction(bloke);
         return;
     }
-    NavigMoveLine(&bloke->nav, bloke->field_7f, &target);
+    NavigMoveLine(&bloke->nav, bloke->speed, &target);
     bloke->pos = target;
     AdvanceBlokeFrame(bloke);
 }
 
 // FUNCTION: LEGOLAND 0x00484630
 void FUN_00484630(Bloke *bloke) {
-    if (bloke->field_70 == 0) {
+    if (bloke->height == 0) {
         bloke->field_46 = bloke->field_44;
         if (bloke->field_3a-- == 0) {
             DoPendingAction(bloke);
             return;
         }
     }
-    bloke->field_70 += bloke->field_46--;
-    if (bloke->field_70 <= 0) {
-        bloke->field_70 = 0;
+    bloke->height += bloke->field_46--;
+    if (bloke->height <= 0) {
+        bloke->height = 0;
     }
-    bloke->field_74 = 0;
-    bloke->field_73 = (bloke->field_72 + 1) & 7;
+    bloke->frame = 0;
+    bloke->field_73 = (bloke->dir + 1) & 7;
     TurnTowardsTargetDir(bloke);
 }
 
@@ -1071,7 +1071,7 @@ void FUN_00484790(Bloke *bloke) {
     int x;
     int y;
 
-    tile = GetTileInDir(bloke->pos, bloke->field_72);
+    tile = GetTileInDir(bloke->pos, bloke->dir);
     if ((Get_RFFlags(tile.x, tile.y) & 3) != 3) {
         bloke->flags &= 0xfff7;
         DoPendingAction(bloke);
@@ -1105,7 +1105,7 @@ void FUN_00484790(Bloke *bloke) {
         }
         bloke->flags &= 0xfff7;
         DoPendingAction(bloke);
-        PTR_FUN_004bd34c[bloke->field_e](bloke);
+        PTR_FUN_004bd34c[bloke->low_level_action](bloke);
         return;
     }
     bloke->field_20++;
@@ -1127,7 +1127,7 @@ LEGO_EXPORT void Bloke_DoNothing(void) {
 // FUNCTION: LEGOLAND 0x00484920
 LEGO_EXPORT void DoLowLevelAI(Bloke *bloke) {
     SetPathFlag(bloke);
-    PTR_FUN_004bd34c[bloke->field_e](bloke);
+    PTR_FUN_004bd34c[bloke->low_level_action](bloke);
 }
 
 // FUNCTION: LEGOLAND 0x00484950
@@ -1213,16 +1213,16 @@ LEGO_EXPORT BNVPath *NewBNVPath(BinVFile *file, unsigned int param_2, char *name
     float scale = 49152.0f / (param_4 - param_5);
     path->file = file;
     strcpy(path->name, name);
-    path->field_1c = scale;
+    path->z_scale = scale;
     path->frame_index = 0;
-    path->field_20 = param_5;
+    path->z_origin = param_5;
     path->field_44 = 1;
     path->x = coords[0];
     path->y = coords[1];
     frame = GetBinVFrame(file, 0);
     object = GetObjectFromName(frame, name);
     vertex = GetVertex(object, 0);
-    path->field_3c = GetZSkew(file, object, vertex);
+    path->z_skew = GetZSkew(file, object, vertex);
     path->field_4 = param_2;
     return path;
 }
@@ -1263,7 +1263,7 @@ LEGO_EXPORT int UpdateBlokeFromBNVPath(Bloke *bloke, struct BNVPath *path) {
     if (path->field_44 == 0) {
         path->x = path->dx + path->x;
         path->y = path->dy + path->y;
-        speed = bloke->field_7f;
+        speed = bloke->speed;
         if (dx * dx + dy * dy < speed * speed) {
             path->field_44 = 1;
             frame = ++path->frame_index;
@@ -1305,14 +1305,14 @@ LEGO_EXPORT int UpdateBlokeFromBNVPath(Bloke *bloke, struct BNVPath *path) {
         }
         dx = sumX * 0.125 - path->x;
         dy = sumY * 0.125 - path->y;
-        depth = (sumZ * 0.125 - path->field_20) * path->field_1c;
+        depth = (sumZ * 0.125 - path->z_origin) * path->z_scale;
         z = depth + 8192.0f;
         bloke->person->field_34 = z >> 8;
         angle = atan2(dy, dx);
-        path->dx = bloke->field_7f * cos(angle) * 0.25;
-        path->dy = bloke->field_7f * sin(angle) * 0.25;
+        path->dx = bloke->speed * cos(angle) * 0.25;
+        path->dy = bloke->speed * sin(angle) * 0.25;
     }
-    person->field_38 = path->field_3c + path->field_3c;
+    person->field_38 = path->z_skew + path->z_skew;
     bloke->screen_x = path->x * 0.5f;
     bloke->screen_y = path->y * 0.5f;
     AdvanceBlokeFrame(bloke);
@@ -1394,13 +1394,13 @@ LEGO_EXPORT void BNVPath_SetDFrame(Bloke *bloke, BNVPath *path, int frame) {
         }
         dx = sumX * 0.125 - path->x;
         dy = sumY * 0.125 - path->y;
-        depth = (sumZ * 0.125 - path->field_20) * path->field_1c;
+        depth = (sumZ * 0.125 - path->z_origin) * path->z_scale;
         z = depth + 8192.0f;
         bloke->person->field_34 = z >> 8;
         angle = atan2(dy, dx);
     }
-    path->dx = bloke->field_7f * cos(angle) * 0.25;
-    path->dy = bloke->field_7f * sin(angle) * 0.25;
+    path->dx = bloke->speed * cos(angle) * 0.25;
+    path->dy = bloke->speed * sin(angle) * 0.25;
 }
 
 // FUNCTION: LEGOLAND 0x00485260

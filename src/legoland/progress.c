@@ -22,26 +22,26 @@ LEGO_EXPORT void InitProgressScreen(void) {
     unsigned int flags;
     int i;
 
-    if ((int)lpConfig->field_28 < 1) {
-        lpConfig->field_28 = 1;
+    if ((int)lpConfig->level < 1) {
+        lpConfig->level = 1;
     }
     if (DAT_00798660 == 0) {
         FUN_0048b6d0();
         if (MapStats.field_3a0 == 0) {
             if (DAT_00798668 == 0) {
-                lpConfig->field_28 = DAT_007cb394 + 1;
+                lpConfig->level = DAT_007cb394 + 1;
             }
         }
-        if (MapStats.field_3a0 == 1 && (int)lpConfig->field_28 <= 0xf) {
-            CurrentProfile.flags[3 + lpConfig->field_28] = 1;
+        if (MapStats.field_3a0 == 1 && (int)lpConfig->level <= 0xf) {
+            CurrentProfile.flags[3 + lpConfig->level] = 1;
             UpDateCurrentProfile();
         }
     }
-    if ((int)lpConfig->field_28 <= 5) {
+    if ((int)lpConfig->level <= 5) {
         FUN_0048bde0();
         return;
     }
-    if ((int)lpConfig->field_28 > 0xf) {
+    if ((int)lpConfig->level > 0xf) {
         DAT_00668e38 = 1;
         SPRITE_TitleScreenBk = NULL;
         EditMode.unk4 = 2;
@@ -55,7 +55,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
     SPRITE_TitleScreenBk = LoadSprite("Progress_ScreenBK.lls", 4);
     flags = 0x6002;
     if (DAT_00798660 == 0) {
-        if (MapStats.field_3a0 == 1 && lpConfig->field_28 == 6) {
+        if (MapStats.field_3a0 == 1 && lpConfig->level == 6) {
             MapStats.field_3a0 = 2;
         }
         FUN_0048b700();
@@ -86,17 +86,17 @@ LEGO_EXPORT void InitProgressScreen(void) {
         flags = 0x200a;
 
         for (i = 0; i < 10; i++) {
-            if (i + 5 == (int)lpConfig->field_28 - 1) {
+            if (i + 5 == (int)lpConfig->level - 1) {
                 icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite0);
                 if (icon) {
-                    icon->field_28 = (void *)RenderFlashingSpriteIcon;
+                    icon->render_func = (void *)RenderFlashingSpriteIcon;
                     icon->string_id = DAT_004beb80.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
                     icon->event_handler = (void *)FUN_0048bb60;
                     icon->flags |= flags;
                 }
-            } else if (i + 5 < (int)lpConfig->field_28 - 1) {
+            } else if (i + 5 < (int)lpConfig->level - 1) {
                 icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite1);
                 if (icon) {
                     icon->string_id = DAT_004beb80.levels[i].id;
@@ -107,10 +107,10 @@ LEGO_EXPORT void InitProgressScreen(void) {
         }
     } else {
         for (i = 0; i < 10; i++) {
-            if (i + 5 == (int)lpConfig->field_28 - 1) {
+            if (i + 5 == (int)lpConfig->level - 1) {
                 icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite0);
                 if (icon) {
-                    icon->field_28 = (void *)RenderFlashingSpriteIcon;
+                    icon->render_func = (void *)RenderFlashingSpriteIcon;
                     icon->string_id = DAT_004beb80.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
@@ -146,7 +146,7 @@ unsigned char FUN_0048bb60(unsigned char *arg0, unsigned int arg1, unsigned int 
         DAT_0079866c = GetTicks();
         DAT_004beb80.last_clicked = arg0[0x18];
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        lpConfig->field_28 = arg0[0x18] + 1;
+        lpConfig->level = arg0[0x18] + 1;
         DAT_0080ff80.unk4 = 0xffffffff;
     }
     return 1;
@@ -162,7 +162,7 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
             DAT_006687b0 = 4;
             PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
             FUN_0048b770();
-            if ((int)lpConfig->field_28 <= 0xf) {
+            if ((int)lpConfig->level <= 0xf) {
                 LoadWatchSprite(0xfa, 0x181);
                 DAT_00668e38 = 0;
                 InitGameInterface(1);
@@ -216,12 +216,12 @@ void FUN_0048bd70(void) {
     RemoveIconGroup(0x23);
     slot = (struct FreePlaySpriteSlot *)&DAT_004beb80.tutorials[0].sprite0;
     while ((int)slot < (int)&DAT_004bed40) {
-        while (KillSprite(slot->field_0) == 0) {
+        while (KillSprite(slot->sprite0) == 0) {
         }
-        while (KillSprite(slot->field_4) == 0) {
+        while (KillSprite(slot->sprite1) == 0) {
         }
-        slot->field_4 = NULL;
-        slot->field_0 = NULL;
+        slot->sprite1 = NULL;
+        slot->sprite0 = NULL;
         slot++;
     }
 }
@@ -267,7 +267,7 @@ void FUN_0048bde0(void) {
     mapping = DAT_007cb380;
     entry = &DAT_004beb80.tutorials[0];
     do {
-        if (i == lpConfig->field_28 - 1) {
+        if (i == lpConfig->level - 1) {
             icon = InsertIcon(entry->x, entry->y, 0x1c, entry->sprite0);
         } else if (CurrentProfile.flags[4 + i] == 1) {
             icon = InsertIcon(entry->x, entry->y, 0x1c, entry->sprite1);
@@ -340,10 +340,10 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
         if (DAT_00798664 != 0) {
             FUN_0048bd70();
-            lpConfig->field_28 = 6;
+            lpConfig->level = 6;
         } else {
             FUN_0048b770();
-            lpConfig->field_28 = 1;
+            lpConfig->level = 1;
         }
     }
     return 1;
@@ -372,7 +372,7 @@ void FUN_0048c100(void) {
             rc.top = entry[1] + 6;
             rc.right = rc.left + 0x190;
             rc.bottom = rc.top + 0x16;
-            if (i == (int)lpConfig->field_28 - 1) {
+            if (i == (int)lpConfig->level - 1) {
                 DrawTextOnRenderSurface(text, 2, rc, 0);
             } else if (CurrentProfile.flags[4 + i] == 1) {
                 DrawTextOnRenderSurface(text, 2, rc, 0x323232);

@@ -49,7 +49,7 @@ LEGO_EXPORT void InitTitleScreen(void) {
     if (FUN_0048fc30() == 0) {
         // STRING: LEGOLAND 0x004bf548
         icon->alt_sprite = LoadSprite("Dark_New_On_Title.lls", 4);
-        icon->field_28 = (void *)FUN_0046e920;
+        icon->render_func = (void *)FUN_0046e920;
         icon->flags |= 8;
     } else {
         icon->alt_sprite = NULL;
@@ -687,9 +687,9 @@ void FUN_00490ea0(void) {
     unsigned int _x = DAT_00813a44.x;
     unsigned int _y = DAT_00813a44.y;
     if ((int)_x < DAT_007cb2e4->x ||
-        (int)DAT_00813a44.x > DAT_007cb2e4->field_10 + DAT_007cb2e4->x ||
+        (int)DAT_00813a44.x > DAT_007cb2e4->width + DAT_007cb2e4->x ||
         (int)DAT_00813a44.y < DAT_007cb2e4->y ||
-        (int)DAT_00813a44.y > DAT_007cb2e4->field_12 + DAT_007cb2e4->y) {
+        (int)DAT_00813a44.y > DAT_007cb2e4->height + DAT_007cb2e4->y) {
         if (GetBlink() != 0) {
             SetIconSprite(DAT_007cb2e4, NextPageSprite);
         } else {
@@ -697,15 +697,15 @@ void FUN_00490ea0(void) {
         }
     }
     if ((int)DAT_00813a44.x < DAT_007cb2e0->x ||
-        (int)DAT_00813a44.x > DAT_007cb2e0->field_10 + DAT_007cb2e0->x ||
+        (int)DAT_00813a44.x > DAT_007cb2e0->width + DAT_007cb2e0->x ||
         (int)DAT_00813a44.y < DAT_007cb2e0->y ||
-        (int)DAT_00813a44.y > DAT_007cb2e0->field_12 + DAT_007cb2e0->y) {
+        (int)DAT_00813a44.y > DAT_007cb2e0->height + DAT_007cb2e0->y) {
         SetIconSprite(DAT_007cb2e0, PreviousPageSprite);
     }
     if ((int)DAT_00813a44.x < DAT_007cb1c0->x ||
-        (int)DAT_00813a44.x > DAT_007cb1c0->field_10 + DAT_007cb1c0->x ||
+        (int)DAT_00813a44.x > DAT_007cb1c0->width + DAT_007cb1c0->x ||
         (int)DAT_00813a44.y < DAT_007cb1c0->y ||
-        (int)DAT_00813a44.y > DAT_007cb1c0->field_12 + DAT_007cb1c0->y) {
+        (int)DAT_00813a44.y > DAT_007cb1c0->height + DAT_007cb1c0->y) {
         SetIconSprite(DAT_007cb1c0, RepHint1Sprite);
     }
 }

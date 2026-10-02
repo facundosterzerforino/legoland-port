@@ -1102,11 +1102,11 @@ void FUN_00469bd0(unsigned int a, void *b) {
     cls = object->cls;
     SetBricksLimited(0);
     GetTileCentre((struct Point *)b, &centre.x);
-    EditCursor.field_1404 = centre.x;
-    EditCursor.field_1408 = centre.y;
+    EditCursor.tile_x = centre.x;
+    EditCursor.tile_y = centre.y;
     cls->method_90(a, &centre, 0x8f8);
     FUN_0045d770(&EditCursor);
-    PutObjOnMap(object->cls, a, (struct Point *)&EditCursor.field_1404);
+    PutObjOnMap(object->cls, a, (struct Point *)&EditCursor.tile_x);
     SetBricksLimited(1);
 }
 
@@ -1177,17 +1177,17 @@ int FUN_00469c80(struct MapRectArg *arg) {
                     point.y = tile_y;
                     saved_class = QueryClass;
                     memcpy(&saved, &QueryCursor, sizeof(struct Cursor));
-                    QueryCursor.field_1408 = tile_y;
+                    QueryCursor.tile_y = tile_y;
                     point.x = tile_x;
-                    QueryCursor.field_1404 = point.x;
+                    QueryCursor.tile_x = point.x;
                     QueryObj.pos.x = (unsigned char)point.x;
                     QueryClass = cls;
                     QueryObj.pos.y = (unsigned char)point.y;
-                    cls->method_94(cls->field_c4, &point);
+                    cls->method_94(cls->element, &point);
                     BuildCursorPtr(&QueryCursor, 0, 0);
                     if (FUN_0045f4b0(&QueryCursor) != 0) {
                         FUN_0045d3d0(QueryClass, &point.x);
-                        RemObjFromMap(QueryClass, (unsigned int)(QueryClass)->field_c4, QueryObj,
+                        RemObjFromMap(QueryClass, (unsigned int)(QueryClass)->element, QueryObj,
                             &QueryCursor);
                     }
                     memcpy(&QueryCursor, &saved, sizeof(struct Cursor));

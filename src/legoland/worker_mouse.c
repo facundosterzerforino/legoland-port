@@ -51,10 +51,10 @@ void PickUpWorker(unsigned int type, Bloke *worker) {
     DBPrintf("Picking up worker (%x) Workorder = %x\n", worker, worker->order);
     WorkerOnMouse = worker;
     DAT_007fdffc = type;
-    worker->field_e = 0xd;
+    worker->low_level_action = 0xd;
     WorkerOldX = WorkerOnMouse->pos.x;
     WorkerOldY = WorkerOnMouse->pos.y;
-    WorkerOnMouse->field_72 = 5;
+    WorkerOnMouse->dir = 5;
     DAT_00668954 = 1;
     if (DAT_007fdffc == 0x307) {
         ClearAGardenersWorkList(WorkerOnMouse);
@@ -185,30 +185,30 @@ WorkOrder *FUN_004704b0(Point *out) {
         ride = elem->field_0->ride;
         if (ride->durability != 0) {
             do {
-            if ((ride->flags & 0x200000) && DAT_007fdffc == 0x307 && lpConfig->field_38 != 0) {
-                if (!(0x4000 & flags)) {
-                    order = AddRepairOrderForObject(ride, pos);
-                    if (order == NULL) {
-                        break;
+                if ((ride->flags & 0x200000) && DAT_007fdffc == 0x307 && lpConfig->gardeners_enabled != 0) {
+                    if (!(0x4000 & flags)) {
+                        order = AddRepairOrderForObject(ride, pos);
+                        if (order == NULL) {
+                            break;
+                        }
+                    }
+                } else if ((ride->flags & 0x400000) && DAT_007fdffc == 0x308 && lpConfig->mechanics_enabled != 0) {
+                    if (!(0x4000 & flags)) {
+                        order = AddRepairOrderForObject(ride, pos);
                     }
                 }
-            } else if ((ride->flags & 0x400000) && DAT_007fdffc == 0x308 && lpConfig->field_34 != 0) {
-                if (!(0x4000 & flags)) {
-                    order = AddRepairOrderForObject(ride, pos);
+                if (order != NULL) {
+                    elem->flags |= 0x4000;
+                    if (out != NULL) {
+                        out->x = order->pos.x + order->footprints->x0;
+                        out->y = order->footprints->y1 + order->pos.y;
+                    }
+                    if (DAT_007fdffc == 0x307) {
+                        PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
+                    } else {
+                        PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
+                    }
                 }
-            }
-            if (order != NULL) {
-                elem->flags |= 0x4000;
-                if (out != NULL) {
-                    out->x = order->pos.x + order->footprints->x0;
-                    out->y = order->footprints->y1 + order->pos.y;
-                }
-                if (DAT_007fdffc == 0x307) {
-                    PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
-                } else {
-                    PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
-                }
-            }
             } while (0);
         }
         return order;
@@ -250,7 +250,7 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
                         isOrder = 1;
                     }
                 } else {
-                    if (Hover.type == 0x10a || Hover.type == 2 || DAT_00813a44.y < 0x20 || DAT_00813a44.y >= 0x174 || DAT_00813a44.x < lpConfig->field_20 + 9) {
+                    if (Hover.type == 0x10a || Hover.type == 2 || DAT_00813a44.y < 0x20 || DAT_00813a44.y >= 0x174 || DAT_00813a44.x < lpConfig->view_x + 9) {
                         break;
                     }
                     ScreenToMapRef(&DAT_00813a44.x, pt, 0);

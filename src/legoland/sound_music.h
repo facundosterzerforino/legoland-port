@@ -11,15 +11,15 @@ struct AVISoundBuffer;
 struct SampleParams {
     /* 0x00 */ int field_0;
     /* 0x04 */ unsigned int field_4;
-    /* 0x08 */ int field_8;
-    /* 0x0c */ int field_c;
+    /* 0x08 */ int x;
+    /* 0x0c */ int y;
 };
 
 struct SampleSource {
     /* 0x00 */ unsigned int type;
-    /* 0x04 */ void *field_4;
-    /* 0x08 */ unsigned int field_8;
-    /* 0x0c */ unsigned int field_c;
+    /* 0x04 */ void *bloke;
+    /* 0x08 */ unsigned int x;
+    /* 0x0c */ unsigned int y;
 };
 typedef struct SampleSource SampleSource;
 

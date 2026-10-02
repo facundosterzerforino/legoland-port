@@ -506,16 +506,16 @@ void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3) {
     memcpy(EditCursor.field_1414, &ride->footprint, 20);
     bits = 0;
     EditCursor.field_1830 = bits;
-    ScreenToMapRef(param_2, (int *)&EditCursor.field_1404, param_3);
+    ScreenToMapRef(param_2, (int *)&EditCursor.tile_x, param_3);
     t = FUN_00413e30(&EditCursor);
     ValidateCursor(&EditCursor, (unsigned int)ride);
     if (FUN_0045f4b0(&EditCursor) == 0) {
         return;
     }
-    rect.x0 = EditCursor.field_1414[0] + EditCursor.field_1404;
-    rect.y0 = EditCursor.field_1414[1] + EditCursor.field_1408;
-    rect.x1 = EditCursor.field_1414[2] + EditCursor.field_1404;
-    rect.y1 = EditCursor.field_1414[3] + EditCursor.field_1408;
+    rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
+    rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
+    rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
+    rect.y1 = EditCursor.field_1414[3] + EditCursor.tile_y;
     result = CheckForPeople(&rect);
     switch (result) {
     case -1:
@@ -530,7 +530,7 @@ void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3) {
             FUN_0045f480(&EditCursor, 2);
         } else {
             if (FUN_0045f4b0(&EditCursor) != 0) {
-                if (FUN_00413520(EditCursor.field_1404, EditCursor.field_1408, &r) == 0) {
+                if (FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &r) == 0) {
                     FUN_0045f480(&EditCursor, 0xe);
                 } else {
                     if (q[0] != NULL) {
@@ -544,8 +544,8 @@ void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3) {
                     } else {
                         type = (unsigned short)(unsigned int)t;
                     }
-                    FUN_004135d0(EditCursor.field_1404, EditCursor.field_1408, &r);
-                    FUN_00413450(EditCursor.field_1404, EditCursor.field_1408, (struct RideQueueEntry **)&r);
+                    FUN_004135d0(EditCursor.tile_x, EditCursor.tile_y, &r);
+                    FUN_00413450(EditCursor.tile_x, EditCursor.tile_y, (struct RideQueueEntry **)&r);
                     if (q[0] != NULL && q[0]->field_8 == type) bits = 1;
                     if (q[1] != NULL && q[1]->field_8 == type) bits |= 2;
                     if (q[2] != NULL && q[2]->field_8 == type) bits |= 4;
@@ -562,8 +562,8 @@ void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3) {
             if (t != NULL && FUN_0045f4b0(&EditCursor) != 0) {
                 memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
                 EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
-                DAT_0082f760.field_1404 = t->x;
-                DAT_0082f760.field_1408 = t->y;
+                DAT_0082f760.tile_x = t->x;
+                DAT_0082f760.tile_y = t->y;
                 DAT_0082f760.field_1830 = 0;
                 DAT_0082f760.field_1828 = 0x2034;
             } else {
@@ -575,40 +575,40 @@ void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3) {
 
 // FUNCTION: LEGOLAND 0x00413e30
 struct RoadTile *FUN_00413e30(struct Cursor *cur) {
-    struct RoadTile *t = FUN_004125f0(cur->field_1404, cur->field_1408);
+    struct RoadTile *t = FUN_004125f0(cur->tile_x, cur->tile_y);
     struct RoadTile *a;
     struct RoadTile *b;
     struct RoadTile *c;
     struct RoadTile *d;
     struct RoadTile *r;
     if (t) {
-        cur->field_1404 = t->x;
-        cur->field_1408 = t->y;
+        cur->tile_x = t->x;
+        cur->tile_y = t->y;
     }
-    a = FUN_004125f0(cur->field_1404, cur->field_1408 - 4);
+    a = FUN_004125f0(cur->tile_x, cur->tile_y - 4);
     if (a && (a->flags & 0xf) == 6) a = NULL;
-    b = FUN_004125f0(cur->field_1404 + 4, cur->field_1408);
+    b = FUN_004125f0(cur->tile_x + 4, cur->tile_y);
     if (b && (b->flags & 0xf) == 6) b = NULL;
-    c = FUN_004125f0(cur->field_1404, cur->field_1408 + 4);
+    c = FUN_004125f0(cur->tile_x, cur->tile_y + 4);
     if (c && (c->flags & 0xf) == 6) c = NULL;
-    d = FUN_004125f0(cur->field_1404 - 4, cur->field_1408);
+    d = FUN_004125f0(cur->tile_x - 4, cur->tile_y);
     if (d && (d->flags & 0xf) == 6) d = NULL;
     r = NULL;
     if (a) {
-        cur->field_1404 = a->x;
-        cur->field_1408 = a->y + 4;
+        cur->tile_x = a->x;
+        cur->tile_y = a->y + 4;
         r = a;
     } else if (b) {
-        cur->field_1404 = b->x - 4;
-        cur->field_1408 = b->y;
+        cur->tile_x = b->x - 4;
+        cur->tile_y = b->y;
         r = b;
     } else if (c) {
-        cur->field_1404 = c->x;
-        cur->field_1408 = c->y - 4;
+        cur->tile_x = c->x;
+        cur->tile_y = c->y - 4;
         r = c;
     } else if (d) {
-        cur->field_1404 = d->x + 4;
-        cur->field_1408 = d->y;
+        cur->tile_x = d->x + 4;
+        cur->tile_y = d->y;
         r = d;
     }
     return r;
@@ -622,8 +622,8 @@ void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param) {
     unsigned int count;
 
     if (tile != NULL) {
-        QueryCursor.field_1404 = tile->x;
-        QueryCursor.field_1408 = tile->y;
+        QueryCursor.tile_x = tile->x;
+        QueryCursor.tile_y = tile->y;
 
         src = &DAT_004b4bf0[0];
         dst = &QueryCursor.field_1414[0];
@@ -682,8 +682,8 @@ void FUN_00414020(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
 void FUN_00414220(Element *edit, TileId tile, struct Cursor *cursor) {
     struct NeighborResult r;
     struct RoadQueueEntry **q = (struct RoadQueueEntry **)&r;
-    int x = cursor->field_1404;
-    int y = cursor->field_1408;
+    int x = cursor->tile_x;
+    int y = cursor->tile_y;
     struct RoadQueueEntry *entry;
 
     BGFullUpdate = 1;
@@ -792,7 +792,7 @@ void FUN_00414440(void) {
         ref.x = e->x;
         ref.y = e->y;
         GetTileBounds(&ref, b);
-        SortSprite(DrivingSchoolLightsData->sprites[ia & 0xff], b[0] + pt.x, b[1] + pt.y, b[1] - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ia & 0xff], b[0] + pt.x, b[1] + pt.y, b[1] - lpConfig->view_y, 0, 0);
 
         ref.x = e->x + 3;
         ref.y = e->y;
@@ -800,7 +800,7 @@ void FUN_00414440(void) {
         pt.x = DrivingSchoolLightsData->off_x[id & 0xff] >> 1;
         pt.y = DrivingSchoolLightsData->off_y[id & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DrivingSchoolLightsData->sprites[id & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[id & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->view_y, 0, 0);
 
         ref.x = e->x + 3;
         ref.y = e->y + 3;
@@ -808,7 +808,7 @@ void FUN_00414440(void) {
         pt.x = DrivingSchoolLightsData->off_x[ib & 0xff] >> 1;
         pt.y = DrivingSchoolLightsData->off_y[ib & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DrivingSchoolLightsData->sprites[ib & 0xff], b[0] + pt.x, b[1] + pt.y, b[3] - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ib & 0xff], b[0] + pt.x, b[1] + pt.y, b[3] - lpConfig->view_y, 0, 0);
 
         ref.x = e->x;
         ref.y = e->y + 3;
@@ -816,7 +816,7 @@ void FUN_00414440(void) {
         pt.x = DrivingSchoolLightsData->off_x[ic & 0xff] >> 1;
         pt.y = DrivingSchoolLightsData->off_y[ic & 0xff] >> 1;
         AdjustOffsetForViewMode(&pt);
-        SortSprite(DrivingSchoolLightsData->sprites[ic & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->field_22, 0, 0);
+        SortSprite(DrivingSchoolLightsData->sprites[ic & 0xff], b[0] + pt.x, b[1] + pt.y, ((b[1] + b[3]) >> 1) - lpConfig->view_y, 0, 0);
     }
 }
 
@@ -838,8 +838,8 @@ void FUN_00414880(struct RoadEditArg *param_1, unsigned int param_2, unsigned in
 
     memcpy(EditCursor.field_1414, (char *)obj + 0x3c, 20);
     EditCursor.field_1830 = 0;
-    ScreenToMapRef(param_2, &EditCursor.field_1404, param_3);
-    tile = FUN_004125f0(EditCursor.field_1404, EditCursor.field_1408);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
+    tile = FUN_004125f0(EditCursor.tile_x, EditCursor.tile_y);
     FUN_0045f480(&EditCursor, 0xe);
     cost = GetObjCost(obj);
     if (GetBrickCount() < cost) {
@@ -848,8 +848,8 @@ void FUN_00414880(struct RoadEditArg *param_1, unsigned int param_2, unsigned in
     if (tile == NULL) {
         return;
     }
-    EditCursor.field_1404 = tile->x;
-    EditCursor.field_1408 = tile->y;
+    EditCursor.tile_x = tile->x;
+    EditCursor.tile_y = tile->y;
     if (tile->flags & 0x10) {
         return;
     }

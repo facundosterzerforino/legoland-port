@@ -382,8 +382,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 }
             }
             DAT_007fda60.action = bloke->action;
-            DAT_007fda60.field_e = bloke->field_e;
-            DAT_007fda60.field_10 = bloke->field_10;
+            DAT_007fda60.low_level_action = bloke->low_level_action;
+            DAT_007fda60.pending_action = bloke->pending_action;
             if (bloke->target != 0) {
                 DAT_007fda60.target = (int)bloke->target;
                 FindeIneList((union SavedElement *)&DAT_007fda60.target);
@@ -408,10 +408,10 @@ LEGO_EXPORT int SaveGame(char *filename) {
             DAT_007fda60.flags = bloke->flags;
             DAT_007fda60.field_64 = bloke->field_64;
             DAT_007fda60.field_78 = bloke->field_78;
-            DAT_007fda60.field_7a = bloke->field_7a;
+            DAT_007fda60.mood = bloke->mood;
             DAT_007fda60.field_7c = bloke->field_7c;
             DAT_007fda60.field_7e = bloke->field_7e;
-            DAT_007fda60.field_7f = bloke->field_7f;
+            DAT_007fda60.speed = bloke->speed;
             DAT_007fda60.field_80 = bloke->field_80;
             DAT_007fda60.field_81 = bloke->field_81;
             DAT_007fda60.field_82 = bloke->field_82;
@@ -425,10 +425,10 @@ LEGO_EXPORT int SaveGame(char *filename) {
             FindeIneList((union SavedElement *)&DAT_007fda60.favourite[3]);
             DAT_007fda60.pos.x = bloke->pos.x;
             DAT_007fda60.pos.y = bloke->pos.y;
-            DAT_007fda60.field_70 = bloke->field_70;
-            DAT_007fda60.field_72 = bloke->field_72;
+            DAT_007fda60.height = bloke->height;
+            DAT_007fda60.dir = bloke->dir;
             DAT_007fda60.field_73 = bloke->field_73;
-            DAT_007fda60.field_74 = bloke->field_74;
+            DAT_007fda60.frame = bloke->frame;
             DAT_007fda60.field_75 = bloke->field_75;
             DAT_007fda60.nav = bloke->nav;
             DAT_007fda60.person_8 = bloke->person->field_8;
@@ -439,8 +439,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
             DAT_007fda60.field_38 = bloke->person->field_38;
             DAT_007fda60.depth = bloke->person->depth;
             DAT_007fda60.rotation = bloke->person->rotation;
-            DAT_007fda60.person_4c = bloke->person->field_4c;
-            DAT_007fda60.anim = (unsigned int)bloke->person->field_88;
+            DAT_007fda60.person_4c = bloke->person->frame;
+            DAT_007fda60.anim = (unsigned int)bloke->person->anim;
             DAT_007fda60.sort_id = bloke->person->sort_id;
             DAT_007fda60.field_38 = bloke->person->field_38;
             memcpy(DAT_007fda60.m, bloke->person->m, sizeof(DAT_007fda60.m));
@@ -531,7 +531,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         LogPrintf("Castle Placed Flag %s",
             // STRING: LEGOLAND 0x004bc654
             CastlePlacedFlag != 0 ? "TRUE" :
-                              // STRING: LEGOLAND 0x004bc64c
+                                  // STRING: LEGOLAND 0x004bc64c
                 "FALSE");
         goto fail;
     }
@@ -555,7 +555,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
             ride = DAT_00669200[i]->ride;
             SaveGameWrite(ride->element->name, 8);
             if (ride->type != 2 && ride->type != 0) {
-                if (SaveGameWrite(ride->counters, lpConfig->field_1a) == 0) {
+                if (SaveGameWrite(ride->counters, lpConfig->max_blokes) == 0) {
                     // STRING: LEGOLAND 0x004bc5c4
                     {
                         LogPrintf("BeenOn Flags for %s Save Failed", ride->element->name);
@@ -910,8 +910,8 @@ LEGO_EXPORT int LoadGame(char *path) {
                 }
             }
             bloke->action = DAT_007fda60.action;
-            bloke->field_e = DAT_007fda60.field_e;
-            bloke->field_10 = DAT_007fda60.field_10;
+            bloke->low_level_action = DAT_007fda60.low_level_action;
+            bloke->pending_action = DAT_007fda60.pending_action;
             if (DAT_007fda60.target != -1) {
                 bloke->target = DAT_00669200[DAT_007fda60.target];
             } else {
@@ -934,10 +934,10 @@ LEGO_EXPORT int LoadGame(char *path) {
             bloke->flags = DAT_007fda60.flags;
             bloke->field_64 = DAT_007fda60.field_64;
             bloke->field_78 = DAT_007fda60.field_78;
-            bloke->field_7a = DAT_007fda60.field_7a;
+            bloke->mood = DAT_007fda60.mood;
             bloke->field_7c = DAT_007fda60.field_7c;
             bloke->field_7e = DAT_007fda60.field_7e;
-            bloke->field_7f = DAT_007fda60.field_7f;
+            bloke->speed = DAT_007fda60.speed;
             bloke->field_80 = DAT_007fda60.field_80;
             bloke->field_81 = DAT_007fda60.field_81;
             bloke->field_82 = DAT_007fda60.field_82;
@@ -963,10 +963,10 @@ LEGO_EXPORT int LoadGame(char *path) {
             }
             bloke->pos.x = DAT_007fda60.pos.x;
             bloke->pos.y = DAT_007fda60.pos.y;
-            bloke->field_70 = DAT_007fda60.field_70;
-            bloke->field_72 = DAT_007fda60.field_72;
+            bloke->height = DAT_007fda60.height;
+            bloke->dir = DAT_007fda60.dir;
             bloke->field_73 = DAT_007fda60.field_73;
-            bloke->field_74 = DAT_007fda60.field_74;
+            bloke->frame = DAT_007fda60.frame;
             bloke->field_75 = DAT_007fda60.field_75;
             bloke->nav = DAT_007fda60.nav;
             bloke->person = malloc(sizeof(Person));
@@ -980,8 +980,8 @@ LEGO_EXPORT int LoadGame(char *path) {
             bloke->person->field_38 = DAT_007fda60.field_38;
             bloke->person->depth = DAT_007fda60.depth;
             bloke->person->rotation = DAT_007fda60.rotation;
-            bloke->person->field_4c = DAT_007fda60.person_4c;
-            bloke->person->field_88 = DAT_007fda60.anim;
+            bloke->person->frame = DAT_007fda60.person_4c;
+            bloke->person->anim = DAT_007fda60.anim;
             bloke->person->sort_id = DAT_007fda60.sort_id;
             bloke->person->field_38 = DAT_007fda60.field_38;
             memcpy(bloke->person->m, DAT_007fda60.m, sizeof(DAT_007fda60.m));
@@ -1041,8 +1041,8 @@ LEGO_EXPORT int LoadGame(char *path) {
                 // STRING: LEGOLAND 0x004bcb90
                 DBPrintf("%s\n", label);
                 if (ride->type != 2 && ride->type != 0) {
-                    ride->counters = malloc(lpConfig->field_1a);
-                    if (SaveGameRead(ride->counters, lpConfig->field_1a) == 0) {
+                    ride->counters = malloc(lpConfig->max_blokes);
+                    if (SaveGameRead(ride->counters, lpConfig->max_blokes) == 0) {
                         LOAD_FAIL();
                     }
                 }

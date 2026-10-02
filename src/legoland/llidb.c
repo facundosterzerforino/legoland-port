@@ -1236,13 +1236,16 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
 // FUNCTION: LEGOLAND 0x0047cf80
 void LLIDB_UnLoadTSM(struct LLIDBHead *head) {
     unsigned int *base = (unsigned int *)head->data;
-    unsigned int *entry = base;
-    int sentinel = base[1];
 
-    while (sentinel != -1) {
-        LLIDB_UnLoadData(*entry);
-        entry += 2;
-        sentinel = entry[1];
+    if (base[1] != -1) {
+        unsigned int *q = base;
+        unsigned int *p = base;
+
+        do {
+            LLIDB_UnLoadData(*q);
+            p += 2;
+            q = p;
+        } while (q[1] != -1);
     }
     free(base);
 }

@@ -97,7 +97,7 @@ void FUN_004808d0(int *src, int *dst, int dir) {
 LEGO_EXPORT int GetRectArea(struct RectNode *list) {
     int total = 0;
     while (list != NULL) {
-        total += (list->field_c - list->field_4 + 1) * (list->field_8 - list->field_0 + 1);
+        total += (list->y1 - list->y0 + 1) * (list->x1 - list->x0 + 1);
         list = list->next;
     }
     return total;

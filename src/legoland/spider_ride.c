@@ -74,7 +74,7 @@ int AddSpiderNode(TileId *key) {
         return;
     }
     memset(node, 0, 0x30);
-    node->field_0 = key->id;
+    node->tile_id = key->id;
     node->next = SpiderNodeList;
     SpiderNodeList = node;
     return FUN_00415a90(node);
@@ -119,7 +119,7 @@ struct SpiderNode *FindSpiderNode(TileId *key) {
 
     if (cur != NULL) {
         do {
-            if (memcmp(&cur->field_0, key, 2) == 0) {
+            if (memcmp(&cur->tile_id, key, 2) == 0) {
                 return cur;
             }
             cur = cur->next;
@@ -132,8 +132,8 @@ struct SpiderNode *FindSpiderNode(TileId *key) {
 void FUN_004159e0(const unsigned char *arg0) {
     struct SampleParams params;
     params.field_0 = 0x2;
-    params.field_8 = arg0[0];
-    params.field_c = arg0[1];
+    params.x = arg0[0];
+    params.y = arg0[1];
     PlayInstanceOfSample(DAT_004b4d90, 1, 1, &params);
 }
 
@@ -199,14 +199,14 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                     IP_RenderBlokeIn3DNow(blokes[i]);
                 }
             }
-            LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->field_4);
+            LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->frame);
             off = GetRenderOffsetForLayer(DAT_004cbf28, 1);
             AdjustOffsetForViewMode(&off);
             PrintSprite(GetSpriteForLayer(DAT_004cbf28, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
             off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
             AdjustOffsetForViewMode(&off);
             PrintSprite(SpiderHutMask2Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
-            *(short *)*ZSpiderSprite->lls = state->field_4;
+            *(short *)*ZSpiderSprite->lls = state->frame;
             for (elem = ride->riders; elem != NULL; elem = elem->next) {
                 Bloke *b;
                 if (tile->id == elem->tile.id && ((b = elem->rider)->flags & 0x80) != 0) {
@@ -239,7 +239,7 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
         }
     }
     {
-        LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->field_4);
+        LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->frame);
         off = GetRenderOffsetForLayer(DAT_004cbf28, 1);
         AdjustOffsetForViewMode(&off);
         PrintSprite(GetSpriteForLayer(DAT_004cbf28, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
@@ -445,7 +445,7 @@ void FUN_00416330(Element *obj) {
         if (state == NULL) {
             return;
         }
-        if (bloke->field_e == 0) {
+        if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 state->field_14++;
@@ -457,8 +457,8 @@ void FUN_00416330(Element *obj) {
                 GetTileDimensions(&w, &h);
                 ey = (dx + dy) * h >> 9;
                 ex = (dx - dy) * w >> 9;
-                ox = lpConfig->field_20 - (short)Get_XScroll() + ex;
-                oy = ey + (lpConfig->field_22 - (short)Get_YScroll());
+                ox = lpConfig->view_x - (short)Get_XScroll() + ex;
+                oy = ey + (lpConfig->view_y - (short)Get_YScroll());
                 coords[0] = (ox - DAT_0082c660.x / 2 - sc.x) * 2;
                 coords[1] = (oy - DAT_0082c660.y / 2 - sc.y) * 2;
                 bloke->flags |= 0x80;
@@ -486,7 +486,7 @@ void FUN_00416330(Element *obj) {
                     free(bloke->path);
                     bloke->path = NULL;
                 }
-                BlokeSetFrame(bloke, bloke->field_74);
+                BlokeSetFrame(bloke, bloke->frame);
                 break;
             case 5:
                 bloke->flags |= 0x80;
@@ -531,7 +531,7 @@ void FUN_00416330(Element *obj) {
                     free(bloke->path);
                     bloke->path = NULL;
                 }
-                BlokeSetFrame(bloke, bloke->field_74);
+                BlokeSetFrame(bloke, bloke->frame);
                 break;
             case 0xd:
                 ex = ride->field_24 + tile->pos.x;
@@ -548,7 +548,7 @@ void FUN_00416330(Element *obj) {
                 bloke->pos.x <<= 8;
                 bloke->dest.x = ex << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_e = 7;
+                bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
