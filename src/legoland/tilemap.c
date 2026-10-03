@@ -1600,9 +1600,9 @@ void FUN_0045d3d0(struct PathFootprint *param_1, int *param_2) {
 // FUNCTION: LEGOLAND 0x0045d560
 int FUN_0045d560(struct MapRect *out, struct MapRect *a, struct MapRect *b) {
     if (a->x0 > b->x0) {
-        out->x0 = b->x0;
-    } else {
         out->x0 = a->x0;
+    } else {
+        out->x0 = b->x0;
     }
     if (a->x1 < b->x1) {
         out->x1 = a->x1;
@@ -1610,9 +1610,9 @@ int FUN_0045d560(struct MapRect *out, struct MapRect *a, struct MapRect *b) {
         out->x1 = b->x1;
     }
     if (a->y0 > b->y0) {
-        out->y0 = b->y0;
-    } else {
         out->y0 = a->y0;
+    } else {
+        out->y0 = b->y0;
     }
     if (a->y1 < b->y1) {
         out->y1 = a->y1;
