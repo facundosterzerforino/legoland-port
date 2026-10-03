@@ -1098,7 +1098,7 @@ extern int (*BlitFrameFunc)(void);
 // 0x004b9ca8
 extern unsigned int OverrideFrame;
 // 0x004b9e5c
-extern unsigned int DAT_004b9e5c[1];
+extern unsigned int DAT_004b9e5c[71];
 // 0x004b9f78
 extern int DAT_004b9f78[4];
 // 0x004b9f88
@@ -1114,7 +1114,7 @@ extern unsigned int DAT_004ba884;
 // 0x004ba8e0
 extern struct InfoTimedEntry DAT_004ba8e0[17];
 // 0x004ba9ac
-extern unsigned int DAT_004ba9ac[1];
+extern unsigned int DAT_004ba9ac[234];
 // 0x004bad54
 extern int mouse_granularity;
 struct KeyMapping {
@@ -1722,13 +1722,13 @@ extern unsigned char DAT_004d8974[0x40];
 // 0x004d89c4
 extern void *DAT_004d89c4;
 // 0x004d89c8
-extern unsigned int LtxFileTable[1];
+extern unsigned int LtxFileTable[30];
 // 0x004d8a40
-extern unsigned int LmsFileTable[1];
+extern unsigned int LmsFileTable[31];
 // 0x004d8abc
-extern unsigned int LfmFileTable[1];
+extern unsigned int LfmFileTable[30];
 // 0x004d8b34
-extern unsigned int LfmFileSizes[1];
+extern unsigned int LfmFileSizes[30];
 // 0x004d8bac
 extern unsigned int RollercoasterLpt;
 // 0x004d8bb0
@@ -1738,7 +1738,7 @@ extern void *DAT_004dcbd0[10];
 // 0x004dcbf8
 extern unsigned int DAT_004dcbf8;
 // 0x004dcc00
-extern unsigned char DAT_004dcc00[1];
+extern unsigned char DAT_004dcc00[2520];
 // 0x004dd5d8
 extern unsigned int DAT_004dd5d8;
 // 0x004dd5e0
@@ -1746,7 +1746,7 @@ extern void *DAT_004dd5e0[24];
 // 0x004dd758
 extern unsigned int CoasterTxtFile;
 // 0x004dd760
-extern char DAT_004dd760[1];
+extern char DAT_004dd760[256];
 // 0x004dd860
 extern unsigned int CoasterObjFile;
 // 0x004dd868
@@ -1857,7 +1857,7 @@ extern unsigned int CoasterTrainWheelLfm;
 // 0x00616010
 extern struct BinVFile *BalloonzBinV;
 // 0x00616018
-extern struct BinVFile *DAT_00616018[1];
+extern struct BinVFile *DAT_00616018[4];
 // 0x0061603c
 extern struct Sprite *DAT_0061603c[1];
 // 0x00616040
@@ -2109,9 +2109,9 @@ extern int *DAT_0062fef8;
 // 0x00630100
 extern void *AltManFileData;
 // 0x00630108
-extern unsigned int DAT_00630108[1];
+extern unsigned int DAT_00630108[0x2000];
 // 0x00638218
-extern unsigned int DAT_00638218[1];
+extern unsigned int DAT_00638218[80];
 // 0x00638358
 extern unsigned short DAT_00638358;
 // 0x0064cd8c
@@ -2463,7 +2463,7 @@ extern RECT DAT_00668108;
 // 0x00668118
 extern int renderEngineTargetIdx;
 // 0x0066811c
-extern LPDIRECTDRAWSURFACE renderEngineTargets[1];
+extern LPDIRECTDRAWSURFACE renderEngineTargets[10];
 // 0x00668144
 extern int VideoSurfaceLocked;
 // 0x00668148
@@ -3342,7 +3342,7 @@ extern struct ObjTableEntry DAT_007cb3e2[128];
 // 0x007cb5e0
 extern struct ObjTableEntry DAT_007cb5e0;
 // 0x007cb600
-extern unsigned char PrintListPool[1];
+extern unsigned char PrintListPool[0x32000];
 // 0x007fd600
 extern struct SortNode *SortCursor;
 // 0x007fd610
@@ -3815,11 +3815,11 @@ extern struct Sprite *NextPageLitSprite;
 // 0x0081c038
 extern unsigned int DAT_0081c038;
 // 0x0081c040
-extern struct Sprite *DAT_0081c040[1];
+extern struct Sprite *DAT_0081c040[5];
 // 0x0081c054
-extern struct Sprite *DAT_0081c054[1];
+extern struct Sprite *DAT_0081c054[5];
 // 0x0081c068
-extern struct Sprite *DAT_0081c068[1];
+extern struct Sprite *DAT_0081c068[5];
 // 0x0081c07c
 extern unsigned int DAT_0081c07c;
 // 0x0081c080
@@ -4136,7 +4136,7 @@ extern char *DAT_00829c54;
 // 0x00829c60
 extern void *DAT_00829c60[1024];
 // 0x0082ac60
-extern void *DAT_0082ac60[1];
+extern void *DAT_0082ac60[48];
 // 0x0082ad20
 extern unsigned char CastleDispatchTable[0x90];
 // 0x0082adb0
