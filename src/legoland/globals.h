@@ -4199,7 +4199,7 @@ extern int DAT_00641000;
 extern int DAT_00641004[3001];
 
 // 0x00643ee8: that person's vertices (x, y, z), rotated and scaled
-extern int DAT_00643ee8[3001][3];
+extern int DAT_00643ee8[3048][3];
 
 // 0x0063810c
 extern int DAT_0063810c;
