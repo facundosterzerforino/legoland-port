@@ -1790,11 +1790,12 @@ extern float DAT_00611654;
 // 0x00611658
 extern Vector3 DAT_00611658[4];
 // 0x00611688
-extern unsigned int DAT_00611688;
-// 0x0061168c
-extern unsigned int DAT_0061168c;
-// 0x00611690
-extern unsigned char DAT_00611690[0x50];
+/* castle.c lookup table: FUN_00427c00 finds value by key; DAT_00611958 counts the entries */
+struct KeyValuePair {
+    unsigned int key;
+    unsigned int value;
+};
+extern struct KeyValuePair DAT_00611688[11];
 // 0x006116e0
 extern Vector3 DAT_006116e0[4];
 // 0x00611710

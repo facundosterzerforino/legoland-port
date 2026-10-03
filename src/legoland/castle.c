@@ -7721,8 +7721,8 @@ void FUN_00427bc0(unsigned int unused, const struct Struct427bc0Src *src) {
 unsigned int FUN_00427c00(unsigned int key) {
     int i;
     for (i = 0; i < (int)DAT_00611958; i++) {
-        if (*(unsigned int *)((unsigned char *)&DAT_00611688 + i * 8) == key)
-            return *(unsigned int *)((unsigned char *)&DAT_0061168c + i * 8);
+        if (DAT_00611688[i].key == key)
+            return DAT_00611688[i].value;
     }
     return 0;
 }
@@ -7863,8 +7863,8 @@ void FUN_00427ef0(struct CastleRideObj *param_1) {
     DAT_00829bfc = (unsigned int)a;
     b = a->next;
     b->field_10 |= 0x2000;
-    *(unsigned int *)((unsigned char *)&DAT_00611688 + DAT_00611958 * 8) = (unsigned int)param_1;
-    *(unsigned int *)((unsigned char *)&DAT_0061168c + DAT_00611958 * 8) = (unsigned int)DAT_004b5d58;
+    DAT_00611688[DAT_00611958].key = (unsigned int)param_1;
+    DAT_00611688[DAT_00611958].value = (unsigned int)DAT_004b5d58;
     DAT_00611958++;
 }
 
@@ -7875,8 +7875,8 @@ void FUN_00427f30(struct CastleRideObj *param_1) {
     DAT_00829a64 = (unsigned int)a;
     b = a->next;
     b->field_10 |= 0x2000;
-    *(unsigned int *)((unsigned char *)&DAT_00611688 + DAT_00611958 * 8) = (unsigned int)param_1;
-    *(unsigned int *)((unsigned char *)&DAT_0061168c + DAT_00611958 * 8) = (unsigned int)DAT_004b5d90;
+    DAT_00611688[DAT_00611958].key = (unsigned int)param_1;
+    DAT_00611688[DAT_00611958].value = (unsigned int)DAT_004b5d90;
     DAT_00611958++;
 }
 
@@ -7940,8 +7940,8 @@ void FUN_00428070(struct CastleRideObj *param_1) {
     struct CastleCarNode *a = param_1->car;
     struct CastleCarNode *b = a->next;
     b->field_10 |= 0x2000;
-    *(unsigned int *)((unsigned char *)&DAT_00611688 + DAT_00611958 * 8) = (unsigned int)param_1;
-    *(unsigned int *)((unsigned char *)&DAT_0061168c + DAT_00611958 * 8) = (unsigned int)DAT_004b5dc8;
+    DAT_00611688[DAT_00611958].key = (unsigned int)param_1;
+    DAT_00611688[DAT_00611958].value = (unsigned int)DAT_004b5dc8;
     DAT_00611958++;
 }
 
