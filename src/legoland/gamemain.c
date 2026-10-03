@@ -632,7 +632,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
     if (r < 0)
         return r;
     // STRING: LEGOLAND 0x004bc090
-    if (strcmp(commands[count - 1].name, "check") != 0)
+    if (strcmp(commands[count - 1].name, "check") == 0)
         r = commands[count - 1].fn(NULL, errors, flags);
     if (r < 0)
         return r;
