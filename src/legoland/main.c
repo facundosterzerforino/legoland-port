@@ -10,10 +10,10 @@
 #include "main.h"
 #include "screens.h"
 #ifdef LEGOLAND_PORT
+#include "extensions.h"
 #include "port_data.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
-#include "extensions.h"
 #endif
 
 // FUNCTION: LEGOLAND 0x00453cd0
@@ -36,6 +36,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     result = -1;
 #ifdef LEGOLAND_PORT
     PortLoadData(); /* [port] the original started with its .data already initialized */
+    if (strstr(lpCmdLine, "-port-selftest") != NULL) {
+        /* [port] check the startup data and exit, without starting the game (or touching its trace file) */
+        return PortDataSelfTest("port-selftest.txt");
+    }
     PortTrace("WinMain: cmdline \"%s\"", lpCmdLine);
     {
         /* [port] keep 64 KB of stack for the crash handler: after a stack overflow, stackdump (5 KB of locals)
@@ -45,10 +49,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
     PortWatchdogStart(); /* [port] freeze and crash reports (port/port_watchdog.c) */
     ExtensionsParseCommandLine(lpCmdLine); /* [port] optional features (extensions/) */
-    if (strstr(lpCmdLine, "-port-selftest") != NULL) {
-        /* [port] check the startup data and exit, without starting the game */
-        return PortDataSelfTest("port-selftest.txt");
-    }
 #endif
     __try {
         GetProductVersion(ProductVersionString);
