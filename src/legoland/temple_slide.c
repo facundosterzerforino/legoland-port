@@ -144,7 +144,7 @@ void FUN_00416f90(struct TempleRide *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00416fa0
-void FUN_00416fa0(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -228,7 +228,7 @@ void FUN_00417200(struct SlideContext *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417240
-void FUN_00417240(void) {
+void TempleSlideSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)DAT_004cbf80;
     DefaultCursor(&EditCursor);
@@ -236,7 +236,7 @@ void FUN_00417240(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00417280
-void FUN_00417280(struct SlideObject *obj, TileId tile, struct Cursor *cursor) {
+void RemoveSlideObject(struct SlideObject *obj, TileId tile, struct Cursor *cursor) {
     struct SlideNode *node = FindSlideNode(&tile);
     if (node != NULL) {
         RemoveSlideNode(node);
@@ -246,7 +246,7 @@ void FUN_00417280(struct SlideObject *obj, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x004172d0
-void FUN_004172d0(Element *obj, int *coords) {
+void TempleSlideAddObject(Element *obj, int *coords) {
     TileId tile;
     tile.pos.x = (unsigned char)coords[0];
     tile.pos.y = (unsigned char)coords[1];
@@ -568,11 +568,11 @@ LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct Callbac
     if (_stricmp("TEMPLE SLIDE", ctx->name) == 0) {
         interfaces->cb_a4 = FUN_00417150;
         interfaces->cb_ac = FUN_00417200;
-        interfaces->cb_8c = FUN_00417240;
+        interfaces->cb_8c = TempleSlideSetEditMode;
         interfaces->cb_a8 = FUN_00417430;
-        interfaces->cb_b0 = FUN_00416fa0;
-        interfaces->cb_9c = FUN_00417280;
-        interfaces->cb_98 = FUN_004172d0;
+        interfaces->cb_b0 = RenderTempleSlide;
+        interfaces->cb_9c = RemoveSlideObject;
+        interfaces->cb_98 = TempleSlideAddObject;
         interfaces->cb_a0 = FUN_00417300;
         interfaces->cb_bc = SaveTempleSlide;
         interfaces->cb_b8 = LoadTempleSlide;

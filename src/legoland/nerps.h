@@ -31,7 +31,7 @@ void FUN_0046b520(struct WrapperNode *node);
 int FUN_0046b5d0(struct SortNode *node);
 void FUN_0046b590(struct SortNode *node);
 void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2);
-void FUN_0046c540(struct AppendArgC *arg);
+void AppendObjectiveEventList(struct AppendArgC *arg);
 void FUN_0046c580(struct AppendArg10 *arg);
 void FUN_0046b650(const char *src, struct StringHolder *holder);
 unsigned int FUN_0046b700(void);

@@ -41,10 +41,10 @@ void FUN_00432ac0(void) {
 // FUNCTION: LEGOLAND 0x00432b90
 int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct Bloke *bloke2) {
     struct JungleScore *score;
-    struct JungleRide *node = DAT_00616164;
+    struct JungleRide *node = JungleRideList;
     struct JungleRide *fresh;
 
-    for (score = DAT_00629c3c; score != NULL; score = score->next) {
+    for (score = JungleScoreList; score != NULL; score = score->next) {
         if (score->tile.id == tile.id) {
             break;
         }
@@ -66,28 +66,28 @@ int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct
     if (fresh == NULL) {
         return 0;
     }
-    fresh->next = DAT_00616164;
+    fresh->next = JungleRideList;
     fresh->tile.id = tile.id;
     fresh->cur_x = tile.pos.x;
     fresh->cur_y = tile.pos.y + 5;
     fresh->next_x = tile.pos.x;
     fresh->next_y = tile.pos.y + 5;
-    fresh->field_3dc = 1;
+    fresh->from_dir = 1;
     fresh->field_3e0 = 1;
     fresh->field_3e4 = (rand() & 0xf) + 4;
     fresh->blokes[0] = bloke0;
     fresh->blokes[1] = bloke1;
     fresh->blokes[2] = bloke2;
-    DAT_00616164 = fresh;
-    memset(fresh->field_1c, 0xf1, sizeof(fresh->field_1c));
-    memset(fresh->field_29c, 0, sizeof(fresh->field_29c));
+    JungleRideList = fresh;
+    memset(fresh->step_offsets, 0xf1, sizeof(fresh->step_offsets));
+    memset(fresh->step_frames, 0, sizeof(fresh->step_frames));
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00432cb0
 void FUN_00432cb0(struct JungleRide *ride) {
     struct JungleRide *prev = NULL;
-    struct JungleRide *node = DAT_00616164;
+    struct JungleRide *node = JungleRideList;
 
     while (node != ride) {
         prev = node;
@@ -102,14 +102,14 @@ void FUN_00432cb0(struct JungleRide *ride) {
     if (prev != NULL) {
         prev->next = node->next;
     } else {
-        DAT_00616164 = node->next;
+        JungleRideList = node->next;
     }
     free(ride);
 }
 
 // FUNCTION: LEGOLAND 0x00432d00
 void FUN_00432d00(int param_1) {
-    struct JungleRide *ride = DAT_00616164;
+    struct JungleRide *ride = JungleRideList;
     int tw;
     int tw2;
     int th2;
@@ -133,28 +133,28 @@ void FUN_00432d00(int param_1) {
                                (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))
                          : !(ride->field_3e0 == 1 || ride->field_3e0 == 0x10 ||
                                (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))) {
-            b = ride->field_1c[DAT_00629c54 * 2 + 1];
-            a = ride->field_1c[DAT_00629c54 * 2];
+            b = ride->step_offsets[JungleCruiseStep * 2 + 1];
+            a = ride->step_offsets[JungleCruiseStep * 2];
             GetTileDimensions(&tw2, &th2);
             dx = (a - b) * tw2 >> 9;
             dy = (a + b) * th2 >> 9;
             baseX = ((int)ride->cur_x - (int)ride->cur_y) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
             baseY = ((int)ride->cur_x + (int)ride->cur_y) * (th >> 1) - (ScrollY >> 8);
-            off.x = JungleCruiseBoats->offset_x[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
-            off.y = JungleCruiseBoats->offset_y[ride->field_29c[DAT_00629c54] & 0xff] >> 1;
+            off.x = JungleCruiseBoats->offset_x[ride->step_frames[JungleCruiseStep] & 0xff] >> 1;
+            off.y = JungleCruiseBoats->offset_y[ride->step_frames[JungleCruiseStep] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
             ride->screen_x = lpConfig->view_x + dx + off.x + baseX;
             ride->screen_y = lpConfig->view_y + dy + off.y + baseY;
-            PrintSprite(JungleCruiseBoats->sprites[ride->field_29c[DAT_00629c54] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
+            PrintSprite(JungleCruiseBoats->sprites[ride->step_frames[JungleCruiseStep] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             off.x = lpConfig->view_x + dx + baseX;
             off.y = lpConfig->view_y + dy + baseY;
             AdjustBlokePosition((struct Point *)&off);
-            if ((int)ride->field_29c[DAT_00629c54] >= 4 && (int)ride->field_29c[DAT_00629c54] < 12) {
+            if ((int)ride->step_frames[JungleCruiseStep] >= 4 && (int)ride->step_frames[JungleCruiseStep] < 12) {
                 for (row = 0; row < 3; row++) {
                     struct Point pos;
 
                     d = 0;
-                    if ((int)ride->field_29c[DAT_00629c54] > 8) {
+                    if ((int)ride->step_frames[JungleCruiseStep] > 8) {
                         if (row == 1) {
                             d = 1;
                         } else if (row == 2) {
@@ -164,18 +164,18 @@ void FUN_00432d00(int param_1) {
                     seat = d + row;
                     if (ride->blokes[seat] != NULL) {
                         person = Find3DPersonFromBloke(ride->blokes[seat]);
-                        pos.x = DAT_0081cb80[seat][ride->field_29c[DAT_00629c54] & 0xf].x + 0x20;
-                        pos.y = DAT_0081cb80[seat][ride->field_29c[DAT_00629c54] & 0xf].y + 0x18;
+                        pos.x = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].x + 0x20;
+                        pos.y = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].y + 0x18;
                         switch (seat) {
                         case 0:
-                            person->field_44 = ((float)(int)ride->field_29c[DAT_00629c54] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)ride->step_frames[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             break;
                         case 1:
-                            person->field_44 = ((float)(int)((ride->field_29c[DAT_00629c54] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         case 2:
-                            person->field_44 = ((float)(int)((ride->field_29c[DAT_00629c54] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         }
@@ -186,7 +186,7 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 2) {
-                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x10 : ride->field_29c[DAT_00629c54] + 0x20) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->step_frames[JungleCruiseStep] + 0x10 : ride->step_frames[JungleCruiseStep] + 0x20) & 0xff];
                         PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
@@ -195,7 +195,7 @@ void FUN_00432d00(int param_1) {
                     struct Point pos;
 
                     d = 0;
-                    if ((int)ride->field_29c[DAT_00629c54] < 8) {
+                    if ((int)ride->step_frames[JungleCruiseStep] < 8) {
                         if (row == 1) {
                             d = 1;
                         } else if (row == 2) {
@@ -205,18 +205,18 @@ void FUN_00432d00(int param_1) {
                     seat = d + row;
                     if (ride->blokes[seat] != NULL) {
                         person = Find3DPersonFromBloke(ride->blokes[seat]);
-                        pos.x = DAT_0081cb80[seat][ride->field_29c[DAT_00629c54] & 0xf].x + 0x20;
-                        pos.y = DAT_0081cb80[seat][ride->field_29c[DAT_00629c54] & 0xf].y + 0x18;
+                        pos.x = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].x + 0x20;
+                        pos.y = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].y + 0x18;
                         switch (seat) {
                         case 0:
-                            person->field_44 = ((float)(int)ride->field_29c[DAT_00629c54] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)ride->step_frames[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             break;
                         case 1:
-                            person->field_44 = ((float)(int)((ride->field_29c[DAT_00629c54] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         case 2:
-                            person->field_44 = ((float)(int)((ride->field_29c[DAT_00629c54] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         }
@@ -227,13 +227,13 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 1) {
-                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[DAT_00629c54] + 0x20 : ride->field_29c[DAT_00629c54] + 0x10) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->step_frames[JungleCruiseStep] + 0x20 : ride->step_frames[JungleCruiseStep] + 0x10) & 0xff];
                         PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
             }
         }
-        if (ride->field_3e0 == 0x10 && ride->field_3e4 == 2 && DAT_00629c54 == 0x4f && param_1 != 0 && ride->blokes[0] != NULL) {
+        if (ride->field_3e0 == 0x10 && ride->field_3e4 == 2 && JungleCruiseStep == 0x4f && param_1 != 0 && ride->blokes[0] != NULL) {
             ride->blokes[0]->param_action++;
             ride->blokes[0] = NULL;
             if (ride->blokes[1] != NULL) {
@@ -251,7 +251,7 @@ void FUN_00432d00(int param_1) {
 
 // FUNCTION: LEGOLAND 0x004332c0
 unsigned int FUN_004332c0(unsigned short *param_1) {
-    struct JungleRide *node = DAT_00616164;
+    struct JungleRide *node = JungleRideList;
     unsigned int count = 0;
     if (node != NULL) {
         unsigned short *src = param_1;
@@ -269,7 +269,7 @@ unsigned int FUN_004332c0(unsigned short *param_1) {
 
 // FUNCTION: LEGOLAND 0x004332f0
 void FUN_004332f0(void) {
-    struct JungleRide *node = DAT_00616164;
+    struct JungleRide *node = JungleRideList;
     struct JungleRide *cur;
 
     while (node != NULL) {
@@ -306,7 +306,7 @@ void FUN_004332f0(void) {
 
 // FUNCTION: LEGOLAND 0x004333b0
 void FUN_004333b0(struct JungleRide *param_1) {
-    FUN_00433840(param_1, param_1->field_3dc, 4);
+    FUN_00433840(param_1, param_1->from_dir, 4);
     param_1->field_3e0 = 4;
     param_1->next_y = param_1->cur_y + 5;
 }
@@ -323,22 +323,22 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         return result;
     }
     FUN_00433840(param_1, 1, 4);
-    param_1->field_3dc = 1;
+    param_1->from_dir = 1;
     if (param_1->field_3e4 == 3) {
-        p = &param_1->field_1c[0x81];
+        p = &param_1->step_offsets[0x81];
         i = 0x10;
         do {
-            p[-1] = param_1->field_1c[0x80];
-            *p = param_1->field_1c[0x81];
+            p[-1] = param_1->step_offsets[0x80];
+            *p = param_1->step_offsets[0x81];
             p = p + 2;
             i = i + -1;
         } while (i != 0);
     } else if (param_1->field_3e4 == 2) {
-        p = &param_1->field_1c[1];
+        p = &param_1->step_offsets[1];
         i = 0x40;
         do {
-            p[-1] = param_1->field_1c[0x80];
-            *p = param_1->field_1c[0x81];
+            p[-1] = param_1->step_offsets[0x80];
+            *p = param_1->step_offsets[0x81];
             p = p + 2;
             i = i + -1;
         } while (i != 0);
@@ -347,11 +347,11 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         param_1->next_y = param_1->cur_y + 5;
     }
     if (param_1->field_3e4 == 1) {
-        p = &param_1->field_1c[0x9e];
+        p = &param_1->step_offsets[0x9e];
         i = 7;
         do {
-            p[0] = param_1->field_1c[0x90];
-            p[1] = param_1->field_1c[0x91];
+            p[0] = param_1->step_offsets[0x90];
+            p[1] = param_1->step_offsets[0x91];
             p = p + -2;
             i = i + -1;
         } while (i != 0);
@@ -362,8 +362,8 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
 
 // FUNCTION: LEGOLAND 0x004334c0
 void FUN_004334c0(struct JungleRide *ride, int param_2) {
-    struct JungleScore *score = DAT_00629c3c;
-    struct JungleRide *other = DAT_00616164;
+    struct JungleScore *score = JungleScoreList;
+    struct JungleRide *other = JungleRideList;
     struct JunglePath *path;
     unsigned int mask;
     unsigned int free;
@@ -374,7 +374,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     int step;
     int dir;
 
-    path = FUN_004371b0(ride->cur_x, ride->cur_y);
+    path = FindJunglePathAt(ride->cur_x, ride->cur_y);
     for (; score != NULL; score = score->next) {
         if (path->owner.id == score->tile.id) {
             break;
@@ -386,8 +386,8 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     } else if (path->tile.id == score->end.id) {
         ride->field_3e0 = 0x10;
         ride->field_3e4 = 3;
-        FUN_00433840(ride, ride->field_3dc, 4);
-        ride->field_3dc = 1;
+        FUN_00433840(ride, ride->from_dir, 4);
+        ride->from_dir = 1;
         ride->next_y = ride->cur_y + 5;
         return;
     }
@@ -422,11 +422,11 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         }
     }
     if (mask == 0) {
-        FUN_00433840(ride, ride->field_3dc, -1);
-        ride->field_3dc = -1;
+        FUN_00433840(ride, ride->from_dir, -1);
+        ride->from_dir = -1;
         return;
     }
-    if ((rand() & 7) == 0 && (free = ~ride->field_3dc & mask) != 0) {
+    if ((rand() & 7) == 0 && (free = ~ride->from_dir & mask) != 0) {
         for (;;) {
             for (i = 0, n = 0; i < 4; i++) {
                 if ((free & (1 << i)) != 0) {
@@ -441,7 +441,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         mask = free;
     }
     for (i = 0; i < 4; i++) {
-        if ((ride->field_3dc & (1 << i)) != 0) {
+        if ((ride->from_dir & (1 << i)) != 0) {
             break;
         }
     }
@@ -461,26 +461,26 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     case 1:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y - 5;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 4;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 4;
         break;
     case 2:
         ride->next_x = ride->cur_x + 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 8;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 8;
         break;
     case 4:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y + 5;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 1;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 1;
         break;
     case 8:
         ride->next_x = ride->cur_x - 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 2;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 2;
         break;
     }
     if (--ride->field_3e4 == 0) {
@@ -508,7 +508,7 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
 
     if (to == -1) {
         if (from == -1) {
-            memset(ride->field_1c, 0, sizeof(ride->field_1c));
+            memset(ride->step_offsets, 0, sizeof(ride->step_offsets));
         } else {
             for (bit = 0; bit < 4; bit++) {
                 if ((from & (1 << bit)) != 0) {
@@ -519,11 +519,11 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             sy = (int)((float)(DAT_004b7148[bit].oy * 40) * DAT_004ab3fc);
             for (i = 0; i < 80; i++) {
                 if (i < 40) {
-                    ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
-                    ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
+                    ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
+                    ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
                 } else {
-                    ride->field_1c[i * 2] = 0;
-                    ride->field_1c[i * 2 + 1] = 0;
+                    ride->step_offsets[i * 2] = 0;
+                    ride->step_offsets[i * 2 + 1] = 0;
                 }
             }
         }
@@ -536,11 +536,11 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
         idx = (bit + 2) % 4;
         for (i = 0; i < 80; i++) {
             if (i >= 40) {
-                ride->field_1c[i * 2] = DAT_004b7148[idx].dx * 16 + ride->field_1c[i * 2 - 2];
-                ride->field_1c[i * 2 + 1] = DAT_004b7148[idx].dy * 16 + ride->field_1c[i * 2 - 1];
+                ride->step_offsets[i * 2] = DAT_004b7148[idx].dx * 16 + ride->step_offsets[i * 2 - 2];
+                ride->step_offsets[i * 2 + 1] = DAT_004b7148[idx].dy * 16 + ride->step_offsets[i * 2 - 1];
             } else {
-                ride->field_1c[i * 2] = 0;
-                ride->field_1c[i * 2 + 1] = 0;
+                ride->step_offsets[i * 2] = 0;
+                ride->step_offsets[i * 2 + 1] = 0;
             }
         }
     } else {
@@ -564,9 +564,9 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             arc += bit;
             step = (arc->a1 - arc->a0) * DAT_004ab3f8;
             angle = arc->a0;
-            ride->field_1c[0] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
-            ride->field_1c[1] = (int)((cos((angle + DAT_004ab3ec) * DAT_004ab3f4) + arc->cy) * DAT_004ab3f0);
-            p = &ride->field_1c[3];
+            ride->step_offsets[0] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
+            ride->step_offsets[1] = (int)((cos((angle + DAT_004ab3ec) * DAT_004ab3f4) + arc->cy) * DAT_004ab3f0);
+            p = &ride->step_offsets[3];
             for (i = 0x4f; i != 0; i--) {
                 angle += step;
                 p[-1] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
@@ -584,46 +584,46 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             if (from == to) {
                 for (i = 0; i < 80; i++) {
                     if (i < 40) {
-                        ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
-                        ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
+                        ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
+                        ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
                     } else {
-                        ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * (80 - i)) * DAT_004ab3fc + sx);
-                        ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * (80 - i)) * DAT_004ab3fc + sy);
+                        ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * (80 - i)) * DAT_004ab3fc + sx);
+                        ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * (80 - i)) * DAT_004ab3fc + sy);
                     }
                 }
             } else {
                 fx = (float)sx;
                 fy = (float)sy;
                 for (i = 0; i < 80; i++) {
-                    ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + fx);
-                    ride->field_1c[i * 2 + 1] = (int)((float)(i * DAT_004b7148[bit].dy) * DAT_004ab3fc + fy);
+                    ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + fx);
+                    ride->step_offsets[i * 2 + 1] = (int)((float)(i * DAT_004b7148[bit].dy) * DAT_004ab3fc + fy);
                 }
             }
         }
     }
     for (i = 0; i < 80; i++) {
         if (i < 76) {
-            tx = ride->field_1c[(i + 4) * 2];
-            ty = ride->field_1c[(i + 4) * 2 + 1];
+            tx = ride->step_offsets[(i + 4) * 2];
+            ty = ride->step_offsets[(i + 4) * 2 + 1];
         } else {
-            tx = ride->field_1c[0x9e];
-            ty = ride->field_1c[0x9f];
+            tx = ride->step_offsets[0x9e];
+            ty = ride->step_offsets[0x9f];
         }
         if (i > 3) {
-            dx = tx - ride->field_1c[(i - 3) * 2];
-            dy = ty - ride->field_1c[(i - 3) * 2 + 1];
+            dx = tx - ride->step_offsets[(i - 3) * 2];
+            dy = ty - ride->step_offsets[(i - 3) * 2 + 1];
         } else {
-            dx = tx - ride->field_1c[0];
-            dy = ty - ride->field_1c[1];
+            dx = tx - ride->step_offsets[0];
+            dy = ty - ride->step_offsets[1];
         }
-        ride->field_29c[i] = ((ArcTan256(dx, dy) >> 4) + 6 & 0xf) + 0;
+        ride->step_frames[i] = ((ArcTan256(dx, dy) >> 4) + 6 & 0xf) + 0;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00433ca0
-void FUN_00433ca0(Element *obj) {
+void LoadBrijMaskSprite(Element *obj) {
     struct Ride *ride = obj->ride;
-    DAT_0081cb70 = ride;
+    MonkeyTreeRide = ride;
     ride->flags |= 0x400;
     // STRING: LEGOLAND 0x004b720c
     BrijMaskSprite = LoadSprite("brijmask.lls", 1);
@@ -635,16 +635,16 @@ void KillBrijMaskSprite(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00433ce0
-void FUN_00433ce0(void) {
+void MonkeyTreeSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb70;
+    EditMode.unk8 = MonkeyTreeRide;
     DefaultCursor(&EditCursor);
     EditCursor.field_1828 |= 0x8;
-    SetEditCursorFootPrint(&DAT_0081cb70->footprint);
+    SetEditCursorFootPrint(&MonkeyTreeRide->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00433d20
-void FUN_00433d20(unsigned int param_1, int *param_2) {
+void MonkeyTreeAddObject(unsigned int param_1, int *param_2) {
     struct JungleObj *obj;
     unsigned char temp[2];
     unsigned short coord;
@@ -689,48 +689,48 @@ void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
     if (FUN_0045f4b0(&EditCursor) == 0) {
         return;
     }
-    DefaultCursor(&DAT_00622320[0]);
-    DefaultCursor(&DAT_00622320[1]);
-    DefaultCursor(&DAT_00622320[2]);
-    DefaultCursor(&DAT_00622320[3]);
-    memcpy(DAT_00622320[0].field_1414, EditCursor.field_1414, 20);
-    memcpy(DAT_00622320[1].field_1414, EditCursor.field_1414, 20);
-    memcpy(DAT_00622320[2].field_1414, EditCursor.field_1414, 20);
-    memcpy(DAT_00622320[3].field_1414, EditCursor.field_1414, 20);
-    FUN_0045f460(&DAT_00622320[0]);
-    FUN_0045f460(&DAT_00622320[1]);
-    FUN_0045f460(&DAT_00622320[2]);
-    FUN_0045f460(&DAT_00622320[3]);
+    DefaultCursor(&JungleCruiseCursors[0]);
+    DefaultCursor(&JungleCruiseCursors[1]);
+    DefaultCursor(&JungleCruiseCursors[2]);
+    DefaultCursor(&JungleCruiseCursors[3]);
+    memcpy(JungleCruiseCursors[0].field_1414, EditCursor.field_1414, 20);
+    memcpy(JungleCruiseCursors[1].field_1414, EditCursor.field_1414, 20);
+    memcpy(JungleCruiseCursors[2].field_1414, EditCursor.field_1414, 20);
+    memcpy(JungleCruiseCursors[3].field_1414, EditCursor.field_1414, 20);
+    FUN_0045f460(&JungleCruiseCursors[0]);
+    FUN_0045f460(&JungleCruiseCursors[1]);
+    FUN_0045f460(&JungleCruiseCursors[2]);
+    FUN_0045f460(&JungleCruiseCursors[3]);
     x = EditCursor.tile_x;
     y = EditCursor.tile_y;
-    DAT_00622320[0].field_1828 = 0x2034;
-    DAT_00622320[1].field_1828 = 0x2034;
-    DAT_00622320[2].field_1828 = 0x2034;
-    DAT_00622320[3].field_1828 = 0x2034;
+    JungleCruiseCursors[0].field_1828 = 0x2034;
+    JungleCruiseCursors[1].field_1828 = 0x2034;
+    JungleCruiseCursors[2].field_1828 = 0x2034;
+    JungleCruiseCursors[3].field_1828 = 0x2034;
     if ((mask & 1) != 0) {
-        DAT_00622320[0].tile_x = x;
-        DAT_00622320[0].tile_y = y - 5;
+        JungleCruiseCursors[0].tile_x = x;
+        JungleCruiseCursors[0].tile_y = y - 5;
         n = 1;
     }
     if ((mask & 2) != 0) {
-        DAT_00622320[n].tile_x = x + 5;
-        DAT_00622320[n].tile_y = y;
+        JungleCruiseCursors[n].tile_x = x + 5;
+        JungleCruiseCursors[n].tile_y = y;
         n++;
     }
     if ((mask & 4) != 0) {
-        DAT_00622320[n].tile_x = x;
-        DAT_00622320[n].tile_y = y + 5;
+        JungleCruiseCursors[n].tile_x = x;
+        JungleCruiseCursors[n].tile_y = y + 5;
         n++;
     }
     if ((mask & 8) != 0) {
-        DAT_00622320[n].tile_x = x - 5;
-        DAT_00622320[n].tile_y = y;
+        JungleCruiseCursors[n].tile_x = x - 5;
+        JungleCruiseCursors[n].tile_y = y;
         n++;
     }
     if (n != 0) {
-        EditCursor.field_1830 = (unsigned int)&DAT_00622320[0];
+        EditCursor.field_1830 = (unsigned int)&JungleCruiseCursors[0];
         if (n > 1) {
-            c = &DAT_00622320[1];
+            c = &JungleCruiseCursors[1];
             n--;
             do {
                 c[-1].field_1830 = (unsigned int)c;
@@ -748,7 +748,7 @@ unsigned int FUN_00433fa0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00433fc0
-void FUN_00433fc0(void *param_1, TileId tile, struct Cursor *param_3) {
+void MonkeyTreeRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) {
     struct JungleObj *node = DAT_00629c2c;
     struct JungleObj *prev = NULL;
 
@@ -773,19 +773,19 @@ void FUN_00433fc0(void *param_1, TileId tile, struct Cursor *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00434040
-struct RideSpriteInfo *FUN_00434040(Element *obj, unsigned short param_2) {
+struct RideSpriteInfo *GetMonkeyTreeSpriteInfo(Element *obj, unsigned short param_2) {
     struct Ride *ride = obj->ride;
-    DAT_0082c6a0.sprite = ride->layer;
-    DAT_0082c6a0.x = ride->field_14;
-    DAT_0082c6a0.y = ride->field_18;
-    DAT_0082c6a0.id = param_2;
-    return &DAT_0082c6a0;
+    RideSpriteInfoBuffer.sprite = ride->layer;
+    RideSpriteInfoBuffer.x = ride->field_14;
+    RideSpriteInfoBuffer.y = ride->field_18;
+    RideSpriteInfoBuffer.id = param_2;
+    return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x00434080
-void FUN_00434080(Element *obj) {
+void LoadMFish2Sprite(Element *obj) {
     struct Ride *ride = obj->ride;
-    DAT_0081cb74 = ride;
+    MFish2Ride = ride;
     ride->flags |= 0x400;
     // STRING: LEGOLAND 0x004b721c
     MFish2Sprite = LoadSprite("mfish2.lls", 1);
@@ -797,16 +797,16 @@ void KillMFish2Sprite(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004340c0
-void FUN_004340c0(void) {
+void MonkeyFishSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb74;
+    EditMode.unk8 = MFish2Ride;
     DefaultCursor(&EditCursor);
     EditCursor.field_1828 |= 0x8;
-    SetEditCursorFootPrint(&DAT_0081cb74->footprint);
+    SetEditCursorFootPrint(&MFish2Ride->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00434100
-void FUN_00434100(struct EditObject *obj, int *coords) {
+void MonkeyFishAddObject(struct EditObject *obj, int *coords) {
     TileId tile;
     struct JungleFish *fish;
     unsigned short owner;
@@ -824,30 +824,30 @@ void FUN_00434100(struct EditObject *obj, int *coords) {
     }
     fish->tile = tile;
     fish->owner = owner;
-    fish->next = DAT_00629c30;
+    fish->next = JungleFishList;
     fish->field_4 = 0;
-    DAT_00629c30 = fish;
+    JungleFishList = fish;
     FUN_00436130(fish->owner, 2);
     AddBasicObject(obj, coords);
-    for (y = DAT_0081cb74->footprint.v[1]; y <= DAT_0081cb74->footprint.v[3]; y++) {
-        for (x = DAT_0081cb74->footprint.v[0]; x <= DAT_0081cb74->footprint.v[2]; x++) {
-            if (x == DAT_0081cb74->footprint.v[0]) {
+    for (y = MFish2Ride->footprint.v[1]; y <= MFish2Ride->footprint.v[3]; y++) {
+        for (x = MFish2Ride->footprint.v[0]; x <= MFish2Ride->footprint.v[2]; x++) {
+            if (x == MFish2Ride->footprint.v[0]) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 9);
-            } else if (x == DAT_0081cb74->footprint.v[2]) {
+            } else if (x == MFish2Ride->footprint.v[2]) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xc);
-            } else if (y == DAT_0081cb74->footprint.v[1]) {
+            } else if (y == MFish2Ride->footprint.v[1]) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 10);
-            } else if (y == DAT_0081cb74->footprint.v[3]) {
+            } else if (y == MFish2Ride->footprint.v[3]) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xb);
             } else {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles);
             }
         }
     }
-    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 5);
-    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 8);
-    SetMapTile(DAT_0081cb74->footprint.v[0] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 6);
-    SetMapTile(DAT_0081cb74->footprint.v[2] + coords[0], DAT_0081cb74->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 7);
+    SetMapTile(MFish2Ride->footprint.v[0] + coords[0], MFish2Ride->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 5);
+    SetMapTile(MFish2Ride->footprint.v[2] + coords[0], MFish2Ride->footprint.v[1] + coords[1], *BoatingSchoolTileMap->tiles + 8);
+    SetMapTile(MFish2Ride->footprint.v[0] + coords[0], MFish2Ride->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 6);
+    SetMapTile(MFish2Ride->footprint.v[2] + coords[0], MFish2Ride->footprint.v[3] + coords[1], *BoatingSchoolTileMap->tiles + 7);
 }
 
 // FUNCTION: LEGOLAND 0x00434330
@@ -936,14 +936,14 @@ unsigned int FUN_00434650(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00434670
-void FUN_00434670(void *param_1, TileId tile, struct Cursor *param_3) {
-    struct JungleFish *node = DAT_00629c30;
+void MonkeyFishRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) {
+    struct JungleFish *node = JungleFishList;
     struct JungleFish *prev = NULL;
     int x;
     int y;
 
-    for (y = DAT_0081cb74->footprint.v[1]; y <= DAT_0081cb74->footprint.v[3]; y++) {
-        for (x = DAT_0081cb74->footprint.v[0]; x <= DAT_0081cb74->footprint.v[2]; x++) {
+    for (y = MFish2Ride->footprint.v[1]; y <= MFish2Ride->footprint.v[3]; y++) {
+        for (x = MFish2Ride->footprint.v[0]; x <= MFish2Ride->footprint.v[2]; x++) {
             RestoreBaseMap(param_3->tile_x + x, param_3->tile_y + y);
         }
     }
@@ -962,15 +962,15 @@ void FUN_00434670(void *param_1, TileId tile, struct Cursor *param_3) {
             free(node);
             return;
         }
-        DAT_00629c30 = node->next;
+        JungleFishList = node->next;
         free(node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00434740
-struct RideSpriteInfo *FUN_00434740(Element *obj, short param_2) {
+struct RideSpriteInfo *GetMonkeyFishSpriteInfo(Element *obj, short param_2) {
     struct Ride *ride = obj->ride;
-    struct JungleFish *node = DAT_00629c30;
+    struct JungleFish *node = JungleFishList;
     short *lls;
     struct LLS *fish_lls;
 
@@ -990,14 +990,14 @@ struct RideSpriteInfo *FUN_00434740(Element *obj, short param_2) {
     if (node->field_4 != 0) {
         fish_lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)MFish2Sprite);
         LLSSetFrame(fish_lls, *lls);
-        DAT_0082c6a0.sprite = MFish2Sprite;
+        RideSpriteInfoBuffer.sprite = MFish2Sprite;
     } else {
-        DAT_0082c6a0.sprite = ride->layer;
+        RideSpriteInfoBuffer.sprite = ride->layer;
     }
-    DAT_0082c6a0.x = ride->field_14;
-    DAT_0082c6a0.y = ride->field_18;
-    DAT_0082c6a0.id = param_2;
-    return &DAT_0082c6a0;
+    RideSpriteInfoBuffer.x = ride->field_14;
+    RideSpriteInfoBuffer.y = ride->field_18;
+    RideSpriteInfoBuffer.id = param_2;
+    return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x00434b40
@@ -1054,14 +1054,14 @@ void FUN_00434b40(void *param_1, TileId tile, struct Cursor *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00434cb0
-void FUN_00434cb0(Element *obj) {
+void LoadJungleCruiseResources(Element *obj) {
     unsigned int handle;
     int i;
     struct Sprite *sprite;
 
-    DAT_0081cb60 = obj->ride;
-    DAT_0081cb60->flags |= 0x20;
-    DAT_0081cb60->layer->flags |= 0x2000;
+    JungleCruiseRide = obj->ride;
+    JungleCruiseRide->flags |= 0x20;
+    JungleCruiseRide->layer->flags |= 0x2000;
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
         BoatingSchoolTileMap = (struct TileMap *)LLIDB_LoadData((void *)handle);
     }
@@ -1074,29 +1074,29 @@ void FUN_00434cb0(Element *obj) {
     }
     // STRING: LEGOLAND 0x004b72b8
     JungMaskSprite = LoadSprite("jungmask.lls", 1);
-    DAT_00629c40 = DAT_0081cb60->footprint;
+    JungleCruiseFootprint = JungleCruiseRide->footprint;
     DAT_004b7260 = DAT_004b7230;
-    DAT_004b7260.v[1] += DAT_00629c40.v[1];
-    DAT_004b7260.v[0] += DAT_00629c40.v[0];
-    DAT_004b7260.v[2] += DAT_00629c40.v[0];
-    DAT_004b7260.v[3] += DAT_00629c40.v[1];
-    DAT_004b7278 = DAT_004b7248;
-    DAT_004b7278.v[1] += DAT_00629c40.v[3] + 1;
-    DAT_004b7278.v[0] += DAT_00629c40.v[0];
-    DAT_004b7278.v[2] += DAT_00629c40.v[0];
-    DAT_004b7278.v[3] += DAT_00629c40.v[3] + 1;
+    DAT_004b7260.v[1] += JungleCruiseFootprint.v[1];
+    DAT_004b7260.v[0] += JungleCruiseFootprint.v[0];
+    DAT_004b7260.v[2] += JungleCruiseFootprint.v[0];
+    DAT_004b7260.v[3] += JungleCruiseFootprint.v[1];
+    JungleCruiseStartFootprint = DAT_004b7248;
+    JungleCruiseStartFootprint.v[1] += JungleCruiseFootprint.v[3] + 1;
+    JungleCruiseStartFootprint.v[0] += JungleCruiseFootprint.v[0];
+    JungleCruiseStartFootprint.v[2] += JungleCruiseFootprint.v[0];
+    JungleCruiseStartFootprint.v[3] += JungleCruiseFootprint.v[3] + 1;
     FUN_00432ac0();
 }
 
 // FUNCTION: LEGOLAND 0x00434e50
-void FUN_00434e50(Element *obj) {
+void UnloadJungleCruiseResources(Element *obj) {
     unsigned int handle;
     int i;
     struct Sprite *sprite;
     struct JungleScore *score;
     struct JunglePath *path;
 
-    DAT_0081cb60 = obj->ride;
+    JungleCruiseRide = obj->ride;
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
         LLIDB_UnLoadData(handle);
     }
@@ -1108,34 +1108,34 @@ void FUN_00434e50(Element *obj) {
     if (LLIDB_FindElement("JUNGLE CRUISE BOATS", &handle, 0) == 0) {
         LLIDB_UnLoadData(handle);
     }
-    while (DAT_00629c3c != NULL) {
-        score = DAT_00629c3c->next;
-        free(DAT_00629c3c);
-        DAT_00629c3c = score;
+    while (JungleScoreList != NULL) {
+        score = JungleScoreList->next;
+        free(JungleScoreList);
+        JungleScoreList = score;
     }
-    while (DAT_00616164 != NULL) {
-        FUN_00432cb0(DAT_00616164);
+    while (JungleRideList != NULL) {
+        FUN_00432cb0(JungleRideList);
     }
-    while (DAT_0062fd2c != NULL) {
-        path = DAT_0062fd2c->next;
-        free(DAT_0062fd2c);
-        DAT_0062fd2c = path;
+    while (JunglePathList != NULL) {
+        path = JunglePathList->next;
+        free(JunglePathList);
+        JunglePathList = path;
     }
     KillSprite(JungMaskSprite);
 }
 
 // FUNCTION: LEGOLAND 0x00434f50
-void FUN_00434f50(void) {
+void JungleCruiseSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb60;
+    EditMode.unk8 = JungleCruiseRide;
     DefaultCursor(&EditCursor);
-    DAT_00629c50 = &DAT_004b7278;
+    DAT_00629c50 = &JungleCruiseStartFootprint;
     DAT_004b7288 = &DAT_004b7260;
-    SetEditCursorFootPrint(&DAT_00629c40);
+    SetEditCursorFootPrint(&JungleCruiseFootprint);
 }
 
 // FUNCTION: LEGOLAND 0x00434f90
-void FUN_00434f90(struct EditObject *obj, int *coords) {
+void JungleCruiseAddObject(struct EditObject *obj, int *coords) {
     TileId tile;
     struct JungleScore *score;
     int x;
@@ -1148,11 +1148,11 @@ void FUN_00434f90(struct EditObject *obj, int *coords) {
         return;
     }
     score->tile.id = tile.id;
-    score->start.pos.x = coords[0] + DAT_004b7278.v[0] + 2;
-    score->start.pos.y = coords[1] + DAT_004b7278.v[1] + 2;
+    score->start.pos.x = coords[0] + JungleCruiseStartFootprint.v[0] + 2;
+    score->start.pos.y = coords[1] + JungleCruiseStartFootprint.v[1] + 2;
     score->end.pos.x = coords[0] + DAT_004b7260.v[0] + 2;
     score->end.pos.y = coords[1] + DAT_004b7260.v[1] + 2;
-    score->field_8 = 0;
+    score->connected = 0;
     score->field_c = 9999;
     score->field_10 = 0;
     score->bloke_count = 0;
@@ -1164,16 +1164,16 @@ void FUN_00434f90(struct EditObject *obj, int *coords) {
     for (x = 0; x < 3; x++) {
         score->seats[x] = NULL;
     }
-    score->next = DAT_00629c3c;
-    DAT_00629c3c = score;
+    score->next = JungleScoreList;
+    JungleScoreList = score;
     AddBasicObject(obj, coords);
-    FUN_00436dc0(coords[0] + DAT_004b7278.v[0] + 2, coords[1] + DAT_004b7278.v[1] + 2, 1, &score->tile.id);
+    FUN_00436dc0(coords[0] + JungleCruiseStartFootprint.v[0] + 2, coords[1] + JungleCruiseStartFootprint.v[1] + 2, 1, &score->tile.id);
     FUN_00436dc0(coords[0] + DAT_004b7260.v[0] + 2, coords[1] + DAT_004b7260.v[1] + 2, 4, &score->tile.id);
-    for (y = DAT_00629c40.v[1]; y <= DAT_00629c40.v[3]; y++) {
-        for (x = DAT_00629c40.v[0]; x <= DAT_00629c40.v[2] - 1; x++) {
-            if (x == DAT_00629c40.v[0]) {
+    for (y = JungleCruiseFootprint.v[1]; y <= JungleCruiseFootprint.v[3]; y++) {
+        for (x = JungleCruiseFootprint.v[0]; x <= JungleCruiseFootprint.v[2] - 1; x++) {
+            if (x == JungleCruiseFootprint.v[0]) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 9);
-            } else if (x == DAT_00629c40.v[2] - 1) {
+            } else if (x == JungleCruiseFootprint.v[2] - 1) {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles + 0xc);
             } else {
                 SetMapTile(coords[0] + x, coords[1] + y, *BoatingSchoolTileMap->tiles);
@@ -1184,9 +1184,9 @@ void FUN_00434f90(struct EditObject *obj, int *coords) {
 
 // FUNCTION: LEGOLAND 0x00435150
 void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
-    memcpy(EditCursor.field_1414, &DAT_00629c40, sizeof(DAT_00629c40));
+    memcpy(EditCursor.field_1414, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
     EditCursor.field_1830 = 0;
-    DAT_00629c50 = &DAT_004b7278;
+    DAT_00629c50 = &JungleCruiseStartFootprint;
     DAT_004b7288 = &DAT_004b7260;
     DAT_004b7260.v[4] = 0;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
@@ -1208,8 +1208,8 @@ void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
 
 // FUNCTION: LEGOLAND 0x00435230
 void FUN_00435230(unsigned int param_1, struct Point *param_2) {
-    struct JunglePath *p1 = DAT_0062fd2c;
-    struct JungleFish *p3 = DAT_00629c30;
+    struct JunglePath *p1 = JunglePathList;
+    struct JungleFish *p3 = JungleFishList;
     struct JungleObj *p4 = DAT_00629c34;
     struct JungleObj *p2 = DAT_00629c2c;
 
@@ -1267,10 +1267,10 @@ void FUN_00435230(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00435470
-void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
-    struct JungleRide *ride = DAT_00616164;
+void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
+    struct JungleRide *ride = JungleRideList;
     struct JungleScore *prev = NULL;
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     struct JunglePath *path;
     struct JungleObj *thing;
     struct JungleFish *fish;
@@ -1281,8 +1281,8 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
     int savedY;
 
     StandardRemoveObject((Element *)obj, tile, cursor);
-    for (y = DAT_00629c40.v[1]; y <= DAT_00629c40.v[3]; y++) {
-        for (x = DAT_00629c40.v[0]; x <= DAT_00629c40.v[2] - 1; x++) {
+    for (y = JungleCruiseFootprint.v[1]; y <= JungleCruiseFootprint.v[3]; y++) {
+        for (x = JungleCruiseFootprint.v[0]; x <= JungleCruiseFootprint.v[2] - 1; x++) {
             RestoreBaseMap(cursor->tile_x + x, cursor->tile_y + y);
         }
     }
@@ -1298,18 +1298,18 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         IncrementObjectCount(DAT_0081cb54);
         IncrementObjectCount(DAT_0081cb54);
         memcpy(DAT_0082ae20.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
-        path = DAT_0062fd2c;
+        path = JunglePathList;
         while (path != NULL) {
             if (path->owner.id == tile.id) {
                 DAT_0082ae20.tile_x = path->tile.pos.x;
                 DAT_0082ae20.tile_y = path->tile.pos.y;
                 FUN_00436f30(&fake, path->tile, &DAT_0082ae20);
-                path = DAT_0062fd2c;
+                path = JunglePathList;
             } else {
                 path = path->next;
             }
         }
-        fake.ride = DAT_0081cb70;
+        fake.ride = MonkeyTreeRide;
         thing = DAT_00629c2c;
         while (thing != NULL) {
             if (thing->owner == tile.id) {
@@ -1317,7 +1317,7 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
                 savedY = cursor->tile_y;
                 cursor->tile_x = thing->tile.pos.x;
                 cursor->tile_y = thing->tile.pos.y;
-                FUN_00433fc0(&fake, thing->tile, cursor);
+                MonkeyTreeRemoveObject(&fake, thing->tile, cursor);
                 cursor->tile_x = savedX;
                 cursor->tile_y = savedY;
                 thing = DAT_00629c2c;
@@ -1325,18 +1325,18 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
                 thing = thing->next;
             }
         }
-        fake.ride = DAT_0081cb74;
-        fish = DAT_00629c30;
+        fake.ride = MFish2Ride;
+        fish = JungleFishList;
         while (fish != NULL) {
             if (fish->owner == tile.id) {
                 savedX = cursor->tile_x;
                 savedY = cursor->tile_y;
                 cursor->tile_x = fish->tile.pos.x;
                 cursor->tile_y = fish->tile.pos.y;
-                FUN_00434670(&fake, fish->tile, cursor);
+                MonkeyFishRemoveObject(&fake, fish->tile, cursor);
                 cursor->tile_x = savedX;
                 cursor->tile_y = savedY;
-                fish = DAT_00629c30;
+                fish = JungleFishList;
             } else {
                 fish = fish->next;
             }
@@ -1360,12 +1360,12 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
         if (prev != NULL) {
             prev->next = score->next;
         } else {
-            DAT_00629c3c = score->next;
+            JungleScoreList = score->next;
         }
         while (ride != NULL) {
             if (ride->tile.id == tile.id) {
                 FUN_00432cb0(ride);
-                ride = DAT_00616164;
+                ride = JungleRideList;
             } else {
                 ride = ride->next;
             }
@@ -1377,7 +1377,7 @@ void FUN_00435470(Element *obj, TileId tile, struct Cursor *cursor) {
 
 // FUNCTION: LEGOLAND 0x00435750
 void FUN_00435750(void) {
-    struct RideNode *node = DAT_0081cb60->riders;
+    struct RideNode *node = JungleCruiseRide->riders;
     struct RideNode *next;
     struct JungleScore *score;
     struct Bloke *bloke;
@@ -1389,14 +1389,14 @@ void FUN_00435750(void) {
     struct Point pos;
     struct Point map;
 
-    if (++DAT_00629c54 == 0x50) {
-        DAT_00629c54 = 0;
+    if (++JungleCruiseStep == 0x50) {
+        JungleCruiseStep = 0;
         FUN_004332f0();
     }
     FUN_00432d00(0);
-    for (score = DAT_00629c3c; score != NULL; score = score->next) {
+    for (score = JungleScoreList; score != NULL; score = score->next) {
         tile.id = score->tile.id;
-        if (score->seats[0] != NULL && --score->timer <= 0 && score->field_8 != 0 &&
+        if (score->seats[0] != NULL && --score->timer <= 0 && score->connected != 0 &&
             score->field_40 > (int)FUN_004332c0(&score->tile.id) * 6 &&
             FUN_00432b90(tile, score->seats[0], score->seats[1], score->seats[2]) != 0) {
             score->seats[0]->flags |= 0x80;
@@ -1422,7 +1422,7 @@ void FUN_00435750(void) {
         }
     }
     for (; node != NULL; node = next) {
-        score = DAT_00629c3c;
+        score = JungleScoreList;
         next = node->next;
         tile = node->tile;
         for (; score != NULL; score = score->next) {
@@ -1445,7 +1445,7 @@ void FUN_00435750(void) {
             }
             if (i == 5) {
                 if (score->bloke_count == 5 || score->blokes[4] != NULL) {
-                    RemoveBlokeFromRide(DAT_0081cb60, node);
+                    RemoveBlokeFromRide(JungleCruiseRide, node);
                     break;
                 }
                 score->blokes[slot] = bloke;
@@ -1462,8 +1462,8 @@ void FUN_00435750(void) {
                 }
             }
             bloke->flags |= 8;
-            bloke->dest.x = ((DAT_0081cb60->x + tile.pos.x) << 8) + DAT_004b7290[4 - slot].x;
-            bloke->dest.y = ((DAT_0081cb60->y + tile.pos.y) << 8) + DAT_004b7290[4 - slot].y;
+            bloke->dest.x = ((JungleCruiseRide->x + tile.pos.x) << 8) + DAT_004b7290[4 - slot].x;
+            bloke->dest.y = ((JungleCruiseRide->y + tile.pos.y) << 8) + DAT_004b7290[4 - slot].y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->field_73 = dir + 0x10;
             bloke->low_level_action = 7;
@@ -1496,8 +1496,8 @@ void FUN_00435750(void) {
             bloke->flags &= 0xff7f;
             bloke->pos = map;
             bloke->dir = 10;
-            bloke->dest.x = ((DAT_0081cb60->field_24 + tile.pos.x) << 8) - 0x180;
-            bloke->dest.y = ((DAT_0081cb60->field_25 + tile.pos.y) << 8) + 0x80;
+            bloke->dest.x = ((JungleCruiseRide->field_24 + tile.pos.x) << 8) - 0x180;
+            bloke->dest.y = ((JungleCruiseRide->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
@@ -1505,8 +1505,8 @@ void FUN_00435750(void) {
             bloke->param_action++;
             break;
         case 4:
-            bloke->dest.x = ((DAT_0081cb60->field_24 + tile.pos.x) << 8) + 0x80;
-            bloke->dest.y = ((DAT_0081cb60->field_25 + tile.pos.y) << 8) + 0x80;
+            bloke->dest.x = ((JungleCruiseRide->field_24 + tile.pos.x) << 8) + 0x80;
+            bloke->dest.y = ((JungleCruiseRide->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
@@ -1515,14 +1515,14 @@ void FUN_00435750(void) {
             break;
         case 5:
             bloke->flags &= 0xfff7;
-            RemoveBlokeFromRide(DAT_0081cb60, node);
+            RemoveBlokeFromRide(JungleCruiseRide, node);
             break;
         }
     }
 }
 
 // FUNCTION: LEGOLAND 0x00435bd0
-void FUN_00435bd0(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderJungleCruise(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
     int ride = *(int *)(param_1 + 0xc);
     unsigned int *node = *(unsigned int **)(ride + 0xcc);
     short *lls1;
@@ -1536,7 +1536,7 @@ void FUN_00435bd0(int param_1, unsigned int param_2, unsigned int param_3, short
         }
     }
     coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
-    lls1 = (short *)GetLLSForSprite((struct SpriteLLS *)DAT_0081cb60->layer);
+    lls1 = (short *)GetLLSForSprite((struct SpriteLLS *)JungleCruiseRide->layer);
     lls2 = GetLLSForSprite((struct SpriteLLS *)JungMaskSprite);
     LLSSetFrame((struct LLS *)lls2, *lls1);
     PrintSprite(JungMaskSprite, coords.x, coords.y, param_6, 0);
@@ -1560,10 +1560,10 @@ int JungleCruise_Save(void) {
     struct JungleRide rideCopy;
 
     count = 0;
-    for (scoreCur = DAT_00629c3c; scoreCur != NULL; scoreCur = scoreCur->next) {
+    for (scoreCur = JungleScoreList; scoreCur != NULL; scoreCur = scoreCur->next) {
         count++;
     }
-    score = DAT_00629c3c;
+    score = JungleScoreList;
     SaveGameWrite(&count, 4);
     while (count--) {
         scoreCopy = *score;
@@ -1574,20 +1574,20 @@ int JungleCruise_Save(void) {
         score = score->next;
     }
     count = 0;
-    for (pathCur = DAT_0062fd2c; pathCur != NULL; pathCur = pathCur->next) {
+    for (pathCur = JunglePathList; pathCur != NULL; pathCur = pathCur->next) {
         count++;
     }
-    path = DAT_0062fd2c;
+    path = JunglePathList;
     SaveGameWrite(&count, 4);
     while (count--) {
         SaveGameWrite(path, sizeof(*path));
         path = path->next;
     }
     count = 0;
-    for (fishCur = DAT_00629c30; fishCur != NULL; fishCur = fishCur->next) {
+    for (fishCur = JungleFishList; fishCur != NULL; fishCur = fishCur->next) {
         count++;
     }
-    fish = DAT_00629c30;
+    fish = JungleFishList;
     SaveGameWrite(&count, 4);
     while (count--) {
         SaveGameWrite(fish, sizeof(*fish));
@@ -1604,10 +1604,10 @@ int JungleCruise_Save(void) {
         thing = thing->next;
     }
     count = 0;
-    for (rideCur = DAT_00616164; rideCur != NULL; rideCur = rideCur->next) {
+    for (rideCur = JungleRideList; rideCur != NULL; rideCur = rideCur->next) {
         count++;
     }
-    ride = DAT_00616164;
+    ride = JungleRideList;
     SaveGameWrite(&count, 4);
     while (count--) {
         rideCopy = *ride;
@@ -1642,8 +1642,8 @@ int JungleCruise_Load(void) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevScore == NULL) {
-            DAT_00629c3c = (struct JungleScore *)malloc(sizeof(struct JungleScore));
-            prevScore = DAT_00629c3c;
+            JungleScoreList = (struct JungleScore *)malloc(sizeof(struct JungleScore));
+            prevScore = JungleScoreList;
         } else {
             score = (struct JungleScore *)malloc(sizeof(struct JungleScore));
             prevScore->next = score;
@@ -1657,8 +1657,8 @@ int JungleCruise_Load(void) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevPath == NULL) {
-            DAT_0062fd2c = (struct JunglePath *)malloc(sizeof(struct JunglePath));
-            prevPath = DAT_0062fd2c;
+            JunglePathList = (struct JunglePath *)malloc(sizeof(struct JunglePath));
+            prevPath = JunglePathList;
         } else {
             path = (struct JunglePath *)malloc(sizeof(struct JunglePath));
             prevPath->next = path;
@@ -1669,8 +1669,8 @@ int JungleCruise_Load(void) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevFish == NULL) {
-            DAT_00629c30 = (struct JungleFish *)malloc(sizeof(struct JungleFish));
-            prevFish = DAT_00629c30;
+            JungleFishList = (struct JungleFish *)malloc(sizeof(struct JungleFish));
+            prevFish = JungleFishList;
         } else {
             fish = (struct JungleFish *)malloc(sizeof(struct JungleFish));
             prevFish->next = fish;
@@ -1690,12 +1690,12 @@ int JungleCruise_Load(void) {
         }
         SaveGameRead(prevThing, sizeof(struct JungleObj));
     }
-    prevRide = DAT_00616164;
+    prevRide = JungleRideList;
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevRide == NULL) {
-            DAT_00616164 = (struct JungleRide *)malloc(sizeof(struct JungleRide));
-            prevRide = DAT_00616164;
+            JungleRideList = (struct JungleRide *)malloc(sizeof(struct JungleRide));
+            prevRide = JungleRideList;
         } else {
             ride = (struct JungleRide *)malloc(sizeof(struct JungleRide));
             prevRide->next = ride;
@@ -1706,7 +1706,7 @@ int JungleCruise_Load(void) {
             prevRide->blokes[i] = (unsigned int)GetBlokePtr(prevRide->blokes[i]);
         }
     }
-    for (score = DAT_00629c3c; score != NULL; score = score->next) {
+    for (score = JungleScoreList; score != NULL; score = score->next) {
         FUN_004373c0(score->tile.id);
     }
     return 1;
@@ -1714,7 +1714,7 @@ int JungleCruise_Load(void) {
 
 // FUNCTION: LEGOLAND 0x00436130
 void FUN_00436130(unsigned short param_1, unsigned int param_2) {
-    struct JungleScore *node = DAT_00629c3c;
+    struct JungleScore *node = JungleScoreList;
     while (node != NULL) {
         if (node->tile.id == param_1) {
             if (node != NULL) {
@@ -1731,8 +1731,8 @@ int FUN_00436160(Element *obj, int param_2) {
     struct JungleScore *node;
     int best = 0;
 
-    for (node = DAT_00629c3c; node != NULL; node = node->next) {
-        if ((int)node->field_40 > best && (param_2 == 0 || node->field_8 != 0)) {
+    for (node = JungleScoreList; node != NULL; node = node->next) {
+        if ((int)node->field_40 > best && (param_2 == 0 || node->connected != 0)) {
             best = node->field_40;
         }
     }
@@ -1740,12 +1740,12 @@ int FUN_00436160(Element *obj, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00436190
-void FUN_00436190(Element *obj) {
+void InitJungleCruiseWater(Element *obj) {
     DAT_0081cb54 = obj->ride;
 }
 
 // FUNCTION: LEGOLAND 0x004361a0
-void FUN_004361a0(void) {
+void JungleCruiseWaterSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = DAT_0081cb54;
     DAT_0081cb54->footprint = DAT_004b7478;
@@ -1844,7 +1844,7 @@ void FUN_00436200(Element *obj, unsigned int param_2, unsigned int param_3) {
 
 // FUNCTION: LEGOLAND 0x00436470
 void FUN_00436470(unsigned int param_1, int *coords) {
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     struct JungleRide *ride;
     struct MapElement *elem;
     struct JunglePath *path;
@@ -1862,18 +1862,18 @@ void FUN_00436470(unsigned int param_1, int *coords) {
     tile.pos.y = coords[1];
     for (; score != NULL; score = score->next) {
         if (tile.id == score->start.id || tile.id == score->end.id) {
-            path = FUN_004371b0(coords[0], coords[1]);
+            path = FindJunglePathAt(coords[0], coords[1]);
             QueryObj.pos.x = path->owner.pos.x;
             coords[0] = QueryObj.pos.x;
             QueryObj.pos.y = path->owner.pos.y;
             coords[1] = QueryObj.pos.y;
-            memcpy(&QueryClass->footprint, &DAT_00629c40, sizeof(DAT_00629c40));
-            fake.ride = DAT_0081cb60;
+            memcpy(&QueryClass->footprint, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
+            fake.ride = JungleCruiseRide;
             FUN_00435230((unsigned int)&fake, (struct Point *)coords);
             return;
         }
     }
-    ride = DAT_00616164;
+    ride = JungleRideList;
     memcpy(&QueryClass->footprint, &DAT_004b7478, sizeof(DAT_004b7478));
     BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
@@ -1886,7 +1886,7 @@ void FUN_00436470(unsigned int param_1, int *coords) {
 
 // FUNCTION: LEGOLAND 0x004365f0
 void FUN_004365f0(Element *obj, int *coords) {
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     unsigned int mask;
     unsigned short owner;
     int x0;
@@ -1920,8 +1920,8 @@ void FUN_004365f0(Element *obj, int *coords) {
             y0 = score->start.pos.y;
             x1 = score->end.pos.x;
             y1 = score->end.pos.y;
-            score->field_8 = FUN_004371e0(x0, y0, x1, y1);
-            if (score->field_8 != 0) {
+            score->connected = AreJunglePathsConnected(x0, y0, x1, y1);
+            if (score->connected != 0) {
                 FUN_004373c0(owner);
             }
             return;
@@ -1931,12 +1931,12 @@ void FUN_004365f0(Element *obj, int *coords) {
 
 // FUNCTION: LEGOLAND 0x004367b0
 void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     struct JunglePath *path;
     int other;
     unsigned int mask;
 
-    path = FUN_004371b0(param_1, param_2);
+    path = FindJunglePathAt(param_1, param_2);
     for (; score != NULL; score = score->next) {
         if (score->tile.id == *param_3) {
             break;
@@ -1950,28 +1950,28 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
             mask = mask & 0xfffffffb;
         }
         if ((mask & 8) != 0 && (mask & 1) != 0 &&
-            (other = (int)FUN_004371b0(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = (int)FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 8) != 0 && (mask & 4) != 0 &&
-            (other = (int)FUN_004371b0(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = (int)FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 3, param_2 + 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 + 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 1) != 0 &&
-            (other = (int)FUN_004371b0(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = (int)FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 4) != 0 &&
-            (other = (int)FUN_004371b0(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = (int)FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 3, param_2 + 2, *BoatingSchoolTileMap->tiles);
@@ -1982,7 +1982,7 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
 
 // FUNCTION: LEGOLAND 0x00436a40
 void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     struct MapElement *elem;
     int ex;
     int ey;
@@ -2006,8 +2006,8 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
         elem = NULL;
     }
     if (elem->field_0 != DAT_0081cb54->element) {
-        fake.ride = DAT_0081cb60;
-        FUN_00435470(&fake, tile, cursor);
+        fake.ride = JungleCruiseRide;
+        JungleCruiseRemoveObject(&fake, tile, cursor);
         return;
     }
     mask = FUN_00436fb0(cursor->tile_x, cursor->tile_y, &owner);
@@ -2043,7 +2043,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
     if ((mask & 1) != 0 && (mask & 8) != 0) {
         x = cursor->tile_x - 5;
         y = cursor->tile_y - 5;
-        if (FUN_004371b0(x, y) != NULL) {
+        if (FindJunglePathAt(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
             FUN_004367b0(x, y, &owner);
@@ -2052,7 +2052,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
     if ((mask & 1) != 0 && (mask & 2) != 0) {
         x = cursor->tile_x + 5;
         y = cursor->tile_y - 5;
-        if (FUN_004371b0(x, y) != NULL) {
+        if (FindJunglePathAt(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
             FUN_004367b0(x, y, &owner);
@@ -2061,7 +2061,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
     if ((mask & 4) != 0 && (mask & 8) != 0) {
         x = cursor->tile_x - 5;
         y = cursor->tile_y + 5;
-        if (FUN_004371b0(x, y) != NULL) {
+        if (FindJunglePathAt(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
             FUN_004367b0(x, y, &owner);
@@ -2070,7 +2070,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
     if ((mask & 4) != 0 && (mask & 2) != 0) {
         x = cursor->tile_x + 5;
         y = cursor->tile_y + 5;
-        if (FUN_004371b0(x, y) != NULL) {
+        if (FindJunglePathAt(x, y) != NULL) {
             dir = FUN_00436fb0(x, y, &other);
             FUN_00436dc0(x, y, dir, &owner);
             FUN_004367b0(x, y, &owner);
@@ -2083,7 +2083,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
             y0 = score->start.pos.y;
             x1 = score->end.pos.x;
             y1 = score->end.pos.y;
-            score->field_8 = FUN_004371e0(x0, y0, x1, y1);
+            score->connected = AreJunglePathsConnected(x0, y0, x1, y1);
             break;
         }
     }
@@ -2100,15 +2100,15 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
 
     tile.pos.x = x;
     tile.pos.y = y;
-    node = FUN_004371b0(x, y);
+    node = FindJunglePathAt(x, y);
     if (node == NULL) {
         node = (struct JunglePath *)malloc(sizeof(struct JunglePath));
         if (node == NULL) {
             return;
         }
-        node->next = DAT_0062fd2c;
+        node->next = JunglePathList;
         node->parent = NULL;
-        DAT_0062fd2c = node;
+        JunglePathList = node;
         FUN_00436130(*owner, 1);
     }
     node->tile = tile;
@@ -2137,7 +2137,7 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
 
 // FUNCTION: LEGOLAND 0x00436f30
 void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
-    struct JunglePath *node = DAT_0062fd2c;
+    struct JunglePath *node = JunglePathList;
     struct JunglePath *prev = NULL;
 
     StandardRemoveObject((Element *)param_1, tile, param_3);
@@ -2155,7 +2155,7 @@ void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
             free(node);
             return;
         }
-        DAT_0062fd2c = node->next;
+        JunglePathList = node->next;
         free(node);
     }
 }
@@ -2171,14 +2171,14 @@ unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
 
     mask = 0;
     valid = 0;
-    score = DAT_00629c3c;
-    node = FUN_004371b0(x, y);
+    score = JungleScoreList;
+    node = FindJunglePathAt(x, y);
     if (node != NULL) {
         *owner = node->owner.id;
         valid = 1;
     }
     n = y - 5;
-    if (x >= 0 && n >= 0 && x < lpConfig->width && n < lpConfig->height && (node = FUN_004371b0(x, n)) != NULL) {
+    if (x >= 0 && n >= 0 && x < lpConfig->width && n < lpConfig->height && (node = FindJunglePathAt(x, n)) != NULL) {
         if (valid) {
             if (node->owner.id == *owner) {
                 mask = 1;
@@ -2190,7 +2190,7 @@ unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
         }
     }
     n = x + 5;
-    if (n >= 0 && y >= 0 && n < lpConfig->width && y < lpConfig->height && (node = FUN_004371b0(n, y)) != NULL) {
+    if (n >= 0 && y >= 0 && n < lpConfig->width && y < lpConfig->height && (node = FindJunglePathAt(n, y)) != NULL) {
         if (valid) {
             if (node->owner.id == *owner) {
                 mask |= 2;
@@ -2202,7 +2202,7 @@ unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
         }
     }
     n = y + 5;
-    if (x >= 0 && n >= 0 && x < lpConfig->width && n < lpConfig->height && (node = FUN_004371b0(x, n)) != NULL) {
+    if (x >= 0 && n >= 0 && x < lpConfig->width && n < lpConfig->height && (node = FindJunglePathAt(x, n)) != NULL) {
         if (valid) {
             if (node->owner.id == *owner) {
                 mask |= 4;
@@ -2214,7 +2214,7 @@ unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
         }
     }
     n = x - 5;
-    if (n >= 0 && y >= 0 && n < lpConfig->width && y < lpConfig->height && (node = FUN_004371b0(n, y)) != NULL) {
+    if (n >= 0 && y >= 0 && n < lpConfig->width && y < lpConfig->height && (node = FindJunglePathAt(n, y)) != NULL) {
         if (valid) {
             if (node->owner.id == *owner) {
                 mask |= 8;
@@ -2240,13 +2240,13 @@ unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
 }
 
 // FUNCTION: LEGOLAND 0x004371b0
-struct JunglePath *FUN_004371b0(int x, int y) {
+struct JunglePath *FindJunglePathAt(int x, int y) {
     struct JunglePath *node;
     TileId key;
 
     key.pos.x = x;
     key.pos.y = y;
-    for (node = DAT_0062fd2c; node != NULL; node = node->next) {
+    for (node = JunglePathList; node != NULL; node = node->next) {
         if (node->tile.id == key.id) {
             break;
         }
@@ -2255,33 +2255,33 @@ struct JunglePath *FUN_004371b0(int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x004371e0
-int FUN_004371e0(int a, int b, int c, int d) {
+int AreJunglePathsConnected(int a, int b, int c, int d) {
     struct JunglePath *node;
     TileId key;
     int result;
 
     result = 0;
-    for (node = DAT_0062fd2c; node != NULL; node = node->next) {
+    for (node = JunglePathList; node != NULL; node = node->next) {
         node->visited = 0;
     }
-    node = FUN_004371b0(a, b);
+    node = FindJunglePathAt(a, b);
     if (node == NULL) {
         return 0;
     }
     key.id = node->owner.id;
-    FUN_00437260(a, b, c, d, &key, &result);
+    SearchJunglePathConnected(a, b, c, d, &key, &result);
     return result;
 }
 
 // FUNCTION: LEGOLAND 0x00437260
-void FUN_00437260(int x, int y, int tx, int ty, TileId *owner, int *found) {
+void SearchJunglePathConnected(int x, int y, int tx, int ty, TileId *owner, int *found) {
     struct JunglePath *node;
     struct JunglePath *next;
 
     if (*found == 1) {
         return;
     }
-    node = FUN_004371b0(x, y);
+    node = FindJunglePathAt(x, y);
     if (node == NULL || node->owner.id != owner->id) {
         return;
     }
@@ -2290,27 +2290,27 @@ void FUN_00437260(int x, int y, int tx, int ty, TileId *owner, int *found) {
         return;
     }
     node->visited = 1;
-    if ((node->dir_mask & 1) != 0 && (next = FUN_004371b0(x, y - 5)) != NULL && next->visited == 0) {
-        FUN_00437260(x, y - 5, tx, ty, owner, found);
+    if ((node->dir_mask & 1) != 0 && (next = FindJunglePathAt(x, y - 5)) != NULL && next->visited == 0) {
+        SearchJunglePathConnected(x, y - 5, tx, ty, owner, found);
     }
-    if ((node->dir_mask & 2) != 0 && (next = FUN_004371b0(x + 5, y)) != NULL && next->visited == 0) {
-        FUN_00437260(x + 5, y, tx, ty, owner, found);
+    if ((node->dir_mask & 2) != 0 && (next = FindJunglePathAt(x + 5, y)) != NULL && next->visited == 0) {
+        SearchJunglePathConnected(x + 5, y, tx, ty, owner, found);
     }
-    if ((node->dir_mask & 4) != 0 && (next = FUN_004371b0(x, y + 5)) != NULL && next->visited == 0) {
-        FUN_00437260(x, y + 5, tx, ty, owner, found);
+    if ((node->dir_mask & 4) != 0 && (next = FindJunglePathAt(x, y + 5)) != NULL && next->visited == 0) {
+        SearchJunglePathConnected(x, y + 5, tx, ty, owner, found);
     }
-    if ((node->dir_mask & 8) != 0 && (next = FUN_004371b0(x - 5, y)) != NULL && next->visited == 0) {
-        FUN_00437260(x - 5, y, tx, ty, owner, found);
+    if ((node->dir_mask & 8) != 0 && (next = FindJunglePathAt(x - 5, y)) != NULL && next->visited == 0) {
+        SearchJunglePathConnected(x - 5, y, tx, ty, owner, found);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004373c0
 void FUN_004373c0(unsigned short param_1) {
-    struct JungleScore *score = DAT_00629c3c;
+    struct JungleScore *score = JungleScoreList;
     struct JunglePath *node;
     struct JunglePath *tmp;
 
-    for (node = DAT_0062fd2c; node != NULL; node = node->next) {
+    for (node = JunglePathList; node != NULL; node = node->next) {
         if (node->owner.id == param_1) {
             node->parent = NULL;
         }
@@ -2318,16 +2318,16 @@ void FUN_004373c0(unsigned short param_1) {
     while (score != NULL && score->tile.id != param_1) {
         score = score->next;
     }
-    node = FUN_004371b0(score->end.pos.x, score->end.pos.y);
+    node = FindJunglePathAt(score->end.pos.x, score->end.pos.y);
     node->field_8 = 0;
     node->bfs_next = NULL;
     DAT_0062fd30 = node;
-    DAT_0062fd34 = NULL;
+    JungleBfsNextFrontier = NULL;
     do {
         FUN_00437440(param_1);
-        tmp = DAT_0062fd34;
+        tmp = JungleBfsNextFrontier;
         DAT_0062fd30 = tmp;
-        DAT_0062fd34 = NULL;
+        JungleBfsNextFrontier = NULL;
     } while (tmp != NULL);
 }
 
@@ -2340,33 +2340,33 @@ void FUN_00437440(short param_1) {
     struct JunglePath *n4;
 
     for (p = DAT_0062fd30; p != NULL; p = p->bfs_next) {
-        n1 = FUN_004371b0(p->tile.pos.x, p->tile.pos.y - 5);
-        n2 = FUN_004371b0(p->tile.pos.x + 5, p->tile.pos.y);
-        n3 = FUN_004371b0(p->tile.pos.x, p->tile.pos.y + 5);
-        n4 = FUN_004371b0(p->tile.pos.x - 5, p->tile.pos.y);
+        n1 = FindJunglePathAt(p->tile.pos.x, p->tile.pos.y - 5);
+        n2 = FindJunglePathAt(p->tile.pos.x + 5, p->tile.pos.y);
+        n3 = FindJunglePathAt(p->tile.pos.x, p->tile.pos.y + 5);
+        n4 = FindJunglePathAt(p->tile.pos.x - 5, p->tile.pos.y);
         if (n1 != NULL && (short)n1->owner.id == param_1 && n1->parent == NULL) {
             n1->parent = p;
             n1->field_8 = p->field_8 + 1;
-            n1->bfs_next = DAT_0062fd34;
-            DAT_0062fd34 = n1;
+            n1->bfs_next = JungleBfsNextFrontier;
+            JungleBfsNextFrontier = n1;
         }
         if (n2 != NULL && (short)n2->owner.id == param_1 && n2->parent == NULL) {
             n2->parent = p;
             n2->field_8 = p->field_8 + 1;
-            n2->bfs_next = DAT_0062fd34;
-            DAT_0062fd34 = n2;
+            n2->bfs_next = JungleBfsNextFrontier;
+            JungleBfsNextFrontier = n2;
         }
         if (n3 != NULL && (short)n3->owner.id == param_1 && n3->parent == NULL) {
             n3->parent = p;
             n3->field_8 = p->field_8 + 1;
-            n3->bfs_next = DAT_0062fd34;
-            DAT_0062fd34 = n3;
+            n3->bfs_next = JungleBfsNextFrontier;
+            JungleBfsNextFrontier = n3;
         }
         if (n4 != NULL && (short)n4->owner.id == param_1 && n4->parent == NULL) {
             n4->parent = p;
             n4->field_8 = p->field_8 + 1;
-            n4->bfs_next = DAT_0062fd34;
-            DAT_0062fd34 = n4;
+            n4->bfs_next = JungleBfsNextFrontier;
+            JungleBfsNextFrontier = n4;
         }
     }
 }

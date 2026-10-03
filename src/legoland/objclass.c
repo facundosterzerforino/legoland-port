@@ -18,7 +18,7 @@
 struct ObjClassNames {
     char *name;
     unsigned char pad_4[0xc - 0x4];
-    void *field_c;
+    void *ride;
 };
 
 struct ObjectInfo {
@@ -86,8 +86,8 @@ struct ClassObjNode {
 
 struct ObjClassInfo {
     /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
+    /* 0x0c */ int x;
+    /* 0x10 */ int y;
     /* 0x14 */ unsigned char pad_14[0x20 - 0x14];
     /* 0x20 */ short type;
     /* 0x22 */ unsigned char pad_22[0x24 - 0x22];
@@ -235,7 +235,7 @@ LEGO_EXPORT unsigned int LoadObjectClass(struct ElemView *cls) {
 void FUN_00480b70(struct ObjClassNames *param) {
     void *value;
 
-    value = param->field_c;
+    value = param->ride;
     EditMode.unk0 = 1;
     EditMode.unk8 = value;
     DefaultCursor(&EditCursor);
@@ -427,7 +427,7 @@ LEGO_EXPORT int LoadObjectLibrary(void *object, const char *name) {
     if (((struct LibraryNode *)NewObjectPtr)->module == 0) {
         return 0;
     }
-    node = DAT_00669244;
+    node = ObjectLibraryHead;
     while (node != 0) {
         if (node->module == ((struct LibraryNode *)NewObjectPtr)->module) {
             NewObjectPtr = node;
@@ -437,17 +437,17 @@ LEGO_EXPORT int LoadObjectLibrary(void *object, const char *name) {
         }
         node = node->next;
     }
-    ((struct LibraryNode *)NewObjectPtr)->next = DAT_00669244;
+    ((struct LibraryNode *)NewObjectPtr)->next = ObjectLibraryHead;
     ((struct LibraryNode *)NewObjectPtr)->refcount = 1;
     staging = (struct LibraryNode *)malloc(sizeof(struct LibraryNode));
     node = (struct LibraryNode *)NewObjectPtr;
-    DAT_00669244 = staging;
+    ObjectLibraryHead = staging;
     staging->next = node->next;
     staging->module = node->module;
     staging->refcount = node->refcount;
     staging->init = node->init;
-    obj->library = DAT_00669244;
-    node = DAT_00669244;
+    obj->library = ObjectLibraryHead;
+    node = ObjectLibraryHead;
 loaded:
     memset(results, 0, sizeof(results));
     node->init(obj->context, results);
@@ -504,13 +504,13 @@ LEGO_EXPORT void UnLoadObjectLibrary(void *object) {
     obj->library->refcount--;
     node = obj->library;
     if (node->refcount == 0) {
-        prev = DAT_00669244;
-        if (DAT_00669244 == node) {
-            DAT_00669244 = DAT_00669244->next;
+        prev = ObjectLibraryHead;
+        if (ObjectLibraryHead == node) {
+            ObjectLibraryHead = ObjectLibraryHead->next;
             free(prev);
             return;
         }
-        if (DAT_00669244 != 0) {
+        if (ObjectLibraryHead != 0) {
             while (prev != 0) {
                 if (prev->next == node) {
                     break;
@@ -527,42 +527,25 @@ LEGO_EXPORT void UnLoadObjectLibrary(void *object) {
 
 // FUNCTION: LEGOLAND 0x00481170
 void FUN_00481170(void) {
-    struct LegoConfig *config;
     struct MapElement *cell;
     void *next;
     int x;
     int y;
-    int offset;
-    int width;
 
-    while (DAT_00669248 != 0) {
-        next = *(void **)DAT_00669248;
-        free(DAT_00669248);
-        DAT_00669248 = next;
+    while (ClassRideList != 0) {
+        next = *(void **)ClassRideList;
+        free(ClassRideList);
+        ClassRideList = next;
     }
-    config = lpConfig;
-    y = 0;
-    if (y < config->height) {
-        do {
-            x = 0;
-            width = config->width;
-            if (width > 0) {
-                offset = 0;
-                do {
-                    if (offset < 0 || x >= (int)width || y < 0 || y >= (int)lpConfig->height) {
-                        cell = 0;
-                    } else {
-                        cell = (struct MapElement *)((char *)GameMap[y] + offset);
-                    }
-                    cell->flags &= 0xfbff;
-                    x++;
-                    width = lpConfig->width;
-                    offset += 0x14;
-                } while (x < (int)width);
+    for (y = 0; y < lpConfig->height; y++) {
+        for (x = 0; x < lpConfig->width; x++) {
+            if (x < 0 || x >= lpConfig->width || y < 0 || y >= lpConfig->height) {
+                cell = 0;
+            } else {
+                cell = &GameMap[y][x];
             }
-            config = lpConfig;
-            y++;
-        } while (y < (int)config->height);
+            cell->flags &= 0xfbff;
+        }
     }
 }
 
@@ -601,26 +584,26 @@ LEGO_EXPORT void BuildObjInfoList(void) {
             }
             cls = origin->field_0->data;
             if (cls->type != 0 && cls->type != 2 && (origin->flags & 0x400) == 0) {
-                for (node = DAT_00669248; node != NULL; node = node->next) {
+                for (node = ClassRideList; node != NULL; node = node->next) {
                     if (node->classid == cls) {
                         break;
                     }
                 }
                 if (node != NULL) {
                     if (rand() % 256 < 0x50) {
-                        node->x = cls->field_c + at.x;
-                        node->y = cls->field_10 + at.y;
+                        node->x = cls->x + at.x;
+                        node->y = cls->y + at.y;
                         node->origin_x = cls->field_24 + at.x;
                         node->origin_y = cls->field_25 + at.y;
                     }
                 } else {
                     node = (struct InfoNode *)malloc(sizeof(struct InfoNode));
-                    node->next = DAT_00669248;
-                    DAT_00669248 = node;
+                    node->next = ClassRideList;
+                    ClassRideList = node;
                     node->classid = cls;
                     node->coords = tile.id;
-                    node->x = cls->field_c + at.x;
-                    node->y = cls->field_10 + at.y;
+                    node->x = cls->x + at.x;
+                    node->y = cls->y + at.y;
                     node->origin_x = cls->field_24 + at.x;
                     node->origin_y = cls->field_25 + at.y;
                 }
@@ -708,10 +691,11 @@ LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke,
         fatigue = 0;
     }
     if (counter != 0) {
-        counter = ((4 - (1 << counter)) * 0x19 + item->value) - fatigue;
+        rating = ((4 - (1 << counter)) * 0x19 + item->value) - fatigue;
     } else {
-        counter = (item->value - fatigue) + 100;
+        rating = (item->value - fatigue) + 100;
     }
+    counter = rating;
     switch (category) {
     case 0:
         if (item->type == 5) {
@@ -750,7 +734,7 @@ LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke,
 LEGO_EXPORT void CalculateRideCodes(struct Bloke *bloke) {
     struct ClassRideNode *node;
 
-    for (node = DAT_00669248; node != 0; node = node->next) {
+    for (node = ClassRideList; node != 0; node = node->next) {
         node->score = Calc_Item_Attractiveness(node->ride, bloke, 0);
     }
 }
@@ -761,9 +745,9 @@ LEGO_EXPORT int ShuffleObjKeys(struct Point *goal, struct Ride **ride) {
     struct InfoNode *node;
     struct InfoNode *next;
 
-    slot = (struct InfoNode **)&DAT_00669248;
-    node = DAT_00669248;
-    if (DAT_00669248 != (void *)DAT_0066924c) {
+    slot = (struct InfoNode **)&ClassRideList;
+    node = ClassRideList;
+    if (ClassRideList != (void *)DAT_0066924c) {
         while (node != 0) {
             next = node->next;
             if ((unsigned int)next == DAT_0066924c) {
@@ -1047,7 +1031,7 @@ void FUN_004819a0(int *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00481b10
-void FUN_00481b10(struct BestNode *node) {
+void MergeBestNode(struct BestNode *node) {
     struct BestNode *cur;
     int i;
 

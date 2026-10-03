@@ -48,17 +48,17 @@ struct ProfileObj {
 
 // FUNCTION: LEGOLAND 0x004912e0
 LEGO_EXPORT void ResetTempProfile(void) {
-    DAT_007cad60.speech_volume = 0x4b;
-    DAT_007cad60.music_volume = 0x4b;
-    DAT_007cad60.fx_volume = 0x4b;
-    DAT_007cad60.name[0] = 0;
-    DAT_007cad60.field_20 = 5;
-    DAT_007cad60.name_len = 0;
-    memset(&DAT_007cad60.field_34, 0, 15);
-    memset(DAT_007cad60.field_43, 0, 200);
-    *(int *)&DAT_007cad60.field_10b = 0;
-    DAT_007cad60.field_10b = 1;
-    FUN_0048a780(DAT_007cad60.field_43);
+    TempProfile.speech_volume = 0x4b;
+    TempProfile.music_volume = 0x4b;
+    TempProfile.fx_volume = 0x4b;
+    TempProfile.name[0] = 0;
+    TempProfile.field_20 = 5;
+    TempProfile.name_len = 0;
+    memset(&TempProfile.field_34, 0, 15);
+    memset(TempProfile.field_43, 0, 200);
+    *(int *)&TempProfile.field_10b = 0;
+    TempProfile.field_10b = 1;
+    FUN_0048a780(TempProfile.field_43);
 }
 
 // FUNCTION: LEGOLAND 0x00491360
@@ -156,7 +156,7 @@ LEGO_EXPORT char LoadProfilesFormDisk(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00491540
-unsigned int TempProfileHasName(void) { return DAT_007cad60.name[0] != 0; }
+unsigned int TempProfileHasName(void) { return TempProfile.name[0] != 0; }
 
 // FUNCTION: LEGOLAND 0x00491550
 LEGO_EXPORT char UpDateCurrentSaveSlotInfo(void) {
@@ -169,7 +169,7 @@ LEGO_EXPORT char UpDateCurrentSaveSlotInfo(void) {
     if (LoadDateIntoTempProfile(CurrentProfile.profile_slot, CurrentProfile.save_slot & 0xff) == 0) {
         return -1;
     }
-    strcpy(temp.name, DAT_007cad60.name);
+    strcpy(temp.name, TempProfile.name);
     temp.speech_volume = CurrentProfile.speech_volume;
     temp.music_volume = CurrentProfile.music_volume;
     temp.fx_volume = CurrentProfile.fx_volume;
@@ -272,7 +272,7 @@ LEGO_EXPORT char SaveProfileToDisk(void) {
     if (stream == 0) {
         printf("\ncannot open output file");
     } else {
-        fwrite(&DAT_007cad60, sizeof(struct ProfileData), 1, stream);
+        fwrite(&TempProfile, sizeof(struct ProfileData), 1, stream);
         fclose(stream);
     }
     result = ReturnFrom_ProfileDir() ? 1 : -1;
@@ -367,26 +367,26 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
     int center_x;
     char *blink;
 
-    count = DAT_007cad60.name_len;
+    count = TempProfile.name_len;
     // STRING: LEGOLAND 0x004bf2e4
     *(short *)cursor_str = *(short *)"|";
     input = GetInputChar();
     if (input != '\0') {
         if (input == -1 && count != 0) {
             count--;
-            DAT_007cad60.name[count] = 0;
+            TempProfile.name[count] = 0;
         }
         if (count < 0x1f && DAT_00798894 < 0x7b && input > '\0') {
             if (input == ' ') {
                 if (count != 0) {
-                    DAT_007cad60.name[count] = ' ';
+                    TempProfile.name[count] = ' ';
                     count++;
-                    DAT_007cad60.name[count] = 0;
+                    TempProfile.name[count] = 0;
                 }
             } else {
-                DAT_007cad60.name[count] = input;
+                TempProfile.name[count] = input;
                 count++;
-                DAT_007cad60.name[count] = 0;
+                TempProfile.name[count] = 0;
             }
         }
     }
@@ -395,7 +395,7 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
     rc.bottom = rc.top + 0x13;
     rc.right = rc.left + 0xc0;
     if (count != 0) {
-        center_x = FUN_00491e40(DAT_007cad60.name, 2, rc, 1);
+        center_x = FUN_00491e40(TempProfile.name, 2, rc, 1);
     } else {
         center_x = (rc.right + rc.left) >> 1;
     }
@@ -410,7 +410,7 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
     rc.left = center_x;
     rc.right = center_x + 100;
     FUN_00490fa0(cursor_str, 2, rc, 1);
-    DAT_007cad60.name_len = count;
+    TempProfile.name_len = count;
 }
 
 // FUNCTION: LEGOLAND 0x00491d60
@@ -466,13 +466,13 @@ int FUN_00491e40(char *text, int font, RECT rc, int color_flag) {
 unsigned char FUN_00491f90(struct RideState *state, unsigned char flags) {
     if ((flags & 0x2) != 0) {
         if (state->var_18 == 2) {
-            if (DAT_007cad60.field_20 >= 2) {
-                DAT_007cad60.field_20--;
+            if (TempProfile.field_20 >= 2) {
+                TempProfile.field_20--;
                 return 1;
             }
         } else {
-            if (DAT_007cad60.field_20 <= 99) {
-                DAT_007cad60.field_20++;
+            if (TempProfile.field_20 <= 99) {
+                TempProfile.field_20++;
                 return 1;
             }
         }

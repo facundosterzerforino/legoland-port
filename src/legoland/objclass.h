@@ -112,6 +112,6 @@ typedef struct BestNode BestNode;
 struct BestNode *FindBestNodeAtPoint(struct Point *pos);
 void FUN_004819a0(int *param_1);
 struct BestNode *FUN_004817d0(int *param_1);
-void FUN_00481b10(struct BestNode *node);
+void MergeBestNode(struct BestNode *node);
 LEGO_EXPORT void AllocBlokeCounters(unsigned int size);
 LEGO_EXPORT void CreateObjectClasses(void);

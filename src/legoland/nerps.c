@@ -96,13 +96,13 @@ void FUN_0046a040(unsigned int param_1, unsigned int param_2) {
         FUN_0044db40();
         break;
     case 7:
-        lpConfig->field_3c = param_2;
+        lpConfig->repair_orders_enabled = param_2;
         break;
     case 8:
         lpConfig->field_2c = param_2;
         break;
     case 9:
-        MapStats.field_174 = param_2;
+        MapStats.brick_meter_max = param_2;
         break;
     case 10:
         MapStats.field_194 = param_2;
@@ -162,7 +162,7 @@ unsigned int FUN_0046a170(struct NerpsArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046a190
-unsigned int FUN_0046a190(struct NerpsArg *arg) {
+unsigned int GenerateWorkers(struct NerpsArg *arg) {
     int i;
 
     SetBricksLimited(0);
@@ -203,10 +203,10 @@ struct TileGroup {
     unsigned char pad_0[0x4];
     struct TileNode *list;
     int count;
-    int field_c;
-    int field_10;
+    int x;
+    int y;
     unsigned char pad_14[0x2c - 0x14];
-    unsigned char field_2c;
+    unsigned char durability;
 };
 
 struct TileGroupHolder {
@@ -226,7 +226,7 @@ unsigned int FUN_0046a230(struct NerpsArg *arg) {
 
     group = ((struct TileGroupHolder *)arg->field_4)->group;
     node = group->list;
-    value = (unsigned int)group->field_2c * arg->field_14;
+    value = (unsigned int)group->durability * arg->field_14;
     threshold = (char)(value / 100);
     limit = arg->field_1c;
     if (limit > group->count || limit == 0) {
@@ -263,18 +263,18 @@ unsigned int FUN_0046a300(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a330
 unsigned int FUN_0046a330(struct NerpsArg *arg) {
-    FUN_00462e50(arg->field_14, arg->field_1c);
+    SetClassPercent(arg->field_14, arg->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a350
 unsigned int FUN_0046a350(struct NerpsArg *arg) {
-    FUN_00462e70(arg->field_14, arg->field_1c);
+    SetClassLimit(arg->field_14, arg->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a370
-unsigned int FUN_0046a370(struct NerpsArg *arg) {
+unsigned int NerpsSetEntranceFee(struct NerpsArg *arg) {
     MapStats.entrance_fee = (short)arg->field_1c;
     return 1;
 }
@@ -297,8 +297,10 @@ unsigned int FUN_0046a3b0(struct NerpsArg *arg) {
     v24 = arg->field_24;
     v20 = arg->field_20;
     GetTileDimensions(&dimX, &dimY);
-    ScrollX = (((v20 - v24) * dimX >> 9) - (lpConfig->view_width >> 1)) * 0x100;
-    ScrollY = (((v20 + v24) * dimY >> 9) - (lpConfig->view_height >> 1)) * 0x100;
+    dimX = (v20 - v24) * dimX;
+    dimY = (v20 + v24) * dimY;
+    ScrollX = ((dimX >> 9) - (lpConfig->view_width >> 1)) * 0x100;
+    ScrollY = ((dimY >> 9) - (lpConfig->view_height >> 1)) * 0x100;
     return 1;
 }
 
@@ -385,68 +387,51 @@ unsigned int FUN_0046a540(struct NerpsArg *arg) {
 unsigned int FUN_0046a5b0(struct NerpsArg *arg) {
     struct MapElement *tile;
     int count;
-    int total;
-    unsigned int x;
-    unsigned int y;
-    int xb;
-    struct MapElement **map;
+    int x;
+    int y;
 
-    y = arg->field_2c;
     count = 0;
-    total = 0;
-    map = GameMap;
-    if ((int)y <= arg->field_34) {
-        do {
-            x = arg->field_28;
-            if ((int)x <= arg->field_30) {
-                xb = x * 0x14;
-                do {
-                    if (xb < 0 || (int)(unsigned int)lpConfig->width <= (int)x || (int)y < 0 ||
-                        (int)(unsigned int)lpConfig->height <= (int)y) {
-                        tile = NULL;
-                    } else {
-                        tile = (struct MapElement *)((char *)map[y] + xb);
-                    }
-                    if ((tile->flags & 0x80) != 0 && tile->field_0 == arg->field_4 &&
-                        tile->field_4 == x && tile->field_5 == y) {
-                        count++;
-                    }
-                    x++;
-                    xb += 0x14;
-                } while ((int)x <= arg->field_30);
+    for (y = arg->field_2c; y <= arg->field_34; y++) {
+        for (x = arg->field_28; x <= arg->field_30; x++) {
+            if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
+                tile = &GameMap[y][x];
+            } else {
+                tile = NULL;
             }
-            y++;
-            total = count;
-        } while ((int)y <= arg->field_34);
+            if ((tile->flags & 0x80) != 0 && tile->field_0 == arg->field_4 && tile->field_4 == x && tile->field_5 == y) {
+                count++;
+            }
+        }
     }
-    if (total < (int)arg->field_1c) {
-        FUN_00468d80(arg, arg->field_4, arg->field_1c - total);
-        return 0;
+    if (count >= (int)arg->field_1c) {
+        return 1;
     }
-    return 1;
+    FUN_00468d80(arg, arg->field_4, arg->field_1c - count);
+    return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0046a690
 unsigned int FUN_0046a690(struct NerpsArg *arg) {
     struct TileGroup *group;
     struct TileNode *node;
+    struct MapElement *tile;
     int x;
     int y;
 
     group = ((struct TileGroupHolder *)arg->field_4)->group;
-    node = group->list;
-    if (node != NULL) {
-        do {
-            x = node->x + group->field_c;
-            y = node->y + group->field_10;
-            if (x < 0 || x >= (int)(unsigned int)lpConfig->width || y < 0 ||
-                y >= (int)(unsigned int)lpConfig->height ||
-                (struct MapElement *)((char *)GameMap[y] + x * 0x14) == NULL) {
-                FUN_00468dc0(arg, arg->field_4);
-                return 0;
-            }
-            node = node->next;
-        } while (node != NULL);
+    for (node = group->list; node != NULL; node = node->next) {
+        x = node->x + group->x;
+        y = node->y + group->y;
+        if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
+            tile = &GameMap[y][x];
+        } else {
+            tile = NULL;
+        }
+        /* `!tile->flags & 0x10` is always false: operator precedence bug in the original */
+        if (tile == NULL || !tile->flags & 0x10) {
+            FUN_00468dc0(arg, arg->field_4);
+            return 0;
+        }
     }
     return 1;
 }
@@ -495,8 +480,8 @@ unsigned int FUN_0046a750(struct NerpsArg *arg) {
         do {
             ox = node->x;
             oy = node->y;
-            pt.x = group->field_c + ox;
-            pt.y = group->field_10 + oy;
+            pt.x = group->x + ox;
+            pt.y = group->y + oy;
             tile = GetTileAtPoint(&pt);
             if (tile == NULL || ((tile->flags == 0) & 0x10)) {
                 total++;
@@ -516,8 +501,8 @@ unsigned int FUN_0046a750(struct NerpsArg *arg) {
             if (FUN_0046a730((struct NerpsArg *)group) != 0) {
                 ox = robj->field_4;
                 oy = robj->field_5;
-                pt.x = group->field_c + ox;
-                pt.y = group->field_10 + oy;
+                pt.x = group->x + ox;
+                pt.y = group->y + oy;
                 tile = GetTileAtPoint(&pt);
                 if (tile == NULL || ((tile->flags == 0) & 0x10)) {
                     total++;
@@ -570,48 +555,27 @@ unsigned int FUN_0046a900(struct NerpsArg *arg) {
 unsigned int FUN_0046a960(struct NerpsArg *arg) {
     struct MapElement *tile;
     int count;
-    int total;
-    unsigned int x;
-    unsigned int y;
-    int xb;
-    int xstart;
-    int yend;
-    struct LegoConfig *cfg;
+    int x;
+    int y;
 
-    total = 0;
-    y = arg->field_2c;
     count = 0;
-    yend = arg->field_34;
-    cfg = lpConfig;
-    if ((int)y <= yend) {
-        xstart = arg->field_28;
-        do {
-            x = xstart;
-            if ((int)x <= arg->field_30) {
-                xb = x * 0x14;
-                do {
-                    if (xb < 0 || (int)(unsigned int)cfg->width <= (int)x || (int)y < 0 ||
-                        (int)(unsigned int)cfg->height <= (int)y) {
-                        tile = NULL;
-                    } else {
-                        tile = (struct MapElement *)((char *)GameMap[y] + xb);
-                    }
-                    if ((tile->flags & 0x80) != 0 && tile->field_4 == x && tile->field_5 == y) {
-                        count++;
-                    }
-                    x++;
-                    xb += 0x14;
-                } while ((int)x <= arg->field_30);
-                total = count;
+    for (y = arg->field_2c; y <= arg->field_34; y++) {
+        for (x = arg->field_28; x <= arg->field_30; x++) {
+            if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
+                tile = &GameMap[y][x];
+            } else {
+                tile = NULL;
             }
-            y++;
-        } while ((int)y <= yend);
+            if ((tile->flags & 0x80) != 0 && tile->field_4 == x && tile->field_5 == y) {
+                count++;
+            }
+        }
     }
-    if (total <= (int)arg->field_14) {
-        return 1;
+    if (count > (int)arg->field_14) {
+        FUN_00468f00(arg, count - arg->field_14);
+        return 0;
     }
-    FUN_00468f00(arg, total - arg->field_14);
-    return 0;
+    return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046aa30
@@ -742,14 +706,12 @@ unsigned int FUN_0046ac00(struct NerpsArg *arg) {
 
     count = 0;
     node = ((struct BuildingHolder *)arg->field_4)->building->list;
-    if (node != NULL) {
-        do {
-            count++;
-            if ((int)arg->field_1c <= count) {
-                return 1;
-            }
-            node = node->next;
-        } while (node != NULL);
+    while (node != NULL) {
+        count++;
+        if (count >= (int)arg->field_1c) {
+            return 1;
+        }
+        node = node->next;
     }
     FUN_00469220(arg, arg->field_4, arg->field_1c - count);
     return 0;
@@ -887,7 +849,7 @@ unsigned int FUN_0046ae70(struct NerpsArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046aec0
-unsigned int FUN_0046aec0(struct NerpsArg *arg) {
+unsigned int AdjustGardenerCount(struct NerpsArg *arg) {
     int current;
     int target;
 
@@ -971,8 +933,8 @@ unsigned int FUN_0046afe0(struct NerpsArg *arg) {
         robj = (struct RenderObj *)GetNextRenderObject((MapElement *)robj)) {
         if (robj->field_11 != 0) {
             group = robj->field_0->group;
-            if (group->field_2c != 0) {
-                pct = robj->field_11 * 100 / group->field_2c;
+            if (group->durability != 0) {
+                pct = robj->field_11 * 100 / group->durability;
             } else {
                 pct = 100;
             }
@@ -1139,8 +1101,8 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_00469b20,
     (EventHandler)FUN_00469b50,
     (EventHandler)FUN_00469b70,
-    (EventHandler)FUN_00469b90,
-    (EventHandler)FUN_00469bb0,
+    (EventHandler)ObjectiveEventAddBricks,
+    (EventHandler)ObjectiveEventSetBricks,
     (EventHandler)FUN_00469c40,
     (EventHandler)FUN_00469c80,
     (EventHandler)FUN_00469ed0,
@@ -1150,13 +1112,13 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_00469fc0,
     (EventHandler)FUN_0046a030,
     (EventHandler)FUN_0046a120,
-    (EventHandler)FUN_0046a190,
+    (EventHandler)GenerateWorkers,
     (EventHandler)FUN_0046a1f0,
     (EventHandler)FUN_0046a230,
     (EventHandler)FUN_0046a300,
     (EventHandler)FUN_0046a330,
     (EventHandler)FUN_0046a350,
-    (EventHandler)FUN_0046a370,
+    (EventHandler)NerpsSetEntranceFee,
     (EventHandler)FUN_0046a3b0,
     (EventHandler)FUN_0046a170,
     (EventHandler)FUN_0046a420,
@@ -1192,7 +1154,7 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_0046ae30,
     (EventHandler)FUN_0046ae40,
     (EventHandler)FUN_0046ae70,
-    (EventHandler)FUN_0046aec0,
+    (EventHandler)AdjustGardenerCount,
     (EventHandler)FUN_0046af10,
     (EventHandler)FUN_0046af60,
     (EventHandler)FUN_0046afe0,
@@ -1298,7 +1260,7 @@ void FUN_0046b2d0(void) {
             DAT_0066879c = (unsigned int)DAT_00668798;
             if (DAT_00668798 != NULL) {
                 DAT_00668790 = 1;
-                FUN_0046c540((struct AppendArgC *)DAT_00668798);
+                AppendObjectiveEventList((struct AppendArgC *)DAT_00668798);
                 FUN_00468d00();
             }
         }
@@ -1411,7 +1373,7 @@ int FUN_0046b5d0(struct SortNode *node) {
 }
 
 struct TimedNode {
-    struct TimedNode *field_0;
+    struct TimedNode *next;
     unsigned char pad_4[0x40 - 0x4];
     unsigned int field_40;
 };
@@ -1425,7 +1387,7 @@ struct TimedList {
 void FUN_0046b610(struct TimedNode *node, struct TimedList *list) {
     node->field_40 = DAT_007fdca4;
     if (list->field_c != NULL) {
-        node->field_0 = list->field_c;
+        node->next = list->field_c;
     }
     list->field_c = node;
 }
@@ -1443,18 +1405,18 @@ void InsertObjectiveEventAtHead(struct ObjectiveEvent *node, struct EventList *l
 
 struct StringHolder {
     unsigned char pad_0[0x8];
-    char *field_8;
+    char *string;
 };
 
 // FUNCTION: LEGOLAND 0x0046b650
 void FUN_0046b650(const char *src, struct StringHolder *holder) {
     char *dst;
 
-    if (holder->field_8 != NULL) {
-        free(holder->field_8);
+    if (holder->string != NULL) {
+        free(holder->string);
     }
     dst = (char *)malloc(strlen(src) + 1);
-    holder->field_8 = dst;
+    holder->string = dst;
     strcpy(dst, src);
 }
 
@@ -1483,7 +1445,7 @@ void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
 unsigned int FUN_0046b700(void) {
     if (DAT_0066879c != 0) {
         if (DAT_00668614 != 0) {
-            FUN_00468bb0(DAT_004b8bbc, DAT_007fe120[DAT_00668614]);
+            PostObjectiveMessage(PercentSFormat, ScriptStringTable[DAT_00668614]);
             DAT_00668618 = 1;
             return 1;
         }
@@ -2200,7 +2162,7 @@ struct AppendArgC {
 };
 
 // FUNCTION: LEGOLAND 0x0046c540
-void FUN_0046c540(struct AppendArgC *arg) {
+void AppendObjectiveEventList(struct AppendArgC *arg) {
     struct ObjectiveEvent *cur;
 
     cur = DAT_00668784;
@@ -2240,8 +2202,8 @@ void FUN_0046c580(struct AppendArg10 *arg) {
 
 // FUNCTION: LEGOLAND 0x0046c5c0
 void FUN_0046c5c0(void) {
-    FreeObjectiveEventList(DAT_00668728);
-    DAT_00668728 = NULL;
+    FreeObjectiveEventList(ObjectiveEventList);
+    ObjectiveEventList = NULL;
     FreeObjectiveEventList(DAT_00668724);
     DAT_00668724 = NULL;
     FreeObjectiveEventList(DAT_00668784);
@@ -2252,7 +2214,7 @@ void FUN_0046c5c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c620
-unsigned int FUN_0046c620(char *str) {
+unsigned int SaveGameWriteString(char *str) {
     int len;
 
     if (str != NULL) {
@@ -2278,7 +2240,7 @@ void *FUN_0046c680(void) {
     void *buffer;
 
     if (SaveGameRead(&len, 4) == 0) {
-        DAT_006687a0++;
+        ScriptLoadErrorCount++;
         return NULL;
     }
     if (len == -1) {
@@ -2287,7 +2249,7 @@ void *FUN_0046c680(void) {
     buffer = malloc(len + 1);
     if (SaveGameRead(buffer, len) == 0) {
         free(buffer);
-        DAT_006687a0++;
+        ScriptLoadErrorCount++;
         return NULL;
     }
     ((char *)buffer)[len] = 0;
@@ -2295,7 +2257,7 @@ void *FUN_0046c680(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c700
-unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
+unsigned int SaveObjectiveEventList(struct ObjectiveEvent *node) {
     unsigned int marker[17];
 
     while (node != NULL) {
@@ -2310,17 +2272,17 @@ unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
             return 0;
         }
         if (node->field_4 != 0) {
-            if (FUN_0046c620(*(char **)node->field_4) == 0) {
+            if (SaveGameWriteString(*(char **)node->field_4) == 0) {
                 return 0;
             }
-        } else if (FUN_0046c620(NULL) == 0) {
+        } else if (SaveGameWriteString(NULL) == 0) {
             return 0;
         }
         if (node->field_8 != 0) {
-            if (FUN_0046c620((char *)node->field_8) == 0) {
+            if (SaveGameWriteString((char *)node->field_8) == 0) {
                 return 0;
             }
-        } else if (FUN_0046c620(NULL) == 0) {
+        } else if (SaveGameWriteString(NULL) == 0) {
             return 0;
         }
         node = node->next;
@@ -2331,7 +2293,7 @@ unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c7e0
-struct ObjectiveEvent *FUN_0046c7e0(void) {
+struct ObjectiveEvent *LoadObjectiveEventList(void) {
     struct ObjectiveEvent *node;
     struct ObjectiveEvent *prev;
     struct ObjectiveEvent *head;
@@ -2355,7 +2317,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
         // STRING: LEGOLAND 0x004ba828
         DBPrintf("Fixed up to %d\n", node->timestamp);
         str = (char *)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             free(node);
             FreeObjectiveEventList(head);
             return NULL;
@@ -2370,7 +2332,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
         if (node->field_8 != 0) {
             node->flags_10 |= 0x20;
         }
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             FreeObjectiveEvent(node);
             FreeObjectiveEventList(head);
             return NULL;
@@ -2385,7 +2347,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
     }
     free(node);
     FreeObjectiveEventList(head);
-    DAT_006687a0++;
+    ScriptLoadErrorCount++;
     return NULL;
 }
 
@@ -2395,7 +2357,7 @@ unsigned int SaveScripts(void) {
     int scratch;
     int i;
 
-    DAT_006687a0 = 0;
+    ScriptLoadErrorCount = 0;
     DAT_007fe994 = GetGameTimer();
     if (FUN_00474920() == 0) {
         return 0;
@@ -2406,11 +2368,11 @@ unsigned int SaveScripts(void) {
     if (SaveGameWrite(DAT_0066869c, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameWrite(&DAT_00668720, 4) == 0) {
+    if (SaveGameWrite(&ScriptStringCount, 4) == 0) {
         return 0;
     }
-    for (i = 0; i < (int)DAT_00668720; i++) {
-        if (FUN_0046c620((char *)DAT_007fe120[i]) == 0) {
+    for (i = 0; i < (int)ScriptStringCount; i++) {
+        if (SaveGameWriteString((char *)ScriptStringTable[i]) == 0) {
             return 0;
         }
     }
@@ -2422,28 +2384,28 @@ unsigned int SaveScripts(void) {
     if (SaveGameWrite(&i, 4) == 0) {
         return 0;
     }
-    if (SaveGameWrite(DAT_007fe930, 0xa) == 0) {
+    if (SaveGameWrite(ObjectiveCounters, 0xa) == 0) {
         return 0;
     }
-    if (FUN_0046c700(DAT_00668784) == 0) {
+    if (SaveObjectiveEventList(DAT_00668784) == 0) {
         return 0;
     }
     for (node = (struct NerpsListNode *)DAT_00668798; node != NULL; node = node->next) {
         if (SaveGameWrite(&node->field_4, 4) == 0) {
             return 0;
         }
-        if (FUN_0046c700((struct ObjectiveEvent *)node->field_c) == 0) {
+        if (SaveObjectiveEventList((struct ObjectiveEvent *)node->field_c) == 0) {
             return 0;
         }
-        if (FUN_0046c700((struct ObjectiveEvent *)node->field_10) == 0) {
+        if (SaveObjectiveEventList((struct ObjectiveEvent *)node->field_10) == 0) {
             return 0;
         }
-        if (FUN_0046c620((char *)node->field_8) == 0) {
+        if (SaveGameWriteString((char *)node->field_8) == 0) {
             return 0;
         }
     }
-    scratch = 0xffffffff;
-    if (SaveGameWrite(&scratch, 4) == 0) {
+    i = 0xffffffff;
+    if (SaveGameWrite(&i, 4) == 0) {
         return 0;
     }
     if (DAT_0066879c != 0) {
@@ -2478,9 +2440,9 @@ unsigned int LoadScripts(void) {
     int base;
     unsigned char skip;
 
-    DAT_006687a0 = 0;
+    ScriptLoadErrorCount = 0;
     DAT_007fe994 = GetGameTimer();
-    if (DAT_006687a0 != 0) {
+    if (ScriptLoadErrorCount != 0) {
         return 0;
     }
     if (FUN_00474970() == 0) {
@@ -2492,12 +2454,12 @@ unsigned int LoadScripts(void) {
     if (SaveGameRead(DAT_0066869c, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameRead(&DAT_00668720, 4) == 0) {
+    if (SaveGameRead(&ScriptStringCount, 4) == 0) {
         return 0;
     }
-    for (i = 0; i < (int)DAT_00668720; i++) {
-        DAT_007fe120[i] = (unsigned int)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+    for (i = 0; i < (int)ScriptStringCount; i++) {
+        ScriptStringTable[i] = (unsigned int)FUN_0046c680();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
     }
@@ -2511,7 +2473,7 @@ unsigned int LoadScripts(void) {
         return 0;
     }
     if (i > 0xa) {
-        if (SaveGameRead(DAT_007fe930, 10) == 0) {
+        if (SaveGameRead(ObjectiveCounters, 10) == 0) {
             return 0;
         }
         for (i -= 10; i != 0; i--) {
@@ -2522,12 +2484,12 @@ unsigned int LoadScripts(void) {
     } else {
         FUN_00468840();
         FUN_004688e0();
-        if (SaveGameRead(DAT_007fe930, i) == 0) {
+        if (SaveGameRead(ObjectiveCounters, i) == 0) {
             return 0;
         }
     }
-    DAT_00668784 = FUN_0046c7e0();
-    if (DAT_006687a0 != 0) {
+    DAT_00668784 = LoadObjectiveEventList();
+    if (ScriptLoadErrorCount != 0) {
         return 0;
     }
     prev = NULL;
@@ -2539,16 +2501,16 @@ unsigned int LoadScripts(void) {
         if (node == NULL) {
             return 0;
         }
-        node->field_c = (unsigned int)FUN_0046c7e0();
-        if (DAT_006687a0 != 0) {
+        node->field_c = (unsigned int)LoadObjectiveEventList();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
-        node->field_10 = (unsigned int)FUN_0046c7e0();
-        if (DAT_006687a0 != 0) {
+        node->field_10 = (unsigned int)LoadObjectiveEventList();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
         node->field_8 = (unsigned int)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
         if (prev != NULL) {

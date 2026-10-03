@@ -74,9 +74,9 @@ void FUN_004860f0(void) {
     for (i = 0; i < 256; i++) {
         f = i * FLOAT_004ab550;
         v = (unsigned short)(int)(f * FLOAT_004ab444);
-        DAT_0066b638[i].shifted = v << sh;
-        DAT_0066b638[i].scaled = (int)(f * mask) << 5;
-        DAT_0066b638[i].value = v;
+        ColorLut[i].shifted = v << sh;
+        ColorLut[i].scaled = (int)(f * mask) << 5;
+        ColorLut[i].value = v;
     }
 }
 
@@ -166,7 +166,7 @@ unsigned int FUN_00486280(int param_1, void *param_2) {
         i = 0;
         if (param_1 > 0) {
             do {
-                frame->data[i++] = DAT_0066b638[(unsigned char)(int)ar].value | DAT_0066b638[(unsigned char)(int)ag].scaled | DAT_0066b638[(unsigned char)(int)ab].shifted;
+                frame->data[i++] = ColorLut[(unsigned char)(int)ar].value | ColorLut[(unsigned char)(int)ag].scaled | ColorLut[(unsigned char)(int)ab].shifted;
                 ab += sb;
                 ag += sg;
                 ar += sr;
@@ -181,7 +181,7 @@ unsigned int FUN_00486280(int param_1, void *param_2) {
         if (param_1 > 0) {
             i = param_1;
             do {
-                frame->data[i++] = DAT_0066b638[(unsigned char)(int)ar].value | DAT_0066b638[(unsigned char)(int)ag].scaled | DAT_0066b638[(unsigned char)(int)ab].shifted;
+                frame->data[i++] = ColorLut[(unsigned char)(int)ar].value | ColorLut[(unsigned char)(int)ag].scaled | ColorLut[(unsigned char)(int)ab].shifted;
                 ab += sb;
                 ag += sg;
                 ar += sr;
@@ -597,13 +597,13 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     }
     DAT_0066b620 = DAT_00668108.left;
     DAT_0066b628 = DAT_00668108.right;
-    DAT_0066b5b0 = DAT_0066809c;
+    DAT_0066b5b0 = CurrentSurfaceDesc;
     DAT_0066b62c = DAT_00668108.bottom;
     DAT_0066b624 = DAT_00668108.top;
-    DAT_0066809c.lpSurface = DAT_0066be54;
-    DAT_0066809c.dwWidth = w;
-    DAT_0066809c.dwHeight = h;
-    DAT_0066809c.lPitch = w * 2;
+    CurrentSurfaceDesc.lpSurface = DAT_0066be54;
+    CurrentSurfaceDesc.dwWidth = w;
+    CurrentSurfaceDesc.dwHeight = h;
+    CurrentSurfaceDesc.lPitch = w * 2;
     DAT_00668108.left = 0;
     DAT_00668108.right = w;
     DAT_00668108.top = 0;
@@ -619,27 +619,16 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     FUN_00464ee0(param_2, &local.rect, local.off);
     FUN_00485fe0(param_2, param_4, param_5);
     transp = GetTransparentColour();
-    yy = 0;
-    if (0 < h) {
-        row = 0;
-        do {
-            int xx = 0;
-            int col = row;
-            if (0 < w) {
-                do {
-                    unsigned int z = FUN_00488820(xx, yy);
-                    unsigned short px = transp;
-                    if ((int)(z & 0xff) <= param_3) {
-                        px = *(unsigned short *)((char *)DAT_0066be54 + col);
-                    }
-                    *(unsigned short *)((char *)DAT_00701e68 + col) = px;
-                    xx = xx + 1;
-                    col = col + 2;
-                } while (xx < w);
+    for (yy = 0; yy < h; yy++) {
+        for (row = 0; row < w; row++) {
+            unsigned short px;
+            if ((int)(FUN_00488820(row, yy) & 0xff) <= param_3) {
+                px = ((unsigned short *)DAT_0066be54)[yy * w + row];
+            } else {
+                px = transp;
             }
-            yy = yy + 1;
-            row = row + w * 2;
-        } while (yy < h);
+            ((unsigned short *)DAT_00701e68)[yy * w + row] = px;
+        }
     }
     DAT_0066be50->width = (short)w;
     DAT_0066be50->height = (short)h;
@@ -647,7 +636,7 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     DAT_00701e64->height = (short)h;
     DAT_00668108.right = DAT_0066b628;
     DAT_00668108.top = DAT_0066b624;
-    DAT_0066809c = DAT_0066b5b0;
+    CurrentSurfaceDesc = DAT_0066b5b0;
     DAT_00668108.left = DAT_0066b620;
     DAT_00668108.bottom = DAT_0066b62c;
     return DAT_00701e64;
@@ -782,7 +771,7 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
         }
     }
     DAT_00798608 = DAT_00668108;
-    DAT_00798598 = DAT_0066809c;
+    DAT_00798598 = CurrentSurfaceDesc;
     memset(&desc2, 0, sizeof(desc2));
     desc2.dwSize = 0x6c;
     if (IDirectDrawSurface_Lock(DAT_0079861c, NULL, &desc2, 0x21, NULL) == 0) {
@@ -794,10 +783,10 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
         off[0] = 0;
         off[1] = 0;
         StoredTransparentColour = GetTransparentColour();
-        DAT_0066809c.lpSurface = desc2.lpSurface;
-        DAT_0066809c.dwWidth = (short)sprite->width;
-        DAT_0066809c.dwHeight = (short)sprite->height;
-        DAT_0066809c.lPitch = desc2.lPitch;
+        CurrentSurfaceDesc.lpSurface = desc2.lpSurface;
+        CurrentSurfaceDesc.dwWidth = (short)sprite->width;
+        CurrentSurfaceDesc.dwHeight = (short)sprite->height;
+        CurrentSurfaceDesc.lPitch = desc2.lPitch;
         SoftPrint_Clear();
         r2.left = 0;
         r2.right = (short)sprite->width;
@@ -812,34 +801,29 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     }
     IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
     hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);
-    for (;;) {
-        if (hr != 0) {
-            if (hr != 0x887601c2) {
-                break;
-            }
-            if (IDirectDrawSurface_Restore(DAT_0079861c) != 0) {
+    if (hr == 0) {
+        goto ok;
+    }
+    if (hr == 0x887601c2) {
+        if (IDirectDrawSurface_Restore(DAT_0079861c) != 0) {
+            IDirectDrawSurface_SetClipper(renderEngine, NULL);
+            CurrentSurfaceDesc = DAT_00798598;
+            DAT_00668108 = DAT_00798608;
+            return 0;
+        }
+        MakeSprite(sprite);
+        if (IDirectDrawSurface_IsLost(PrimarySurface) != 0x887601c2 || IDirectDrawSurface_Restore(PrimarySurface) == 0) {
+            if (IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x8000, NULL) == 0) {
+            ok:
                 IDirectDrawSurface_SetClipper(renderEngine, NULL);
-                DAT_0066809c = DAT_00798598;
+                CurrentSurfaceDesc = DAT_00798598;
                 DAT_00668108 = DAT_00798608;
-                return 0;
-            }
-            MakeSprite(sprite);
-            if (IDirectDrawSurface_IsLost(PrimarySurface) == 0x887601c2) {
-                if (IDirectDrawSurface_Restore(PrimarySurface) != 0) {
-                    break;
-                }
-            }
-            if (IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x8000, NULL) != 0) {
-                break;
+                return 1;
             }
         }
-        IDirectDrawSurface_SetClipper(renderEngine, NULL);
-        DAT_0066809c = DAT_00798598;
-        DAT_00668108 = DAT_00798608;
-        return 1;
     }
     IDirectDrawSurface_SetClipper(renderEngine, NULL);
-    DAT_0066809c = DAT_00798598;
+    CurrentSurfaceDesc = DAT_00798598;
     DAT_00668108 = DAT_00798608;
     return 0;
 }
@@ -996,11 +980,9 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
 
 // FUNCTION: LEGOLAND 0x00489390
 LEGO_EXPORT void RenderThickBox(int x, int y, int w, int h, int thickness, unsigned int color) {
-    int inner;
     RenderBlock(x, y, w, thickness, color);
-    inner = h + thickness * -2;
-    RenderBlock(x, y + thickness, thickness, inner, color);
-    RenderBlock((x - thickness) + w, y + thickness, thickness, inner, color);
+    RenderBlock(x, y + thickness, thickness, h - thickness * 2, color);
+    RenderBlock((x - thickness) + w, y + thickness, thickness, h - thickness * 2, color);
     RenderBlock(x, (y - thickness) + h, w, thickness, color);
 }
 

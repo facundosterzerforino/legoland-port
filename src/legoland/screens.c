@@ -274,8 +274,8 @@ void FUN_00458a50(void) {
         QueryClass = 0;
         CastlePlacedFlag = 0;
         PauseGameTimer();
-        FUN_00499410();
-        FUN_0047f810();
+        ResetGameTimer();
+        MarkGameTimer();
         // STRING: LEGOLAND 0x004b9150
         sprintf(buf, "objlist%d.txt", lpConfig->level);
         SetBricksLimited(0);
@@ -296,10 +296,10 @@ void FUN_00458a50(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00458b20
-void FUN_00458b20(void) {
+void UnloadMap(void) {
     if (MapLoaded != 0) {
         FUN_00481170();
-        FUN_0046fb40(0xd2);
+        DestroyIconGroup(0xd2);
         DelObjectList();
         FreeBlokeCounters();
         FreeAllObjectClassInstances();
@@ -368,8 +368,8 @@ int FUN_00458c00(void) {
         ResumeGameTimer();
     } else if (DAT_00667c64 != 0) {
         PauseGameTimer();
-        FUN_00499410();
-        FUN_0047f810();
+        ResetGameTimer();
+        MarkGameTimer();
         DAT_006687bc = 0;
         DAT_006687c0 = 0;
         CastlePlacedFlag = 0;
@@ -420,7 +420,7 @@ int FUN_00458c00(void) {
     if (DAT_00667c64 == 0) {
         // STRING: LEGOLAND 0x004b9160
         DAT_00667c40 = "SFX";
-        FUN_004969d0();
+        UpdateSound();
         ReadGameButtons();
         FrameCounter = FrameCounter + 1;
         if (MapStats.field_3a0 != 0 && EditMode.unk4 == 3) {
@@ -435,21 +435,21 @@ int FUN_00458c00(void) {
                     ((struct ScreenConfig *)lpConfig)->slot += 1;
                 }
                 FUN_0048a750();
-                FUN_00458b20();
+                UnloadMap();
                 DAT_00668e38 = 1;
                 EditMode.unk4 = 2;
                 DAT_0080ff80.unk4 = 0xffffffff;
                 DAT_0080ff80.unk8 = 6;
-                FUN_0046d110();
+                UpdateSpeechPlayback();
                 return 1;
             }
             DAT_00668e38 = 0;
             EditMode.unk4 = 2;
             DAT_0080ff80.unk4 = 0xffffffff;
             DAT_0080ff80.unk8 = 1;
-            FUN_00458b20();
+            UnloadMap();
         }
-        FUN_0046d110();
+        UpdateSpeechPlayback();
     }
     return 1;
 }
@@ -510,10 +510,10 @@ void FUN_00458ee0(void) {
     }
     input = Hover.type;
     if ((input & 0x100) != 0 && (EditMode.unk0 == 0 || EditMode.unk0 == 2)) {
-        frame.help_rect.left = DAT_00813a44.x;
-        frame.help_rect.top = DAT_00813a44.y - 0xa;
-        frame.help_rect.right = DAT_00813a44.x;
-        frame.help_rect.bottom = DAT_00813a44.y;
+        frame.help_rect.left = MousePos.x;
+        frame.help_rect.top = MousePos.y - 0xa;
+        frame.help_rect.right = MousePos.x;
+        frame.help_rect.bottom = MousePos.y;
         if (EditMode.unk0 == 0) {
             if (input == 0x7e4) {
                 value = GetString(0x7e4);
@@ -649,18 +649,18 @@ void FUN_00459360(void) {
         RenderMouseBounds();
         SetClipping(&clipping);
         if ((DAT_00813ac4 & var_4) != 0) {
-            MapScreenSetScrollPos(&DAT_00813a44);
+            MapScreenSetScrollPos(&MousePos);
         }
         if ((DAT_00813ac4 & 2) != 0) {
             ticks = GetTicks();
-            if (ticks - DAT_00667c68 < 0x1f4 && abs(DAT_00813a44.x - DAT_00667c70) < 5 &&
-                abs(DAT_00813a44.y - DAT_00667c74) < 5) {
+            if (ticks - DAT_00667c68 < 0x1f4 && abs(MousePos.x - DAT_00667c70) < 5 &&
+                abs(MousePos.y - DAT_00667c74) < 5) {
                 DAT_0080ff70 = var_4;
                 EditMode.unk4 = DAT_00667c60;
                 DAT_00667c60 = var_4;
             }
-            DAT_00667c70 = DAT_00813a44.x;
-            DAT_00667c74 = DAT_00813a44.y;
+            DAT_00667c70 = MousePos.x;
+            DAT_00667c74 = MousePos.y;
             DAT_00667c68 = ticks;
         }
     }
@@ -681,7 +681,7 @@ void FUN_004594e0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004594f0
-void FUN_004594f0(void) {
+void InitDefaultProfile(void) {
     int i;
 
     for (i = 0; i < 68; i = i + 1) {
@@ -699,8 +699,8 @@ void FUN_00459520(void) {
     MSG msg;
 
     // STRING: LEGOLAND 0x004b7138
-    DAT_0081cd08 = ElemID("HEDGE")->data;
-    FUN_004594f0();
+    HedgeObjectClass = ElemID("HEDGE")->data;
+    InitDefaultProfile();
     InitSoundSystem();
     DebugTrace("boot: after InitSoundSystem()");
     SetMusicGrooveLevel(1);

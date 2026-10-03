@@ -31,8 +31,8 @@
 
 struct ObjInfo {
     unsigned char pad_c[12];
-    int field_c;
-    int field_10;
+    int x;
+    int y;
     unsigned char pad_14[16];
     signed char field_24;
     signed char field_25;
@@ -97,7 +97,7 @@ struct ObjBox {
 
 struct ObjNode {
     unsigned char pad_0[12];
-    struct ObjBox *field_c;
+    struct ObjBox *obj;
 };
 
 struct ObjDef {
@@ -117,10 +117,10 @@ struct Overlay {
     unsigned int field_4;
     unsigned char pad_8[0x10 - 0x8];
     int field_10;
-    unsigned int field_14;
-    unsigned int field_18;
+    unsigned int x;
+    unsigned int y;
     struct Overlay *next;
-    int field_20;
+    int sprite;
 };
 
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
@@ -205,7 +205,7 @@ LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3) {
         }
         rect = *rect.next;
     }
-    if (DAT_00667cd8 == 0 && DAT_00667ca0 == 0) {
+    if (DAT_00667cd8 == 0 && LoadInProgress == 0) {
         CalculateMapRenderOrder();
     }
 }
@@ -487,7 +487,7 @@ int FUN_0045e620(struct ObjBox *obj) {
 
 // FUNCTION: LEGOLAND 0x0045e690
 int FUN_0045e690(struct ObjInfo *obj) {
-    if (((int)obj->field_24 != obj->field_c) || ((int)obj->field_25 != obj->field_10)) {
+    if (((int)obj->field_24 != obj->x) || ((int)obj->field_25 != obj->y)) {
         return 1;
     }
     return 0;
@@ -530,7 +530,7 @@ void FUN_0045e770(struct ObjNode *node, int *offset) {
     int x;
     int y;
 
-    obj = node->field_c;
+    obj = node->obj;
     if (FUN_0045e620(obj) != 0) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
@@ -560,7 +560,7 @@ void FUN_0045e850(struct ObjNode *node, int *offset) {
     int x;
     int y;
 
-    obj = node->field_c;
+    obj = node->obj;
     if (FUN_0045e620(obj) != 0) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
@@ -606,7 +606,7 @@ int FUN_0045e960(struct ObjNode *node, int *offset) {
     int x;
     int y;
 
-    obj = node->field_c;
+    obj = node->obj;
     if (FUN_0045e620(obj) != 0) {
         x = offset[0] + obj->pos.x;
         y = offset[1] + obj->pos.y;
@@ -708,7 +708,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         out.x = out.x + coords[0];
         out.y = out.y + coords[1];
         if (obj->flags & 0x400000) {
-            FUN_00482a90();
+            InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
             FUN_00477bd0(out.x, out.y, effect->x, effect->y);
@@ -726,7 +726,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         out.y = out.y + coords[1];
         PutObjOnMap((struct ObjClass *)obj, (unsigned int)editObj, (struct Point *)coords);
         if (obj->flags & 0x400000) {
-            FUN_00482a90();
+            InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
             FUN_00477bd0(out.x, out.y, effect->x, effect->y);
@@ -820,7 +820,7 @@ LEGO_EXPORT void ObjectIsBuilt(struct ObjClass *obj, TileId coords) {
         EditCursor.field_140c = saved_140c;
         EditCursor.field_1410 = saved_1410;
     } else if (EditMode.unk8 != 0) {
-        ((struct MapObject *)EditMode.unk8)->method_90(((struct ObjClass *)EditMode.unk8)->element, &DAT_00813a44, 0x8f8);
+        ((struct MapObject *)EditMode.unk8)->method_90(((struct ObjClass *)EditMode.unk8)->element, &MousePos, 0x8f8);
     }
 }
 
@@ -1625,8 +1625,8 @@ void FUN_00460560(int index) {
 
     for (ov = (struct Overlay *)OverlayList; ov != 0; ov = ov->next) {
         if (ov->field_10 >> 8 == index + 1) {
-            sc[0] = (lpConfig->view_x - (ScrollX >> 8)) + ov->field_14;
-            sc[1] = (lpConfig->view_y - (ScrollY >> 8)) + ov->field_18;
+            sc[0] = (lpConfig->view_x - (ScrollX >> 8)) + ov->x;
+            sc[1] = (lpConfig->view_y - (ScrollY >> 8)) + ov->y;
             ScreenToMapRef(sc, (int *)&pt, 0);
             if ((char)ov->field_10 == 0) {
                 pt.x += 0xf;
@@ -1804,18 +1804,18 @@ void FUN_004608c0(struct Point *pos, RECT *clip) {
         cell.y = saved.y + 1;
     }
     for (; ov != 0; ov = ov->next) {
-        if (ov->field_20 == 0) {
+        if (ov->sprite == 0) {
             continue;
         }
-        PrintSpriteSimple((struct Sprite *)ov->field_20, ov->field_14 - dx, ov->field_18 - dy);
+        PrintSpriteSimple((struct Sprite *)ov->sprite, ov->x - dx, ov->y - dy);
         frame = ov->field_10;
         if ((frame & 0xff00) == 0 || MapStats.field_3e0[(frame >> 8) - 1] == 0) {
             continue;
         }
         set = (struct SpriteSet *)BridgesData;
         if ((frame & 0xff) == 0) {
-            ox = ov->field_14 - dx;
-            oy = ov->field_18 - dy;
+            ox = ov->x - dx;
+            oy = ov->y - dy;
             PrintSpriteSimple(set->sprites[(frame + 2) & 0xff], ox + DAT_004b9218, oy + DAT_004b921c);
             k = (ov->field_10 + 4) & 0xff;
             if (k < ((struct SpriteSet *)BridgesData)->count) {
@@ -1823,8 +1823,8 @@ void FUN_004608c0(struct Point *pos, RECT *clip) {
                 SortSprite(sprite, ox + DAT_00805f40, oy + DAT_00805f44, (short)sprite->height + oy + DAT_00805f44, 0, 0);
             }
         } else if ((frame & 0xff) == 1) {
-            ox = ov->field_14 - dx;
-            oy = ov->field_18 - dy;
+            ox = ov->x - dx;
+            oy = ov->y - dy;
             PrintSpriteSimple(set->sprites[(frame + 2) & 0xff], ox + DAT_004b9210, oy + DAT_004b9214);
             k = (ov->field_10 + 4) & 0xff;
             if (k < ((struct SpriteSet *)BridgesData)->count) {
@@ -2073,7 +2073,7 @@ LEGO_EXPORT void ProcessScrolling(unsigned int a, unsigned int b) {
 LEGO_EXPORT void MouseScrollMap(void) {
     struct Point mouse;
 
-    mouse = DAT_00813a44;
+    mouse = MousePos;
     if (mouse.x < lpConfig->scroll_border_x) {
         if (ScrollSpeedX > -(int)lpConfig->scroll_max_x) {
             ScrollSpeedX -= lpConfig->scroll_accel_x;
@@ -2304,7 +2304,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     char strbuf[512];
     struct Point pos;
 
-    if (DAT_00667d50 != 0) {
+    if (MapDataLoaded != 0) {
         return 0xffffffff;
     }
     if (LLIDB_FindElement((const char *)param_1, (unsigned int *)&elem, 0) != 0) {
@@ -2317,7 +2317,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     if (file == 0) {
         return 0xfffffffd;
     }
-    DAT_00667ca0 = 1;
+    LoadInProgress = 1;
     FUN_00459880();
     RES_ReadFile(file, &len, 4);
     RES_ReadFile(file, namebuf, len);
@@ -2338,8 +2338,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     RES_ReadFile(file, &lpConfig->height, 2);
     if (RES_ReadFile(file, &DAT_00801b28, 4) != 4) {
         RES_CloseFile(file);
-        DAT_00667d50 = 1;
-        DAT_00667ca0 = 0;
+        MapDataLoaded = 1;
+        LoadInProgress = 0;
         return 1;
     }
     for (row = 0; row < lpConfig->height; row++) {
@@ -2718,8 +2718,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                 case 0:
                     if (RES_ReadFile(file, &len, 1) != 1) {
                         RES_CloseFile(file);
-                        DAT_00667d50 = 1;
-                        DAT_00667ca0 = 0;
+                        MapDataLoaded = 1;
+                        LoadInProgress = 0;
                         DAT_00810140 = 0;
                         FUN_00462c60();
                         return 1;
@@ -2740,8 +2740,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         }
     }
     RES_CloseFile(file);
-    DAT_00667d50 = 1;
-    DAT_00667ca0 = 0;
+    MapDataLoaded = 1;
+    LoadInProgress = 0;
     DAT_00810140 = 0;
     FUN_00462c60();
     return 1;
@@ -2757,7 +2757,7 @@ unsigned int UnloadBaseMap(void) {
     struct Element *elem;
     struct Element *elem2;
 
-    if (DAT_00667d50 == 0) {
+    if (MapDataLoaded == 0) {
         return 0;
     }
     FUN_00459880();
@@ -2806,7 +2806,7 @@ unsigned int UnloadBaseMap(void) {
     free(DAT_00801a70);
     ClearOverlays();
     FUN_004828f0();
-    DAT_00667d50 = 0;
+    MapDataLoaded = 0;
     return 1;
 }
 
@@ -2829,15 +2829,15 @@ LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
         } else {
             OverlayList = node;
         }
-        node->field_14 = param->x;
-        node->field_18 = param->y;
+        node->x = param->x;
+        node->y = param->y;
         *(struct OverlayParam *)node = *param;
         if (param->field_10 & 0xff00) {
             sample = *(int *)(*(int *)((int)BridgesData + 8) + (param->field_10 & 0xff) * 4);
         } else {
             sample = *(int *)(*(int *)(OverlayILF + 8) + (param->field_10 & 0xff) * 4);
         }
-        node->field_20 = sample;
+        node->sprite = sample;
         lls = *(int **)(sample + 8);
         if ((lls[5] == 2 || lls[5] == 3) && 1 < *(short *)(*lls + 0x10)) {
             LLSPlay((struct LLS *)*lls, (unsigned int)lls);
@@ -2862,8 +2862,8 @@ void FUN_00462c00(struct OverlayParam *param) {
         } else {
             OverlayList = node;
         }
-        node->field_14 = param->x;
-        node->field_18 = param->y;
+        node->x = param->x;
+        node->y = param->y;
         *(struct OverlayParam *)node = *param;
     }
 }
@@ -2879,13 +2879,13 @@ void FUN_00462c60(void) {
             if (BridgesData != 0) {
                 sample = *(int *)(*(int *)((int)BridgesData + 8) + (node->field_10 & 0xff) * 4);
             } else {
-                node->field_20 = 0;
+                node->sprite = 0;
                 continue;
             }
         } else {
             sample = *(int *)(*(int *)(OverlayILF + 8) + (node->field_10 & 0xff) * 4);
         }
-        node->field_20 = sample;
+        node->sprite = sample;
         if (sample != 0) {
             lls = *(int **)(sample + 8);
             if ((lls[5] == 2 || lls[5] == 3) && *(short *)(*lls + 0x10) > 1) {
@@ -2957,12 +2957,12 @@ LEGO_EXPORT void ResetMapAI(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00462e50
-void FUN_00462e50(unsigned int index, unsigned int value) {
+void SetClassPercent(unsigned int index, unsigned int value) {
     MapStats.classes[index].percent = value;
 }
 
 // FUNCTION: LEGOLAND 0x00462e70
-void FUN_00462e70(unsigned int index, unsigned int value) {
+void SetClassLimit(unsigned int index, unsigned int value) {
     MapStats.classes[index].limit = value;
 }
 
@@ -3170,7 +3170,7 @@ void FUN_00463460(struct MapElement *tile, struct Point *pos) {
                 tile->durability_level = threshold;
                 return;
             }
-            if (lpConfig->field_3c != 0 && (tile->flags & 0x4000) == 0) {
+            if (lpConfig->repair_orders_enabled != 0 && (tile->flags & 0x4000) == 0) {
                 if (AddRepairOrderForObject(ride, *pos) != 0) {
                     tile->flags |= 0x4000;
                 }
@@ -3198,11 +3198,11 @@ int FUN_00463520(void) {
     if (MapStats.field_180 == 0) {
         return 0;
     }
-    curr = FUN_00499460();
+    curr = GetGameTimerFrames();
     diff = curr - DAT_00667d58;
     quotient = 0x168 / (int)MapStats.field_180;
     if (diff > quotient) {
-        DAT_00667d58 = FUN_00499460();
+        DAT_00667d58 = GetGameTimerFrames();
         return 1;
     }
     return 0;
@@ -3211,7 +3211,7 @@ int FUN_00463520(void) {
 // FUNCTION: LEGOLAND 0x00463560
 void FUN_00463560(void) {
     DAT_00667d54 = GetGameTimer();
-    DAT_00667d58 = FUN_00499460();
+    DAT_00667d58 = GetGameTimerFrames();
 }
 
 // FUNCTION: LEGOLAND 0x00463580

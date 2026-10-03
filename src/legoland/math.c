@@ -50,7 +50,7 @@ LEGO_EXPORT void NavigMoveLine(struct Navigator *nav, unsigned short a, struct P
 }
 
 // FUNCTION: LEGOLAND 0x00480840
-void FUN_00480840(struct Point *src, struct Point *dst, int dir) {
+void MovePointInDirection(struct Point *src, struct Point *dst, int dir) {
     switch (dir) {
     case 1:
         dst->x = src->x;
@@ -72,7 +72,7 @@ void FUN_00480840(struct Point *src, struct Point *dst, int dir) {
 }
 
 // FUNCTION: LEGOLAND 0x004808d0
-void FUN_004808d0(int *src, int *dst, int dir) {
+void StepPointByDirection(int *src, int *dst, int dir) {
     switch (dir) {
     case 1:
         dst[0] = src[0];

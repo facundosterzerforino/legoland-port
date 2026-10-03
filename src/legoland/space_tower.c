@@ -24,9 +24,9 @@ struct SpaceTowerSeat {
     /* 0x08 */ int pos;
     /* 0x0c */ int state;
     /* 0x10 */ int field_10;
-    /* 0x14 */ int field_14;
-    /* 0x18 */ struct SpaceTowerRideNode *field_18;
-    /* 0x1c */ struct SpaceTowerRideNode *field_1c;
+    /* 0x14 */ int descending;
+    /* 0x18 */ struct SpaceTowerRideNode *rider_slot0;
+    /* 0x1c */ struct SpaceTowerRideNode *rider_slot1;
     /* 0x20 */ signed char delta;
     /* 0x21 */ unsigned char pad_21[3];
 };
@@ -84,15 +84,15 @@ struct SpaceTowerRideNode {
 
 struct SpaceTowerRide {
     /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
+    /* 0x0c */ int x;
+    /* 0x10 */ int y;
     /* 0x14 */ unsigned char pad_14[0x1c - 0x14];
     /* 0x1c */ unsigned int flags;
     /* 0x20 */ unsigned char pad_20[0x24 - 0x20];
     /* 0x24 */ char field_24;
     /* 0x25 */ char field_25;
     /* 0x26 */ unsigned char pad_26[0x2e - 0x26];
-    /* 0x2e */ short field_2e;
+    /* 0x2e */ short seats;
     /* 0x30 */ unsigned char pad_30[0x64 - 0x30];
     /* 0x64 */ void *layers;
     /* 0x68 */ unsigned char pad_68[0xcc - 0x68];
@@ -159,9 +159,9 @@ void FUN_0043a820(struct AnimEntry *param_1, struct SpaceTowerRideNode *param_2)
 
     bloke = param_2->bloke;
     base = FUN_0043a7a0((struct AnimLayout *)DAT_004b7758[bloke->field_50].anim_layout, bloke->field_4a, bloke->field_38);
-    ride = (struct SpaceTowerRide *)DAT_0062fd74;
-    base.x += (param_2->coord.x + ride->field_c) << 8;
-    base.y += (param_2->coord.y + ride->field_10) << 8;
+    ride = (struct SpaceTowerRide *)SpaceTowerRideObj;
+    base.x += (param_2->coord.x + ride->x) << 8;
+    base.y += (param_2->coord.y + ride->y) << 8;
     bloke->dest.x = base.x;
     bloke->dest.y = base.y;
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
@@ -210,17 +210,17 @@ void FUN_0043a940(struct SpaceTowerSeat *seat) {
             }
             break;
         case 2:
-            if (seat->field_14 == 0) {
+            if (seat->descending == 0) {
                 seat->pos += seat->delta;
                 if (seat->pos > 200) {
                     seat->pos = 200;
-                    seat->field_14 = 1;
+                    seat->descending = 1;
                 }
             } else {
                 seat->pos -= 2;
                 if (seat->pos < 0) {
                     seat->pos = 0;
-                    seat->field_14 = 0;
+                    seat->descending = 0;
                     seat->state = 0;
                 }
             }
@@ -241,7 +241,7 @@ void FUN_0043a9b0(struct SpaceTowerCar *arg) {
         if (arg->flags_a4[i] != 0) {
             arg->seats[i >> 1].flags |= 1;
             arg->seats[i >> 1].state = 2;
-            arg->seats[i >> 1].field_14 = 0;
+            arg->seats[i >> 1].descending = 0;
             arg->seats[i >> 1].pos = 0;
         }
     }
@@ -434,7 +434,7 @@ void FUN_0043ad90(struct SpaceTowerCar *param_1, int param_2, unsigned int param
     struct Point coords;
     struct Point off;
 
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, DAT_0062fd74);
+    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
     if (SpaceTowerSeatMatteSprites[param_2] != NULL) {
         off = DAT_0062fd88[param_2];
         off.y -= param_1->seats[param_2].pos;
@@ -449,7 +449,7 @@ void FUN_0043ae20(struct SpaceTowerCar *param_1, int param_2, unsigned int param
     struct Point off;
     int id;
 
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, DAT_0062fd74);
+    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
     off = DAT_0062fd88[param_2];
     off.y -= param_1->seats[param_2].pos;
     AdjustOffsetForViewMode(&off);
@@ -467,26 +467,26 @@ void FUN_0043ae20(struct SpaceTowerCar *param_1, int param_2, unsigned int param
         id = 2;
         break;
     }
-    PrintSprite(GetSpriteForLayer((struct LayerContainer *)DAT_0062fd60, id), coords.x + off.x, coords.y + off.y, param_3, 0);
+    PrintSprite(GetSpriteForLayer((struct LayerContainer *)SpaceTowerLayers, id), coords.x + off.x, coords.y + off.y, param_3, 0);
 }
 
 // FUNCTION: LEGOLAND 0x0043aee0
-void FUN_0043aee0(struct SpaceTowerCar *param_1, int param_2, unsigned int param_3) {
+void RenderSpaceTowerSeat(struct SpaceTowerCar *param_1, int param_2, unsigned int param_3) {
     FUN_0043ae20(param_1, param_2, param_3);
     if ((param_1->seats[param_2].flags & 1) != 0) {
         FUN_0043ad00((unsigned char *)param_1, param_2);
-        if (param_1->seats[param_2].field_18 != NULL) {
-            IP_RenderBlokeIn3DNow(param_1->seats[param_2].field_18->bloke);
+        if (param_1->seats[param_2].rider_slot0 != NULL) {
+            IP_RenderBlokeIn3DNow(param_1->seats[param_2].rider_slot0->bloke);
         }
-        if (param_1->seats[param_2].field_1c != NULL) {
-            IP_RenderBlokeIn3DNow(param_1->seats[param_2].field_1c->bloke);
+        if (param_1->seats[param_2].rider_slot1 != NULL) {
+            IP_RenderBlokeIn3DNow(param_1->seats[param_2].rider_slot1->bloke);
         }
         FUN_0043ad90(param_1, param_2, param_3);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0043af50
-void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderSpaceTower(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
     struct SpaceTowerRide *ride;
     struct SpaceTowerRideNode *node;
     struct SpaceTowerCar *car;
@@ -502,7 +502,7 @@ void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned 
         return;
     }
     coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
-    off1 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 1);
+    off1 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 1);
     AdjustOffsetForViewMode(&off1);
     if (node != NULL) {
         for (; node != NULL; node = node->next) {
@@ -513,11 +513,11 @@ void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned 
                 }
             }
         }
-        FUN_0043aee0(car, 1, param_6);
-        FUN_0043aee0(car, 2, param_6);
+        RenderSpaceTowerSeat(car, 1, param_6);
+        RenderSpaceTowerSeat(car, 2, param_6);
         PrintSprite(SpaceTowerMatte2Sprite, coords.x + off1.x, coords.y + off1.y, param_6, 0);
-        FUN_0043aee0(car, 0, param_6);
-        FUN_0043aee0(car, 3, param_6);
+        RenderSpaceTowerSeat(car, 0, param_6);
+        RenderSpaceTowerSeat(car, 3, param_6);
         node = ride->list;
         for (; node != NULL; node = node->next) {
             if (memcmp(&node->id, param_4, 2) == 0) {
@@ -528,47 +528,47 @@ void FUN_0043af50(struct SpaceTowerCtx *param_1, unsigned int param_2, unsigned 
             }
         }
         PrintSprite(SpaceTowerMatte1Sprite, coords.x + off1.x, coords.y + off1.y, param_6, 0);
-        LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 5), (char)car->var_ad);
-        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 5);
+        LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), (char)car->var_ad);
+        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 5);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct LayerContainer *)DAT_0062fd60, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
-        LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 3), (char)car->var_ac);
-        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 3);
+        PrintSprite(GetSpriteForLayer((struct LayerContainer *)SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), (char)car->var_ac);
+        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 3);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct LayerContainer *)DAT_0062fd60, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer((struct LayerContainer *)SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
     } else {
-        FUN_0043aee0(car, 1, param_6);
-        FUN_0043aee0(car, 2, param_6);
+        RenderSpaceTowerSeat(car, 1, param_6);
+        RenderSpaceTowerSeat(car, 2, param_6);
         PrintSprite(SpaceTowerMatte2Sprite, coords.x + off1.x, coords.y + off1.y, param_6, 0);
-        FUN_0043aee0(car, 0, param_6);
-        FUN_0043aee0(car, 3, param_6);
-        LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 5), (char)car->var_ad);
-        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 5);
+        RenderSpaceTowerSeat(car, 0, param_6);
+        RenderSpaceTowerSeat(car, 3, param_6);
+        LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), (char)car->var_ad);
+        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 5);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct LayerContainer *)DAT_0062fd60, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
-        LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 3), (char)car->var_ac);
-        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 3);
+        PrintSprite(GetSpriteForLayer((struct LayerContainer *)SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), (char)car->var_ac);
+        off2 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 3);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct LayerContainer *)DAT_0062fd60, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer((struct LayerContainer *)SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0043b2b0
 void FUN_0043b2b0(struct SpaceTowerCtx *param_1) {
-    DAT_0062fd74 = param_1->ride;
-    ((struct SpaceTowerRide *)DAT_0062fd74)->flags |= 0x420;
-    DAT_0062fd60 = ((struct SpaceTowerRide *)DAT_0062fd74)->layers;
-    *(unsigned int *)((char *)DAT_0062fd60 + 0x10) = *(unsigned int *)((char *)DAT_0062fd60 + 0x10) | 0x2000;
-    HideLayer(DAT_0062fd60, 5);
-    StopLayerPlaying(DAT_0062fd60, 5);
-    LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 5), 0);
-    HideLayer(DAT_0062fd60, 3);
-    StopLayerPlaying(DAT_0062fd60, 3);
-    LLSSetFrame(GetLLSForLayer(DAT_0062fd60, 3), 0);
-    DAT_0062fd88[0] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 6);
-    DAT_0062fd88[1] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 4);
-    DAT_0062fd88[2] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 0);
-    DAT_0062fd88[3] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd60, 2);
+    SpaceTowerRideObj = param_1->ride;
+    ((struct SpaceTowerRide *)SpaceTowerRideObj)->flags |= 0x420;
+    SpaceTowerLayers = ((struct SpaceTowerRide *)SpaceTowerRideObj)->layers;
+    *(unsigned int *)((char *)SpaceTowerLayers + 0x10) = *(unsigned int *)((char *)SpaceTowerLayers + 0x10) | 0x2000;
+    HideLayer(SpaceTowerLayers, 5);
+    StopLayerPlaying(SpaceTowerLayers, 5);
+    LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), 0);
+    HideLayer(SpaceTowerLayers, 3);
+    StopLayerPlaying(SpaceTowerLayers, 3);
+    LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), 0);
+    DAT_0062fd88[0] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 6);
+    DAT_0062fd88[1] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 4);
+    DAT_0062fd88[2] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 0);
+    DAT_0062fd88[3] = GetRenderOffsetForLayer((struct LayerOffsetHolder *)SpaceTowerLayers, 2);
     SpaceTowerSeatMatteSprites[0] = NULL;
     // STRING: LEGOLAND 0x004b7880
     SpaceTowerSeatMatteSprites[1] = LoadSprite("SpaceTower Seat2 Matte.lls", 1);
@@ -583,15 +583,15 @@ void FUN_0043b2b0(struct SpaceTowerCtx *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0043b420
-void FUN_0043b420(void) {
+void SpaceTowerSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0062fd74;
+    EditMode.unk8 = SpaceTowerRideObj;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((void *)((unsigned int)EditMode.unk8 + 0x3c));
 }
 
 // FUNCTION: LEGOLAND 0x0043b460
-void FUN_0043b460(struct EditObject *param_1, TileId tile, struct Cursor *param_3) {
+void SpaceTowerRemoveObject(struct EditObject *param_1, TileId tile, struct Cursor *param_3) {
     struct SpaceTowerCar *node;
 
     node = FindSpaceTowerCar(&tile.id);
@@ -604,7 +604,7 @@ void FUN_0043b460(struct EditObject *param_1, TileId tile, struct Cursor *param_
 }
 
 // FUNCTION: LEGOLAND 0x0043b4b0
-void FUN_0043b4b0(struct EditObject *param_1, int *coords) {
+void SpaceTowerAddObject(struct EditObject *param_1, int *coords) {
     TileId id;
 
     id.pos.x = (unsigned char)coords[0];
@@ -623,11 +623,11 @@ void *FUN_0043b4e0(int param_1, unsigned short param_2) {
     DAT_0062fd50 = *(unsigned int *)(ride + 0x18);
     DAT_0062fd54 = param_2;
     *(unsigned int *)(*(int *)(ride + 0x64) + 0x10) |= 0x2000;
-    HideLayer(DAT_0062fd60, 6);
-    HideLayer(DAT_0062fd60, 4);
-    HideLayer(DAT_0062fd60, 0);
-    HideLayer(DAT_0062fd60, 2);
-    HideLayer(DAT_0062fd60, 5);
+    HideLayer(SpaceTowerLayers, 6);
+    HideLayer(SpaceTowerLayers, 4);
+    HideLayer(SpaceTowerLayers, 0);
+    HideLayer(SpaceTowerLayers, 2);
+    HideLayer(SpaceTowerLayers, 5);
     return &DAT_0062fd48;
 }
 
@@ -639,7 +639,7 @@ void FUN_0043b570(void) {
     KillSprite(SpaceTowerSeatMatteSprites[2]);
     FreeAllSpaceTowerCars();
     Kill_FXList(SPACE_TOWER_SFX, 1);
-    ((struct SpaceTowerCar *)DAT_0062fd74)->var_cc = 0;
+    ((struct SpaceTowerCar *)SpaceTowerRideObj)->var_cc = 0;
 }
 
 // FUNCTION: LEGOLAND 0x0043b5d0
@@ -662,12 +662,12 @@ LEGO_EXPORT int SpaceTower_Save(void) {
             }
             for (i = 0; i < 8; i++) {
                 if (i & 1) {
-                    field = &car->seats[i >> 1].field_1c;
+                    field = &car->seats[i >> 1].rider_slot1;
                 } else {
-                    field = &car->seats[i >> 1].field_18;
+                    field = &car->seats[i >> 1].rider_slot0;
                 }
                 index = 0;
-                for (cur = ((struct SpaceTowerRide *)DAT_0062fd74)->list; cur != NULL; cur = cur->next) {
+                for (cur = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list; cur != NULL; cur = cur->next) {
                     if (cur == *field) {
                         break;
                     }
@@ -716,12 +716,12 @@ LEGO_EXPORT int SpaceTower_Load(void) {
         prev = node;
         for (i = 0; i < 8; i++) {
             if (i & 1) {
-                field = &node->seats[i >> 1].field_1c;
+                field = &node->seats[i >> 1].rider_slot1;
             } else {
-                field = &node->seats[i >> 1].field_18;
+                field = &node->seats[i >> 1].rider_slot0;
             }
             n = (int)*field;
-            cur = ((struct SpaceTowerRide *)DAT_0062fd74)->list;
+            cur = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list;
             if (n != 0) {
                 while (--n != 0) {
                     cur = cur->next;
@@ -743,12 +743,12 @@ void SpaceTowerRide(struct ClassNode *name, struct CallbackTable *obj) {
     // STRING: LEGOLAND 0x004b789c
     if (_stricmp("SPACE TOWER RIDE", name->name) == 0) {
         obj->cb_a4 = FUN_0043b2b0;
-        obj->cb_8c = FUN_0043b420;
+        obj->cb_8c = SpaceTowerSetEditMode;
         obj->cb_a8 = FUN_0043bac0;
         obj->cb_a0 = FUN_0043b4e0;
-        obj->cb_b0 = FUN_0043af50;
-        obj->cb_9c = FUN_0043b460;
-        obj->cb_98 = FUN_0043b4b0;
+        obj->cb_b0 = RenderSpaceTower;
+        obj->cb_9c = SpaceTowerRemoveObject;
+        obj->cb_98 = SpaceTowerAddObject;
         obj->cb_ac = FUN_0043b570;
         obj->cb_bc = SpaceTower_Save;
         obj->cb_b8 = SpaceTower_Load;
@@ -767,25 +767,25 @@ void FUN_0043b810(struct SpaceTowerCar *param_1) {
     struct Point pos;
     struct Person *person;
 
-    node = ((struct SpaceTowerRide *)DAT_0062fd74)->list;
-    param_1->seats[0].field_18 = NULL;
-    param_1->seats[0].field_1c = NULL;
-    param_1->seats[1].field_18 = NULL;
-    param_1->seats[1].field_1c = NULL;
-    param_1->seats[2].field_18 = NULL;
-    param_1->seats[2].field_1c = NULL;
-    param_1->seats[3].field_18 = NULL;
-    param_1->seats[3].field_1c = NULL;
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, DAT_0062fd74);
+    node = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list;
+    param_1->seats[0].rider_slot0 = NULL;
+    param_1->seats[0].rider_slot1 = NULL;
+    param_1->seats[1].rider_slot0 = NULL;
+    param_1->seats[1].rider_slot1 = NULL;
+    param_1->seats[2].rider_slot0 = NULL;
+    param_1->seats[2].rider_slot1 = NULL;
+    param_1->seats[3].rider_slot0 = NULL;
+    param_1->seats[3].rider_slot1 = NULL;
+    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
     for (; node != NULL; node = node->next) {
         if (memcmp(&node->id, &param_1->var_0, 2) == 0 && (node->bloke->flags & 0x80) != 0) {
             slot = node->bloke->field_36;
             idx = slot >> 1;
             odd = slot & 1;
             if (odd == 0) {
-                param_1->seats[idx].field_18 = node;
+                param_1->seats[idx].rider_slot0 = node;
             } else {
-                param_1->seats[idx].field_1c = node;
+                param_1->seats[idx].rider_slot1 = node;
             }
             off = DAT_0062fd88[idx];
             off.y -= param_1->seats[idx].pos;
@@ -824,7 +824,7 @@ void FUN_0043b990(struct SpaceTowerCar *esi) {
         FUN_0043a940(&esi->seats[2]);
         FUN_0043a940(&esi->seats[3]);
         if (esi->seats[0].state == 0 && esi->seats[1].state == 0 && esi->seats[2].state == 0 && esi->seats[3].state == 0) {
-            if (GetAllBlokesOffRide((struct Ride *)DAT_0062fd74, esi->var_0) == 0) {
+            if (GetAllBlokesOffRide((struct Ride *)SpaceTowerRideObj, esi->var_0) == 0) {
                 return;
             }
             FUN_0043aac0(esi);
@@ -832,7 +832,7 @@ void FUN_0043b990(struct SpaceTowerCar *esi) {
         }
     }
     FUN_0043b810(esi);
-    Put3DBlokesOnRide2(DAT_0062fd74, esi);
+    Put3DBlokesOnRide2(SpaceTowerRideObj, esi);
     if (esi->var_c & 1) {
         return;
     }
@@ -893,10 +893,10 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
             return;
         }
         x = node->coord.x;
-        ride_x = ride->field_c + x;
+        ride_x = ride->x + x;
         tile = (TileId *)&node->id;
         y = tile->pos.y;
-        ride_y = ride->field_10 + y;
+        ride_y = ride->y + y;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
@@ -937,7 +937,7 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
                 bloke->param_action++;
                 obj->var_2++;
                 FUN_0043a9b0(obj);
-                if ((short)(char)obj->var_2 == ((struct SpaceTowerRide *)DAT_0062fd74)->field_2e) {
+                if ((short)(char)obj->var_2 == ((struct SpaceTowerRide *)SpaceTowerRideObj)->seats) {
                     FUN_0043aa90(obj);
                 }
                 break;

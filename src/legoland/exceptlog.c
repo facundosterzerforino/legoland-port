@@ -83,7 +83,7 @@ int stackdump(void *exc_info, const char *filename) {
             }
             // STRING: LEGOLAND 0x004b8bc0
             wsprintfA(tmp, "%s location %08x caused an access violation.\r\n", kind, rec->ExceptionInformation[1]);
-            WriteFileFormatted(hFile, (char *)DAT_004b8bbc, tmp);
+            WriteFileFormatted(hFile, (char *)PercentSFormat, tmp);
         }
         // STRING: LEGOLAND 0x004b8bb8
         WriteFileFormatted(hFile, "\r\n");
@@ -152,12 +152,12 @@ int stackdump(void *exc_info, const char *filename) {
                 out += wsprintfA(out, "%08x%s", *sp, sep);
                 sp = next;
                 if (out > bufend) {
-                    WriteFileFormatted(hFile, (char *)DAT_004b8bbc, buf);
+                    WriteFileFormatted(hFile, (char *)PercentSFormat, buf);
                     buf[0] = 0;
                     out = buf;
                 }
             }
-            WriteFileFormatted(hFile, (char *)DAT_004b8bbc, buf);
+            WriteFileFormatted(hFile, (char *)PercentSFormat, buf);
         } __except (1) {
             // STRING: LEGOLAND 0x004b8aa0
             WriteFileFormatted(hFile, "Exception encountered during stack dump.\r\n");

@@ -13,7 +13,7 @@ LEGO_EXPORT void AddPathSquare(struct Point *pos);
 LEGO_EXPORT void RemovePathSquare(struct Point *pos);
 void FUN_00482a40(struct Point *pos);
 void FUN_00482a80(void);
-void FUN_00482a90(void);
+void InitEntrance1Point(void);
 void FUN_004828f0(void);
 struct Point *GetEntrance1Point(void);
 unsigned int FUN_00482860(void);

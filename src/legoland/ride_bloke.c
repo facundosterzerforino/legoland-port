@@ -162,7 +162,7 @@ struct BlokeSprite {
 };
 
 // FUNCTION: LEGOLAND 0x00401000
-__int64 FUN_00401000(int x, int y, int rot) {
+__int64 RotateOffset(int x, int y, int rot) {
     union {
         __int64 i;
         struct {
@@ -208,44 +208,44 @@ void FUN_00401080(struct NewBloke *b) {
     local.y = b->ty;
     frame = b->f_bb;
     if (DAT_004c11c0 != 0) {
-        FUN_00480840(&local, &local, b->f_ba);
-        r.i = FUN_00401000(104, 0, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba);
+        r.i = RotateOffset(104, 0, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(268, 88, b->f_ba);
+        r.i = RotateOffset(268, 88, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(424, 244, b->f_ba);
+        r.i = RotateOffset(424, 244, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(512, 408, b->f_ba);
+        r.i = RotateOffset(512, 408, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        FUN_00480840(&local, &local, b->f_ba);
-        FUN_00480840(&local, &local, b->f_ba = (b->f_ba + 2) & 7);
+        MovePointInDirection(&local, &local, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba = (b->f_ba + 2) & 7);
         b->wp[frame].x = local.x << 16;
         b->wp[frame].y = local.y << 16;
     } else {
-        r.i = FUN_00401000(104, 0, b->f_ba);
+        r.i = RotateOffset(104, 0, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(268, 44, b->f_ba);
+        r.i = RotateOffset(268, 44, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(424, 122, b->f_ba);
+        r.i = RotateOffset(424, 122, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(512, 204, b->f_ba);
+        r.i = RotateOffset(512, 204, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
-        FUN_00480840(&local, &local, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba);
         b->f_ba = (b->f_ba + 2) & 7;
     }
     b->tx = local.x;
@@ -269,43 +269,43 @@ void FUN_00401320(struct NewBloke *b) {
     local.y = b->ty;
     frame = b->f_bb;
     if (DAT_004c11c0 != 0) {
-        r.i = FUN_00401000(104, 0, b->f_ba);
+        r.i = RotateOffset(104, 0, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(268, -44, b->f_ba);
+        r.i = RotateOffset(268, -44, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(424, -122, b->f_ba);
+        r.i = RotateOffset(424, -122, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(512, -204, b->f_ba);
+        r.i = RotateOffset(512, -204, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
-        FUN_00480840(&local, &local, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba);
         b->f_ba = (b->f_ba - 2) & 7;
     } else {
-        FUN_00480840(&local, &local, b->f_ba);
-        r.i = FUN_00401000(104, 0, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba);
+        r.i = RotateOffset(104, 0, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(268, -88, b->f_ba);
+        r.i = RotateOffset(268, -88, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(424, -244, b->f_ba);
+        r.i = RotateOffset(424, -244, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(512, -408, b->f_ba);
+        r.i = RotateOffset(512, -408, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        FUN_00480840(&local, &local, b->f_ba);
-        FUN_00480840(&local, &local, b->f_ba = (b->f_ba - 2) & 7);
+        MovePointInDirection(&local, &local, b->f_ba);
+        MovePointInDirection(&local, &local, b->f_ba = (b->f_ba - 2) & 7);
         b->wp[frame].x = local.x << 16;
         b->wp[frame].y = local.y << 16;
     }
@@ -328,8 +328,8 @@ void FUN_004015e0(unsigned char *param_1) {
     local.x = *(int *)(param_1 + 0x20);
     local.y = *(int *)(param_1 + 0x24);
     frame = *(unsigned char *)(param_1 + 0xbb);
-    FUN_00480840(&local, &local, *(unsigned char *)(param_1 + 0xba));
-    FUN_00480840(&local, &local, *(unsigned char *)(param_1 + 0xba));
+    MovePointInDirection(&local, &local, *(unsigned char *)(param_1 + 0xba));
+    MovePointInDirection(&local, &local, *(unsigned char *)(param_1 + 0xba));
     *(int *)(param_1 + 0x20) = local.x;
     *(int *)(param_1 + 0x24) = local.y;
     *(int *)(param_1 + 0x30 + frame * 8) = local.x << 16;
@@ -354,16 +354,16 @@ void FUN_00401660(struct NewBloke *b) {
     local.y = b->ty;
     frame = b->f_bb;
     if (DAT_004c11c0 != 0) {
-        r.i = FUN_00401000(13, 40, b->f_ba);
+        r.i = RotateOffset(13, 40, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(33, 84, b->f_ba);
+        r.i = RotateOffset(33, 84, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
         d = b->f_ba + 2;
-        FUN_00480840(&local, &local, b->f_ba = d & 7);
+        MovePointInDirection(&local, &local, b->f_ba = d & 7);
         b->wp[frame].x = local.x << 16;
         b->wp[frame].y = local.y << 16;
         b->tx = local.x;
@@ -371,16 +371,16 @@ void FUN_00401660(struct NewBloke *b) {
         b->f_bb = frame + 1;
         b->f_c2 = 1;
     } else {
-        r.i = FUN_00401000(13, -40, b->f_ba);
+        r.i = RotateOffset(13, -40, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
-        r.i = FUN_00401000(33, -84, b->f_ba);
+        r.i = RotateOffset(33, -84, b->f_ba);
         b->wp[frame].x = ((local.x << 8) + r.p.lo) << 8;
         b->wp[frame].y = ((local.y << 8) + r.p.hi) << 8;
         frame++;
         d = b->f_ba - 2;
-        FUN_00480840(&local, &local, b->f_ba = d & 7);
+        MovePointInDirection(&local, &local, b->f_ba = d & 7);
         b->wp[frame].x = local.x << 16;
         b->wp[frame].y = local.y << 16;
         b->tx = local.x;
@@ -519,41 +519,44 @@ int *FUN_00401970(int *param_1, int param_2, int param_3) {
 void FUN_004019c0(struct RideMover *m) {
     unsigned char oldDir = m->dir;
     unsigned char moving = m->moving;
+    int dy, dx, dist, diff, vx, vy;
+    unsigned char newDir;
 
     if (!moving) {
         m->velX = 0;
         m->velY = 0;
     } else {
-        int dy, dx, dist, diff;
-        unsigned char newDir;
-
-        dx = m->destX - m->x;
-        dy = m->destY - m->y;
-        dist = (int)sqrt((float)dx * (float)dx + (float)dy * (float)dy);
-        if (dist != 0) {
-            m->dirX = (float)dx / dist;
-            m->dirY = (float)dy / dist;
-            newDir = (ArcTan256(dx, dy) + 8) >> 4 & 15;
-            m->dir = newDir;
-            diff = (newDir - oldDir) & 15;
-            if (diff & 8)
-                diff |= -16;
-            if (diff < -2 || diff > 2) {
+        do {
+            dx = m->destX - m->x;
+            dy = m->destY - m->y;
+            dist = (int)sqrt((float)dx * (float)dx + (float)dy * (float)dy);
+            if (dist != 0) {
+                m->dirX = (float)dx / dist;
+                m->dirY = (float)dy / dist;
+                newDir = (ArcTan256(dx, dy) + 8) >> 4 & 15;
+                m->dir = newDir;
+                diff = (newDir - oldDir) & 15;
                 if (diff & 8)
-                    oldDir--;
-                else
-                    oldDir++;
-                m->dir = oldDir;
-                m->dir = oldDir & 15;
+                    diff |= -16;
+                if (diff < -2 || diff > 2) {
+                    if (diff & 8)
+                        oldDir--;
+                    else
+                        oldDir++;
+                    m->dir = oldDir;
+                    m->dir = oldDir & 15;
+                }
+                vx = m->speed * dx / dist;
+                vy = m->speed * dy / dist;
+            } else {
+                vx = 0;
+                m->dirX = 0;
+                m->dirY = 0;
+                vy = 0;
             }
-            m->velX = m->speed * dx / dist;
-            m->velY = m->speed * dy / dist;
-        } else {
-            m->velX = 0;
-            m->dirX = 0;
-            m->dirY = 0;
-            m->velY = 0;
-        }
+            m->velX = vx;
+            m->velY = vy;
+        } while (0);
     }
 }
 
@@ -729,26 +732,26 @@ int FUN_00401f30(unsigned short id, struct PathPair *p, int dir) {
     char r;
     int mask;
 
-    e = (struct RideQueueEntry *)FUN_004125f0(p->a, p->b);
+    e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
     r = rand() & 3;
     mask = 0;
     if (e == NULL) {
         return 0;
     }
-    FUN_004808d0(&e->x, &pt.a, dir);
+    StepPointByDirection(&e->x, &pt.a, dir);
     q = FUN_004125a0(pt.a, pt.b);
     if (q != NULL && q->id == id && (q->field_14 & 0xf) != 6) {
-        FUN_004808d0(&q->x, &pt.a, dir);
+        StepPointByDirection(&q->x, &pt.a, dir);
         t1 = FUN_004125a0(pt.a, pt.b);
         if (t1 != NULL && (t1->id != id || (t1->field_14 & 0xf) == 6)) {
             t1 = NULL;
         }
-        FUN_004808d0(&q->x, &pt.a, (dir - 2) & 7);
+        StepPointByDirection(&q->x, &pt.a, (dir - 2) & 7);
         t2 = FUN_004125a0(pt.a, pt.b);
         if (t2 != NULL && (t2->id != id || (t2->field_14 & 0xf) == 6)) {
             t2 = NULL;
         }
-        FUN_004808d0(&q->x, &pt.a, (dir + 2) & 7);
+        StepPointByDirection(&q->x, &pt.a, (dir + 2) & 7);
         t3 = FUN_004125a0(pt.a, pt.b);
         if (t3 != NULL && (t3->id != id || (t3->field_14 & 0xf) == 6)) {
             t3 = NULL;
@@ -792,12 +795,12 @@ int FUN_00402150(unsigned short id, struct PathPair *p, int dir) {
     struct RideQueueEntry *s;
     struct PathPair pt;
 
-    e = (struct RideQueueEntry *)FUN_004125f0(p->a, p->b);
+    e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
     if (e != NULL) {
         if (e->field_18 == NULL) {
             return FUN_00401f30(id, p, dir);
         }
-        FUN_004808d0(&e->x, &pt.a, dir);
+        StepPointByDirection(&e->x, &pt.a, dir);
         q = FUN_004125a0(pt.a, pt.b);
         if (q == NULL) {
             return FUN_00401f30(id, p, dir);
@@ -813,18 +816,18 @@ int FUN_00402150(unsigned short id, struct PathPair *p, int dir) {
             return FUN_00401f30(id, p, dir);
         }
         s = q->field_18;
-        FUN_004808d0(&e->x, &pt.a, dir);
-        FUN_004808d0(&pt.a, &pt.a, (dir - 2) & 7);
+        StepPointByDirection(&e->x, &pt.a, dir);
+        StepPointByDirection(&pt.a, &pt.a, (dir - 2) & 7);
         if (s->x == pt.a && s->y == pt.b) {
             return 1;
         }
-        FUN_004808d0(&e->x, &pt.a, dir);
-        FUN_004808d0(&pt.a, &pt.a, (dir + 2) & 7);
+        StepPointByDirection(&e->x, &pt.a, dir);
+        StepPointByDirection(&pt.a, &pt.a, (dir + 2) & 7);
         if (s->x == pt.a && s->y == pt.b) {
             return 3;
         }
-        FUN_004808d0(&e->x, &pt.a, dir);
-        FUN_004808d0(&pt.a, &pt.a, dir);
+        StepPointByDirection(&e->x, &pt.a, dir);
+        StepPointByDirection(&pt.a, &pt.a, dir);
         if (s->x == pt.a && s->y == pt.b) {
             return 2;
         }
@@ -855,13 +858,13 @@ int FUN_00402390(unsigned char *param_1) {
     void *iVar1;
     struct Point local;
 
-    iVar1 = FUN_004125f0(*(unsigned int *)(param_1 + 0x20), *(unsigned int *)(param_1 + 0x24));
+    iVar1 = FindQueueEntryAtTile(*(unsigned int *)(param_1 + 0x20), *(unsigned int *)(param_1 + 0x24));
     if (iVar1 == 0) {
         return 0;
     }
     local.x = *(int *)((char *)iVar1 + 0xc);
     local.y = *(int *)((char *)iVar1 + 0x10);
-    FUN_004808d0((int *)&local, (int *)&local,
+    StepPointByDirection((int *)&local, (int *)&local,
         DAT_004b4034[(unsigned int)*(unsigned char *)(param_1 + 0xb8)]);
     iVar1 = FUN_004125a0(local.x, local.y);
     if ((iVar1 != 0) && ((*(unsigned char *)((char *)iVar1 + 0x14) & 0xf) == 5)) {
@@ -872,8 +875,8 @@ int FUN_00402390(unsigned char *param_1) {
 
 // FUNCTION: LEGOLAND 0x00402430
 int FUN_00402430(struct PairArg *a, struct PairArg *b) {
-    struct TileInfo *p1 = FUN_004125f0(a->var_0, a->var_4);
-    struct TileInfo *p2 = FUN_004125f0(b->var_0, b->var_4);
+    struct TileInfo *p1 = FindQueueEntryAtTile(a->var_0, a->var_4);
+    struct TileInfo *p2 = FindQueueEntryAtTile(b->var_0, b->var_4);
 
     if (p2 != p1) {
         if (p1 != 0) {
@@ -1037,7 +1040,7 @@ void FUN_00402780(struct NewBloke *b) {
     wp0 = b->wp[0];
     op = b->p;
     v = 0;
-    FUN_004125f0(b->px, b->py);
+    FindQueueEntryAtTile(b->px, b->py);
     GetTileDimensions(&w2, &h2);
     sx = r.p.lo - ((w2 + 1) >> 1) - (ScrollX >> 8);
     sy = r.p.hi - (ScrollY >> 8);
@@ -1173,7 +1176,7 @@ void FUN_00402c10(void) {
             cur->field_c0--;
         }
 
-        tile = (struct TileInfo *)FUN_004125f0(cur->px, cur->py);
+        tile = (struct TileInfo *)FindQueueEntryAtTile(cur->px, cur->py);
 
         if ((tile == 0 && cur->field_c2 == 0) || cur->field_be == 0) {
             FUN_00401c60((struct RideBloke *)cur);

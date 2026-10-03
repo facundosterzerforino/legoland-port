@@ -147,9 +147,9 @@ struct Sprite *GetProfileOffSprite(signed char param_1) {
 // FUNCTION: LEGOLAND 0x0048c650
 LEGO_EXPORT void EnterNewProfileCheckBoxIcons(struct IconNode *param_1) {
     // STRING: LEGOLAND 0x004bf148
-    DAT_0079867c = LoadSprite("RegClose.lls", 4);
+    PopUpCloseSprite = LoadSprite("RegClose.lls", 4);
     // STRING: LEGOLAND 0x004bf138
-    DAT_00798680 = LoadSprite("RegCloseON.lls", 4);
+    PuCloseOnSprite = LoadSprite("RegCloseON.lls", 4);
     ClosePopUpSprite = LoadSprite("PU_ClosePopUp.lls", 4);
     ClosePopUpOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
 
@@ -167,8 +167,8 @@ LEGO_EXPORT void EnterNewProfileCheckBoxIcons(struct IconNode *param_1) {
 LEGO_EXPORT void InitProfileCheckBoxIcons(struct IconNode *param_1) {
     PuOkSprite = LoadSprite("PU_OK.lls", 4);
     PuOkOnSprite = LoadSprite("PU_OKON.lls", 4);
-    DAT_0079867c = LoadSprite("RegClose.lls", 4);
-    DAT_00798680 = LoadSprite("RegCloseON.lls", 4);
+    PopUpCloseSprite = LoadSprite("RegClose.lls", 4);
+    PuCloseOnSprite = LoadSprite("RegCloseON.lls", 4);
     ClosePopUpSprite = LoadSprite("PU_ClosePopUp.lls", 4);
     ClosePopUpOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
 
@@ -179,7 +179,7 @@ LEGO_EXPORT void InitProfileCheckBoxIcons(struct IconNode *param_1) {
     PopUpOkIcon->flags |= 0x4002;
     PopUpOkIcon->event_handler = (void *)ConfirmDeleteProfileClick;
 
-    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, DAT_0079867c);
+    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, PopUpCloseSprite);
     PopUpCloseIcon->string_id = 0x4;
     PopUpCloseIcon->string = GetString(0x4);
     PopUpCloseIcon->flags |= 0x2000;
@@ -191,8 +191,8 @@ LEGO_EXPORT void InitProfileCheckBoxIcons(struct IconNode *param_1) {
 void FUN_0048c860(struct IconNode *param_1) {
     PuOkSprite = LoadSprite("PU_OK.lls", 4);
     PuOkOnSprite = LoadSprite("PU_OKON.lls", 4);
-    DAT_0079867c = LoadSprite("RegClose.lls", 4);
-    DAT_00798680 = LoadSprite("RegCloseON.lls", 4);
+    PopUpCloseSprite = LoadSprite("RegClose.lls", 4);
+    PuCloseOnSprite = LoadSprite("RegCloseON.lls", 4);
     ClosePopUpSprite = LoadSprite("PU_ClosePopUp.lls", 4);
     ClosePopUpOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
 
@@ -203,7 +203,7 @@ void FUN_0048c860(struct IconNode *param_1) {
     PopUpOkIcon->flags |= 0x4002;
     PopUpOkIcon->event_handler = (void *)FUN_0048e450;
 
-    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, DAT_0079867c);
+    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, PopUpCloseSprite);
     PopUpCloseIcon->string_id = 4;
     PopUpCloseIcon->string = GetString(4);
     PopUpCloseIcon->flags |= 0x2000;
@@ -221,13 +221,13 @@ LEGO_EXPORT void KillFrontEndCheckBoxSprite(void) {
         KillSprite(PuOkSprite);
         PuOkSprite = NULL;
     }
-    if (DAT_00798680 != NULL) {
-        KillSprite(DAT_00798680);
-        DAT_00798680 = NULL;
+    if (PuCloseOnSprite != NULL) {
+        KillSprite(PuCloseOnSprite);
+        PuCloseOnSprite = NULL;
     }
-    if (DAT_0079867c != NULL) {
-        KillSprite(DAT_0079867c);
-        DAT_0079867c = NULL;
+    if (PopUpCloseSprite != NULL) {
+        KillSprite(PopUpCloseSprite);
+        PopUpCloseSprite = NULL;
     }
     if (ClosePopUpSprite != NULL) {
         KillSprite(ClosePopUpSprite);
@@ -381,7 +381,7 @@ LEGO_EXPORT void LightUpthisDeleteIcon(struct IconNode *icon, int param_2) {
     SetIconSprite(DeleteIcon, RegDeleteSprite);
     bx = DeleteIcon->x;
     by = DeleteIcon->y;
-    if (DAT_00813a44.x < bx + 0x24 && bx < DAT_00813a44.x && DAT_00813a44.y < by + 0x1b && by < DAT_00813a44.y) {
+    if (MousePos.x < bx + 0x24 && bx < MousePos.x && MousePos.y < by + 0x1b && by < MousePos.y) {
         SetIconSprite(DeleteIcon, RegDeleteOnSprite);
     }
 }
@@ -399,25 +399,25 @@ LEGO_EXPORT void UpdateProfileCheckBoxIcons(void) {
     if (NewProfilePopUpShown) {
         SetIconSprite(PopUpCloseIcon, ClosePopUpSprite);
     } else {
-        SetIconSprite(PopUpCloseIcon, DAT_0079867c);
+        SetIconSprite(PopUpCloseIcon, PopUpCloseSprite);
     }
     a = PopUpOkIcon;
     if (a) {
         x = a->x;
         y = a->y;
-        if (DAT_00813a44.x < x + 0x24 && x < DAT_00813a44.x && DAT_00813a44.y < y + 0x1b && y < DAT_00813a44.y) {
+        if (MousePos.x < x + 0x24 && x < MousePos.x && MousePos.y < y + 0x1b && y < MousePos.y) {
             SetIconSprite(a, PuOkOnSprite);
         }
     }
     b = PopUpCloseIcon;
     x = b->x;
     y = b->y;
-    if (DAT_00813a44.x < x + 0x24 && x < DAT_00813a44.x && DAT_00813a44.y < y + 0x1b && y < DAT_00813a44.y) {
+    if (MousePos.x < x + 0x24 && x < MousePos.x && MousePos.y < y + 0x1b && y < MousePos.y) {
         if (NewProfilePopUpShown) {
             SetIconSprite(b, ClosePopUpOnSprite);
             return;
         }
-        SetIconSprite(b, DAT_00798680);
+        SetIconSprite(b, PuCloseOnSprite);
     }
 }
 
@@ -433,14 +433,14 @@ LEGO_EXPORT void PrintProfileDetails(void) {
 
     y = 0x72;
     DeleteIcon->flags |= 0x400;
-    icon = DAT_006687c8;
+    icon = IconListHead;
     FUN_00455e50(DAT_007cb340, 0x8d, y, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
     while (icon != NULL) {
         sel = 1;
         show = 1;
         if ((icon->flags & 0x400) == 0 && (icon->field_20b & 1)) {
-            if (DAT_00813a44.x >= icon->x - 0x18 && DAT_00813a44.x < icon->x && DAT_00813a44.y >= icon->slot * 0x26 + 0x86 &&
-                DAT_00813a44.y < icon->width + icon->y) {
+            if (MousePos.x >= icon->x - 0x18 && MousePos.x < icon->x && MousePos.y >= icon->slot * 0x26 + 0x86 &&
+                MousePos.y < icon->width + icon->y) {
                 Hover.type = 2;
                 Hover.ptr = (struct Bloke *)icon;
             }

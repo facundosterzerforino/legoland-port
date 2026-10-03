@@ -25,6 +25,6 @@ struct BarrelNode {
 
 void FUN_0043c2f0(struct BarrelNode *node);
 void FUN_0043c950(struct Element *elem);
-unsigned int FUN_0043ce10(struct RideNode *rn, struct BarrelNode *node, signed char n);
+unsigned int PickBarrelSeat(struct RideNode *rn, struct BarrelNode *node, signed char n);
 
 void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct CallbackTable *ride);

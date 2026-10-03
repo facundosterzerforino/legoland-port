@@ -30,7 +30,7 @@ struct SpiderState {
     unsigned short id;
     unsigned char field_2;
     unsigned char field_3;
-    char field_4;
+    char frame;
     unsigned char pad_5[3];
     unsigned int field_8;
     unsigned char field_c;
@@ -57,7 +57,7 @@ struct SlotBloke {
 
 struct SlotOwner {
     unsigned char pad_0[8];
-    struct SlotBloke *field_8;
+    struct SlotBloke *rider;
 };
 
 struct SlotArray {
@@ -151,7 +151,7 @@ void FUN_00415a60(struct SpiderState *a) {
     a->field_3 = a->field_2;
     a->field_2 = 0;
     a->field_8 = (a->field_8 & 0xffffbfff) | 0x1;
-    a->field_4 = 0;
+    a->frame = 0;
     a->field_10 = 0;
     FUN_004159e0((const unsigned char *)a);
 }
@@ -160,7 +160,7 @@ void FUN_00415a60(struct SpiderState *a) {
 int FUN_00415a90(struct SpiderNode *node) {
     struct SpiderState *a = (struct SpiderState *)node;
     a->field_10 = 0;
-    a->field_4 = 0;
+    a->frame = 0;
     a->field_c = rand() % 2 != 0 ? 4 : 3;
     a->field_8 &= 0xffffbffe;
     a->field_14 = 0;
@@ -169,7 +169,7 @@ int FUN_00415a90(struct SpiderNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00415ae0
-void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
     Ride *ride = obj->ride;
     RideNode *elem = ride->riders;
     char count = 0;
@@ -199,11 +199,11 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                     IP_RenderBlokeIn3DNow(blokes[i]);
                 }
             }
-            LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->frame);
-            off = GetRenderOffsetForLayer(DAT_004cbf28, 1);
+            LLSSetFrame(GetLLSForLayer(SpiderRideLayer, 1), state->frame);
+            off = GetRenderOffsetForLayer(SpiderRideLayer, 1);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(GetSpriteForLayer(DAT_004cbf28, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
-            off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
+            PrintSprite(GetSpriteForLayer(SpiderRideLayer, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
+            off = GetRenderOffsetForLayer(SpiderRideLayer, 2);
             AdjustOffsetForViewMode(&off);
             PrintSprite(SpiderHutMask2Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
             *(short *)*ZSpiderSprite->lls = state->frame;
@@ -232,20 +232,20 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                     IP_RenderBlokeIn3DNow(elem->rider);
                 }
             }
-            off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
+            off = GetRenderOffsetForLayer(SpiderRideLayer, 2);
             AdjustOffsetForViewMode(&off);
             PrintSprite(SpiderHutMask1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);
             return;
         }
     }
     {
-        LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), state->frame);
-        off = GetRenderOffsetForLayer(DAT_004cbf28, 1);
+        LLSSetFrame(GetLLSForLayer(SpiderRideLayer, 1), state->frame);
+        off = GetRenderOffsetForLayer(SpiderRideLayer, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer(DAT_004cbf28, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
-        off = GetRenderOffsetForLayer(DAT_004cbf28, 2);
+        PrintSprite(GetSpriteForLayer(SpiderRideLayer, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
+        off = GetRenderOffsetForLayer(SpiderRideLayer, 2);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer(DAT_004cbf28, 2), screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(SpiderRideLayer, 2), screen.x + off.x, screen.y + off.y, param_6, 0);
     }
 }
 
@@ -253,8 +253,8 @@ void FUN_00415ae0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
 void FUN_00415e80(struct CarNode *param_1) {
     DAT_004cbf20 = ((unsigned int *)param_1)[3];
     ((unsigned int *)DAT_004cbf20)[7] |= 0x420;
-    DAT_004cbf28 = (struct Sprite *)((unsigned int *)DAT_004cbf20)[25];
-    DAT_004cbf28->flags |= 0x2000;
+    SpiderRideLayer = (struct Sprite *)((unsigned int *)DAT_004cbf20)[25];
+    SpiderRideLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b4ea0
     SpiderRunBinV = LoadBinV("Zbuffers\\spiderrun.bnv");
     // STRING: LEGOLAND 0x004b4e88
@@ -273,12 +273,12 @@ void FUN_00415e80(struct CarNode *param_1) {
     DAT_004cbf38[1] = ZSpiderSprite;
     DAT_004cbf30[1] = SpiderOnBinV;
     DAT_004cbf38[0] = SpiderOffBinV;
-    HideLayer(DAT_004cbf28, 2);
-    StopLayerPlaying(DAT_004cbf28, 2);
-    LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 2), 0);
-    HideLayer(DAT_004cbf28, 1);
-    StopLayerPlaying(DAT_004cbf28, 1);
-    LLSSetFrame(GetLLSForLayer(DAT_004cbf28, 1), 0);
+    HideLayer(SpiderRideLayer, 2);
+    StopLayerPlaying(SpiderRideLayer, 2);
+    LLSSetFrame(GetLLSForLayer(SpiderRideLayer, 2), 0);
+    HideLayer(SpiderRideLayer, 1);
+    StopLayerPlaying(SpiderRideLayer, 1);
+    LLSSetFrame(GetLLSForLayer(SpiderRideLayer, 1), 0);
     Load_FXList(SpiderRide_SFX, 1);
 }
 
@@ -305,7 +305,7 @@ void FUN_00415fd0(struct CarNode *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00416060
-void FUN_00416060(void) {
+void SpiderSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)DAT_004cbf20;
     DefaultCursor(&EditCursor);
@@ -313,7 +313,7 @@ void FUN_00416060(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004160a0
-void FUN_004160a0(Element *obj, TileId tile, struct Cursor *cursor) {
+void SpiderRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     struct SpiderNode *node = FindSpiderNode(&tile);
 
     if (node != NULL) {
@@ -325,7 +325,7 @@ void FUN_004160a0(Element *obj, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x004160f0
-void FUN_004160f0(Element *editObj, int *coords) {
+void SpiderAddObject(Element *editObj, int *coords) {
     TileId key;
 
     key.pos.x = coords[0];
@@ -352,11 +352,11 @@ void SpiderRide(struct ClassNode *name_ptr, struct CallbackTable *obj) {
     if (_stricmp("SPIDER RIDE", name_ptr->name) == 0) {
         obj->cb_a4 = FUN_00415e80;
         obj->cb_ac = FUN_00415fd0;
-        obj->cb_8c = FUN_00416060;
+        obj->cb_8c = SpiderSetEditMode;
         obj->cb_a8 = FUN_00416330;
-        obj->cb_b0 = FUN_00415ae0;
-        obj->cb_9c = FUN_004160a0;
-        obj->cb_98 = FUN_004160f0;
+        obj->cb_b0 = RenderSpider;
+        obj->cb_9c = SpiderRemoveObject;
+        obj->cb_98 = SpiderAddObject;
         obj->cb_a0 = FUN_00416120;
         obj->cb_bc = SaveSpider;
         obj->cb_b8 = LoadSpider;
@@ -382,9 +382,9 @@ void FUN_004161f0(struct SpiderNode *node) {
         }
         if (v >= 2) {
             s->field_10 = 0;
-            s->field_4++;
-            if (s->field_4 >= 0x20) {
-                s->field_4 = 0;
+            s->frame++;
+            if (s->frame >= 0x20) {
+                s->frame = 0;
                 s->field_c = c - 1;
             }
         }
@@ -403,11 +403,11 @@ void FUN_004161f0(struct SpiderNode *node) {
     }
     for (; r != NULL; r = r->next) {
         if (s->id == r->tile.id && r->rider->field_35 == 1) {
-            sprintf(DAT_004b4d94.name + 6, "%02d", r->rider->field_36);
-            SetBlokePositionFromBNV(SpiderRunBinV, r->rider, DAT_004b4d94.name, s->field_4, -1617787.75f, -1618096.5f, 0);
+            sprintf(SpiderBnvInfo.name + 6, "%02d", r->rider->field_36);
+            SetBlokePositionFromBNV(SpiderRunBinV, r->rider, SpiderBnvInfo.name, s->frame, -1617787.75f, -1618096.5f, 0);
         }
     }
-    *(short *)*ZSpiderSprite->lls = (short)s->field_4;
+    *(short *)*ZSpiderSprite->lls = (short)s->frame;
 }
 
 // FUNCTION: LEGOLAND 0x00416310
@@ -467,8 +467,8 @@ void FUN_00416330(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(DAT_004b4d94.name + 6, "%02d", FUN_00416830((struct SlotOwner *)elem, (struct SlotArray *)state, ((struct Ride *)DAT_004cbf20)->seats));
-                bloke->path = NewBNVPath(DAT_004cbf30[1], 1, DAT_004b4d94.name, -1617787.75f, -1618096.5f, coords);
+                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct SlotOwner *)elem, (struct SlotArray *)state, ((struct Ride *)DAT_004cbf20)->seats));
+                bloke->path = NewBNVPath(DAT_004cbf30[1], 1, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->field_58 = 0;
                 bloke->param_action++;
@@ -480,7 +480,7 @@ void FUN_00416330(Element *obj) {
                     free(bloke->path);
                     bloke->path = NULL;
                 }
-                if (bloke->path != NULL && (int)BNVPath_GetDFrame(bloke->path) >= DAT_004b4d94.tab1[bloke->field_36]) {
+                if (bloke->path != NULL && (int)BNVPath_GetDFrame(bloke->path) >= SpiderBnvInfo.tab1[bloke->field_36]) {
                     bloke->field_35 = 1;
                     bloke->param_action = 5;
                     free(bloke->path);
@@ -512,8 +512,8 @@ void FUN_00416330(Element *obj) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 2;
-                sprintf(DAT_004b4d94.name + 6, "%02d", bloke->field_36);
-                bloke->path = NewBNVPath(DAT_004cbf38[0], 2, DAT_004b4d94.name, -1617787.75f, -1618096.5f, walk);
+                sprintf(SpiderBnvInfo.name + 6, "%02d", bloke->field_36);
+                bloke->path = NewBNVPath(DAT_004cbf38[0], 2, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, walk);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -525,7 +525,7 @@ void FUN_00416330(Element *obj) {
                     free(bloke->path);
                     bloke->path = NULL;
                 }
-                if (bloke->path != NULL && (int)BNVPath_GetDFrame(bloke->path) >= DAT_004b4d94.tab2[bloke->field_36]) {
+                if (bloke->path != NULL && (int)BNVPath_GetDFrame(bloke->path) >= SpiderBnvInfo.tab2[bloke->field_36]) {
                     bloke->field_35 = 2;
                     bloke->param_action = 0xd;
                     free(bloke->path);
@@ -583,7 +583,7 @@ int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char cou
     }
 
     arr->slots[i] = 1;
-    owner->field_8->field_36 = (unsigned char)(i + 1);
+    owner->rider->field_36 = (unsigned char)(i + 1);
     return i + 1;
 }
 
@@ -606,8 +606,8 @@ LEGO_EXPORT int SaveSpider(void) {
 }
 
 struct SpiderTypeC {
-    void *field_0;
-    unsigned int field_4;
+    void *file;
+    unsigned int index;
 };
 
 struct SpiderData {
@@ -624,24 +624,24 @@ struct SpiderCar2 {
 struct SpiderListNode {
     struct SpiderListNode *next;
     unsigned char pad_4[4];
-    struct SpiderData *field_8;
+    struct SpiderData *rider;
     unsigned char pad_c[4];
-    struct SpiderCar2 *field_10;
+    struct SpiderCar2 *person;
 };
 
 struct SpiderGameObject {
     unsigned char pad_0[0xcc];
-    struct SpiderListNode *field_cc;
+    struct SpiderListNode *riders;
 };
 
 struct SpiderLoadArg {
     unsigned char pad_0[0xc];
-    struct SpiderGameObject *field_c;
+    struct SpiderGameObject *ride;
 };
 
 // FUNCTION: LEGOLAND 0x004168f0
 LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
-    struct SpiderGameObject *obj = arg->field_c;
+    struct SpiderGameObject *obj = arg->ride;
     struct SpiderNode *prev = NULL;
     struct SpiderListNode *list;
     struct SpiderCar2 *car;
@@ -669,19 +669,19 @@ LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             car->field_2c = DAT_004cbf38[car->field_30];
         } else {
             car->field_2c = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
-        data = list->field_8;
+        data = list->rider;
         tc = data->field_54;
         if (tc != NULL) {
-            tc->field_0 = DAT_004cbf30[tc->field_4];
+            tc->file = DAT_004cbf30[tc->index];
         }
         list = list->next;
     }

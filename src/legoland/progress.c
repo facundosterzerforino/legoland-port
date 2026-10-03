@@ -87,19 +87,19 @@ LEGO_EXPORT void InitProgressScreen(void) {
 
         for (i = 0; i < 10; i++) {
             if (i + 5 == (int)lpConfig->level - 1) {
-                icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite0);
+                icon = InsertIcon(ProgressScreenTables.levels[i].x, ProgressScreenTables.levels[i].y, 0x1c, ProgressScreenTables.levels[i].sprite0);
                 if (icon) {
                     icon->render_func = (void *)RenderFlashingSpriteIcon;
-                    icon->string_id = DAT_004beb80.levels[i].id;
+                    icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
                     icon->event_handler = (void *)FUN_0048bb60;
                     icon->flags |= flags;
                 }
             } else if (i + 5 < (int)lpConfig->level - 1) {
-                icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite1);
+                icon = InsertIcon(ProgressScreenTables.levels[i].x, ProgressScreenTables.levels[i].y, 0x1c, ProgressScreenTables.levels[i].sprite1);
                 if (icon) {
-                    icon->string_id = DAT_004beb80.levels[i].id;
+                    icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->flags |= 0x2000;
                 }
@@ -108,19 +108,19 @@ LEGO_EXPORT void InitProgressScreen(void) {
     } else {
         for (i = 0; i < 10; i++) {
             if (i + 5 == (int)lpConfig->level - 1) {
-                icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite0);
+                icon = InsertIcon(ProgressScreenTables.levels[i].x, ProgressScreenTables.levels[i].y, 0x1c, ProgressScreenTables.levels[i].sprite0);
                 if (icon) {
                     icon->render_func = (void *)RenderFlashingSpriteIcon;
-                    icon->string_id = DAT_004beb80.levels[i].id;
+                    icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
                     icon->event_handler = (void *)FUN_0048bb60;
                     icon->flags |= 0x600a;
                 }
             } else if (CurrentProfile.flags[4 + i + 5] == 1) {
-                icon = InsertIcon(DAT_004beb80.levels[i].x, DAT_004beb80.levels[i].y, 0x1c, DAT_004beb80.levels[i].sprite1);
+                icon = InsertIcon(ProgressScreenTables.levels[i].x, ProgressScreenTables.levels[i].y, 0x1c, ProgressScreenTables.levels[i].sprite1);
                 if (icon) {
-                    icon->string_id = DAT_004beb80.levels[i].id;
+                    icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
                     icon->event_handler = (void *)FUN_0048bb60;
@@ -137,14 +137,14 @@ LEGO_EXPORT void InitProgressScreen(void) {
 unsigned char FUN_0048bb60(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
     DAT_00798660 = 1;
     if ((arg1 & 2) != 0) {
-        if ((int)(GetTicks() - DAT_0079866c) < 500 && arg0[0x18] == DAT_004beb80.last_clicked) {
+        if ((int)(GetTicks() - DAT_0079866c) < 500 && arg0[0x18] == ProgressScreenTables.last_clicked) {
             if (DAT_00798664 != 0) {
                 return FUN_0048bf90(arg0, arg1, arg2, arg3);
             }
             return FUN_0048bc20(arg0, arg1, arg2, arg3);
         }
         DAT_0079866c = GetTicks();
-        DAT_004beb80.last_clicked = arg0[0x18];
+        ProgressScreenTables.last_clicked = arg0[0x18];
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
         lpConfig->level = arg0[0x18] + 1;
         DAT_0080ff80.unk4 = 0xffffffff;
@@ -190,7 +190,7 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
 void LoadTutorialSprites(void) {
     struct ProgressEntry *e;
 
-    e = &DAT_004beb80.tutorials[0];
+    e = &ProgressScreenTables.tutorials[0];
     do {
         e->sprite0 = LoadSprite(e->name0, 4);
         e->sprite1 = LoadSprite(e->name1, 4);
@@ -201,7 +201,7 @@ void LoadTutorialSprites(void) {
 void FUN_0048bd40(void) {
     int *esi;
 
-    esi = (int *)&DAT_004beb80.tutorials[0].sprite1;
+    esi = (int *)&ProgressScreenTables.tutorials[0].sprite1;
     do {
         ReferenceSprite((struct Sprite *)esi[-1]);
         ReferenceSprite((struct Sprite *)esi[0]);
@@ -214,7 +214,7 @@ void FUN_0048bd70(void) {
 
     RemoveIconGroup(0x1c);
     RemoveIconGroup(0x23);
-    slot = (struct FreePlaySpriteSlot *)&DAT_004beb80.tutorials[0].sprite0;
+    slot = (struct FreePlaySpriteSlot *)&ProgressScreenTables.tutorials[0].sprite0;
     while ((int)slot < (int)&DAT_004bed40) {
         while (KillSprite(slot->sprite0) == 0) {
         }
@@ -265,7 +265,7 @@ void FUN_0048bde0(void) {
     RemoveIconGroup(0x1c);
     i = 0;
     mapping = DAT_007cb380;
-    entry = &DAT_004beb80.tutorials[0];
+    entry = &ProgressScreenTables.tutorials[0];
     do {
         if (i == lpConfig->level - 1) {
             icon = InsertIcon(entry->x, entry->y, 0x1c, entry->sprite0);
@@ -365,7 +365,7 @@ void FUN_0048c100(void) {
         NewPrintCent(GetString(0x28a), 3, rc, 0);
         i = 0;
         mapping = DAT_007cb380;
-        entry = &DAT_004beb80.tutorials[0].x;
+        entry = &ProgressScreenTables.tutorials[0].x;
         do {
             text = GetString(entry[-1]);
             rc.left = entry[0] + 0x32;
@@ -379,13 +379,13 @@ void FUN_0048c100(void) {
             } else {
                 DrawTextOnRenderSurface(text, 2, rc, 0xa0a0a0);
             }
-            if (CurrentProfile.flags[4 + i] == 1 && DAT_00813a44.x >= rc.left && DAT_00813a44.x < rc.right && DAT_00813a44.y >= rc.top && DAT_00813a44.y < rc.bottom) {
+            if (CurrentProfile.flags[4 + i] == 1 && MousePos.x >= rc.left && MousePos.x < rc.right && MousePos.y >= rc.top && MousePos.y < rc.bottom) {
                 Hover.type = 2;
                 Hover.ptr = (struct Bloke *)*mapping;
             }
             i++;
             entry += 7;
             mapping++;
-        } while ((int)entry < (int)&DAT_004beb80.tail[12]);
+        } while ((int)entry < (int)&ProgressScreenTables.tail[12]);
     }
 }

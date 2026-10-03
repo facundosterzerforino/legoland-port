@@ -29,9 +29,9 @@ void FUN_00411b20(struct PumpNode *node);
 void FUN_00411ba0(unsigned short param_1);
 void FUN_00411bd0(void);
 
-void FUN_00411a10(struct PumpSource *param_1);
-void FUN_00411a20();
+void InitDrivingSchoolPumps(struct PumpSource *param_1);
+void DrivingSchoolPumpsSetEditMode();
 struct PumpTile *FUN_00411dc0(struct Cursor *cursor);
-void FUN_00411bf0(Element *obj, int *coords);
-void FUN_00411c70(void *param_1, TileId tile, struct Cursor *cursor);
+void DrivingSchoolPumpsAddObject(Element *obj, int *coords);
+void DrivingSchoolPumpsRemoveObject(void *param_1, TileId tile, struct Cursor *cursor);
 void FUN_00411cd0(Element *obj, int *screen, unsigned int param_3);

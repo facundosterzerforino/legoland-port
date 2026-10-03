@@ -108,6 +108,7 @@
 #include "port_data.h"
 
 /* Symbols no header declares (callbacks only reached through these tables, TU-level globals). */
+void AdjustGardenerCount();
 void Bloke_DoNothing();
 extern char CopterPathTable0[];
 extern char CopterPathTable1[];
@@ -118,7 +119,6 @@ extern char DAT_004b4608[];
 extern char DAT_004b47b8[];
 extern char DAT_004b47e8[];
 extern char DAT_004b9d44[];
-void FUN_00410160();
 void FUN_00423940();
 void FUN_00423970();
 void FUN_00423990();
@@ -143,13 +143,11 @@ void FUN_00450330();
 void FUN_00450450();
 void FUN_0046a120();
 void FUN_0046a170();
-void FUN_0046a190();
 void FUN_0046a1f0();
 void FUN_0046a230();
 void FUN_0046a300();
 void FUN_0046a330();
 void FUN_0046a350();
-void FUN_0046a370();
 void FUN_0046a390();
 void FUN_0046a3b0();
 void FUN_0046a420();
@@ -184,7 +182,6 @@ void FUN_0046ae20();
 void FUN_0046ae30();
 void FUN_0046ae40();
 void FUN_0046ae70();
-void FUN_0046aec0();
 void FUN_0046af10();
 void FUN_0046af60();
 void FUN_0046afe0();
@@ -289,10 +286,13 @@ void FlipFrame();
 void Gardener_Build();
 void Gardener_Idle();
 void Garderner_Repair();
+void GenerateWorkers();
 void IsStringEmpty();
+void LogFlumeHoldUpRemoveObject();
 void Mechanic_Build();
 void Mechanic_Idle();
 void Mechanics_Repair();
+void NerpsSetEntranceFee();
 
 #define PORT_DATA_VA 0x004ab000u
 #define PORT_DATA_SIZE 0x17000u
@@ -4248,7 +4248,7 @@ static const struct PortFixup port_fixups[] = {
     {0x318c, 'G', (void *)&DAT_004cc090, sizeof(DAT_004cc090), 0x3f70, ~0u},
     {0x35a4, 'G', (void *)&DAT_004e3870, 0x1u, 0x8c803, ~0u},
     {0x3e60, 'F', (void *)FUN_004119a0, 0, 0, ~0u},
-    {0x3f80, 'F', (void *)FUN_00410160, 0, 0, ~0u},
+    {0x3f80, 'F', (void *)LogFlumeHoldUpRemoveObject, 0, 0, ~0u},
     {0x4f1c, 'G', (void *)&NullGuid, sizeof(NullGuid), 0x307a, 0x504au},
     {0x4f20, 'G', (void *)&DAT_004cc090, sizeof(DAT_004cc090), 0x3fbc, ~0u},
     {0x4f24, 'G', (void *)&DAT_004e3870, 0x1u, 0xc7de, ~0u},
@@ -4349,10 +4349,10 @@ static const struct PortFixup port_fixups[] = {
     {0xa970, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x48, 0xa9d0u},
     {0xa97c, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x38, 0xa9c0u},
     {0xa980, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x48, 0xa9d0u},
-    {0xaaac, 'G', (void *)&DAT_004b59f8, 0xc4u, 0x18, 0xaa10u},
-    {0xaab0, 'G', (void *)&DAT_004b59f8, 0xc4u, 0x40, 0xaa38u},
-    {0xaab4, 'G', (void *)&DAT_004b59f8, 0xc4u, 0x68, 0xaa60u},
-    {0xaab8, 'G', (void *)&DAT_004b59f8, 0xc4u, 0x90, 0xaa88u},
+    {0xaaac, 'G', (void *)&SitLoManSitName, 0xc4u, 0x18, 0xaa10u},
+    {0xaab0, 'G', (void *)&SitLoManSitName, 0xc4u, 0x40, 0xaa38u},
+    {0xaab4, 'G', (void *)&SitLoManSitName, 0xc4u, 0x68, 0xaa60u},
+    {0xaab8, 'G', (void *)&SitLoManSitName, 0xc4u, 0x90, 0xaa88u},
     {0xab20, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x84, ~0u},
     {0xab24, 'G', (void *)&DAT_004e3870, 0x1u, 0x0, ~0u},
     {0xab3c, 'G', (void *)&DAT_004dd870, sizeof(DAT_004dd870), 0x0, ~0u},
@@ -4624,8 +4624,8 @@ static const struct PortFixup port_fixups[] = {
     {0xed4c, 'F', (void *)FUN_00469b20, 0, 0, ~0u},
     {0xed50, 'F', (void *)FUN_00469b50, 0, 0, ~0u},
     {0xed54, 'F', (void *)FUN_00469b70, 0, 0, ~0u},
-    {0xed58, 'F', (void *)FUN_00469b90, 0, 0, ~0u},
-    {0xed5c, 'F', (void *)FUN_00469bb0, 0, 0, ~0u},
+    {0xed58, 'F', (void *)ObjectiveEventAddBricks, 0, 0, ~0u},
+    {0xed5c, 'F', (void *)ObjectiveEventSetBricks, 0, 0, ~0u},
     {0xed60, 'F', (void *)FUN_00469c40, 0, 0, ~0u},
     {0xed64, 'F', (void *)FUN_00469c80, 0, 0, ~0u},
     {0xed68, 'F', (void *)FUN_00469ed0, 0, 0, ~0u},
@@ -4635,13 +4635,13 @@ static const struct PortFixup port_fixups[] = {
     {0xed78, 'F', (void *)FUN_00469fc0, 0, 0, ~0u},
     {0xed7c, 'F', (void *)FUN_0046a030, 0, 0, ~0u},
     {0xed80, 'F', (void *)FUN_0046a120, 0, 0, ~0u},
-    {0xed84, 'F', (void *)FUN_0046a190, 0, 0, ~0u},
+    {0xed84, 'F', (void *)GenerateWorkers, 0, 0, ~0u},
     {0xed88, 'F', (void *)FUN_0046a1f0, 0, 0, ~0u},
     {0xed8c, 'F', (void *)FUN_0046a230, 0, 0, ~0u},
     {0xed90, 'F', (void *)FUN_0046a300, 0, 0, ~0u},
     {0xed94, 'F', (void *)FUN_0046a330, 0, 0, ~0u},
     {0xed98, 'F', (void *)FUN_0046a350, 0, 0, ~0u},
-    {0xed9c, 'F', (void *)FUN_0046a370, 0, 0, ~0u},
+    {0xed9c, 'F', (void *)NerpsSetEntranceFee, 0, 0, ~0u},
     {0xeda0, 'F', (void *)FUN_0046a3b0, 0, 0, ~0u},
     {0xeda4, 'F', (void *)FUN_0046a170, 0, 0, ~0u},
     {0xeda8, 'F', (void *)FUN_0046a420, 0, 0, ~0u},
@@ -4677,7 +4677,7 @@ static const struct PortFixup port_fixups[] = {
     {0xee20, 'F', (void *)FUN_0046ae30, 0, 0, ~0u},
     {0xee24, 'F', (void *)FUN_0046ae40, 0, 0, ~0u},
     {0xee28, 'F', (void *)FUN_0046ae70, 0, 0, ~0u},
-    {0xee2c, 'F', (void *)FUN_0046aec0, 0, 0, ~0u},
+    {0xee2c, 'F', (void *)AdjustGardenerCount, 0, 0, ~0u},
     {0xee30, 'F', (void *)FUN_0046af10, 0, 0, ~0u},
     {0xee34, 'F', (void *)FUN_0046af60, 0, 0, ~0u},
     {0xee38, 'F', (void *)FUN_0046afe0, 0, 0, ~0u},
@@ -4689,7 +4689,7 @@ static const struct PortFixup port_fixups[] = {
     {0xee50, 'F', (void *)FUN_0046b180, 0, 0, ~0u},
     {0xee54, 'F', (void *)FUN_0046b1e0, 0, 0, ~0u},
     {0xee58, 'F', (void *)FUN_0046b1f0, 0, 0, ~0u},
-    {0xf87c, 'G', (void *)&DAT_006687c8, sizeof(DAT_006687c8), 0x0, ~0u},
+    {0xf87c, 'G', (void *)&IconListHead, sizeof(IconListHead), 0x0, ~0u},
     {0xf880, 'G', (void *)&DAT_006687cc, sizeof(DAT_006687cc), 0x0, ~0u},
     {0x100a4, 'G', (void *)&DAT_004b5b62, sizeof(DAT_004b5b62), 0xaa, 0xac0cu},
     {0x100a8, 'G', (void *)&DAT_004b5b62, sizeof(DAT_004b5b62), 0x9a, 0xabfcu},
@@ -5403,7 +5403,7 @@ static const struct PortFixup port_fixups[] = {
     {0x133ec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x944, 0x137fcu},
     {0x133fc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1c8, 0xd970u},
     {0x1340c, 'G', (void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0x98, 0x9eb8u},
-    {0x1341c, 'G', (void *)&DAT_004b78b4, 0x108u, 0xc4, 0xc978u},
+    {0x1341c, 'G', (void *)&BoxBlokeBnvName, 0x108u, 0xc4, 0xc978u},
     {0x1342c, 'G', (void *)&JOUST_SFX, sizeof(JOUST_SFX), 0x90, 0x9718u},
     {0x1343c, 'G', (void *)&DAT_004b4f1c, sizeof(DAT_004b4f1c), 0x70, 0x9f8cu},
     {0x1344c, 'G', (void *)&DAT_004b7e9c, sizeof(DAT_004b7e9c), 0x214, 0xd0b0u},
@@ -5472,15 +5472,15 @@ static const struct PortFixup port_fixups[] = {
     {0x13c7c, 'G', (void *)&DAT_004bed44, sizeof(DAT_004bed44), 0x24, 0x13d68u},
     {0x13c80, 'G', (void *)&DAT_004bed44, sizeof(DAT_004bed44), 0x10, 0x13d54u},
     {0x13ca0, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
-    {0x13ca4, 'G', (void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x1ac, 0x13d2cu},
+    {0x13ca4, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x13cbc, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
-    {0x13cc0, 'G', (void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x1ac, 0x13d2cu},
+    {0x13cc0, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x13cd8, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
-    {0x13cdc, 'G', (void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x1ac, 0x13d2cu},
+    {0x13cdc, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x13cf4, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
-    {0x13cf8, 'G', (void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x1ac, 0x13d2cu},
+    {0x13cf8, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x13d10, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
-    {0x13d14, 'G', (void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x1ac, 0x13d2cu},
+    {0x13d14, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x14898, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
     {0x1489c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
     {0x148a8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
@@ -5686,7 +5686,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b4470, sizeof(DAT_004b4470), 0x9470, 0x110},
     {(void *)&DAT_004b4580, sizeof(DAT_004b4580), 0x9580, 0x30},
     {(void *)&JOUST_SFX, sizeof(JOUST_SFX), 0x9688, 0xa0},
-    {(void *)&DAT_004b4728, sizeof(DAT_004b4728), 0x9728, 0x4},
+    {(void *)&LogFlumeFootprint, sizeof(LogFlumeFootprint), 0x9728, 0x4},
     {(void *)&DAT_004b472c, sizeof(DAT_004b472c), 0x972c, 0x4},
     {(void *)&DAT_004b4730, sizeof(DAT_004b4730), 0x9730, 0x4},
     {(void *)&DAT_004b4734, sizeof(DAT_004b4734), 0x9734, 0x8},
@@ -5714,13 +5714,13 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b4ce4, sizeof(DAT_004b4ce4), 0x9ce4, 0xa4},
     {(void *)&SpiderRide_SFX, sizeof(SpiderRide_SFX), 0x9d88, 0x8},
     {(void *)&DAT_004b4d90, sizeof(DAT_004b4d90), 0x9d90, 0x4},
-    {(void *)&DAT_004b4d94, sizeof(DAT_004b4d94), 0x9d94, 0x8c},
+    {(void *)&SpiderBnvInfo, sizeof(SpiderBnvInfo), 0x9d94, 0x8c},
     {(void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0x9e20, 0xe8},
     {(void *)&DAT_004b4f08, sizeof(DAT_004b4f08), 0x9f08, 0x10},
     {(void *)&DAT_004b4f18, sizeof(DAT_004b4f18), 0x9f18, 0x4},
     {(void *)&DAT_004b4f1c, sizeof(DAT_004b4f1c), 0x9f1c, 0x8c},
     {(void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x9fa8, 0x170},
-    {(void *)&DAT_004b5118, sizeof(DAT_004b5118), 0xa118, 0x40},
+    {(void *)&BoatingSchoolDirSteps, sizeof(BoatingSchoolDirSteps), 0xa118, 0x40},
     {(void *)&DAT_004b5158, sizeof(DAT_004b5158), 0xa158, 0x40},
     {(void *)&DAT_004b5198, sizeof(DAT_004b5198), 0xa198, 0x40},
     {(void *)&DAT_004b51d8, sizeof(DAT_004b51d8), 0xa1d8, 0x88},
@@ -5824,7 +5824,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7230, sizeof(DAT_004b7230), 0xc230, 0x18},
     {(void *)&DAT_004b7248, sizeof(DAT_004b7248), 0xc248, 0x18},
     {(void *)&DAT_004b7260, sizeof(DAT_004b7260), 0xc260, 0x18},
-    {(void *)&DAT_004b7278, sizeof(DAT_004b7278), 0xc278, 0x10},
+    {(void *)&JungleCruiseStartFootprint, sizeof(JungleCruiseStartFootprint), 0xc278, 0x10},
     {(void *)&DAT_004b7288, sizeof(DAT_004b7288), 0xc288, 0x8},
     {(void *)&DAT_004b7290, sizeof(DAT_004b7290), 0xc290, 0x54},
     {(void *)&DAT_004b72e4, sizeof(DAT_004b72e4), 0xc2e4, 0x194},
@@ -5845,7 +5845,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7d84, sizeof(DAT_004b7d84), 0xcd84, 0x118},
     {(void *)&DAT_004b7e9c, sizeof(DAT_004b7e9c), 0xce9c, 0x324},
     {(void *)&GraphicsPath, sizeof(GraphicsPath), 0xd1c0, 0x4},
-    {(void *)&DAT_004b81c4, sizeof(DAT_004b81c4), 0xd1c4, 0x4},
+    {(void *)&GraphicsPathPrefix, sizeof(GraphicsPathPrefix), 0xd1c4, 0x4},
     {(void *)&GraphicsSmallPath, sizeof(GraphicsSmallPath), 0xd1c8, 0x4},
     {(void *)&MasksPath, sizeof(MasksPath), 0xd1cc, 0x4},
     {(void *)&MasksSmallPath, sizeof(MasksSmallPath), 0xd1d0, 0x4},
@@ -5863,7 +5863,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b8a88, sizeof(DAT_004b8a88), 0xda88, 0x4},
     {(void *)&DAT_004b8a8c, sizeof(DAT_004b8a8c), 0xda8c, 0x4},
     {(void *)&DAT_004b8a90, sizeof(DAT_004b8a90), 0xda90, 0x12c},
-    {(void *)&DAT_004b8bbc, sizeof(DAT_004b8bbc), 0xdbbc, 0x53c},
+    {(void *)&PercentSFormat, sizeof(PercentSFormat), 0xdbbc, 0x53c},
     {(void *)&BrickCount, sizeof(BrickCount), 0xe0f8, 0x4},
     {(void *)&UnlimitedBricks, sizeof(UnlimitedBricks), 0xe0fc, 0x114},
     {(void *)&DAT_004b9210, sizeof(DAT_004b9210), 0xe210, 0x4},
@@ -5903,8 +5903,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b9608, sizeof(DAT_004b9608), 0xe608, 0x4},
     {(void *)&DAT_004b960c, sizeof(DAT_004b960c), 0xe60c, 0x4},
     {(void *)&DAT_004b9610, sizeof(DAT_004b9610), 0xe610, 0x694},
-    {(void *)&DAT_004b9ca4, sizeof(DAT_004b9ca4), 0xeca4, 0x4},
-    {(void *)&DAT_004b9ca8, sizeof(DAT_004b9ca8), 0xeca8, 0x9c},
+    {(void *)&BlitFrameFunc, sizeof(BlitFrameFunc), 0xeca4, 0x4},
+    {(void *)&OverrideFrame, sizeof(OverrideFrame), 0xeca8, 0x9c},
     {(void *)&DAT_004b9e5c, sizeof(DAT_004b9e5c), 0xee5c, 0x11c},
     {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
     {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
@@ -5932,7 +5932,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004bb5a0, sizeof(DAT_004bb5a0), 0x105a0, 0x4},
     {(void *)&DAT_004bb5a4, sizeof(DAT_004bb5a4), 0x105a4, 0x8},
     {(void *)&DAT_004bb5ac, sizeof(DAT_004bb5ac), 0x105ac, 0x4},
-    {(void *)&DAT_004bb5b0, sizeof(DAT_004bb5b0), 0x105b0, 0x4},
+    {(void *)&ScriptConditionActive, sizeof(ScriptConditionActive), 0x105b0, 0x4},
     {(void *)&DAT_004bb5b4, sizeof(DAT_004bb5b4), 0x105b4, 0x10},
     {(void *)&DAT_004bb5c4, sizeof(DAT_004bb5c4), 0x105c4, 0x14},
     {(void *)&DAT_004bb5d8, sizeof(DAT_004bb5d8), 0x105d8, 0x8},
@@ -5954,19 +5954,19 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&Hover, sizeof(Hover), 0x12d00, 0x1a0},
     {(void *)&SPRITE_ClipRect, sizeof(SPRITE_ClipRect), 0x12ea0, 0x18},
     {(void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x12eb8, 0xcc8},
-    {(void *)&DAT_004beb80, sizeof(DAT_004beb80), 0x13b80, 0x1c0},
+    {(void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x13b80, 0x1c0},
     {(void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x13d40, 0x4},
     {(void *)&DAT_004bed44, sizeof(DAT_004bed44), 0x13d44, 0x258},
     {(void *)&DAT_004bef9c, sizeof(DAT_004bef9c), 0x13f9c, 0x6d4},
     {(void *)&DAT_004bf670, sizeof(DAT_004bf670), 0x14670, 0x104},
     {(void *)&MusicEnabled, sizeof(MusicEnabled), 0x14774, 0x4},
-    {(void *)&DAT_004bf778, sizeof(DAT_004bf778), 0x14778, 0x7b0},
+    {(void *)&MusicState, sizeof(MusicState), 0x14778, 0x7b0},
     {(void *)&DAT_004c10d4, sizeof(DAT_004c10d4), 0x160d4, 0x8},
     {(void *)&CastleLevelRide, sizeof(CastleLevelRide), 0x160dc, 0x8},
     {(void *)&CastleLevelMatteSprite, sizeof(CastleLevelMatteSprite), 0x160e4, 0x4},
     {(void *)&DAT_004c10e8, sizeof(DAT_004c10e8), 0x160e8, 0x8},
     {(void *)&DAT_004c10f0, sizeof(DAT_004c10f0), 0x160f0, 0x4},
-    {(void *)&DAT_004c10f4, sizeof(DAT_004c10f4), 0x160f4, 0xc},
+    {(void *)&ActiveCatapultRide, sizeof(ActiveCatapultRide), 0x160f4, 0xc},
     {(void *)&DAT_004c1100, sizeof(DAT_004c1100), 0x16100, 0x4},
     {(void *)&DAT_004c1104, sizeof(DAT_004c1104), 0x16104, 0x4},
     {(void *)&DAT_004c1108, sizeof(DAT_004c1108), 0x16108, 0x4},
@@ -5993,7 +5993,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004c11ac, sizeof(DAT_004c11ac), 0x161ac, 0x4},
     {(void *)&DAT_004c11b0, sizeof(DAT_004c11b0), 0x161b0, 0x4},
     {(void *)&CopterNodeList, sizeof(CopterNodeList), 0x161b4, 0x8},
-    {(void *)&DAT_004c11bc, sizeof(DAT_004c11bc), 0x161bc, 0x4},
+    {(void *)&DrivingSchoolCountList, sizeof(DrivingSchoolCountList), 0x161bc, 0x4},
     {(void *)&DAT_004c11c0, sizeof(DAT_004c11c0), 0x161c0, 0x4},
     {(void *)&DAT_004c11c4, sizeof(DAT_004c11c4), 0x161c4, 0x4},
     {(void *)&DAT_004c11c8, sizeof(DAT_004c11c8), 0x161c8, 0x4},
@@ -6002,18 +6002,18 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&FortRide, sizeof(FortRide), 0x161dc, 0x4},
     {(void *)&DAT_004c11e0, sizeof(DAT_004c11e0), 0x161e0, 0x4},
     {(void *)&DAT_004c11e4, sizeof(DAT_004c11e4), 0x161e4, 0x4},
-    {(void *)&DAT_004c11e8, sizeof(DAT_004c11e8), 0x161e8, 0x8},
-    {(void *)&DAT_004c11f0, sizeof(DAT_004c11f0), 0x161f0, 0x4},
+    {(void *)&GoldRushLayer, sizeof(GoldRushLayer), 0x161e8, 0x8},
+    {(void *)&GoldRushRide, sizeof(GoldRushRide), 0x161f0, 0x4},
     {(void *)&GoldMaskSprite, sizeof(GoldMaskSprite), 0x161f4, 0x4},
     {(void *)&GoldWashMatte1Sprite, sizeof(GoldWashMatte1Sprite), 0x161f8, 0x4},
     {(void *)&GoldWashSprite, sizeof(GoldWashSprite), 0x161fc, 0x4},
     {(void *)&GoldWashMatte2Sprite, sizeof(GoldWashMatte2Sprite), 0x16200, 0x4},
     {(void *)&GoldWashList, sizeof(GoldWashList), 0x16204, 0x4},
-    {(void *)&DAT_004c1208, sizeof(DAT_004c1208), 0x16208, 0x8},
+    {(void *)&GoldRushBlokeRenderList, sizeof(GoldRushBlokeRenderList), 0x16208, 0x8},
     {(void *)&ZJoustSprite, sizeof(ZJoustSprite), 0x16210, 0x4},
-    {(void *)&DAT_004c1214, sizeof(DAT_004c1214), 0x16214, 0x4},
+    {(void *)&JoustLayer, sizeof(JoustLayer), 0x16214, 0x4},
     {(void *)&JoustRideBnv, sizeof(JoustRideBnv), 0x16218, 0x4},
-    {(void *)&DAT_004c121c, sizeof(DAT_004c121c), 0x1621c, 0xc},
+    {(void *)&JoustRide, sizeof(JoustRide), 0x1621c, 0xc},
     {(void *)&DAT_004c1228, sizeof(DAT_004c1228), 0x16228, 0x4},
     {(void *)&DAT_004c122c, sizeof(DAT_004c122c), 0x1622c, 0x4},
     {(void *)&DAT_004c1230, sizeof(DAT_004c1230), 0x16230, 0x4},

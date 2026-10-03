@@ -80,17 +80,19 @@ LEGO_EXPORT unsigned int *AllocTileSpace(void *manager, int count, unsigned int 
 int FUN_0045aa50(struct FXSpriteList **out) {
     int count = 0;
     struct FXSpriteList *prev = NULL;
-    void **slot = TileSpriteArray;
-    struct TileSpriteEntry *info = TileSpriteInfo;
     struct FXSpriteList *src;
+    struct FXSpriteList **dst = out;
+    struct TileSpriteEntry *info = TileSpriteInfo;
+    void **slot = TileSpriteArray;
 
     do {
         if (*slot != (void *)-1) {
             src = info->src;
             if (src != NULL && src != prev) {
-                *out++ = src;
+                *dst = src;
                 count++;
                 prev = src;
+                dst++;
             }
         }
         slot++;
@@ -216,7 +218,6 @@ void FUN_0045ade0(void) {
     int iVar13;
     int local_50;
     int local_4c;
-    int local_44;
     int local_2c;
     RECT local_24;
     short size;
@@ -282,20 +283,18 @@ void FUN_0045ade0(void) {
             iVar2 = local_2c;
             iVar8 = (local_24.left + iVar13 * -2) - local_50;
             if (iVar8 < (int)(iVar13 * 2 + local_24.right)) {
-                iVar11 = local_2c * 0x14;
                 iVar10 = iVar3;
                 do {
-                    if (iVar11 < 0 || local_2c >= (int)lpConfig->width || iVar10 < 0 ||
-                        iVar10 >= (int)lpConfig->height) {
-                        tile.flags_10 = 0;
+                    if (local_2c >= 0 && local_2c < (int)lpConfig->width && iVar10 >= 0 &&
+                        iVar10 < (int)lpConfig->height) {
+                        tile = *(struct MapTile *)&GameMap[iVar10][local_2c];
                     } else {
-                        tile = *(struct MapTile *)((char *)GameMap[iVar10] + iVar11);
+                        tile.flags_10 = 0;
                     }
                     if ((tile.flags_10 & 2) != 0) {
                         PrintSprite((struct Sprite *)TileSpriteArray[(DAT_00805f48 & 0xff) + *(unsigned int *)DAT_00801a6c], iVar8, local_4c, 0xff6868, 0);
                     }
                     local_2c = local_2c + 1;
-                    iVar11 = iVar11 + 0x14;
                     iVar8 = iVar8 + iVar13;
                     iVar10 = iVar10 + -1;
                 } while (iVar8 < (int)(iVar13 * 2 + local_24.right));
@@ -303,22 +302,20 @@ void FUN_0045ade0(void) {
             iVar2 = iVar2 + 1;
             iVar8 = (local_24.left + iVar13 * -2) - local_50;
             if (iVar8 < (int)(iVar13 * 2 + local_24.right)) {
-                local_44 = iVar2 * 0x14;
                 iVar10 = iVar8 + iVar7;
                 iVar11 = iVar3;
                 local_2c = iVar2;
                 do {
-                    if (local_44 < 0 || local_2c >= (int)lpConfig->width || iVar11 < 0 ||
-                        iVar11 >= (int)lpConfig->height) {
-                        tile.flags_10 = 0;
+                    if (local_2c >= 0 && local_2c < (int)lpConfig->width && iVar11 >= 0 &&
+                        iVar11 < (int)lpConfig->height) {
+                        tile = *(struct MapTile *)&GameMap[iVar11][local_2c];
                     } else {
-                        tile = *(struct MapTile *)((char *)GameMap[iVar11] + local_44);
+                        tile.flags_10 = 0;
                     }
                     if ((tile.flags_10 & 2) != 0) {
                         PrintSprite((struct Sprite *)TileSpriteArray[(DAT_00805f48 & 0xff) + *(unsigned int *)DAT_00801a6c], iVar10, local_4c + iVar1, 0xff6868, 0);
                     }
                     local_2c = local_2c + 1;
-                    local_44 = local_44 + 0x14;
                     iVar8 = iVar8 + iVar13;
                     iVar11 = iVar11 + -1;
                     iVar10 = iVar10 + iVar13;
@@ -790,57 +787,56 @@ LEGO_EXPORT unsigned int ScreenToMapRef(int *param_1, int *out, unsigned int par
     if (sprite == NULL) {
         return 0xffffffff;
     }
-    size = sprite->size;
-    w = (int)size;
-    twice = size * 2;
-    hy = w + 1 >> 1;
-    half = twice + 1 >> 1;
-    sx = ((ScrollX >> 8) - lpConfig->view_x) + *param_1 + half;
-    sy = ((ScrollY >> 8) - lpConfig->view_y) + param_1[1];
-    qx = sx / twice;
-    rx = sx % twice;
-    qy = sy / w;
-    ry = sy % w;
-    *out = qx + qy;
-    out[1] = qy - qx;
-    if (rx < 0) {
-        rx = rx + -2 + twice;
-        out[1] = (qy - qx) + 1;
-        *out = (qx + qy) + -1;
-    }
-    if (ry < 0) {
-        out[1] = out[1] + -1;
-        *out = *out + -1;
-        ry = ry + -1 + w;
-    }
-    sel = (rx >= half) + 1;
-    if (ry > hy) {
-        sel += 2;
-    }
-    switch (sel) {
-    case 1:
-        if (rx < half + ry * -2) {
-            *out = *out + -1;
-            return 1;
+    do {
+        size = sprite->size;
+        w = (int)size;
+        twice = size * 2;
+        hy = w + 1 >> 1;
+        half = twice + 1 >> 1;
+        sx = ((ScrollX >> 8) - lpConfig->view_x) + *param_1 + half;
+        sy = ((ScrollY >> 8) - lpConfig->view_y) + param_1[1];
+        qx = sx / twice;
+        rx = sx % twice;
+        qy = sy / w;
+        ry = sy % w;
+        *out = qx + qy;
+        out[1] = qy - qx;
+        if (rx < 0) {
+            rx = rx + -2 + twice;
+            out[1] = (qy - qx) + 1;
+            *out = (qx + qy) + -1;
         }
-        break;
-    case 2:
-        if (rx >= half + ry * 2) {
+        if (ry < 0) {
             out[1] = out[1] + -1;
-            return 1;
+            *out = *out + -1;
+            ry = ry + -1 + w;
         }
-        break;
-    case 3:
-        if (rx < half + (ry - w) * 2) {
-            out[1] = out[1] + 1;
-            return 1;
+        sel = (rx >= half) + 1;
+        if (ry > hy) {
+            sel += 2;
         }
-        break;
-    case 4:
-        if (rx >= half + (w - ry) * 2) {
-            *out = *out + 1;
+        switch (sel) {
+        case 1:
+            if (rx < half + ry * -2) {
+                *out = *out + -1;
+            }
+            break;
+        case 2:
+            if (rx >= half + ry * 2) {
+                out[1] = out[1] + -1;
+            }
+            break;
+        case 3:
+            if (rx < half + (ry - w) * 2) {
+                out[1] = out[1] + 1;
+            }
+            break;
+        case 4:
+            if (rx >= half + (w - ry) * 2) {
+                *out = *out + 1;
+            }
         }
-    }
+    } while (0);
     return 1;
 }
 
@@ -865,9 +861,9 @@ LEGO_EXPORT unsigned char Bit_To_Dir(unsigned char bit) {
 LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, char *param_3) {
     int x;
     int y;
-    int ym1;
     int yp1;
     int xp1;
+    int xm1;
     char local_15;
     char local_16;
     unsigned char local_17;
@@ -875,15 +871,15 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
 
     y = pos->y;
     x = pos->x;
-    ym1 = y + -1;
+    pos = (struct Point *)(y + -1);
     local_15 = '\0';
     local_16 = '\0';
     local_17 = 0;
-    if (x < 0 || x >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (x < 0 || x >= (int)lpConfig->width || (int)pos < 0 || (int)pos >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)pos] + x * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_16 = '\x01';
@@ -911,26 +907,26 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         local_16 = local_16 + '\x01';
         local_17 = local_17 | 4;
     }
-    x = x + -1;
-    if (x < 0 || x >= (int)lpConfig->width || y < 0 || y >= (int)lpConfig->height) {
+    xm1 = x + -1;
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || y < 0 || y >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[y] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[y] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
         local_17 = local_17 | 0x40;
     }
-    if (xp1 < 0 || xp1 >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (xp1 < 0 || xp1 >= (int)lpConfig->width || (int)pos < 0 || (int)pos >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + xp1 * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)pos] + xp1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
-        local_17 = local_17 | 2;
         local_15 = '\x01';
+        local_17 = local_17 | 2;
     }
     if (xp1 < 0 || xp1 >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
@@ -942,21 +938,21 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         local_15 = local_15 + '\x01';
         local_17 = local_17 | 8;
     }
-    if (x < 0 || x >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[yp1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[yp1] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
         local_17 = local_17 | 0x20;
     }
-    if (x < 0 || x >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || (int)pos < 0 || (int)pos >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)pos] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -975,9 +971,9 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
 unsigned char FUN_0045c440(int *param_1, char *param_2, char *param_3) {
     int x;
     int y;
-    int ym1;
     int yp1;
     int xp1;
+    int xm1;
     char local_15;
     char local_16;
     unsigned char local_17;
@@ -985,15 +981,15 @@ unsigned char FUN_0045c440(int *param_1, char *param_2, char *param_3) {
 
     y = param_1[1];
     x = *param_1;
-    ym1 = y + -1;
+    param_1 = (int *)(y + -1);
     local_15 = '\0';
     local_16 = '\0';
     local_17 = 0;
-    if (x < 0 || x >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (x < 0 || x >= (int)lpConfig->width || (int)param_1 < 0 || (int)param_1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)param_1] + x * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_16 = '\x01';
@@ -1021,26 +1017,26 @@ unsigned char FUN_0045c440(int *param_1, char *param_2, char *param_3) {
         local_16 = local_16 + '\x01';
         local_17 = local_17 | 4;
     }
-    x = x + -1;
-    if (x < 0 || x >= (int)lpConfig->width || y < 0 || y >= (int)lpConfig->height) {
+    xm1 = x + -1;
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || y < 0 || y >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[y] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[y] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
         local_17 = local_17 | 0x40;
     }
-    if (xp1 < 0 || xp1 >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (xp1 < 0 || xp1 >= (int)lpConfig->width || (int)param_1 < 0 || (int)param_1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + xp1 * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)param_1] + xp1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
-        local_17 = local_17 | 2;
         local_15 = '\x01';
+        local_17 = local_17 | 2;
     }
     if (xp1 < 0 || xp1 >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
@@ -1052,21 +1048,21 @@ unsigned char FUN_0045c440(int *param_1, char *param_2, char *param_3) {
         local_15 = local_15 + '\x01';
         local_17 = local_17 | 8;
     }
-    if (x < 0 || x >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || yp1 < 0 || yp1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[yp1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[yp1] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
         local_17 = local_17 | 0x20;
     }
-    if (x < 0 || x >= (int)lpConfig->width || ym1 < 0 || ym1 >= (int)lpConfig->height) {
+    if (xm1 < 0 || xm1 >= (int)lpConfig->width || (int)param_1 < 0 || (int)param_1 >= (int)lpConfig->height) {
         tile.flags_c = 0x40;
         tile.flags_10 = 0;
     } else {
-        tile = *(struct MapTile *)((char *)GameMap[ym1] + x * 0x14);
+        tile = *(struct MapTile *)((char *)GameMap[(int)param_1] + xm1 * 0x14);
     }
     if ((tile.flags_10 & 1) != 0 || ((tile.flags_c & 0x10) != 0 && (tile.flags_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -1139,24 +1135,16 @@ LEGO_EXPORT void AdjustTileRFFlags(int *param_1) {
 // FUNCTION: LEGOLAND 0x0045c900
 int FUN_0045c900(struct MapRect *param_1) {
     int x;
-    int x1;
-    int y0;
-    int y1;
-    int xoff;
     int y;
     struct MapTile tile;
 
-    x1 = param_1->x1;
-    for (x = param_1->x0; x <= x1; x++) {
-        y0 = param_1->y0;
-        y1 = param_1->y1;
-        xoff = x * 0x14;
-        for (y = y0; y <= y1; y++) {
-            if (xoff < 0 || x >= (int)lpConfig->width || y < 0 || y >= (int)lpConfig->height) {
+    for (x = param_1->x0; x <= param_1->x1; x++) {
+        for (y = param_1->y0; y <= param_1->y1; y++) {
+            if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
+                tile = *(struct MapTile *)&GameMap[y][x];
+            } else {
                 tile.flags_c = 0x40;
                 tile.flags_10 = 0;
-            } else {
-                tile = *(struct MapTile *)((char *)GameMap[y] + xoff);
             }
             if ((tile.flags_c & 0x10) == 0 || (tile.flags_10 & 2) != 0) {
                 return 0;
@@ -1235,30 +1223,13 @@ int FUN_0045ca90(int *param_1, int *param_2) {
 
 // FUNCTION: LEGOLAND 0x0045cb20
 void FUN_0045cb20(struct MapRect *param_1) {
-    unsigned int parity;
     int x;
-    int xoff;
-    unsigned int sum;
     int y;
 
-    y = param_1->y0;
-    if (y <= param_1->y1) {
-        do {
-            x = param_1->x0;
-            if (x <= param_1->x1) {
-                sum = x + y;
-                xoff = x * 0x14;
-                do {
-                    parity = sum & 1;
-                    xoff = xoff + 0x14;
-                    x = x + 1;
-                    sum = sum + 1;
-                    *(unsigned short *)((char *)GameMap[y] + -0xc + xoff) =
-                        (unsigned short)((2 - (parity != 0) & 0xff) + *(unsigned int *)PathSprite);
-                } while (x <= param_1->x1);
-            }
-            y = y + 1;
-        } while (y <= param_1->y1);
+    for (y = param_1->y0; y <= param_1->y1; y++) {
+        for (x = param_1->x0; x <= param_1->x1; x++) {
+            GameMap[y][x].field_8 = ((((x + y) & 1) ? 1 : 2) & 0xff) + *(unsigned short *)PathSprite;
+        }
     }
 }
 
@@ -1596,58 +1567,32 @@ struct PathFootprint {
 
 // FUNCTION: LEGOLAND 0x0045d3d0
 void FUN_0045d3d0(struct PathFootprint *param_1, int *param_2) {
-    struct MapTile *tile;
     int x;
     int y;
-    int xoff;
-    struct Point local_8;
+    struct Point pt;
 
     if (param_1->type != 0 && param_1->type != 2) {
-        y = param_2[1] + param_1->y_lo + -1;
-        if (y <= param_2[1] + 1 + param_1->y_hi) {
-            do {
-                x = *param_2 + param_1->x_lo + -1;
-                if (x <= *param_2 + param_1->x_hi + 1) {
-                    xoff = x * 0x14;
-                    do {
-                        *(unsigned short *)((char *)GameMap[y] + 0xc + xoff) =
-                            *(unsigned short *)((char *)GameMap[y] + 0xc + xoff) & 0xffe7;
-                        *(unsigned char *)((char *)GameMap[y] + 0x10 + xoff) = 0;
-                        tile = (struct MapTile *)GameMap[y];
-                        *(unsigned short *)((char *)tile + xoff + 8) =
-                            *(unsigned short *)((char *)tile + xoff + 0xa);
-                        local_8.x = x;
-                        local_8.y = y;
-                        FUN_0045d260(&local_8);
-                        RemovePathSquare((struct Point *)&local_8);
-                        x = x + 1;
-                        xoff = xoff + 0x14;
-                    } while (x <= *param_2 + param_1->x_hi + 1);
-                }
-                y = y + 1;
-            } while (y <= param_2[1] + 1 + param_1->y_hi);
+        for (y = param_2[1] + param_1->y_lo - 1; y <= param_2[1] + 1 + param_1->y_hi; y++) {
+            for (x = *param_2 + param_1->x_lo - 1; x <= *param_2 + param_1->x_hi + 1; x++) {
+                GameMap[y][x].flags &= 0xffe7;
+                GameMap[y][x].field_10 = 0;
+                GameMap[y][x].field_8 = GameMap[y][x].field_a;
+                pt.x = x;
+                pt.y = y;
+                FUN_0045d260(&pt);
+                RemovePathSquare(&pt);
+            }
         }
-        y = param_2[1] + param_1->y_lo;
-        if (y <= param_2[1] + param_1->y_hi) {
-            do {
-                x = *param_2 + param_1->x_lo;
-                if (x <= *param_2 + param_1->x_hi) {
-                    xoff = x * 0x14;
-                    do {
-                        tile = (struct MapTile *)((char *)GameMap[y] + xoff);
-                        tile->flags_c = tile->flags_c & 0xffe7;
-                        tile->flags_10 = 0;
-                        tile->tile = tile->base_id;
-                        local_8.x = x;
-                        local_8.y = y;
-                        FUN_0045d260(&local_8);
-                        RemovePathSquare((struct Point *)&local_8);
-                        x = x + 1;
-                        xoff = xoff + 0x14;
-                    } while (x <= *param_2 + param_1->x_hi);
-                }
-                y = y + 1;
-            } while (y <= param_2[1] + param_1->y_hi);
+        for (y = param_2[1] + param_1->y_lo; y <= param_2[1] + param_1->y_hi; y++) {
+            for (x = *param_2 + param_1->x_lo; x <= *param_2 + param_1->x_hi; x++) {
+                GameMap[y][x].flags &= 0xffe7;
+                GameMap[y][x].field_10 = 0;
+                GameMap[y][x].field_8 = GameMap[y][x].field_a;
+                pt.x = x;
+                pt.y = y;
+                FUN_0045d260(&pt);
+                RemovePathSquare(&pt);
+            }
         }
     }
 }
@@ -1682,73 +1627,56 @@ int FUN_0045d560(struct MapRect *out, struct MapRect *a, struct MapRect *b) {
 
 // FUNCTION: LEGOLAND 0x0045d5d0
 void FUN_0045d5d0(struct MapRect *param) {
-    struct MapRect result;
+    struct MapRect r;
     struct MapRect *cur;
+    struct MapRect *slot;
     int i;
-    int count;
-    int x0, y0, x1;
-    int y1;
-    int idx;
+    struct MapRect old;
 
     i = 0;
-    if (0 < DAT_00667d3c) {
+    if (i < DAT_00667d3c) {
         cur = DAT_00801a80;
         do {
-            count = DAT_00667d3c;
-            if (FUN_0045d560(&result, param, cur) != 0) {
-                x0 = cur->x0;
-                y0 = cur->y0;
-                x1 = cur->x1;
-                y1 = cur->y1;
-                idx = DAT_00667d3c + -1;
-                DAT_00667d3c = idx;
-                if (i < idx) {
-                    cur->x0 = DAT_00801a80[idx].x0;
-                    cur->y0 = DAT_00801a80[idx].y0;
-                    cur->x1 = DAT_00801a80[idx].x1;
-                    cur->y1 = DAT_00801a80[idx].y1;
+            if (FUN_0045d560(&r, param, cur) != 0) {
+                old = *cur;
+                DAT_00667d3c--;
+                if (i < DAT_00667d3c) {
+                    *cur = DAT_00801a80[DAT_00667d3c];
                 }
-                i = i + -1;
-                cur = cur + -1;
-                if (y0 < result.y0) {
-                    DAT_00667d3c = count;
-                    DAT_00801a80[idx].x0 = x0;
-                    DAT_00801a80[idx].y0 = y0;
-                    DAT_00801a80[idx].x1 = x1;
-                    DAT_00801a80[idx].y1 = result.y0 + -1;
-                    idx = count;
+                i--;
+                cur--;
+                if (old.y0 < r.y0) {
+                    slot = &DAT_00801a80[DAT_00667d3c++];
+                    slot->x0 = old.x0;
+                    slot->y0 = old.y0;
+                    slot->x1 = old.x1;
+                    slot->y1 = r.y0 - 1;
                 }
-                count = idx;
-                if (x0 < result.x0) {
-                    count = idx + 1;
-                    DAT_00667d3c = count;
-                    DAT_00801a80[idx].x0 = x0;
-                    DAT_00801a80[idx].y0 = result.y0;
-                    DAT_00801a80[idx].x1 = result.x0 + -1;
-                    DAT_00801a80[idx].y1 = result.y1;
+                if (old.x0 < r.x0) {
+                    slot = &DAT_00801a80[DAT_00667d3c++];
+                    slot->x0 = old.x0;
+                    slot->y0 = r.y0;
+                    slot->x1 = r.x0 - 1;
+                    slot->y1 = r.y1;
                 }
-                y0 = count;
-                if (result.x1 < x1) {
-                    y0 = count + 1;
-                    DAT_00667d3c = y0;
-                    DAT_00801a80[count].x0 = result.x1 + 1;
-                    DAT_00801a80[count].y0 = result.y0;
-                    DAT_00801a80[count].x1 = x1;
-                    DAT_00801a80[count].y1 = result.y1;
+                if (r.x1 < old.x1) {
+                    slot = &DAT_00801a80[DAT_00667d3c++];
+                    slot->x0 = r.x1 + 1;
+                    slot->y0 = r.y0;
+                    slot->x1 = old.x1;
+                    slot->y1 = r.y1;
                 }
-                count = y0;
-                if (result.y1 < y1) {
-                    count = y0 + 1;
-                    DAT_00667d3c = count;
-                    DAT_00801a80[y0].x0 = x0;
-                    DAT_00801a80[y0].y0 = result.y1 + 1;
-                    DAT_00801a80[y0].x1 = x1;
-                    DAT_00801a80[y0].y1 = y1;
+                if (r.y1 < old.y1) {
+                    slot = &DAT_00801a80[DAT_00667d3c++];
+                    slot->x0 = old.x0;
+                    slot->y0 = r.y1 + 1;
+                    slot->x1 = old.x1;
+                    slot->y1 = old.y1;
                 }
             }
-            cur = cur + 1;
-            i = i + 1;
-        } while (i < count);
+            i++;
+            cur++;
+        } while (i < DAT_00667d3c);
     }
 }
 

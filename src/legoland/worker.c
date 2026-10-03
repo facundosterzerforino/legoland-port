@@ -357,7 +357,7 @@ Bloke *FUN_00499c40(int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00499d00
-int FUN_00499d00(Bloke *worker) {
+int AssignGardenerWorkOrder(Bloke *worker) {
     WorkOrder *order = FUN_00499be0(GardenerOrderHead, worker);
     if (order == NULL) {
         return 0;
@@ -509,7 +509,7 @@ void FUN_00499f40(WorkOrder *order) {
 }
 
 // FUNCTION: LEGOLAND 0x00499fb0
-void FUN_00499fb0(void) {
+void UpdateGardeners(void) {
     Bloke *current = GardenerList;
     if (current != NULL) {
         Bloke *next;
@@ -554,7 +554,7 @@ void FUN_0049a010(void) {
 // FUNCTION: LEGOLAND 0x0049a070
 LEGO_EXPORT void ControlWorkers(void) {
     FUN_0049a010();
-    FUN_00499fb0();
+    UpdateGardeners();
 }
 
 // FUNCTION: LEGOLAND 0x0049a080
@@ -764,7 +764,7 @@ LEGO_EXPORT void RemoveAMechanic(Bloke *worker) {
 // FUNCTION: LEGOLAND 0x0049a480
 LEGO_EXPORT void Gardener_Idle(Bloke *worker) {
     worker->low_level_action = 0xe;
-    FUN_00499d00(worker);
+    AssignGardenerWorkOrder(worker);
 }
 
 // FUNCTION: LEGOLAND 0x0049a4a0
@@ -859,7 +859,7 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         coords[1] = order->pos.y;
         if (BuildObject(order->element, coords) != 0) {
             FreeGardenerWorkOrder(worker->order);
-            if (FUN_00499d00(worker) == 0) {
+            if (AssignGardenerWorkOrder(worker) == 0) {
                 NewLongTermAction(worker, 0x10);
             }
         } else {
@@ -1220,7 +1220,7 @@ LEGO_EXPORT void EraseGardenerOrder(WorkOrder *order) {
 }
 
 // FUNCTION: LEGOLAND 0x0049b270
-void FUN_0049b270(Ride *ride, TileId tile) {
+void EraseWorkOrdersAtTile(Ride *ride, TileId tile) {
     int x = tile.pos.x;
     int y = tile.pos.y;
     WorkOrder *order;
@@ -1240,7 +1240,7 @@ LEGO_EXPORT int SetGardenerWorkOrderAtPostion(Bloke *worker, int x, int y) {
     WorkOrder *order = GetGardenerWorkOrderAt(x, y);
 
     if (order == NULL) {
-        if (FUN_00499d00(worker) == 0) {
+        if (AssignGardenerWorkOrder(worker) == 0) {
             NewLongTermAction(worker, 0x10);
             return 1;
         }
@@ -1413,11 +1413,11 @@ LEGO_EXPORT void RemoveMechanicsWorkOrderAt(int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x0049b690
-void FUN_0049b690(Footprint *footprint, int *coords, float rate) {
+void AddRepairOrder(Footprint *footprint, int *coords, float rate) {
     RepairOrder *order = malloc(sizeof(RepairOrder));
 
-    order->next = DAT_0079a8d4;
-    DAT_0079a8d4 = order;
+    order->next = RepairOrderList;
+    RepairOrderList = order;
     order->footprint = *footprint;
     order->pos.x = coords[0];
     order->pos.y = coords[1];
@@ -1430,11 +1430,11 @@ void FUN_0049b6e0(RepairOrder *order) {
     RepairOrder *cur;
     RepairOrder *prev;
 
-    if (DAT_0079a8d4 == order) {
-        DAT_0079a8d4 = order->next;
+    if (RepairOrderList == order) {
+        RepairOrderList = order->next;
     } else {
-        cur = DAT_0079a8d4->next;
-        prev = DAT_0079a8d4;
+        cur = RepairOrderList->next;
+        prev = RepairOrderList;
         while (cur != order) {
             prev = prev->next;
             if (prev == NULL) {
@@ -1451,7 +1451,7 @@ void FUN_0049b6e0(RepairOrder *order) {
 
 // FUNCTION: LEGOLAND 0x0049b720
 LEGO_EXPORT void RemoveNoneWorkersRepairOrderAT(int x, int y) {
-    RepairOrder *current = DAT_0079a8d4;
+    RepairOrder *current = RepairOrderList;
     while (current != NULL) {
         if (current->pos.x == x && current->pos.y == y) {
             FUN_0049b6e0(current);
@@ -1478,7 +1478,7 @@ LEGO_EXPORT void IterateNoneWorkersRepairOrders(void) {
     Point pt;
     int bounds[4];
 
-    for (order = DAT_0079a8d4; order != NULL; order = next) {
+    for (order = RepairOrderList; order != NULL; order = next) {
         next = order->next;
         r.x0 = order->footprint.x0 + order->pos.x;
         r.y0 = order->footprint.y0 + order->pos.y;
@@ -1550,7 +1550,7 @@ LEGO_EXPORT WorkOrder *AddRepairOrderForObject(Ride *ride, struct Point pos) {
     if ((ride->flags & 0x400000) != 0 && lpConfig->mechanics_enabled != 0) {
         return FUN_00499830(ride->element, &pos.x, 2);
     }
-    FUN_0049b690(&ride->footprint, &pos.x, rate);
+    AddRepairOrder(&ride->footprint, &pos.x, rate);
 }
 
 // FUNCTION: LEGOLAND 0x0049ba10
@@ -1650,7 +1650,7 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
     case 10:
         worker->flags &= 0xfff7;
         FreeGardenerWorkOrder(worker->order);
-        if (FUN_00499d00(worker) == 0) {
+        if (AssignGardenerWorkOrder(worker) == 0) {
             NewLongTermAction(worker, 0x10);
         }
         return;
@@ -1824,7 +1824,7 @@ void SaveGardeners(void) {
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
-        rec.person_8 = worker->person->field_8;
+        rec.person_8 = worker->person->character;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
@@ -1890,7 +1890,7 @@ void LoadGardeners(void) {
         worker->person = malloc(sizeof(Person));
         AddPersonToList(worker->person);
         worker->person->bloke = worker;
-        worker->person->field_8 = rec.person_8;
+        worker->person->character = rec.person_8;
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;
@@ -1967,7 +1967,7 @@ void SaveMechanics(void) {
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
-        rec.person_8 = worker->person->field_8;
+        rec.person_8 = worker->person->character;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
@@ -2033,7 +2033,7 @@ void LoadMechanics(void) {
         worker->person = malloc(sizeof(Person));
         AddPersonToList(worker->person);
         worker->person->bloke = worker;
-        worker->person->field_8 = rec.person_8;
+        worker->person->character = rec.person_8;
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;
@@ -2232,8 +2232,8 @@ void FUN_0049cfc0(void) {
     while (MechanicOrderHead != NULL) {
         FreeMechanicWorkOrder(MechanicOrderHead);
     }
-    while (DAT_0079a8d4 != NULL) {
-        FUN_0049b6e0(DAT_0079a8d4);
+    while (RepairOrderList != NULL) {
+        FUN_0049b6e0(RepairOrderList);
     }
     while (GardenerList != NULL) {
         RemoveAGardener(GardenerList);

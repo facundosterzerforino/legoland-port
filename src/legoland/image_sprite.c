@@ -778,13 +778,13 @@ LEGO_EXPORT int GetSprite(unsigned int *param_1, struct Sprite *param_2) {
         param_1[1] = locals[2];
         locals[3] = (unsigned int)*((unsigned short *)lpConfig + 1);
         param_1[2] = locals[3];
-        param_1[4] = (unsigned int)DAT_00668078;
-        iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)DAT_00668078 + 0x64))(
-            (void *)DAT_00668078, locals, surfDesc, 1, 0);
+        param_1[4] = (unsigned int)OffscreenSurface;
+        iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)OffscreenSurface + 0x64))(
+            (void *)OffscreenSurface, locals, surfDesc, 1, 0);
         if (iVar1 == (int)0x887601c2) {
-            (*(void(__stdcall **)(void *))(*(unsigned int *)DAT_00668078 + 0x6c))((void *)DAT_00668078);
-            iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)DAT_00668078 + 0x64))(
-                (void *)DAT_00668078, locals, surfDesc, 1, 0);
+            (*(void(__stdcall **)(void *))(*(unsigned int *)OffscreenSurface + 0x6c))((void *)OffscreenSurface);
+            iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)OffscreenSurface + 0x64))(
+                (void *)OffscreenSurface, locals, surfDesc, 1, 0);
         }
         if (iVar1 != 0) {
             return 0;

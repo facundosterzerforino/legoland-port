@@ -9,12 +9,12 @@
 
 struct MidiFile {
     unsigned int field_0;
-    unsigned int field_4;
-    int field_8;
+    unsigned int time_step;
+    int song_time;
     short trackCount;
     unsigned char pad_e[2];
     void **trackArray;
-    short field_14;
+    short playing;
     unsigned char pad_16[2];
 };
 
@@ -54,7 +54,7 @@ LEGO_EXPORT struct MidiFile *LoadMIDIFile(const char *filename) {
         midi->trackArray[i] = ReadMidiTrack(file);
         ((struct MidiTrack *)midi->trackArray[i])->parent = midi;
     }
-    midi->field_4 = 0x100;
+    midi->time_step = 0x100;
     RES_CloseFile(file);
     return midi;
 }
@@ -107,7 +107,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
             track->field_14 += ReadMidiVarLen(track);
             track->field_1a = 0;
         }
-        if ((unsigned int)track->parent->field_8 >> 8 < (unsigned int)track->field_14) {
+        if ((unsigned int)track->parent->song_time >> 8 < (unsigned int)track->field_14) {
             return 1;
         }
         track->field_1a = 1;
@@ -130,7 +130,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
             hi = track->data[track->pos++];
             hi = (hi << 8) | track->data[track->pos];
             track->pos += 2;
-            track->parent->field_4 = track->parent->field_0 / hi;
+            track->parent->time_step = track->parent->field_0 / hi;
             break;
         }
         default:
@@ -176,13 +176,13 @@ void __stdcall MidiTimerCallback(unsigned int p1, unsigned int p2, unsigned int 
     unsigned int busy = 0;
     int i;
 
-    if (midi != NULL && midi->field_14 == 1) {
-        midi->field_8 += midi->field_4;
+    if (midi != NULL && midi->playing == 1) {
+        midi->song_time += midi->time_step;
         for (i = 0; i < midi->trackCount; i++) {
             busy |= FUN_00480330((struct MidiTrack *)midi->trackArray[i]);
         }
         if (busy == 0) {
-            midi->field_14 = 0;
+            midi->playing = 0;
         }
     }
 }
@@ -192,8 +192,8 @@ LEGO_EXPORT void PlayMIDI(struct MidiFile *midi) {
     int i;
 
     CurrentMidiFile = midi;
-    midi->field_8 = 0;
-    midi->field_14 = 1;
+    midi->song_time = 0;
+    midi->playing = 1;
     for (i = 0; i < midi->trackCount;) {
         i++;
         ((struct MidiTrack *)midi->trackArray[i - 1])->field_14 = 0;

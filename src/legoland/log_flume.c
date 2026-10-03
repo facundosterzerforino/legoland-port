@@ -68,7 +68,7 @@ struct FlumeOut {
 
 struct Obj {
     unsigned char pad_0[0xc];
-    void *field_0c;
+    void *ride;
 };
 
 struct ResA {
@@ -458,8 +458,8 @@ void FUN_00408e40(TileId tile) {
     if (entry != NULL) {
         memset(entry, 0, sizeof(struct FlumeEntry));
         entry->tile = tile;
-        entry->next = DAT_004cbe84;
-        DAT_004cbe84 = entry;
+        entry->next = FlumeEntryList;
+        FlumeEntryList = entry;
     }
 }
 
@@ -468,11 +468,11 @@ void FUN_00408e80(struct FlumeEntry *entry) {
     struct FlumeEntry *prev;
     struct FlumeEntry *cur;
 
-    if (DAT_004cbe84 == entry) {
-        DAT_004cbe84 = entry->next;
+    if (FlumeEntryList == entry) {
+        FlumeEntryList = entry->next;
     } else {
-        cur = DAT_004cbe84->next;
-        prev = DAT_004cbe84;
+        cur = FlumeEntryList->next;
+        prev = FlumeEntryList;
         while (cur != entry) {
             prev = prev->next;
             if (prev == NULL) {
@@ -488,8 +488,8 @@ void FUN_00408e80(struct FlumeEntry *entry) {
 }
 
 // FUNCTION: LEGOLAND 0x00408ec0
-struct FlumeEntry *FUN_00408ec0(TileId *tile) {
-    struct FlumeEntry *cur = DAT_004cbe84;
+struct FlumeEntry *FindFlumeEntryByTile(TileId *tile) {
+    struct FlumeEntry *cur = FlumeEntryList;
     if (cur == NULL) {
         return NULL;
     }
@@ -503,8 +503,8 @@ struct FlumeEntry *FUN_00408ec0(TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x00408ef0
-struct FlumeEntry *FUN_00408ef0(TileId *tile) {
-    struct FlumeEntry *outer = DAT_004cbe84;
+struct FlumeEntry *FindFlumeSubEntryByTile(TileId *tile) {
+    struct FlumeEntry *outer = FlumeEntryList;
     struct FlumeEntry *cur;
 
     if (outer == NULL) {
@@ -529,8 +529,8 @@ unsigned int FUN_00408f30(struct SubBuf *buf) {
     struct FlumeEntry *mid;
     struct FlumeEntry *cur;
 
-    outer = DAT_004cbe84;
-    if (DAT_004cbe84 != NULL) {
+    outer = FlumeEntryList;
+    if (FlumeEntryList != NULL) {
         for (; outer != NULL; outer = outer->next) {
             for (mid = outer->sub; mid != NULL; mid = mid->next) {
                 cur = mid->sub2;
@@ -557,20 +557,18 @@ struct FlumeEntry *FUN_00408f90(int x, int y) {
     struct FlumeEntry *outer;
     struct FlumeEntry *cur;
     int h = DAT_004b4734 - DAT_004b472c;
-    int w = DAT_004b4730 - DAT_004b4728;
+    int w = DAT_004b4730 - LogFlumeFootprint;
 
-    outer = DAT_004cbe84;
-    if (outer != NULL) {
-        do {
-            for (cur = outer->sub; cur != NULL; cur = cur->next) {
-                int tx = cur->tile.pos.x;
-                int ty = cur->tile.pos.y;
-                if (x >= tx && x <= tx + w && y >= ty && y <= ty + h) {
-                    return cur;
-                }
+    outer = FlumeEntryList;
+    while (outer != NULL) {
+        cur = outer->sub;
+        while (cur != NULL) {
+            if (x >= cur->tile.pos.x && x <= cur->tile.pos.x + w && y >= cur->tile.pos.y && y <= cur->tile.pos.y + h) {
+                return cur;
             }
-            outer = outer->next;
-        } while (outer != NULL);
+            cur = cur->next;
+        }
+        outer = outer->next;
     }
     return NULL;
 }
@@ -585,7 +583,7 @@ void *FUN_00409010(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00409040
-void FUN_00409040(struct Node *node, struct Node *insert) {
+void InsertNodeBefore(struct Node *node, struct Node *insert) {
     if (node->prev != NULL) {
         node->prev->next = insert;
     }
@@ -598,7 +596,7 @@ void FUN_00409040(struct Node *node, struct Node *insert) {
 }
 
 // FUNCTION: LEGOLAND 0x00409080
-void FUN_00409080(struct Node *node, struct Node *insert) {
+void LinkNodeAfter(struct Node *node, struct Node *insert) {
     if (node->next != NULL) {
         node->next->prev = insert;
     }
@@ -610,7 +608,7 @@ void FUN_00409080(struct Node *node, struct Node *insert) {
 }
 
 // FUNCTION: LEGOLAND 0x004090c0
-void FUN_004090c0(struct Node *node1, struct Node *node2, struct Node *node3) {
+void InsertNodeBetween(struct Node *node1, struct Node *node2, struct Node *node3) {
     node3->prev = node1;
     node3->next = node2;
     node1->next = node3;
@@ -634,7 +632,7 @@ struct Node *FUN_004090e0(struct Node *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00409110
-void FUN_00409110(struct Node *container) {
+void ReverseNodeList(struct Node *container) {
     struct Node *node = FUN_004090e0(container);
     struct Node *next;
     struct Node *prev;
@@ -667,7 +665,7 @@ int FUN_00409140(struct Node *container) {
 }
 
 // FUNCTION: LEGOLAND 0x00409170
-void FUN_00409170(struct Node *container, struct ListNode *node) {
+void AppendListNode(struct Node *container, struct ListNode *node) {
     node->prev = container->tail_2c;
     node->next = NULL;
     if (container->tail_2c != NULL) {
@@ -781,7 +779,7 @@ int FUN_004092b0(struct FlumeHolder *holder) {
 // FUNCTION: LEGOLAND 0x00409360
 void FUN_00409360(TileId tile) {
     struct SubBuf buf;
-    int w = DAT_004b4730 - DAT_004b4728;
+    int w = DAT_004b4730 - LogFlumeFootprint;
     int h = DAT_004b4734 - DAT_004b472c;
 
     buf.b0 = tile.pos.x;
@@ -1140,16 +1138,16 @@ void FUN_00409b10(struct Node *a, struct Node *b) {
         // STRING: LEGOLAND 0x004b48e4
         printf("both pieces are joined to log flume - error");
     } else if (a_ok == 0 && b_ok == 0) {
-        FUN_00409110(a);
+        ReverseNodeList(a);
     } else if (a_ok != 0 && b_ok == 0) {
-        FUN_00409110(b);
+        ReverseNodeList(b);
     } else {
-        FUN_00409110(a);
+        ReverseNodeList(a);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00409b70
-void FUN_00409b70(int i, int j, struct Node **nodes, struct Node *insert) {
+void JoinOppositeFlumeNodes(int i, int j, struct Node **nodes, struct Node *insert) {
     int a_ok;
     int b_ok;
 
@@ -1162,16 +1160,16 @@ void FUN_00409b70(int i, int j, struct Node **nodes, struct Node *insert) {
         printf("both pieces are joined to log flume - error");
         return;
     } else if (a_ok == 0 && b_ok == 0) {
-        FUN_00409110(nodes[i]);
+        ReverseNodeList(nodes[i]);
     } else if (a_ok != 0 && b_ok == 0) {
-        FUN_00409110(nodes[j]);
+        ReverseNodeList(nodes[j]);
     } else {
-        FUN_00409110(nodes[i]);
+        ReverseNodeList(nodes[i]);
     }
     if (nodes[i]->next == NULL && nodes[j]->prev == NULL) {
-        FUN_004090c0(nodes[i], nodes[j], insert);
+        InsertNodeBetween(nodes[i], nodes[j], insert);
     } else {
-        FUN_004090c0(nodes[j], nodes[i], insert);
+        InsertNodeBetween(nodes[j], nodes[i], insert);
     }
 }
 
@@ -1185,105 +1183,105 @@ void FUN_00409c20(struct FlumeEntry *entry, unsigned int *list) {
     case 0x01:
         a = nodes[0];
         if (a->prev == NULL) {
-            FUN_00409040(a, insert);
+            InsertNodeBefore(a, insert);
         } else {
-            FUN_00409080(a, insert);
+            LinkNodeAfter(a, insert);
         }
         break;
     case 0x10:
         a = nodes[2];
         if (a->prev == NULL) {
-            FUN_00409040(a, insert);
+            InsertNodeBefore(a, insert);
         } else {
-            FUN_00409080(a, insert);
+            LinkNodeAfter(a, insert);
         }
         break;
     case 0x04:
         a = nodes[1];
         if (a->prev == NULL) {
-            FUN_00409040(a, insert);
+            InsertNodeBefore(a, insert);
         } else {
-            FUN_00409080(a, insert);
+            LinkNodeAfter(a, insert);
         }
         break;
     case 0x40:
         a = nodes[3];
         if (a->prev == NULL) {
-            FUN_00409040(a, insert);
+            InsertNodeBefore(a, insert);
         } else {
-            FUN_00409080(a, insert);
+            LinkNodeAfter(a, insert);
         }
         break;
     case 0x11:
         a = nodes[0];
         if ((a->next != NULL && nodes[2]->next != NULL && a->prev == NULL && nodes[2]->prev == NULL) || (a->next == NULL && nodes[2]->next == NULL && a->prev != NULL && nodes[2]->prev != NULL)) {
-            FUN_00409b70(0, 2, nodes, insert);
+            JoinOppositeFlumeNodes(0, 2, nodes, insert);
             return;
         }
         if (a->next == NULL && nodes[2]->prev == NULL) {
-            FUN_004090c0(a, nodes[2], insert);
+            InsertNodeBetween(a, nodes[2], insert);
         } else {
-            FUN_004090c0(nodes[2], a, insert);
+            InsertNodeBetween(nodes[2], a, insert);
         }
         return;
     case 0x44:
         a = nodes[1];
         if ((a->next != NULL && nodes[3]->next != NULL && a->prev == NULL && nodes[3]->prev == NULL) || (a->next == NULL && nodes[3]->next == NULL && a->prev != NULL && nodes[3]->prev != NULL)) {
-            FUN_00409b70(1, 3, nodes, insert);
+            JoinOppositeFlumeNodes(1, 3, nodes, insert);
             return;
         }
         if (a->prev == NULL && nodes[3]->next == NULL) {
-            FUN_004090c0(nodes[3], a, insert);
+            InsertNodeBetween(nodes[3], a, insert);
         } else {
-            FUN_004090c0(a, nodes[3], insert);
+            InsertNodeBetween(a, nodes[3], insert);
         }
         return;
     case 0x05:
         a = nodes[0];
         if ((a->next != NULL && nodes[1]->next != NULL && a->prev == NULL && nodes[1]->prev == NULL) || (a->next == NULL && nodes[1]->next == NULL && a->prev != NULL && nodes[1]->prev != NULL)) {
-            FUN_00409b70(0, 1, nodes, insert);
+            JoinOppositeFlumeNodes(0, 1, nodes, insert);
             return;
         }
         if (nodes[1]->prev == NULL && a->next == NULL) {
-            FUN_004090c0(a, nodes[1], insert);
+            InsertNodeBetween(a, nodes[1], insert);
         } else {
-            FUN_004090c0(nodes[1], a, insert);
+            InsertNodeBetween(nodes[1], a, insert);
         }
         return;
     case 0x14:
         a = nodes[1];
         if ((a->next != NULL && nodes[2]->next != NULL && a->prev == NULL && nodes[2]->prev == NULL) || (a->next == NULL && nodes[2]->next == NULL && a->prev != NULL && nodes[2]->prev != NULL)) {
-            FUN_00409b70(1, 2, nodes, insert);
+            JoinOppositeFlumeNodes(1, 2, nodes, insert);
             return;
         }
         if (nodes[2]->prev == NULL && a->next == NULL) {
-            FUN_004090c0(a, nodes[2], insert);
+            InsertNodeBetween(a, nodes[2], insert);
         } else {
-            FUN_004090c0(nodes[2], a, insert);
+            InsertNodeBetween(nodes[2], a, insert);
         }
         return;
     case 0x50:
         a = nodes[2];
         if ((a->next != NULL && nodes[3]->next != NULL && a->prev == NULL && nodes[3]->prev == NULL) || (a->next == NULL && nodes[3]->next == NULL && a->prev != NULL && nodes[3]->prev != NULL)) {
-            FUN_00409b70(2, 3, nodes, insert);
+            JoinOppositeFlumeNodes(2, 3, nodes, insert);
             return;
         }
         if (nodes[3]->prev == NULL && a->next == NULL) {
-            FUN_004090c0(a, nodes[3], insert);
+            InsertNodeBetween(a, nodes[3], insert);
         } else {
-            FUN_004090c0(nodes[3], a, insert);
+            InsertNodeBetween(nodes[3], a, insert);
         }
         return;
     case 0x41:
         a = nodes[3];
         if ((a->next != NULL && nodes[0]->next != NULL && a->prev == NULL && nodes[0]->prev == NULL) || (a->next != NULL && nodes[0]->next != NULL && a->prev == NULL && nodes[0]->prev == NULL)) {
-            FUN_00409b70(3, 0, nodes, insert);
+            JoinOppositeFlumeNodes(3, 0, nodes, insert);
             return;
         }
         if (nodes[0]->prev == NULL && a->next == NULL) {
-            FUN_004090c0(a, nodes[0], insert);
+            InsertNodeBetween(a, nodes[0], insert);
         } else {
-            FUN_004090c0(nodes[0], a, insert);
+            InsertNodeBetween(nodes[0], a, insert);
         }
         return;
     }
@@ -1296,9 +1294,9 @@ void FUN_0040a010(struct Node *a, struct Node *b) {
         FUN_00409b10(a, b);
     }
     if (a->next == NULL) {
-        FUN_00409080(a, b);
+        LinkNodeAfter(a, b);
     } else {
-        FUN_00409040(a, b);
+        InsertNodeBefore(a, b);
     }
 }
 
@@ -1430,11 +1428,11 @@ void FUN_0040a2a0(void *other, struct StateNode **ctx) {
 void FUN_0040a2e0(Element *elem) {
     struct LLS *lls;
 
-    DAT_004c2b9c = elem->ride;
-    DAT_004c2b9c->flags |= 0x20;
-    DAT_004c8d54 = DAT_004c2b9c->layer;
-    if (DAT_004c8d54 != NULL) {
-        DAT_004c8d54->flags |= 0x2000;
+    LogFlumeEntranceRide = elem->ride;
+    LogFlumeEntranceRide->flags |= 0x20;
+    LogFlumeEntranceLayer = LogFlumeEntranceRide->layer;
+    if (LogFlumeEntranceLayer != NULL) {
+        LogFlumeEntranceLayer->flags |= 0x2000;
     }
     DAT_004c2ae8 = (void *)FUN_00412100(&DAT_004b47b8);
     DAT_004c2af8 = (void *)FUN_00412100(&DAT_004b47e8);
@@ -1507,7 +1505,7 @@ void FUN_0040a410(void) {
         KillSprite(LogFlumeBarrelMatteSprite);
     }
 
-    current = DAT_004cbe84;
+    current = FlumeEntryList;
     if (current != NULL) {
         while (current != NULL) {
             struct FlumeEntry *next = current->next;
@@ -1520,16 +1518,16 @@ void FUN_0040a410(void) {
             free(current);
             current = next;
         }
-        DAT_004cbe84 = current;
+        FlumeEntryList = current;
         return;
     }
-    DAT_004cbe84 = NULL;
+    FlumeEntryList = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x0040a540
-void FUN_0040a540(void) {
+void LogFlumeEntranceSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_004c2b9c;
+    EditMode.unk8 = LogFlumeEntranceRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
@@ -1572,7 +1570,7 @@ void FUN_0040a5d0(struct ParticleEmitter *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0040a600
-void FUN_0040a600(Element *elem, int *pt) {
+void LogFlumeEntranceAddObject(Element *elem, int *pt) {
     TileId t;
     struct FlumeEntry *entry;
     struct FlumeEntry *mid;
@@ -1592,7 +1590,7 @@ void FUN_0040a600(Element *elem, int *pt) {
     t.pos.y = pt[1];
     AddBasicObject(elem, pt);
     FUN_00408e40(t);
-    entry = FUN_00408ec0(&t);
+    entry = FindFlumeEntryByTile(&t);
     if (entry != NULL) {
         h = DAT_004b4734 - DAT_004b472c;
         midY = t.pos.y + ride->footprint.y0 + ((ride->footprint.y1 - ride->footprint.y0) >> 1);
@@ -1603,27 +1601,27 @@ void FUN_0040a600(Element *elem, int *pt) {
         if (node != NULL) {
             node->mode = 3;
             node->submode = 0;
-            node->ride = DAT_004cbe30;
+            node->ride = LogFlumeTrackRide;
             node->parent = entry;
             node->link28 = NULL;
             node->flags10d |= 3;
-            node->tile.pos.x = pos[0] - DAT_004b4728;
+            node->tile.pos.x = pos[0] - LogFlumeFootprint;
             node->tile.pos.y = pos[1] - DAT_004b472c;
         }
         FUN_004091f0((struct Node *)entry, (struct ListNode *)node);
         coords[0] = node->tile.pos.x;
         coords[1] = node->tile.pos.y;
-        memcpy(&DAT_004cbe30->footprint, &DAT_004b4728, sizeof(struct Footprint));
-        DAT_004cbe30->footprint.x1--;
-        DAT_004cbe30->footprint.y1--;
+        memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
+        LogFlumeTrackRide->footprint.x1--;
+        LogFlumeTrackRide->footprint.y1--;
         AddBasicObject(DAT_004c74f4, coords);
         mid = FUN_00409010();
         mid->parent = entry;
-        mid->ride = DAT_004c2b9c;
+        mid->ride = LogFlumeEntranceRide;
         mid->tile = entry->tile;
         FUN_004091f0((struct Node *)entry, (struct ListNode *)mid);
         entry->link = mid;
-        FUN_00409080((struct Node *)node, (struct Node *)mid);
+        LinkNodeAfter((struct Node *)node, (struct Node *)mid);
         prev = node;
         count = (ride->footprint.y1 - ride->footprint.y0 + 1) / h;
         coords[1] = pos[1] + h;
@@ -1634,24 +1632,24 @@ void FUN_0040a600(Element *elem, int *pt) {
                 node->mode = 1;
                 node->submode = 0;
                 node->link28 = mid;
-                node->ride = DAT_004cbe30;
+                node->ride = LogFlumeTrackRide;
                 node->parent = entry;
                 node->flags10d |= 7;
-                node->tile.pos.x = pos[0] - DAT_004b4728;
+                node->tile.pos.x = pos[0] - LogFlumeFootprint;
                 node->tile.pos.y = coords[1] - DAT_004b472c;
             }
             if (coords[1] <= midY && coords[1] + h >= midY) {
                 entry->field_8 = node;
                 entry->field_c = prev;
             }
-            FUN_00409170((struct Node *)mid, (struct ListNode *)node);
+            AppendListNode((struct Node *)mid, (struct ListNode *)node);
             if (i == 0) {
                 mid->link30 = node;
             }
             if (i == last) {
                 mid->link34 = node;
             }
-            FUN_00409080((struct Node *)prev, (struct Node *)node);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)node);
             prev = node;
             coords[1] += h;
         }
@@ -1663,16 +1661,16 @@ void FUN_0040a600(Element *elem, int *pt) {
             node->submode = 2;
             node->flags10d |= 3;
             node->link28 = NULL;
-            node->ride = DAT_004cbe30;
+            node->ride = LogFlumeTrackRide;
             node->parent = entry;
-            node->tile.pos.x = coords[0] - DAT_004b4728;
+            node->tile.pos.x = coords[0] - LogFlumeFootprint;
             node->tile.pos.y = coords[1] - DAT_004b472c;
         }
         FUN_004091f0((struct Node *)entry, (struct ListNode *)node);
         coords[0] = node->tile.pos.x;
         coords[1] = node->tile.pos.y;
         AddBasicObject(DAT_004c74f4, coords);
-        FUN_00409080((struct Node *)prev, (struct Node *)node);
+        LinkNodeAfter((struct Node *)prev, (struct Node *)node);
         FUN_0040a5d0((struct ParticleEmitter *)entry);
     }
 }
@@ -1703,17 +1701,17 @@ void FUN_0040a930(Element *elem, int *param_2, unsigned int param_3) {
     PathCursor.footprint.next = NULL;
     PathCursor.field_1828 = 0x1000;
     FUN_0045f460(&PathCursor);
-    memcpy(DAT_004c8d78.footprint.v, &DAT_004b4728, 20);
+    memcpy(DAT_004c8d78.footprint.v, &LogFlumeFootprint, 20);
     DAT_004c8d78.footprint.x1 = DAT_004b4730 - 1;
     DAT_004c8d78.footprint.y1 = DAT_004c8d78.footprint.y1 - 1;
     FUN_0045f460(&DAT_004c8d78);
     x = EditCursor.tile_x;
     y = EditCursor.tile_y;
-    DAT_004c8d78.tile_x = DAT_004c2b9c->footprint.x0 + x;
-    DAT_004c8d78.tile_y = DAT_004c2b9c->footprint.y0 + y - h;
+    DAT_004c8d78.tile_x = LogFlumeEntranceRide->footprint.x0 + x;
+    DAT_004c8d78.tile_y = LogFlumeEntranceRide->footprint.y0 + y - h;
     DAT_004c8d78.tile_x++;
-    DAT_004c2c18.tile_x = DAT_004c2b9c->footprint.x0 + x;
-    DAT_004c2c18.tile_y = DAT_004c2b9c->footprint.y1 + y - 1 + h;
+    DAT_004c2c18.tile_x = LogFlumeEntranceRide->footprint.x0 + x;
+    DAT_004c2c18.tile_y = LogFlumeEntranceRide->footprint.y1 + y - 1 + h;
     DAT_004c2c18.tile_x++;
     memcpy(DAT_004c2c18.footprint.v, DAT_004c8d78.footprint.v, 20);
     FUN_0045f460(&DAT_004c2c18);
@@ -1727,8 +1725,8 @@ void FUN_0040aac0(unsigned int param_1, struct Point *param_2) {
     struct FlumeEntry *cur;
 
     BasicObjectDCalcCursor(param_1, param_2);
-    DefaultCursor(&DAT_004c74f8);
-    entry = FUN_00408ec0(&QueryObj);
+    DefaultCursor(&LogFlumeCursor);
+    entry = FindFlumeEntryByTile(&QueryObj);
     if (entry != NULL) {
         for (cur = entry->sub; cur != NULL; cur = cur->next) {
             if (cur->field_28 != -1) {
@@ -1736,51 +1734,51 @@ void FUN_0040aac0(unsigned int param_1, struct Point *param_2) {
                 if (param_1 == 0) {
                     continue;
                 }
-                memcpy(DAT_004c74f8.footprint.v, (void *)param_1, 20);
-                DAT_004c74f8.tile_x = cur->tile.pos.x;
-                DAT_004c74f8.tile_y = cur->tile.pos.y;
+                memcpy(LogFlumeCursor.footprint.v, (void *)param_1, 20);
+                LogFlumeCursor.tile_x = cur->tile.pos.x;
+                LogFlumeCursor.tile_y = cur->tile.pos.y;
             }
-            DAT_004c74f8.field_1828 = 0x18;
-            FUN_0045f460(&DAT_004c74f8);
-            BuildCursorPtr(&DAT_004c74f8, 0, 0);
-            RenderCursor(&DAT_004c74f8);
+            LogFlumeCursor.field_1828 = 0x18;
+            FUN_0045f460(&LogFlumeCursor);
+            BuildCursorPtr(&LogFlumeCursor, 0, 0);
+            RenderCursor(&LogFlumeCursor);
         }
-        PathCursor.tile_x = DAT_004c74f8.tile_x;
-        PathCursor.tile_y = DAT_004c74f8.tile_y;
-        PathCursor.footprint.y0 = DAT_004c74f8.footprint.y0 - 1;
-        PathCursor.footprint.x0 = DAT_004c74f8.footprint.x0 + 3;
-        PathCursor.footprint.x1 = DAT_004c74f8.footprint.x1 + 1;
-        PathCursor.footprint.y1 = DAT_004c74f8.footprint.y1 + 1;
+        PathCursor.tile_x = LogFlumeCursor.tile_x;
+        PathCursor.tile_y = LogFlumeCursor.tile_y;
+        PathCursor.footprint.y0 = LogFlumeCursor.footprint.y0 - 1;
+        PathCursor.footprint.x0 = LogFlumeCursor.footprint.x0 + 3;
+        PathCursor.footprint.x1 = LogFlumeCursor.footprint.x1 + 1;
+        PathCursor.footprint.y1 = LogFlumeCursor.footprint.y1 + 1;
         PathCursor.footprint.next = NULL;
         PathCursor.field_1828 = 0x1000;
-        PathCursor.next = DAT_004c74f8.next;
-        DAT_004c74f8.next = &PathCursor;
+        PathCursor.next = LogFlumeCursor.next;
+        LogFlumeCursor.next = &PathCursor;
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040abf0
-void FUN_0040abf0(Element *obj, TileId tile, struct Cursor *cursor_arg) {
+void LogFlumeEntranceRemoveObject(Element *obj, TileId tile, struct Cursor *cursor_arg) {
     struct Cursor cursor;
     struct FlumeEntry *entry;
     struct FlumeEntry *cur;
     struct FlumeEntry *next;
 
     StandardRemoveObject(obj, tile, cursor_arg);
-    entry = FUN_00408ec0(&tile);
+    entry = FindFlumeEntryByTile(&tile);
     if (entry != NULL) {
         cur = entry->sub;
         if (cur != NULL) {
             do {
                 next = cur->next;
-                memcpy(&DAT_004cbe30->footprint, &DAT_004b4728, 20);
-                DAT_004cbe30->footprint.x1--;
-                DAT_004cbe30->footprint.y1--;
-                cursor.tile_x = cur->tile.pos.x + DAT_004b4728;
+                memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, 20);
+                LogFlumeTrackRide->footprint.x1--;
+                LogFlumeTrackRide->footprint.y1--;
+                cursor.tile_x = cur->tile.pos.x + LogFlumeFootprint;
                 cursor.tile_y = cur->tile.pos.y + DAT_004b4730;
-                memcpy(cursor.footprint.v, &DAT_004cbe30->footprint, 20);
-                StandardRemoveObject(DAT_004cbe30->element, cur->tile, &cursor);
+                memcpy(cursor.footprint.v, &LogFlumeTrackRide->footprint, 20);
+                StandardRemoveObject(LogFlumeTrackRide->element, cur->tile, &cursor);
                 if (cur->flags10 & 2) {
-                    UseBricks(GetObjCost(DAT_004cbe30));
+                    UseBricks(GetObjCost(LogFlumeTrackRide));
                 }
                 FUN_00409270((struct Node *)entry, (struct Node *)cur);
                 cur = next;
@@ -1788,7 +1786,7 @@ void FUN_0040abf0(Element *obj, TileId tile, struct Cursor *cursor_arg) {
         }
         FreeAllQueueNodes((struct Queue *)&entry->sub2);
         FUN_00408e80(entry);
-        DAT_004cbe30->field_8++;
+        LogFlumeTrackRide->field_8++;
     }
     RemoveAllBlokesFromRide(obj->ride, tile);
 }
@@ -2045,7 +2043,7 @@ int FUN_0040b390(struct FlumeEntry *entry) {
 }
 
 // FUNCTION: LEGOLAND 0x0040b420
-void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct Point base;
     struct FlumeEntry *entry;
@@ -2058,7 +2056,7 @@ void FUN_0040b420(Element *elem, unsigned int param_2, unsigned int param_3, Til
 
     base.x = ride->x + tile->pos.x;
     base.y = ride->y + tile->pos.y;
-    entry = FUN_00408ec0(tile);
+    entry = FindFlumeEntryByTile(tile);
     coords = GetScreenCoordsForObject(tile, ride);
     if (entry != NULL) {
         ok = FUN_0040b390(entry->link);
@@ -2432,7 +2430,7 @@ void FUN_0040be00(struct FlumeSlotSet *set) {
     } else {
         FUN_0040a580((struct ParticleEmitter *)set);
     }
-    FUN_004120a0((struct Queue *)set->queue, DAT_004c2b9c->x + set->tile.pos.x, DAT_004c2b9c->y + set->tile.pos.y);
+    FUN_004120a0((struct Queue *)set->queue, LogFlumeEntranceRide->x + set->tile.pos.x, LogFlumeEntranceRide->y + set->tile.pos.y);
     if (FUN_00411e60((struct Queue *)set->queue)) {
         Ride_SetFlagToNotLetAnyoneOn(&set->tile);
     } else {
@@ -2443,7 +2441,7 @@ void FUN_0040be00(struct FlumeSlotSet *set) {
 
 // FUNCTION: LEGOLAND 0x0040bf50
 void FUN_0040bf50(void) {
-    struct FlumeEntry *current = DAT_004cbe84;
+    struct FlumeEntry *current = FlumeEntryList;
     while (current != NULL) {
         FUN_0040be00((struct FlumeSlotSet *)current);
         current = current->next;
@@ -2474,7 +2472,7 @@ void FUN_0040bf70(Element *obj) {
             switch (bloke->param_action) {
             case 0:
                 bloke->flags |= 8;
-                entry = FUN_00408ec0(tile);
+                entry = FindFlumeEntryByTile(tile);
                 if (entry != NULL) {
                     FUN_00411f20(&entry->queue, (struct QueueItemMid *)elem);
                     if (FUN_00411e60(&entry->queue)) {
@@ -2508,7 +2506,7 @@ void FUN_0040bf70(Element *obj) {
                 bloke->flags |= 0x80;
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                entry = FUN_00408ec0(tile);
+                entry = FindFlumeEntryByTile(tile);
                 if (entry != NULL) {
                     if (entry->target != NULL) {
                         *(int *)entry->target = 1;
@@ -2570,9 +2568,9 @@ void FUN_0040bf70(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c250
-int FUN_0040c250(struct FlumeEntry *param_1) {
-    struct FlumeEntry *entry = param_1;
+int FUN_0040c250(struct FlumeEntry *entry) {
     struct FlumeSlotSet *set = entry->slotset;
+    struct FlumeEntry *param_1 = entry;
     struct FlumeEntry *tmp;
     struct FlumeEntry *node;
     int i;
@@ -2649,10 +2647,10 @@ int FUN_0040c2e0(struct FlumeChainOwner *owner) {
 void FUN_0040c350(Element *elem) {
     int i;
 
-    DAT_004cbe30 = elem->ride;
-    DAT_004cbe30->flags |= 0x400;
-    DAT_004cbe30->field_18 = 0;
-    DAT_004cbe30->field_14 = 0;
+    LogFlumeTrackRide = elem->ride;
+    LogFlumeTrackRide->flags |= 0x400;
+    LogFlumeTrackRide->field_18 = 0;
+    LogFlumeTrackRide->field_14 = 0;
     DAT_004c74f4 = elem;
     // STRING: LEGOLAND 0x004b4a0c
     if (LLIDB_FindElement("LOG FLUME IMAGE LIST", &LogFlumeImageListId, 0) == 0) {
@@ -2708,7 +2706,7 @@ void FUN_0040c4a0(Element *elem, int *param_2, unsigned int param_3) {
     int cost;
     int code;
 
-    memcpy(&EditCursor.footprint, &DAT_004b4728, sizeof(struct Footprint));
+    memcpy(&EditCursor.footprint, &LogFlumeFootprint, sizeof(struct Footprint));
     EditCursor.footprint.x1 = DAT_004b4730 - 1;
     EditCursor.footprint.y1--;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
@@ -2735,7 +2733,7 @@ void FUN_0040c4a0(Element *elem, int *param_2, unsigned int param_3) {
         FUN_0045f480(&EditCursor, 2);
     }
     if (FUN_0045f4b0(&EditCursor)) {
-        t.pos.x = DAT_004b4728 + EditCursor.tile_x;
+        t.pos.x = LogFlumeFootprint + EditCursor.tile_x;
         t.pos.y = DAT_004b472c + EditCursor.tile_y;
         FUN_00409440(t, (void **)&list);
         FUN_00409510((struct StateSlots *)list);
@@ -2783,7 +2781,7 @@ void FUN_0040c6c0(int unused, struct Point *pt) {
         QueryCursor.tile_x = entry->tile.pos.x;
         QueryCursor.tile_y = entry->tile.pos.y;
         v = DAT_004b4730;
-        memcpy(&QueryCursor.footprint, &DAT_004b4728, sizeof(struct Footprint));
+        memcpy(&QueryCursor.footprint, &LogFlumeFootprint, sizeof(struct Footprint));
         QueryCursor.footprint.x1 = v - 1;
         QueryCursor.footprint.y1 = QueryCursor.footprint.y1 - 1;
         QueryCursor.field_1828 = 8;
@@ -2796,7 +2794,7 @@ void FUN_0040c6c0(int unused, struct Point *pt) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c780
-void FUN_0040c780(int unused, struct Point *pt) {
+void LogFlumeTrackAddObject(int unused, struct Point *pt) {
     TileId t;
     int coords[2];
     struct FlumeEntry *entry;
@@ -2810,9 +2808,9 @@ void FUN_0040c780(int unused, struct Point *pt) {
     coords[1] = t.pos.y;
     entry = FUN_00409010();
     if (entry != NULL) {
-        entry->ride = DAT_004cbe30;
+        entry->ride = LogFlumeTrackRide;
         entry->link28 = NULL;
-        entry->tile.pos.x = DAT_004b4728 + coords[0];
+        entry->tile.pos.x = LogFlumeFootprint + coords[0];
         entry->tile.pos.y = DAT_004b472c + coords[1];
         FUN_00409440(t, (void **)&list);
         FUN_00409510((struct StateSlots *)list);
@@ -2840,9 +2838,9 @@ void FUN_0040c780(int unused, struct Point *pt) {
             entry->parent = (struct FlumeEntry *)key;
             FUN_004094b0(key, list);
             FUN_004091f0((struct Node *)key, (struct ListNode *)entry);
-            memcpy(&DAT_004cbe30->footprint, &DAT_004b4728, sizeof(struct Footprint));
-            DAT_004cbe30->footprint.x1--;
-            DAT_004cbe30->footprint.y1--;
+            memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
+            LogFlumeTrackRide->footprint.x1--;
+            LogFlumeTrackRide->footprint.y1--;
             AddBasicObject(DAT_004c74f4, coords);
             FUN_00409c20(entry, (unsigned int *)list);
             FUN_004097a0(entry, (struct StateSlots *)list);
@@ -2854,11 +2852,11 @@ void FUN_0040c780(int unused, struct Point *pt) {
 void FUN_0040c8d0(Element *elem, TileId tile, struct Cursor *cursor) {
     struct FlumeEntry *entry;
 
-    memcpy(&DAT_004cbe30->footprint, &DAT_004b4728, sizeof(struct Footprint));
-    DAT_004cbe30->footprint.x1--;
-    DAT_004cbe30->footprint.y1--;
+    memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
+    --LogFlumeTrackRide->footprint.x1;
+    --LogFlumeTrackRide->footprint.y1;
     StandardRemoveObject(elem, tile, cursor);
-    entry = FUN_00408ef0(&tile);
+    entry = FindFlumeSubEntryByTile(&tile);
     FUN_004119a0((struct ParticleEmitter *)entry->parent, -1);
     if (entry != NULL) {
         FUN_00409440(tile, (void **)&cursor);
@@ -2869,7 +2867,7 @@ void FUN_0040c8d0(Element *elem, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c970
-struct RideSpriteInfo *FUN_0040c970(int unused, TileId tile) {
+struct RideSpriteInfo *GetLogFlumeTrackSpriteInfo(int unused, TileId tile) {
     struct FlumeEntry *entry;
     struct Sprite *spr;
     unsigned int lls;
@@ -3006,8 +3004,8 @@ void FUN_0040cc00(struct FlumeEntry *entry, int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0040cc50
-int FUN_0040cc50(int a, int b, int c, TileId *tile, int e, int arg) {
-    struct FlumeEntry *entry = FUN_00408ef0(tile);
+int RenderLogFlumeTrack(int a, int b, int c, TileId *tile, int e, int arg) {
+    struct FlumeEntry *entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         if (entry->mode == 2 && (entry->submode == 0 || entry->submode == 2)) {
             return FUN_0040ca60(entry, arg);
@@ -3093,7 +3091,7 @@ void FUN_0040cd70(struct PairHolder *p, int param1) {
 // FUNCTION: LEGOLAND 0x0040cdf0
 int FUN_0040cdf0(TileId *tile) {
     int result = 0;
-    struct FlumeEntry *entry = FUN_00408ef0(tile);
+    struct FlumeEntry *entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         result = FUN_0040b390(entry);
     }
@@ -3105,7 +3103,7 @@ void FUN_0040ce20(struct InputBuffer *esi) {
     unsigned int eax = DAT_004b4730;
     unsigned int edx = DAT_004b472c;
     unsigned int ebx = DAT_004b4734;
-    unsigned int local_8 = eax - DAT_004b4728;
+    unsigned int local_8 = eax - LogFlumeFootprint;
     struct SubBuf buf;
 
     ebx = ebx - edx;
@@ -3195,10 +3193,10 @@ struct Point FUN_0040cfd0(struct FlumeEntry *entry) {
     struct Point off;
     int idx;
 
-    if (entry->ride == DAT_004c2b9c) {
-        return GetScreenCoordsForObject(&entry->parent->tile, DAT_004c2b9c);
+    if (entry->ride == LogFlumeEntranceRide) {
+        return GetScreenCoordsForObject(&entry->parent->tile, LogFlumeEntranceRide);
     }
-    if (entry->ride == DAT_004cbe30) {
+    if (entry->ride == LogFlumeTrackRide) {
         entry->ride->field_18 = 0;
         entry->ride->field_14 = 0;
         pos = GetScreenCoordsForObject(&entry->tile, entry->ride);
@@ -3227,15 +3225,15 @@ void FUN_0040d090(struct FlumeEntry *entry, struct Footprint **out, TileId *tile
     if (cur->link28 == (struct FlumeEntry *)-1) {
         tile->pos.x = cur->parent->tile.pos.x;
         tile->pos.y = cur->parent->tile.pos.y;
-        DAT_004c2aa8 = DAT_004c2b9c->footprint;
-        DAT_004c2aa8.x1 = DAT_004c2aa8.x0 + (DAT_004b4730 - DAT_004b4728) * 2;
+        DAT_004c2aa8 = LogFlumeEntranceRide->footprint;
+        DAT_004c2aa8.x1 = DAT_004c2aa8.x0 + (DAT_004b4730 - LogFlumeFootprint) * 2;
         *out = &DAT_004c2aa8;
         return;
     }
     r = cur->ride;
-    if (r == DAT_004cbe30) {
+    if (r == LogFlumeTrackRide) {
         v = DAT_004b4730;
-        memcpy(&DAT_004c8d38, &DAT_004b4728, sizeof(struct Footprint));
+        memcpy(&DAT_004c8d38, &LogFlumeFootprint, sizeof(struct Footprint));
         DAT_004c8d38.x1 = v - 1;
         DAT_004c8d38.y1 = DAT_004c8d38.y1 - 1;
         *out = &DAT_004c8d38;
@@ -3269,8 +3267,8 @@ struct FlumeEntry *FUN_0040d210(int x, int y) {
     int tx;
     int ty;
 
-    outer = DAT_004cbe84;
-    if (DAT_004cbe84 != NULL) {
+    outer = FlumeEntryList;
+    if (FlumeEntryList != NULL) {
         for (; outer != NULL; outer = outer->next) {
             cur = outer->sub;
             while (cur != NULL) {
@@ -3337,7 +3335,7 @@ void FUN_0040d420(unsigned int *res) {
     int n;
 
     DAT_004c4468.next = &DAT_004c5ca0;
-    memcpy(&DAT_004c4468.footprint, &DAT_004b4728, sizeof(struct Footprint));
+    memcpy(&DAT_004c4468.footprint, &LogFlumeFootprint, sizeof(struct Footprint));
     DAT_004c4468.footprint.x1 = DAT_004b4730 - 1;
     DAT_004c4468.footprint.y1 = DAT_004c4468.footprint.y1 - 1;
     DAT_004c5ca0.next = NULL;
@@ -3479,8 +3477,8 @@ unsigned int FUN_0040d6f0(struct CursorSource *param_1, unsigned int param_2, un
     if (FUN_0045f4b0(&EditCursor)) {
         int cx = EditCursor.tile_x;
         int cy = EditCursor.tile_y;
-        rect.x0 = cx + EditCursor.footprint.x0;
-        rect.y0 = cy + EditCursor.footprint.y0;
+        rect.x0 = EditCursor.footprint.x0 + cx;
+        rect.y0 = EditCursor.footprint.y0 + cy;
         rect.x1 = EditCursor.footprint.x1 + cx;
         rect.y1 = EditCursor.footprint.y1 + cy;
         r = CheckForPeople(&rect);
@@ -3591,7 +3589,7 @@ void FUN_0040da10(struct Context *a, struct LinkList *list) {
 
 // FUNCTION: LEGOLAND 0x0040db00
 void FUN_0040db00(unsigned int param_1, unsigned int param_2, unsigned int param_3, FlumeCallback param_4) {
-    struct FlumeEntry *entry = FUN_00408ef0((TileId *)&param_2);
+    struct FlumeEntry *entry = FindFlumeSubEntryByTile((TileId *)&param_2);
     struct Footprint *fp;
     TileId t;
     struct InputBuffer buf;
@@ -3611,19 +3609,19 @@ void FUN_0040db00(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040dbb0
-void FUN_0040dbb0(void) {
+void LogFlumeTrackSetEditMode(void) {
     unsigned int local[5];
     unsigned int v = DAT_004b4730;
 
-    memcpy(local, &DAT_004b4728, sizeof(local));
+    memcpy(local, &LogFlumeFootprint, sizeof(local));
     local[2] = v - 1;
     local[3] = local[3] - 1;
-    FUN_0040d3b0(DAT_004cbe30, local);
+    FUN_0040d3b0(LogFlumeTrackRide, local);
 }
 
 // FUNCTION: LEGOLAND 0x0040dc00
 void FUN_0040dc00(struct FlumeEntry *entry) {
-    unsigned int w = DAT_004b4730 - DAT_004b4728;
+    unsigned int w = DAT_004b4730 - LogFlumeFootprint;
     unsigned int h = DAT_004b4734 - DAT_004b472c;
     struct FlumeXY t;
     struct FlumeEntry *n;
@@ -3643,14 +3641,14 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
             if (n != NULL) {
                 n->mode = 3;
                 n->submode = 0;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->slotset = entry->slotset;
                 n->flags10d |= 4;
                 n->link28 = entry;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
             entry->link30 = n;
             prev = n;
             t.y += h;
@@ -3660,13 +3658,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y += h;
             n = FUN_00409010();
@@ -3675,13 +3673,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x += w;
             n = FUN_00409010();
@@ -3690,13 +3688,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x += w;
             n = FUN_00409010();
@@ -3705,7 +3703,7 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
@@ -3722,12 +3720,12 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
             prev = n;
             entry->link30 = n;
             t.x -= w;
@@ -3737,13 +3735,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x -= w;
             n = FUN_00409010();
@@ -3752,13 +3750,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y += h;
             n = FUN_00409010();
@@ -3767,13 +3765,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y += h;
             n = FUN_00409010();
@@ -3782,7 +3780,7 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 2;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
@@ -3799,12 +3797,12 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 2;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
             prev = n;
             entry->link30 = n;
             t.y -= h;
@@ -3814,13 +3812,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y -= h;
             n = FUN_00409010();
@@ -3829,13 +3827,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 2;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x -= w;
             n = FUN_00409010();
@@ -3844,13 +3842,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x -= w;
             n = FUN_00409010();
@@ -3859,7 +3857,7 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 3;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
@@ -3874,12 +3872,12 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 3;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
             entry->link30 = n;
             prev = n;
             t.x += w;
@@ -3889,13 +3887,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 1;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.x += w;
             n = FUN_00409010();
@@ -3904,13 +3902,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 3;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y -= h;
             n = FUN_00409010();
@@ -3919,13 +3917,13 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
             }
-            FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-            FUN_00409080((struct Node *)prev, (struct Node *)n);
+            AppendListNode((struct Node *)entry, (struct ListNode *)n);
+            LinkNodeAfter((struct Node *)prev, (struct Node *)n);
             prev = n;
             t.y -= h;
             n = FUN_00409010();
@@ -3934,7 +3932,7 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
                 n->submode = 0;
                 n->slotset = entry->slotset;
                 n->link28 = entry;
-                n->ride = DAT_004cbe30;
+                n->ride = LogFlumeTrackRide;
                 n->flags10d |= 4;
                 n->tile.pos.x = t.x;
                 n->tile.pos.y = t.y;
@@ -3943,8 +3941,8 @@ void FUN_0040dc00(struct FlumeEntry *entry) {
         default:
             return;
         }
-        FUN_00409170((struct Node *)entry, (struct ListNode *)n);
-        FUN_00409080((struct Node *)prev, (struct Node *)n);
+        AppendListNode((struct Node *)entry, (struct ListNode *)n);
+        LinkNodeAfter((struct Node *)prev, (struct Node *)n);
         entry->link34 = n;
     }
 }
@@ -4007,7 +4005,7 @@ int FUN_0040e3b0(unsigned int *ctx) {
 // FUNCTION: LEGOLAND 0x0040e440
 void FUN_0040e440(struct FlumeXY p, unsigned int *result) {
     unsigned int h = DAT_004b4734 - DAT_004b472c;
-    unsigned int w = DAT_004b4730 - DAT_004b4728;
+    unsigned int w = DAT_004b4730 - LogFlumeFootprint;
 
     switch (DAT_004c2af4) {
     case 0:
@@ -4050,14 +4048,14 @@ void FUN_0040e440(struct FlumeXY p, unsigned int *result) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e630
-void FUN_0040e630(void) {
+void LogFlumeSpecialCorner1SetEditMode(void) {
     unsigned int local[5];
     memcpy(local, DAT_004c445c->var_3c, 20);
     FUN_0040d3b0(DAT_004c445c, local);
 }
 
 // FUNCTION: LEGOLAND 0x0040e660
-void FUN_0040e660(void) {
+void LogFlumeSpecialCorner2SetEditMode(void) {
     struct CursorSource *src = DAT_004c2aa0;
     unsigned int local[5];
     memcpy(local, src->var_3c, sizeof(local));
@@ -4065,7 +4063,7 @@ void FUN_0040e660(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e690
-void FUN_0040e690(void) {
+void LogFlumeSpecialCorner3SetEditMode(void) {
     struct CursorSource *src = DAT_004c2b0c;
     unsigned int local[5];
     memcpy(local, src->var_3c, sizeof(local));
@@ -4073,7 +4071,7 @@ void FUN_0040e690(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e6c0
-void FUN_0040e6c0(void) {
+void LogFlumeSpecialCorner4SetEditMode(void) {
     struct CursorSource *src = DAT_004c74d4;
     unsigned int local[5];
     memcpy(local, src->var_3c, sizeof(local));
@@ -4141,11 +4139,11 @@ void FUN_0040e890(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e8b0
-void FUN_0040e8b0(struct Obj *obj_ptr) {
+void LogFlumeSpecialCorner1LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c445c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c445c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c445c;
     resA->flags_1c |= 0x400;
 
@@ -4169,11 +4167,11 @@ void FUN_0040e8b0(struct Obj *obj_ptr) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e920
-void FUN_0040e920(struct Obj *obj_ptr) {
+void LogFlumeSpecialCorner2LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2aa0 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2aa0 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2aa0;
     resA->flags_1c |= 0x400;
 
@@ -4191,11 +4189,11 @@ void FUN_0040e920(struct Obj *obj_ptr) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e970
-void FUN_0040e970(struct Obj *obj_ptr) {
+void LogFlumeSpecialCorner3LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2b0c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2b0c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2b0c;
     resA->flags_1c |= 0x400;
 
@@ -4219,11 +4217,11 @@ void FUN_0040e970(struct Obj *obj_ptr) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e9e0
-void FUN_0040e9e0(struct Obj *obj_ptr) {
+void LogFlumeSpecialCorner4LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c74d4 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c74d4 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c74d4;
     resA->flags_1c |= 0x400;
     DAT_004c2ba0 = obj_ptr;
@@ -4275,7 +4273,7 @@ void LogFlumeSpecialCorner4UnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ead0
-void FUN_0040ead0(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner1AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4286,7 +4284,7 @@ void FUN_0040ead0(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040eb40
-void FUN_0040eb40(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner2AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4297,7 +4295,7 @@ void FUN_0040eb40(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ebb0
-void FUN_0040ebb0(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner3AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4308,7 +4306,7 @@ void FUN_0040ebb0(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ec20
-void FUN_0040ec20(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner4AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4319,27 +4317,27 @@ void FUN_0040ec20(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ec90
-void FUN_0040ec90(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner1RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 0;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
 }
 
 // FUNCTION: LEGOLAND 0x0040ecc0
-unsigned int FUN_0040ecc0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeSpecialCorner2RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 1;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ecf0
-unsigned int FUN_0040ecf0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeSpecialCorner3RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 2;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ed20
-void FUN_0040ed20(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner4RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     DAT_004c2af4 = 3;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
 }
@@ -4347,7 +4345,7 @@ void FUN_0040ed20(unsigned int param_1, unsigned int param_2, unsigned int param
 // FUNCTION: LEGOLAND 0x0040ed50
 struct RideSpriteInfo *FUN_0040ed50(struct FlumeRideArg *arg1, TileId arg2) {
     struct FlumeRideSrc *src = arg1->field_c;
-    struct FlumeEntry *entry = FUN_00408ef0(&arg2);
+    struct FlumeEntry *entry = FindFlumeSubEntryByTile(&arg2);
     if (entry != NULL) {
         FUN_0040cd70((struct PairHolder *)entry, 0);
         DAT_004cbe58.id = arg2.id;
@@ -4360,7 +4358,7 @@ struct RideSpriteInfo *FUN_0040ed50(struct FlumeRideArg *arg1, TileId arg2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040edb0
-void FUN_0040edb0(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
+void RenderLogFlumeSpecialCorner1(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4382,7 +4380,7 @@ void FUN_0040edb0(Element *elem, unsigned int param_2, unsigned int param_3, Til
         LLSSetFrame(lls, frame);
     }
     FUN_0040cdf0(tile);
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         FUN_0040b290(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4808, 0);
         FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4390,7 +4388,7 @@ void FUN_0040edb0(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x0040ee60
-void FUN_0040ee60(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeSpecialCorner2(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4398,7 +4396,7 @@ void FUN_0040ee60(Element *elem, unsigned int param_2, unsigned int param_3, Til
     int frame;
 
     DAT_004c2af4 = 1;
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         frame = 0;
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
@@ -4418,7 +4416,7 @@ void FUN_0040ee60(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x0040ef00
-void FUN_0040ef00(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
+void RenderLogFlumeSpecialCorner3(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4441,7 +4439,7 @@ void FUN_0040ef00(Element *elem, unsigned int param_2, unsigned int param_3, Til
     }
     pos = GetScreenCoordsForObject(tile, ride);
     FUN_0040cdf0(tile);
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         FUN_0040b290(entry, pos.x, pos.y, &DAT_004b4828, 1);
         FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4449,7 +4447,7 @@ void FUN_0040ef00(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x0040efb0
-void FUN_0040efb0(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeSpecialCorner4(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4457,7 +4455,7 @@ void FUN_0040efb0(Element *elem, unsigned int param_2, unsigned int param_3, Til
     int frame;
 
     DAT_004c2af4 = 3;
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         frame = 0;
         lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
@@ -4483,7 +4481,7 @@ static __inline struct FlumeNode *NewFlumeNode(struct FlumeNode *parent, int mod
         node->submode = submode;
         node->owner = parent->owner;
         node->entry = parent;
-        node->ride = (struct Ride *)DAT_004cbe30;
+        node->ride = (struct Ride *)LogFlumeTrackRide;
         node->flags |= 4;
         node->tile.pos.x = x;
         node->tile.pos.y = y;
@@ -4496,42 +4494,42 @@ void FUN_0040f050(struct FlumeNode *parent) {
     struct FlumeNode *node;
     struct FlumeNode *prev;
     TileId pos;
-    int w = DAT_004b4730 - DAT_004b4728;
+    int w = DAT_004b4730 - LogFlumeFootprint;
     int h = DAT_004b4734 - DAT_004b472c;
 
     pos.pos.x = ((struct Ride *)DAT_004cbe18)->footprint.x0 + parent->tile.pos.x + 6;
     pos.pos.y = ((struct Ride *)DAT_004cbe18)->footprint.y0 + parent->tile.pos.y;
     node = NewFlumeNode(parent, 3, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
     parent->field_30 = (unsigned int)node;
     pos.pos.y += h;
     prev = NewFlumeNode(parent, 1, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)prev);
-    FUN_00409080((struct Node *)node, (struct Node *)prev);
+    AppendListNode((struct Node *)parent, (struct ListNode *)prev);
+    LinkNodeAfter((struct Node *)node, (struct Node *)prev);
     pos.pos.y += h;
     node = NewFlumeNode(parent, 2, 3, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     pos.pos.x -= w;
     prev = node;
     node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     pos.pos.x -= w;
     prev = node;
     node = NewFlumeNode(parent, 2, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     pos.pos.y += h;
     prev = node;
     node = NewFlumeNode(parent, 1, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     pos.pos.y += h;
     prev = node;
     node = NewFlumeNode(parent, 3, 2, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     parent->field_34 = (unsigned int)node;
 }
 
@@ -4568,11 +4566,11 @@ void FUN_0040f360(struct FlumeXY p, unsigned int *result) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f3e0
-void FUN_0040f3e0(struct Obj *obj_ptr) {
+void LogFlumeTunnelLoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004cbe18 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004cbe18 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004cbe18;
     resA->flags_1c |= 0x400;
     DAT_004cbe48 = obj_ptr;
@@ -4597,14 +4595,14 @@ void LogFlumeTunnelUnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f450
-void FUN_0040f450(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeTunnel(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
     struct Point pos;
     int frame;
 
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         if (LogFlumeTunelMSprite != NULL) {
             lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
@@ -4623,7 +4621,7 @@ void FUN_0040f450(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x0040f4f0
-void FUN_0040f4f0(void) {
+void LogFlumeTunnelSetEditMode(void) {
     FUN_0040d3b0(DAT_004cbe18, DAT_004cbe18->var_3c);
 }
 
@@ -4633,7 +4631,7 @@ void FUN_0040f510(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040f540
-void FUN_0040f540(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeTunnelAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -4641,7 +4639,7 @@ void FUN_0040f540(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f580
-void FUN_0040f580(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeTunnelRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040f360);
 }
 
@@ -4657,37 +4655,37 @@ void FUN_0040f5b0(struct FlumeNode *param_1) {
     struct FlumeNode *prev;
     struct FlumeNode *last;
     TileId pos;
-    int w = DAT_004b4730 - DAT_004b4728;
+    int w = DAT_004b4730 - LogFlumeFootprint;
     int h = DAT_004b4734 - DAT_004b472c;
     int i;
 
     pos.pos.x = ((struct Ride *)DAT_004c2bf0)->footprint.x0 + parent->tile.pos.x;
     pos.pos.y = ((struct Ride *)DAT_004c2bf0)->footprint.y0 + parent->tile.pos.y + 3;
     node = NewFlumeNode(parent, 3, 3, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
     parent->field_30 = (unsigned int)node;
     prev = node;
     for (i = 4; i != 0; i--) {
         pos.pos.x += w;
         node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
-        FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-        FUN_00409080((struct Node *)prev, (struct Node *)node);
+        AppendListNode((struct Node *)parent, (struct ListNode *)node);
+        LinkNodeAfter((struct Node *)prev, (struct Node *)node);
         prev = node;
     }
     pos.pos.x += w;
     node = NewFlumeNode(parent, 2, 3, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y -= h;
     node = NewFlumeNode(parent, 2, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.x += w;
     last = NewFlumeNode(parent, 3, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)last);
-    FUN_00409080((struct Node *)prev, (struct Node *)last);
+    AppendListNode((struct Node *)parent, (struct ListNode *)last);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)last);
     parent->field_34 = (unsigned int)last;
 }
 
@@ -4712,7 +4710,7 @@ unsigned int FUN_0040f800(unsigned int *param_1) {
 
 // FUNCTION: LEGOLAND 0x0040f830
 void FUN_0040f830(struct FlumeXY p, unsigned int *result) {
-    unsigned int w = DAT_004b4730 - DAT_004b4728;
+    unsigned int w = DAT_004b4730 - LogFlumeFootprint;
 
     p.x += (unsigned char)DAT_004c2bf0->var_3c[0];
     p.y += (unsigned char)DAT_004c2bf0->var_3c[1];
@@ -4728,7 +4726,7 @@ struct Sprite *FUN_0040f8b0(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2bf0 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2bf0 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2bf0;
     resA->flags_1c |= 0x400;
     DAT_004c4460 = obj_ptr;
@@ -4754,7 +4752,7 @@ void LogFlumeCsawUnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f920
-void FUN_0040f920(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeCsaw(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4762,7 +4760,7 @@ void FUN_0040f920(Element *elem, unsigned int param_2, unsigned int param_3, Til
     struct Point pos;
     int frame;
 
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         if (LogFlumeCsaw2MSprite != NULL) {
             lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer(ride->layer, 1));
@@ -4785,7 +4783,7 @@ void FUN_0040f920(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x0040fa00
-void FUN_0040fa00(void) {
+void LogFlumeCsawSetEditMode(void) {
     FUN_0040d3b0(DAT_004c2bf0, DAT_004c2bf0->var_3c);
 }
 
@@ -4801,7 +4799,7 @@ void FUN_0040fa50(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fa60
-void FUN_0040fa60(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeCsawAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -4810,67 +4808,82 @@ void FUN_0040fa60(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fab0
-unsigned int FUN_0040fab0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeCsawRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040f830);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
+
+#define NEW_FLUME_NODE(node, parent, mode_, submode_, y_, x_) \
+    do { \
+        (node) = FUN_00409010(); \
+        if ((node) != NULL) { \
+            (node)->mode = (mode_); \
+            (node)->submode = (submode_); \
+            (node)->owner = (parent)->owner; \
+            (node)->entry = (parent); \
+            (node)->ride = (struct Ride *)LogFlumeTrackRide; \
+            (node)->flags |= 4; \
+            (node)->tile.pos.x = (x_); \
+            (node)->tile.pos.y = (y_); \
+        } \
+    } while (0)
 
 // FUNCTION: LEGOLAND 0x0040fad0
 void FUN_0040fad0(struct FlumeNode *parent) {
     struct FlumeNode *node;
     struct FlumeNode *prev;
     TileId pos;
-    int w = DAT_004b4730 - DAT_004b4728;
+    int w = DAT_004b4730 - LogFlumeFootprint;
     int h = DAT_004b4734 - DAT_004b472c;
     int i;
 
     pos.pos.x = ((struct Ride *)DAT_004c2b60)->footprint.x0 + parent->tile.pos.x;
     pos.pos.y = ((struct Ride *)DAT_004c2b60)->footprint.y0 + parent->tile.pos.y + 9;
-    node = NewFlumeNode(parent, 3, 3, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
+    NEW_FLUME_NODE(node, parent, 3, 3, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
     parent->field_30 = (unsigned int)node;
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 1, 1, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 2, 3, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 2, 3, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y -= h;
-    node = NewFlumeNode(parent, 1, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 1, 0, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y -= h;
-    node = NewFlumeNode(parent, 2, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 2, 1, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     for (i = 2; i != 0; i--) {
         pos.pos.x += w;
-        node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
-        FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-        FUN_00409080((struct Node *)prev, (struct Node *)node);
+        NEW_FLUME_NODE(node, parent, 1, 1, pos.pos.y, pos.pos.x);
+        AppendListNode((struct Node *)parent, (struct ListNode *)node);
+        LinkNodeAfter((struct Node *)prev, (struct Node *)node);
         prev = node;
     }
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 2, 2, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 2, 2, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y += h;
-    node = NewFlumeNode(parent, 2, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 2, 0, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 3, 1, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    NEW_FLUME_NODE(node, parent, 3, 1, pos.pos.y, pos.pos.x);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     parent->field_34 = (unsigned int)node;
 }
 
@@ -4898,7 +4911,7 @@ void FUN_0040feb0(TileId pos, struct FlumeOut *out) {
     struct Ride *ride = (struct Ride *)DAT_004c2b60;
     unsigned char x = pos.pos.x + (unsigned char)ride->footprint.x0;
     unsigned char y = pos.pos.y + (unsigned char)ride->footprint.y0;
-    int span = DAT_004b4730 - DAT_004b4728;
+    int span = DAT_004b4730 - LogFlumeFootprint;
     pos.pos.x = x;
     pos.pos.y = y;
     out->kind = 10;
@@ -4910,11 +4923,11 @@ void FUN_0040feb0(TileId pos, struct FlumeOut *out) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ff30
-void FUN_0040ff30(struct Obj *obj_ptr) {
+void LogFlumeHoldUpLoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2b60 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2b60 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2b60;
     resA->flags_1c |= 0x400;
 
@@ -4946,7 +4959,7 @@ void LogFlumeHoldUpUnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ffd0
-void FUN_0040ffd0(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
+void RenderLogFlumeHoldUp(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct LLS *lls;
@@ -4977,7 +4990,7 @@ void FUN_0040ffd0(Element *elem, unsigned int param_2, unsigned int param_3, Til
     pos.x += off.x;
     pos.y += off.y;
     FUN_0040cdf0(tile);
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         FUN_0040b290(entry, pos.x, pos.y, &DAT_004b4858, 0);
         FUN_0040cd70((struct PairHolder *)entry, 1);
@@ -4985,7 +4998,7 @@ void FUN_0040ffd0(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x004100b0
-void FUN_004100b0(void) {
+void LogFlumeHoldUpSetEditMode(void) {
     FUN_0040d3b0(DAT_004c2b60, DAT_004c2b60->var_3c);
 }
 
@@ -5001,7 +5014,7 @@ void FUN_00410100(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410110
-void FUN_00410110(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeHoldUpAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -5010,7 +5023,7 @@ void FUN_00410110(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410160
-unsigned int FUN_00410160(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeHoldUpRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040feb0);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -5027,7 +5040,7 @@ void FUN_00410180(struct FlumeNode *param_1) {
     pos.pos.y = ((struct Ride *)DAT_004c8d6c)->footprint.y0 + parent->tile.pos.y;
     pos.pos.x = ((struct Ride *)DAT_004c8d6c)->footprint.x0 + parent->tile.pos.x + 2;
     node = NewFlumeNode(parent, 3, 0, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
     n = 0x18 / w;
     n += -2;
     parent->field_30 = (unsigned int)node;
@@ -5035,14 +5048,14 @@ void FUN_00410180(struct FlumeNode *param_1) {
     for (; n > 0; n--) {
         pos.pos.y += w;
         node = NewFlumeNode(parent, 1, 0, pos.pos.y, pos.pos.x);
-        FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-        FUN_00409080((struct Node *)prev, (struct Node *)node);
+        AppendListNode((struct Node *)parent, (struct ListNode *)node);
+        LinkNodeAfter((struct Node *)prev, (struct Node *)node);
         prev = node;
     }
     pos.pos.y += w;
     node = NewFlumeNode(parent, 3, 2, pos.pos.y, pos.pos.x);
-    FUN_00409170((struct Node *)parent, (struct ListNode *)node);
-    FUN_00409080((struct Node *)prev, (struct Node *)node);
+    AppendListNode((struct Node *)parent, (struct ListNode *)node);
+    LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     parent->field_34 = (unsigned int)node;
 }
 
@@ -5093,7 +5106,7 @@ struct Sprite *FUN_004103e0(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c8d6c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c8d6c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c8d6c;
     resA->flags_1c |= 0x400;
 
@@ -5133,7 +5146,7 @@ void LogFlumeDropUnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004104b0
-void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderLogFlumeDrop(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct FlumeEntry *entry;
     struct Sprite *sprite;
@@ -5142,7 +5155,7 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
     struct Point pos;
     int frame;
 
-    entry = FUN_00408ef0(tile);
+    entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile) && entry != NULL) {
         if (LogFlumeDrop1MSprite != NULL && LogFlumeDrop2MSprite != NULL) {
             frame = 0;
@@ -5201,7 +5214,7 @@ void FUN_004104b0(Element *elem, unsigned int param_2, unsigned int param_3, Til
 }
 
 // FUNCTION: LEGOLAND 0x004106e0
-unsigned int FUN_004106e0(void) {
+unsigned int LogFlumeDropSetEditMode(void) {
     return FUN_0040d3b0(DAT_004c8d6c, DAT_004c8d6c->var_3c);
 }
 
@@ -5217,7 +5230,7 @@ void FUN_00410730(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410740
-void FUN_00410740(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeDropAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -5226,7 +5239,7 @@ void FUN_00410740(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410790
-unsigned int FUN_00410790(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeDropRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_00410360);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -5295,7 +5308,7 @@ int FUN_00410910(struct FlumeEntry *entry) {
 
 // FUNCTION: LEGOLAND 0x00410930
 int LogFlumeEntrance_Save(void) {
-    struct FlumeEntry *entry = DAT_004cbe84;
+    struct FlumeEntry *entry = FlumeEntryList;
     int marker = 1;
     int end = 0;
     int i;
@@ -5310,10 +5323,10 @@ int LogFlumeEntrance_Save(void) {
             buf.field_c = (struct FlumeNode *)FUN_004107b0((struct FlumeNode *)buf.sub, buf.field_c);
             buf.link = (struct FlumeEntry *)FUN_004107b0((struct FlumeNode *)buf.sub, (struct FlumeNode *)buf.link);
             buf.target = (void *)FUN_00410910(entry);
-            FUN_004123c0((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, &buf.queue);
+            SaveQueue((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &buf.queue);
             for (i = 0; i < 4; i++) {
                 buf.slots[i].owner = FUN_004107b0((struct FlumeNode *)buf.sub, (struct FlumeNode *)buf.slots[i].owner);
-                buf.slots[i].busy = FUN_004123a0((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, (struct QueueNode *)buf.slots[i].busy);
+                buf.slots[i].busy = FUN_004123a0((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, (struct QueueNode *)buf.slots[i].busy);
             }
             SaveGameWrite(&buf, sizeof(buf));
             entry = entry->next;
@@ -5361,7 +5374,7 @@ struct FlumeNode *FUN_00410a50(struct FlumeEntry *owner, struct FlumeEntry *entr
 }
 
 // FUNCTION: LEGOLAND 0x00410b60
-void *FUN_00410b60(void *base, unsigned int packed) {
+void *IndexToFlumeNode(void *base, unsigned int packed) {
     unsigned int hi;
     unsigned int lo;
     unsigned int i;
@@ -5406,10 +5419,10 @@ void FUN_00410bb0(void *arg0, struct FlumeNode *arg1) {
 
     current = arg1;
     do {
-        current->field_8 = (unsigned int)FUN_00410b60(arg0, current->field_8);
-        current->field_c = (unsigned int)FUN_00410b60(arg0, current->field_c);
-        current->field_30 = (unsigned int)FUN_00410b60(arg0, current->field_30);
-        current->field_34 = (unsigned int)FUN_00410b60(arg0, current->field_34);
+        current->field_8 = (unsigned int)IndexToFlumeNode(arg0, current->field_8);
+        current->field_c = (unsigned int)IndexToFlumeNode(arg0, current->field_c);
+        current->field_30 = (unsigned int)IndexToFlumeNode(arg0, current->field_30);
+        current->field_34 = (unsigned int)IndexToFlumeNode(arg0, current->field_34);
         FUN_00410bb0(arg0, current->field_2c);
         current = current->next;
     } while (current != NULL);
@@ -5428,7 +5441,7 @@ int LogFlumeEntrance_Load(void) {
     while (marker != 0) {
         if (cur == NULL) {
             cur = malloc(0xd4);
-            DAT_004cbe84 = cur;
+            FlumeEntryList = cur;
             cur->next = NULL;
         } else {
             cur->next = malloc(0xd4);
@@ -5436,18 +5449,18 @@ int LogFlumeEntrance_Load(void) {
         }
         head = FUN_00410a50(cur, NULL);
         FUN_00410bb0(head, head);
-        FUN_00412490((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, &queue);
+        FUN_00412490((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &queue);
         SaveGameRead(cur, 0xd4);
         cur->sub = (struct FlumeEntry *)head;
         cur->queue = queue;
-        cur->field_8 = (struct FlumeNode *)FUN_00410b60(head, (unsigned int)cur->field_8);
-        cur->field_c = (struct FlumeNode *)FUN_00410b60(cur->sub, (unsigned int)cur->field_c);
-        cur->link = (struct FlumeEntry *)FUN_00410b60(cur->sub, (unsigned int)cur->link);
+        cur->field_8 = (struct FlumeNode *)IndexToFlumeNode(head, (unsigned int)cur->field_8);
+        cur->field_c = (struct FlumeNode *)IndexToFlumeNode(cur->sub, (unsigned int)cur->field_c);
+        cur->link = (struct FlumeEntry *)IndexToFlumeNode(cur->sub, (unsigned int)cur->link);
         cur->target = &cur->slots[(int)cur->target];
         slot = cur->slots;
         for (i = 4; i != 0; i--) {
-            slot->owner = (int)FUN_00410b60(cur->sub, slot->owner);
-            slot->busy = (int)GetNthNextQueueNode((struct QueueNode *)((struct Ride *)DAT_004c2b9c)->riders, slot->busy);
+            slot->owner = (int)IndexToFlumeNode(cur->sub, slot->owner);
+            slot->busy = (int)GetNthNextQueueNode((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, slot->busy);
             slot++;
         }
         SaveGameRead(&marker, 4);
@@ -5460,13 +5473,13 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
     // STRING: LEGOLAND 0x004b4bb4
     if (_stricmp("LOG FLUME ENTRANCE", flume->name) == 0) {
         vtbl->cb_a4 = FUN_0040a2e0;
-        vtbl->cb_8c = FUN_0040a540;
+        vtbl->cb_8c = LogFlumeEntranceSetEditMode;
         vtbl->cb_90 = FUN_0040a930;
         vtbl->cb_94 = FUN_0040aac0;
-        vtbl->cb_98 = FUN_0040a600;
-        vtbl->cb_9c = FUN_0040abf0;
+        vtbl->cb_98 = LogFlumeEntranceAddObject;
+        vtbl->cb_9c = LogFlumeEntranceRemoveObject;
         vtbl->cb_a8 = FUN_0040bf70;
-        vtbl->cb_b0 = FUN_0040b420;
+        vtbl->cb_b0 = RenderLogFlumeEntrance;
         vtbl->cb_ac = FUN_0040a410;
         vtbl->cb_bc = LogFlumeEntrance_Save;
         vtbl->cb_b8 = LogFlumeEntrance_Load;
@@ -5477,117 +5490,117 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
     if (_stricmp("LOG FLUME TRACK", flume->name) == 0) {
         DAT_0082c688 = flume->iface;
         vtbl->cb_a4 = FUN_0040c350;
-        vtbl->cb_8c = FUN_0040dbb0;
-        vtbl->cb_a0 = FUN_0040c970;
-        vtbl->cb_b0 = FUN_0040cc50;
+        vtbl->cb_8c = LogFlumeTrackSetEditMode;
+        vtbl->cb_a0 = GetLogFlumeTrackSpriteInfo;
+        vtbl->cb_b0 = RenderLogFlumeTrack;
         vtbl->cb_90 = FUN_0040c4a0;
         vtbl->cb_94 = FUN_0040c6c0;
-        vtbl->cb_98 = FUN_0040c780;
+        vtbl->cb_98 = LogFlumeTrackAddObject;
         vtbl->cb_9c = FUN_0040c8d0;
         vtbl->cb_ac = FUN_0040c430;
         return;
     }
     // STRING: LEGOLAND 0x004b4b88
     if (_stricmp("LOG FLUME SPECIAL CORNER 1", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040e8b0;
-        vtbl->cb_8c = FUN_0040e630;
+        vtbl->cb_a4 = LogFlumeSpecialCorner1LoadSprites;
+        vtbl->cb_8c = LogFlumeSpecialCorner1SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040edb0;
+        vtbl->cb_b0 = RenderLogFlumeSpecialCorner1;
         vtbl->cb_90 = FUN_0040e6f0;
         vtbl->cb_94 = FUN_0040e830;
-        vtbl->cb_98 = FUN_0040ead0;
-        vtbl->cb_9c = FUN_0040ec90;
+        vtbl->cb_98 = LogFlumeSpecialCorner1AddObject;
+        vtbl->cb_9c = LogFlumeSpecialCorner1RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner1UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b6c
     if (_stricmp("LOG FLUME SPECIAL CORNER 2", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040e920;
-        vtbl->cb_8c = FUN_0040e660;
+        vtbl->cb_a4 = LogFlumeSpecialCorner2LoadSprites;
+        vtbl->cb_8c = LogFlumeSpecialCorner2SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040ee60;
+        vtbl->cb_b0 = RenderLogFlumeSpecialCorner2;
         vtbl->cb_90 = FUN_0040e740;
         vtbl->cb_94 = FUN_0040e850;
-        vtbl->cb_98 = FUN_0040eb40;
-        vtbl->cb_9c = FUN_0040ecc0;
+        vtbl->cb_98 = LogFlumeSpecialCorner2AddObject;
+        vtbl->cb_9c = LogFlumeSpecialCorner2RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner2UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b50
     if (_stricmp("LOG FLUME SPECIAL CORNER 3", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040e970;
-        vtbl->cb_8c = FUN_0040e690;
+        vtbl->cb_a4 = LogFlumeSpecialCorner3LoadSprites;
+        vtbl->cb_8c = LogFlumeSpecialCorner3SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040ef00;
+        vtbl->cb_b0 = RenderLogFlumeSpecialCorner3;
         vtbl->cb_90 = FUN_0040e790;
         vtbl->cb_94 = FUN_0040e870;
-        vtbl->cb_98 = FUN_0040ebb0;
-        vtbl->cb_9c = FUN_0040ecf0;
+        vtbl->cb_98 = LogFlumeSpecialCorner3AddObject;
+        vtbl->cb_9c = LogFlumeSpecialCorner3RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner3UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b34
     if (_stricmp("LOG FLUME SPECIAL CORNER 4", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040e9e0;
-        vtbl->cb_8c = FUN_0040e6c0;
+        vtbl->cb_a4 = LogFlumeSpecialCorner4LoadSprites;
+        vtbl->cb_8c = LogFlumeSpecialCorner4SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040efb0;
+        vtbl->cb_b0 = RenderLogFlumeSpecialCorner4;
         vtbl->cb_90 = FUN_0040e7e0;
         vtbl->cb_94 = FUN_0040e890;
-        vtbl->cb_98 = FUN_0040ec20;
-        vtbl->cb_9c = FUN_0040ed20;
+        vtbl->cb_98 = LogFlumeSpecialCorner4AddObject;
+        vtbl->cb_9c = LogFlumeSpecialCorner4RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner4UnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b24
     if (_stricmp("LOG FLUME CSAW", flume->name) == 0) {
         vtbl->cb_a4 = (RideCallback)FUN_0040f8b0;
-        vtbl->cb_8c = FUN_0040fa00;
+        vtbl->cb_8c = LogFlumeCsawSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040f920;
+        vtbl->cb_b0 = RenderLogFlumeCsaw;
         vtbl->cb_90 = FUN_0040fa20;
         vtbl->cb_94 = FUN_0040fa50;
-        vtbl->cb_98 = FUN_0040fa60;
-        vtbl->cb_9c = FUN_0040fab0;
+        vtbl->cb_98 = LogFlumeCsawAddObject;
+        vtbl->cb_9c = LogFlumeCsawRemoveObject;
         vtbl->cb_ac = LogFlumeCsawUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b10
     if (_stricmp("LOG FLUME TUNNEL", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040f3e0;
-        vtbl->cb_8c = FUN_0040f4f0;
+        vtbl->cb_a4 = LogFlumeTunnelLoadSprites;
+        vtbl->cb_8c = LogFlumeTunnelSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040f450;
+        vtbl->cb_b0 = RenderLogFlumeTunnel;
         vtbl->cb_90 = FUN_0040f510;
         vtbl->cb_94 = FUN_0040f5a0;
-        vtbl->cb_98 = FUN_0040f540;
-        vtbl->cb_9c = FUN_0040f580;
+        vtbl->cb_98 = LogFlumeTunnelAddObject;
+        vtbl->cb_9c = LogFlumeTunnelRemoveObject;
         vtbl->cb_ac = LogFlumeTunnelUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4b00
     if (_stricmp("LOG FLUME DROP", flume->name) == 0) {
         vtbl->cb_a4 = (RideCallback)FUN_004103e0;
-        vtbl->cb_8c = FUN_004106e0;
+        vtbl->cb_8c = LogFlumeDropSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_004104b0;
+        vtbl->cb_b0 = RenderLogFlumeDrop;
         vtbl->cb_90 = FUN_00410700;
         vtbl->cb_94 = FUN_00410730;
-        vtbl->cb_98 = FUN_00410740;
-        vtbl->cb_9c = FUN_00410790;
+        vtbl->cb_98 = LogFlumeDropAddObject;
+        vtbl->cb_9c = LogFlumeDropRemoveObject;
         vtbl->cb_ac = LogFlumeDropUnloadSprites;
         return;
     }
     // STRING: LEGOLAND 0x004b4aec
     if (_stricmp("LOG FLUME HOLD UP", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040ff30;
-        vtbl->cb_8c = FUN_004100b0;
+        vtbl->cb_a4 = LogFlumeHoldUpLoadSprites;
+        vtbl->cb_8c = LogFlumeHoldUpSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
-        vtbl->cb_b0 = FUN_0040ffd0;
+        vtbl->cb_b0 = RenderLogFlumeHoldUp;
         vtbl->cb_90 = FUN_004100d0;
         vtbl->cb_94 = FUN_00410100;
-        vtbl->cb_98 = FUN_00410110;
-        vtbl->cb_9c = FUN_00410160;
+        vtbl->cb_98 = LogFlumeHoldUpAddObject;
+        vtbl->cb_9c = LogFlumeHoldUpRemoveObject;
         vtbl->cb_ac = LogFlumeHoldUpUnloadSprites;
     }
 }
@@ -5959,7 +5972,7 @@ void FUN_004119a0(struct ParticleEmitter *param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x004119c0
 int FUN_004119c0(Element *obj, int filter) {
-    struct FlumeEntry *entry = DAT_004cbe84;
+    struct FlumeEntry *entry = FlumeEntryList;
     int best = 0;
 
     while (entry != NULL) {

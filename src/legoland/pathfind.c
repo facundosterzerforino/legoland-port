@@ -50,8 +50,8 @@ struct ElemInfo {
 
 struct MatchResult {
     unsigned char pad_0[4];
-    unsigned char field_4;
-    unsigned char field_5;
+    unsigned char anchor_x;
+    unsigned char anchor_y;
 };
 
 // FUNCTION: LEGOLAND 0x00481c50
@@ -71,7 +71,7 @@ LEGO_EXPORT void AddPathSquare(struct Point *pos) {
     y = pos->y;
     node->y_max = y;
     node->y_min = y;
-    FUN_00481b10(node);
+    MergeBestNode(node);
 }
 
 // FUNCTION: LEGOLAND 0x00481c90
@@ -93,7 +93,7 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
         node->y_max = pos->y - 1;
         node->x_min = box.x_min;
         node->x_max = box.x_max;
-        FUN_00481b10(node);
+        MergeBestNode(node);
     }
     if (box.y_max > pos->y) {
         node = AddBestNode();
@@ -101,21 +101,21 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
         node->y_max = box.y_max;
         node->x_min = box.x_min;
         node->x_max = box.x_max;
-        FUN_00481b10(node);
+        MergeBestNode(node);
     }
     if (box.x_min < pos->x) {
         node = AddBestNode();
         node->y_min = node->y_max = pos->y;
         node->x_min = box.x_min;
         node->x_max = pos->x - 1;
-        FUN_00481b10(node);
+        MergeBestNode(node);
     }
     if (box.x_max > pos->x) {
         node = AddBestNode();
         node->y_min = node->y_max = pos->y;
         node->x_min = pos->x + 1;
         node->x_max = box.x_max;
-        FUN_00481b10(node);
+        MergeBestNode(node);
     }
 }
 
@@ -296,21 +296,21 @@ void FUN_004821c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004821e0
-void FUN_004821e0(void) {
+void FreeDirNodeList(void) {
     struct DirNode *node;
     struct DirNode *next;
 
-    node = DAT_0066b450;
+    node = DirSearchNodeList;
     while (node != NULL) {
         next = node->next;
         free(node);
         node = next;
     }
-    DAT_0066b450 = NULL;
+    DirSearchNodeList = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00482210
-void FUN_00482210(void) {
+void FreeDirPathNodes(void) {
     struct DirNode *node;
     struct DirNode *next;
 
@@ -351,8 +351,8 @@ void FUN_00482240(int x, int y, struct DirNode *parent) {
         return;
     }
 
-    node->next = DAT_0066b450;
-    DAT_0066b450 = node;
+    node->next = DirSearchNodeList;
+    DirSearchNodeList = node;
     node->parent = parent;
     node->x = x;
     node->y = y;
@@ -466,8 +466,8 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
     goal_x = goal->x >> 8;
     goal_y = goal->y >> 8;
 
-    FUN_004821e0();
-    FUN_00482210();
+    FreeDirNodeList();
+    FreeDirPathNodes();
     FUN_004821c0();
 
     DAT_00669250 = 0;
@@ -476,7 +476,7 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
 
     while (DAT_00669250 != 0) {
         wave = DAT_00669250;
-        node = DAT_0066b450;
+        node = DirSearchNodeList;
         DAT_00669250 = 0;
         while (wave-- != 0) {
             if (node->x == goal_x && node->y == goal_y) {
@@ -484,14 +484,14 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
                 if (FUN_00482430()) {
                     out->x = goal->x;
                     out->y = goal->y;
-                    FUN_004821e0();
-                    FUN_00482210();
+                    FreeDirNodeList();
+                    FreeDirPathNodes();
                     return 2;
                 }
                 out->x = (DAT_0066b458->x << 8) + 0x80;
                 out->y = (DAT_0066b458->y << 8) + 0x80;
-                FUN_004821e0();
-                FUN_00482210();
+                FreeDirNodeList();
+                FreeDirPathNodes();
                 return 1;
             }
             FUN_00482240(node->x, node->y - 1, node);
@@ -502,8 +502,8 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
         }
     }
 
-    FUN_004821e0();
-    FUN_00482210();
+    FreeDirNodeList();
+    FreeDirPathNodes();
     return 0;
 }
 
@@ -533,8 +533,8 @@ void FUN_00482620(int x, int y, struct DirNode *parent) {
     }
 
     node = malloc(16);
-    node->next = DAT_0066b450;
-    DAT_0066b450 = node;
+    node->next = DirSearchNodeList;
+    DirSearchNodeList = node;
     node->parent = parent;
     node->x = x;
     node->y = y;
@@ -556,8 +556,8 @@ int FUN_00482710(int *a, int *b, int *out) {
     goal_x = b[0] >> 8;
     goal_y = b[1] >> 8;
 
-    FUN_004821e0();
-    FUN_00482210();
+    FreeDirNodeList();
+    FreeDirPathNodes();
     FUN_004821c0();
 
     DAT_00669250 = 0;
@@ -566,7 +566,7 @@ int FUN_00482710(int *a, int *b, int *out) {
 
     while (DAT_00669250 != 0) {
         wave = DAT_00669250;
-        node = DAT_0066b450;
+        node = DirSearchNodeList;
         DAT_00669250 = 0;
         while (wave-- != 0) {
             if (node->x == goal_x && node->y == goal_y) {
@@ -574,14 +574,14 @@ int FUN_00482710(int *a, int *b, int *out) {
                 if (FUN_00482430()) {
                     out[0] = b[0];
                     out[1] = b[1];
-                    FUN_004821e0();
-                    FUN_00482210();
+                    FreeDirNodeList();
+                    FreeDirPathNodes();
                     return 2;
                 }
                 out[0] = (DAT_0066b458->x << 8) + 0x80;
                 out[1] = (DAT_0066b458->y << 8) + 0x80;
-                FUN_004821e0();
-                FUN_00482210();
+                FreeDirNodeList();
+                FreeDirPathNodes();
                 return 1;
             }
             FUN_00482620(node->x, node->y - 1, node);
@@ -592,8 +592,8 @@ int FUN_00482710(int *a, int *b, int *out) {
         }
     }
 
-    FUN_004821e0();
-    FUN_00482210();
+    FreeDirNodeList();
+    FreeDirPathNodes();
     return 0;
 }
 
@@ -723,7 +723,7 @@ void FUN_00482a80(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00482a90
-void FUN_00482a90(void) {
+void InitEntrance1Point(void) {
     struct MatchResult *match;
     struct ObjData *obj;
 
@@ -739,8 +739,8 @@ void FUN_00482a90(void) {
         (Element *)Entrance1Elem);
     obj = ((struct ElemInfo *)Entrance1Elem)->obj;
 
-    Entrance1Point.x = match->field_4 + obj->field_3c - 1;
-    Entrance1Point.y = ((obj->field_48 + obj->field_40) / 2) + match->field_5;
+    Entrance1Point.x = match->anchor_x + obj->field_3c - 1;
+    Entrance1Point.y = ((obj->field_48 + obj->field_40) / 2) + match->anchor_y;
 }
 
 // FUNCTION: LEGOLAND 0x00482b00

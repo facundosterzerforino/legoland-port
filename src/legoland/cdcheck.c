@@ -133,7 +133,7 @@ void FUN_00451210(int param_1) {
         *(char *)&drive = (char)toupper((char)param_1) - 0x40;
         FUN_00451280(DAT_004b85c4, drive);
         FUN_00451410(DAT_004b85c4, drive);
-        FUN_00451550(DAT_004b85c4, drive);
+        UnlockLogicalVolume(DAT_004b85c4, drive);
         CloseDeviceHandle(DAT_004b85c4);
         DAT_004b85c4 = INVALID_HANDLE_VALUE;
     }
@@ -172,7 +172,8 @@ int FUN_00451280(HANDLE h, int drive) {
         regs.reg_EAX = 0x440d;
         regs.reg_ECX = 0x848;
         if (!DeviceIoControl(h, 1, &regs, sizeof(regs), &regs, sizeof(regs), (LPDWORD)&drive, NULL) || (regs.reg_Flags & 1)) {
-            return 0;
+            result = 0;
+            break;
         }
         i++;
         result = 1;
@@ -249,7 +250,7 @@ BOOL __stdcall FUN_004514b0(HANDLE h, int drive, int param_3, int param_4) {
 }
 
 // FUNCTION: LEGOLAND 0x00451550
-BOOL __stdcall FUN_00451550(HANDLE h, int drive) {
+BOOL __stdcall UnlockLogicalVolume(HANDLE h, int drive) {
     DIOC_REGISTERS regs = {0};
     unsigned char category = 0x48;
     BOOL result;

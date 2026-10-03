@@ -180,3 +180,12 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   `if (FAILED(hr)) goto release_perf; ... release_perf: perf->Release(); release_composer: ...`.
   Nested ifs or duplicated cleanup code give the wrong block layout (SaveGame: 62.77% -> 91.55% with `goto fail`).
 
+
+## Remaining STUB()s Are Hand-Written Assembly
+- All 44 functions still left as `STUB()` (copters.c, castle.c, man3d.c, render3d.c, draw.c, render.c) were checked
+  against the original bytes: each is hand-written assembly. 36 have an `ebp` frame plus instructions MSVC6 never
+  emits from C (`rdtsc` timing, `xchg`, `fistp` fast float->int, `pusha/popa`, `shrd` fixed point, `fldcw/fstcw`).
+  The 8 draw.c sprite blitters (0x466d80-0x468410) have no frame but use `rol`, `rep movsw`/`rep stosw` and a
+  decode block repeated like an asm macro, and they reuse argument slots as scratch.
+- Each one carries a `// Hand-written assembly in the original (...)` comment above its `// FUNCTION:` line.
+  They can only be matched with `__asm`, which the project does not allow.

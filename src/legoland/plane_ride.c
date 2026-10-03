@@ -39,7 +39,7 @@ struct PlaneRideNode {
 
 struct PlaneRideObject {
     unsigned char pad_0[0xc];
-    unsigned int field_c;
+    unsigned int ride;
 };
 
 struct PlaneRideBlockData {
@@ -52,7 +52,7 @@ struct PlaneRideBlock {
     unsigned int field_14;
     unsigned int field_18;
     unsigned char pad_1c[0x48];
-    struct PlaneRideBlockData *field_64;
+    struct PlaneRideBlockData *layer;
 };
 
 struct PlaneRideRoot {
@@ -160,17 +160,17 @@ void FUN_0043d9f0(struct PlaneRideNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043da60
-void FUN_0043da60(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
-    char n = 0;
+void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride;
     struct RideNode *r;
+    struct Point coords;
+    char i;
+    struct Point off;
     struct PlaneRideNode *node;
     struct Bloke *riders[4] = {0};
+    char n = 0;
     struct Bloke *bloke;
     struct Person *person;
-    struct Point coords;
-    struct Point off;
-    char i;
 
     ride = element->ride;
     r = ride->riders;
@@ -196,41 +196,42 @@ void FUN_0043da60(struct Element *element, unsigned int param_2, unsigned int pa
                     IP_RenderBlokeIn3DNow(riders[i]);
                 }
             }
-            LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 1), node->b4);
+            LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 1), node->b4);
             off = GetRenderOffsetForLayer(ride->layer, 1);
             AdjustOffsetForViewMode(&off);
             PrintSprite(GetSpriteForLayer(ride->layer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
             *(short *)*ZoomerSprite->lls = node->b4;
             for (r = ride->riders; r != NULL; r = r->next) {
                 if (tile->id == r->tile.id) {
+                    struct Point off2;
                     bloke = r->rider;
                     if (bloke->flags & 0x80) {
                         person = bloke->person;
-                        off.x = DAT_0081cae8;
-                        off.y = DAT_0081caec;
+                        off2.x = DAT_0081cae8;
+                        off2.y = DAT_0081caec;
                         person->offset.x = bloke->screen_x;
                         person->offset.y = bloke->screen_y;
                         AdjustBlokePosition(&person->offset);
-                        AdjustOffsetForViewMode(&off);
-                        person->screen.x = bloke->screen_x + coords.x + off.x;
-                        person->screen.y = bloke->screen_y + coords.y + off.y;
+                        AdjustOffsetForViewMode(&off2);
+                        person->screen.x = bloke->screen_x + coords.x + off2.x;
+                        person->screen.y = bloke->screen_y + coords.y + off2.y;
                         AdjustBlokePosition(&person->screen);
                         IP_RenderBlokeIn3DNow(r->rider);
                     }
                 }
             }
-            LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 2), node->b5);
+            LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 2), node->b5);
             off = GetRenderOffsetForLayer(ride->layer, 2);
             AdjustOffsetForViewMode(&off);
             PrintSprite(GetSpriteForLayer(ride->layer, 2), coords.x + off.x, coords.y + off.y, param_6, 0);
             return;
         }
     }
-    LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 1), node->b4);
+    LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 1), node->b4);
     off = GetRenderOffsetForLayer(ride->layer, 1);
     AdjustOffsetForViewMode(&off);
     PrintSprite(GetSpriteForLayer(ride->layer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
-    LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 2), node->b5);
+    LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 2), node->b5);
     off = GetRenderOffsetForLayer(ride->layer, 2);
     AdjustOffsetForViewMode(&off);
     PrintSprite(GetSpriteForLayer(ride->layer, 2), coords.x + off.x, coords.y + off.y, param_6, 0);
@@ -240,10 +241,10 @@ void FUN_0043da60(struct Element *element, unsigned int param_2, unsigned int pa
 void FUN_0043dda0(Element *input) {
     struct LayerResult layer;
 
-    DAT_0062fe58 = input->ride;
-    DAT_0062fe58->flags |= 0x420;
-    DAT_0062fe7c = DAT_0062fe58->layer;
-    DAT_0062fe7c->flags |= 0x2000;
+    PlaneRide = input->ride;
+    PlaneRide->flags |= 0x420;
+    PlaneRideLayer = PlaneRide->layer;
+    PlaneRideLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b7a54
     ZoomerideBinV = LoadBinV("Zbuffers\\Zoomeride.bnv");
     // STRING: LEGOLAND 0x004b7a3c
@@ -258,18 +259,18 @@ void FUN_0043dda0(Element *input) {
     DAT_0062fe84[1] = Zoomer0nBinV;
     DAT_0062fe84[2] = Zoomer0ffBinV;
     Load_FXList(DAT_004b79d0, 2);
-    HideLayer(DAT_0062fe7c, 1);
-    StopLayerPlaying(DAT_0062fe7c, 1);
-    LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 1), 0);
-    HideLayer(DAT_0062fe7c, 2);
-    StopLayerPlaying(DAT_0062fe7c, 2);
-    LLSSetFrame(GetLLSForLayer(DAT_0062fe7c, 2), 0);
-    GetLayer(DAT_0062fe58->layer, &layer, 1);
+    HideLayer(PlaneRideLayer, 1);
+    StopLayerPlaying(PlaneRideLayer, 1);
+    LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 1), 0);
+    HideLayer(PlaneRideLayer, 2);
+    StopLayerPlaying(PlaneRideLayer, 2);
+    LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 2), 0);
+    GetLayer(PlaneRide->layer, &layer, 1);
 }
 
 // FUNCTION: LEGOLAND 0x0043dee0
 void FUN_0043dee0(struct PlaneRideObject *input) {
-    DAT_0062fe58 = (struct Ride *)input->field_c;
+    PlaneRide = (struct Ride *)input->ride;
     if (ZoomerSprite) {
         KillSprite(ZoomerSprite);
     }
@@ -287,25 +288,25 @@ void FUN_0043dee0(struct PlaneRideObject *input) {
 }
 
 // FUNCTION: LEGOLAND 0x0043df50
-void FUN_0043df50(void) {
+void PlaneRideSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = (void *)DAT_0062fe58;
+    EditMode.unk8 = (void *)PlaneRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x0043df90
-void FUN_0043df90(struct PlaneRideObject *a1, TileId a2, struct PlaneRideObject *a3) {
+void PlaneRideRemoveObject(struct PlaneRideObject *a1, TileId a2, struct PlaneRideObject *a3) {
     unsigned int temp = FindPlaneRideNode(&a2);
     if (temp != 0) {
         RemovePlaneRideNode((void *)temp);
     }
     StandardRemoveObject((unsigned int)a1, a2, (unsigned int)a3);
-    RemoveAllBlokesFromRide(a1->field_c, a2);
+    RemoveAllBlokesFromRide(a1->ride, a2);
 }
 
 // FUNCTION: LEGOLAND 0x0043dfe0
-void FUN_0043dfe0(Element *a, int *p) {
+void PlaneRideAddObject(Element *a, int *p) {
     unsigned char c[2];
 
     c[0] = *(unsigned char *)p;
@@ -318,11 +319,11 @@ void FUN_0043dfe0(Element *a, int *p) {
 unsigned int *FUN_0043e010(struct PlaneRideRoot *param1, unsigned short param2) {
     struct PlaneRideBlock *block = param1->field_c;
 
-    DAT_0062fe60 = (unsigned int)block->field_64;
+    DAT_0062fe60 = (unsigned int)block->layer;
     DAT_0062fe64 = block->field_14;
     DAT_0062fe68 = block->field_18;
     DAT_0062fe6c = param2;
-    block->field_64->field_10 |= 0x2000;
+    block->layer->field_10 |= 0x2000;
 
     return &DAT_0062fe60;
 }
@@ -395,14 +396,14 @@ struct ZoomerCar {
 struct ZoomerListNode {
     struct ZoomerListNode *next;
     unsigned char pad_4[4];
-    struct ZoomerData *field_8;
+    struct ZoomerData *rider;
     unsigned char pad_c[4];
-    struct ZoomerCar *field_10;
+    struct ZoomerCar *person;
 };
 
 struct ZoomerGameObject {
     unsigned char pad_0[0xcc];
-    struct ZoomerListNode *field_cc;
+    struct ZoomerListNode *riders;
 };
 
 struct ZoomerLoadArg {
@@ -445,16 +446,16 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             car->field_2c = (&Zoomer0nBinV)[car->field_30];
         } else {
             car->field_2c = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
-        data = list->field_8;
+        data = list->rider;
         tc = data->field_54;
         if (tc != NULL) {
             tc->field_0 = DAT_0062fe84[tc->field_4];
@@ -470,11 +471,11 @@ void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface
     if (_stricmp("PLANE RIDE", name->name) == 0) {
         iface->cb_a4 = FUN_0043dda0;
         iface->cb_ac = FUN_0043dee0;
-        iface->cb_8c = FUN_0043df50;
+        iface->cb_8c = PlaneRideSetEditMode;
         iface->cb_a8 = FUN_0043e410;
-        iface->cb_b0 = FUN_0043da60;
-        iface->cb_9c = FUN_0043df90;
-        iface->cb_98 = FUN_0043dfe0;
+        iface->cb_b0 = RenderPlaneRide;
+        iface->cb_9c = PlaneRideRemoveObject;
+        iface->cb_98 = PlaneRideAddObject;
         iface->cb_a0 = FUN_0043e010;
         iface->cb_b8 = LoadZoomer;
         iface->cb_bc = SaveZoomer;
@@ -483,7 +484,7 @@ void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface
 
 // FUNCTION: LEGOLAND 0x0043e2b0
 void FUN_0043e2b0(struct PlaneRideNode *node) {
-    struct RideNode *r = DAT_0062fe58->riders;
+    struct RideNode *r = PlaneRide->riders;
     unsigned int flags;
 
     if (++node->b5 >= 0x18) {
@@ -494,7 +495,7 @@ void FUN_0043e2b0(struct PlaneRideNode *node) {
         int v = ++node->f10;
         char c = node->b12;
         if (c == 0) {
-            if (GetAllBlokesOffRide(DAT_0062fe58, *(unsigned short *)node) == 0) {
+            if (GetAllBlokesOffRide(PlaneRide, *(unsigned short *)node) == 0) {
                 return;
             }
             FUN_0043d9f0(node);
@@ -593,7 +594,7 @@ void FUN_0043e410(struct Element *elem) {
                 bloke->person->depth = GetUnitDepth(-1617706.75f, -1617948.625f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(DAT_004b79bc + 6, "%02d", FUN_0043e050(rn, node, (char)DAT_0062fe58->seats));
+                sprintf(DAT_004b79bc + 6, "%02d", FUN_0043e050(rn, node, (char)PlaneRide->seats));
                 bloke->path = NewBNVPath(DAT_0062fe84[1], 1, DAT_004b79bc, -1617706.75f, -1617948.625f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -622,7 +623,7 @@ void FUN_0043e410(struct Element *elem) {
                 bloke->field_35 = 1;
                 bloke->person->depth = GetUnitDepth(-1617706.75f, -1617948.625f);
                 bloke->param_action++;
-                if ((char)++node->b2 == DAT_0062fe58->seats) {
+                if ((char)++node->b2 == PlaneRide->seats) {
                     FUN_0043d990(node);
                 }
                 break;

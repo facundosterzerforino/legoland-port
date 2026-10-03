@@ -16,7 +16,7 @@
 #include "sound_music.h"
 
 struct CatapultNode {
-    unsigned short field_0;
+    unsigned short tile_id;
     unsigned char pad_2[2];
     struct CatapultNode *next;
     void *field_8;
@@ -41,7 +41,7 @@ struct CatapultItem {
 
 struct CatapultLayer {
     unsigned char pad_0[0xc];
-    struct CatapultSprite *field_c;
+    struct CatapultSprite *ride;
 };
 
 struct CatapultSprite {
@@ -114,7 +114,7 @@ struct CatapultNode *Catapult_AddNode(const unsigned short *arg) {
     struct CatapultNode *node = (struct CatapultNode *)malloc(0x3c);
     if (node != NULL) {
         memset(node, 0, 0x3c);
-        node->field_0 = *arg;
+        node->tile_id = *arg;
         node->next = CatapultNodeList;
         CatapultNodeList = node;
     }
@@ -157,7 +157,7 @@ struct CatapultRideNode *Catapult_FindNode(const unsigned short *key) {
 
     if (cur != NULL) {
         do {
-            if (memcmp(&cur->field_0, key, 2) == 0) {
+            if (memcmp(&cur->tile_id, key, 2) == 0) {
                 return (struct CatapultRideNode *)cur;
             }
             cur = cur->next;
@@ -167,18 +167,18 @@ struct CatapultRideNode *Catapult_FindNode(const unsigned short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004031e0
-void FUN_004031e0(struct CatapultLayer *param1) {
+void LoadCatapultResources(struct CatapultLayer *param1) {
     struct CatapultSprite *sprite;
     struct CatapultInner *inner;
 
-    sprite = param1->field_c;
-    DAT_004c10f4 = sprite;
+    sprite = param1->ride;
+    ActiveCatapultRide = sprite;
     if (sprite != NULL) {
         sprite->field_1c |= 0x420;
-        inner = ((struct CatapultSprite *)DAT_004c10f4)->field_64;
+        inner = ((struct CatapultSprite *)ActiveCatapultRide)->field_64;
         if (inner != NULL) {
             inner->field_10 |= 0x2000;
-            DAT_004c10f0 = ((struct CatapultSprite *)DAT_004c10f4)->field_64;
+            DAT_004c10f0 = ((struct CatapultSprite *)ActiveCatapultRide)->field_64;
         }
     }
     HideLayer(DAT_004c10f0, 0);
@@ -187,13 +187,13 @@ void FUN_004031e0(struct CatapultLayer *param1) {
 }
 
 // FUNCTION: LEGOLAND 0x00403250
-void FUN_00403250(void) {
+void CatapultFreeNodesAndKillSfx(void) {
     Catapult_FreeNodes();
     Kill_FXList(Catapult_SFX, 4);
 }
 
 // FUNCTION: LEGOLAND 0x00403270
-void FUN_00403270(struct Element *obj, int unused, int unused2, TileId *tile, int unused3, int arg5) {
+void RenderCatapult(struct Element *obj, int unused, int unused2, TileId *tile, int unused3, int arg5) {
     struct CatapultItem *item;
     struct Ride *ride = obj->ride;
     struct ChainNode *chain;
@@ -460,16 +460,16 @@ void FUN_00403820(struct Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x00403930
-void FUN_00403930(void) {
-    EditMode.unk8 = DAT_004c10f4;
+void CatapultSetEditMode(void) {
+    EditMode.unk8 = ActiveCatapultRide;
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_004c10f4;
+    EditMode.unk8 = ActiveCatapultRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((unsigned char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00403970
-void FUN_00403970(struct EditObject *edit2, struct CatapultEdit *edit) {
+void CatapultAddObject(struct EditObject *edit2, struct CatapultEdit *edit) {
     struct CatapultKey key;
 
     key.field_0 = edit->field_0;
@@ -479,7 +479,7 @@ void FUN_00403970(struct EditObject *edit2, struct CatapultEdit *edit) {
 }
 
 // FUNCTION: LEGOLAND 0x004039a0
-void FUN_004039a0(struct CatapultRemoveEdit *edit, TileId key, void *cursor, unsigned int param_4) {
+void CatapultRemoveObject(struct CatapultRemoveEdit *edit, TileId key, void *cursor, unsigned int param_4) {
     struct CatapultRideNode *node;
 
     StandardRemoveObject((Element *)edit, key, (struct Cursor *)cursor);
@@ -492,7 +492,7 @@ void FUN_004039a0(struct CatapultRemoveEdit *edit, TileId key, void *cursor, uns
 
 // FUNCTION: LEGOLAND 0x004039e0
 unsigned int *FUN_004039e0(struct CatapultLayer *arg1, unsigned short arg2) {
-    struct CatapultSprite *sprite = arg1->field_c;
+    struct CatapultSprite *sprite = arg1->ride;
 
     DAT_004c1100 = sprite->field_64;
     DAT_004c1104 = sprite->field_14;
@@ -529,7 +529,7 @@ LEGO_EXPORT int Catapult_Save(void) {
             if (SaveGameWrite(&one, 4) == 0) {
                 return 0;
             }
-            ride = DAT_004c10f4;
+            ride = ActiveCatapultRide;
             field = (int *)&scratch.data[4];
             i = 4;
             do {
@@ -587,7 +587,7 @@ LEGO_EXPORT int Catapult_Load(void) {
 
         for (i = 0; i < 4; i++) {
             count = (unsigned int)node->slots[i];
-            chain = ((struct CatapultRide *)DAT_004c10f4)->chain;
+            chain = ((struct CatapultRide *)ActiveCatapultRide)->chain;
             if (count != 0) {
                 while (--count != 0) {
                     chain = chain->next;
@@ -610,13 +610,13 @@ LEGO_EXPORT int Catapult_Load(void) {
 void Catapult_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b412c
     if (_stricmp("CATAPULT", name->name) == 0) {
-        ci->cb_a4 = FUN_004031e0;
-        ci->cb_ac = FUN_00403250;
-        ci->cb_8c = FUN_00403930;
+        ci->cb_a4 = LoadCatapultResources;
+        ci->cb_ac = CatapultFreeNodesAndKillSfx;
+        ci->cb_8c = CatapultSetEditMode;
         ci->cb_a8 = FUN_00403820;
-        ci->cb_b0 = FUN_00403270;
-        ci->cb_9c = FUN_004039a0;
-        ci->cb_98 = FUN_00403970;
+        ci->cb_b0 = RenderCatapult;
+        ci->cb_9c = CatapultRemoveObject;
+        ci->cb_98 = CatapultAddObject;
         ci->cb_a0 = FUN_004039e0;
         ci->cb_bc = Catapult_Save;
         ci->cb_b8 = Catapult_Load;

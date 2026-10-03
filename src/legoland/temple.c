@@ -17,13 +17,13 @@
 #include "ride_queue.h"
 
 // FUNCTION: LEGOLAND 0x004169c0
-void FUN_004169c0(Element *obj) {
-    DAT_004cbf5c = obj->ride;
-    if (DAT_004cbf5c != NULL) {
-        DAT_004cbf5c->flags |= 0x20;
-        if (DAT_004cbf5c->layer != NULL) {
-            DAT_004cbf5c->layer->flags |= 0x2000;
-            DAT_004cbf64 = DAT_004cbf5c->layer;
+void LoadTempleMatteSprites(Element *obj) {
+    TempleBuildingRide = obj->ride;
+    if (TempleBuildingRide != NULL) {
+        TempleBuildingRide->flags |= 0x20;
+        if (TempleBuildingRide->layer != NULL) {
+            TempleBuildingRide->layer->flags |= 0x2000;
+            TempleLayer = TempleBuildingRide->layer;
         }
     }
     // STRING: LEGOLAND 0x004b4edc
@@ -33,7 +33,7 @@ void FUN_004169c0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00416a30
-void FUN_00416a30(void) {
+void KillTempleMatteSprites(void) {
     if (TempleMatte1Sprite != 0) {
         KillSprite(TempleMatte1Sprite);
     }
@@ -43,7 +43,7 @@ void FUN_00416a30(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00416a60
-void FUN_00416a60(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *coords, unsigned int param_5, unsigned int clip) {
+void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *coords, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -58,10 +58,10 @@ void FUN_00416a60(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     }
     RenderBlokeList((struct BlokeListHead *)&DAT_004cbf70);
     pos = GetScreenCoordsForObject((unsigned char *)coords, ride);
-    offset = GetRenderOffsetForLayer(DAT_004cbf64, 0);
+    offset = GetRenderOffsetForLayer(TempleLayer, 0);
     AdjustOffsetForViewMode(&offset);
     PrintSprite(TempleMatte1Sprite, offset.x + pos.x, offset.y + pos.y, clip, 0);
-    offset = GetRenderOffsetForLayer(DAT_004cbf64, 3);
+    offset = GetRenderOffsetForLayer(TempleLayer, 3);
     AdjustOffsetForViewMode(&offset);
     PrintSprite(TempleMatte2Sprite, offset.x + pos.x, offset.y + pos.y, clip, 0);
 }
@@ -184,8 +184,8 @@ void FUN_00416b50(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00416dc0
-void FUN_00416dc0(void) {
-    void *temp = DAT_004cbf5c;
+void TempleSetEditMode(void) {
+    void *temp = TempleBuildingRide;
     EditMode.unk0 = 1;
     EditMode.unk8 = temp;
     DefaultCursor(&EditCursor);
@@ -193,12 +193,12 @@ void FUN_00416dc0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00416e00
-void FUN_00416e00(unsigned int param_1, unsigned int param_2) {
+void TempleAddObject(unsigned int param_1, unsigned int param_2) {
     AddBasicObject(param_1, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00416e20
-void FUN_00416e20(Element *a1, TileId tile, unsigned int a3) {
+void TempleRemoveObject(Element *a1, TileId tile, unsigned int a3) {
     StandardRemoveObject((unsigned int)a1, tile, a3);
     RemoveAllBlokesFromRide(a1->ride, tile);
 }
@@ -207,12 +207,12 @@ void FUN_00416e20(Element *a1, TileId tile, unsigned int a3) {
 void Temple_GetInterfaces(struct ClassNode *str, struct CallbackTable *obj) {
     // STRING: LEGOLAND 0x004b4ef0
     if (_stricmp("TEMPLE", str->name) == 0) {
-        obj->cb_a4 = FUN_004169c0;
-        obj->cb_ac = FUN_00416a30;
-        obj->cb_8c = FUN_00416dc0;
+        obj->cb_a4 = LoadTempleMatteSprites;
+        obj->cb_ac = KillTempleMatteSprites;
+        obj->cb_8c = TempleSetEditMode;
         obj->cb_a8 = FUN_00416b50;
-        obj->cb_b0 = FUN_00416a60;
-        obj->cb_9c = FUN_00416e20;
-        obj->cb_98 = FUN_00416e00;
+        obj->cb_b0 = RenderTemple;
+        obj->cb_9c = TempleRemoveObject;
+        obj->cb_98 = TempleAddObject;
     }
 }

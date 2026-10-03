@@ -48,11 +48,11 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
         return 0;
     case 8:
     case 0x1f:
-        DAT_00669238 = PauseGameTimer();
+        PauseGameTimerResult = PauseGameTimer();
         lpConfig->field_1c |= 1;
         break;
     case 7:
-        if (DAT_00669238 == 0) {
+        if (PauseGameTimerResult == 0) {
             ResumeGameTimer();
         }
         *(unsigned short *)&lpConfig->field_1c &= (unsigned short)~1;

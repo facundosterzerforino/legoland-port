@@ -6,7 +6,7 @@ int _ftol();
 #define FUN_00458930 _ftol
 void FUN_00458940(void);
 void FUN_00458a50(void);
-void FUN_00458b20(void);
+void UnloadMap(void);
 void SetMapLoaded(unsigned int param_1);
 void FUN_00458be0(void);
 void FUN_00459520(void);

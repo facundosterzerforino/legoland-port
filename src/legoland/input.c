@@ -234,27 +234,27 @@ LEGO_EXPORT void UpdateControllerFromKeyboardData(struct CtrlBuffer *buffer) {
         CheatKeyBuffer[0x13] = c;
         // STRING: LEGOLAND 0x004baf9c
         if (_memicmp(":THEME", &CheatKeyBuffer[0xe], 6) == 0) {
-            FUN_00492ce0(0);
+            SetInteractiveMusicTheme(0);
             // STRING: LEGOLAND 0x004baf88
             DBPrintf("CHEATTHEME=THEME\n");
             // STRING: LEGOLAND 0x004baf70
         } else if (_memicmp(":EGYPT", &CheatKeyBuffer[0xe], 6) == 0) {
-            FUN_00492ce0(1);
+            SetInteractiveMusicTheme(1);
             // STRING: LEGOLAND 0x004baf58
             DBPrintf("CHEATTHEME=EGYPTIAN\n");
             // STRING: LEGOLAND 0x004baf50
         } else if (_memicmp(":INCA", &CheatKeyBuffer[0xf], 5) == 0) {
-            FUN_00492ce0(2);
+            SetInteractiveMusicTheme(2);
             // STRING: LEGOLAND 0x004baf3c
             DBPrintf("CHEATTHEME=INCA\n");
             // STRING: LEGOLAND 0x004baf34
         } else if (_memicmp(":CASTLE", &CheatKeyBuffer[0xd], 7) == 0) {
-            FUN_00492ce0(3);
+            SetInteractiveMusicTheme(3);
             // STRING: LEGOLAND 0x004baf20
             DBPrintf("CHEATTHEME=CASTLE\n");
             // STRING: LEGOLAND 0x004baf18
         } else if (_memicmp(":WEST", &CheatKeyBuffer[0xf], 5) == 0) {
-            FUN_00492ce0(4);
+            SetInteractiveMusicTheme(4);
             // STRING: LEGOLAND 0x004baf04
             DBPrintf("CHEATTHEME=WEST\n");
             // STRING: LEGOLAND 0x004baefc
@@ -304,7 +304,7 @@ LEGO_EXPORT void UpdateControllerFromKeyboardData(struct CtrlBuffer *buffer) {
             } else if (_memicmp(":PRAISEME", &CheatKeyBuffer[0xb], 9) == 0) {
                 // STRING: LEGOLAND 0x004bae60
                 DBPrintf("CHEAT:Instant Appraisal\n");
-                DAT_00666098 = 1;
+                AppraisalDeadline = 1;
                 // STRING: LEGOLAND 0x004bae50
             } else if (_memicmp(":WELOVELEGOLAND", &CheatKeyBuffer[5], 0xf) == 0) {
                 // STRING: LEGOLAND 0x004bae3c

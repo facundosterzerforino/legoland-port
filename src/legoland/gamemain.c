@@ -27,12 +27,12 @@
 
 struct GameMainNode {
     struct GameMainNode *next;
-    struct GameMainNode *field_4;
-    int field_8;
-    int field_c;
-    int field_10;
-    int field_14;
-    int field_18;
+    struct GameMainNode *parent;
+    int x;
+    int y;
+    int step_cost;
+    int path_cost;
+    int heuristic;
     int field_1c;
     int field_20;
     int field_24;
@@ -85,7 +85,7 @@ void FUN_004776c0(struct QueryNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x004776e0
-void FUN_004776e0(struct EventNode *node) {
+void InsertOpenListSorted(struct EventNode *node) {
     struct EventNode *current;
     struct EventNode *previous;
 
@@ -121,7 +121,7 @@ struct GameMainNode *FUN_00477730(struct Point *ctx) {
         return NULL;
     }
     while (node != NULL) {
-        if (node->field_8 == ctx->x && node->field_c == ctx->y) {
+        if (node->x == ctx->x && node->y == ctx->y) {
             return node;
         }
         node = node->next;
@@ -130,7 +130,7 @@ struct GameMainNode *FUN_00477730(struct Point *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477760
-void FUN_00477760(struct QueryNode *ctx) {
+void RemoveQueryNode(struct QueryNode *ctx) {
     struct QueryNode *prev;
     struct QueryNode *node;
 
@@ -151,7 +151,7 @@ void FUN_00477760(struct QueryNode *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477790
-void FUN_00477790(struct EventNode *param_1) {
+void RemoveFromOpenList(struct EventNode *param_1) {
     struct EventNode *prev;
     struct EventNode *node;
 
@@ -181,7 +181,7 @@ struct GameMainNode *FUN_004777c0(struct Point *arg) {
     }
     first = arg->x;
     do {
-        if (node->field_8 == first && node->field_c == arg->y) {
+        if (node->x == first && node->y == arg->y) {
             return node;
         }
         node = node->next;
@@ -222,40 +222,40 @@ struct GameMainNode *FUN_004777f0(struct Point *pos, int *result) {
         } else {
             node->field_20 = 0;
         }
-        node->field_10 = 1;
+        node->step_cost = 1;
     } else if (flags & 0x40) {
         node->field_20 = 5;
-        node->field_10 = -1;
+        node->step_cost = -1;
     } else if (flags & 0x8a0) {
         ride = tile->field_0->ride;
         if (ride->flags & 0x200000) {
             if (ride->range > 1) {
                 node->field_20 = 4;
-                node->field_10 = 0x14;
+                node->step_cost = 0x14;
             } else {
                 node->field_20 = 3;
-                node->field_10 = 9;
+                node->step_cost = 9;
             }
         } else {
             node->field_20 = 5;
-            node->field_10 = -1;
+            node->step_cost = -1;
         }
     } else if (tile->field_10 & 2) {
         node->field_20 = 5;
-        node->field_10 = -1;
+        node->step_cost = -1;
     } else {
         node->field_20 = 2;
-        node->field_10 = 3;
+        node->step_cost = 3;
     }
-    node->field_8 = pos->x;
-    node->field_c = pos->y;
-    node->field_14 = 0x7fffffff;
+    node->x = pos->x;
+    node->y = pos->y;
+    node->path_cost = 0x7fffffff;
     dy = abs(pos->y - DAT_004bb5a4);
     dx = abs(pos->x - DAT_004bb5a0);
-    node->field_4 = 0;
+    node->parent = 0;
     node->field_24 = 0;
-    node->field_18 = dx + dy;
-    node->field_1c = node->field_10 + node->field_18;
+    node->heuristic = dx + dy;
+    node->field_1c = node->step_cost + node->heuristic;
     return node;
 }
 
@@ -360,129 +360,129 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     DAT_004bb5a0 = a;
     DAT_004bb5a4 = b;
     nb = FUN_004777f0(&DAT_004bb598, &result);
-    nb->field_14 = 0;
-    FUN_004776e0((struct EventNode *)nb);
+    nb->path_cost = 0;
+    InsertOpenListSorted((struct EventNode *)nb);
     while ((cur = DAT_00668fc0) != NULL) {
         DAT_00668fc0 = cur->next;
 
-        if ((cur->field_8 == DAT_004bb5a0 && cur->field_c == DAT_004bb5a4) || cur->field_20 == 1) {
+        if ((cur->x == DAT_004bb5a0 && cur->y == DAT_004bb5a4) || cur->field_20 == 1) {
             best = cur;
         } else {
-            pos.x = cur->field_8;
-            pos.y = cur->field_c - 1;
+            pos.x = cur->x;
+            pos.y = cur->y - 1;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                if (nb->field_10 != -1) {
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
             }
-            pos.x = cur->field_8 + 1;
-            pos.y = cur->field_c;
+            pos.x = cur->x + 1;
+            pos.y = cur->y;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
             }
-            pos.x = cur->field_8;
-            pos.y = cur->field_c + 1;
+            pos.x = cur->x;
+            pos.y = cur->y + 1;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
             }
-            pos.x = cur->field_8 - 1;
-            pos.y = cur->field_c;
+            pos.x = cur->x - 1;
+            pos.y = cur->y;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
@@ -494,7 +494,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     id = ElemID("PATH CONTROL");
     while (best != NULL) {
         nb = best;
-        pp = (struct Point *)&nb->field_8;
+        pp = (struct Point *)&nb->x;
         if (pp->x >= 0 && pp->x < lpConfig->width && pp->y >= 0 && pp->y < lpConfig->height) {
             tile = &GameMap[pp->y][pp->x];
         } else {
@@ -504,10 +504,10 @@ void FUN_00477bd0(int x, int y, int a, int b) {
             FUN_004779d0(pp);
             AddBasicPath((struct EditObject *)id, (int *)pp);
         }
-        nb = nb->field_4;
+        nb = nb->parent;
     }
     while (DAT_00668fc4 != NULL) {
-        FUN_00477760((struct QueryNode *)DAT_00668fc4);
+        RemoveQueryNode((struct QueryNode *)DAT_00668fc4);
     }
 }
 
@@ -646,7 +646,7 @@ void FUN_004784c0(void) {
     NEWFLC_CheckDuplicate = 1;
     DAT_00669054 = 0;
     DAT_004bb5ac = 1;
-    DAT_00669050 = 0;
+    CurrentObjectiveEventFlags = 0;
     DAT_0066879c = 0;
     DAT_00669098 = 0;
 
@@ -659,7 +659,7 @@ void FUN_004784c0(void) {
 
     FUN_004689a0();
     DAT_007fdca4 = FUN_004689f0(0, 0, 0);
-    DAT_004bb5b0 = 1;
+    ScriptConditionActive = 1;
 
     FUN_004441f0();
     FUN_0044db20();
@@ -671,13 +671,13 @@ void FUN_004784c0(void) {
     FUN_00482d70();
     FUN_00462e90();
     FUN_00476000();
-    FUN_00476050();
+    ClearButtonFlashStates();
     FUN_00490610(DAT_004d8bb0);
     FUN_00463560();
     ResetPathUpdateTimer();
     FUN_00459960();
 
-    MapStats.field_174 = 1000;
+    MapStats.brick_meter_max = 1000;
     MapStats.field_194 = 0;
     MapStats.field_180 = 0;
     MapStats.field_3a8 = 1;
@@ -696,16 +696,16 @@ void FUN_00478610(unsigned int param_1) {
     DAT_004bb5ac = param_1;
     switch (param_1) {
     case 1:
-        DAT_00669050 = 1;
+        CurrentObjectiveEventFlags = 1;
         break;
     case 2:
-        DAT_00669050 = 2;
+        CurrentObjectiveEventFlags = 2;
         break;
     case 3:
-        DAT_00669050 = 4;
+        CurrentObjectiveEventFlags = 4;
         break;
     default:
-        DAT_00669050 = 0;
+        CurrentObjectiveEventFlags = 0;
         break;
     }
 }
@@ -719,9 +719,9 @@ void FUN_00478650(unsigned int param_1, unsigned int param_2) {
     }
     // STRING: LEGOLAND 0x004bb9ec
     if (_stricmp(entry->name, "PURGE") == 0) {
-        DAT_00669050 |= 0x8;
+        CurrentObjectiveEventFlags |= 0x8;
     } else {
-        DAT_00669050 &= 0xf7;
+        CurrentObjectiveEventFlags &= 0xf7;
     }
 }
 
@@ -744,7 +744,7 @@ unsigned int FUN_004786c0(unsigned int param_1, unsigned int param_2, unsigned i
 }
 
 // FUNCTION: LEGOLAND 0x00478700
-void FUN_00478700(int *param_1, char **param_2, int param_3) {
+void ParseRect(int *param_1, char **param_2, int param_3) {
     int temp;
 
     param_1[0] = atoi(param_2[param_3 + 0]);
@@ -765,7 +765,7 @@ void FUN_00478700(int *param_1, char **param_2, int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00478770
-void FUN_00478770(int *param_1, char **param_2, int param_3) {
+void ParseIntPair(int *param_1, char **param_2, int param_3) {
     param_1[0] = atoi(param_2[param_3 + 0]);
     param_1[1] = atoi(param_2[param_3 + 1]);
 }

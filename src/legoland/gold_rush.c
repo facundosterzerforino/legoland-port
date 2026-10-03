@@ -24,8 +24,8 @@ struct GoldArray {
 
 struct GoldItem {
     /* 0x00 */ unsigned char pad_0[8];
-    /* 0x08 */ struct GoldSub *field_8;
-    /* 0x0c */ unsigned char field_c;
+    /* 0x08 */ struct GoldSub *rider;
+    /* 0x0c */ unsigned char tile;
 };
 
 struct GoldSub {
@@ -40,7 +40,7 @@ struct GoldRandSub {
 
 struct GoldRandItem {
     unsigned char pad_0[8];
-    struct GoldRandSub *field_8;
+    struct GoldRandSub *rider;
 };
 
 struct GoldBloke {
@@ -62,8 +62,8 @@ struct GoldBlokeRef {
 
 struct GoldRide {
     unsigned char pad_0[0xc];
-    int field_c;
-    int field_10;
+    int x;
+    int y;
 };
 
 struct GoldEditObject {
@@ -178,12 +178,12 @@ void *FindGoldWashNode(void *param) {
 // FUNCTION: LEGOLAND 0x00406a10
 void FUN_00406a10(struct GoldObj *obj) {
     struct GoldInner *inner = obj->inner;
-    DAT_004c11f0 = inner;
+    GoldRushRide = inner;
     if (inner != NULL) {
         inner->flags |= 0x20;
-        if (((struct GoldInner *)DAT_004c11f0)->layer != NULL) {
-            ((struct GoldInner *)DAT_004c11f0)->layer->flags |= 0x2000;
-            DAT_004c11e8 = (struct Sprite *)((struct GoldInner *)DAT_004c11f0)->layer;
+        if (((struct GoldInner *)GoldRushRide)->layer != NULL) {
+            ((struct GoldInner *)GoldRushRide)->layer->flags |= 0x2000;
+            GoldRushLayer = (struct Sprite *)((struct GoldInner *)GoldRushRide)->layer;
         }
     }
 
@@ -219,7 +219,7 @@ void FUN_00406ab0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406b10
-void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -229,17 +229,17 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 
     pos = GetScreenCoordsForObject((TileId *)tile, ride);
     RenderItems_New();
-    DAT_004c1208 = NULL;
+    GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x <= (((unsigned char *)tile)[0] << 8) + 0x780 && node->rider->pos.y <= (((unsigned char *)tile)[1] << 8) - 0x280) {
-            AddBlokeToRenderList(&DAT_004c1208, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
+    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
     if (GoldMaskSprite != NULL) {
         struct Point off;
         frame = 0;
-        spr = GetSpriteForLayer(DAT_004c11e8, 1);
+        spr = GetSpriteForLayer(GoldRushLayer, 1);
         if (spr != NULL) {
             lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)spr);
             if (lls != NULL) {
@@ -250,51 +250,51 @@ void FUN_00406b10(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
-        off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
+        off = GetRenderOffsetForLayer(GoldRushLayer, 1);
         AdjustOffsetForViewMode(&off);
         PrintSprite(GoldMaskSprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
-    DAT_004c1208 = NULL;
+    GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x <= (((unsigned char *)tile)[0] << 8) + 0x780 && node->rider->pos.y >= (((unsigned char *)tile)[1] << 8) - 0x280) {
-            AddBlokeToRenderList(&DAT_004c1208, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
+    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
     if (GoldWashMatte2Sprite != NULL) {
         struct Point off;
-        off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
+        off = GetRenderOffsetForLayer(GoldRushLayer, 1);
         AdjustOffsetForViewMode(&off);
         PrintSprite(GoldWashMatte2Sprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
-    DAT_004c1208 = NULL;
+    GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x > (((unsigned char *)tile)[0] << 8) + 0x780) {
-            AddBlokeToRenderList(&DAT_004c1208, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
+    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
     if (GoldWashMatte1Sprite != NULL) {
         struct Point off;
-        off = GetRenderOffsetForLayer(DAT_004c11e8, 1);
+        off = GetRenderOffsetForLayer(GoldRushLayer, 1);
         AdjustOffsetForViewMode(&off);
         PrintSprite(GoldWashMatte1Sprite, pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
-    DAT_004c1208 = NULL;
+    GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && (node->rider->pos.x >> 8) > ((unsigned char *)tile)[0] + 8) {
-            AddBlokeToRenderList(&DAT_004c1208, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c1208);
-    if (DAT_004c11e8 != NULL) {
+    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
+    if (GoldRushLayer != NULL) {
         struct Point off;
-        off = GetRenderOffsetForLayer(DAT_004c11e8, 3);
+        off = GetRenderOffsetForLayer(GoldRushLayer, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer(DAT_004c11e8, 3), pos.x + off.x, pos.y + off.y, clip, 0);
+        PrintSprite(GetSpriteForLayer(GoldRushLayer, 3), pos.x + off.x, pos.y + off.y, clip, 0);
     }
 }
 
@@ -325,7 +325,7 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
     for (i = 0; i < 6; i++) {
         if (a->field_14[i] == 0) {
             a->field_14[i] = 1;
-            item->field_8->field_36 = (unsigned char)i;
+            item->rider->field_36 = (unsigned char)i;
             return;
         }
     }
@@ -333,8 +333,8 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
 
 // FUNCTION: LEGOLAND 0x00406f00
 struct GoldArray *FUN_00406f00(struct GoldItem *item) {
-    unsigned int idx = item->field_8->field_36;
-    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->field_c);
+    unsigned int idx = item->rider->field_36;
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->tile);
 
     if (a != NULL) {
         a->field_14[idx] = 0;
@@ -423,7 +423,7 @@ void FUN_00407170(struct GoldWalkItem *item, unsigned char *p) {
 // FUNCTION: LEGOLAND 0x00407230
 void FUN_00407230(struct GoldRandItem *param) {
     int value = rand() % 31;
-    param->field_8->field_58 = value + 15;
+    param->rider->field_58 = value + 15;
 }
 
 // FUNCTION: LEGOLAND 0x00407250
@@ -539,15 +539,15 @@ void FUN_004072b0(struct Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x004075b0
-void FUN_004075b0(void) {
+void GoldRushSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_004c11f0;
+    EditMode.unk8 = GoldRushRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((unsigned char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x004075f0
-void FUN_004075f0(struct GoldEditObject *editObj, struct Point *pos) {
+void GoldRushAddObject(struct GoldEditObject *editObj, struct Point *pos) {
     TileId id;
     struct Point p;
     struct GoldRide *ride;
@@ -558,25 +558,25 @@ void FUN_004075f0(struct GoldEditObject *editObj, struct Point *pos) {
     AddBasicObject((Element *)editObj, (int *)pos);
     AddGoldWashNode((struct GoldNode *)&id);
 
-    p.x = pos->x + ride->field_c - 1;
-    p.y = pos->y + ride->field_10;
+    p.x = pos->x + ride->x - 1;
+    p.y = pos->y + ride->y;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10 - 1;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y - 1;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10 - 2;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y - 2;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 }
 
 // FUNCTION: LEGOLAND 0x004076e0
-void FUN_004076e0(struct GoldEditObject *editObj, TileId coords, struct Cursor *cursor) {
+void GoldRushRemoveObject(struct GoldEditObject *editObj, TileId coords, struct Cursor *cursor) {
     int p[2];
     struct GoldRide *ride = editObj->ride;
     void *found = FindGoldWashNode(&coords);
@@ -588,20 +588,20 @@ void FUN_004076e0(struct GoldEditObject *editObj, TileId coords, struct Cursor *
     StandardRemoveObject((Element *)editObj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)ride, coords);
 
-    p[0] = coords.pos.x + ride->field_c - 1;
-    p[1] = coords.pos.y + ride->field_10;
+    p[0] = coords.pos.x + ride->x - 1;
+    p[1] = coords.pos.y + ride->y;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10 - 1;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y - 1;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10 - 2;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y - 2;
     RemoveRollerCoasterPath(p);
 }
 
@@ -660,11 +660,11 @@ void GoldRush_GetInterfaces(struct ClassNode *str, struct CallbackTable *module)
     if (_stricmp("GOLD RUSH", str->name) == 0) {
         module->cb_a4 = FUN_00406a10;
         module->cb_ac = FUN_00406ab0;
-        module->cb_8c = FUN_004075b0;
+        module->cb_8c = GoldRushSetEditMode;
         module->cb_a8 = FUN_004072b0;
-        module->cb_b0 = FUN_00406b10;
-        module->cb_98 = FUN_004075f0;
-        module->cb_9c = FUN_004076e0;
+        module->cb_b0 = RenderGoldRush;
+        module->cb_98 = GoldRushAddObject;
+        module->cb_9c = GoldRushRemoveObject;
         module->cb_b8 = LoadGoldWash;
         module->cb_bc = SaveGoldWash;
     }

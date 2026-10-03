@@ -212,7 +212,7 @@ unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_
 unsigned char OptionsSaveIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        DAT_007cb328 = 0;
+        LoadMode = 0;
         DAT_007cb324 = 0;
         DAT_0080ff80.unk8 = 4;
     }
@@ -238,15 +238,15 @@ LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2) {
     FUN_0048eb20();
     PuOkSprite = LoadSprite("PU_OK.lls", 4);
     PuOkOnSprite = LoadSprite("PU_OKON.lls", 4);
-    DAT_0079867c = LoadSprite("PU_ClosePopUp.lls", 4);
-    DAT_00798680 = LoadSprite("PU_ClosePopUpON.lls", 4);
+    PopUpCloseSprite = LoadSprite("PU_ClosePopUp.lls", 4);
+    PuCloseOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
     ClosePopUpSprite = LoadSprite("PU_ClosePopUp.lls", 4);
     ClosePopUpOnSprite = LoadSprite("PU_ClosePopUpON.lls", 4);
 
     for (;;) {
         if (DAT_0080ff80.unk8 == 5) {
             DAT_006687bc = (unsigned int)FUN_0048f440;
-            if (FUN_0047f820() > 0xea60) {
+            if (GetGameTimerSinceMark() > 0xea60) {
                 DAT_00798754 = 1;
                 // STRING: LEGOLAND 0x004bf4c4
                 icon = LoadSpriteIcon("PU_BigPopupBK.lls", 4, param_1, param_2, 0xe);
@@ -270,7 +270,7 @@ LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2) {
     PopUpOkIcon->flags |= 0x4002;
     PopUpOkIcon->event_handler = (void *)DAT_006687bc;
 
-    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, DAT_0079867c);
+    PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, PopUpCloseSprite);
     PopUpCloseIcon->string_id = 4;
     PopUpCloseIcon->string = GetString(4);
     PopUpCloseIcon->flags |= 0x2000;
@@ -325,7 +325,7 @@ unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2) {
         MapStats.field_3a0 = 3;
         DAT_00668e38 = 0;
         RemoveIconGroup(7);
-        FUN_0046fb40(0xd2);
+        DestroyIconGroup(0xd2);
         KillTitleScreenSprites();
         EditMode.unk4 = 3;
         FUN_0048eb40();
@@ -352,7 +352,7 @@ unsigned char FUN_0048f4f0(unsigned int param_1, unsigned int param_2) {
         DAT_007cb320 = 0;
         CloseFontEndCheckBox();
         DAT_007cb310 = 1;
-        DAT_007cb328 = 0;
+        LoadMode = 0;
         DAT_007cb324 = 0;
         DAT_0080ff80.unk8 = 4;
     }
@@ -363,7 +363,7 @@ unsigned char FUN_0048f4f0(unsigned int param_1, unsigned int param_2) {
 unsigned char OptionsLoadIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        DAT_007cb328 = 1;
+        LoadMode = 1;
         DAT_007cb324 = 0;
         DAT_0080ff80.unk8 = 4;
     }
@@ -404,7 +404,7 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                 sample = 0;
             }
             while ((DAT_00813ac4 & 4) != 0) {
-                if (GetIconAtPos(&DAT_00813a44, &pos) != param_1) {
+                if (GetIconAtPos(&MousePos, &pos) != param_1) {
                     break;
                 }
                 switch ((int)(unsigned short)param_1->field_18s) {
@@ -413,7 +413,7 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                         CurrentProfile.speech_volume--;
                         result = FUN_0048eaf0(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
-                        if (!DAT_006687b4 && !FUN_00498cf0()) {
+                        if (!DAT_006687b4 && !SpeechIsPlaying()) {
                             FUN_0046d230(-2);
                         }
                         FUN_0046d230(param_1->string_id);
@@ -434,7 +434,7 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                     }
                     break;
                 }
-                FUN_0046d110();
+                UpdateSpeechPlayback();
                 RenderScreen();
                 SpeechStreamUpdate();
             }
@@ -464,7 +464,7 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                 sample = 0;
             }
             while ((DAT_00813ac4 & 4) != 0) {
-                if (GetIconAtPos(&DAT_00813a44, &pos) != param_1) {
+                if (GetIconAtPos(&MousePos, &pos) != param_1) {
                     break;
                 }
                 switch ((int)(unsigned short)param_1->field_18s) {
@@ -473,7 +473,7 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                         CurrentProfile.speech_volume++;
                         result = FUN_0048eaf0(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
-                        if (!DAT_006687b4 && !FUN_00498cf0()) {
+                        if (!DAT_006687b4 && !SpeechIsPlaying()) {
                             FUN_0046d230(-2);
                         }
                         FUN_0046d230(param_1->string_id);
@@ -494,7 +494,7 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                     }
                     break;
                 }
-                FUN_0046d110();
+                UpdateSpeechPlayback();
                 RenderScreen();
                 SpeechStreamUpdate();
             }
@@ -520,10 +520,10 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
         } else {
             sample = 0;
         }
-        initial_offset = DAT_00813a44.x - param_1->x;
+        initial_offset = MousePos.x - param_1->x;
         while ((DAT_00813ac4 & 4) != 0) {
             short min = 0x7c;
-            x = DAT_00813a44.x - initial_offset;
+            x = MousePos.x - initial_offset;
             param_1->x = (short)x;
             if (param_1->x > 0x16d) {
                 param_1->x = 0x16d;
@@ -535,7 +535,7 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
             switch ((unsigned int)(unsigned short)param_1->field_18s) {
             case 3:
                 CurrentProfile.speech_volume = result;
-                if (!DAT_006687b4 && !FUN_00498cf0()) {
+                if (!DAT_006687b4 && !SpeechIsPlaying()) {
                     FUN_0046d230(-2);
                 }
                 FUN_0046d230(param_1->string_id);
@@ -547,7 +547,7 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
                 CurrentProfile.fx_volume = result;
                 break;
             }
-            FUN_0046d110();
+            UpdateSpeechPlayback();
             RenderScreen();
             SpeechStreamUpdate();
         }

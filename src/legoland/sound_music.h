@@ -30,7 +30,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
 LEGO_EXPORT void UnSourceAndFadeAllSamplesFromSource(void *source, int fade);
 LEGO_EXPORT void Load_FXList(const unsigned char *list, int count);
 LEGO_EXPORT void Kill_FXList(const unsigned char *list, int count);
-void FUN_004969d0(void);
+void UpdateSound(void);
 void FUN_00496e60(int param_1, int param_2);
 void FUN_00496d10(struct Sample *sample);
 LEGO_EXPORT void AddSFX_Callback(struct CallbackEntry *entry, unsigned int delay, unsigned int (*callback)(struct CallbackEntry *self));

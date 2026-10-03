@@ -17,7 +17,7 @@
 #include "render3d.h"
 
 // FUNCTION: LEGOLAND 0x00402ca0
-void FUN_00402ca0(Element *obj) {
+void LoadCastleLevelMatteSprite(Element *obj) {
     struct Ride *ride = obj->ride;
 
     CastleLevelRide = ride;
@@ -39,7 +39,7 @@ void KillCastleLevelMatteSprite(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00402d00
-void FUN_00402d00(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -162,21 +162,21 @@ void FUN_00402dc0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00402ff0
-void FUN_00402ff0(void) {
+void CastleLevelSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = CastleLevelRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->field_3c);
+    SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00403030
-void FUN_00403030(Element *obj, TileId tile, struct Cursor *cursor) {
+void CastleLevelRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     StandardRemoveObject((Element *)obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
 }
 
 // FUNCTION: LEGOLAND 0x00403060
-void FUN_00403060(unsigned int param1, unsigned int param2) {
+void CastleLevelAddObject(unsigned int param1, unsigned int param2) {
     AddBasicObject(param1, param2);
 }
 
@@ -184,12 +184,12 @@ void FUN_00403060(unsigned int param1, unsigned int param2) {
 void CastleLevel1_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b408c
     if (_stricmp("CASTLE LEVEL 1", name->name) == 0) {
-        ci->cb_a4 = FUN_00402ca0;
+        ci->cb_a4 = LoadCastleLevelMatteSprite;
         ci->cb_ac = KillCastleLevelMatteSprite;
-        ci->cb_8c = FUN_00402ff0;
-        ci->cb_98 = FUN_00403060;
-        ci->cb_9c = FUN_00403030;
+        ci->cb_8c = CastleLevelSetEditMode;
+        ci->cb_98 = CastleLevelAddObject;
+        ci->cb_9c = CastleLevelRemoveObject;
         ci->cb_a8 = FUN_00402dc0;
-        ci->cb_b0 = FUN_00402d00;
+        ci->cb_b0 = RenderCastleLevel;
     }
 }

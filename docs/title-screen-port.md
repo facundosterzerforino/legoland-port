@@ -78,9 +78,9 @@ One tick of the main loop. Returns 0 to quit. Each tick it:
   | 1 | (transition) | `FUN_00459360` (STUB) |
   | **2** | **front-end screens** | `InitScreens(DAT_0080ff88 & 0xff)` |
   | 3 | in-game | `FUN_00458ee0` (STUB) |
-- then runs input + audio for the frame: `FUN_004969d0` (sound, MATCHED) →
+- then runs input + audio for the frame: `UpdateSound` (sound, MATCHED) →
   **`ReadGameButtons`** (controller poll, STUB) → frame counter → handles a couple of
-  `DAT_00832ba0` mode-change transitions → `FUN_0046d110`.
+  `DAT_00832ba0` mode-change transitions → `UpdateSpeechPlayback`.
 
 ### Front-end state machine: `InitScreens` @ `0x00458640` (screens.c) — **STUB, critical**
 Called from frame-loop case 2 with the screen id in `DAT_0080ff88`. On a screen change
@@ -164,7 +164,7 @@ functions it calls are already done.
 ### D. Render — icon system (the menu visuals + hit handling)
 | addr | name | file | size | deps | notes |
 |---|---|---|---|---|---|
-| `0x0046eee0` | `RenderIcons` | icon.c | M | `PrintSprite`(E), `StoreClipping`/`RestoreClipping`(100%), `FUN_0046df60`(100%), `FUN_0046ec50`(STUB), `RenderThickBox`(E), `GetNearestColour`(100%), `LLSPlayOnce` | **draws all visible icons + focus highlight.** Core title visual. |
+| `0x0046eee0` | `RenderIcons` | icon.c | M | `PrintSprite`(E), `StoreClipping`/`RestoreClipping`(100%), `SetClippingToScreenRect`(100%), `FUN_0046ec50`(STUB), `RenderThickBox`(E), `GetNearestColour`(100%), `LLSPlayOnce` | **draws all visible icons + focus highlight.** Core title visual. |
 | `0x0046f010` | `RenderIcons2` | icon.c | M | same as above (group-filtered variant) | used by other screens + in-game; cheap once RenderIcons done |
 | `0x0046f4c0` | `CheckFocussedIcon` | icon.c | M | calls `FocussedIconPtr->event_handler` and the default `DAT_006687bc/c0` handlers using `ReadGameButtons` bits | **routes mouse/keys to the menu button handlers — the "responds to input" core.** |
 | `0x0046d520` | `RemoveIconGroup` | icon.c | S/M | icon list unlink | teardown used by every title handler; needed for clean transitions |
