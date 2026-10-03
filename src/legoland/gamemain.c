@@ -492,8 +492,8 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     }
     // STRING: LEGOLAND 0x004b8a70
     id = ElemID("PATH CONTROL");
-    while (best != NULL) {
-        nb = best;
+    nb = best;
+    while (nb != NULL) {
         pp = (struct Point *)&nb->x;
         if (pp->x >= 0 && pp->x < lpConfig->width && pp->y >= 0 && pp->y < lpConfig->height) {
             tile = &GameMap[pp->y][pp->x];
