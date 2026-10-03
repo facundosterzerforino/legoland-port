@@ -11,6 +11,9 @@ if(LEGOLAND_MODERN_BUILD)
     list(FILTER LEGOLAND_SOURCES EXCLUDE REGEX "/src/legoland/(bootstrap|imports)\\.c$")
     # Port-only code (startup data, asm helpers, later platform layers).
     file(GLOB PORT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/*.c")
+    # [library:movie] FFmpeg's Indeo 5 decoder (LGPL-2.1+, see port/indeo5/README.md)
+    file(GLOB PORT_INDEO5_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/indeo5/*.c")
+    list(APPEND PORT_SOURCES ${PORT_INDEO5_SOURCES})
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
     # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
