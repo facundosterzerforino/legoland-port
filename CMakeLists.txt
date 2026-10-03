@@ -14,12 +14,15 @@ if(LEGOLAND_MODERN_BUILD)
     # [library:movie] FFmpeg's Indeo 3 and Indeo 5 decoders (LGPL-2.1+, see port/ffmpeg/README.md)
     file(GLOB PORT_FFMPEG_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/ffmpeg/*.c")
     list(APPEND PORT_SOURCES ${PORT_FFMPEG_SOURCES})
+    # Optional features, each off unless its command-line switch is given (extensions/extensions.h)
+    file(GLOB EXTENSION_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/extensions/*.c")
+    list(APPEND PORT_SOURCES ${EXTENSION_SOURCES})
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
     # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
     # below 0x0800 keeps DirectInputCreateA declared.
     target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500)
-    target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port")
+    target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port" "${CMAKE_CURRENT_SOURCE_DIR}/extensions")
     # Static C runtime, debug info in the objects, a PDB for debuggers.
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     target_compile_options(legoland PRIVATE /Z7

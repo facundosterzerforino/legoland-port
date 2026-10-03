@@ -13,6 +13,7 @@
 #include "port_data.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
+#include "extensions.h"
 #endif
 
 // FUNCTION: LEGOLAND 0x00453cd0
@@ -43,6 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         SetThreadStackGuarantee(&guarantee);
     }
     PortWatchdogStart(); /* [port] freeze and crash reports (port/port_watchdog.c) */
+    ExtensionsParseCommandLine(lpCmdLine); /* [port] optional features (extensions/) */
     if (strstr(lpCmdLine, "-port-selftest") != NULL) {
         /* [port] check the startup data and exit, without starting the game */
         return PortDataSelfTest("port-selftest.txt");

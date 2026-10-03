@@ -59,6 +59,9 @@ struct ScreenConfig {
 #include "image_sprite.h"
 #include "stream.h"
 #include "worker_mouse.h"
+#ifdef LEGOLAND_PORT
+#include "extensions.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x004585c0
 void CloseFrontEndScreen(void) {
@@ -714,7 +717,11 @@ void FUN_00459520(void) {
     ProcessSystemEvents();
     DebugTrace("boot: after ProcessSystemEvents()");
     // STRING: LEGOLAND 0x004b9200
+#ifdef LEGOLAND_PORT
+    PlayMovie("lmi.avi", ExtSkipLogo, 1); /* [port] extensions/: -skip-logo lets a click skip the logo */
+#else
     PlayMovie("lmi.avi", 0, 1);
+#endif
     DebugTrace("boot: after PlayMovie lmi.avi");
     PrintTitleScreen1();
     DebugTrace("boot: after PrintTitleScreen1()");
