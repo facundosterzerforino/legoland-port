@@ -19,7 +19,7 @@
 
 struct PopUp {
     unsigned char pad_0[0x34];
-    unsigned int field_34;
+    unsigned int flags;
 };
 
 #include "certificate.h"
@@ -793,12 +793,12 @@ unsigned int FUN_004911c0(const char *a, const char *b) {
         DAT_0080ff80.unk4 = 0xffffffff;
         DAT_0080ff80.unk8 = 7;
         if (DAT_00668e9c != 0) {
-            ((struct PopUp *)DAT_00668e9c)->field_34 &= 0xfffffbff;
+            ((struct PopUp *)DAT_00668e9c)->flags &= 0xfffffbff;
         }
         return 1;
     }
     if (DAT_00668e9c != 0) {
-        ((struct PopUp *)DAT_00668e9c)->field_34 |= 0x400;
+        ((struct PopUp *)DAT_00668e9c)->flags |= 0x400;
     }
     return 0;
 }
@@ -811,10 +811,10 @@ unsigned int FUN_00491240(const char *param_1) {
         return 0;
     }
     if (FUN_004907a0(param_1) != 0) {
-        ((struct PopUp *)DAT_00668e9c)->field_34 &= 0xfffffbff;
+        ((struct PopUp *)DAT_00668e9c)->flags &= 0xfffffbff;
         result = 1;
     } else {
-        ((struct PopUp *)DAT_00668e9c)->field_34 |= 0x400;
+        ((struct PopUp *)DAT_00668e9c)->flags |= 0x400;
         result = 0;
     }
     FUN_00490850();

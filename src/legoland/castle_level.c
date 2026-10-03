@@ -166,7 +166,7 @@ void CastleLevelSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = CastleLevelRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->field_3c);
+    SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00403030

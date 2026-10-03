@@ -50,8 +50,8 @@ struct ElemInfo {
 
 struct MatchResult {
     unsigned char pad_0[4];
-    unsigned char field_4;
-    unsigned char field_5;
+    unsigned char anchor_x;
+    unsigned char anchor_y;
 };
 
 // FUNCTION: LEGOLAND 0x00481c50
@@ -739,8 +739,8 @@ void InitEntrance1Point(void) {
         (Element *)Entrance1Elem);
     obj = ((struct ElemInfo *)Entrance1Elem)->obj;
 
-    Entrance1Point.x = match->field_4 + obj->field_3c - 1;
-    Entrance1Point.y = ((obj->field_48 + obj->field_40) / 2) + match->field_5;
+    Entrance1Point.x = match->anchor_x + obj->field_3c - 1;
+    Entrance1Point.y = ((obj->field_48 + obj->field_40) / 2) + match->anchor_y;
 }
 
 // FUNCTION: LEGOLAND 0x00482b00

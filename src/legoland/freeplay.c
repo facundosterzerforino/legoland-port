@@ -37,18 +37,18 @@ struct PanelNode {
 };
 
 struct FreePlayGroup {
-    short field_0;
+    short group;
     unsigned char pad_2[2];
     unsigned int field_4;
-    struct IconNode *field_8;
-    int field_c;
-    int field_10;
+    struct IconNode *icon;
+    int content_left;
+    int content_top;
     int field_14;
-    int field_18;
-    int field_1c;
-    int field_20;
-    int field_24;
-    int field_28;
+    int content_bottom;
+    int clip_left;
+    int clip_top;
+    int clip_right;
+    int clip_bottom;
 };
 
 struct GameListNode {
@@ -484,17 +484,17 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         return 0;
     }
     icon = AddGBarIcons((unsigned int)group, b, c, 1, d, a);
-    group->field_8 = icon;
+    group->icon = icon;
     b = icon->x;
-    group->field_1c = b;
-    group->field_c = b;
+    group->clip_left = b;
+    group->content_left = b;
     y = icon->y;
-    group->field_20 = y;
-    group->field_10 = y;
-    group->field_24 = icon->width + icon->x;
-    group->field_28 = icon->height + icon->y;
+    group->clip_top = y;
+    group->content_top = y;
+    group->clip_right = icon->width + icon->x;
+    group->clip_bottom = icon->height + icon->y;
     group->field_4 = 1;
-    group->field_0 = (short)a;
+    group->group = (short)a;
     SetNewGroup_Callbacks(0, (void *)RenderFreePlayIcons, (void *)FUN_0048b000);
     do {
         AddFreePlayIcon((unsigned int)group, (struct InfoSource *)list, b, y, a, 1, list->after);
@@ -503,7 +503,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     } while (list != NULL);
     AddFullScreenIcon((void *)(a + 6));
     group->field_14 = b;
-    group->field_18 = y;
+    group->content_bottom = y;
     icon = FindIcon(a + 4);
     if (icon != NULL) {
         SetIconSprite(icon, sprite);

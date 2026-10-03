@@ -157,7 +157,7 @@ struct Person *FUN_0043f8c0(struct Bloke *param_1, unsigned int param_2) {
         } else {
             person->random = 0;
         }
-        person->field_8 = param_2;
+        person->character = param_2;
         person->bloke = param_1;
         person->field_7c = 0xffffffff;
         person->field_80 = 0xffffffff;
@@ -379,7 +379,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
         OffsetRect(&clip, -(int)person->field_1c, -(int)person->field_20);
         if (GetVideoSurface(&vid) != 0) {
             ptr = (unsigned int)vid.bits + person->field_20 * vid.pitch + person->field_1c * 2;
-            FUN_00485f30(ptr, vid.pitch, vid.field_4, vid.field_8);
+            FUN_00485f30(ptr, vid.pitch, vid.width, vid.height);
             FUN_00488700((unsigned int)vid.bits, &MousePos);
             Render_SetViewport(&clip);
             __asm { fstcw word ptr [DAT_00638358] }
@@ -389,7 +389,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
                 if (DAT_00668954 != 0 && person->bloke == GetWorkerOnMouse()) {
                     return;
                 }
-                switch (person->field_8) {
+                switch (person->character) {
                 case 2:
                     Hover.type = 0x307;
                     Hover.ptr = person->bloke;
@@ -716,7 +716,7 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
 
     person = bloke->person;
     if (person->anim != (unsigned int)anim) {
-        kind = person->field_8;
+        kind = person->character;
         person->anim = anim;
         switch (kind) {
         case 1:
@@ -737,7 +737,7 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
         if (kind == 1 && person->field_50 != 0) {
             free(person->field_50);
         }
-        switch (person->field_8) {
+        switch (person->character) {
         case 1:
             context = VisitorLocData;
             break;
@@ -770,7 +770,7 @@ LEGO_EXPORT struct Anim3D *GetBlokeAnim3D(struct Bloke *bloke) {
     result = 0;
     person = bloke->person;
     if (person != 0) {
-        switch (person->field_8) {
+        switch (person->character) {
         case 1:
             if (person->random == 0) {
                 base = ManMeshes;
@@ -797,7 +797,7 @@ LEGO_EXPORT struct Anim3D *GetBlokeAnim3DFromPerson(struct Person *person) {
 
     result = 0;
     if (person != 0) {
-        switch (person->field_8) {
+        switch (person->character) {
         case 1:
             if (person->random == 0) {
                 base = ManMeshes;
@@ -864,7 +864,7 @@ LEGO_EXPORT void BlokeAnimNextFrame(struct Bloke *bloke) {
 LEGO_EXPORT void BlokeWalkAnim(struct Bloke *bloke) {
     int anim;
 
-    switch (bloke->person->field_8) {
+    switch (bloke->person->character) {
     case 2:
         anim = 0;
         break;

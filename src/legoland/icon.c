@@ -32,17 +32,17 @@ struct IconSprite {
 
 struct Rect16 {
     unsigned char pad_0[0xc];
-    short field_c;
-    short field_e;
-    short field_10;
-    short field_12;
+    short x;
+    short y;
+    short width;
+    short height;
 };
 
 struct Rect32 {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_c;
+    int left;
+    int top;
+    int right;
+    int bottom;
 };
 
 struct Config {
@@ -74,7 +74,7 @@ struct MenuGroup {
     /* 0x00 */ short field_0;
     /* 0x02 */ unsigned char pad_2[0x4 - 0x2];
     /* 0x04 */ unsigned int field_4;
-    /* 0x08 */ struct IconNode *field_8;
+    /* 0x08 */ struct IconNode *icon;
     /* 0x0c */ int field_c;
     /* 0x10 */ int field_10;
     /* 0x14 */ int field_14;
@@ -113,10 +113,10 @@ struct ScrollRegion {
     /* 0x02 */ unsigned char pad_2[0x4 - 0x2];
     /* 0x04 */ unsigned char field_4;
     /* 0x05 */ unsigned char pad_5[0xc - 0x5];
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
-    /* 0x14 */ int field_14;
-    /* 0x18 */ int field_18;
+    /* 0x0c */ int content_left;
+    /* 0x10 */ int content_top;
+    /* 0x14 */ int content_right;
+    /* 0x18 */ int content_bottom;
     /* 0x1c */ RECT clip;
 };
 
@@ -124,19 +124,19 @@ struct IndicatorFuncs {
     unsigned char pad_0[4];
     unsigned int field_4;
     unsigned char pad_8[0x18 - 0x8];
-    unsigned int field_18;
-    unsigned int field_1c;
+    unsigned int check_func;
+    unsigned int click_func;
 };
 
 struct TimedIndicator {
     struct Indicator *next;
     unsigned int field_4;
-    unsigned int field_8;
-    unsigned int field_c;
+    unsigned int start_time;
+    unsigned int duration;
     unsigned int field_10;
-    struct IconNode *field_14;
-    unsigned int field_18;
-    unsigned int field_1c;
+    struct IconNode *icon;
+    unsigned int check_func;
+    unsigned int click_func;
 };
 
 #include "bricks.h"
@@ -393,28 +393,28 @@ void FUN_0046d850(struct ScrollRegion *r, int param_2, int param_3) {
     int edge;
 
     if ((r->field_4 & 1) != 0) {
-        if (r->field_18 - r->field_10 <= r->clip.bottom - r->clip.top) {
-            MoveIcons(0xffff, r->field_0, 0, (short)(r->clip.top - r->field_10));
+        if (r->content_bottom - r->content_top <= r->clip.bottom - r->clip.top) {
+            MoveIcons(0xffff, r->field_0, 0, (short)(r->clip.top - r->content_top));
             return;
         }
     } else {
-        if (r->field_14 - r->field_c <= r->clip.right - r->clip.left) {
-            MoveIcons(0xffff, r->field_0, (short)(r->clip.left - r->field_c), 0);
+        if (r->content_right - r->content_left <= r->clip.right - r->clip.left) {
+            MoveIcons(0xffff, r->field_0, (short)(r->clip.left - r->content_left), 0);
             return;
         }
     }
 
-    dy = FUN_0046dd10(0xffff, (short)((r->clip.top - r->field_10) - param_3), (short)(r->field_10 + param_3), r->field_0, param_3);
+    dy = FUN_0046dd10(0xffff, (short)((r->clip.top - r->content_top) - param_3), (short)(r->content_top + param_3), r->field_0, param_3);
     dx = param_3;
-    l = r->field_c;
-    t = r->field_10;
+    l = r->content_left;
+    t = r->content_top;
     nl = l + dx;
     nt = t + dy;
     if ((r->field_4 & 1) != 0) {
         if (nt > r->clip.top) {
             dy = dy + (r->clip.top - nt);
         } else {
-            edge = r->field_18 + dy;
+            edge = r->content_bottom + dy;
             if (edge < r->clip.bottom) {
                 dy = dy + (r->clip.bottom - edge);
             }
@@ -423,16 +423,16 @@ void FUN_0046d850(struct ScrollRegion *r, int param_2, int param_3) {
         if (nl > r->clip.left) {
             dx = dx + (r->clip.left - nl);
         } else {
-            edge = r->field_14 + dx;
+            edge = r->content_right + dx;
             if (edge < r->clip.right) {
                 dx = dx + (r->clip.right - edge);
             }
         }
     }
-    r->field_c = l + dx;
-    r->field_10 = t + dy;
-    r->field_14 = r->field_14 + dx;
-    r->field_18 = r->field_18 + dy;
+    r->content_left = l + dx;
+    r->content_top = t + dy;
+    r->content_right = r->content_right + dx;
+    r->content_bottom = r->content_bottom + dy;
     DAT_00668e44[DAT_00668e64] = DAT_00668e44[DAT_00668e64] + dy;
     MoveIcons(0xffff, r->field_0, (short)dx, (short)dy);
 }
@@ -488,9 +488,9 @@ unsigned char FUN_0046da20(struct IconNode *icon, unsigned char buttons, int a3,
             LastScrollIconTick = GetTickCount();
             if ((region->field_4 & 1) != 0) {
                 FUN_0046d850(region, 0, -6);
-                return 2;
+            } else {
+                FUN_0046d850(region, -0x20, 0);
             }
-            FUN_0046d850(region, -0x20, 0);
         }
         return 2;
     }
@@ -634,10 +634,10 @@ int FUN_0046dd10(unsigned short param_1, short param_2, short param_3, unsigned 
 
 // FUNCTION: LEGOLAND 0x0046de50
 void FUN_0046de50(struct Rect16 *src, struct Rect32 *dst) {
-    dst->field_0 = src->field_c;
-    dst->field_4 = src->field_e;
-    dst->field_8 = src->field_10 + src->field_c;
-    dst->field_c = src->field_12 + src->field_e;
+    dst->left = src->x;
+    dst->top = src->y;
+    dst->right = src->width + src->x;
+    dst->bottom = src->height + src->y;
 }
 
 // FUNCTION: LEGOLAND 0x0046de90
@@ -926,7 +926,7 @@ LEGO_EXPORT int RenderMoneyBar(struct IconNode *node) {
     }
     width = node->width;
     bricks = GetBrickCount();
-    fill = (bricks * width) / (int)MapStats.field_174;
+    fill = (bricks * width) / (int)MapStats.brick_meter_max;
     if (fill < 0) {
         fill = 0;
     }
@@ -1604,7 +1604,6 @@ int FUN_0046f9a0(int param_1, int param_2, int param_3, int param_4, unsigned in
     int total;
     struct MenuGroup *group;
     struct IconNode *icon;
-    int row;
     struct ListElement *elem;
 
     group = (struct MenuGroup *)malloc(sizeof(struct MenuGroup));
@@ -1612,20 +1611,19 @@ int FUN_0046f9a0(int param_1, int param_2, int param_3, int param_4, unsigned in
         return 0;
     }
     icon = AddGBarIcons((unsigned int)group, param_3, param_4, param_5, param_6, param_1);
-    group->field_8 = icon;
-    row = icon->x;
-    group->field_1c = row;
-    group->field_c = row;
+    group->icon = icon;
+    param_1 = icon->x;
+    group->field_1c = param_1;
+    group->field_c = param_1;
     param_6 = icon->y;
     group->field_20 = param_6;
     group->field_10 = param_6;
     group->field_24 = icon->width + icon->x;
     group->field_28 = icon->height + icon->y;
     group->field_4 = param_5;
-    group->field_0 = (short)param_1;
+    group->field_0 = (short)saved;
     SetNewGroup_Callbacks(0, 0, (void *)FUN_00470000);
     total = LLIDB_GetCount();
-    param_1 = row;
     if (total > 0) {
         do {
             LLIDB_GetElement(i, (int *)&elem);
@@ -1642,7 +1640,7 @@ int FUN_0046f9a0(int param_1, int param_2, int param_3, int param_4, unsigned in
         } while (i < total);
     }
     AddFullScreenIcon((void *)(saved + 6));
-    icon = group->field_8;
+    icon = group->icon;
     group->field_14 = param_1;
     group->field_18 = param_6;
     if ((param_5 & 1) == 0) {
@@ -1713,26 +1711,26 @@ LEGO_EXPORT struct TimedIndicator *AllocateTimedIndicator(struct Sprite *sprite,
     ind = malloc(40);
     ind->next = DAT_006688d4;
     ind->field_4 = 0;
-    ind->field_8 = GetGameTimer();
-    ind->field_c = a2;
+    ind->start_time = GetGameTimer();
+    ind->duration = a2;
     ind->field_10 = a3;
 
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
-    ind->field_14 = icon;
+    ind->icon = icon;
     icon->render_func = (void *)FUN_0046eaa0;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->event_handler = (void *)FUN_0046fbc0;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->flags = icon->flags | 0x40a;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->field_30 = ind;
 
-    ind->field_18 = 0;
-    ind->field_1c = 0;
+    ind->check_func = 0;
+    ind->click_func = 0;
 
     DAT_006688d4 = (struct Indicator *)ind;
     return ind;
@@ -1746,25 +1744,25 @@ LEGO_EXPORT struct TimedIndicator *AllocatePermanentIndicator(struct Sprite *spr
     ind = malloc(40);
     ind->next = DAT_006688d4;
     ind->field_4 = 1;
-    ind->field_8 = GetGameTimer();
+    ind->start_time = GetGameTimer();
     ind->field_10 = param_2;
 
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
-    ind->field_14 = icon;
+    ind->icon = icon;
     icon->render_func = (void *)FUN_0046eaa0;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->event_handler = (void *)FUN_0046fbc0;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->flags = icon->flags | 0x40a;
 
-    icon = ind->field_14;
+    icon = ind->icon;
     icon->field_30 = ind;
 
-    ind->field_18 = 0;
-    ind->field_1c = 0;
+    ind->check_func = 0;
+    ind->click_func = 0;
 
     DAT_006688d4 = (struct Indicator *)ind;
     return ind;
@@ -1772,29 +1770,28 @@ LEGO_EXPORT struct TimedIndicator *AllocatePermanentIndicator(struct Sprite *spr
 
 // FUNCTION: LEGOLAND 0x0046fd00
 LEGO_EXPORT void SetCheckFunc(struct IndicatorFuncs *ind, unsigned int func) {
-    ind->field_18 = func;
+    ind->check_func = func;
     ind->field_4 |= 0x4;
 }
 
 // FUNCTION: LEGOLAND 0x0046fd20
 LEGO_EXPORT void SetClickFunc(struct IndicatorFuncs *ind, unsigned int func) {
-    ind->field_1c = func;
+    ind->click_func = func;
     ind->field_4 |= 0x4;
 }
 
 // FUNCTION: LEGOLAND 0x0046fd40
 LEGO_EXPORT void AddIndicator(struct Indicator *ind) {
     struct Indicator *cur = DAT_006688d4;
-    struct Indicator *next;
     if (cur == ind) {
         DAT_006688d4 = cur->next;
     } else {
-        for (; cur != NULL; cur = next) {
-            next = cur->next;
-            if (next == ind) {
+        while (cur != NULL) {
+            if (cur->next == ind) {
                 cur->next = ind->next;
                 break;
             }
+            cur = cur->next;
         }
     }
     if (cur != NULL) {
@@ -1809,16 +1806,15 @@ LEGO_EXPORT void AddIndicator(struct Indicator *ind) {
 // FUNCTION: LEGOLAND 0x0046fda0
 LEGO_EXPORT void RemoveIndicator(struct Indicator *ind) {
     struct Indicator *cur = ActiveIndicators;
-    struct Indicator *next;
     if (cur == ind) {
         ActiveIndicators = cur->next;
     } else {
-        for (; cur != NULL; cur = next) {
-            next = cur->next;
-            if (next == ind) {
+        while (cur != NULL) {
+            if (cur->next == ind) {
                 cur->next = ind->next;
                 break;
             }
+            cur = cur->next;
         }
     }
     if (cur != NULL) {

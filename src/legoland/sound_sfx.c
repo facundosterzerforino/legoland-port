@@ -152,10 +152,7 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
                 if (size <= sizeof(WAVEFORMATEX)) {
                     format->cbSize = 0;
                 }
-                if (RES_ReadFile(file, &chunk, 4) != 4) {
-                    break;
-                }
-                for (;;) {
+                while (RES_ReadFile(file, &chunk, 4) == 4) {
                     if (chunk == 0x61746164) {
                         if (RES_ReadFile(file, &size, 4) != 4) {
                             break;
@@ -201,9 +198,6 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
                         break;
                     }
                     free(data);
-                    if (RES_ReadFile(file, &chunk, 4) != 4) {
-                        break;
-                    }
                 }
             } while (0);
             free(format);

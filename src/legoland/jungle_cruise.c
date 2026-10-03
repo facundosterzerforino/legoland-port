@@ -72,15 +72,15 @@ int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct
     fresh->cur_y = tile.pos.y + 5;
     fresh->next_x = tile.pos.x;
     fresh->next_y = tile.pos.y + 5;
-    fresh->field_3dc = 1;
+    fresh->from_dir = 1;
     fresh->field_3e0 = 1;
     fresh->field_3e4 = (rand() & 0xf) + 4;
     fresh->blokes[0] = bloke0;
     fresh->blokes[1] = bloke1;
     fresh->blokes[2] = bloke2;
     JungleRideList = fresh;
-    memset(fresh->field_1c, 0xf1, sizeof(fresh->field_1c));
-    memset(fresh->field_29c, 0, sizeof(fresh->field_29c));
+    memset(fresh->step_offsets, 0xf1, sizeof(fresh->step_offsets));
+    memset(fresh->step_frames, 0, sizeof(fresh->step_frames));
     return 1;
 }
 
@@ -133,28 +133,28 @@ void FUN_00432d00(int param_1) {
                                (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))
                          : !(ride->field_3e0 == 1 || ride->field_3e0 == 0x10 ||
                                (ride->cur_x == ride->tile.pos.x && (int)ride->cur_y >= ride->tile.pos.y + 5))) {
-            b = ride->field_1c[JungleCruiseStep * 2 + 1];
-            a = ride->field_1c[JungleCruiseStep * 2];
+            b = ride->step_offsets[JungleCruiseStep * 2 + 1];
+            a = ride->step_offsets[JungleCruiseStep * 2];
             GetTileDimensions(&tw2, &th2);
             dx = (a - b) * tw2 >> 9;
             dy = (a + b) * th2 >> 9;
             baseX = ((int)ride->cur_x - (int)ride->cur_y) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
             baseY = ((int)ride->cur_x + (int)ride->cur_y) * (th >> 1) - (ScrollY >> 8);
-            off.x = JungleCruiseBoats->offset_x[ride->field_29c[JungleCruiseStep] & 0xff] >> 1;
-            off.y = JungleCruiseBoats->offset_y[ride->field_29c[JungleCruiseStep] & 0xff] >> 1;
+            off.x = JungleCruiseBoats->offset_x[ride->step_frames[JungleCruiseStep] & 0xff] >> 1;
+            off.y = JungleCruiseBoats->offset_y[ride->step_frames[JungleCruiseStep] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
             ride->screen_x = lpConfig->view_x + dx + off.x + baseX;
             ride->screen_y = lpConfig->view_y + dy + off.y + baseY;
-            PrintSprite(JungleCruiseBoats->sprites[ride->field_29c[JungleCruiseStep] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
+            PrintSprite(JungleCruiseBoats->sprites[ride->step_frames[JungleCruiseStep] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             off.x = lpConfig->view_x + dx + baseX;
             off.y = lpConfig->view_y + dy + baseY;
             AdjustBlokePosition((struct Point *)&off);
-            if ((int)ride->field_29c[JungleCruiseStep] >= 4 && (int)ride->field_29c[JungleCruiseStep] < 12) {
+            if ((int)ride->step_frames[JungleCruiseStep] >= 4 && (int)ride->step_frames[JungleCruiseStep] < 12) {
                 for (row = 0; row < 3; row++) {
                     struct Point pos;
 
                     d = 0;
-                    if ((int)ride->field_29c[JungleCruiseStep] > 8) {
+                    if ((int)ride->step_frames[JungleCruiseStep] > 8) {
                         if (row == 1) {
                             d = 1;
                         } else if (row == 2) {
@@ -164,18 +164,18 @@ void FUN_00432d00(int param_1) {
                     seat = d + row;
                     if (ride->blokes[seat] != NULL) {
                         person = Find3DPersonFromBloke(ride->blokes[seat]);
-                        pos.x = DAT_0081cb80[seat][ride->field_29c[JungleCruiseStep] & 0xf].x + 0x20;
-                        pos.y = DAT_0081cb80[seat][ride->field_29c[JungleCruiseStep] & 0xf].y + 0x18;
+                        pos.x = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].x + 0x20;
+                        pos.y = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].y + 0x18;
                         switch (seat) {
                         case 0:
-                            person->field_44 = ((float)(int)ride->field_29c[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)ride->step_frames[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             break;
                         case 1:
-                            person->field_44 = ((float)(int)((ride->field_29c[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         case 2:
-                            person->field_44 = ((float)(int)((ride->field_29c[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         }
@@ -186,7 +186,7 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 2) {
-                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[JungleCruiseStep] + 0x10 : ride->field_29c[JungleCruiseStep] + 0x20) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->step_frames[JungleCruiseStep] + 0x10 : ride->step_frames[JungleCruiseStep] + 0x20) & 0xff];
                         PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
@@ -195,7 +195,7 @@ void FUN_00432d00(int param_1) {
                     struct Point pos;
 
                     d = 0;
-                    if ((int)ride->field_29c[JungleCruiseStep] < 8) {
+                    if ((int)ride->step_frames[JungleCruiseStep] < 8) {
                         if (row == 1) {
                             d = 1;
                         } else if (row == 2) {
@@ -205,18 +205,18 @@ void FUN_00432d00(int param_1) {
                     seat = d + row;
                     if (ride->blokes[seat] != NULL) {
                         person = Find3DPersonFromBloke(ride->blokes[seat]);
-                        pos.x = DAT_0081cb80[seat][ride->field_29c[JungleCruiseStep] & 0xf].x + 0x20;
-                        pos.y = DAT_0081cb80[seat][ride->field_29c[JungleCruiseStep] & 0xf].y + 0x18;
+                        pos.x = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].x + 0x20;
+                        pos.y = DAT_0081cb80[seat][ride->step_frames[JungleCruiseStep] & 0xf].y + 0x18;
                         switch (seat) {
                         case 0:
-                            person->field_44 = ((float)(int)ride->field_29c[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)ride->step_frames[JungleCruiseStep] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             break;
                         case 1:
-                            person->field_44 = ((float)(int)((ride->field_29c[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] + 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         case 2:
-                            person->field_44 = ((float)(int)((ride->field_29c[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                            person->field_44 = ((float)(int)((ride->step_frames[JungleCruiseStep] - 6) & 0xf) * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                             pos.y -= 0x10;
                             break;
                         }
@@ -227,7 +227,7 @@ void FUN_00432d00(int param_1) {
                         IP_RenderBlokeIn3DNow(ride->blokes[seat]);
                     }
                     if (row == 0 || row == 1) {
-                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->field_29c[JungleCruiseStep] + 0x20 : ride->field_29c[JungleCruiseStep] + 0x10) & 0xff];
+                        sprite = JungleCruiseBoats->sprites[(row == 0 ? ride->step_frames[JungleCruiseStep] + 0x20 : ride->step_frames[JungleCruiseStep] + 0x10) & 0xff];
                         PrintSprite(sprite, ride->screen_x, ride->screen_y, 0, 0);
                     }
                 }
@@ -306,7 +306,7 @@ void FUN_004332f0(void) {
 
 // FUNCTION: LEGOLAND 0x004333b0
 void FUN_004333b0(struct JungleRide *param_1) {
-    FUN_00433840(param_1, param_1->field_3dc, 4);
+    FUN_00433840(param_1, param_1->from_dir, 4);
     param_1->field_3e0 = 4;
     param_1->next_y = param_1->cur_y + 5;
 }
@@ -323,22 +323,22 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         return result;
     }
     FUN_00433840(param_1, 1, 4);
-    param_1->field_3dc = 1;
+    param_1->from_dir = 1;
     if (param_1->field_3e4 == 3) {
-        p = &param_1->field_1c[0x81];
+        p = &param_1->step_offsets[0x81];
         i = 0x10;
         do {
-            p[-1] = param_1->field_1c[0x80];
-            *p = param_1->field_1c[0x81];
+            p[-1] = param_1->step_offsets[0x80];
+            *p = param_1->step_offsets[0x81];
             p = p + 2;
             i = i + -1;
         } while (i != 0);
     } else if (param_1->field_3e4 == 2) {
-        p = &param_1->field_1c[1];
+        p = &param_1->step_offsets[1];
         i = 0x40;
         do {
-            p[-1] = param_1->field_1c[0x80];
-            *p = param_1->field_1c[0x81];
+            p[-1] = param_1->step_offsets[0x80];
+            *p = param_1->step_offsets[0x81];
             p = p + 2;
             i = i + -1;
         } while (i != 0);
@@ -347,11 +347,11 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         param_1->next_y = param_1->cur_y + 5;
     }
     if (param_1->field_3e4 == 1) {
-        p = &param_1->field_1c[0x9e];
+        p = &param_1->step_offsets[0x9e];
         i = 7;
         do {
-            p[0] = param_1->field_1c[0x90];
-            p[1] = param_1->field_1c[0x91];
+            p[0] = param_1->step_offsets[0x90];
+            p[1] = param_1->step_offsets[0x91];
             p = p + -2;
             i = i + -1;
         } while (i != 0);
@@ -386,8 +386,8 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     } else if (path->tile.id == score->end.id) {
         ride->field_3e0 = 0x10;
         ride->field_3e4 = 3;
-        FUN_00433840(ride, ride->field_3dc, 4);
-        ride->field_3dc = 1;
+        FUN_00433840(ride, ride->from_dir, 4);
+        ride->from_dir = 1;
         ride->next_y = ride->cur_y + 5;
         return;
     }
@@ -422,11 +422,11 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         }
     }
     if (mask == 0) {
-        FUN_00433840(ride, ride->field_3dc, -1);
-        ride->field_3dc = -1;
+        FUN_00433840(ride, ride->from_dir, -1);
+        ride->from_dir = -1;
         return;
     }
-    if ((rand() & 7) == 0 && (free = ~ride->field_3dc & mask) != 0) {
+    if ((rand() & 7) == 0 && (free = ~ride->from_dir & mask) != 0) {
         for (;;) {
             for (i = 0, n = 0; i < 4; i++) {
                 if ((free & (1 << i)) != 0) {
@@ -441,7 +441,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         mask = free;
     }
     for (i = 0; i < 4; i++) {
-        if ((ride->field_3dc & (1 << i)) != 0) {
+        if ((ride->from_dir & (1 << i)) != 0) {
             break;
         }
     }
@@ -461,26 +461,26 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     case 1:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y - 5;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 4;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 4;
         break;
     case 2:
         ride->next_x = ride->cur_x + 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 8;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 8;
         break;
     case 4:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y + 5;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 1;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 1;
         break;
     case 8:
         ride->next_x = ride->cur_x - 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->field_3dc, dir);
-        ride->field_3dc = 2;
+        FUN_00433840(ride, ride->from_dir, dir);
+        ride->from_dir = 2;
         break;
     }
     if (--ride->field_3e4 == 0) {
@@ -508,7 +508,7 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
 
     if (to == -1) {
         if (from == -1) {
-            memset(ride->field_1c, 0, sizeof(ride->field_1c));
+            memset(ride->step_offsets, 0, sizeof(ride->step_offsets));
         } else {
             for (bit = 0; bit < 4; bit++) {
                 if ((from & (1 << bit)) != 0) {
@@ -519,11 +519,11 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             sy = (int)((float)(DAT_004b7148[bit].oy * 40) * DAT_004ab3fc);
             for (i = 0; i < 80; i++) {
                 if (i < 40) {
-                    ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
-                    ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
+                    ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
+                    ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
                 } else {
-                    ride->field_1c[i * 2] = 0;
-                    ride->field_1c[i * 2 + 1] = 0;
+                    ride->step_offsets[i * 2] = 0;
+                    ride->step_offsets[i * 2 + 1] = 0;
                 }
             }
         }
@@ -536,11 +536,11 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
         idx = (bit + 2) % 4;
         for (i = 0; i < 80; i++) {
             if (i >= 40) {
-                ride->field_1c[i * 2] = DAT_004b7148[idx].dx * 16 + ride->field_1c[i * 2 - 2];
-                ride->field_1c[i * 2 + 1] = DAT_004b7148[idx].dy * 16 + ride->field_1c[i * 2 - 1];
+                ride->step_offsets[i * 2] = DAT_004b7148[idx].dx * 16 + ride->step_offsets[i * 2 - 2];
+                ride->step_offsets[i * 2 + 1] = DAT_004b7148[idx].dy * 16 + ride->step_offsets[i * 2 - 1];
             } else {
-                ride->field_1c[i * 2] = 0;
-                ride->field_1c[i * 2 + 1] = 0;
+                ride->step_offsets[i * 2] = 0;
+                ride->step_offsets[i * 2 + 1] = 0;
             }
         }
     } else {
@@ -564,9 +564,9 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             arc += bit;
             step = (arc->a1 - arc->a0) * DAT_004ab3f8;
             angle = arc->a0;
-            ride->field_1c[0] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
-            ride->field_1c[1] = (int)((cos((angle + DAT_004ab3ec) * DAT_004ab3f4) + arc->cy) * DAT_004ab3f0);
-            p = &ride->field_1c[3];
+            ride->step_offsets[0] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
+            ride->step_offsets[1] = (int)((cos((angle + DAT_004ab3ec) * DAT_004ab3f4) + arc->cy) * DAT_004ab3f0);
+            p = &ride->step_offsets[3];
             for (i = 0x4f; i != 0; i--) {
                 angle += step;
                 p[-1] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
@@ -584,39 +584,39 @@ void FUN_00433840(struct JungleRide *ride, int from, int to) {
             if (from == to) {
                 for (i = 0; i < 80; i++) {
                     if (i < 40) {
-                        ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
-                        ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
+                        ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + sx);
+                        ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * i) * DAT_004ab3fc + sy);
                     } else {
-                        ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * (80 - i)) * DAT_004ab3fc + sx);
-                        ride->field_1c[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * (80 - i)) * DAT_004ab3fc + sy);
+                        ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * (80 - i)) * DAT_004ab3fc + sx);
+                        ride->step_offsets[i * 2 + 1] = (int)((float)(DAT_004b7148[bit].dy * (80 - i)) * DAT_004ab3fc + sy);
                     }
                 }
             } else {
                 fx = (float)sx;
                 fy = (float)sy;
                 for (i = 0; i < 80; i++) {
-                    ride->field_1c[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + fx);
-                    ride->field_1c[i * 2 + 1] = (int)((float)(i * DAT_004b7148[bit].dy) * DAT_004ab3fc + fy);
+                    ride->step_offsets[i * 2] = (int)((float)(DAT_004b7148[bit].dx * i) * DAT_004ab3fc + fx);
+                    ride->step_offsets[i * 2 + 1] = (int)((float)(i * DAT_004b7148[bit].dy) * DAT_004ab3fc + fy);
                 }
             }
         }
     }
     for (i = 0; i < 80; i++) {
         if (i < 76) {
-            tx = ride->field_1c[(i + 4) * 2];
-            ty = ride->field_1c[(i + 4) * 2 + 1];
+            tx = ride->step_offsets[(i + 4) * 2];
+            ty = ride->step_offsets[(i + 4) * 2 + 1];
         } else {
-            tx = ride->field_1c[0x9e];
-            ty = ride->field_1c[0x9f];
+            tx = ride->step_offsets[0x9e];
+            ty = ride->step_offsets[0x9f];
         }
         if (i > 3) {
-            dx = tx - ride->field_1c[(i - 3) * 2];
-            dy = ty - ride->field_1c[(i - 3) * 2 + 1];
+            dx = tx - ride->step_offsets[(i - 3) * 2];
+            dy = ty - ride->step_offsets[(i - 3) * 2 + 1];
         } else {
-            dx = tx - ride->field_1c[0];
-            dy = ty - ride->field_1c[1];
+            dx = tx - ride->step_offsets[0];
+            dy = ty - ride->step_offsets[1];
         }
-        ride->field_29c[i] = ((ArcTan256(dx, dy) >> 4) + 6 & 0xf) + 0;
+        ride->step_frames[i] = ((ArcTan256(dx, dy) >> 4) + 6 & 0xf) + 0;
     }
 }
 
@@ -1152,7 +1152,7 @@ void JungleCruiseAddObject(struct EditObject *obj, int *coords) {
     score->start.pos.y = coords[1] + JungleCruiseStartFootprint.v[1] + 2;
     score->end.pos.x = coords[0] + DAT_004b7260.v[0] + 2;
     score->end.pos.y = coords[1] + DAT_004b7260.v[1] + 2;
-    score->field_8 = 0;
+    score->connected = 0;
     score->field_c = 9999;
     score->field_10 = 0;
     score->bloke_count = 0;
@@ -1396,7 +1396,7 @@ void FUN_00435750(void) {
     FUN_00432d00(0);
     for (score = JungleScoreList; score != NULL; score = score->next) {
         tile.id = score->tile.id;
-        if (score->seats[0] != NULL && --score->timer <= 0 && score->field_8 != 0 &&
+        if (score->seats[0] != NULL && --score->timer <= 0 && score->connected != 0 &&
             score->field_40 > (int)FUN_004332c0(&score->tile.id) * 6 &&
             FUN_00432b90(tile, score->seats[0], score->seats[1], score->seats[2]) != 0) {
             score->seats[0]->flags |= 0x80;
@@ -1732,7 +1732,7 @@ int FUN_00436160(Element *obj, int param_2) {
     int best = 0;
 
     for (node = JungleScoreList; node != NULL; node = node->next) {
-        if ((int)node->field_40 > best && (param_2 == 0 || node->field_8 != 0)) {
+        if ((int)node->field_40 > best && (param_2 == 0 || node->connected != 0)) {
             best = node->field_40;
         }
     }
@@ -1920,8 +1920,8 @@ void FUN_004365f0(Element *obj, int *coords) {
             y0 = score->start.pos.y;
             x1 = score->end.pos.x;
             y1 = score->end.pos.y;
-            score->field_8 = AreJunglePathsConnected(x0, y0, x1, y1);
-            if (score->field_8 != 0) {
+            score->connected = AreJunglePathsConnected(x0, y0, x1, y1);
+            if (score->connected != 0) {
                 FUN_004373c0(owner);
             }
             return;
@@ -2083,7 +2083,7 @@ void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
             y0 = score->start.pos.y;
             x1 = score->end.pos.x;
             y1 = score->end.pos.y;
-            score->field_8 = AreJunglePathsConnected(x0, y0, x1, y1);
+            score->connected = AreJunglePathsConnected(x0, y0, x1, y1);
             break;
         }
     }

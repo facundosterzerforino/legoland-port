@@ -11,8 +11,8 @@ union RectPoints {
 
 struct VideoArg {
     /* 0x00 */ int pitch;
-    /* 0x04 */ int field_4;
-    /* 0x08 */ int field_8;
+    /* 0x04 */ int width;
+    /* 0x08 */ int height;
     /* 0x0c */ void *bits;
     /* 0x10 */ int field_10;
     /* 0x14 */ int field_14;

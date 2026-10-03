@@ -36,7 +36,7 @@ struct RenderListNode {
 struct RenderListNode *FUN_00441830(void *param_1, short *param_2) {
     struct RenderListNode *node = (struct RenderListNode *)DAT_0081c8cc;
     while (node != NULL) {
-        if (*param_2 == node->id) {
+        if (memcmp(&node->id, param_2, sizeof(node->id)) == 0) {
             DAT_0081c8cc = node;
             return node;
         }
@@ -48,14 +48,14 @@ struct RenderListNode *FUN_00441830(void *param_1, short *param_2) {
 
 struct ViewportEntry {
     unsigned char pad_0[0x2e];
-    short field_2e;
+    short seats;
     unsigned char pad_30[0xcc - 0x30];
-    void *field_cc;
+    void *riders;
 };
 
 // FUNCTION: LEGOLAND 0x00441870
 struct RenderListNode *FUN_00441870(struct ViewportEntry *param_1, short *param_2) {
-    DAT_0081c8cc = param_1->field_cc;
+    DAT_0081c8cc = param_1->riders;
     return FUN_00441830(param_1, param_2);
 }
 
@@ -74,7 +74,7 @@ struct RenderListNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, 
     struct RenderListNode *node = FUN_00441870(param_2, param_3);
     int i = 0;
     if (node != NULL) {
-        for (; i < param_2->field_2e; i++) {
+        for (; i < param_2->seats; i++) {
             if (i == param_1) {
                 return node;
             }
@@ -320,7 +320,6 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
     struct Point coords;
     int idx;
     void *base;
-    int *entry;
     int i;
     struct Point offset;
 
@@ -330,36 +329,29 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
         idx = param_2 % param_1->modulo;
     }
     base = param_1->frame_array[idx];
-    i = param_1->loop_count - 1;
-    if (i >= 0) {
-        entry = (int *)((char *)base + i * 4);
-        i = i + 1;
-        do {
-            int sprite_id = *entry;
-            struct BlokeRideNode *node;
-            int *frame;
-            if (param_1->data_table == NULL) {
-                node = (struct BlokeRideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
-            } else {
-                node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[param_1->remap_table[sprite_id]], param_3, (short *)param_4);
-            }
-            if (node != NULL && (node->inner->flags & 0x80) != 0) {
-                IP_RenderBlokeIn3DNow((struct Bloke *)node->inner);
-            }
-            frame = (int *)param_1->index_array[sprite_id];
-            if (frame != NULL) {
-                LLSSetFrame((struct LLS *)GetLLSForSprite((struct SpriteLLS *)frame), param_2);
-            }
-            offset.x = param_1->x;
-            offset.y = param_1->y;
-            AdjustOffsetForViewMode(&offset);
-            frame = (int *)param_1->index_array[sprite_id];
-            if (frame != NULL) {
-                PrintSprite((struct Sprite *)frame, coords.x + offset.x, coords.y + offset.y, 0, 0);
-            }
-            entry = entry - 1;
-            i = i - 1;
-        } while (i != 0);
+    for (i = param_1->loop_count - 1; i >= 0; i--) {
+        int sprite_id = ((int *)base)[i];
+        struct BlokeRideNode *node;
+        int *frame;
+        if (param_1->data_table == NULL) {
+            node = (struct BlokeRideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
+        } else {
+            node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[param_1->remap_table[sprite_id]], param_3, (short *)param_4);
+        }
+        if (node != NULL && (node->inner->flags & 0x80) != 0) {
+            IP_RenderBlokeIn3DNow((struct Bloke *)node->inner);
+        }
+        frame = (int *)param_1->index_array[sprite_id];
+        if (frame != NULL) {
+            LLSSetFrame((struct LLS *)GetLLSForSprite((struct SpriteLLS *)frame), param_2);
+        }
+        offset.x = param_1->x;
+        offset.y = param_1->y;
+        AdjustOffsetForViewMode(&offset);
+        frame = (int *)param_1->index_array[sprite_id];
+        if (frame != NULL) {
+            PrintSprite((struct Sprite *)frame, coords.x + offset.x, coords.y + offset.y, 0, 0);
+        }
     }
 }
 
@@ -427,10 +419,10 @@ LEGO_EXPORT unsigned short *LoadPalette(unsigned int path) {
                 RES_ReadFile(file, &path, 1);
                 RES_ReadFile(file, &g, 1);
                 RES_ReadFile(file, &b, 1);
-                if (DisplayPixelFormat != 2) {
-                    *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xf8)) << 2) | (b >> 3));
+                if (DisplayPixelFormat == 2) {
+                    *out = (((path & 0xf8) << 5 | (g & 0xfc)) << 3) | (b >> 3);
                 } else {
-                    *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xfc)) << 3) | (b >> 3));
+                    *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xf8)) << 2) | (b >> 3));
                 }
                 out++;
             }
@@ -451,8 +443,8 @@ struct CellContainer {
 
 struct CellEntry {
     short field_0;
-    unsigned char field_2;
-    unsigned char field_3;
+    unsigned char x;
+    unsigned char y;
     unsigned char field_4;
     unsigned char field_5;
 };
@@ -463,10 +455,10 @@ void FUN_00442040(struct CellContainer *param_1, int param_2, int param_3, float
     struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->entries + param_3 * 6);
     unsigned char bVar3 = entry1->field_4;
     int iVar22 = entry2->field_0 + param_1->field_4;
-    int lo_x = entry1->field_2;
-    int hi_x = bVar3 + entry1->field_2 + 1;
-    int lo_y = entry1->field_3;
-    int hi_y = entry1->field_5 + entry1->field_3 + 1;
+    int lo_x = entry1->x;
+    int hi_x = bVar3 + entry1->x + 1;
+    int lo_y = entry1->y;
+    int hi_y = entry1->field_5 + entry1->y + 1;
     int idx1 = entry1->field_0 + param_1->field_4;
     float *p;
     int local_18;
@@ -509,15 +501,15 @@ void FUN_00442040(struct CellContainer *param_1, int param_2, int param_3, float
                     (float)lo_y <= v1 && v1 <= (float)hi_y &&
                     (float)lo_y <= v3 && v3 <= (float)hi_y &&
                     (float)lo_y <= v5 && v5 <= (float)hi_y) {
-                    float e1_2 = (float)entry1->field_2;
+                    float e1_2 = (float)entry1->x;
                     float e1_4 = (float)entry1->field_4;
                     float e2_4 = (float)entry2->field_4;
-                    float e2_2 = (float)entry2->field_2;
+                    float e2_2 = (float)entry2->x;
                     float t0 = (float)DAT_0081c0c0[iVar22 * 2];
-                    float e1_3 = (float)entry1->field_3;
+                    float e1_3 = (float)entry1->y;
                     float e1_5 = (float)entry1->field_5;
                     float e2_5 = (float)entry2->field_5;
-                    float e2_3 = (float)entry2->field_3;
+                    float e2_3 = (float)entry2->y;
                     float t1 = (float)DAT_0081c0c0[iVar22 * 2 + 1];
                     *(int *)(p - 1) = entry2->field_0 + param_1->field_4;
                     p[1] = (((v1 - e1_3) / e1_5) * e2_5 + e2_3) / t1;
@@ -601,7 +593,7 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
     int modI;
     int modJ;
 
-    if (person->field_8 == 1) {
+    if (person->character == 1) {
         if (flag == 0) {
             arrA = DAT_00655a38;
             arrD = DAT_0062fea8;
@@ -647,10 +639,10 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
         }
     } else {
         for (;;) {
-            if (person->field_8 == 3) {
+            if (person->character == 3) {
                 a = 4;
                 b = 1;
-            } else if (person->field_8 == 2) {
+            } else if (person->character == 2) {
                 a = 0;
                 b = 3;
             } else {
@@ -671,7 +663,7 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
     mem = malloc(size);
     if (mem != 0) {
         memcpy(mem, (void *)src, size);
-        if ((int)person->field_8 < 2) {
+        if ((int)person->character < 2) {
             FUN_00442040(context, valC, arrA[idxI], (float *)mem, count);
             FUN_00442040(context, valE, arrD[idxJ], (float *)mem, count);
         }
@@ -739,30 +731,32 @@ unsigned char *GetNthStringInList(unsigned char *str, int count) {
 
 // FUNCTION: LEGOLAND 0x004428f0
 unsigned char *FUN_004428f0(char *param_1, int param_2, int param_3) {
-    char *pcVar4;
-    char *pcVar5;
+    char *names;
+    char *values;
+    char *p;
     int flag;
 
     if (param_1 != NULL) {
-        param_1 = param_1 + strlen(param_1) + 1;
-        flag = *(int *)param_1;
-        param_1 = param_1 + 4;
-        pcVar4 = param_1;
+        p = param_1 + strlen(param_1) + 1;
+        flag = *(int *)p;
+        p = p + 4;
+        names = p;
         if (flag != 0) {
-            pcVar5 = param_1;
             do {
-                pcVar5 = pcVar5 + strlen(pcVar5) + 1;
-            } while (strlen(pcVar5) != 0);
-            pcVar5++;
-            param_1 = pcVar5 + strlen(pcVar5) + 1 + 4;
+                p = p + strlen(p) + 1;
+            } while (strlen(p) != 0);
+            p++;
+            /* only set here; in the original it shares param_1's stack slot */
+            values = p + strlen(p) + 1 + 4;
         }
     } else {
-        pcVar4 = (char *)param_3;
+        names = (char *)param_3;
     }
-    if (param_2 == 1) {
-        pcVar4 = param_1;
+    switch (param_2) {
+    case 1:
+        return GetNthStringInList((unsigned char *)values, param_3);
     }
-    return GetNthStringInList((unsigned char *)pcVar4, param_3);
+    return GetNthStringInList((unsigned char *)names, param_3);
 }
 
 // FUNCTION: LEGOLAND 0x00442980
@@ -886,7 +880,7 @@ unsigned int FUN_00442c70(void) {
 
 // FUNCTION: LEGOLAND 0x00442cc0
 LEGO_EXPORT struct Point GetScreenCoordsForObject(TileId *tile, struct Ride *ride) {
-    int bounds[2];
+    int bounds[4];
     struct Point ref;
     int iVar1;
     int iVar2;
@@ -903,12 +897,12 @@ LEGO_EXPORT struct Point GetScreenCoordsForObject(TileId *tile, struct Ride *rid
         iVar2 = iVar2 >> 1;
     }
     if (iVar1 < 0) {
-        r.y = bounds[1] - (-iVar1 >> 1);
         r.x = iVar2 + bounds[0];
+        r.y = bounds[1] - (-iVar1 >> 1);
         return r;
     }
-    r.y = bounds[1] + (iVar1 >> 1);
     r.x = iVar2 + bounds[0];
+    r.y = bounds[1] + (iVar1 >> 1);
     return r;
 }
 
@@ -1003,22 +997,25 @@ LEGO_EXPORT void RenderItem_Link(struct RenderItemNode **head, struct RenderItem
         *head = node;
         return;
     }
-    while (key > cur->key) {
+    for (;;) {
+        if (key <= cur->key) {
+            node->next = cur;
+            node->prev = cur->prev;
+            if (cur->prev != NULL) {
+                cur->prev->next = node;
+            }
+            cur->prev = node;
+            if (cur == *head) {
+                *head = node;
+            }
+            return;
+        }
         if (cur->next == NULL) {
             cur->next = node;
             node->prev = cur;
             return;
         }
         cur = cur->next;
-    }
-    node->next = cur;
-    node->prev = cur->prev;
-    if (cur->prev != NULL) {
-        cur->prev->next = node;
-    }
-    cur->prev = node;
-    if (cur == *head) {
-        *head = node;
     }
 }
 
@@ -1138,22 +1135,25 @@ LEGO_EXPORT void RenderItem2_Link(struct RenderItemNode **head, struct RenderIte
         *head = node;
         return;
     }
-    while (key > cur->key) {
+    for (;;) {
+        if (key <= cur->key) {
+            node->next = cur;
+            node->prev = cur->prev;
+            if (cur->prev != NULL) {
+                cur->prev->next = node;
+            }
+            cur->prev = node;
+            if (cur == *head) {
+                *head = node;
+            }
+            return;
+        }
         if (cur->next == NULL) {
             cur->next = node;
             node->prev = cur;
             return;
         }
         cur = cur->next;
-    }
-    node->next = cur;
-    node->prev = cur->prev;
-    if (cur->prev != NULL) {
-        cur->prev->next = node;
-    }
-    cur->prev = node;
-    if (cur == *head) {
-        *head = node;
     }
 }
 
@@ -1210,8 +1210,6 @@ LEGO_EXPORT char *GetFaceTextureNameOfBloke(struct BlokeSex0 *param_1) {
     case 1:
         ptr = AltWomanFileData;
         break;
-    default:
-        ptr = param_1;
     }
     name = (char *)FUN_004428f0((char *)ptr, 0, inner->field_80);
     // STRING: LEGOLAND 0x004b7d24
@@ -1232,8 +1230,6 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
     case 1:
         ptr = AltWomanFileData;
         break;
-    default:
-        ptr = param_1;
     }
     name = (char *)FUN_004428f0((char *)ptr, 1, inner->field_80);
     _stricmp(name, "chest girly1");
@@ -1243,13 +1239,19 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
 // FUNCTION: LEGOLAND 0x004431f0
 LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_8c;
-    return (BlokeColours[idx * 3] << 16) | (BlokeColours[idx * 3 + 1] << 8) | BlokeColours[idx * 3 + 2];
+    unsigned int r = BlokeColours[idx * 3];
+    unsigned int b = BlokeColours[idx * 3 + 2];
+    unsigned int g = BlokeColours[idx * 3 + 1];
+    return (((r << 8) | g) << 8) | b;
 }
 
 // FUNCTION: LEGOLAND 0x00443220
 LEGO_EXPORT unsigned int GetArmColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_90;
-    return (BlokeColours[idx * 3] << 16) | (BlokeColours[idx * 3 + 1] << 8) | BlokeColours[idx * 3 + 2];
+    unsigned int r = BlokeColours[idx * 3];
+    unsigned int b = BlokeColours[idx * 3 + 2];
+    unsigned int g = BlokeColours[idx * 3 + 1];
+    return (((r << 8) | g) << 8) | b;
 }
 
 // FUNCTION: LEGOLAND 0x00443250

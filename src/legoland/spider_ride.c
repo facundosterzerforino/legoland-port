@@ -30,7 +30,7 @@ struct SpiderState {
     unsigned short id;
     unsigned char field_2;
     unsigned char field_3;
-    char field_4;
+    char frame;
     unsigned char pad_5[3];
     unsigned int field_8;
     unsigned char field_c;
@@ -57,7 +57,7 @@ struct SlotBloke {
 
 struct SlotOwner {
     unsigned char pad_0[8];
-    struct SlotBloke *field_8;
+    struct SlotBloke *rider;
 };
 
 struct SlotArray {
@@ -151,7 +151,7 @@ void FUN_00415a60(struct SpiderState *a) {
     a->field_3 = a->field_2;
     a->field_2 = 0;
     a->field_8 = (a->field_8 & 0xffffbfff) | 0x1;
-    a->field_4 = 0;
+    a->frame = 0;
     a->field_10 = 0;
     FUN_004159e0((const unsigned char *)a);
 }
@@ -160,7 +160,7 @@ void FUN_00415a60(struct SpiderState *a) {
 int FUN_00415a90(struct SpiderNode *node) {
     struct SpiderState *a = (struct SpiderState *)node;
     a->field_10 = 0;
-    a->field_4 = 0;
+    a->frame = 0;
     a->field_c = rand() % 2 != 0 ? 4 : 3;
     a->field_8 &= 0xffffbffe;
     a->field_14 = 0;
@@ -382,9 +382,9 @@ void FUN_004161f0(struct SpiderNode *node) {
         }
         if (v >= 2) {
             s->field_10 = 0;
-            s->field_4++;
-            if (s->field_4 >= 0x20) {
-                s->field_4 = 0;
+            s->frame++;
+            if (s->frame >= 0x20) {
+                s->frame = 0;
                 s->field_c = c - 1;
             }
         }
@@ -404,10 +404,10 @@ void FUN_004161f0(struct SpiderNode *node) {
     for (; r != NULL; r = r->next) {
         if (s->id == r->tile.id && r->rider->field_35 == 1) {
             sprintf(SpiderBnvInfo.name + 6, "%02d", r->rider->field_36);
-            SetBlokePositionFromBNV(SpiderRunBinV, r->rider, SpiderBnvInfo.name, s->field_4, -1617787.75f, -1618096.5f, 0);
+            SetBlokePositionFromBNV(SpiderRunBinV, r->rider, SpiderBnvInfo.name, s->frame, -1617787.75f, -1618096.5f, 0);
         }
     }
-    *(short *)*ZSpiderSprite->lls = (short)s->field_4;
+    *(short *)*ZSpiderSprite->lls = (short)s->frame;
 }
 
 // FUNCTION: LEGOLAND 0x00416310
@@ -583,7 +583,7 @@ int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char cou
     }
 
     arr->slots[i] = 1;
-    owner->field_8->field_36 = (unsigned char)(i + 1);
+    owner->rider->field_36 = (unsigned char)(i + 1);
     return i + 1;
 }
 
@@ -606,8 +606,8 @@ LEGO_EXPORT int SaveSpider(void) {
 }
 
 struct SpiderTypeC {
-    void *field_0;
-    unsigned int field_4;
+    void *file;
+    unsigned int index;
 };
 
 struct SpiderData {
@@ -624,24 +624,24 @@ struct SpiderCar2 {
 struct SpiderListNode {
     struct SpiderListNode *next;
     unsigned char pad_4[4];
-    struct SpiderData *field_8;
+    struct SpiderData *rider;
     unsigned char pad_c[4];
-    struct SpiderCar2 *field_10;
+    struct SpiderCar2 *person;
 };
 
 struct SpiderGameObject {
     unsigned char pad_0[0xcc];
-    struct SpiderListNode *field_cc;
+    struct SpiderListNode *riders;
 };
 
 struct SpiderLoadArg {
     unsigned char pad_0[0xc];
-    struct SpiderGameObject *field_c;
+    struct SpiderGameObject *ride;
 };
 
 // FUNCTION: LEGOLAND 0x004168f0
 LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
-    struct SpiderGameObject *obj = arg->field_c;
+    struct SpiderGameObject *obj = arg->ride;
     struct SpiderNode *prev = NULL;
     struct SpiderListNode *list;
     struct SpiderCar2 *car;
@@ -669,19 +669,19 @@ LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             car->field_2c = DAT_004cbf38[car->field_30];
         } else {
             car->field_2c = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
-        data = list->field_8;
+        data = list->rider;
         tc = data->field_54;
         if (tc != NULL) {
-            tc->field_0 = DAT_004cbf30[tc->field_4];
+            tc->file = DAT_004cbf30[tc->index];
         }
         list = list->next;
     }

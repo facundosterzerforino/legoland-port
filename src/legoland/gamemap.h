@@ -17,7 +17,7 @@ struct MapRenderOrderEntry {
 
 struct EditCursorData {
     /* 0x00 */ unsigned char pad_0[0x3c];
-    /* 0x3c */ unsigned char field_3c;
+    /* 0x3c */ unsigned char footprint;
 };
 
 /* An object's footprint rectangle (tile offsets from its origin), chained via next. */

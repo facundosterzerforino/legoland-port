@@ -24,9 +24,9 @@ struct SpaceTowerSeat {
     /* 0x08 */ int pos;
     /* 0x0c */ int state;
     /* 0x10 */ int field_10;
-    /* 0x14 */ int field_14;
-    /* 0x18 */ struct SpaceTowerRideNode *field_18;
-    /* 0x1c */ struct SpaceTowerRideNode *field_1c;
+    /* 0x14 */ int descending;
+    /* 0x18 */ struct SpaceTowerRideNode *rider_slot0;
+    /* 0x1c */ struct SpaceTowerRideNode *rider_slot1;
     /* 0x20 */ signed char delta;
     /* 0x21 */ unsigned char pad_21[3];
 };
@@ -84,15 +84,15 @@ struct SpaceTowerRideNode {
 
 struct SpaceTowerRide {
     /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
+    /* 0x0c */ int x;
+    /* 0x10 */ int y;
     /* 0x14 */ unsigned char pad_14[0x1c - 0x14];
     /* 0x1c */ unsigned int flags;
     /* 0x20 */ unsigned char pad_20[0x24 - 0x20];
     /* 0x24 */ char field_24;
     /* 0x25 */ char field_25;
     /* 0x26 */ unsigned char pad_26[0x2e - 0x26];
-    /* 0x2e */ short field_2e;
+    /* 0x2e */ short seats;
     /* 0x30 */ unsigned char pad_30[0x64 - 0x30];
     /* 0x64 */ void *layers;
     /* 0x68 */ unsigned char pad_68[0xcc - 0x68];
@@ -160,8 +160,8 @@ void FUN_0043a820(struct AnimEntry *param_1, struct SpaceTowerRideNode *param_2)
     bloke = param_2->bloke;
     base = FUN_0043a7a0((struct AnimLayout *)DAT_004b7758[bloke->field_50].anim_layout, bloke->field_4a, bloke->field_38);
     ride = (struct SpaceTowerRide *)SpaceTowerRideObj;
-    base.x += (param_2->coord.x + ride->field_c) << 8;
-    base.y += (param_2->coord.y + ride->field_10) << 8;
+    base.x += (param_2->coord.x + ride->x) << 8;
+    base.y += (param_2->coord.y + ride->y) << 8;
     bloke->dest.x = base.x;
     bloke->dest.y = base.y;
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
@@ -210,17 +210,17 @@ void FUN_0043a940(struct SpaceTowerSeat *seat) {
             }
             break;
         case 2:
-            if (seat->field_14 == 0) {
+            if (seat->descending == 0) {
                 seat->pos += seat->delta;
                 if (seat->pos > 200) {
                     seat->pos = 200;
-                    seat->field_14 = 1;
+                    seat->descending = 1;
                 }
             } else {
                 seat->pos -= 2;
                 if (seat->pos < 0) {
                     seat->pos = 0;
-                    seat->field_14 = 0;
+                    seat->descending = 0;
                     seat->state = 0;
                 }
             }
@@ -241,7 +241,7 @@ void FUN_0043a9b0(struct SpaceTowerCar *arg) {
         if (arg->flags_a4[i] != 0) {
             arg->seats[i >> 1].flags |= 1;
             arg->seats[i >> 1].state = 2;
-            arg->seats[i >> 1].field_14 = 0;
+            arg->seats[i >> 1].descending = 0;
             arg->seats[i >> 1].pos = 0;
         }
     }
@@ -475,11 +475,11 @@ void RenderSpaceTowerSeat(struct SpaceTowerCar *param_1, int param_2, unsigned i
     FUN_0043ae20(param_1, param_2, param_3);
     if ((param_1->seats[param_2].flags & 1) != 0) {
         FUN_0043ad00((unsigned char *)param_1, param_2);
-        if (param_1->seats[param_2].field_18 != NULL) {
-            IP_RenderBlokeIn3DNow(param_1->seats[param_2].field_18->bloke);
+        if (param_1->seats[param_2].rider_slot0 != NULL) {
+            IP_RenderBlokeIn3DNow(param_1->seats[param_2].rider_slot0->bloke);
         }
-        if (param_1->seats[param_2].field_1c != NULL) {
-            IP_RenderBlokeIn3DNow(param_1->seats[param_2].field_1c->bloke);
+        if (param_1->seats[param_2].rider_slot1 != NULL) {
+            IP_RenderBlokeIn3DNow(param_1->seats[param_2].rider_slot1->bloke);
         }
         FUN_0043ad90(param_1, param_2, param_3);
     }
@@ -662,9 +662,9 @@ LEGO_EXPORT int SpaceTower_Save(void) {
             }
             for (i = 0; i < 8; i++) {
                 if (i & 1) {
-                    field = &car->seats[i >> 1].field_1c;
+                    field = &car->seats[i >> 1].rider_slot1;
                 } else {
-                    field = &car->seats[i >> 1].field_18;
+                    field = &car->seats[i >> 1].rider_slot0;
                 }
                 index = 0;
                 for (cur = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list; cur != NULL; cur = cur->next) {
@@ -716,9 +716,9 @@ LEGO_EXPORT int SpaceTower_Load(void) {
         prev = node;
         for (i = 0; i < 8; i++) {
             if (i & 1) {
-                field = &node->seats[i >> 1].field_1c;
+                field = &node->seats[i >> 1].rider_slot1;
             } else {
-                field = &node->seats[i >> 1].field_18;
+                field = &node->seats[i >> 1].rider_slot0;
             }
             n = (int)*field;
             cur = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list;
@@ -768,14 +768,14 @@ void FUN_0043b810(struct SpaceTowerCar *param_1) {
     struct Person *person;
 
     node = ((struct SpaceTowerRide *)SpaceTowerRideObj)->list;
-    param_1->seats[0].field_18 = NULL;
-    param_1->seats[0].field_1c = NULL;
-    param_1->seats[1].field_18 = NULL;
-    param_1->seats[1].field_1c = NULL;
-    param_1->seats[2].field_18 = NULL;
-    param_1->seats[2].field_1c = NULL;
-    param_1->seats[3].field_18 = NULL;
-    param_1->seats[3].field_1c = NULL;
+    param_1->seats[0].rider_slot0 = NULL;
+    param_1->seats[0].rider_slot1 = NULL;
+    param_1->seats[1].rider_slot0 = NULL;
+    param_1->seats[1].rider_slot1 = NULL;
+    param_1->seats[2].rider_slot0 = NULL;
+    param_1->seats[2].rider_slot1 = NULL;
+    param_1->seats[3].rider_slot0 = NULL;
+    param_1->seats[3].rider_slot1 = NULL;
     coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
     for (; node != NULL; node = node->next) {
         if (memcmp(&node->id, &param_1->var_0, 2) == 0 && (node->bloke->flags & 0x80) != 0) {
@@ -783,9 +783,9 @@ void FUN_0043b810(struct SpaceTowerCar *param_1) {
             idx = slot >> 1;
             odd = slot & 1;
             if (odd == 0) {
-                param_1->seats[idx].field_18 = node;
+                param_1->seats[idx].rider_slot0 = node;
             } else {
-                param_1->seats[idx].field_1c = node;
+                param_1->seats[idx].rider_slot1 = node;
             }
             off = DAT_0062fd88[idx];
             off.y -= param_1->seats[idx].pos;
@@ -893,10 +893,10 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
             return;
         }
         x = node->coord.x;
-        ride_x = ride->field_c + x;
+        ride_x = ride->x + x;
         tile = (TileId *)&node->id;
         y = tile->pos.y;
-        ride_y = ride->field_10 + y;
+        ride_y = ride->y + y;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
@@ -937,7 +937,7 @@ void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
                 bloke->param_action++;
                 obj->var_2++;
                 FUN_0043a9b0(obj);
-                if ((short)(char)obj->var_2 == ((struct SpaceTowerRide *)SpaceTowerRideObj)->field_2e) {
+                if ((short)(char)obj->var_2 == ((struct SpaceTowerRide *)SpaceTowerRideObj)->seats) {
                     FUN_0043aa90(obj);
                 }
                 break;

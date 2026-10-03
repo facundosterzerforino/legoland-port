@@ -68,7 +68,7 @@ struct FlumeOut {
 
 struct Obj {
     unsigned char pad_0[0xc];
-    void *field_0c;
+    void *ride;
 };
 
 struct ResA {
@@ -560,17 +560,15 @@ struct FlumeEntry *FUN_00408f90(int x, int y) {
     int w = DAT_004b4730 - LogFlumeFootprint;
 
     outer = FlumeEntryList;
-    if (outer != NULL) {
-        do {
-            for (cur = outer->sub; cur != NULL; cur = cur->next) {
-                int tx = cur->tile.pos.x;
-                int ty = cur->tile.pos.y;
-                if (x >= tx && x <= tx + w && y >= ty && y <= ty + h) {
-                    return cur;
-                }
+    while (outer != NULL) {
+        cur = outer->sub;
+        while (cur != NULL) {
+            if (x >= cur->tile.pos.x && x <= cur->tile.pos.x + w && y >= cur->tile.pos.y && y <= cur->tile.pos.y + h) {
+                return cur;
             }
-            outer = outer->next;
-        } while (outer != NULL);
+            cur = cur->next;
+        }
+        outer = outer->next;
     }
     return NULL;
 }
@@ -2570,9 +2568,9 @@ void FUN_0040bf70(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c250
-int FUN_0040c250(struct FlumeEntry *param_1) {
-    struct FlumeEntry *entry = param_1;
+int FUN_0040c250(struct FlumeEntry *entry) {
     struct FlumeSlotSet *set = entry->slotset;
+    struct FlumeEntry *param_1 = entry;
     struct FlumeEntry *tmp;
     struct FlumeEntry *node;
     int i;
@@ -2855,8 +2853,8 @@ void FUN_0040c8d0(Element *elem, TileId tile, struct Cursor *cursor) {
     struct FlumeEntry *entry;
 
     memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
-    LogFlumeTrackRide->footprint.x1--;
-    LogFlumeTrackRide->footprint.y1--;
+    --LogFlumeTrackRide->footprint.x1;
+    --LogFlumeTrackRide->footprint.y1;
     StandardRemoveObject(elem, tile, cursor);
     entry = FindFlumeSubEntryByTile(&tile);
     FUN_004119a0((struct ParticleEmitter *)entry->parent, -1);
@@ -3479,8 +3477,8 @@ unsigned int FUN_0040d6f0(struct CursorSource *param_1, unsigned int param_2, un
     if (FUN_0045f4b0(&EditCursor)) {
         int cx = EditCursor.tile_x;
         int cy = EditCursor.tile_y;
-        rect.x0 = cx + EditCursor.footprint.x0;
-        rect.y0 = cy + EditCursor.footprint.y0;
+        rect.x0 = EditCursor.footprint.x0 + cx;
+        rect.y0 = EditCursor.footprint.y0 + cy;
         rect.x1 = EditCursor.footprint.x1 + cx;
         rect.y1 = EditCursor.footprint.y1 + cy;
         r = CheckForPeople(&rect);
@@ -4145,7 +4143,7 @@ void LogFlumeSpecialCorner1LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c445c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c445c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c445c;
     resA->flags_1c |= 0x400;
 
@@ -4173,7 +4171,7 @@ void LogFlumeSpecialCorner2LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2aa0 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2aa0 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2aa0;
     resA->flags_1c |= 0x400;
 
@@ -4195,7 +4193,7 @@ void LogFlumeSpecialCorner3LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2b0c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2b0c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2b0c;
     resA->flags_1c |= 0x400;
 
@@ -4223,7 +4221,7 @@ void LogFlumeSpecialCorner4LoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c74d4 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c74d4 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c74d4;
     resA->flags_1c |= 0x400;
     DAT_004c2ba0 = obj_ptr;
@@ -4572,7 +4570,7 @@ void LogFlumeTunnelLoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004cbe18 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004cbe18 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004cbe18;
     resA->flags_1c |= 0x400;
     DAT_004cbe48 = obj_ptr;
@@ -4728,7 +4726,7 @@ struct Sprite *FUN_0040f8b0(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2bf0 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2bf0 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2bf0;
     resA->flags_1c |= 0x400;
     DAT_004c4460 = obj_ptr;
@@ -4815,6 +4813,21 @@ unsigned int LogFlumeCsawRemoveObject(unsigned int param_1, unsigned int param_2
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
+#define NEW_FLUME_NODE(node, parent, mode_, submode_, y_, x_) \
+    do { \
+        (node) = FUN_00409010(); \
+        if ((node) != NULL) { \
+            (node)->mode = (mode_); \
+            (node)->submode = (submode_); \
+            (node)->owner = (parent)->owner; \
+            (node)->entry = (parent); \
+            (node)->ride = (struct Ride *)LogFlumeTrackRide; \
+            (node)->flags |= 4; \
+            (node)->tile.pos.x = (x_); \
+            (node)->tile.pos.y = (y_); \
+        } \
+    } while (0)
+
 // FUNCTION: LEGOLAND 0x0040fad0
 void FUN_0040fad0(struct FlumeNode *parent) {
     struct FlumeNode *node;
@@ -4826,49 +4839,49 @@ void FUN_0040fad0(struct FlumeNode *parent) {
 
     pos.pos.x = ((struct Ride *)DAT_004c2b60)->footprint.x0 + parent->tile.pos.x;
     pos.pos.y = ((struct Ride *)DAT_004c2b60)->footprint.y0 + parent->tile.pos.y + 9;
-    node = NewFlumeNode(parent, 3, 3, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 3, 3, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     parent->field_30 = (unsigned int)node;
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 1, 1, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 2, 3, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 2, 3, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y -= h;
-    node = NewFlumeNode(parent, 1, 0, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 1, 0, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y -= h;
-    node = NewFlumeNode(parent, 2, 1, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 2, 1, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     for (i = 2; i != 0; i--) {
         pos.pos.x += w;
-        node = NewFlumeNode(parent, 1, 1, pos.pos.y, pos.pos.x);
+        NEW_FLUME_NODE(node, parent, 1, 1, pos.pos.y, pos.pos.x);
         AppendListNode((struct Node *)parent, (struct ListNode *)node);
         LinkNodeAfter((struct Node *)prev, (struct Node *)node);
         prev = node;
     }
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 2, 2, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 2, 2, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.y += h;
-    node = NewFlumeNode(parent, 2, 0, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 2, 0, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     prev = node;
     pos.pos.x += w;
-    node = NewFlumeNode(parent, 3, 1, pos.pos.y, pos.pos.x);
+    NEW_FLUME_NODE(node, parent, 3, 1, pos.pos.y, pos.pos.x);
     AppendListNode((struct Node *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct Node *)prev, (struct Node *)node);
     parent->field_34 = (unsigned int)node;
@@ -4914,7 +4927,7 @@ void LogFlumeHoldUpLoadSprites(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c2b60 = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c2b60 = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c2b60;
     resA->flags_1c |= 0x400;
 
@@ -5093,7 +5106,7 @@ struct Sprite *FUN_004103e0(struct Obj *obj_ptr) {
     struct ResA *resA;
     struct ResB *resB;
 
-    DAT_004c8d6c = (struct CursorSource *)obj_ptr->field_0c;
+    DAT_004c8d6c = (struct CursorSource *)obj_ptr->ride;
     resA = (struct ResA *)DAT_004c8d6c;
     resA->flags_1c |= 0x400;
 

@@ -468,17 +468,13 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
 // FUNCTION: LEGOLAND 0x004557c0
 LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
     RECT box;
+    RECT frame;
     struct TextCell *cell;
     HDC hdc;
     HGDIOBJ old_font;
     unsigned int block_color;
     int text_h;
     int cx;
-    int x4;
-    int y4;
-    int w;
-    int h;
-    int x8;
 
     box.left = 0;
     box.top = 0;
@@ -511,14 +507,18 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
         } else if (cx > (int)(unsigned int)lpConfig->screen_width) {
             cx = (unsigned int)lpConfig->screen_width;
         }
-        box.right = box.right - box.left;
-        box.left = cx - (box.right >> 1);
-        if (box.left < 0) {
-            box.left = 0;
-        } else if ((((box.right + 1) >> 1) + cx) >= (int)(unsigned int)lpConfig->screen_width) {
-            box.left = (unsigned int)lpConfig->screen_width - box.right;
+        {
+            int width = box.right - box.left;
+            int right;
+            box.left = cx - (width >> 1);
+            right = ((width + 1) >> 1) + cx;
+            if (box.left < 0) {
+                box.left = 0;
+            } else if (right >= (int)(unsigned int)lpConfig->screen_width) {
+                box.left = (unsigned int)lpConfig->screen_width - width;
+            }
+            box.right = width + box.left;
         }
-        box.right = box.right + box.left;
         if (rect->top < (box.bottom - box.top) + 8) {
             box.top = rect->bottom + 6;
             box.bottom = text_h + box.top;
@@ -526,16 +526,15 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
             box.bottom = rect->top + -6;
             box.top = box.bottom - text_h;
         }
-        y4 = box.bottom + 4;
-        x4 = box.top + -4;
-        h = y4 - x4;
-        w = box.right + 4;
-        x8 = box.left + -4;
-        RenderBlock(box.left + -3, box.top + -3, w - x8, h + -1, block_color);
-        RenderBlock(x8, x4, w - x8, 1, 0);
-        RenderBlock(x8, y4, w - x8, 1, 0);
-        RenderBlock(x8, x4, 1, h, 0);
-        RenderBlock(w, x4, 1, h, 0);
+        frame.left = box.left - 4;
+        frame.top = box.top - 4;
+        frame.right = box.right + 4;
+        frame.bottom = box.bottom + 4;
+        RenderBlock(frame.left + 1, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1, block_color);
+        RenderBlock(frame.left, frame.top, frame.right - frame.left, 1, 0);
+        RenderBlock(frame.left, frame.bottom, frame.right - frame.left, 1, 0);
+        RenderBlock(frame.left, frame.top, 1, frame.bottom - frame.top, 0);
+        RenderBlock(frame.right, frame.top, 1, frame.bottom - frame.top, 0);
         PrintTextCell(cell, box.left, box.top);
     }
 }
@@ -709,6 +708,7 @@ void FlushTextCells(int evict_all) {
 // FUNCTION: LEGOLAND 0x00455fc0
 void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
     RECT box;
+    RECT frame;
     HDC hdc;
     HDC ddhdc;
     HGDIOBJ old_font;
@@ -718,10 +718,6 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
     int text_h;
     int cx;
     int half_mood;
-    int x4;
-    int y4;
-    int w;
-    int h;
 
     box.right = 0;
     box.bottom = 0;
@@ -758,15 +754,19 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
         } else if ((int)(unsigned int)lpConfig->screen_width < cx) {
             cx = (unsigned int)lpConfig->screen_width;
         }
-        box.right = box.right - box.left;
-        box.left = cx - (box.right >> 1);
-        if (box.left < 0) {
-            box.left = 0;
-        } else if ((int)(unsigned int)lpConfig->screen_width <= (((box.right + 1) >> 1) + cx + mood_pad)) {
-            box.left = ((unsigned int)lpConfig->screen_width - box.right) - mood_pad;
+        {
+            int width = box.right - box.left;
+            int right;
+            box.left = cx - (width >> 1);
+            right = ((width + 1) >> 1) + cx + mood_pad;
+            if (box.left < 0) {
+                box.left = 0;
+            } else if (right >= (int)(unsigned int)lpConfig->screen_width) {
+                box.left = ((unsigned int)lpConfig->screen_width - width) - mood_pad;
+            }
+            half_mood = mood_pad / 2;
+            box.right = half_mood + width + box.left;
         }
-        half_mood = mood_pad / 2;
-        box.right = half_mood + box.right + box.left;
         if (rect->top < (box.bottom - box.top) + 8) {
             box.top = rect->bottom + 6;
             box.bottom = text_h + box.top;
@@ -774,18 +774,17 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
             box.bottom = rect->top + -6;
             box.top = box.bottom - text_h;
         }
-        y4 = box.bottom + 4;
-        x4 = box.top + -4;
-        h = y4 - x4;
-        w = box.right + 4;
-        text_h = box.left + -4;
-        RenderBlock(box.left + -3, box.top + -3, w - text_h, h + -1, block_color);
-        RenderBlock(text_h, x4, w - text_h, 1, 0);
-        RenderBlock(text_h, y4, w - text_h, 1, 0);
-        RenderBlock(text_h, x4, 1, h, 0);
-        RenderBlock(w, x4, 1, h, 0);
+        frame.left = box.left - 4;
+        frame.top = box.top - 4;
+        frame.right = box.right + 4;
+        frame.bottom = box.bottom + 4;
+        RenderBlock(frame.left + 1, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1, block_color);
+        RenderBlock(frame.left, frame.top, frame.right - frame.left, 1, 0);
+        RenderBlock(frame.left, frame.bottom, frame.right - frame.left, 1, 0);
+        RenderBlock(frame.left, frame.top, 1, frame.bottom - frame.top, 0);
+        RenderBlock(frame.right, frame.top, 1, frame.bottom - frame.top, 0);
         if (mood != 0) {
-            PrintSprite((&DAT_008139e0)[mood], w - half_mood, (x4 + y4) / 2 + -0x14, 0, 0);
+            PrintSprite((&DAT_008139e0)[mood], frame.right - half_mood, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);
         }
         PushRenderingStatusAndUnlockVideoSurface();
         ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->GetDC((LPDIRECTDRAWSURFACE)renderEngine, &ddhdc);

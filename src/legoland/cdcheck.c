@@ -172,7 +172,8 @@ int FUN_00451280(HANDLE h, int drive) {
         regs.reg_EAX = 0x440d;
         regs.reg_ECX = 0x848;
         if (!DeviceIoControl(h, 1, &regs, sizeof(regs), &regs, sizeof(regs), (LPDWORD)&drive, NULL) || (regs.reg_Flags & 1)) {
-            return 0;
+            result = 0;
+            break;
         }
         i++;
         result = 1;

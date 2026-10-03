@@ -691,7 +691,7 @@ int FUN_00483c20(Bloke *bloke, Point pos) {
     int state;
 
     chance = (bloke->flags & 2) ? 0 : 20;
-    state = bloke->person->field_8;
+    state = bloke->person->character;
     if (state != 2 && state != 3) {
         if (HitPathEdge(bloke, pos.x, pos.y) != 0 || HitObstacle(bloke, pos.x, pos.y) != 0 || (rand() & 0x3ff) < chance) {
             unsigned char dir = rand() & 7;

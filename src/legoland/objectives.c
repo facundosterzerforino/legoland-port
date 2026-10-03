@@ -1127,9 +1127,9 @@ int FUN_00469c80(struct MapRectArg *arg) {
     struct SweepInstance *next;
     RECT rect;
     struct SweepInstance *current;
-    char tile_x;
+    short tile_x;
     struct ObjClass *cls;
-    char tile_y;
+    short tile_y;
     struct Cursor saved;
     struct Point point;
     struct Sample *sample;

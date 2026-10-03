@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "globals.h"
 #include "legoland.h"
 
@@ -70,22 +71,17 @@ void FreeAllCarouselNodes(void) {
 struct CarouselNode *FindCarouselNode(unsigned short *param_1) {
     struct CarouselNode *node;
 
-    if (CarouselNodeList != NULL) {
-        node = CarouselNodeList;
-        if (*param_1 == CarouselNodeList->id) {
-            return CarouselNodeList;
-        }
-        while (1) {
-            node = node->next;
-            if (node == NULL) {
-                break;
-            }
-            if (*param_1 == node->id) {
-                return node;
-            }
+    node = CarouselNodeList;
+    if (node == NULL) {
+        return NULL;
+    }
+    while (memcmp(&node->id, param_1, sizeof(node->id)) != 0) {
+        node = node->next;
+        if (node == NULL) {
+            return NULL;
         }
     }
-    return NULL;
+    return node;
 }
 
 // FUNCTION: LEGOLAND 0x0042bc90

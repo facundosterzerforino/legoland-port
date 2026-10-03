@@ -1824,7 +1824,7 @@ void SaveGardeners(void) {
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
-        rec.person_8 = worker->person->field_8;
+        rec.person_8 = worker->person->character;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
@@ -1890,7 +1890,7 @@ void LoadGardeners(void) {
         worker->person = malloc(sizeof(Person));
         AddPersonToList(worker->person);
         worker->person->bloke = worker;
-        worker->person->field_8 = rec.person_8;
+        worker->person->character = rec.person_8;
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;
@@ -1967,7 +1967,7 @@ void SaveMechanics(void) {
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
-        rec.person_8 = worker->person->field_8;
+        rec.person_8 = worker->person->character;
         rec.scale = worker->person->scale;
         rec.screen = worker->person->screen;
         rec.rotation = worker->person->rotation;
@@ -2033,7 +2033,7 @@ void LoadMechanics(void) {
         worker->person = malloc(sizeof(Person));
         AddPersonToList(worker->person);
         worker->person->bloke = worker;
-        worker->person->field_8 = rec.person_8;
+        worker->person->character = rec.person_8;
         worker->person->scale = rec.scale;
         worker->person->screen = rec.screen;
         worker->person->rotation = rec.rotation;

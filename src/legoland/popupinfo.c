@@ -518,7 +518,6 @@ void FUN_004718c0(int param_1) {
 
 // FUNCTION: LEGOLAND 0x00471950
 LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsigned int param_5) {
-    short sVar1;
     int iVar2;
     int x;
     int y;
@@ -529,7 +528,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     uVar3 = t.data.value & 0xffff;
     x = uVar3 & 0xff;
     y = uVar3 >> 8;
-    if ((x < 0) || (lpConfig->width <= x) || (y < 0) || (lpConfig->height <= y)) {
+    if ((x < 0) || (x >= lpConfig->width) || (y < 0) || (y >= lpConfig->height)) {
         iVar4 = NULL;
     } else {
         iVar4 = (unsigned char *)GameMap[y] + x * 0x14;
@@ -543,73 +542,71 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     DAT_007fdec0.type = t.type;
     DAT_007fdec0.ptr = t.ptr;
     DAT_007fdec0.data.value = t.data.value;
-    if (t.type < 0x308) {
-        if (t.type == 0x307) {
-            if (*(short *)((char *)t.ptr + 0xc) != 5) {
-                PlayInstanceOfSample(DAT_004b92e4, 0, 1, 0);
-                PickUpWorker(0x307, t.ptr);
-                ResetInfoStruct();
-                return;
-            }
-        } else if (t.type == 0x103) {
-            if (t.ptr == NULL) {
-                DAT_007fdfa0 = 1;
-                DAT_007fdfa8 = 1;
-                return;
-            }
-            if (((unsigned int)t.ptr != PathControlHandle) && ((unsigned int)t.ptr != Entrance1Handle)) {
-                DAT_007fdf7c = *(unsigned int *)((char *)t.ptr + 0xc);
-                DAT_007fdf84 = iVar4;
-                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == PottingShedHandle) {
-                    DAT_007fdfa0 = 0;
-                    DAT_007fdf9c = 10;
-                    param_4 = iVar4[4];
-                    param_5 = iVar4[5];
-                    if (BuyGardener() == 0) {
-                        return;
-                    }
-                    GenerateGardener(&param_4, 1);
+    switch (t.type) {
+    case 0x307:
+        if (*(short *)((char *)t.ptr + 0xc) != 5) {
+            PlayInstanceOfSample(DAT_004b92e4, 0, 1, 0);
+            PickUpWorker(0x307, t.ptr);
+        }
+        break;
+    case 0x103:
+        if (t.ptr == NULL) {
+            return;
+        }
+        if (((unsigned int)t.ptr != PathControlHandle) && ((unsigned int)t.ptr != Entrance1Handle)) {
+            DAT_007fdf7c = *(unsigned int *)((char *)t.ptr + 0xc);
+            DAT_007fdf84 = iVar4;
+            if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == PottingShedHandle) {
+                DAT_007fdfa0 = 0;
+                DAT_007fdf9c = 10;
+                param_4 = iVar4[4];
+                (&param_4)[1] = iVar4[5];
+                if (BuyGardener() == 0) {
                     return;
                 }
-                if (*(unsigned int *)(DAT_007fdf7c + 0xc4) != MechanicsHutHandle) {
-                    DAT_007fdf9c = 0x103;
-                    return;
-                }
+                GenerateGardener((int *)&param_4, 1);
+                return;
+            }
+            if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == MechanicsHutHandle) {
                 DAT_007fdfa0 = 0;
                 DAT_007fdf9c = 0x14;
                 param_4 = iVar4[4];
-                param_5 = iVar4[5];
+                (&param_4)[1] = iVar4[5];
                 if (BuyMechanic() == 0) {
                     return;
                 }
-                GenerateMechanic(&param_4, 1);
+                GenerateMechanic((int *)&param_4, 1);
                 return;
             }
-        } else if (t.type == 0x306) {
-            DAT_007fdf9c = t.type;
-            DAT_007fdf8c = t.ptr;
-            DAT_007fdf90 = *(unsigned int *)(*(int *)((char *)t.ptr + 4) + 0x1c);
-            DAT_007fdf94 = *(unsigned int *)(*(int *)((char *)t.ptr + 4) + 0x20);
+            DAT_007fdf9c = 0x103;
             return;
         }
-    } else if ((t.type == 0x308) && (sVar1 = *(short *)((char *)t.ptr + 0xc), sVar1 != 5)) {
-        if (((sVar1 == 0x13) && (0x6a < *(unsigned char *)((char *)t.ptr + 0x60))) ||
-            ((sVar1 == 0x16) && (0x6a < *(unsigned char *)((char *)t.ptr + 0x60)))) {
-            iVar4 = *(unsigned char **)((char *)t.ptr + 0x50);
-            iVar5 = *(int *)(iVar4 + 8);
-            if ((iVar5 < 0) ||
-                (((int)(unsigned int)lpConfig->width <= iVar5 ||
-                     (iVar2 = *(int *)(iVar4 + 0xc), iVar2 < 0)) ||
-                    ((int)(unsigned int)lpConfig->height <= iVar2))) {
-                iVar5 = 0;
-            } else {
-                iVar5 = (int)GameMap[iVar2] + iVar5 * 0x14;
+        break;
+    case 0x306:
+        DAT_007fdf9c = t.type;
+        DAT_007fdf8c = t.ptr;
+        DAT_007fdf90 = *(unsigned int *)(*(int *)((char *)t.ptr + 4) + 0x1c);
+        DAT_007fdf94 = *(unsigned int *)(*(int *)((char *)t.ptr + 4) + 0x20);
+        return;
+    case 0x308:
+        if (t.ptr->action != 5) {
+            if (((t.ptr->action == 0x13) && (t.ptr->param_action >= 0x6b)) ||
+                ((t.ptr->action == 0x16) && (t.ptr->param_action >= 0x6b))) {
+                iVar4 = (unsigned char *)t.ptr->order;
+                iVar5 = *(int *)(iVar4 + 8);
+                if ((iVar5 < 0) || (iVar5 >= (int)(unsigned int)lpConfig->width || (iVar2 = *(int *)(iVar4 + 0xc), iVar2 < 0)) ||
+                    (iVar2 >= (int)(unsigned int)lpConfig->height)) {
+                    iVar5 = 0;
+                } else {
+                    iVar5 = (int)GameMap[iVar2] + iVar5 * 0x14;
+                }
+                *(unsigned short *)(iVar5 + 0xc) = *(unsigned short *)(iVar5 + 0xc) & 0xbfff;
+                FreeMechanicWorkOrder((WorkOrder *)iVar4);
             }
-            *(unsigned short *)(iVar5 + 0xc) = *(unsigned short *)(iVar5 + 0xc) & 0xbfff;
-            FreeMechanicWorkOrder(iVar4);
+            PlayInstanceOfSample(DAT_004b9308, 0, 1, 0);
+            PickUpWorker(0x308, t.ptr);
         }
-        PlayInstanceOfSample(DAT_004b9308, 0, 1, 0);
-        PickUpWorker(0x308, t.ptr);
+        break;
     }
     ResetInfoStruct();
 }
@@ -644,48 +641,41 @@ void AddNewObjectIcon(struct NewObjInfo *param_1) {
 
 // FUNCTION: LEGOLAND 0x00471ca0
 void RemoveNewObject(void *param) {
-    struct Sprite **puVar2;
-    int iVar3;
-    int iVar4;
-    int iVar5;
-    struct Sprite **puVar6;
-    int iVar7;
+    struct Sprite **q;
+    int j;
+    int k;
+    int n;
 
-    if (0 < (int)NewObjects.count) {
-        puVar6 = NewObjects.sprites;
-        iVar5 = NewObjects.count;
-        iVar7 = 1;
-        do {
-            if (param == ((void **)puVar6)[-0x14]) {
-                if (*puVar6 != NULL) {
-                    KillSprite(*puVar6);
-                    *puVar6 = NULL;
-                    iVar5 = NewObjects.count;
+    n = (int)NewObjects.count;
+    if (0 < n) {
+        for (j = 0; j < n; j++) {
+            if (param == NewObjects.objs[j]) {
+                if (NewObjects.sprites[j] != NULL) {
+                    KillSprite(NewObjects.sprites[j]);
+                    NewObjects.sprites[j] = NULL;
+                    n = (int)NewObjects.count;
                 }
-                puVar2 = puVar6;
-                iVar3 = iVar7;
-                iVar4 = iVar5;
-                if (iVar7 < iVar5) {
+                k = j + 1;
+                if (k < n) {
+                    q = &NewObjects.sprites[j];
                     do {
-                        iVar3 = iVar3 + 1;
-                        *puVar2 = puVar2[1];
-                        ((void **)puVar2)[-0x14] = ((void **)puVar2)[-0x13];
-                        puVar2 = puVar2 + 1;
-                        iVar4 = NewObjects.count;
-                    } while (iVar3 < NewObjects.count);
+                        k++;
+                        q[0] = q[1];
+                        ((void **)q)[-0x14] = ((void **)q)[-0x13];
+                        q++;
+                        n = (int)NewObjects.count;
+                    } while (k < n);
                 }
-                iVar5 = iVar4 + -1;
-                if (iVar5 <= NewObjects.current) {
-                    NewObjects.current = iVar4 + -2;
+                n--;
+                if (NewObjects.current >= n) {
+                    NewObjects.current = n - 1;
                 }
-                NewObjects.count = iVar5;
-                if ((iVar5 == 0) && (DAT_007fdfa0 == 2)) {
-                    DAT_007fdfa0 = 0;
+                NewObjects.count = n;
+                if ((n == 0) && (DAT_007fdfa0 == 2)) {
+                    DAT_007fdfa0 = n;
                 }
             }
-            puVar6 = puVar6 + 1;
-            iVar7 = iVar7 + 1;
-        } while (iVar7 + -1 < iVar5);
+        }
     }
 }
 
@@ -711,8 +701,7 @@ void FUN_00471d90(void) {
     int uVar4;
     int iVar5;
     int iVar6;
-    int iVar7;
-    int iVar8;
+    RECT rc;
     struct PrintCtx ctx;
     char local_14[20];
 
@@ -740,13 +729,19 @@ void FUN_00471d90(void) {
     CBCloseIcon->y = sVar2;
     str = GetString(0xa2);
     sprintf(local_14, (char *)PercentSFormat, str);
-    iVar7 = PopUpInfoX + 0xc;
-    iVar8 = iVar1 + 6;
-    FUN_00455e50(local_14, iVar7, iVar8, (PopUpInfoX + 0x86 + iVar5) - iVar7, (iVar1 + 0x21) - iVar8, 1, 5, 0xff0000, 0xffffff);
-    if ((CBCloseIcon->x + 0x24 < (int)MousePos.x) || ((int)MousePos.x < PopUpInfoOkIcon->x)) {
+    rc.left = PopUpInfoX + 0xc;
+    rc.top = iVar1 + 6;
+    rc.right = rc.left + 0x7a + iVar5;
+    rc.bottom = rc.top + 0x1b;
+    FUN_00455e50(local_14, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
+    rc.left = PopUpInfoOkIcon->x;
+    rc.top = iVar1;
+    rc.right = CBCloseIcon->x + 0x24;
+    rc.bottom = iVar1 + 0x1b;
+    if ((rc.right < (int)MousePos.x) || ((int)MousePos.x < rc.left)) {
         SetPopUpOkCloseIconSprites();
     }
-    if ((iVar1 + 0x1b < (int)MousePos.y) || ((int)MousePos.y < iVar1)) {
+    if ((rc.bottom < (int)MousePos.y) || ((int)MousePos.y < rc.top)) {
         SetPopUpOkCloseIconSprites();
     }
     FUN_00471470();

@@ -19,9 +19,9 @@ struct JungleRide {
     /* 0x010 */ unsigned int next_y;
     /* 0x014 */ unsigned int screen_x;
     /* 0x018 */ unsigned int screen_y;
-    /* 0x01c */ int field_1c[0xa0];
-    /* 0x29c */ unsigned int field_29c[0x50];
-    /* 0x3dc */ unsigned int field_3dc;
+    /* 0x01c */ int step_offsets[0xa0];
+    /* 0x29c */ unsigned int step_frames[0x50];
+    /* 0x3dc */ unsigned int from_dir;
     /* 0x3e0 */ unsigned int field_3e0;
     /* 0x3e4 */ unsigned int field_3e4;
     /* 0x3e8 */ struct Bloke *blokes[3];
@@ -33,7 +33,7 @@ struct JungleScore {
     /* 0x02 */ TileId start;
     /* 0x04 */ TileId end;
     /* 0x06 */ unsigned char pad_6[2];
-    /* 0x08 */ unsigned int field_8;
+    /* 0x08 */ unsigned int connected;
     /* 0x0c */ unsigned int field_c;
     /* 0x10 */ unsigned int field_10;
     /* 0x14 */ unsigned int bloke_count;

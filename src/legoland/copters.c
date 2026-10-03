@@ -43,7 +43,7 @@ struct CopterRide {
     int field_18;
     unsigned int field_1c;
     unsigned char pad_20[0x64 - 0x20];
-    struct CopterModel *field_64;
+    struct CopterModel *layer;
 };
 
 struct CopterEditObject {
@@ -53,8 +53,8 @@ struct CopterEditObject {
 
 // Same object as CopterNode, viewed with the two id bytes split apart.
 struct CopterSfxNode {
-    /* 0x00 */ unsigned char field_0;
-    /* 0x01 */ unsigned char field_1;
+    /* 0x00 */ unsigned char tile_x;
+    /* 0x01 */ unsigned char tile_y;
     /* 0x02 */ unsigned char field_2;
     /* 0x03 */ unsigned char field_3;
     /* 0x04 */ struct CopterNode *next;
@@ -183,12 +183,17 @@ void CoptersRemoveAllNodes(void) {
 struct CopterNode *CoptersFindNode(struct CopterSource *src) {
     struct CopterNode *node;
 
-    for (node = CopterNodeList; node != NULL; node = node->next) {
-        if (src->field_0 == node->field_0) {
-            return node;
+    node = CopterNodeList;
+    if (node == NULL) {
+        return NULL;
+    }
+    while (memcmp(&node->field_0, &src->field_0, sizeof(node->field_0)) != 0) {
+        node = node->next;
+        if (node == NULL) {
+            return NULL;
         }
     }
-    return NULL;
+    return node;
 }
 
 // FUNCTION: LEGOLAND 0x00403d30
@@ -234,7 +239,7 @@ void CoptersLoad(struct CopterEditObject *param_1) {
     ride = param_1->field_c;
     ActiveCopterRide = ride;
     ride->field_1c |= 0x420;
-    CopterModelLayers = ((struct CopterRide *)ActiveCopterRide)->field_64;
+    CopterModelLayers = ((struct CopterRide *)ActiveCopterRide)->layer;
     ((struct CopterModel *)CopterModelLayers)->field_10 |= 0x2000;
     for (i = 0; i < 10; i++) {
         CopterModelSprites[i] = LoadSprite(Copters_LLSNames[i], 1);
@@ -262,8 +267,8 @@ void CoptersInitNode(struct CopterNode *node) {
     struct LLS *lls;
     char frame;
 
-    node->layer[1].field_8 = 10;
-    node->layer[1].field_c = 3;
+    node->layer[1].idle_layer = 10;
+    node->layer[1].active_layer = 3;
     node->layer[1].field_10 = 2;
     node->layer[1].field_14 = 7;
     node->layer[1].flags = 0;
@@ -276,8 +281,8 @@ void CoptersInitNode(struct CopterNode *node) {
             node->layer[1].frame = frame - 1;
         }
     }
-    node->layer[0].field_8 = 2;
-    node->layer[0].field_c = 1;
+    node->layer[0].idle_layer = 2;
+    node->layer[0].active_layer = 1;
     node->layer[0].field_10 = 0;
     node->layer[0].field_14 = 6;
     node->layer[0].flags = 0;
@@ -290,8 +295,8 @@ void CoptersInitNode(struct CopterNode *node) {
             node->layer[0].frame = frame - 1;
         }
     }
-    node->layer[2].field_c = 0xb;
-    node->layer[2].field_8 = 4;
+    node->layer[2].active_layer = 0xb;
+    node->layer[2].idle_layer = 4;
     node->layer[2].field_10 = 4;
     node->layer[2].field_14 = 8;
     node->layer[2].flags = 0;
@@ -304,8 +309,8 @@ void CoptersInitNode(struct CopterNode *node) {
             node->layer[2].frame = frame - 1;
         }
     }
-    node->layer[3].field_c = 6;
-    node->layer[3].field_8 = 5;
+    node->layer[3].active_layer = 6;
+    node->layer[3].idle_layer = 5;
     node->layer[3].field_10 = 3;
     node->layer[3].field_14 = 5;
     node->layer[3].flags = 0;
@@ -318,8 +323,8 @@ void CoptersInitNode(struct CopterNode *node) {
             node->layer[3].frame = frame - 1;
         }
     }
-    node->layer[4].field_8 = 8;
-    node->layer[4].field_c = 7;
+    node->layer[4].idle_layer = 8;
+    node->layer[4].active_layer = 7;
     node->layer[4].field_10 = 1;
     node->layer[4].field_14 = 9;
     node->layer[4].flags = 0;
@@ -384,13 +389,13 @@ void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3
 
     layer = &node->layer[index];
     if (layer->flags & 1) {
-        b = layer->field_c;
+        b = layer->active_layer;
         a = layer->field_14;
     } else {
-        b = layer->field_8;
+        b = layer->idle_layer;
         a = layer->field_10;
     }
-    lls = GetLLSForLayer(CopterModelLayers, layer->field_8);
+    lls = GetLLSForLayer(CopterModelLayers, layer->idle_layer);
     if (lls != NULL) {
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
@@ -400,7 +405,7 @@ void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
     }
-    lls = GetLLSForLayer(CopterModelLayers, layer->field_c);
+    lls = GetLLSForLayer(CopterModelLayers, layer->active_layer);
     if (lls != NULL) {
         LLSStop((unsigned int)lls);
         LLSSetFrame(lls, 0);
@@ -496,11 +501,11 @@ void CoptersSetEditMode(void) {
 unsigned int *FUN_00404490(struct CopterEditObject *editobj, unsigned short uid) {
     struct CopterRide *ride = editobj->field_c;
 
-    DAT_004c1170 = (int)ride->field_64;
+    DAT_004c1170 = (int)ride->layer;
     DAT_004c1174 = ride->field_14;
     DAT_004c1178 = ride->field_18;
     DAT_004c117c = uid;
-    ride->field_64->field_10 |= 0x2000;
+    ride->layer->field_10 |= 0x2000;
 
     if (CoptersFindNode((struct CopterSource *)&uid) != 0) {
         HideLayer(CopterModelLayers, 1);
@@ -531,8 +536,8 @@ void CoptersRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     }
     StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
-    x = node->field_0;
-    y = node->field_1;
+    x = node->tile_x;
+    y = node->tile_y;
     src.type = 2;
     src.x = x;
     src.y = y;
@@ -679,8 +684,8 @@ void FUN_004048b0(struct CopterSfxNode *node) {
     node->layer[3].frame = 0;
     node->layer[4].frame = 0;
 
-    params.x = node->field_0;
-    params.y = node->field_1;
+    params.x = node->tile_x;
+    params.y = node->tile_y;
     params.field_0 = 2;
 
     PlayInstanceOfSample(fx->field_8, 0, 1, &params);
@@ -716,9 +721,9 @@ void FUN_004049a0(struct CopterNode *node, int param) {
     n->layer[4].rider = 0;
     n->field_8 &= ~0x4001u;
     if (param == 0) {
-        params.x = n->field_0;
+        params.x = n->tile_x;
         params.field_0 = 2;
-        params.y = n->field_1;
+        params.y = n->tile_y;
         UnSourceAndFadeAllSamplesFromSource(&params, -200);
         PlayInstanceOfSample(fx->field_20, 0, 1, &params);
     }

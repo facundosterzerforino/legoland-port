@@ -24,15 +24,15 @@
 
 struct DSCursorSource {
     /* 0x00 */ unsigned char pad_0[0x1c];
-    /* 0x1c */ unsigned int field_1c;
+    /* 0x1c */ unsigned int flags;
     /* 0x20 */ unsigned char pad_20[0x3c - 0x20];
-    /* 0x3c */ int field_3c;
-    /* 0x40 */ int field_40;
+    /* 0x3c */ int footprint_x0;
+    /* 0x40 */ int footprint_y0;
 };
 
 struct DSHead {
     /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct DSCursorSource *field_c;
+    /* 0x0c */ struct DSCursorSource *ride;
 };
 
 struct Node8 {
@@ -50,7 +50,7 @@ struct DSCarSub {
     unsigned int field_14;
     unsigned int field_18;
     unsigned char pad_1c[72];
-    struct DSCarInner *field_64;
+    struct DSCarInner *layer;
 };
 
 struct DSCarInner {
@@ -79,9 +79,9 @@ struct DSSampleConfig {
 
 struct DSObjClass {
     /* 0x00 */ unsigned char pad_0[0x26];
-    /* 0x26 */ short field_26;
+    /* 0x26 */ short cost;
     /* 0x28 */ unsigned char pad_28[0xc4 - 0x28];
-    /* 0xc4 */ unsigned int field_c4;
+    /* 0xc4 */ unsigned int element;
 };
 
 struct DSBlokeNode {
@@ -211,14 +211,14 @@ void FUN_00405310(TileId tile) {
 void LoadDrivingSchoolResources(struct DSHead *param_1) {
     unsigned int lls;
 
-    DrivingSchoolRide = param_1->field_c;
+    DrivingSchoolRide = param_1->ride;
     if (LLIDB_FindElement("DSCHOOL MAPPING", (unsigned int *)&param_1, 0) == 0) {
         DSchoolMappingData = LLIDB_LoadData(param_1);
     }
     if (LLIDB_FindElement("DSCHOOL BLUE CAR", (unsigned int *)&param_1, 0) == 0) {
         DSchoolBlueCarData = LLIDB_LoadData(param_1);
     }
-    DrivingSchoolRide->field_1c |= 0x420;
+    DrivingSchoolRide->flags |= 0x420;
     Load_FXList(DRIVING_SCHOOL_SFX, 6);
     // STRING: LEGOLAND 0x004b4524
     DSchoolMatteSprite = LoadSprite("DSchool Matte.lls", 1);
@@ -340,7 +340,7 @@ void DrivingSchoolAddObject(unsigned int param_1, int *coords) {
 
 // FUNCTION: LEGOLAND 0x00405740
 void FUN_00405740(struct DSHead *param_1, unsigned int param_2, unsigned int param_3) {
-    struct DSCursorSource *src = param_1->field_c;
+    struct DSCursorSource *src = param_1->ride;
     struct DSCursorSource *c694;
     unsigned int mapx;
     unsigned int mapy;
@@ -356,20 +356,20 @@ void FUN_00405740(struct DSHead *param_1, unsigned int param_2, unsigned int par
     DAT_0082f760.field_1830 = 0;
     mapy = EditCursor.tile_y;
     DAT_0082f760.field_1828 = 0x4108;
-    DAT_0082f760.tile_x = c694->field_3c + mapx;
-    DAT_0082f760.tile_y = c694->field_40 + mapy;
+    DAT_0082f760.tile_x = c694->footprint_x0 + mapx;
+    DAT_0082f760.tile_y = c694->footprint_y0 + mapy;
 
     memcpy(DAT_0082c6e0.field_1414, DAT_004b4458, 20);
     DAT_0082c6e0.field_1830 = 0;
     DAT_0082c6e0.field_1828 = 0x4208;
-    DAT_0082c6e0.tile_x = c694->field_3c + mapx;
-    DAT_0082c6e0.tile_y = c694->field_40 + mapy;
+    DAT_0082c6e0.tile_x = c694->footprint_x0 + mapx;
+    DAT_0082c6e0.tile_y = c694->footprint_y0 + mapy;
 
     memcpy(DAT_0082df20.field_1414, DAT_004b4470, 20);
     DAT_0082df20.field_1830 = 0;
     DAT_0082df20.field_1828 = 0x5008;
-    DAT_0082df20.tile_x = c694->field_3c + mapx;
-    DAT_0082df20.tile_y = c694->field_40 + mapy;
+    DAT_0082df20.tile_x = c694->footprint_x0 + mapx;
+    DAT_0082df20.tile_y = c694->footprint_y0 + mapy;
 
     ValidateCursor(&DAT_0082df20, (unsigned int)src);
     ValidateCursor(&DAT_0082c6e0, (unsigned int)src);
@@ -437,17 +437,17 @@ void DrivingSchoolRemoveObject(Element *obj, TileId tile, unsigned int param_3) 
             if (queue->field_14 & 0x10) {
                 queue->field_14 &= 0xef;
                 FUN_00413650(queue->id, queue->x, queue->y);
-                AddBricks(((struct DSObjClass *)ZebraCrossingRide)->field_26);
+                AddBricks(((struct DSObjClass *)ZebraCrossingRide)->cost);
             }
             DAT_0082f760.tile_x = queue->x;
             DAT_0082f760.tile_y = queue->y;
-            StandardRemoveObject((Element *)((struct DSObjClass *)DAT_0082c684)->field_c4, *(TileId *)&queue->id, &DAT_0082f760);
+            StandardRemoveObject((Element *)((struct DSObjClass *)DAT_0082c684)->element, *(TileId *)&queue->id, &DAT_0082f760);
             FUN_004133e0(queue->x, queue->y);
         }
         queue = next;
     }
 
-    AddBricks(((struct DSObjClass *)DAT_0082c684)->field_26 * 5);
+    AddBricks(((struct DSObjClass *)DAT_0082c684)->cost * 5);
 
     while (blokes != NULL) {
         nextBloke = blokes->next;
@@ -463,14 +463,14 @@ void DrivingSchoolRemoveObject(Element *obj, TileId tile, unsigned int param_3) 
 // FUNCTION: LEGOLAND 0x00405ad0
 struct RideSpriteInfo *GetDrivingSchoolSpriteInfo(struct DSCarLayer *arg1, unsigned short arg2) {
     struct DSCarSub *sub = arg1->field_c;
-    struct DSCarInner *inner = sub->field_64;
+    struct DSCarInner *inner = sub->layer;
 
     RideSpriteInfoBuffer.sprite = inner;
     RideSpriteInfoBuffer.x = sub->field_14;
     RideSpriteInfoBuffer.y = sub->field_18;
     RideSpriteInfoBuffer.id = arg2;
 
-    inner = sub->field_64;
+    inner = sub->layer;
     inner->field_10 |= 0x2000;
 
     return &RideSpriteInfoBuffer;

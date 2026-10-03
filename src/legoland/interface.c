@@ -32,11 +32,11 @@ struct ProfileObj {
 
 struct InterfaceObj {
     unsigned char pad_0[0x2c];
-    void *field_2c;
+    void *event_handler;
     unsigned char pad_30[0x34 - 0x30];
-    unsigned int field_34;
-    char *field_38;
-    unsigned int field_3c;
+    unsigned int flags;
+    char *string;
+    unsigned int string_id;
 };
 
 struct ObjectClassInfo {
@@ -55,10 +55,10 @@ struct LLDBElem {
 };
 
 struct MovieHandle {
-    /* 0x00 */ unsigned int field_0;
-    /* 0x04 */ unsigned int field_4;
-    /* 0x08 */ int field_8;
-    /* 0x0c */ int field_c;
+    /* 0x00 */ unsigned int frame_count;
+    /* 0x04 */ unsigned int frame_rate;
+    /* 0x08 */ int width;
+    /* 0x0c */ int height;
     /* 0x10 */ void *file;
     /* 0x14 */ void *frame;
     /* 0x18 */ void *audio_stream;
@@ -90,15 +90,15 @@ struct AviStreamInfo {
 
 struct BuildObject {
     unsigned char pad_0[0x1c];
-    /* 0x1c */ unsigned int field_1c;
+    /* 0x1c */ unsigned int flags;
     unsigned char pad_20[0x58 - 0x20];
-    /* 0x58 */ void *field_58;
-    /* 0x5c */ void *field_5c;
-    /* 0x60 */ void *field_60;
+    /* 0x58 */ void *parent_element;
+    /* 0x5c */ void *theme_element;
+    /* 0x60 */ void *menu_element;
     unsigned char pad_64[0x7c - 0x64];
     /* 0x7c */ char *field_7c;
     unsigned char pad_80[0xc4 - 0x80];
-    /* 0xc4 */ struct ObjectClassInfo *field_c4;
+    /* 0xc4 */ struct ObjectClassInfo *element;
 };
 
 struct PathControlElem {
@@ -359,16 +359,16 @@ void FUN_004748a0(void *a) {
     }
     if (FUN_0046b280() == 0) {
         if (a != NULL) {
-            ((struct InterfaceObj *)ScriptEndIcon)->field_34 |= 0x2002;
+            ((struct InterfaceObj *)ScriptEndIcon)->flags |= 0x2002;
         } else {
-            ((struct InterfaceObj *)ScriptEndIcon)->field_34 &= 0xffffdffd;
+            ((struct InterfaceObj *)ScriptEndIcon)->flags &= 0xffffdffd;
         }
         return;
     }
-    ((struct InterfaceObj *)ScriptEndIcon)->field_34 |= 0x2002;
-    ((struct InterfaceObj *)ScriptEndIcon)->field_2c = (void *)FUN_00474f80;
-    ((struct InterfaceObj *)ScriptEndIcon)->field_3c = 0x8fc;
-    ((struct InterfaceObj *)ScriptEndIcon)->field_38 = GetString(0x8fc);
+    ((struct InterfaceObj *)ScriptEndIcon)->flags |= 0x2002;
+    ((struct InterfaceObj *)ScriptEndIcon)->event_handler = (void *)FUN_00474f80;
+    ((struct InterfaceObj *)ScriptEndIcon)->string_id = 0x8fc;
+    ((struct InterfaceObj *)ScriptEndIcon)->string = GetString(0x8fc);
 }
 
 // FUNCTION: LEGOLAND 0x00474920
@@ -884,11 +884,11 @@ LEGO_EXPORT void InsertChildIntoList(struct BuildObject *param_1) {
     node->flag = 0;
     node->next = NULL;
     while (current != NULL) {
-        if (((struct BuildObject *)current->data)->field_c4 == param_1->field_58) {
+        if (((struct BuildObject *)current->data)->element == param_1->parent_element) {
             prev = current;
             current = current->next;
             while (current != NULL) {
-                if (((struct BuildObject *)node->data)->field_58 != ((struct BuildObject *)current->data)->field_58) {
+                if (((struct BuildObject *)node->data)->parent_element != ((struct BuildObject *)current->data)->parent_element) {
                     break;
                 }
                 if (GetObjCost(node->data) <= GetObjCost(current->data)) {
@@ -961,9 +961,9 @@ LEGO_EXPORT unsigned int ObjectLinkedList(unsigned int *entry) {
             LLIDB_GetElement(i, (struct Element **)&elem);
             if ((elem->flags & 0x13) == 0x13) {
                 obj = elem->obj;
-                if (obj->field_58 == build_elem) {
-                    if ((obj->field_5c == param_elem && obj->field_60 == menu_elem) ||
-                        (obj->field_5c == theme_elem && DAT_004baff8 == 0 && obj->field_60 == menu_elem)) {
+                if (obj->parent_element == build_elem) {
+                    if ((obj->theme_element == param_elem && obj->menu_element == menu_elem) ||
+                        (obj->theme_element == theme_elem && DAT_004baff8 == 0 && obj->menu_element == menu_elem)) {
                         FUN_004755c0(obj);
                         matched++;
                     }
@@ -975,7 +975,7 @@ LEGO_EXPORT unsigned int ObjectLinkedList(unsigned int *entry) {
         LLIDB_GetElement(i, (struct Element **)&elem);
         if ((elem->flags & 0x13) == 0x13) {
             obj = elem->obj;
-            if (obj->field_5c == param_elem && obj->field_58 != build_elem && obj->field_58 != NULL) {
+            if (obj->theme_element == param_elem && obj->parent_element != build_elem && obj->parent_element != NULL) {
                 InsertChildIntoList(obj);
             }
         }
@@ -1056,7 +1056,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
             y = y + 0x42;
             ctx = node;
             node = node->next;
-        } else if ((((struct BuildObject *)ctx->data)->field_c4->flags & 8) != 0) {
+        } else if ((((struct BuildObject *)ctx->data)->element->flags & 8) != 0) {
             y -= 10;
             CloseChildrenBar(ctx, param_1, (short)x, (short)y);
             y += 0x1a;
@@ -1177,15 +1177,15 @@ LEGO_EXPORT int RAndDLinkedList(unsigned int *entry) {
             LLIDB_GetElement(i, (struct Element **)&elem);
             if ((elem->flags & 0x10011) == 0x10011) {
                 obj = elem->obj;
-                if (obj->field_58 == build_elem) {
-                    if (obj->field_5c == param_elem && obj->field_60 == menu_elem) {
-                        if ((obj->field_1c & 0xc000000) == 0) {
-                            obj->field_1c |= 0x4000000;
+                if (obj->parent_element == build_elem) {
+                    if (obj->theme_element == param_elem && obj->menu_element == menu_elem) {
+                        if ((obj->flags & 0xc000000) == 0) {
+                            obj->flags |= 0x4000000;
                         }
                         FUN_004755c0(obj);
-                    } else if (obj->field_5c == theme_elem && DAT_004baff8 == 0 && menu_index == 0) {
-                        if ((obj->field_1c & 0xc000000) == 0) {
-                            obj->field_1c |= 0x4000000;
+                    } else if (obj->theme_element == theme_elem && DAT_004baff8 == 0 && menu_index == 0) {
+                        if ((obj->flags & 0xc000000) == 0) {
+                            obj->flags |= 0x4000000;
                         }
                         FUN_004755c0(obj);
                     }
@@ -1197,9 +1197,9 @@ LEGO_EXPORT int RAndDLinkedList(unsigned int *entry) {
         LLIDB_GetElement(i, (struct Element **)&elem);
         if ((elem->flags & 0x10011) == 0x10011) {
             obj = elem->obj;
-            if (obj->field_58 != build_elem && obj->field_58 != NULL && obj->field_5c == param_elem) {
-                if ((obj->field_1c & 0xc000000) == 0) {
-                    obj->field_1c |= 0x4000000;
+            if (obj->parent_element != build_elem && obj->parent_element != NULL && obj->theme_element == param_elem) {
+                if ((obj->flags & 0xc000000) == 0) {
+                    obj->flags |= 0x4000000;
                 }
                 InsertChildIntoList(obj);
             }
@@ -1252,8 +1252,8 @@ void FUN_00475f40(void) {
 
     obj = (struct BuildObject *)EditMode.unk8;
     match = NULL;
-    info = obj->field_c4;
-    if ((obj->field_1c & 0x2000000) != 0) {
+    info = obj->element;
+    if ((obj->flags & 0x2000000) != 0) {
         match = info;
     } else {
         pair = &DAT_004bb0a4[0].elem_name;
@@ -1444,9 +1444,9 @@ void SaveResearchList(void) {
     SaveGameWrite(&count, 4);
     node = ResearchList;
     while (node != NULL) {
-        len = strlen(((struct BuildObject *)node->data)->field_c4->name);
+        len = strlen(((struct BuildObject *)node->data)->element->name);
         SaveGameWrite(&len, 4);
-        SaveGameWrite(((struct BuildObject *)node->data)->field_c4->name, len);
+        SaveGameWrite(((struct BuildObject *)node->data)->element->name, len);
         SaveGameWrite(&node->field_8, 4);
         node = node->next;
     }
@@ -1475,8 +1475,8 @@ void LoadResearchList(void) {
         buf[len] = 0;
         obj = ((struct LLDBElem *)ElemID(buf))->obj;
         node->data = obj;
-        obj->field_1c &= 0xfbffffff;
-        ((struct BuildObject *)node->data)->field_1c |= 0x8000000;
+        obj->flags &= 0xfbffffff;
+        ((struct BuildObject *)node->data)->flags |= 0x8000000;
         SaveGameRead(&node->field_8, 4);
     }
     if (node != NULL) {
@@ -1575,11 +1575,15 @@ struct MovieHandle *OpenAviMovie(const char *filename) {
                     AVIStreamRelease(audio_stream);
                 }
                 AVIFileRelease(file);
+                if (AviOpenCount == 0) {
+                    AVIFileExit();
+                }
+                return NULL;
             } else {
-                handle->field_0 = length;
-                handle->field_4 = rate;
-                handle->field_8 = width;
-                handle->field_c = height;
+                handle->frame_count = length;
+                handle->frame_rate = rate;
+                handle->width = width;
+                handle->height = height;
                 handle->frame = NULL;
                 handle->file = file;
                 handle->audio_stream = audio_stream;
@@ -1660,67 +1664,64 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
     }
     audio = FUN_00476910(handle);
     DAT_004bb4e0.biBitCount = 0x10;
-    DAT_004bb4e0.biWidth = handle->field_8;
-    DAT_004bb4e0.biHeight = handle->field_c;
+    DAT_004bb4e0.biWidth = handle->width;
+    DAT_004bb4e0.biHeight = handle->height;
     DAT_004bb4e0.biSizeImage = DAT_004bb4e0.biHeight * DAT_004bb4e0.biWidth * 2;
     handle->frame = AVIStreamGetFrameOpen(handle->video_stream, &DAT_004bb4e0);
-    if ((int)handle->field_0 > 0) {
-        do {
-            if (param_3 != 0) {
-                if (ProcessSystemEvents() == 0) {
-                    break;
-                }
-                ReadGameButtons();
-                if ((DAT_00813ac4 & 1) != 0) {
-                    break;
-                }
-                if ((DAT_00813ad4 & 7) != 0) {
-                    DAT_00668fb0 = 1;
-                    break;
-                }
-                if ((KeyboardState[0x39] & 0x80) != 0) {
-                    break;
-                }
-            } else {
-                ProcessSystemEvents();
-                if (((KeyboardState[0x1d] | KeyboardState[0x9d]) & 0x80) != 0 && (KeyboardState[0x10] & 0x80) != 0) {
-                    break;
-                }
+    while ((int)target < (int)handle->frame_count) {
+        if (param_3 != 0) {
+            if (ProcessSystemEvents() == 0) {
+                break;
             }
-            if (frame_index == -1) {
-                frame = AVIStreamGetFrame(handle->frame, target);
+            ReadGameButtons();
+            if ((DAT_00813ac4 & 1) != 0) {
+                break;
             }
-            if (frame == NULL) {
-                handle->frame = NULL;
-                return 0;
+            if ((DAT_00813ad4 & 7) != 0) {
+                DAT_00668fb0 = 1;
+                break;
             }
-            PushRenderingStatusAndLockVideoSurface();
-            FUN_00465850(frame);
-            PopRenderingStatus();
-            if (started == 0) {
-                if (audio != 0) {
-                    StartMovieAudio(handle);
-                }
-                started = GetPerformanceTime();
+            if ((KeyboardState[0x39] & 0x80) != 0) {
+                break;
             }
-            RenderingComplete();
-            frame_index = GetPerformanceTime();
-            if ((unsigned int)((frame_index - started) * handle->field_4) / 1000 == target) {
-                frame_index = target + 1;
-                if (frame_index < (int)handle->field_0) {
-                    frame = AVIStreamGetFrame(handle->frame, frame_index);
-                }
-            } else {
-                frame_index = -1;
+        } else {
+            ProcessSystemEvents();
+            if (((KeyboardState[0x1d] | KeyboardState[0x9d]) & 0x80) != 0 && (KeyboardState[0x10] & 0x80) != 0) {
+                break;
             }
-            while (target == prev) {
-                target = (unsigned int)((GetPerformanceTime() - started) * handle->field_4) / 1000;
-            }
+        }
+        if (frame_index == -1) {
+            frame = AVIStreamGetFrame(handle->frame, target);
+        }
+        if (frame == NULL) {
+            handle->frame = NULL;
+            return 0;
+        }
+        PushRenderingStatusAndLockVideoSurface();
+        FUN_00465850(frame);
+        PopRenderingStatus();
+        if (started == 0) {
             if (audio != 0) {
-                FUN_00476d20(target, prev);
+                StartMovieAudio(handle);
             }
-            prev = target;
-        } while ((int)target < (int)handle->field_0);
+            started = GetPerformanceTime();
+        }
+        RenderingComplete();
+        if ((unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000 == target) {
+            frame_index = target + 1;
+            if (frame_index < (int)handle->frame_count) {
+                frame = AVIStreamGetFrame(handle->frame, frame_index);
+            }
+        } else {
+            frame_index = -1;
+        }
+        while (target == prev) {
+            target = (unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000;
+        }
+        if (audio != 0) {
+            FUN_00476d20(target, prev);
+        }
+        prev = target;
     }
     StopMovieAudio();
     do {
@@ -1764,8 +1765,8 @@ int FUN_00476910(struct MovieHandle *handle) {
         DAT_00668ee0 = 0;
         DAT_00668f9c = 0;
         DAT_00668f50 = DAT_00668fa4;
-        AviSoundBytesPerFrame = fmt->nAvgBytesPerSec / handle->field_4;
-        DAT_00668f90 = fmt->nSamplesPerSec / handle->field_4;
+        AviSoundBytesPerFrame = fmt->nAvgBytesPerSec / handle->frame_rate;
+        DAT_00668f90 = fmt->nSamplesPerSec / handle->frame_rate;
         DAT_00668f4c = fmt->wBitsPerSample;
         AviAudioStream = handle->audio_stream;
         AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(fmt, AviSoundBytesPerFrame * DAT_00668fa4);
@@ -1785,8 +1786,8 @@ int FUN_00476910(struct MovieHandle *handle) {
     }
     DAT_00668f9c = 0;
     DAT_00668f50 = DAT_00668fa4;
-    AviSoundBytesPerFrame = AviPcmFormat.nAvgBytesPerSec / handle->field_4;
-    DAT_00668f90 = AviPcmFormat.nSamplesPerSec / handle->field_4;
+    AviSoundBytesPerFrame = AviPcmFormat.nAvgBytesPerSec / handle->frame_rate;
+    DAT_00668f90 = AviPcmFormat.nSamplesPerSec / handle->frame_rate;
     DAT_00668f4c = AviPcmFormat.wBitsPerSample;
     AviAudioStream = handle->audio_stream;
     AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(&AviPcmFormat, AviSoundBytesPerFrame * DAT_00668fa4);

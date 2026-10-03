@@ -1052,7 +1052,7 @@ void FUN_00450250(Bloke *bloke) {
     switch (bloke->param_action) {
     case 0:
         NewDirForAction(bloke, 4);
-        if (bloke->person->field_8 == 1) {
+        if (bloke->person->character == 1) {
             bloke->flags |= 0x100;
             BlokeSetAnim(bloke, 2);
             BlokeSetFrame(bloke, 0);
@@ -1075,7 +1075,7 @@ void FUN_00450250(Bloke *bloke) {
         bloke->param_action++;
         return;
     case 3:
-        state = bloke->person->field_8;
+        state = bloke->person->character;
         switch (state) {
         case 2:
             NewLongTermAction(bloke, 0x10);
@@ -1102,7 +1102,7 @@ void FUN_00450330(Bloke *bloke) {
         bloke->param_action++;
         return;
     case 2:
-        state = bloke->person->field_8;
+        state = bloke->person->character;
         switch (state) {
         case 2:
             NewLongTermAction(bloke, 0x10);
@@ -1353,7 +1353,7 @@ void FUN_00450a40(Bloke *bloke) {
     if ((bloke->flags & 0x28) != 0) {
         return;
     }
-    state = bloke->person->field_8;
+    state = bloke->person->character;
     if (state < 2 || state > 3) {
         bloke->flags |= 0x8;
         NewLongTermAction(bloke, 14);

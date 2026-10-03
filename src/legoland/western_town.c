@@ -48,8 +48,8 @@ struct MapObject {
 
 struct JailCell {
     struct JailCell *next;
-    unsigned short field_4;
-    unsigned char field_6;
+    unsigned short tile_id;
+    unsigned char frame;
     unsigned char pad_7[0x8 - 0x7];
     unsigned int field_8;
     unsigned int field_c;
@@ -456,8 +456,8 @@ void FUN_00437f10(unsigned short *param) {
     struct JailCell *cell = malloc(sizeof(struct JailCell));
     if (cell != NULL) {
         memset(cell, 0, sizeof(struct JailCell));
-        cell->field_4 = *param;
-        cell->field_6 = 9;
+        cell->tile_id = *param;
+        cell->frame = 9;
         cell->field_8 = 0;
         cell->field_c = 0;
         cell->field_10 = 0;
@@ -485,7 +485,7 @@ struct JailCell *FUN_00437f90(unsigned short *key) {
     if (cell == NULL) {
         return NULL;
     }
-    while (memcmp(&cell->field_4, key, 2) != 0) {
+    while (memcmp(&cell->tile_id, key, 2) != 0) {
         cell = cell->next;
         if (cell == NULL) {
             return NULL;
@@ -596,7 +596,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->field_6);
+        LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->frame);
         offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
         AdjustOffsetForViewMode(&offset);
         PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
@@ -635,7 +635,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
         }
         return;
     }
-    LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->field_6);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->frame);
     offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
     AdjustOffsetForViewMode(&offset);
     PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
@@ -668,7 +668,7 @@ void FUN_00438430(Element *obj) {
         if (cell == NULL) {
             return;
         }
-        field_6 = cell->field_6;
+        field_6 = cell->frame;
         field_8 = cell->field_8;
         field_c = cell->field_c;
         field_10 = cell->field_10;
@@ -753,7 +753,7 @@ void FUN_00438430(Element *obj) {
                 bloke->flags &= 0xfff7;
             }
         }
-        cell->field_6 = field_6;
+        cell->frame = field_6;
         cell->field_8 = field_8;
         cell->field_c = field_c;
         cell->field_10 = field_10;
@@ -763,7 +763,7 @@ void FUN_00438430(Element *obj) {
     }
     for (jc = JailCellList; jc != NULL; jc = jc->next) {
         field_14 = jc->field_14;
-        field_6 = jc->field_6;
+        field_6 = jc->frame;
         field_8 = jc->field_8;
         field_c = jc->field_c;
         field_10 = jc->field_10;
@@ -782,7 +782,7 @@ void FUN_00438430(Element *obj) {
                 field_c = 0;
             }
         }
-        jc->field_6 = field_6;
+        jc->frame = field_6;
         jc->field_8 = field_8;
         jc->field_c = field_c;
         jc->field_10 = field_10;

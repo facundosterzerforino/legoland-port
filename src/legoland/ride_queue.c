@@ -12,28 +12,28 @@
 
 struct QueueItemInner {
     unsigned char pad_0[0xe];
-    unsigned short field_e;
+    unsigned short low_level_action;
     unsigned char pad_10[0x24 - 0x10];
-    int field_24;
-    int field_28;
+    int dest_x;
+    int dest_y;
     unsigned char pad_2c[0x38 - 0x2c];
     short field_38;
     unsigned char pad_3a[0x60 - 0x3a];
-    unsigned char field_60;
+    unsigned char param_action;
     unsigned char pad_61;
-    unsigned short field_62;
+    unsigned short flags;
     unsigned char pad_64[0x68 - 0x64];
-    int field_68;
-    int field_6c;
+    int pos_x;
+    int pos_y;
     unsigned char pad_70[0x73 - 0x70];
     unsigned char field_73;
     unsigned char pad_74[0x98 - 0x74];
-    struct Navigator field_98;
+    struct Navigator nav;
 };
 
 struct QueueItemMid {
     unsigned char pad_0[0x8];
-    struct QueueItemInner *field_8;
+    struct QueueItemInner *rider;
 };
 
 struct QueueNode {
@@ -69,7 +69,7 @@ struct RideSlot {
 
 struct RQObjClass {
     unsigned char pad_0[0xc4];
-    struct Element *field_c4;
+    struct Element *element;
 };
 
 static __inline struct MapElement *TileAt(int x, int y) {
@@ -118,7 +118,7 @@ unsigned int QueueHasNodes(struct Queue *queue) {
 int FUN_00411ea0(struct Queue *queue) {
     struct QueueNode *head = queue->head;
     if (head != NULL) {
-        short value = head->field_4->field_8->field_38;
+        short value = head->field_4->rider->field_38;
         if (value == (queue->count->count - 1)) {
             return 1;
         }
@@ -153,9 +153,9 @@ void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
     if (node != NULL) {
         memset(node, 0, sizeof(*node));
         node->field_4 = mid;
-        mid->field_8->field_62 |= 0x40;
-        mid->field_8->field_38 = 0;
-        mid->field_8->field_60++;
+        mid->rider->flags |= 0x40;
+        mid->rider->field_38 = 0;
+        mid->rider->param_action++;
         QueueAppendNode(queue, node);
     }
 }
@@ -163,7 +163,7 @@ void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
 // FUNCTION: LEGOLAND 0x00411f70
 int FUN_00411f70(struct Queue *queue, struct QueueItemInner *inner) {
     struct QueueNode *head = queue->head;
-    if (head != NULL && head->field_4->field_8 == inner) {
+    if (head != NULL && head->field_4->rider == inner) {
         return 1;
     }
     return 0;
@@ -181,10 +181,10 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
 
     x = (step->dx + param_2) << 8;
     y = (step->dy + param_3) << 8;
-    inner->field_24 = x;
-    inner->field_28 = y;
-    dir = CalcMoveLine(*(struct Point *)&inner->field_68, *(struct Point *)&inner->field_24, &inner->field_98);
-    inner->field_e = 7;
+    inner->dest_y = y;
+    inner->dest_x = x;
+    dir = CalcMoveLine(*(struct Point *)&inner->pos_x, *(struct Point *)&inner->dest_x, &inner->nav);
+    inner->low_level_action = 7;
     inner->field_73 = dir + 0x10;
     NewDirForAction((Bloke *)inner, (unsigned char)(inner->field_73 >> 5) + 3);
     inner->field_38++;
@@ -194,7 +194,7 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
         return;
     }
     for (node = queue->head; node != NULL; node = node->next) {
-        struct QueueItemInner *other = node->field_4->field_8;
+        struct QueueItemInner *other = node->field_4->rider;
         if (other->field_38 == cur && other != inner) {
             inner->field_38 = cur - 1;
             return;
@@ -206,9 +206,9 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
 void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
     struct QueueNode *node = queue->head;
     if (node != NULL) {
-        struct QueueItemInner *inner = node->field_4->field_8;
-        inner->field_62 &= ~0x40;
-        inner->field_60++;
+        struct QueueItemInner *inner = node->field_4->rider;
+        inner->flags &= ~0x40;
+        inner->param_action++;
         *out = node->field_4;
         QueueUnlinkHead(queue);
         free(node);
@@ -219,8 +219,8 @@ void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
 void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_3) {
     struct QueueNode *node = queue->head;
     while (node != NULL) {
-        struct QueueItemInner *inner = node->field_4->field_8;
-        if (inner->field_e == 0) {
+        struct QueueItemInner *inner = node->field_4->rider;
+        if (inner->low_level_action == 0) {
             FUN_00411fa0(queue, param_2, param_3, inner);
         }
         node = node->next;
@@ -375,11 +375,11 @@ void SaveQueue(struct QueueNode *start, struct Queue *queue) {
 
 // FUNCTION: LEGOLAND 0x00412470
 struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n) {
-    int i = n;
-    while (i-- != 0) {
-        node = node->next;
+    struct QueueNode *p = node;
+    while (n-- != 0) {
+        p = p->next;
     }
-    return node;
+    return p;
 }
 
 // FUNCTION: LEGOLAND 0x00412490
@@ -512,19 +512,19 @@ void FUN_00412680(int x, int y, int param_3, int param_4) {
         tile = TileAt(pos.x, pos.y);
         tile[0].field_10 = 2;
         tile[0].flags |= 8;
-        tile[0].field_0 = ((struct RQObjClass *)DAT_0082c684)->field_c4;
+        tile[0].field_0 = ((struct RQObjClass *)DAT_0082c684)->element;
         tile[0].anchor = id;
         tile[1].field_10 = 2;
         tile[1].flags |= 8;
-        tile[1].field_0 = ((struct RQObjClass *)DAT_0082c684)->field_c4;
+        tile[1].field_0 = ((struct RQObjClass *)DAT_0082c684)->element;
         tile[1].anchor = id;
         tile[2].field_10 = 2;
         tile[2].flags |= 8;
-        tile[2].field_0 = ((struct RQObjClass *)DAT_0082c684)->field_c4;
+        tile[2].field_0 = ((struct RQObjClass *)DAT_0082c684)->element;
         tile[2].anchor = id;
         tile[3].field_10 = 2;
         tile[3].flags |= 8;
-        tile[3].field_0 = ((struct RQObjClass *)DAT_0082c684)->field_c4;
+        tile[3].field_0 = ((struct RQObjClass *)DAT_0082c684)->element;
         tile[3].anchor = id;
         RemovePathSquare(&pos);
         pos.x++;

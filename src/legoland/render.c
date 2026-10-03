@@ -619,27 +619,16 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     FUN_00464ee0(param_2, &local.rect, local.off);
     FUN_00485fe0(param_2, param_4, param_5);
     transp = GetTransparentColour();
-    yy = 0;
-    if (0 < h) {
-        row = 0;
-        do {
-            int xx = 0;
-            int col = row;
-            if (0 < w) {
-                do {
-                    unsigned int z = FUN_00488820(xx, yy);
-                    unsigned short px = transp;
-                    if ((int)(z & 0xff) <= param_3) {
-                        px = *(unsigned short *)((char *)DAT_0066be54 + col);
-                    }
-                    *(unsigned short *)((char *)DAT_00701e68 + col) = px;
-                    xx = xx + 1;
-                    col = col + 2;
-                } while (xx < w);
+    for (yy = 0; yy < h; yy++) {
+        for (row = 0; row < w; row++) {
+            unsigned short px;
+            if ((int)(FUN_00488820(row, yy) & 0xff) <= param_3) {
+                px = ((unsigned short *)DAT_0066be54)[yy * w + row];
+            } else {
+                px = transp;
             }
-            yy = yy + 1;
-            row = row + w * 2;
-        } while (yy < h);
+            ((unsigned short *)DAT_00701e68)[yy * w + row] = px;
+        }
     }
     DAT_0066be50->width = (short)w;
     DAT_0066be50->height = (short)h;
@@ -812,31 +801,26 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     }
     IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
     hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);
-    for (;;) {
-        if (hr != 0) {
-            if (hr != 0x887601c2) {
-                break;
-            }
-            if (IDirectDrawSurface_Restore(DAT_0079861c) != 0) {
+    if (hr == 0) {
+        goto ok;
+    }
+    if (hr == 0x887601c2) {
+        if (IDirectDrawSurface_Restore(DAT_0079861c) != 0) {
+            IDirectDrawSurface_SetClipper(renderEngine, NULL);
+            CurrentSurfaceDesc = DAT_00798598;
+            DAT_00668108 = DAT_00798608;
+            return 0;
+        }
+        MakeSprite(sprite);
+        if (IDirectDrawSurface_IsLost(PrimarySurface) != 0x887601c2 || IDirectDrawSurface_Restore(PrimarySurface) == 0) {
+            if (IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x8000, NULL) == 0) {
+            ok:
                 IDirectDrawSurface_SetClipper(renderEngine, NULL);
                 CurrentSurfaceDesc = DAT_00798598;
                 DAT_00668108 = DAT_00798608;
-                return 0;
-            }
-            MakeSprite(sprite);
-            if (IDirectDrawSurface_IsLost(PrimarySurface) == 0x887601c2) {
-                if (IDirectDrawSurface_Restore(PrimarySurface) != 0) {
-                    break;
-                }
-            }
-            if (IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x8000, NULL) != 0) {
-                break;
+                return 1;
             }
         }
-        IDirectDrawSurface_SetClipper(renderEngine, NULL);
-        CurrentSurfaceDesc = DAT_00798598;
-        DAT_00668108 = DAT_00798608;
-        return 1;
     }
     IDirectDrawSurface_SetClipper(renderEngine, NULL);
     CurrentSurfaceDesc = DAT_00798598;
@@ -996,11 +980,9 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
 
 // FUNCTION: LEGOLAND 0x00489390
 LEGO_EXPORT void RenderThickBox(int x, int y, int w, int h, int thickness, unsigned int color) {
-    int inner;
     RenderBlock(x, y, w, thickness, color);
-    inner = h + thickness * -2;
-    RenderBlock(x, y + thickness, thickness, inner, color);
-    RenderBlock((x - thickness) + w, y + thickness, thickness, inner, color);
+    RenderBlock(x, y + thickness, thickness, h - thickness * 2, color);
+    RenderBlock((x - thickness) + w, y + thickness, thickness, h - thickness * 2, color);
     RenderBlock(x, (y - thickness) + h, w, thickness, color);
 }
 

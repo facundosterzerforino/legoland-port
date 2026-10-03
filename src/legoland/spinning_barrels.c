@@ -346,14 +346,14 @@ struct BarrelCar {
 struct BarrelListNode {
     struct BarrelListNode *next;
     unsigned char pad_4[4];
-    struct BarrelData *field_8;
+    struct BarrelData *rider;
     unsigned char pad_c[4];
-    struct BarrelCar *field_10;
+    struct BarrelCar *person;
 };
 
 struct BarrelGameObject {
     unsigned char pad_0[0xcc];
-    struct BarrelListNode *field_cc;
+    struct BarrelListNode *riders;
 };
 
 struct BarrelLoadArg {
@@ -391,16 +391,16 @@ LEGO_EXPORT int LoadSBarrel(struct BarrelLoadArg *arg) {
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             car->field_2c = DAT_0062fe00[car->field_30];
         } else {
             car->field_2c = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
-        data = list->field_8;
+        data = list->rider;
         tc = data->field_54;
         if (tc != NULL) {
             tc->field_0 = DAT_0062fdf0[tc->field_4];

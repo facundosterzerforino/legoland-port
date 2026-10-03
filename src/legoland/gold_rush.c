@@ -24,8 +24,8 @@ struct GoldArray {
 
 struct GoldItem {
     /* 0x00 */ unsigned char pad_0[8];
-    /* 0x08 */ struct GoldSub *field_8;
-    /* 0x0c */ unsigned char field_c;
+    /* 0x08 */ struct GoldSub *rider;
+    /* 0x0c */ unsigned char tile;
 };
 
 struct GoldSub {
@@ -40,7 +40,7 @@ struct GoldRandSub {
 
 struct GoldRandItem {
     unsigned char pad_0[8];
-    struct GoldRandSub *field_8;
+    struct GoldRandSub *rider;
 };
 
 struct GoldBloke {
@@ -62,8 +62,8 @@ struct GoldBlokeRef {
 
 struct GoldRide {
     unsigned char pad_0[0xc];
-    int field_c;
-    int field_10;
+    int x;
+    int y;
 };
 
 struct GoldEditObject {
@@ -325,7 +325,7 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
     for (i = 0; i < 6; i++) {
         if (a->field_14[i] == 0) {
             a->field_14[i] = 1;
-            item->field_8->field_36 = (unsigned char)i;
+            item->rider->field_36 = (unsigned char)i;
             return;
         }
     }
@@ -333,8 +333,8 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
 
 // FUNCTION: LEGOLAND 0x00406f00
 struct GoldArray *FUN_00406f00(struct GoldItem *item) {
-    unsigned int idx = item->field_8->field_36;
-    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->field_c);
+    unsigned int idx = item->rider->field_36;
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->tile);
 
     if (a != NULL) {
         a->field_14[idx] = 0;
@@ -423,7 +423,7 @@ void FUN_00407170(struct GoldWalkItem *item, unsigned char *p) {
 // FUNCTION: LEGOLAND 0x00407230
 void FUN_00407230(struct GoldRandItem *param) {
     int value = rand() % 31;
-    param->field_8->field_58 = value + 15;
+    param->rider->field_58 = value + 15;
 }
 
 // FUNCTION: LEGOLAND 0x00407250
@@ -558,20 +558,20 @@ void GoldRushAddObject(struct GoldEditObject *editObj, struct Point *pos) {
     AddBasicObject((Element *)editObj, (int *)pos);
     AddGoldWashNode((struct GoldNode *)&id);
 
-    p.x = pos->x + ride->field_c - 1;
-    p.y = pos->y + ride->field_10;
+    p.x = pos->x + ride->x - 1;
+    p.y = pos->y + ride->y;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10 - 1;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y - 1;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 
-    p.x = pos->x + ride->field_c - 2;
-    p.y = pos->y + ride->field_10 - 2;
+    p.x = pos->x + ride->x - 2;
+    p.y = pos->y + ride->y - 2;
     AddPathTileGFX(&p, *(unsigned short *)PathSprite);
 }
 
@@ -588,20 +588,20 @@ void GoldRushRemoveObject(struct GoldEditObject *editObj, TileId coords, struct 
     StandardRemoveObject((Element *)editObj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)ride, coords);
 
-    p[0] = coords.pos.x + ride->field_c - 1;
-    p[1] = coords.pos.y + ride->field_10;
+    p[0] = coords.pos.x + ride->x - 1;
+    p[1] = coords.pos.y + ride->y;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10 - 1;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y - 1;
     RemoveRollerCoasterPath(p);
 
-    p[0] = coords.pos.x + ride->field_c - 2;
-    p[1] = coords.pos.y + ride->field_10 - 2;
+    p[0] = coords.pos.x + ride->x - 2;
+    p[1] = coords.pos.y + ride->y - 2;
     RemoveRollerCoasterPath(p);
 }
 

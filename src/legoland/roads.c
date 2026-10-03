@@ -55,12 +55,12 @@ struct LLIDB_Head {
 
 struct RoadEditArg {
     unsigned char pad_0[0xc];
-    void *field_c;
+    void *ride;
 };
 
 struct RoadPlaceArg {
-    unsigned int field_0;
-    unsigned int field_4;
+    unsigned int x;
+    unsigned int y;
 };
 
 struct NeighborResult {
@@ -616,7 +616,7 @@ struct RoadTile *FUN_00413e30(struct Cursor *cur) {
 
 // FUNCTION: LEGOLAND 0x00413fa0
 void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param) {
-    struct RoadTile *tile = FindQueueEntryAtTile(param->field_0, param->field_4);
+    struct RoadTile *tile = FindQueueEntryAtTile(param->x, param->y);
     unsigned int *src;
     unsigned int *dst;
     unsigned int count;
@@ -649,8 +649,8 @@ void FUN_00414020(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
     struct NeighborResult r;
     struct RoadQueueEntry **q = (struct RoadQueueEntry **)&r;
     TileId id;
-    int x = place->field_0;
-    int y = place->field_4;
+    int x = place->x;
+    int y = place->y;
 
     FUN_00413520(x, y, &r);
     if (r.field_0) {
@@ -675,7 +675,7 @@ void FUN_00414020(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
     if (q[6] && q[6]->field_8 == id.id && (q[6]->field_14 & 0xf) != 6) FUN_00413650(id.id, x - 4, y);
     if (q[7] && q[7]->field_8 == id.id && (q[7]->field_14 & 0xf) != 6) FUN_00413650(id.id, x - 4, y - 4);
     FUN_00406020(id.id, 1);
-    IncrementObjectCount((struct ObjectCount *)edit->field_c);
+    IncrementObjectCount((struct ObjectCount *)edit->ride);
 }
 
 // FUNCTION: LEGOLAND 0x00414220
@@ -832,7 +832,7 @@ void ZebraCrossingSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00414880
 void FUN_00414880(struct RoadEditArg *param_1, unsigned int param_2, unsigned int param_3) {
-    void *obj = param_1->field_c;
+    void *obj = param_1->ride;
     struct RoadTile *tile;
     int cost;
 
@@ -865,20 +865,20 @@ void FUN_00414880(struct RoadEditArg *param_1, unsigned int param_2, unsigned in
 
 // FUNCTION: LEGOLAND 0x00414940
 void InitZebraCrossing(struct RoadEditArg *param_1) {
-    ZebraCrossingRide = param_1->field_c;
+    ZebraCrossingRide = param_1->ride;
 }
 
 // FUNCTION: LEGOLAND 0x00414950
 void FUN_00414950(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
     struct NeighborResult r;
-    struct RoadTile *tile = (struct RoadTile *)FUN_004125a0(place->field_0, place->field_4);
+    struct RoadTile *tile = (struct RoadTile *)FUN_004125a0(place->x, place->y);
 
     if (tile != NULL) {
-        FUN_004135d0(place->field_0, place->field_4, &r);
+        FUN_004135d0(place->x, place->y, &r);
         tile->flags |= 0x10;
-        FUN_00413650(*(short *)((char *)tile + 8), place->field_0, place->field_4);
+        FUN_00413650(*(short *)((char *)tile + 8), place->x, place->y);
         tile->field_1d = 0;
         tile->field_1c = 0;
-        IncrementObjectCount((struct ObjectCount *)edit->field_c);
+        IncrementObjectCount((struct ObjectCount *)edit->ride);
     }
 }

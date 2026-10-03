@@ -250,10 +250,10 @@ void BrollyAddObject(int param_1, unsigned char *param_2) {
 // FUNCTION: LEGOLAND 0x0042e560
 struct RideSpriteInfo *GetBrollySpriteInfo(int param_1, unsigned int param_2) {
     unsigned char *b = (unsigned char *)&param_2;
-    int idx = ((unsigned short)Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xff) * 4;
-    RideSpriteInfoBuffer.sprite = *(int *)((char *)BrollyImagesData->table_8 + idx);
-    RideSpriteInfoBuffer.x = *(int *)((char *)BrollyImagesData->table_c + idx) >> 1;
-    RideSpriteInfoBuffer.y = *(int *)((char *)BrollyImagesData->table_10 + idx) >> 1;
+    int i = Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xffff;
+    RideSpriteInfoBuffer.sprite = (void *)BrollyImagesData->table_8[(unsigned char)i];
+    RideSpriteInfoBuffer.x = BrollyImagesData->table_c[(unsigned char)i] >> 1;
+    RideSpriteInfoBuffer.y = BrollyImagesData->table_10[(unsigned char)i] >> 1;
     RideSpriteInfoBuffer.field_10 = 0;
     return &RideSpriteInfoBuffer;
 }

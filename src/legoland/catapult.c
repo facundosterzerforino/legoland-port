@@ -16,7 +16,7 @@
 #include "sound_music.h"
 
 struct CatapultNode {
-    unsigned short field_0;
+    unsigned short tile_id;
     unsigned char pad_2[2];
     struct CatapultNode *next;
     void *field_8;
@@ -41,7 +41,7 @@ struct CatapultItem {
 
 struct CatapultLayer {
     unsigned char pad_0[0xc];
-    struct CatapultSprite *field_c;
+    struct CatapultSprite *ride;
 };
 
 struct CatapultSprite {
@@ -114,7 +114,7 @@ struct CatapultNode *Catapult_AddNode(const unsigned short *arg) {
     struct CatapultNode *node = (struct CatapultNode *)malloc(0x3c);
     if (node != NULL) {
         memset(node, 0, 0x3c);
-        node->field_0 = *arg;
+        node->tile_id = *arg;
         node->next = CatapultNodeList;
         CatapultNodeList = node;
     }
@@ -157,7 +157,7 @@ struct CatapultRideNode *Catapult_FindNode(const unsigned short *key) {
 
     if (cur != NULL) {
         do {
-            if (memcmp(&cur->field_0, key, 2) == 0) {
+            if (memcmp(&cur->tile_id, key, 2) == 0) {
                 return (struct CatapultRideNode *)cur;
             }
             cur = cur->next;
@@ -171,7 +171,7 @@ void LoadCatapultResources(struct CatapultLayer *param1) {
     struct CatapultSprite *sprite;
     struct CatapultInner *inner;
 
-    sprite = param1->field_c;
+    sprite = param1->ride;
     ActiveCatapultRide = sprite;
     if (sprite != NULL) {
         sprite->field_1c |= 0x420;
@@ -492,7 +492,7 @@ void CatapultRemoveObject(struct CatapultRemoveEdit *edit, TileId key, void *cur
 
 // FUNCTION: LEGOLAND 0x004039e0
 unsigned int *FUN_004039e0(struct CatapultLayer *arg1, unsigned short arg2) {
-    struct CatapultSprite *sprite = arg1->field_c;
+    struct CatapultSprite *sprite = arg1->ride;
 
     DAT_004c1100 = sprite->field_64;
     DAT_004c1104 = sprite->field_14;

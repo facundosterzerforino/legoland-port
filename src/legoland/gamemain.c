@@ -27,12 +27,12 @@
 
 struct GameMainNode {
     struct GameMainNode *next;
-    struct GameMainNode *field_4;
-    int field_8;
-    int field_c;
-    int field_10;
-    int field_14;
-    int field_18;
+    struct GameMainNode *parent;
+    int x;
+    int y;
+    int step_cost;
+    int path_cost;
+    int heuristic;
     int field_1c;
     int field_20;
     int field_24;
@@ -121,7 +121,7 @@ struct GameMainNode *FUN_00477730(struct Point *ctx) {
         return NULL;
     }
     while (node != NULL) {
-        if (node->field_8 == ctx->x && node->field_c == ctx->y) {
+        if (node->x == ctx->x && node->y == ctx->y) {
             return node;
         }
         node = node->next;
@@ -181,7 +181,7 @@ struct GameMainNode *FUN_004777c0(struct Point *arg) {
     }
     first = arg->x;
     do {
-        if (node->field_8 == first && node->field_c == arg->y) {
+        if (node->x == first && node->y == arg->y) {
             return node;
         }
         node = node->next;
@@ -222,40 +222,40 @@ struct GameMainNode *FUN_004777f0(struct Point *pos, int *result) {
         } else {
             node->field_20 = 0;
         }
-        node->field_10 = 1;
+        node->step_cost = 1;
     } else if (flags & 0x40) {
         node->field_20 = 5;
-        node->field_10 = -1;
+        node->step_cost = -1;
     } else if (flags & 0x8a0) {
         ride = tile->field_0->ride;
         if (ride->flags & 0x200000) {
             if (ride->range > 1) {
                 node->field_20 = 4;
-                node->field_10 = 0x14;
+                node->step_cost = 0x14;
             } else {
                 node->field_20 = 3;
-                node->field_10 = 9;
+                node->step_cost = 9;
             }
         } else {
             node->field_20 = 5;
-            node->field_10 = -1;
+            node->step_cost = -1;
         }
     } else if (tile->field_10 & 2) {
         node->field_20 = 5;
-        node->field_10 = -1;
+        node->step_cost = -1;
     } else {
         node->field_20 = 2;
-        node->field_10 = 3;
+        node->step_cost = 3;
     }
-    node->field_8 = pos->x;
-    node->field_c = pos->y;
-    node->field_14 = 0x7fffffff;
+    node->x = pos->x;
+    node->y = pos->y;
+    node->path_cost = 0x7fffffff;
     dy = abs(pos->y - DAT_004bb5a4);
     dx = abs(pos->x - DAT_004bb5a0);
-    node->field_4 = 0;
+    node->parent = 0;
     node->field_24 = 0;
-    node->field_18 = dx + dy;
-    node->field_1c = node->field_10 + node->field_18;
+    node->heuristic = dx + dy;
+    node->field_1c = node->step_cost + node->heuristic;
     return node;
 }
 
@@ -360,32 +360,32 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     DAT_004bb5a0 = a;
     DAT_004bb5a4 = b;
     nb = FUN_004777f0(&DAT_004bb598, &result);
-    nb->field_14 = 0;
+    nb->path_cost = 0;
     InsertOpenListSorted((struct EventNode *)nb);
     while ((cur = DAT_00668fc0) != NULL) {
         DAT_00668fc0 = cur->next;
 
-        if ((cur->field_8 == DAT_004bb5a0 && cur->field_c == DAT_004bb5a4) || cur->field_20 == 1) {
+        if ((cur->x == DAT_004bb5a0 && cur->y == DAT_004bb5a4) || cur->field_20 == 1) {
             best = cur;
         } else {
-            pos.x = cur->field_8;
-            pos.y = cur->field_c - 1;
+            pos.x = cur->x;
+            pos.y = cur->y - 1;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                if (nb->field_10 != -1) {
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
                                 RemoveQueryNode((struct QueryNode *)nb);
                             }
@@ -397,25 +397,25 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                     }
                 }
             }
-            pos.x = cur->field_8 + 1;
-            pos.y = cur->field_c;
+            pos.x = cur->x + 1;
+            pos.y = cur->y;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
                                 RemoveQueryNode((struct QueryNode *)nb);
                             }
@@ -427,25 +427,25 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                     }
                 }
             }
-            pos.x = cur->field_8;
-            pos.y = cur->field_c + 1;
+            pos.x = cur->x;
+            pos.y = cur->y + 1;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
                                 RemoveQueryNode((struct QueryNode *)nb);
                             }
@@ -457,25 +457,25 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                     }
                 }
             }
-            pos.x = cur->field_8 - 1;
-            pos.y = cur->field_c;
+            pos.x = cur->x - 1;
+            pos.y = cur->y;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                if (nb->field_10 != -1) {
+                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                if (nb->step_cost != -1) {
                     if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c)) + cur->field_14 + nb->field_10;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
-                        cost = cur->field_14 + nb->field_10;
+                        cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->field_14) {
+                        if (best != NULL && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->field_8, cur->field_c, nb->field_8, nb->field_c);
-                            nb->field_4 = cur;
-                            nb->field_14 = cost;
-                            nb->field_1c = nb->field_18 + cost;
+                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            nb->parent = cur;
+                            nb->path_cost = cost;
+                            nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
                                 RemoveQueryNode((struct QueryNode *)nb);
                             }
@@ -494,7 +494,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     id = ElemID("PATH CONTROL");
     while (best != NULL) {
         nb = best;
-        pp = (struct Point *)&nb->field_8;
+        pp = (struct Point *)&nb->x;
         if (pp->x >= 0 && pp->x < lpConfig->width && pp->y >= 0 && pp->y < lpConfig->height) {
             tile = &GameMap[pp->y][pp->x];
         } else {
@@ -504,7 +504,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
             FUN_004779d0(pp);
             AddBasicPath((struct EditObject *)id, (int *)pp);
         }
-        nb = nb->field_4;
+        nb = nb->parent;
     }
     while (DAT_00668fc4 != NULL) {
         RemoveQueryNode((struct QueryNode *)DAT_00668fc4);
@@ -677,7 +677,7 @@ void FUN_004784c0(void) {
     ResetPathUpdateTimer();
     FUN_00459960();
 
-    MapStats.field_174 = 1000;
+    MapStats.brick_meter_max = 1000;
     MapStats.field_194 = 0;
     MapStats.field_180 = 0;
     MapStats.field_3a8 = 1;

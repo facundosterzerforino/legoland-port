@@ -36,7 +36,7 @@ struct JoustNode {
     TileId id;
     unsigned char pad_2[2];
     struct JoustNode *next;
-    struct Sample *field_8;
+    struct Sample *sample;
     int busy;
     char x;
     char y;
@@ -72,7 +72,7 @@ struct JoustBlock {
     unsigned int field_18;
     unsigned int flags_1c;
     unsigned char pad_20[0x44];
-    struct JoustBlockData *field_64;
+    struct JoustBlockData *layer;
 };
 
 struct JoustRoot {
@@ -111,7 +111,7 @@ void JoustAddObject(Element *editObj, int *coords) {
     key.pos.x = (unsigned char)coords[0];
     key.pos.y = (unsigned char)coords[1];
     AddBasicObject(editObj, coords);
-    AddJoustNode(&key)->field_8 = 0;
+    AddJoustNode(&key)->sample = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00407a20
@@ -172,11 +172,11 @@ void JoustRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor) {
 
     node = FindJoustNode(&coords);
     if (node != NULL) {
-        source.kind = 2;
         source.x = node->id.pos.x;
+        source.kind = 2;
         source.y = node->id.pos.y;
         UnSourceAndFadeAllSamplesFromSource(&source, -200);
-        node->field_8 = 0;
+        node->sample = 0;
         RemoveJoustNode(node);
     }
     StandardRemoveObject(editObj, coords, cursor);
@@ -188,7 +188,7 @@ void JoustLoadResources(struct JoustRoot *root) {
     Load_FXList(JOUST_SFX, 1);
     JoustRide = (unsigned int)root->field_c;
     ((struct JoustBlock *)JoustRide)->flags_1c |= 0x420;
-    JoustLayer = (unsigned int)((struct JoustBlock *)JoustRide)->field_64;
+    JoustLayer = (unsigned int)((struct JoustBlock *)JoustRide)->layer;
     ((struct JoustBlockData *)JoustLayer)->field_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b46f4
     JoustFMaskSprite = LoadSprite("Joust_fmask.lls", 1);
@@ -521,25 +521,25 @@ void FUN_00407c30(struct Element *elem) {
                 } else {
                     break;
                 }
-                if (jn->field_8 != 0) {
+                if (jn->sample != 0) {
                     struct JoustSource stop;
 
                     stop.kind = 2;
                     stop.x = jn->id.pos.x;
                     stop.y = jn->id.pos.y;
                     UnSourceAndFadeAllSamplesFromSource(&stop, -1000);
-                    jn->field_8 = 0;
+                    jn->sample = 0;
                 }
                 continue;
             }
-            if (jn->field_8 == 0) {
+            if (jn->sample == 0) {
                 struct JoustSource play;
 
                 play.kind = 2;
                 play.x = jn->id.pos.x;
                 play.y = jn->id.pos.y;
-                jn->field_8 = PlayInstanceOfSample(*(void **)(JOUST_SFX + 8), 1, 0, &play);
-                FUN_00496d10(jn->field_8);
+                jn->sample = PlayInstanceOfSample(*(void **)(JOUST_SFX + 8), 1, 0, &play);
+                FUN_00496d10(jn->sample);
             }
             step++;
             if (step > 0x3f) {
@@ -760,11 +760,11 @@ void JoustFreeResources(void) {
 unsigned int *FUN_00408c50(struct JoustRoot *param1, unsigned short param2) {
     struct JoustBlock *block = param1->field_c;
 
-    DAT_004c1228 = (unsigned int)block->field_64;
+    DAT_004c1228 = (unsigned int)block->layer;
     DAT_004c122c = block->field_14;
     DAT_004c1230 = block->field_18;
     DAT_004c1234 = param2;
-    block->field_64->field_10 |= 0x2000;
+    block->layer->field_10 |= 0x2000;
 
     return &DAT_004c1228;
 }
@@ -800,12 +800,12 @@ struct JoustCar {
 struct JoustListNode {
     struct JoustListNode *next;
     unsigned char pad_4[0xc];
-    struct JoustCar *field_10;
+    struct JoustCar *person;
 };
 
 struct JoustGameObject {
     unsigned char pad_0[0xcc];
-    struct JoustListNode *field_cc;
+    struct JoustListNode *riders;
 };
 
 struct JoustLoadArg {
@@ -835,21 +835,21 @@ LEGO_EXPORT int LoadJoust(struct JoustLoadArg *arg) {
         } else {
             JoustNodeList = node;
         }
-        node->field_8 = 0;
+        node->sample = 0;
         prev = node;
         if (!SaveGameRead(&marker, 4)) {
             return 0;
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             car->field_2c = DAT_004c123c[car->field_30];
         } else {
             car->field_2c = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
         list = list->next;
     }

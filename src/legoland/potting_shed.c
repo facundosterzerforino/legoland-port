@@ -20,7 +20,7 @@ struct PSCarSub {
     unsigned int field_14;
     unsigned int field_18;
     unsigned char pad_1c[0x48];
-    struct PSCarInner *field_64;
+    struct PSCarInner *layer;
 };
 
 struct PSCarLayer {
@@ -169,12 +169,12 @@ struct RideSpriteInfo *FUN_0043d210(struct PSCarLayer *param1, unsigned short pa
     struct PSCarSub *s2 = param1->field_c;
     struct PSCarInner *s3;
 
-    DAT_0062fe10.sprite = s2->field_64;
+    DAT_0062fe10.sprite = s2->layer;
     DAT_0062fe10.x = s2->field_14;
     DAT_0062fe10.y = s2->field_18;
     DAT_0062fe10.id = param2;
 
-    s3 = s2->field_64;
+    s3 = s2->layer;
     s3->field_10 |= 0x2000;
 
     return &DAT_0062fe10;

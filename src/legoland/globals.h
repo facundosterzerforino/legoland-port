@@ -185,7 +185,7 @@ struct LegoConfig {
     /* 0x30 */ unsigned int field_30;
     /* 0x34 */ unsigned int mechanics_enabled;
     /* 0x38 */ unsigned int gardeners_enabled;
-    /* 0x3c */ int field_3c;
+    /* 0x3c */ int repair_orders_enabled;
     /* 0x40 */ unsigned int field_40;
 };
 
@@ -457,7 +457,7 @@ struct MapStats {
     /* 0x138 */ int mood_threshold4;
     /* 0x13c */ int mood_delta[13];
     /* 0x170 */ int entrance_fee;
-    /* 0x174 */ unsigned int field_174;
+    /* 0x174 */ unsigned int brick_meter_max;
     /* 0x178 */ unsigned int timer_minutes;
     /* 0x17c */ int field_17c;
     /* 0x180 */ unsigned int field_180;
@@ -477,7 +477,7 @@ struct MapStats {
     /* 0x3b0 */ char leave_ratings[0x19];
     /* 0x3c9 */ signed char leave_rating_index;
     unsigned char pad_3ca[0x2];
-    /* 0x3cc */ int field_3cc;
+    /* 0x3cc */ int power_spare_percent;
     /* 0x3d0 */ int power_supply;
     /* 0x3d4 */ int power_demand;
     /* 0x3d8 */ unsigned int unpowered_demand;

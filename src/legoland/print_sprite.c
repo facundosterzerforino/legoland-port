@@ -48,7 +48,29 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
 
     result = 1;
     DAT_007feb14 = 0;
-    if ((sprite->flags & 0x8000) != 0) {
+    if ((sprite->flags & 0x8000) == 0) {
+        if (param_4 != 0) {
+            if (*GetVRAMAddress(sprite) == 0) {
+                if (FUN_00499500(sprite) != 0) {
+                    result = RenderSpriteX(sprite, x, y, param_4);
+                } else {
+                    result = 0;
+                }
+            } else {
+                result = RenderSpriteX(sprite, x, y, param_4);
+            }
+        } else {
+            if (*GetVRAMAddress(sprite) == 0) {
+                if (FUN_00499500(sprite) != 0) {
+                    result = RenderSprite(sprite, x, y);
+                } else {
+                    result = 0;
+                }
+            } else {
+                result = RenderSprite(sprite, x, y);
+            }
+        }
+    } else {
         i = 0;
         if (sprite->group->count > 0) {
             do {
@@ -65,50 +87,30 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
                     } else {
                         yoff = yoff >> 1;
                     }
-                    if (param_4 == 0) {
+                    if (param_4 != 0) {
                         if (*GetVRAMAddress(sprite->group->subs[i]) == 0) {
-                            if (FUN_00499500(sprite->group->subs[i]) == 0) {
-                                goto cont;
+                            if (FUN_00499500(sprite->group->subs[i]) != 0) {
+                                RenderSpriteX(sprite->group->subs[i], xoff + x, yoff + y, param_4);
                             }
-                        }
-                        RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
-                    } else {
-                        if (*GetVRAMAddress(sprite->group->subs[i]) != 0 || FUN_00499500(sprite->group->subs[i]) != 0) {
+                        } else {
                             RenderSpriteX(sprite->group->subs[i], xoff + x, yoff + y, param_4);
+                        }
+                    } else {
+                        if (*GetVRAMAddress(sprite->group->subs[i]) == 0) {
+                            if (FUN_00499500(sprite->group->subs[i]) != 0) {
+                                RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
+                            }
+                        } else {
+                            RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
                         }
                     }
                 }
-            cont:
                 i = i + 1;
             } while (i < sprite->group->count);
         }
-        goto writeback;
     }
-    if (param_4 == 0) {
-        if (*GetVRAMAddress(sprite) != 0) {
-            result = RenderSprite(sprite, x, y);
-            goto writeback;
-        }
-        if (FUN_00499500(sprite) != 0) {
-            result = RenderSprite(sprite, x, y);
-            goto writeback;
-        }
-    } else {
-        if (*GetVRAMAddress(sprite) != 0) {
-            result = RenderSpriteX(sprite, x, y, param_4);
-            goto writeback;
-        }
-        if (FUN_00499500(sprite) != 0) {
-            result = RenderSpriteX(sprite, x, y, param_4);
-            goto writeback;
-        }
-    }
-    result = 0;
-writeback:
     if (param_5 != NULL && DAT_007feb14 != 0 && *param_5 != 0x100) {
-        Hover.type = *param_5;
-        Hover.ptr = param_5[1];
-        Hover.data.value = param_5[2];
+        Hover = *(struct HoverInfo *)param_5;
     }
     return result;
 }
@@ -212,10 +214,10 @@ LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
     }
     mask = arg->mask;
     group = (struct SpriteGroup *)sprite->image;
-    i = 0;
     if (group->count <= 0) {
         return result;
     }
+    i = 0;
     do {
         if ((mask & 1) != 0) {
             xoff = group->xoffs[i];

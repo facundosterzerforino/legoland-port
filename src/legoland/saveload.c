@@ -431,7 +431,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.frame = bloke->frame;
             BlokeSaveBuffer.field_75 = bloke->field_75;
             BlokeSaveBuffer.nav = bloke->nav;
-            BlokeSaveBuffer.person_8 = bloke->person->field_8;
+            BlokeSaveBuffer.person_8 = bloke->person->character;
             BlokeSaveBuffer.scale = bloke->person->scale;
             BlokeSaveBuffer.screen = bloke->person->screen;
             BlokeSaveBuffer.offset = bloke->person->offset;
@@ -972,7 +972,7 @@ LEGO_EXPORT int LoadGame(char *path) {
             bloke->person = malloc(sizeof(Person));
             AddPersonToList(bloke->person);
             bloke->person->bloke = bloke;
-            bloke->person->field_8 = BlokeSaveBuffer.person_8;
+            bloke->person->character = BlokeSaveBuffer.person_8;
             bloke->person->scale = BlokeSaveBuffer.scale;
             bloke->person->screen = BlokeSaveBuffer.screen;
             bloke->person->offset = BlokeSaveBuffer.offset;

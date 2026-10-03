@@ -142,10 +142,10 @@ struct CallbackEntry {
 };
 
 struct SampleConfig {
-    unsigned int field_0;
-    unsigned int field_4;
-    unsigned int field_8;
-    unsigned int field_c;
+    unsigned int source_type;
+    unsigned int bloke;
+    unsigned int source_x;
+    unsigned int source_y;
 };
 
 struct FXItem {
@@ -915,7 +915,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
         return 0;
     }
     if (config != 0) {
-        memcpy(&sample->source_type, &((struct SampleConfig *)config)->field_0, 16);
+        memcpy(&sample->source_type, &((struct SampleConfig *)config)->source_type, 16);
         FUN_004966a0(sample);
     } else {
         FUN_00496660(sample);

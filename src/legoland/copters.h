@@ -10,8 +10,8 @@ struct CopterLayer {
     /* 0x00 */ unsigned int flags;
     /* 0x04 */ char frame;
     /* 0x05 */ unsigned char pad_5[3];
-    /* 0x08 */ int field_8;
-    /* 0x0c */ int field_c;
+    /* 0x08 */ int idle_layer;
+    /* 0x0c */ int active_layer;
     /* 0x10 */ int field_10;
     /* 0x14 */ int field_14;
     /* 0x18 */ struct RideNode *rider;

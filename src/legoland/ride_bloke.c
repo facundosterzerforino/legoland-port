@@ -519,41 +519,44 @@ int *FUN_00401970(int *param_1, int param_2, int param_3) {
 void FUN_004019c0(struct RideMover *m) {
     unsigned char oldDir = m->dir;
     unsigned char moving = m->moving;
+    int dy, dx, dist, diff, vx, vy;
+    unsigned char newDir;
 
     if (!moving) {
         m->velX = 0;
         m->velY = 0;
     } else {
-        int dy, dx, dist, diff;
-        unsigned char newDir;
-
-        dx = m->destX - m->x;
-        dy = m->destY - m->y;
-        dist = (int)sqrt((float)dx * (float)dx + (float)dy * (float)dy);
-        if (dist != 0) {
-            m->dirX = (float)dx / dist;
-            m->dirY = (float)dy / dist;
-            newDir = (ArcTan256(dx, dy) + 8) >> 4 & 15;
-            m->dir = newDir;
-            diff = (newDir - oldDir) & 15;
-            if (diff & 8)
-                diff |= -16;
-            if (diff < -2 || diff > 2) {
+        do {
+            dx = m->destX - m->x;
+            dy = m->destY - m->y;
+            dist = (int)sqrt((float)dx * (float)dx + (float)dy * (float)dy);
+            if (dist != 0) {
+                m->dirX = (float)dx / dist;
+                m->dirY = (float)dy / dist;
+                newDir = (ArcTan256(dx, dy) + 8) >> 4 & 15;
+                m->dir = newDir;
+                diff = (newDir - oldDir) & 15;
                 if (diff & 8)
-                    oldDir--;
-                else
-                    oldDir++;
-                m->dir = oldDir;
-                m->dir = oldDir & 15;
+                    diff |= -16;
+                if (diff < -2 || diff > 2) {
+                    if (diff & 8)
+                        oldDir--;
+                    else
+                        oldDir++;
+                    m->dir = oldDir;
+                    m->dir = oldDir & 15;
+                }
+                vx = m->speed * dx / dist;
+                vy = m->speed * dy / dist;
+            } else {
+                vx = 0;
+                m->dirX = 0;
+                m->dirY = 0;
+                vy = 0;
             }
-            m->velX = m->speed * dx / dist;
-            m->velY = m->speed * dy / dist;
-        } else {
-            m->velX = 0;
-            m->dirX = 0;
-            m->dirY = 0;
-            m->velY = 0;
-        }
+            m->velX = vx;
+            m->velY = vy;
+        } while (0);
     }
 }
 
