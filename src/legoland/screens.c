@@ -718,7 +718,7 @@ void FUN_00459520(void) {
     DebugTrace("boot: after ProcessSystemEvents()");
     // STRING: LEGOLAND 0x004b9200
 #ifdef LEGOLAND_PORT
-    PlayMovie("lmi.avi", ExtSkipLogo, 1); /* [port] extensions/: -skip-logo lets a click skip the logo */
+    PlayMovie("lmi.avi", ExtSkipLogo, 1); /* [port] extensions/: a click skips the logo (-no-skip-logo: original) */
 #else
     PlayMovie("lmi.avi", 0, 1);
 #endif

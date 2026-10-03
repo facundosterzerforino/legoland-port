@@ -1,13 +1,15 @@
-/* Optional features, off by default: see extensions.h. */
+/* Optional features: see extensions.h. */
 #include <string.h>
 
 #include "extensions.h"
 
-int ExtSkipLogo;
+int ExtSkipLogo = 1;
 
 void ExtensionsParseCommandLine(const char *cmdline) {
     if (cmdline == NULL) {
         return;
     }
-    ExtSkipLogo = strstr(cmdline, "-skip-logo") != NULL;
+    if (strstr(cmdline, "-no-skip-logo") != NULL) {
+        ExtSkipLogo = 0;
+    }
 }
