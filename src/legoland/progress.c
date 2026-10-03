@@ -187,42 +187,46 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
 }
 
 // FUNCTION: LEGOLAND 0x0048bd00
+// [port:rewrite] loops over the 5 tutorial entries by index; the original's loop bound was the address
+// one past the table (0x4bed40, which the decomp names DAT_004bed40 for matching)
 void LoadTutorialSprites(void) {
     struct ProgressEntry *e;
+    int i;
 
-    e = &ProgressScreenTables.tutorials[0];
-    do {
+    for (i = 0; i < 5; i++) {
+        e = &ProgressScreenTables.tutorials[i];
         e->sprite0 = LoadSprite(e->name0, 4);
         e->sprite1 = LoadSprite(e->name1, 4);
-        e++;
-    } while ((int)&e->sprite0 < (int)&DAT_004bed40);
+    }
 }
 // FUNCTION: LEGOLAND 0x0048bd40
+// [port:rewrite] loops over the 5 tutorial entries by index; the original's loop bound was the address
+// one past the table (0x4bed44, DAT_004bed44 in the decomp)
 void FUN_0048bd40(void) {
-    int *esi;
+    int i;
 
-    esi = (int *)&ProgressScreenTables.tutorials[0].sprite1;
-    do {
-        ReferenceSprite((struct Sprite *)esi[-1]);
-        ReferenceSprite((struct Sprite *)esi[0]);
-        esi += 7;
-    } while ((int)esi < (int)&DAT_004bed44);
+    for (i = 0; i < 5; i++) {
+        ReferenceSprite(ProgressScreenTables.tutorials[i].sprite0);
+        ReferenceSprite(ProgressScreenTables.tutorials[i].sprite1);
+    }
 }
 // FUNCTION: LEGOLAND 0x0048bd70
+// [port:rewrite] loops over the 5 tutorial entries by index; the original stopped at the address one past
+// the table (0x4bed40)
 void FUN_0048bd70(void) {
-    struct FreePlaySpriteSlot *slot;
+    struct ProgressEntry *e;
+    int i;
 
     RemoveIconGroup(0x1c);
     RemoveIconGroup(0x23);
-    slot = (struct FreePlaySpriteSlot *)&ProgressScreenTables.tutorials[0].sprite0;
-    while ((int)slot < (int)&DAT_004bed40) {
-        while (KillSprite(slot->sprite0) == 0) {
+    for (i = 0; i < 5; i++) {
+        e = &ProgressScreenTables.tutorials[i];
+        while (KillSprite(e->sprite0) == 0) {
         }
-        while (KillSprite(slot->sprite1) == 0) {
+        while (KillSprite(e->sprite1) == 0) {
         }
-        slot->sprite1 = NULL;
-        slot->sprite0 = NULL;
-        slot++;
+        e->sprite1 = NULL;
+        e->sprite0 = NULL;
     }
 }
 
