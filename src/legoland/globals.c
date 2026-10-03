@@ -1098,11 +1098,14 @@ LEGO_EXPORT RECT SPRITE_ClipRect;
 // GLOBAL: LEGOLAND 0x004beb80
 struct ProgressTables ProgressScreenTables;
 
+// [port:rewrite] 0x4bed40..0x4bef9c holds the progress and tutorial screens' sprite names ("Appraisal_Yes.lls",
+// "Pro_Egypt_Unlit.lls", ... "TutorialBK.lls"), which ProgressScreenTables and the screen code point into. The
+// decomp declares 0x4bed40 and 0x4bed44 as unsigned ints only because the original's loops compare against
+// those addresses (one past ProgressScreenTables.tutorials, see progress.c). As 4-byte globals gen_data cut
+// every one of these names short ("Appraisa"), so the port sizes 0x4bed40 to the whole string pool and leaves
+// DAT_004bed44 out.
 // GLOBAL: LEGOLAND 0x004bed40
-unsigned int DAT_004bed40;
-
-// GLOBAL: LEGOLAND 0x004bed44
-unsigned int DAT_004bed44;
+char DAT_004bed40[0x25c];
 
 // GLOBAL: LEGOLAND 0x004bef9c
 unsigned int DAT_004bef9c;

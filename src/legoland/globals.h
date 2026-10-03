@@ -1209,9 +1209,7 @@ extern LEGO_EXPORT RECT SPRITE_ClipRect;
 // 0x004beb80
 extern struct ProgressTables ProgressScreenTables;
 // 0x004bed40
-extern unsigned int DAT_004bed40;
-// 0x004bed44
-extern unsigned int DAT_004bed44;
+extern char DAT_004bed40[0x25c]; /* progress/tutorial sprite-name strings, see globals.c */
 // 0x004bef9c
 extern unsigned int DAT_004bef9c;
 // 0x004bf670
