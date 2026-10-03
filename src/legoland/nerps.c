@@ -1095,7 +1095,7 @@ void FUN_0046b290(void) {
 typedef int (*EventHandler)(struct ObjectiveEvent *);
 
 // GLOBAL: LEGOLAND 0x004b9d44
-EventHandler DAT_004b9d44[68] = {
+EventHandler DAT_004b9d44[70] = {
     NULL,
     NULL,
     (EventHandler)FUN_00469b20,
@@ -1164,6 +1164,8 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_0046b100,
     (EventHandler)FUN_0046b130,
     (EventHandler)FUN_0046b180,
+    (EventHandler)FUN_0046b1e0,
+    (EventHandler)FUN_0046b1f0,
 };
 
 // FUNCTION: LEGOLAND 0x0046b2d0
