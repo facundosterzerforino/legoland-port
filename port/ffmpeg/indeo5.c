@@ -28,7 +28,7 @@
  */
 
 #define BITSTREAM_READER_LE
-#include "ivi_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
+#include "ffmpeg_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
 #include "ivi.h"
 #include "ivi_dsp.h"
 #include "indeo5data.h"

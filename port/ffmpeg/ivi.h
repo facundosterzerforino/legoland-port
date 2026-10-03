@@ -29,7 +29,7 @@
 #ifndef AVCODEC_IVI_H
 #define AVCODEC_IVI_H
 
-#include "ivi_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
+#include "ffmpeg_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
 #include <stdint.h>
 
 /**

@@ -1,20 +1,18 @@
-/* [library:movie] Indeo 5 frames for AVI streams, decoded by the port instead of a Video for Windows codec.
+/* [library:movie] Indeo 3 and Indeo 5 frames for AVI streams, decoded by the port instead of a Video for Windows codec.
  * See port_movie.h. */
 #include <windows.h>
 #include <vfw.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "indeo5/port_indeo5.h"
+#include "ffmpeg/port_ffmpeg.h"
 #include "port_movie.h"
-
-#define IV50_FOURCC mmioFOURCC('I', 'V', '5', '0')
 
 /* One stream is decoded at a time (the game shows one advisor animation or one movie at once). Frames depend
  * on the previous ones, so the decoder is kept between calls and fed every sample from the last key frame. */
 static struct {
     PAVISTREAM stream;
-    PortIndeo5 *decoder;
+    PortVideoDecoder *decoder;
     int width;
     int height;
     long position; /* last sample fed to the decoder, -1 for none */
@@ -26,7 +24,7 @@ static struct {
 
 static void ResetMovie(void) {
     if (movie.decoder != NULL) {
-        PortIndeo5_Close(movie.decoder);
+        PortVideoDecoder_Close(movie.decoder);
     }
     free(movie.sample);
     free(movie.dib);
@@ -36,18 +34,31 @@ static void ResetMovie(void) {
 
 static int OpenMovie(PAVISTREAM stream) {
     BITMAPINFOHEADER format;
-    LONG format_size = sizeof(format);
+    BITMAPINFOHEADER *full;
+    LONG format_size = 0;
 
     ResetMovie();
-    memset(&format, 0, sizeof(format));
-    if (AVIStreamReadFormat(stream, 0, &format, &format_size) != 0 || format.biCompression != IV50_FOURCC ||
-        format.biWidth <= 0 || format.biHeight <= 0 || format.biWidth > 1024 || format.biHeight > 1024) {
+    /* the stream's format can be longer than a BITMAPINFOHEADER (codec data after it) */
+    if (AVIStreamReadFormat(stream, 0, NULL, &format_size) != 0 || format_size < (LONG)sizeof(format)) {
+        return 0;
+    }
+    full = (BITMAPINFOHEADER *)calloc(1, format_size);
+    if (full == NULL) {
+        return 0;
+    }
+    if (AVIStreamReadFormat(stream, 0, full, &format_size) != 0) {
+        free(full);
+        return 0;
+    }
+    format = *full;
+    free(full);
+    if (format.biWidth <= 0 || format.biHeight <= 0 || format.biWidth > 1024 || format.biHeight > 1024) {
         return 0;
     }
     movie.width = format.biWidth;
     movie.height = format.biHeight;
     movie.dib = (BITMAPINFOHEADER *)calloc(1, sizeof(BITMAPINFOHEADER) + (size_t)movie.width * movie.height * 2);
-    movie.decoder = PortIndeo5_Open(movie.width, movie.height);
+    movie.decoder = PortVideoDecoder_Open(format.biCompression, movie.width, movie.height);
     if (movie.dib == NULL || movie.decoder == NULL) {
         ResetMovie();
         return 0;
@@ -105,7 +116,7 @@ static int DecodeSample(long position) {
     }
     if (bytes > movie.sample_size) {
         /* the decoder may read a little past the end of the data */
-        unsigned char *grown = (unsigned char *)realloc(movie.sample, bytes + PORT_INDEO5_PADDING);
+        unsigned char *grown = (unsigned char *)realloc(movie.sample, bytes + PORT_FFMPEG_PADDING);
         if (grown == NULL) {
             return 0;
         }
@@ -115,8 +126,8 @@ static int DecodeSample(long position) {
     if (AVIStreamRead(movie.stream, position, 1, movie.sample, bytes, &bytes, NULL) != 0) {
         return 0;
     }
-    memset(movie.sample + bytes, 0, PORT_INDEO5_PADDING);
-    result = PortIndeo5_Decode(movie.decoder, movie.sample, bytes, planes, linesize);
+    memset(movie.sample + bytes, 0, PORT_FFMPEG_PADDING);
+    result = PortVideoDecoder_Decode(movie.decoder, movie.sample, bytes, planes, linesize);
     if (result < 0) {
         return 0;
     }

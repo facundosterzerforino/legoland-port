@@ -27,7 +27,7 @@
  */
 
 #include <string.h>
-#include "ivi_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
+#include "ffmpeg_compat.h" /* [library:movie] the port builds this file without the rest of FFmpeg */
 #include "ivi.h"
 #include "ivi_dsp.h"
 
