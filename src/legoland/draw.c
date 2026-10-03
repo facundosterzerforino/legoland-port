@@ -88,6 +88,23 @@ LEGO_EXPORT unsigned int SetPointer(unsigned int param_1) {
     return old;
 }
 
+/* [library:video] port-only helper. In windowed mode (WINDEBUG) the game no longer takes the desktop's pixel
+ * format, which on Windows 11 is 32-bit: its own surfaces are always RGB565, the format the 16-bit renderer
+ * draws, and BlitFrameToWindow converts to the desktop with GDI. */
+static void SetWindowedSurfaceFormat(DDSURFACEDESC *desc) {
+    if (WinDebugMode == 0) {
+        return;
+    }
+    desc->dwFlags |= DDSD_PIXELFORMAT;
+    memset(&desc->ddpfPixelFormat, 0, sizeof(desc->ddpfPixelFormat));
+    desc->ddpfPixelFormat.dwSize = sizeof(desc->ddpfPixelFormat);
+    desc->ddpfPixelFormat.dwFlags = DDPF_RGB;
+    desc->ddpfPixelFormat.dwRGBBitCount = 16;
+    desc->ddpfPixelFormat.dwRBitMask = 0xf800;
+    desc->ddpfPixelFormat.dwGBitMask = 0x07e0;
+    desc->ddpfPixelFormat.dwBBitMask = 0x001f;
+}
+
 // FUNCTION: LEGOLAND 0x00463870
 LEGO_EXPORT int InitScreen(void) {
     HRESULT hr;
@@ -250,6 +267,7 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x40;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
+        SetWindowedSurfaceFormat(&desc); /* [library:video] RGB565, not the desktop's format */
         if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &OffscreenSurface, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             IDirectDrawSurface_Release(PrimarySurface);
@@ -262,6 +280,7 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x40;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
+        SetWindowedSurfaceFormat(&desc); /* [library:video] */
         if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
@@ -293,6 +312,12 @@ int SetDisplayModeAndDetectPixelFormat(void) {
     DebugTrace("SetDisplayMode: display is %lux%lu %lu bpp (masks %lx %lx %lx)", desc.dwWidth, desc.dwHeight,
         desc.ddpfPixelFormat.dwRGBBitCount, desc.ddpfPixelFormat.dwRBitMask, desc.ddpfPixelFormat.dwGBitMask,
         desc.ddpfPixelFormat.dwBBitMask);
+    if (WinDebugMode != 0) {
+        /* [library:video] windowed mode can't change the desktop's format (32-bit on Windows 11, which the
+         * original refused); the game's surfaces are RGB565 instead (SetWindowedSurfaceFormat). */
+        DisplayPixelFormat = 2;
+        return 1;
+    }
     if (desc.ddpfPixelFormat.dwRGBBitCount != 8) {
         if (desc.ddpfPixelFormat.dwRGBBitCount != 0x10) {
             return 0;
@@ -1688,6 +1713,46 @@ int FlipFrame(void) {
     return 1;
 }
 
+/* [library:video] port-only helper for windowed mode: the RGB565 frame can't be blitted to a primary surface in
+ * another format (DirectDraw doesn't convert), so GDI copies it into the window's client area instead. */
+static HRESULT PresentWindowedFrame(int width, int height) {
+    struct {
+        BITMAPINFOHEADER header;
+        DWORD masks[3];
+    } bmi;
+    DDSURFACEDESC desc;
+    HRESULT hr;
+    HDC dc;
+
+    desc.dwSize = sizeof(desc);
+    hr = IDirectDrawSurface_Lock(OffscreenSurface, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
+    if (hr == DDERR_SURFACELOST) {
+        IDirectDrawSurface_Restore(OffscreenSurface);
+        hr = IDirectDrawSurface_Lock(OffscreenSurface, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
+    }
+    if (hr != DD_OK) {
+        return hr;
+    }
+    memset(&bmi, 0, sizeof(bmi));
+    bmi.header.biSize = sizeof(bmi.header);
+    bmi.header.biWidth = desc.lPitch / 2;
+    bmi.header.biHeight = -height; /* top-down */
+    bmi.header.biPlanes = 1;
+    bmi.header.biBitCount = 16;
+    bmi.header.biCompression = BI_BITFIELDS;
+    bmi.masks[0] = 0xf800;
+    bmi.masks[1] = 0x07e0;
+    bmi.masks[2] = 0x001f;
+    dc = GetDC(WNDENV_Gethwnd());
+    if (dc != NULL) {
+        StretchDIBits(dc, 0, 0, width, height, 0, 0, width, height, desc.lpSurface, (BITMAPINFO *)&bmi, DIB_RGB_COLORS,
+            SRCCOPY);
+        ReleaseDC(WNDENV_Gethwnd(), dc);
+    }
+    IDirectDrawSurface_Unlock(OffscreenSurface, desc.lpSurface);
+    return DD_OK;
+}
+
 // FUNCTION: LEGOLAND 0x004661d0
 int BlitFrameToWindow(void) {
     RECT dst;
@@ -1712,11 +1777,16 @@ int BlitFrameToWindow(void) {
         tick = GetTickCount();
     }
     LastPresentTicks = GetTickCount();
-    GetClientRect(WNDENV_Gethwnd(), &client.rect);
-    ClientToScreen(WNDENV_Gethwnd(), &client.pt[0]);
-    OffsetRect(&dst, client.rect.left, client.rect.top);
-    surface = PrimarySurface;
-    result = IDirectDrawSurface_Blt(surface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
+    if (WinDebugMode != 0) {
+        /* [library:video] the RGB565 frame goes to the window through GDI (PresentWindowedFrame) */
+        result = PresentWindowedFrame(dst.right, dst.bottom);
+    } else {
+        GetClientRect(WNDENV_Gethwnd(), &client.rect);
+        ClientToScreen(WNDENV_Gethwnd(), &client.pt[0]);
+        OffsetRect(&dst, client.rect.left, client.rect.top);
+        surface = PrimarySurface;
+        result = IDirectDrawSurface_Blt(surface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
+    }
     if (result == 0x887601c2) {
         IDirectDrawSurface_Restore(PrimarySurface);
         result = IDirectDrawSurface_Blt(PrimarySurface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
@@ -1882,6 +1952,7 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
     desc.dwFlags = 7;
     desc.ddsCaps.dwCaps = 0x40;
     desc.dwHeight = (short)sprite->height;
+    SetWindowedSurfaceFormat(&desc); /* [library:video] sprites match the RGB565 back buffer */
     for (;;) {
         if ((sprite->flags & 0x10) == 0) {
             ddraw2 = DDRAWENV.ddraw2;
@@ -1894,6 +1965,7 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
         desc.dwSize = 0x6c;
         desc.dwFlags = 7;
         desc.ddsCaps.dwCaps = 0x840;
+        SetWindowedSurfaceFormat(&desc); /* [library:video] */
         ddraw2 = DDRAWENV.ddraw2;
         if (IDirectDraw2_CreateSurface(ddraw2, &desc, &sprite->surface, NULL) != 0) {
             ddraw2 = DDRAWENV.ddraw2;
