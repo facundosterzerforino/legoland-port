@@ -4,13 +4,15 @@
 /* [port] Freeze and crash reporting, port-only.
  *
  * A background thread watches a heartbeat that the game's main thread bumps (ProcessSystemEvents, DebugTrace,
- * DrawWatchSprite). If it stops for PORT_WATCHDOG_FREEZE_MS while the game isn't paused on purpose, the thread
+ * DrawWatchSprite). If it stops for PORT_WATCHDOG_FREEZE_MS, or Windows marks the window "not responding",
+ * while the game isn't paused on purpose, the thread
  * writes "FREEZE detected" to legoland-port-trace.txt with the main thread's call stack (symbolized from
  * legoland.pdb when it sits next to the exe, plus RVAs for llvm-symbolizer) and saves a minidump
  * (freeze-<time>.dmp). A first-chance access violation or stack overflow inside the exe is reported the same way
  * (crash-<time>.dmp) before the game's own handler runs, since that handler can't run on a broken stack. */
 
-#define PORT_WATCHDOG_FREEZE_MS 3000
+#define PORT_WATCHDOG_FREEZE_MS 1000 /* report */
+#define PORT_WATCHDOG_DUMP_MS 5000 /* and save a minidump if it lasts */
 
 void PortWatchdogStart(void);
 void PortHeartbeat(void);

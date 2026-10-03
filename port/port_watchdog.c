@@ -177,17 +177,49 @@ static LONG CALLBACK FirstChanceHandler(EXCEPTION_POINTERS *pointers) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
+static BOOL CALLBACK FindVisibleWindow(HWND window, LPARAM out) {
+    if (IsWindowVisible(window)) {
+        *(HWND *)out = window;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/* Windows' own "not responding": the main thread hasn't taken messages for 5 s. Catches loops that keep the
+ * heartbeat going (DrawWatchSprite) but never pump messages. */
+static int WindowHung(void) {
+    HWND window = NULL;
+
+    EnumThreadWindows(main_thread_id, FindVisibleWindow, (LPARAM)&window);
+    return window != NULL && IsHungAppWindow(window);
+}
+
+static int SampleMainThread(void) {
+    if (SuspendThread(main_thread) == (DWORD)-1) {
+        return 0;
+    }
+    report_context.ContextFlags = CONTEXT_FULL;
+    GetThreadContext(main_thread, &report_context);
+    CopyStack(report_context.Esp);
+    ResumeThread(main_thread);
+    return 1;
+}
+
 static DWORD WINAPI WatchdogThread(LPVOID unused) {
     LONG last = heartbeat;
     DWORD since = GetTickCount();
     int reported = 0;
+    int dumped = 0;
+    int hung;
+    int i;
+    DWORD stalled;
     EXCEPTION_RECORD *record;
 
     (void)unused;
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     symbols_ready = SymInitialize(GetCurrentProcess(), exe_dir, TRUE);
     for (;;) {
-        if (WaitForSingleObject(crash_event, 500) == WAIT_OBJECT_0) {
+        if (WaitForSingleObject(crash_event, 250) == WAIT_OBJECT_0) {
             record = crash_pointers->ExceptionRecord;
             report_context = *crash_pointers->ContextRecord;
             CopyStack(report_context.Esp);
@@ -199,26 +231,39 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
             SetEvent(crash_done);
             continue;
         }
-        if (paused || heartbeat != last) {
+        hung = !paused && WindowHung();
+        if (!hung && (paused || heartbeat != last)) {
             last = heartbeat;
             since = GetTickCount();
             reported = 0;
+            dumped = 0;
             continue;
         }
-        if (reported || GetTickCount() - since < PORT_WATCHDOG_FREEZE_MS) {
+        stalled = GetTickCount() - since;
+        if (!hung && stalled < PORT_WATCHDOG_FREEZE_MS) {
             continue;
         }
-        reported = 1;
-        if (SuspendThread(main_thread) == (DWORD)-1) {
-            continue;
+        if (!reported) {
+            reported = 1;
+            if (hung) {
+                PortTrace("FREEZE detected: the window stopped responding (heartbeat %s)",
+                    heartbeat != last ? "still moving: a loop that doesn't pump messages" : "stopped");
+            } else {
+                PortTrace("FREEZE detected: no heartbeat for %lu ms", stalled);
+            }
+            /* three samples, so a loop shows where it spins */
+            for (i = 0; i < 3; i++) {
+                if (!SampleMainThread()) {
+                    break;
+                }
+                Report(i == 0 ? "FREEZE" : "FREEZE (again)");
+                Sleep(300);
+            }
         }
-        report_context.ContextFlags = CONTEXT_FULL;
-        GetThreadContext(main_thread, &report_context);
-        CopyStack(report_context.Esp);
-        ResumeThread(main_thread);
-        PortTrace("FREEZE detected: no heartbeat for %lu ms", GetTickCount() - since);
-        Report("FREEZE");
-        WriteDump("freeze", main_thread_id, NULL);
+        if (!dumped && (hung || stalled >= PORT_WATCHDOG_DUMP_MS)) {
+            dumped = 1;
+            WriteDump("freeze", main_thread_id, NULL);
+        }
     }
     return 0;
 }
