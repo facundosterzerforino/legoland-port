@@ -71,21 +71,25 @@ LEGO_EXPORT void ScanKeyboard(void) {
     if (dinput_keyboard == NULL) {
         return;
     }
-    while (1) {
-        hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dinput_keyboard, 0x100, KeyboardState);
-        if (hr == DI_OK) {
-            return;
+    hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dinput_keyboard, 0x100, KeyboardState);
+    if (hr == DI_OK) {
+        return;
+    }
+    if (kb_trace < 5) {
+        kb_trace++;
+        DebugTrace("ScanKeyboard: GetDeviceState hr=%lx", hr);
+    }
+    /* [library:input] the original retried Acquire until it worked. A foreground device can't be acquired while
+     * another window is active, so that loop hung the game whenever it lost focus (or never got it at launch);
+     * try once, and read no keys this frame if it still fails. ProcessSystemEvents pauses while inactive. */
+    if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
+        hr = IDirectInputDevice_Acquire((IDirectInputDeviceA *)dinput_keyboard);
+        if (hr == DI_OK || hr == S_FALSE) {
+            hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dinput_keyboard, 0x100, KeyboardState);
         }
-        if (kb_trace < 5) {
-            kb_trace++;
-            DebugTrace("ScanKeyboard: GetDeviceState hr=%lx", hr);
-        }
-        if (hr == 0x8007000c || hr == 0x8007001e) {
-            hr = IDirectInputDevice_Acquire((IDirectInputDeviceA *)dinput_keyboard);
-            if (kb_trace < 5) {
-                DebugTrace("ScanKeyboard: Acquire hr=%lx", hr);
-            }
-        }
+    }
+    if (hr != DI_OK) {
+        memset(KeyboardState, 0, 0x100);
     }
 }
 
@@ -133,20 +137,21 @@ LEGO_EXPORT void ScanMouse(void) {
     HRESULT hr;
 
     if (dintput_mouse != NULL) {
-        while (1) {
-            hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dintput_mouse, 0x10, &MouseState);
-            if (hr == DI_OK) {
-                break;
-            }
+        hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dintput_mouse, 0x10, &MouseState);
+        if (hr != DI_OK) {
             if (ms_trace < 5) {
                 ms_trace++;
                 DebugTrace("ScanMouse: GetDeviceState hr=%lx", hr);
             }
-            if (hr == 0x8007000c || hr == 0x8007001e) {
+            /* [library:input] as in ScanKeyboard: one Acquire, then no movement or buttons this frame */
+            if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
                 hr = IDirectInputDevice_Acquire((IDirectInputDeviceA *)dintput_mouse);
-                if (ms_trace < 5) {
-                    DebugTrace("ScanMouse: Acquire hr=%lx", hr);
+                if (hr == DI_OK || hr == S_FALSE) {
+                    hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dintput_mouse, 0x10, &MouseState);
                 }
+            }
+            if (hr != DI_OK) {
+                memset(&MouseState, 0, sizeof(MouseState));
             }
         }
     }

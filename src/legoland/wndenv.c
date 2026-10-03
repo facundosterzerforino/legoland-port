@@ -57,6 +57,14 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
         }
         *(unsigned short *)&lpConfig->field_1c &= (unsigned short)~1;
         break;
+    case WM_ACTIVATEAPP:
+        /* [library:input] also pause when another program is activated (the game can't read its input then; see
+         * ScanKeyboard); WM_SETFOCUS above resumes. Only pause once, or the timer would never resume. */
+        if (wParam == 0 && (lpConfig->field_1c & 1) == 0) {
+            PauseGameTimerResult = PauseGameTimer();
+            lpConfig->field_1c |= 1;
+        }
+        break;
     }
     return DefWindowProcA(hWnd, msg, wParam, lParam);
 }
@@ -76,6 +84,12 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
             TranslateMessage(&msg);
             DispatchMessageA(&msg);
             SetCursor(NULL);
+        }
+        /* [library:input] a window that never became the foreground one (launched from the background) gets no
+         * WM_KILLFOCUS, and its DirectInput devices can't be acquired: pause until it gets the focus. */
+        if ((lpConfig->field_1c & 1) == 0 && GetForegroundWindow() != WNDENV_Gethwnd()) {
+            PauseGameTimerResult = PauseGameTimer();
+            lpConfig->field_1c |= 1;
         }
         if ((lpConfig->field_1c & 1) != 0) {
             if (!peeked) {
