@@ -1036,9 +1036,6 @@ extern unsigned char PowerStationSFX[0x18];
 // 0x004b8768
 extern struct FXItem DINO_SFX[5];
 // 0x004b87a8
-extern unsigned char MONEY_SFX[12];
-// 0x004b87b0
-extern void *PTR_004b87b0[4];
 extern struct FXItem MONEY_SFX[2];
 // 0x004b8bbc
 extern unsigned char PercentSFormat[1];

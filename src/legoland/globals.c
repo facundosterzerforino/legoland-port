@@ -801,10 +801,6 @@ unsigned char PowerStationSFX[0x18];
 struct FXItem DINO_SFX[5];
 
 // GLOBAL: LEGOLAND 0x004b87a8
-unsigned char MONEY_SFX[12];
-
-// GLOBAL: LEGOLAND 0x004b87b0
-void *PTR_004b87b0[4]; /* 4 dwords up to the strings at 0x4b87c0 */
 struct FXItem MONEY_SFX[2];
 
 // GLOBAL: LEGOLAND 0x004b8bbc
