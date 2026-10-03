@@ -53,8 +53,9 @@ NAME_RE = re.compile(r"\(\s*\*\s*(\w+)\s*\)|(\w+)\s*(?:\[|=|;|$)")
 
 
 def def_name(line):
+    line = re.sub(r"/\*.*?\*/|//.*$", "", line)  # a trailing comment would hide the name
     head = line.split("=")[0].strip()
-    m = re.search(r"\(\s*\*\s*(\w+)\s*\)", head)
+    m = re.search(r"\(\s*\*\s*(\w+)\s*(\[[^\]]*\])?\s*\)", head)  # (*name)(...) and (*name[N])(...)
     if m:
         return m.group(1)
     m = re.search(r"(\w+)\s*(\[[^=]*\])?\s*;?\s*$", head)

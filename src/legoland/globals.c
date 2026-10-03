@@ -738,7 +738,7 @@ unsigned short DAT_004b7d7e;
 unsigned int DAT_004b7d84;
 
 // GLOBAL: LEGOLAND 0x004b7e9c
-unsigned int DAT_004b7e9c;
+char *DAT_004b7e9c[22]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004b81c0
 // STRING: LEGOLAND 0x004b8260
@@ -988,31 +988,31 @@ unsigned int DAT_004bb5ac;
 unsigned int ScriptConditionActive;
 
 // GLOBAL: LEGOLAND 0x004bb5b4
-unsigned int DAT_004bb5b4;
+char *DAT_004bb5b4[4]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb5c4
-unsigned int DAT_004bb5c4;
+char *DAT_004bb5c4[5]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb5d8
-unsigned int DAT_004bb5d8;
+char *DAT_004bb5d8[2]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb5e0
-unsigned int DAT_004bb5e0;
+char *DAT_004bb5e0[5]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb5f4
-unsigned int DAT_004bb5f4;
+char *DAT_004bb5f4[12]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb624
-unsigned int DAT_004bb624;
+char *DAT_004bb624[25]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb688
-unsigned int DAT_004bb688;
+char *DAT_004bb688[13]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb6bc
-unsigned int DAT_004bb6bc;
+char *DAT_004bb6bc[6]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb6d4
-unsigned int DAT_004bb6d4;
+char *DAT_004bb6d4[9]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb6f8
 struct ScriptCommand DAT_004bb6f8[0x5d];

@@ -998,7 +998,7 @@ extern unsigned short DAT_004b7d7e;
 // 0x004b7d84
 extern unsigned int DAT_004b7d84;
 // 0x004b7e9c
-extern unsigned int DAT_004b7e9c;
+extern char *DAT_004b7e9c[22];
 // 0x004b81c0
 extern char *GraphicsPath;
 // 0x004b81c4
@@ -1159,23 +1159,23 @@ extern unsigned int DAT_004bb5ac;
 // 0x004bb5b0
 extern unsigned int ScriptConditionActive;
 // 0x004bb5b4
-extern unsigned int DAT_004bb5b4;
+extern char *DAT_004bb5b4[4];
 // 0x004bb5c4
-extern unsigned int DAT_004bb5c4;
+extern char *DAT_004bb5c4[5];
 // 0x004bb5d8
-extern unsigned int DAT_004bb5d8;
+extern char *DAT_004bb5d8[2];
 // 0x004bb5e0
-extern unsigned int DAT_004bb5e0;
+extern char *DAT_004bb5e0[5];
 // 0x004bb5f4
-extern unsigned int DAT_004bb5f4;
+extern char *DAT_004bb5f4[12];
 // 0x004bb624
-extern unsigned int DAT_004bb624;
+extern char *DAT_004bb624[25];
 // 0x004bb688
-extern unsigned int DAT_004bb688;
+extern char *DAT_004bb688[13];
 // 0x004bb6bc
-extern unsigned int DAT_004bb6bc;
+extern char *DAT_004bb6bc[6];
 // 0x004bb6d4
-extern unsigned int DAT_004bb6d4;
+extern char *DAT_004bb6d4[9];
 // 0x004bb6f8
 extern struct ScriptCommand DAT_004bb6f8[0x5d];
 // 0x004bcba4

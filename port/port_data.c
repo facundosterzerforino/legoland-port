@@ -293,6 +293,7 @@ void Mechanic_Build();
 void Mechanic_Idle();
 void Mechanics_Repair();
 void NerpsSetEntranceFee();
+extern char PTR_FUN_004b7e38[];
 
 #define PORT_DATA_VA 0x004ab000u
 #define PORT_DATA_SIZE 0x17000u
@@ -4736,8 +4737,8 @@ static const struct PortFixup port_fixups[] = {
     {0x10164, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x2b0, 0x9b10u},
     {0x10168, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x344, 0x9ba4u},
     {0x1016c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x140, 0xd8e8u},
-    {0x10170, 'G', (void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0x94, 0xd3dcu},
-    {0x10174, 'G', (void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0x94, 0xd3dcu},
+    {0x10170, 'G', (void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0x74, 0xd3dcu},
+    {0x10174, 'G', (void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0x74, 0xd3dcu},
     {0x1017c, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x120, 0xa0c8u},
     {0x10184, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x134, 0xa0dcu},
     {0x105b4, 'G', (void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0x10c, 0xd6d0u},
@@ -5378,7 +5379,7 @@ static const struct PortFixup port_fixups[] = {
     {0x1325c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x158, 0xd900u},
     {0x1326c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x14c, 0xc5c4u},
     {0x1327c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x140, 0xd8e8u},
-    {0x1328c, 'G', (void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0x94, 0xd3dcu},
+    {0x1328c, 'G', (void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0x74, 0xd3dcu},
     {0x1329c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1bc, 0xd964u},
     {0x132ac, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1ac, 0xd954u},
     {0x132bc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x19c, 0xd944u},
@@ -5840,7 +5841,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7d74, sizeof(DAT_004b7d74), 0xcd74, 0x4},
     {(void *)&DAT_004b7d78, sizeof(DAT_004b7d78), 0xcd78, 0x6},
     {(void *)&DAT_004b7d7e, sizeof(DAT_004b7d7e), 0xcd7e, 0x6},
-    {(void *)&DAT_004b7d84, sizeof(DAT_004b7d84), 0xcd84, 0x118},
+    {(void *)&DAT_004b7d84, sizeof(DAT_004b7d84), 0xcd84, 0xb4},
     {(void *)&DAT_004b7e9c, sizeof(DAT_004b7e9c), 0xce9c, 0x324},
     {(void *)&GraphicsPath, sizeof(GraphicsPath), 0xd1c0, 0x4},
     {(void *)&GraphicsPathPrefix, sizeof(GraphicsPathPrefix), 0xd1c4, 0x4},
@@ -5848,10 +5849,14 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&MasksPath, sizeof(MasksPath), 0xd1cc, 0x4},
     {(void *)&MasksSmallPath, sizeof(MasksSmallPath), 0xd1d0, 0x4},
     {(void *)&IconsPath, sizeof(IconsPath), 0xd1d4, 0x4},
-    {(void *)&ModelsPath, sizeof(ModelsPath), 0xd1d8, 0x15c},
+    {(void *)&ModelsPath, sizeof(ModelsPath), 0xd1d8, 0x140},
+    {(void *)&DAT_004b8318, sizeof(DAT_004b8318), 0xd318, 0x8},
+    {(void *)&DAT_004b8320, sizeof(DAT_004b8320), 0xd320, 0x8},
+    {(void *)&DAT_004b8328, sizeof(DAT_004b8328), 0xd328, 0xc},
     {(void *)&DAT_004b8334, sizeof(DAT_004b8334), 0xd334, 0x10},
     {(void *)&DAT_004b8344, sizeof(DAT_004b8344), 0xd344, 0x4},
-    {(void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0xd348, 0x27c},
+    {(void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0xd348, 0x20},
+    {(void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0xd368, 0x25c},
     {(void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0xd5c4, 0x14c},
     {(void *)&FountainSFX, sizeof(FountainSFX), 0xd710, 0x40},
     {(void *)&PowerStationSFX, sizeof(PowerStationSFX), 0xd750, 0x18},
