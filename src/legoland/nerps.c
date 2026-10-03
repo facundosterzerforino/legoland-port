@@ -162,7 +162,7 @@ unsigned int FUN_0046a170(struct NerpsArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046a190
-unsigned int FUN_0046a190(struct NerpsArg *arg) {
+unsigned int GenerateWorkers(struct NerpsArg *arg) {
     int i;
 
     SetBricksLimited(0);
@@ -263,18 +263,18 @@ unsigned int FUN_0046a300(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a330
 unsigned int FUN_0046a330(struct NerpsArg *arg) {
-    FUN_00462e50(arg->field_14, arg->field_1c);
+    SetClassPercent(arg->field_14, arg->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a350
 unsigned int FUN_0046a350(struct NerpsArg *arg) {
-    FUN_00462e70(arg->field_14, arg->field_1c);
+    SetClassLimit(arg->field_14, arg->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a370
-unsigned int FUN_0046a370(struct NerpsArg *arg) {
+unsigned int NerpsSetEntranceFee(struct NerpsArg *arg) {
     MapStats.entrance_fee = (short)arg->field_1c;
     return 1;
 }
@@ -887,7 +887,7 @@ unsigned int FUN_0046ae70(struct NerpsArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046aec0
-unsigned int FUN_0046aec0(struct NerpsArg *arg) {
+unsigned int AdjustGardenerCount(struct NerpsArg *arg) {
     int current;
     int target;
 
@@ -1139,8 +1139,8 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_00469b20,
     (EventHandler)FUN_00469b50,
     (EventHandler)FUN_00469b70,
-    (EventHandler)FUN_00469b90,
-    (EventHandler)FUN_00469bb0,
+    (EventHandler)ObjectiveEventAddBricks,
+    (EventHandler)ObjectiveEventSetBricks,
     (EventHandler)FUN_00469c40,
     (EventHandler)FUN_00469c80,
     (EventHandler)FUN_00469ed0,
@@ -1150,13 +1150,13 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_00469fc0,
     (EventHandler)FUN_0046a030,
     (EventHandler)FUN_0046a120,
-    (EventHandler)FUN_0046a190,
+    (EventHandler)GenerateWorkers,
     (EventHandler)FUN_0046a1f0,
     (EventHandler)FUN_0046a230,
     (EventHandler)FUN_0046a300,
     (EventHandler)FUN_0046a330,
     (EventHandler)FUN_0046a350,
-    (EventHandler)FUN_0046a370,
+    (EventHandler)NerpsSetEntranceFee,
     (EventHandler)FUN_0046a3b0,
     (EventHandler)FUN_0046a170,
     (EventHandler)FUN_0046a420,
@@ -1192,7 +1192,7 @@ EventHandler DAT_004b9d44[68] = {
     (EventHandler)FUN_0046ae30,
     (EventHandler)FUN_0046ae40,
     (EventHandler)FUN_0046ae70,
-    (EventHandler)FUN_0046aec0,
+    (EventHandler)AdjustGardenerCount,
     (EventHandler)FUN_0046af10,
     (EventHandler)FUN_0046af60,
     (EventHandler)FUN_0046afe0,
@@ -1298,7 +1298,7 @@ void FUN_0046b2d0(void) {
             DAT_0066879c = (unsigned int)DAT_00668798;
             if (DAT_00668798 != NULL) {
                 DAT_00668790 = 1;
-                FUN_0046c540((struct AppendArgC *)DAT_00668798);
+                AppendObjectiveEventList((struct AppendArgC *)DAT_00668798);
                 FUN_00468d00();
             }
         }
@@ -1483,7 +1483,7 @@ void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
 unsigned int FUN_0046b700(void) {
     if (DAT_0066879c != 0) {
         if (DAT_00668614 != 0) {
-            FUN_00468bb0(DAT_004b8bbc, DAT_007fe120[DAT_00668614]);
+            PostObjectiveMessage(PercentSFormat, ScriptStringTable[DAT_00668614]);
             DAT_00668618 = 1;
             return 1;
         }
@@ -2200,7 +2200,7 @@ struct AppendArgC {
 };
 
 // FUNCTION: LEGOLAND 0x0046c540
-void FUN_0046c540(struct AppendArgC *arg) {
+void AppendObjectiveEventList(struct AppendArgC *arg) {
     struct ObjectiveEvent *cur;
 
     cur = DAT_00668784;
@@ -2240,8 +2240,8 @@ void FUN_0046c580(struct AppendArg10 *arg) {
 
 // FUNCTION: LEGOLAND 0x0046c5c0
 void FUN_0046c5c0(void) {
-    FreeObjectiveEventList(DAT_00668728);
-    DAT_00668728 = NULL;
+    FreeObjectiveEventList(ObjectiveEventList);
+    ObjectiveEventList = NULL;
     FreeObjectiveEventList(DAT_00668724);
     DAT_00668724 = NULL;
     FreeObjectiveEventList(DAT_00668784);
@@ -2252,7 +2252,7 @@ void FUN_0046c5c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c620
-unsigned int FUN_0046c620(char *str) {
+unsigned int SaveGameWriteString(char *str) {
     int len;
 
     if (str != NULL) {
@@ -2278,7 +2278,7 @@ void *FUN_0046c680(void) {
     void *buffer;
 
     if (SaveGameRead(&len, 4) == 0) {
-        DAT_006687a0++;
+        ScriptLoadErrorCount++;
         return NULL;
     }
     if (len == -1) {
@@ -2287,7 +2287,7 @@ void *FUN_0046c680(void) {
     buffer = malloc(len + 1);
     if (SaveGameRead(buffer, len) == 0) {
         free(buffer);
-        DAT_006687a0++;
+        ScriptLoadErrorCount++;
         return NULL;
     }
     ((char *)buffer)[len] = 0;
@@ -2295,7 +2295,7 @@ void *FUN_0046c680(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c700
-unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
+unsigned int SaveObjectiveEventList(struct ObjectiveEvent *node) {
     unsigned int marker[17];
 
     while (node != NULL) {
@@ -2310,17 +2310,17 @@ unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
             return 0;
         }
         if (node->field_4 != 0) {
-            if (FUN_0046c620(*(char **)node->field_4) == 0) {
+            if (SaveGameWriteString(*(char **)node->field_4) == 0) {
                 return 0;
             }
-        } else if (FUN_0046c620(NULL) == 0) {
+        } else if (SaveGameWriteString(NULL) == 0) {
             return 0;
         }
         if (node->field_8 != 0) {
-            if (FUN_0046c620((char *)node->field_8) == 0) {
+            if (SaveGameWriteString((char *)node->field_8) == 0) {
                 return 0;
             }
-        } else if (FUN_0046c620(NULL) == 0) {
+        } else if (SaveGameWriteString(NULL) == 0) {
             return 0;
         }
         node = node->next;
@@ -2331,7 +2331,7 @@ unsigned int FUN_0046c700(struct ObjectiveEvent *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c7e0
-struct ObjectiveEvent *FUN_0046c7e0(void) {
+struct ObjectiveEvent *LoadObjectiveEventList(void) {
     struct ObjectiveEvent *node;
     struct ObjectiveEvent *prev;
     struct ObjectiveEvent *head;
@@ -2355,7 +2355,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
         // STRING: LEGOLAND 0x004ba828
         DBPrintf("Fixed up to %d\n", node->timestamp);
         str = (char *)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             free(node);
             FreeObjectiveEventList(head);
             return NULL;
@@ -2370,7 +2370,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
         if (node->field_8 != 0) {
             node->flags_10 |= 0x20;
         }
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             FreeObjectiveEvent(node);
             FreeObjectiveEventList(head);
             return NULL;
@@ -2385,7 +2385,7 @@ struct ObjectiveEvent *FUN_0046c7e0(void) {
     }
     free(node);
     FreeObjectiveEventList(head);
-    DAT_006687a0++;
+    ScriptLoadErrorCount++;
     return NULL;
 }
 
@@ -2395,7 +2395,7 @@ unsigned int SaveScripts(void) {
     int scratch;
     int i;
 
-    DAT_006687a0 = 0;
+    ScriptLoadErrorCount = 0;
     DAT_007fe994 = GetGameTimer();
     if (FUN_00474920() == 0) {
         return 0;
@@ -2406,11 +2406,11 @@ unsigned int SaveScripts(void) {
     if (SaveGameWrite(DAT_0066869c, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameWrite(&DAT_00668720, 4) == 0) {
+    if (SaveGameWrite(&ScriptStringCount, 4) == 0) {
         return 0;
     }
-    for (i = 0; i < (int)DAT_00668720; i++) {
-        if (FUN_0046c620((char *)DAT_007fe120[i]) == 0) {
+    for (i = 0; i < (int)ScriptStringCount; i++) {
+        if (SaveGameWriteString((char *)ScriptStringTable[i]) == 0) {
             return 0;
         }
     }
@@ -2422,23 +2422,23 @@ unsigned int SaveScripts(void) {
     if (SaveGameWrite(&i, 4) == 0) {
         return 0;
     }
-    if (SaveGameWrite(DAT_007fe930, 0xa) == 0) {
+    if (SaveGameWrite(ObjectiveCounters, 0xa) == 0) {
         return 0;
     }
-    if (FUN_0046c700(DAT_00668784) == 0) {
+    if (SaveObjectiveEventList(DAT_00668784) == 0) {
         return 0;
     }
     for (node = (struct NerpsListNode *)DAT_00668798; node != NULL; node = node->next) {
         if (SaveGameWrite(&node->field_4, 4) == 0) {
             return 0;
         }
-        if (FUN_0046c700((struct ObjectiveEvent *)node->field_c) == 0) {
+        if (SaveObjectiveEventList((struct ObjectiveEvent *)node->field_c) == 0) {
             return 0;
         }
-        if (FUN_0046c700((struct ObjectiveEvent *)node->field_10) == 0) {
+        if (SaveObjectiveEventList((struct ObjectiveEvent *)node->field_10) == 0) {
             return 0;
         }
-        if (FUN_0046c620((char *)node->field_8) == 0) {
+        if (SaveGameWriteString((char *)node->field_8) == 0) {
             return 0;
         }
     }
@@ -2478,9 +2478,9 @@ unsigned int LoadScripts(void) {
     int base;
     unsigned char skip;
 
-    DAT_006687a0 = 0;
+    ScriptLoadErrorCount = 0;
     DAT_007fe994 = GetGameTimer();
-    if (DAT_006687a0 != 0) {
+    if (ScriptLoadErrorCount != 0) {
         return 0;
     }
     if (FUN_00474970() == 0) {
@@ -2492,12 +2492,12 @@ unsigned int LoadScripts(void) {
     if (SaveGameRead(DAT_0066869c, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameRead(&DAT_00668720, 4) == 0) {
+    if (SaveGameRead(&ScriptStringCount, 4) == 0) {
         return 0;
     }
-    for (i = 0; i < (int)DAT_00668720; i++) {
-        DAT_007fe120[i] = (unsigned int)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+    for (i = 0; i < (int)ScriptStringCount; i++) {
+        ScriptStringTable[i] = (unsigned int)FUN_0046c680();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
     }
@@ -2511,7 +2511,7 @@ unsigned int LoadScripts(void) {
         return 0;
     }
     if (i > 0xa) {
-        if (SaveGameRead(DAT_007fe930, 10) == 0) {
+        if (SaveGameRead(ObjectiveCounters, 10) == 0) {
             return 0;
         }
         for (i -= 10; i != 0; i--) {
@@ -2522,12 +2522,12 @@ unsigned int LoadScripts(void) {
     } else {
         FUN_00468840();
         FUN_004688e0();
-        if (SaveGameRead(DAT_007fe930, i) == 0) {
+        if (SaveGameRead(ObjectiveCounters, i) == 0) {
             return 0;
         }
     }
-    DAT_00668784 = FUN_0046c7e0();
-    if (DAT_006687a0 != 0) {
+    DAT_00668784 = LoadObjectiveEventList();
+    if (ScriptLoadErrorCount != 0) {
         return 0;
     }
     prev = NULL;
@@ -2539,16 +2539,16 @@ unsigned int LoadScripts(void) {
         if (node == NULL) {
             return 0;
         }
-        node->field_c = (unsigned int)FUN_0046c7e0();
-        if (DAT_006687a0 != 0) {
+        node->field_c = (unsigned int)LoadObjectiveEventList();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
-        node->field_10 = (unsigned int)FUN_0046c7e0();
-        if (DAT_006687a0 != 0) {
+        node->field_10 = (unsigned int)LoadObjectiveEventList();
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
         node->field_8 = (unsigned int)FUN_0046c680();
-        if (DAT_006687a0 != 0) {
+        if (ScriptLoadErrorCount != 0) {
             return 0;
         }
         if (prev != NULL) {

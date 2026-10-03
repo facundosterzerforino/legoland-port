@@ -30,10 +30,10 @@ LEGO_EXPORT int SetupControllers(void) {
     DAT_00813aa8 = 0x40;
     DAT_00813ab0 = 8;
     DAT_00813ad8 = 0x400;
-    DAT_00813a64 = 10;
-    DAT_00813a68 = 4;
-    DAT_00813a6c = 1;
-    DAT_00813a70 = 1;
+    MouseTileX = 10;
+    MouseTileY = 4;
+    FootprintWidth = 1;
+    FootprintHeight = 1;
     if (CONTROLLERBUFFER != NULL) {
         ControllersInitialized = 1;
         return 1;
@@ -126,12 +126,12 @@ void FUN_00452030(void) {
         DAT_00813a84 = local_14;
         DAT_00813a88 = local_10;
         if (DAT_0080ff6c == NULL) {
-            DAT_00813a6c = 1;
-            DAT_00813a70 = 1;
+            FootprintWidth = 1;
+            FootprintHeight = 1;
         } else {
             cls = (struct ObjClass *)DAT_0080ff6c;
-            DAT_00813a6c = (cls->footprint.v[2] - cls->footprint.v[0]) + 1;
-            DAT_00813a70 = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
+            FootprintWidth = (cls->footprint.v[2] - cls->footprint.v[0]) + 1;
+            FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
         }
     } else {
         local_14 = v74;
@@ -152,26 +152,26 @@ void FUN_00452030(void) {
         }
         cls = (struct ObjClass *)EditMode.unk8;
         local_c = cls->footprint.v[2] - cls->footprint.v[0];
-        DAT_00813a6c = local_c + 1;
-        DAT_00813a70 = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
+        FootprintWidth = local_c + 1;
+        FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
         if (v74 == v7c && v78 == v80) {
             bValidate = 1;
-            local_c = ((DAT_00813a6c - local_14) + iVar5) / DAT_00813a6c * DAT_00813a6c + -1 + local_14;
-            iVar5 = ((DAT_00813a70 - local_10) + local_8) / DAT_00813a70 * DAT_00813a70 + -1 + local_10;
+            local_c = ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth + -1 + local_14;
+            iVar5 = ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight + -1 + local_10;
         } else {
-            if ((int)DAT_00813a6c < 2 || local_14 != v7c || iVar5 != v74) {
-                local_c = ((DAT_00813a6c - local_14) + iVar5) / DAT_00813a6c * DAT_00813a6c + -1 + local_14;
+            if ((int)FootprintWidth < 2 || local_14 != v7c || iVar5 != v74) {
+                local_c = ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth + -1 + local_14;
             } else {
-                local_14 = iVar5 - ((DAT_00813a6c - local_14) + iVar5) / DAT_00813a6c * DAT_00813a6c;
+                local_14 = iVar5 - ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth;
                 local_c = local_c + v74;
             }
-            if ((int)DAT_00813a70 < 2 || local_10 != v80 || local_8 != v78) {
-                iVar5 = ((DAT_00813a70 - local_10) + local_8) / DAT_00813a70 * DAT_00813a70 + -1 + local_10;
+            if ((int)FootprintHeight < 2 || local_10 != v80 || local_8 != v78) {
+                iVar5 = ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight + -1 + local_10;
             } else {
-                iVar5 = v78 + -1 + DAT_00813a70;
-                local_10 = local_8 - ((DAT_00813a70 - local_10) + local_8) / DAT_00813a70 * DAT_00813a70;
+                iVar5 = v78 + -1 + FootprintHeight;
+                local_10 = local_8 - ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight;
             }
-            if (abs(local_14 - local_c) <= (int)DAT_00813a6c && abs(local_10 - iVar5) <= (int)DAT_00813a70) {
+            if (abs(local_14 - local_c) <= (int)FootprintWidth && abs(local_10 - iVar5) <= (int)FootprintHeight) {
                 bValidate = 1;
             }
         }
@@ -213,13 +213,13 @@ void FUN_00452390(void) {
         DAT_00813a3c = (DAT_00813afc - DAT_00813af4) + 1;
         DAT_00813a74 = QueryObj.pos.x + DAT_00813af0;
         DAT_00813a78 = QueryObj.pos.y + DAT_00813af4;
-        DAT_00813a7c = DAT_00813a64;
-        DAT_00813a80 = DAT_00813a68;
+        DAT_00813a7c = MouseTileX;
+        DAT_00813a80 = MouseTileY;
     } else {
-        DAT_00813a74 = DAT_00813a64;
-        DAT_00813a78 = DAT_00813a68;
-        DAT_00813a7c = DAT_00813a64;
-        DAT_00813a80 = DAT_00813a68;
+        DAT_00813a74 = MouseTileX;
+        DAT_00813a78 = MouseTileY;
+        DAT_00813a7c = MouseTileX;
+        DAT_00813a80 = MouseTileY;
     }
     if ((DAT_00813ac4 & 1) != 0) {
         GamePad = GamePad | 0x1000;
@@ -317,8 +317,8 @@ LEGO_EXPORT void ReadGameButtons(void) {
     if ((repeat & DAT_00813ad8) != 0) DAT_00813adc |= 8;
 
     if (lpConfig->field_1e != 0) {
-        DAT_00813a44.x = CONTROLLERBUFFER->x;
-        DAT_00813a44.y = CONTROLLERBUFFER->y;
+        MousePos.x = CONTROLLERBUFFER->x;
+        MousePos.y = CONTROLLERBUFFER->y;
         if (MapLoaded != 0) {
             scroll = FUN_00451f70();
             if ((GamePad & 0x1000) != 0 || FocussedIconPtr == 0) {
@@ -330,10 +330,10 @@ LEGO_EXPORT void ReadGameButtons(void) {
                     GamePad = GamePad | 8;
                     DAT_00813ae0 = GetTicks();
                 }
-                ScreenToMapRef((unsigned int)&DAT_00813a44, (int *)&mp, 0);
-                if (DAT_00813a64 != mp.x || DAT_00813a68 != mp.y) {
-                    DAT_00813a68 = mp.y;
-                    DAT_00813a64 = mp.x;
+                ScreenToMapRef((unsigned int)&MousePos, (int *)&mp, 0);
+                if (MouseTileX != mp.x || MouseTileY != mp.y) {
+                    MouseTileY = mp.y;
+                    MouseTileX = mp.x;
                     if ((GamePad & 0x1000) == 0) {
                         GamePad = GamePad | 4;
                     }
@@ -359,8 +359,8 @@ LEGO_EXPORT void ReadGameButtons(void) {
         }
         if ((GamePad & 0x400) != 0 && (Hover.type & 0x100) != 0) {
             if ((GamePad & 0x1000) != 0) {
-                DAT_00813a7c = DAT_00813a64;
-                DAT_00813a80 = DAT_00813a68;
+                DAT_00813a7c = MouseTileX;
+                DAT_00813a80 = MouseTileY;
                 if ((DAT_00813ac4 & 2) != 0) {
                     DAT_00667c48 = 1;
                     DAT_00813ac4 = DAT_00813ac4 | 0x11;

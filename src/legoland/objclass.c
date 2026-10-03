@@ -427,7 +427,7 @@ LEGO_EXPORT int LoadObjectLibrary(void *object, const char *name) {
     if (((struct LibraryNode *)NewObjectPtr)->module == 0) {
         return 0;
     }
-    node = DAT_00669244;
+    node = ObjectLibraryHead;
     while (node != 0) {
         if (node->module == ((struct LibraryNode *)NewObjectPtr)->module) {
             NewObjectPtr = node;
@@ -437,17 +437,17 @@ LEGO_EXPORT int LoadObjectLibrary(void *object, const char *name) {
         }
         node = node->next;
     }
-    ((struct LibraryNode *)NewObjectPtr)->next = DAT_00669244;
+    ((struct LibraryNode *)NewObjectPtr)->next = ObjectLibraryHead;
     ((struct LibraryNode *)NewObjectPtr)->refcount = 1;
     staging = (struct LibraryNode *)malloc(sizeof(struct LibraryNode));
     node = (struct LibraryNode *)NewObjectPtr;
-    DAT_00669244 = staging;
+    ObjectLibraryHead = staging;
     staging->next = node->next;
     staging->module = node->module;
     staging->refcount = node->refcount;
     staging->init = node->init;
-    obj->library = DAT_00669244;
-    node = DAT_00669244;
+    obj->library = ObjectLibraryHead;
+    node = ObjectLibraryHead;
 loaded:
     memset(results, 0, sizeof(results));
     node->init(obj->context, results);
@@ -504,13 +504,13 @@ LEGO_EXPORT void UnLoadObjectLibrary(void *object) {
     obj->library->refcount--;
     node = obj->library;
     if (node->refcount == 0) {
-        prev = DAT_00669244;
-        if (DAT_00669244 == node) {
-            DAT_00669244 = DAT_00669244->next;
+        prev = ObjectLibraryHead;
+        if (ObjectLibraryHead == node) {
+            ObjectLibraryHead = ObjectLibraryHead->next;
             free(prev);
             return;
         }
-        if (DAT_00669244 != 0) {
+        if (ObjectLibraryHead != 0) {
             while (prev != 0) {
                 if (prev->next == node) {
                     break;
@@ -535,10 +535,10 @@ void FUN_00481170(void) {
     int offset;
     int width;
 
-    while (DAT_00669248 != 0) {
-        next = *(void **)DAT_00669248;
-        free(DAT_00669248);
-        DAT_00669248 = next;
+    while (ClassRideList != 0) {
+        next = *(void **)ClassRideList;
+        free(ClassRideList);
+        ClassRideList = next;
     }
     config = lpConfig;
     y = 0;
@@ -601,7 +601,7 @@ LEGO_EXPORT void BuildObjInfoList(void) {
             }
             cls = origin->field_0->data;
             if (cls->type != 0 && cls->type != 2 && (origin->flags & 0x400) == 0) {
-                for (node = DAT_00669248; node != NULL; node = node->next) {
+                for (node = ClassRideList; node != NULL; node = node->next) {
                     if (node->classid == cls) {
                         break;
                     }
@@ -615,8 +615,8 @@ LEGO_EXPORT void BuildObjInfoList(void) {
                     }
                 } else {
                     node = (struct InfoNode *)malloc(sizeof(struct InfoNode));
-                    node->next = DAT_00669248;
-                    DAT_00669248 = node;
+                    node->next = ClassRideList;
+                    ClassRideList = node;
                     node->classid = cls;
                     node->coords = tile.id;
                     node->x = cls->field_c + at.x;
@@ -750,7 +750,7 @@ LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke,
 LEGO_EXPORT void CalculateRideCodes(struct Bloke *bloke) {
     struct ClassRideNode *node;
 
-    for (node = DAT_00669248; node != 0; node = node->next) {
+    for (node = ClassRideList; node != 0; node = node->next) {
         node->score = Calc_Item_Attractiveness(node->ride, bloke, 0);
     }
 }
@@ -761,9 +761,9 @@ LEGO_EXPORT int ShuffleObjKeys(struct Point *goal, struct Ride **ride) {
     struct InfoNode *node;
     struct InfoNode *next;
 
-    slot = (struct InfoNode **)&DAT_00669248;
-    node = DAT_00669248;
-    if (DAT_00669248 != (void *)DAT_0066924c) {
+    slot = (struct InfoNode **)&ClassRideList;
+    node = ClassRideList;
+    if (ClassRideList != (void *)DAT_0066924c) {
         while (node != 0) {
             next = node->next;
             if ((unsigned int)next == DAT_0066924c) {
@@ -1047,7 +1047,7 @@ void FUN_004819a0(int *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00481b10
-void FUN_00481b10(struct BestNode *node) {
+void MergeBestNode(struct BestNode *node) {
     struct BestNode *cur;
     int i;
 

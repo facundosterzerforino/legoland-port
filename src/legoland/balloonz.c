@@ -18,11 +18,11 @@
 #include "render3d.h"
 
 // FUNCTION: LEGOLAND 0x0042a7b0
-void FUN_0042a7b0(Element *obj) {
-    DAT_0081cde4 = obj->ride;
-    DAT_0081cde4->flags |= 0x420;
-    DAT_00616044 = DAT_0081cde4->layer;
-    DAT_0081cde4->flags |= 0x2000;
+void LoadBalloonzResources(Element *obj) {
+    BalloonzRide = obj->ride;
+    BalloonzRide->flags |= 0x420;
+    BalloonzLayer = BalloonzRide->layer;
+    BalloonzRide->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b64ac
     BallBaseM1Sprite = LoadSprite("Ballbasem1.lls", 1);
     // STRING: LEGOLAND 0x004b649c
@@ -41,12 +41,12 @@ void FUN_0042a7b0(Element *obj) {
     // STRING: LEGOLAND 0x004b6430
     BalloonzBinV = LoadBinV("Zbuffers\\balloonz.bnv");
     DAT_00616018[0] = BalloonzBinV;
-    HideLayer(DAT_00616044, 2);
-    StopLayerPlaying(DAT_00616044, 2);
-    LLSSetFrame(GetLLSForLayer(DAT_00616044, 2), 0);
-    HideLayer(DAT_00616044, 1);
-    StopLayerPlaying(DAT_00616044, 1);
-    LLSSetFrame(GetLLSForLayer(DAT_00616044, 1), 0);
+    HideLayer(BalloonzLayer, 2);
+    StopLayerPlaying(BalloonzLayer, 2);
+    LLSSetFrame(GetLLSForLayer(BalloonzLayer, 2), 0);
+    HideLayer(BalloonzLayer, 1);
+    StopLayerPlaying(BalloonzLayer, 1);
+    LLSSetFrame(GetLLSForLayer(BalloonzLayer, 1), 0);
 }
 
 // FUNCTION: LEGOLAND 0x0042a8f0
@@ -73,7 +73,7 @@ void AddBalloonNode(TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x0042a950
-void FUN_0042a950(Element *obj, int *coords) {
+void BalloonzAddObject(Element *obj, int *coords) {
     TileId tile;
 
     tile.pos.x = coords[0];
@@ -138,7 +138,7 @@ void RemoveAllBalloonNodes(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042aa10
-void FUN_0042aa10(Element *obj, TileId tile, Cursor *cursor) {
+void BalloonzRemoveObject(Element *obj, TileId tile, Cursor *cursor) {
     BalloonNode *node;
 
     node = FindBalloonNode(&tile);
@@ -450,7 +450,7 @@ void FUN_0042aa90(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042b2a0
-RideSpriteInfo *FUN_0042b2a0(Element *obj, unsigned short id) {
+RideSpriteInfo *GetBalloonzSpriteInfo(Element *obj, unsigned short id) {
     Ride *ride = obj->ride;
 
     DAT_00616028.sprite = ride->layer;
@@ -462,7 +462,7 @@ RideSpriteInfo *FUN_0042b2a0(Element *obj, unsigned short id) {
 }
 
 // FUNCTION: LEGOLAND 0x0042b2e0
-void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderBalloonz(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
     Ride *ride = obj->ride;
     RideNode *elem;
     RideNode *riders;
@@ -499,7 +499,7 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
     }
     if (count != 0) {
         riders = ride->riders;
-        off = GetRenderOffsetForLayer(DAT_00616044, 0);
+        off = GetRenderOffsetForLayer(BalloonzLayer, 0);
         AdjustOffsetForViewMode(&off);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 6) {
@@ -554,13 +554,13 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        LLSSetFrame(GetLLSForLayer(DAT_00616044, 1), frame);
-        off = GetRenderOffsetForLayer(DAT_00616044, 1);
+        LLSSetFrame(GetLLSForLayer(BalloonzLayer, 1), frame);
+        off = GetRenderOffsetForLayer(BalloonzLayer, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer(DAT_00616044, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(BalloonzLayer, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
         if (frame % 8 == 0 || frame == 0) {
-            LLSSetFrame(GetLLSForLayer(DAT_00616044, 1), frame);
-            off = GetRenderOffsetForLayer(DAT_00616044, 1);
+            LLSSetFrame(GetLLSForLayer(BalloonzLayer, 1), frame);
+            off = GetRenderOffsetForLayer(BalloonzLayer, 1);
             AdjustOffsetForViewMode(&off);
             for (i = 0; i < count; i++) {
                 if (blokes[i]->param_action == 8) {
@@ -623,24 +623,24 @@ void FUN_0042b2e0(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
             }
         }
     } else {
-        LLSSetFrame(GetLLSForLayer(DAT_00616044, 1), frame);
-        off = GetRenderOffsetForLayer(DAT_00616044, 1);
+        LLSSetFrame(GetLLSForLayer(BalloonzLayer, 1), frame);
+        off = GetRenderOffsetForLayer(BalloonzLayer, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer(DAT_00616044, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(BalloonzLayer, 1), screen.x + off.x, screen.y + off.y, param_6, 0);
     }
     anim++;
     if (anim > 48) {
         anim = 0;
     }
     state->anim = anim;
-    LLSSetFrame(GetLLSForLayer(DAT_00616044, 2), anim);
-    off = GetRenderOffsetForLayer(DAT_00616044, 2);
+    LLSSetFrame(GetLLSForLayer(BalloonzLayer, 2), anim);
+    off = GetRenderOffsetForLayer(BalloonzLayer, 2);
     AdjustOffsetForViewMode(&off);
-    PrintSprite(GetSpriteForLayer(DAT_00616044, 2), screen.x + off.x, screen.y + off.y, param_6, 0);
+    PrintSprite(GetSpriteForLayer(BalloonzLayer, 2), screen.x + off.x, screen.y + off.y, param_6, 0);
 }
 
 // FUNCTION: LEGOLAND 0x0042b9d0
-void FUN_0042b9d0(void) {
+void UnloadBalloonzResources(void) {
     KillSprite(BallBaseM1Sprite);
     KillSprite(BallBaseM2Sprite);
     KillSprite(BallBaseM3Sprite);
@@ -653,9 +653,9 @@ void FUN_0042b9d0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ba40
-void FUN_0042ba40(void) {
+void BalloonzSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cde4;
+    EditMode.unk8 = BalloonzRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }

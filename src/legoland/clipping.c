@@ -103,7 +103,7 @@ void FUN_0048a780(void *arg) {
 
 // FUNCTION: LEGOLAND 0x0048a790
 void FUN_0048a790(void) {
-    struct ClipNode *node = (struct ClipNode *)DAT_006687c8;
+    struct ClipNode *node = (struct ClipNode *)IconListHead;
     DAT_00798648 = 1;
 
     while (node != NULL) {

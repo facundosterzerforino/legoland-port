@@ -105,7 +105,7 @@ struct JoustNode *AddJoustNode(TileId *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004079e0
-void FUN_004079e0(Element *editObj, int *coords) {
+void JoustAddObject(Element *editObj, int *coords) {
     TileId key;
 
     key.pos.x = (unsigned char)coords[0];
@@ -161,7 +161,7 @@ void FreeJoustNodeList(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00407ad0
-void FUN_00407ad0(Element *editObj, TileId coords, struct Cursor *cursor) {
+void JoustRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor) {
     struct JoustNode *node;
     struct {
         unsigned int kind;
@@ -184,12 +184,12 @@ void FUN_00407ad0(Element *editObj, TileId coords, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x00407b50
-void FUN_00407b50(struct JoustRoot *root) {
+void JoustLoadResources(struct JoustRoot *root) {
     Load_FXList(JOUST_SFX, 1);
-    DAT_004c121c = (unsigned int)root->field_c;
-    ((struct JoustBlock *)DAT_004c121c)->flags_1c |= 0x420;
-    DAT_004c1214 = (unsigned int)((struct JoustBlock *)DAT_004c121c)->field_64;
-    ((struct JoustBlockData *)DAT_004c1214)->field_10 |= 0x2000;
+    JoustRide = (unsigned int)root->field_c;
+    ((struct JoustBlock *)JoustRide)->flags_1c |= 0x420;
+    JoustLayer = (unsigned int)((struct JoustBlock *)JoustRide)->field_64;
+    ((struct JoustBlockData *)JoustLayer)->field_10 |= 0x2000;
     // STRING: LEGOLAND 0x004b46f4
     JoustFMaskSprite = LoadSprite("Joust_fmask.lls", 1);
     // STRING: LEGOLAND 0x004b46e0
@@ -200,9 +200,9 @@ void FUN_00407b50(struct JoustRoot *root) {
     DAT_004c1240 = ZJoustSprite = LoadSprite("z_joust.lls", 1);
     // STRING: LEGOLAND 0x004b46a8
     JoustRideBnv = LoadBinV("Zbuffers\\joustride.bnv");
-    HideLayer((struct Sprite *)DAT_004c1214, 1);
-    StopLayerPlaying((struct Sprite *)DAT_004c1214, 1);
-    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_004c1214, 1), 0);
+    HideLayer((struct Sprite *)JoustLayer, 1);
+    StopLayerPlaying((struct Sprite *)JoustLayer, 1);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)JoustLayer, 1), 0);
 }
 
 // FUNCTION: LEGOLAND 0x00407c20
@@ -556,7 +556,7 @@ void FUN_00407c30(struct Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x00408580
-void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderJoust(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride;
     struct RideNode *r;
     struct JoustNode *node;
@@ -610,7 +610,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                         IP_RenderBlokeIn3DNow(riders[i]);
                     }
                 }
-                off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 0);
+                off = GetRenderOffsetForLayer((struct Sprite *)JoustLayer, 0);
                 AdjustOffsetForViewMode(&off);
                 PrintSprite(JoustSpecRMSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 for (i = 0; i < n; i++) {
@@ -633,7 +633,7 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                         IP_RenderBlokeIn3DNow(riders[i]);
                     }
                 }
-                off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 0);
+                off = GetRenderOffsetForLayer((struct Sprite *)JoustLayer, 0);
                 AdjustOffsetForViewMode(&off);
                 PrintSprite(JoustSpecLMSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 for (i = 0; i < n; i++) {
@@ -651,10 +651,10 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                         IP_RenderBlokeIn3DNow(riders[i]);
                     }
                 }
-                LLSSetFrame(GetLLSForLayer((struct Sprite *)DAT_004c1214, 1), frame);
-                off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 1);
+                LLSSetFrame(GetLLSForLayer((struct Sprite *)JoustLayer, 1), frame);
+                off = GetRenderOffsetForLayer((struct Sprite *)JoustLayer, 1);
                 AdjustOffsetForViewMode(&off);
-                PrintSprite(GetSpriteForLayer((struct Sprite *)DAT_004c1214, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
+                PrintSprite(GetSpriteForLayer((struct Sprite *)JoustLayer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
                 for (r = ride->riders; r != NULL; r = r->next) {
                     if (tile->id == r->tile.id) {
                         bloke = r->rider;
@@ -724,29 +724,29 @@ void FUN_00408580(struct Element *element, unsigned int param_2, unsigned int pa
                         IP_RenderBlokeIn3DNow(riders[i]);
                     }
                 }
-                off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 1);
+                off = GetRenderOffsetForLayer((struct Sprite *)JoustLayer, 1);
                 AdjustOffsetForViewMode(&off);
                 PrintSprite(JoustFMaskSprite, coords.x + off.x, coords.y + off.y, param_6, 0);
                 return;
             }
         }
-        LLSSetFrame(GetLLSForLayer((struct Sprite *)DAT_004c1214, 1), frame);
-        off = GetRenderOffsetForLayer((struct Sprite *)DAT_004c1214, 1);
+        LLSSetFrame(GetLLSForLayer((struct Sprite *)JoustLayer, 1), frame);
+        off = GetRenderOffsetForLayer((struct Sprite *)JoustLayer, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite(GetSpriteForLayer((struct Sprite *)DAT_004c1214, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)JoustLayer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00408bc0
-void FUN_00408bc0(void) {
+void JoustSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = (void *)DAT_004c121c;
+    EditMode.unk8 = (void *)JoustRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00408c00
-void FUN_00408c00(void) {
+void JoustFreeResources(void) {
     Kill_FXList(JOUST_SFX, 1);
     KillSprite(JoustFMaskSprite);
     KillSprite(JoustSpecRMSprite);
@@ -860,13 +860,13 @@ LEGO_EXPORT int LoadJoust(struct JoustLoadArg *arg) {
 LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct CallbackTable *iface) {
     // STRING: LEGOLAND 0x004b4718
     if (_stricmp("JOUST", head->name) == 0) {
-        iface->cb_a4 = FUN_00407b50;
-        iface->cb_ac = FUN_00408c00;
-        iface->cb_8c = FUN_00408bc0;
+        iface->cb_a4 = JoustLoadResources;
+        iface->cb_ac = JoustFreeResources;
+        iface->cb_8c = JoustSetEditMode;
         iface->cb_a8 = FUN_00407c30;
-        iface->cb_b0 = FUN_00408580;
-        iface->cb_9c = FUN_00407ad0;
-        iface->cb_98 = FUN_004079e0;
+        iface->cb_b0 = RenderJoust;
+        iface->cb_9c = JoustRemoveObject;
+        iface->cb_98 = JoustAddObject;
         iface->cb_a0 = FUN_00408c50;
         iface->cb_bc = SaveJoust;
         iface->cb_b8 = LoadJoust;

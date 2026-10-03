@@ -4,7 +4,7 @@
 
 struct Cursor;
 
-/* Earth-slide class node (one 0x24 allocation), head at DAT_006160e8. */
+/* Earth-slide class node (one 0x24 allocation), head at EarthNodeHead. */
 struct EarthNode {
     /* 0x00 */ unsigned short id;
     /* 0x02 */ unsigned char pad_2[0x4 - 0x2];
@@ -37,14 +37,14 @@ struct EarthBlokeElem {
     /* 0x0d */ unsigned char id_y;
 };
 
-/* Callback argument; field_c points at the ride/cursor object (DAT_006160d0). */
+/* Callback argument; field_c points at the ride/cursor object (EarthSlideRide). */
 struct EarthRideObj {
     /* 0x00 */ unsigned char pad_0[0xc];
     /* 0x0c */ struct Cursor *ride;
 };
 
 void FUN_0042cd70(unsigned short *a1);
-void FUN_0042cdc0(struct EarthNode *node);
+void RemoveEarthNode(struct EarthNode *node);
 struct EarthNode *FUN_0042ce20(volatile unsigned short *param_1);
 void FUN_0042ce50(struct EarthNode *node, struct EarthBlokeElem *elem);
 void EarthNodeAppendQueueEntry(struct EarthNode *p, struct EarthQueue *value);
@@ -56,12 +56,12 @@ unsigned int CountEarthBlokeElemsUntil(struct EarthBlokeElem *param_1, struct Ea
 struct EarthBlokeElem *GetNthNextEarthBlokeElem(struct EarthBlokeElem *param_1, unsigned int param_2);
 void FUN_0042d5f0(void);
 
-void FUN_0042d070(struct EarthRideObj *param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6);
-void FUN_0042d100(struct EarthRideObj *param_1);
-void FUN_0042d1f0(struct EarthRideObj *arg1);
-void FUN_0042d230();
-void FUN_0042d270(struct EarthRideObj *param_1, TileId tile, unsigned int param_3);
-void FUN_0042d2c0(unsigned int param_1, unsigned char *param_2);
+void RenderEarthSlide(struct EarthRideObj *param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6);
+void LoadEarthSlideResources(struct EarthRideObj *param_1);
+void UnloadEarthSlideResources(struct EarthRideObj *arg1);
+void EarthSlideSetEditMode();
+void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned int param_3);
+void EarthSlideAddObject(unsigned int param_1, unsigned char *param_2);
 int EarthSlideRide_Save(void);
 int EarthSlideRide_Load(void);
 void FUN_0042d610(struct EarthRideObj *param_1);

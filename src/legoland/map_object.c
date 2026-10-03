@@ -205,7 +205,7 @@ LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3) {
         }
         rect = *rect.next;
     }
-    if (DAT_00667cd8 == 0 && DAT_00667ca0 == 0) {
+    if (DAT_00667cd8 == 0 && LoadInProgress == 0) {
         CalculateMapRenderOrder();
     }
 }
@@ -708,7 +708,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         out.x = out.x + coords[0];
         out.y = out.y + coords[1];
         if (obj->flags & 0x400000) {
-            FUN_00482a90();
+            InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
             FUN_00477bd0(out.x, out.y, effect->x, effect->y);
@@ -726,7 +726,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         out.y = out.y + coords[1];
         PutObjOnMap((struct ObjClass *)obj, (unsigned int)editObj, (struct Point *)coords);
         if (obj->flags & 0x400000) {
-            FUN_00482a90();
+            InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
             FUN_00477bd0(out.x, out.y, effect->x, effect->y);
@@ -820,7 +820,7 @@ LEGO_EXPORT void ObjectIsBuilt(struct ObjClass *obj, TileId coords) {
         EditCursor.field_140c = saved_140c;
         EditCursor.field_1410 = saved_1410;
     } else if (EditMode.unk8 != 0) {
-        ((struct MapObject *)EditMode.unk8)->method_90(((struct ObjClass *)EditMode.unk8)->element, &DAT_00813a44, 0x8f8);
+        ((struct MapObject *)EditMode.unk8)->method_90(((struct ObjClass *)EditMode.unk8)->element, &MousePos, 0x8f8);
     }
 }
 
@@ -2073,7 +2073,7 @@ LEGO_EXPORT void ProcessScrolling(unsigned int a, unsigned int b) {
 LEGO_EXPORT void MouseScrollMap(void) {
     struct Point mouse;
 
-    mouse = DAT_00813a44;
+    mouse = MousePos;
     if (mouse.x < lpConfig->scroll_border_x) {
         if (ScrollSpeedX > -(int)lpConfig->scroll_max_x) {
             ScrollSpeedX -= lpConfig->scroll_accel_x;
@@ -2304,7 +2304,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     char strbuf[512];
     struct Point pos;
 
-    if (DAT_00667d50 != 0) {
+    if (MapDataLoaded != 0) {
         return 0xffffffff;
     }
     if (LLIDB_FindElement((const char *)param_1, (unsigned int *)&elem, 0) != 0) {
@@ -2317,7 +2317,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     if (file == 0) {
         return 0xfffffffd;
     }
-    DAT_00667ca0 = 1;
+    LoadInProgress = 1;
     FUN_00459880();
     RES_ReadFile(file, &len, 4);
     RES_ReadFile(file, namebuf, len);
@@ -2338,8 +2338,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     RES_ReadFile(file, &lpConfig->height, 2);
     if (RES_ReadFile(file, &DAT_00801b28, 4) != 4) {
         RES_CloseFile(file);
-        DAT_00667d50 = 1;
-        DAT_00667ca0 = 0;
+        MapDataLoaded = 1;
+        LoadInProgress = 0;
         return 1;
     }
     for (row = 0; row < lpConfig->height; row++) {
@@ -2718,8 +2718,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                 case 0:
                     if (RES_ReadFile(file, &len, 1) != 1) {
                         RES_CloseFile(file);
-                        DAT_00667d50 = 1;
-                        DAT_00667ca0 = 0;
+                        MapDataLoaded = 1;
+                        LoadInProgress = 0;
                         DAT_00810140 = 0;
                         FUN_00462c60();
                         return 1;
@@ -2740,8 +2740,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         }
     }
     RES_CloseFile(file);
-    DAT_00667d50 = 1;
-    DAT_00667ca0 = 0;
+    MapDataLoaded = 1;
+    LoadInProgress = 0;
     DAT_00810140 = 0;
     FUN_00462c60();
     return 1;
@@ -2757,7 +2757,7 @@ unsigned int UnloadBaseMap(void) {
     struct Element *elem;
     struct Element *elem2;
 
-    if (DAT_00667d50 == 0) {
+    if (MapDataLoaded == 0) {
         return 0;
     }
     FUN_00459880();
@@ -2806,7 +2806,7 @@ unsigned int UnloadBaseMap(void) {
     free(DAT_00801a70);
     ClearOverlays();
     FUN_004828f0();
-    DAT_00667d50 = 0;
+    MapDataLoaded = 0;
     return 1;
 }
 
@@ -2957,12 +2957,12 @@ LEGO_EXPORT void ResetMapAI(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00462e50
-void FUN_00462e50(unsigned int index, unsigned int value) {
+void SetClassPercent(unsigned int index, unsigned int value) {
     MapStats.classes[index].percent = value;
 }
 
 // FUNCTION: LEGOLAND 0x00462e70
-void FUN_00462e70(unsigned int index, unsigned int value) {
+void SetClassLimit(unsigned int index, unsigned int value) {
     MapStats.classes[index].limit = value;
 }
 
@@ -3198,11 +3198,11 @@ int FUN_00463520(void) {
     if (MapStats.field_180 == 0) {
         return 0;
     }
-    curr = FUN_00499460();
+    curr = GetGameTimerFrames();
     diff = curr - DAT_00667d58;
     quotient = 0x168 / (int)MapStats.field_180;
     if (diff > quotient) {
-        DAT_00667d58 = FUN_00499460();
+        DAT_00667d58 = GetGameTimerFrames();
         return 1;
     }
     return 0;
@@ -3211,7 +3211,7 @@ int FUN_00463520(void) {
 // FUNCTION: LEGOLAND 0x00463560
 void FUN_00463560(void) {
     DAT_00667d54 = GetGameTimer();
-    DAT_00667d58 = FUN_00499460();
+    DAT_00667d58 = GetGameTimerFrames();
 }
 
 // FUNCTION: LEGOLAND 0x00463580

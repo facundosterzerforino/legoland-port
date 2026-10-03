@@ -1034,14 +1034,14 @@ struct BlokeRenderSrc {
 
 // FUNCTION: LEGOLAND 0x00442f20
 LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key) {
-    struct RenderItem *item = (struct RenderItem *)FUN_00442f50();
+    struct RenderItem *item = (struct RenderItem *)AllocRenderItem();
     item->field_4 = src->field_8;
     item->field_0 = key;
     RenderItem_Link(head, (struct RenderItemNode *)item, key);
 }
 
 // FUNCTION: LEGOLAND 0x00442f50
-unsigned int FUN_00442f50(void) {
+unsigned int AllocRenderItem(void) {
     unsigned int result = DAT_0062feec[0];
     DAT_0062feec[0] = DAT_0062feec[0] + 16;
     RenderItemCount = RenderItemCount + 1;

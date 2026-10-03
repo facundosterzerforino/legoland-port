@@ -51,7 +51,7 @@ LEGO_EXPORT void MatrixMultiply(float *A, float *B, float *C);
 LEGO_EXPORT void BuildYRotationMatrix(float angle, float *out);
 LEGO_EXPORT void CopyMatrix(struct Matrix3x3 *src, struct Matrix3x3 *dest);
 unsigned int FUN_00442c70(void);
-unsigned int FUN_00442f50(void);
+unsigned int AllocRenderItem(void);
 struct ResFile;
 char *RES_ReadLine(struct ResFile *param_1, char *param_2, int param_3);
 int FindIndexInStringList(char *param_1, char *param_2);

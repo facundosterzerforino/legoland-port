@@ -10,7 +10,7 @@ struct Queue {
 };
 
 unsigned int FUN_004123a0(struct QueueNode *start, struct QueueNode *stop);
-void FUN_004123c0(struct QueueNode *start, struct Queue *queue);
+void SaveQueue(struct QueueNode *start, struct Queue *queue);
 struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n);
 void FUN_00412490(struct QueueNode *start, struct Queue *queue);
 
@@ -56,7 +56,7 @@ void FUN_004122a0(struct RideSlotArg *param_1, struct RideSlot *slot);
 void FUN_004122d0(struct RideSlotArg *param_1, struct RideSlot *slot);
 struct RideSlotArg *FUN_004122f0(struct RideSlot *slot);
 void FUN_00412300(struct QueueTable *table, int x, int y, struct Bloke *bloke);
-void *FUN_004125f0(unsigned int a, unsigned int b);
+void *FindQueueEntryAtTile(unsigned int a, unsigned int b);
 struct RideQueueEntry *FUN_004125a0(int x, int y);
 struct RideQueueEntry *FUN_00412650(unsigned short param_1);
 void FUN_00412680(int x, int y, int param_3, int param_4);

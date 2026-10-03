@@ -11,7 +11,7 @@ LEGO_EXPORT unsigned int GetGameTimer(void) {
     unsigned int now;
 
     if (GameTimerPaused != 0) {
-        now = DAT_0079a894;
+        now = GameTimerPausedTicks;
     } else {
         now = GetTickCount();
     }
@@ -19,11 +19,11 @@ LEGO_EXPORT unsigned int GetGameTimer(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00499460
-unsigned int FUN_00499460(void) {
+unsigned int GetGameTimerFrames(void) {
     unsigned int now;
 
     if (GameTimerPaused != 0) {
-        now = DAT_0079a89c;
+        now = GameTimerPausedFrame;
     } else {
         now = FrameCounter;
     }

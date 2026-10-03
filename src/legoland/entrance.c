@@ -31,7 +31,7 @@ void FUN_0042d970(TileId *tile, unsigned int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d9c0
-void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -48,13 +48,13 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
     lo = (tile->pos.x + ride->footprint.x1) << 8;
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x < lo) {
-            AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
 
     off1 = GetRenderOffsetForLayer(ride->layer, 1);
     AdjustOffsetForViewMode(&off1);
@@ -66,77 +66,77 @@ void FUN_0042d9c0(Element *obj, unsigned int param_2, unsigned int param_3, Tile
     PrintSprite(spr, pos.x + off1.x, pos.y + off1.y, 0, 0);
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0x820 && node->rider->pos.y <= hi + 0x8d0) {
-            AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
     if (EntranceMatte4Sprite != NULL) {
         PrintSprite(EntranceMatte4Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0x920 && node->rider->pos.y <= hi + 0x9d0) {
-            AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
     if (EntranceMatte3Sprite != NULL) {
         PrintSprite(EntranceMatte3Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0xc20 && node->rider->pos.y <= hi + 0xcd0) {
-            AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
     if (EntranceMatte2Sprite != NULL) {
         PrintSprite(EntranceMatte2Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0xd20 && node->rider->pos.y <= hi + 0xdd0) {
-            AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
     if (EntranceMatte1Sprite != NULL) {
         PrintSprite(EntranceMatte1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 
     RenderItems_New();
-    DAT_006160ec = NULL;
+    BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo) {
             int y = node->rider->pos.y;
             if ((y < hi + 0x820 || y > hi + 0x8d0) && (y < hi + 0x920 || y > hi + 0x9d0) && (y < hi + 0xc20 || y > hi + 0xcd0) && (y < hi + 0xd20 || y > hi + 0xdd0)) {
-                AddBlokeToRenderList(&DAT_006160ec, (struct BlokeRenderSrc *)node, node->person->field_20);
+                AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
             }
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_006160ec);
+    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
     if (Booth1Sprite != NULL) {
         PrintSprite(Booth1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042de50
-void FUN_0042de50(Element *param) {
+void LoadEntranceResources(Element *param) {
     Load_FXList(ENTRANCE_SFX, 1);
     LoadMoneySFX();
-    DAT_006160f4 = param->ride;
-    DAT_006160f4->flags |= 0x20;
-    DAT_006160f0 = DAT_006160f4->layer;
-    DAT_006160f0->flags |= 0x2000;
+    EntranceRide = param->ride;
+    EntranceRide->flags |= 0x20;
+    EntranceLayer = EntranceRide->layer;
+    EntranceLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b66cc
     EntranceMatte1Sprite = LoadSprite("entrance_matte1.lls", 1);
     // STRING: LEGOLAND 0x004b66b8
@@ -150,10 +150,10 @@ void FUN_0042de50(Element *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0042def0
-void FUN_0042def0(Element *param) {
+void UnloadEntranceResources(Element *param) {
     Kill_FXList(ENTRANCE_SFX, 1);
     KillMoneySFX();
-    DAT_006160f4 = param->ride;
+    EntranceRide = param->ride;
     if (Booth1Sprite != 0) {
         KillSprite(Booth1Sprite);
     }
@@ -172,7 +172,7 @@ void FUN_0042def0(Element *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0042df70
-void FUN_0042df70(Element *obj, TileId tile, struct Cursor *cursor) {
+void EntranceRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
 }

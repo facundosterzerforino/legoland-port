@@ -26,14 +26,14 @@ int FUN_0043e930(RECT *rc, int min, int max, int value, int step) {
     pos = (rc->bottom - rc->top) * value / (max - min);
     RenderThickBox(rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, 2, 0);
     RenderBlock(rc->left, rc->top + pos - 1, rc->right - rc->left, 3, GetNearestColour(0xff, 0, 0));
-    if ((DAT_00813ac4 & 4) && DAT_00813a44.x >= rc->left && DAT_00813a44.x <= rc->right &&
-        DAT_00813a44.y >= rc->top && DAT_00813a44.y <= rc->bottom) {
+    if ((DAT_00813ac4 & 4) && MousePos.x >= rc->left && MousePos.x <= rc->right &&
+        MousePos.y >= rc->top && MousePos.y <= rc->bottom) {
         DAT_0062fea4 = 1;
     } else if (!DAT_0062fea4) {
         return value;
     }
     if (DAT_00813ac4 & 4) {
-        pos = DAT_00813a44.y;
+        pos = MousePos.y;
         if (pos < rc->top) {
             pos = rc->top;
         } else if (pos > rc->bottom) {
@@ -75,7 +75,7 @@ int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (
     retry = 0;
     DAT_0062fea4 = 0;
     if (flag == 0) {
-        DAT_0062fea0 = 0;
+        DialogListScrollY = 0;
     }
     n = 0;
     while (names[n]) {
@@ -122,8 +122,8 @@ int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (
         if ((DAT_00813ad4 & 1) || (DAT_00813acc & 1)) {
             break;
         }
-        if (DAT_00813a44.x >= clip.left && DAT_00813a44.x <= clip.right && DAT_00813a44.y >= clip.top && DAT_00813a44.y <= clip.bottom) {
-            my = DAT_00813a44.y - clip.top + DAT_0062fea0;
+        if (MousePos.x >= clip.left && MousePos.x <= clip.right && MousePos.y >= clip.top && MousePos.y <= clip.bottom) {
+            my = MousePos.y - clip.top + DialogListScrollY;
             for (i = 0; i < n; i++) {
                 if (my >= items[i].top && my <= items[i].bottom) {
                     sel = i;
@@ -149,12 +149,12 @@ int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (
         RenderBlock(box->left + 2, box->top + 2, box->right - 4, 0x18, GetNearestColour(0, 0x3f, 0x7f));
         PrintLimitedText(box->left + 2, box->top + 2, box->right - 4, title, 0, 0xefefef, 0);
         if (retry) {
-            DAT_0062fea0 = FUN_0043e930(&bar, 0, over, DAT_0062fea0, 0x10);
+            DialogListScrollY = FUN_0043e930(&bar, 0, over, DialogListScrollY, 0x10);
         }
         GetClipping(&saved);
         SetClipping(&clip);
         for (j = 0; j < n; j++) {
-            if (items[j].bottom >= DAT_0062fea0) {
+            if (items[j].bottom >= DialogListScrollY) {
                 break;
             }
         }
@@ -162,17 +162,17 @@ int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (
             np = names + j;
             for (i = j; i < n; i++) {
                 ip = &items[i];
-                if (ip->top >= DAT_0062fea0 + viewH) {
+                if (ip->top >= DialogListScrollY + viewH) {
                     break;
                 }
                 t = ip->top;
                 l = ip->left;
                 if (sel == i) {
-                    RenderBlock(l + clip.left, t - DAT_0062fea0 + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0x7f, 0x7f, 0xef));
+                    RenderBlock(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0x7f, 0x7f, 0xef));
                 } else {
-                    RenderBox(l + clip.left, t - DAT_0062fea0 + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0xcf, 0xcf, 0xcf));
+                    RenderBox(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0xcf, 0xcf, 0xcf));
                 }
-                FUN_00455220(ip->left + clip.left, ip->top - DAT_0062fea0 + clip.top, *np, 2, itemW);
+                FUN_00455220(ip->left + clip.left, ip->top - DialogListScrollY + clip.top, *np, 2, itemW);
                 np++;
             }
         }

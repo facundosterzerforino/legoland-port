@@ -125,7 +125,7 @@ struct Bloke {
 };
 typedef struct Bloke Bloke;
 
-/* The 0x124-byte save-game record of a visitor and its Person (scratch buffer DAT_007fda60). */
+/* The 0x124-byte save-game record of a visitor and its Person (scratch buffer BlokeSaveBuffer). */
 struct BlokeSave {
     /* 0x00 */ unsigned short action;
     /* 0x02 */ unsigned short low_level_action;
@@ -229,9 +229,9 @@ LEGO_EXPORT char *GetVisitorName(Bloke *bloke);
 int FUN_00482cb0(Bloke *bloke);
 struct BlokeNameView;
 void RandomiseBlokeName(Bloke *bloke);
-int FUN_00482df0(Bloke *bloke, int index, int mul);
+int ApplyMoodDelta(Bloke *bloke, int index, int mul);
 int GetBlokeMood(Bloke *bloke);
-void FUN_00482d60(unsigned int index, int value);
+void SetMoodDelta(unsigned int index, int value);
 void FUN_00482d70(void);
 void DestroyAllBlokes(void);
 LEGO_EXPORT Bloke *MakeBloke(int param_1);

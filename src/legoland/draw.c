@@ -70,10 +70,10 @@ LEGO_EXPORT void KillHostSystemGPU(void) {
         IDirectDraw2_Release(DDRAWENV.ddraw2);
         DDRAWENV.ddraw2 = 0;
     }
-    DeleteObject((HGDIOBJ)PTR_00668090);
-    DeleteObject((HGDIOBJ)PTR_00668098);
-    DeleteObject((HGDIOBJ)PTR_0066808c);
-    DeleteObject((HGDIOBJ)PTR_00668094);
+    DeleteObject((HGDIOBJ)LegoFont24Bold);
+    DeleteObject((HGDIOBJ)LegoFont28Normal);
+    DeleteObject((HGDIOBJ)LegoFont20Bold);
+    DeleteObject((HGDIOBJ)LegoFont18SemiBold);
     if (DDRAWENV.ddraw != 0) {
         IDirectDraw_Release(DDRAWENV.ddraw);
         DDRAWENV.ddraw = 0;
@@ -84,7 +84,7 @@ LEGO_EXPORT void KillHostSystemGPU(void) {
 LEGO_EXPORT unsigned int SetPointer(unsigned int param_1) {
     unsigned int old = DAT_0066814c;
     DAT_0066814c = param_1;
-    DAT_00668148 = DAT_007fe9c0[param_1];
+    DAT_00668148 = PointerSprites[param_1];
     return old;
 }
 
@@ -134,23 +134,23 @@ LEGO_EXPORT int InitScreen(void) {
     font.lfPitchAndFamily = 0;
     // STRING: LEGOLAND 0x004b86e0
     strcpy(font.lfFaceName, "Lego");
-    PTR_00668090 = CreateFontIndirectA(&font);
+    LegoFont24Bold = CreateFontIndirectA(&font);
 
     font.lfWeight = 0x190;
     font.lfHeight = 0x1c;
     font.lfWidth = 0;
-    PTR_00668098 = CreateFontIndirectA(&font);
+    LegoFont28Normal = CreateFontIndirectA(&font);
     font.lfHeight = 0x14;
     font.lfWidth = 0;
     font.lfWeight = 0x2bc;
-    PTR_0066808c = CreateFontIndirectA(&font);
+    LegoFont20Bold = CreateFontIndirectA(&font);
     font.lfWeight = 0x258;
     font.lfHeight = 0x12;
     font.lfWidth = 0;
     strcpy(font.lfFaceName, "Lego");
-    PTR_00668094 = CreateFontIndirectA(&font);
+    LegoFont18SemiBold = CreateFontIndirectA(&font);
 
-    if (DAT_00667d6c == 0) {
+    if (WinDebugMode == 0) {
         DisplayPixelFormat = 2;
         WNDENV_Sethwnd(CreateWindowExA(8, "LEGOLANDMAIN",
             // STRING: LEGOLAND 0x004b86d0
@@ -173,7 +173,7 @@ LEGO_EXPORT int InitScreen(void) {
         if (lpConfig->field_1e == 0) {
             ShowCursor(0);
         }
-        DAT_004b9ca4 = BlitFrameToWindow;
+        BlitFrameFunc = BlitFrameToWindow;
         desc.dwSize = sizeof(desc);
         desc.dwFlags = 1;
         desc.ddsCaps.dwCaps = 0x4200;
@@ -187,11 +187,11 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x800;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL)) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &OffscreenSurface, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
         }
-        renderEngine = DAT_00668078;
+        renderEngine = OffscreenSurface;
         desc.dwSize = sizeof(desc);
         desc.dwFlags = 7;
         desc.ddsCaps.dwCaps = 0x4000;
@@ -250,13 +250,13 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x40;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668078, NULL)) != 0) {
+        if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &OffscreenSurface, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             IDirectDrawSurface_Release(PrimarySurface);
             DestroyWindow(WNDENV_Gethwnd());
             return 0;
         }
-        renderEngine = DAT_00668078;
+        renderEngine = OffscreenSurface;
         desc.dwSize = sizeof(desc);
         desc.dwFlags = 7;
         desc.ddsCaps.dwCaps = 0x40;
@@ -276,7 +276,7 @@ int SetDisplayModeAndDetectPixelFormat(void) {
     DDSURFACEDESC desc;
     LPDIRECTDRAW2 ddraw2;
 
-    if (DAT_00667d6c == 0) {
+    if (WinDebugMode == 0) {
         ddraw2 = DDRAWENV.ddraw2;
         if (IDirectDraw2_SetDisplayMode(ddraw2, lpConfig->screen_width, lpConfig->screen_height, 0x10, 0, 0) != 0) {
             DebugTrace("SetDisplayMode: %dx%d 16bpp refused", lpConfig->screen_width, lpConfig->screen_height);
@@ -310,40 +310,40 @@ LEGO_EXPORT void PushRenderingStatusAndLockVideoSurface(void) {
     LPDIRECTDRAWSURFACE surface;
     int value;
 
-    value = DAT_00668144;
-    DAT_00668164[DAT_006681e4] = DAT_00668144;
-    DAT_006681e4 = DAT_006681e4 + 1;
+    value = VideoSurfaceLocked;
+    DAT_00668164[RenderingStatusStackDepth] = VideoSurfaceLocked;
+    RenderingStatusStackDepth = RenderingStatusStackDepth + 1;
     if (value == 0) {
         local.left = value;
         local.top = value;
         local.right = lpConfig->screen_width - 1;
         local.bottom = lpConfig->screen_height - 1;
-        DAT_0066809c.dwSize = 0x6c;
+        CurrentSurfaceDesc.dwSize = 0x6c;
         IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
         surface = renderEngine;
-        if (IDirectDrawSurface_Lock(surface, NULL, &DAT_0066809c, 0x21, NULL) == 0x887601c2) {
+        if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
-            IDirectDrawSurface_Lock(renderEngine, NULL, &DAT_0066809c, 0x21, NULL);
+            IDirectDrawSurface_Lock(renderEngine, NULL, &CurrentSurfaceDesc, 0x21, NULL);
         }
         StoredTransparentColour = GetTransparentColour();
     }
-    DAT_00668144 = 1;
+    VideoSurfaceLocked = 1;
 }
 
 // FUNCTION: LEGOLAND 0x00464080
 LEGO_EXPORT void PushRenderingStatusAndUnlockVideoSurface(void) {
     LPDIRECTDRAWSURFACE surface;
 
-    DAT_00668164[DAT_006681e4] = DAT_00668144;
-    DAT_006681e4 = DAT_006681e4 + 1;
-    if (DAT_00668144 != 0) {
+    DAT_00668164[RenderingStatusStackDepth] = VideoSurfaceLocked;
+    RenderingStatusStackDepth = RenderingStatusStackDepth + 1;
+    if (VideoSurfaceLocked != 0) {
         surface = renderEngine;
-        if (IDirectDrawSurface_Unlock(surface, DAT_0066809c.lpSurface) == 0x887601c2) {
+        if (IDirectDrawSurface_Unlock(surface, CurrentSurfaceDesc.lpSurface) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
-            IDirectDrawSurface_Unlock(renderEngine, DAT_0066809c.lpSurface);
+            IDirectDrawSurface_Unlock(renderEngine, CurrentSurfaceDesc.lpSurface);
         }
     }
-    DAT_00668144 = 0;
+    VideoSurfaceLocked = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004640f0
@@ -352,29 +352,29 @@ void FUN_004640f0(void) {
     LPDIRECTDRAWSURFACE surface;
     int wasLocked;
 
-    wasLocked = DAT_00668144;
+    wasLocked = VideoSurfaceLocked;
     local.left = 0;
     local.top = 0;
     local.right = lpConfig->screen_width - 1;
     local.bottom = lpConfig->screen_height - 1;
-    DAT_00668164[DAT_006681e4] = DAT_00668144;
-    DAT_006681e4 = DAT_006681e4 + 1;
+    DAT_00668164[RenderingStatusStackDepth] = VideoSurfaceLocked;
+    RenderingStatusStackDepth = RenderingStatusStackDepth + 1;
     if (wasLocked != 0) {
         surface = renderEngine;
-        if (IDirectDrawSurface_Unlock(surface, DAT_0066809c.lpSurface) == 0x887601c2) {
+        if (IDirectDrawSurface_Unlock(surface, CurrentSurfaceDesc.lpSurface) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
-            IDirectDrawSurface_Unlock(renderEngine, DAT_0066809c.lpSurface);
+            IDirectDrawSurface_Unlock(renderEngine, CurrentSurfaceDesc.lpSurface);
         }
     }
-    DAT_0066809c.dwSize = 0x6c;
+    CurrentSurfaceDesc.dwSize = 0x6c;
     IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
     surface = renderEngine;
-    if (IDirectDrawSurface_Lock(surface, NULL, &DAT_0066809c, 0x21, NULL) == 0x887601c2) {
+    if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
         IDirectDrawSurface_Restore(renderEngine);
-        IDirectDrawSurface_Lock(renderEngine, NULL, &DAT_0066809c, 0x21, NULL);
+        IDirectDrawSurface_Lock(renderEngine, NULL, &CurrentSurfaceDesc, 0x21, NULL);
     }
     StoredTransparentColour = GetTransparentColour();
-    DAT_00668144 = 1;
+    VideoSurfaceLocked = 1;
 }
 
 // FUNCTION: LEGOLAND 0x004641f0
@@ -382,44 +382,44 @@ LEGO_EXPORT void PopRenderingStatus(void) {
     RECT local;
     LPDIRECTDRAWSURFACE surface;
 
-    DAT_006681e4 = DAT_006681e4 - 1;
-    if (DAT_00668164[DAT_006681e4] != 0) {
-        if (DAT_00668144 == 0) {
+    RenderingStatusStackDepth = RenderingStatusStackDepth - 1;
+    if (DAT_00668164[RenderingStatusStackDepth] != 0) {
+        if (VideoSurfaceLocked == 0) {
             local.left = 0;
             local.top = 0;
             local.right = lpConfig->screen_width - 1;
             local.bottom = lpConfig->screen_height - 1;
-            DAT_0066809c.dwSize = 0x6c;
+            CurrentSurfaceDesc.dwSize = 0x6c;
             IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
             surface = renderEngine;
-            if (IDirectDrawSurface_Lock(surface, NULL, &DAT_0066809c, 0x21, NULL) == 0x887601c2) {
+            if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
                 IDirectDrawSurface_Restore(renderEngine);
-                IDirectDrawSurface_Lock(renderEngine, NULL, &DAT_0066809c, 0x21, NULL);
+                IDirectDrawSurface_Lock(renderEngine, NULL, &CurrentSurfaceDesc, 0x21, NULL);
             }
             StoredTransparentColour = GetTransparentColour();
-            DAT_00668144 = 1;
+            VideoSurfaceLocked = 1;
         }
         return;
     }
-    if (DAT_00668144 != 0) {
+    if (VideoSurfaceLocked != 0) {
         surface = renderEngine;
-        if (IDirectDrawSurface_Unlock(surface, DAT_0066809c.lpSurface) == 0x887601c2) {
+        if (IDirectDrawSurface_Unlock(surface, CurrentSurfaceDesc.lpSurface) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
-            IDirectDrawSurface_Unlock(renderEngine, DAT_0066809c.lpSurface);
+            IDirectDrawSurface_Unlock(renderEngine, CurrentSurfaceDesc.lpSurface);
         }
-        DAT_00668144 = 0;
+        VideoSurfaceLocked = 0;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00464310
 LEGO_EXPORT int GetVideoSurface(struct VideoArg *arg) {
-    if (DAT_00668144 == 0) {
+    if (VideoSurfaceLocked == 0) {
         return 0;
     }
-    arg->pitch = DAT_0066809c.lPitch;
+    arg->pitch = CurrentSurfaceDesc.lPitch;
     arg->field_4 = lpConfig->screen_width;
     arg->field_8 = lpConfig->screen_height;
-    arg->bits = DAT_0066809c.lpSurface;
+    arg->bits = CurrentSurfaceDesc.lpSurface;
     arg->field_14 = 2;
     return 1;
 }
@@ -445,27 +445,27 @@ LEGO_EXPORT void CommitCliprectToHardware(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00464400
-LEGO_EXPORT void SetOverridePalette(unsigned int param_1) { DAT_006681e8 = param_1; }
+LEGO_EXPORT void SetOverridePalette(unsigned int param_1) { OverridePalette = param_1; }
 
 // FUNCTION: LEGOLAND 0x00464410
-LEGO_EXPORT unsigned int GetOverridePalette(void) { return DAT_006681e8; }
+LEGO_EXPORT unsigned int GetOverridePalette(void) { return OverridePalette; }
 
 // FUNCTION: LEGOLAND 0x00464420
-LEGO_EXPORT void SetOverrideFrame(unsigned int param_1) { DAT_004b9ca8 = param_1; }
+LEGO_EXPORT void SetOverrideFrame(unsigned int param_1) { OverrideFrame = param_1; }
 
 // FUNCTION: LEGOLAND 0x00464430
-LEGO_EXPORT unsigned int GetOverrideFrame(void) { return DAT_004b9ca8; }
+LEGO_EXPORT unsigned int GetOverrideFrame(void) { return OverrideFrame; }
 
 // FUNCTION: LEGOLAND 0x00464440
-LEGO_EXPORT void ClearOverrideFrame(void) { DAT_004b9ca8 = 0xffffffff; }
+LEGO_EXPORT void ClearOverrideFrame(void) { OverrideFrame = 0xffffffff; }
 
 // FUNCTION: LEGOLAND 0x00464450
-LEGO_EXPORT void ClearOverridePalette(void) { DAT_006681e8 = 0; }
+LEGO_EXPORT void ClearOverridePalette(void) { OverridePalette = 0; }
 
 // FUNCTION: LEGOLAND 0x00464460
 LEGO_EXPORT void ClearSpriteOverrides(void) {
-    DAT_004b9ca8 = 0xffffffff;
-    DAT_006681e8 = 0;
+    OverrideFrame = 0xffffffff;
+    OverridePalette = 0;
 }
 
 /* Port [library:asm]: bit reader for the stream that places the pixels of an indexed-colour animation frame
@@ -548,9 +548,9 @@ static struct DrawLLSIdxFrame *PortIdxFrameAt(struct DrawLLS *lls, int index) {
     return frame;
 }
 
-/* The frame to draw: the override (DAT_004b9ca8) if set, else the animation's own, clamped to the last frame. */
+/* The frame to draw: the override (OverrideFrame) if set, else the animation's own, clamped to the last frame. */
 static int PortLLSFrameIndex(struct DrawLLS *lls) {
-    int index = (int)DAT_004b9ca8;
+    int index = (int)OverrideFrame;
 
     if (index < 0) {
         index = lls->frame;
@@ -565,7 +565,7 @@ static int PortLLSFrameIndex(struct DrawLLS *lls) {
 void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
     /* Port [library:asm]: the original is inline asm. Draws one frame (two, for animations with flag 1: the base
      * frame, then the delta frame on top) of an indexed-colour animation into the software screen at pos, showing
-     * only the part inside rect. Each source byte indexes a 16-bit palette (DAT_006681e8 if overridden, else the one
+     * only the part inside rect. Each source byte indexes a 16-bit palette (OverridePalette if overridden, else the one
      * stored with frame 0). Sets DAT_007feb14 bit 0 when a drawn run touches the mouse cursor (DAT_007fe9a8).
      * Quirks kept: when a transparent or copy run ends exactly at the left clip edge the decoder stays in its
      * left-margin state (so the next item is dropped); a single-pixel skip after the visible width is used up wraps
@@ -601,7 +601,7 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
 
     frame_index = PortLLSFrameIndex(lls);
     passes = (lls->flags & 1) ? 2 : 1;
-    pitch = DAT_0066809c.lPitch;
+    pitch = CurrentSurfaceDesc.lPitch;
     cursor = (unsigned short *)DAT_007fe9a8;
     left = rect->left;
     width = rect->right - rect->left;
@@ -623,8 +623,8 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
             with_palette = 0;
         }
         if (passes == 1 || pass == 0) {
-            if (DAT_006681e8 != 0) {
-                palette = (const unsigned short *)DAT_006681e8;
+            if (OverridePalette != 0) {
+                palette = (const unsigned short *)OverridePalette;
             } else {
                 palette = (const unsigned short *)(first->pixels + first->pixel_count);
             }
@@ -633,7 +633,7 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
         bits.bits = 0;
         bits.left = 0;
         bits.next = (const unsigned int *)(frame->pixels + frame->pixel_count + (with_palette ? 0x200 : 0));
-        row = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->x * 2 + pos->y * pitch);
+        row = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + pos->x * 2 + pos->y * pitch);
         for (rows = top; rows > 0; rows--) {
             src = PortIdxSkipRow(&bits, src);
         }
@@ -1047,8 +1047,8 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
     rect->top += (short)sprite->src_y;
     rect->right += (short)sprite->src_x;
     rect->bottom += (short)sprite->src_y;
-    pitch = DAT_0066809c.lPitch;
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * pitch + DAT_00813a44.x * 2);
+    pitch = CurrentSurfaceDesc.lPitch;
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
         FUN_00464480((struct DrawLLS *)image->data, rect, (struct Point *)off);
         return;
@@ -1059,7 +1059,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
     }
     width = rect->right - rect->left;
     height = rect->bottom - rect->top;
-    dst = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + off[0] * 2 + off[1] * pitch);
+    dst = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + off[0] * 2 + off[1] * pitch);
     if (image->field_14 == 0) {
         stride = (image->width + 3) & ~3;
         palette = (const unsigned short *)((unsigned char *)image->aux + 4);
@@ -1103,15 +1103,15 @@ LEGO_EXPORT void SoftPrint_Clear(void) {
     int y;
     int x;
 
-    DAT_007fea14 = DAT_0066809c.dwHeight;
-    DAT_007fea1c = DAT_0066809c.dwWidth;
+    DAT_007fea14 = CurrentSurfaceDesc.dwHeight;
+    DAT_007fea1c = CurrentSurfaceDesc.dwWidth;
     DAT_007fe9a4 = DAT_007fea1c;
-    row = DAT_0066809c.lpSurface;
+    row = CurrentSurfaceDesc.lpSurface;
     for (y = DAT_007fea14; y != 0; y--) {
         for (x = 0; x < DAT_007fe9a4; x++) {
             row[x] = colour;
         }
-        row = (unsigned short *)((char *)row + DAT_0066809c.lPitch);
+        row = (unsigned short *)((char *)row + CurrentSurfaceDesc.lPitch);
     }
 }
 
@@ -1154,7 +1154,7 @@ void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
 
     frame_index = PortLLSFrameIndex(lls);
     passes = (lls->flags & 1) ? 2 : 1;
-    pitch = DAT_0066809c.lPitch;
+    pitch = CurrentSurfaceDesc.lPitch;
     cursor = (unsigned short *)DAT_007fe9a8;
     tint = (unsigned short)DAT_007fe998;
     left = rect->left;
@@ -1185,7 +1185,7 @@ void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
         bits.bits = 0;
         bits.left = 0;
         bits.next = (const unsigned int *)(frame->pixels + frame->pixel_count + (with_palette ? 0x200 : 0));
-        row = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->x * 2 + pos->y * pitch);
+        row = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + pos->x * 2 + pos->y * pitch);
         for (rows = top; rows > 0; rows--) {
             src = PortIdxSkipRow(&bits, src);
         }
@@ -1376,7 +1376,7 @@ void FUN_00465850(struct AviFrame *frame) {
     int y;
     int x;
 
-    dst = DAT_0066809c.lpSurface;
+    dst = CurrentSurfaceDesc.lpSurface;
     DAT_006681ec = (DAT_006681ec != dst) ? dst : 0;
     height = frame->height;
     width = frame->width;
@@ -1386,10 +1386,10 @@ void FUN_00465850(struct AviFrame *frame) {
     row = frame->pixels + (height - 1) * width;
     for (y = half; y > 0; y--) {
         memset(dst, 0, 0x500);
-        dst += DAT_0066809c.lPitch;
+        dst += CurrentSurfaceDesc.lPitch;
     }
     for (y = height; y != 0; y--) {
-        next = dst + DAT_0066809c.lPitch;
+        next = dst + CurrentSurfaceDesc.lPitch;
         s = row;
         p0 = (unsigned short *)dst;
         p1 = (unsigned short *)next;
@@ -1407,12 +1407,12 @@ void FUN_00465850(struct AviFrame *frame) {
             p1 += 2;
         }
         row -= width;
-        dst += DAT_0066809c.lPitch * 2;
+        dst += CurrentSurfaceDesc.lPitch * 2;
     }
-    dst = next + DAT_0066809c.lPitch;
+    dst = next + CurrentSurfaceDesc.lPitch;
     for (y = rest; y > 0; y--) {
         memset(dst, 0, 0x500);
-        dst += DAT_0066809c.lPitch;
+        dst += CurrentSurfaceDesc.lPitch;
     }
 }
 
@@ -1431,7 +1431,7 @@ void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3) {
 
     height = param_1->height;
     width = param_1->width;
-    dst = (unsigned short *)((char *)DAT_0066809c.lpSurface + DAT_0066809c.lPitch * param_3 + param_2 * 2);
+    dst = (unsigned short *)((char *)CurrentSurfaceDesc.lpSurface + CurrentSurfaceDesc.lPitch * param_3 + param_2 * 2);
     last = height - 1;
     src = param_1->pixels + last * width;
     if (height != 0) {
@@ -1451,7 +1451,7 @@ void FUN_004659a0(struct AviFrame *param_1, int param_2, int param_3) {
                     j--;
                 } while (j != 0);
             }
-            dst = (unsigned short *)((char *)dst + DAT_0066809c.lPitch);
+            dst = (unsigned short *)((char *)dst + CurrentSurfaceDesc.lPitch);
             src -= width;
             i--;
         } while (i != 0);
@@ -1513,8 +1513,8 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
     src->top += (short)sprite->src_y;
     src->right += (short)sprite->src_x;
     src->bottom += (short)sprite->src_y;
-    pitch = DAT_0066809c.lPitch;
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * pitch + DAT_00813a44.x * 2);
+    pitch = CurrentSurfaceDesc.lPitch;
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
         FUN_00465240((struct DrawLLS *)image->data, src, (struct Point *)dst);
         return;
@@ -1529,7 +1529,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
         width = src->right - src->left;
         height = src->bottom - src->top;
         frame_index = PortLLSFrameIndex(lls);
-        out = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + dst->top * pitch + (dst->left - src->left) * 2);
+        out = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + dst->top * pitch + (dst->left - src->left) * 2);
         frame = (struct DrawLLSFrame *)(lls + 1);
         if (lls->flags & 1) {
             PortHalfFrame(out, frame, height, pitch, src->top, src->left, width, (unsigned short *)DAT_007fe9a8);
@@ -1548,7 +1548,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
     mask = (unsigned short)DAT_007fe998;
     width = src->right - src->left;
     height = src->bottom - src->top;
-    out = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + dst->left * 2 + dst->top * pitch);
+    out = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + dst->left * 2 + dst->top * pitch);
     if (image->field_14 == 0) {
         stride = (image->width + 3) & ~3;
         palette = (const unsigned short *)((unsigned char *)image->aux + 4);
@@ -1593,27 +1593,27 @@ void FUN_00465ee0(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     int i;
     int off;
 
-    DAT_007fe9a4 = DAT_0066809c.lPitch;
-    DAT_007fea4c.left = clip->left;
-    DAT_007febac.width = clip->right - clip->left;
-    DAT_007fea4c.top = clip->top;
-    DAT_007febac.height = clip->bottom - clip->top;
-    if ((int)DAT_004b9ca8 < 0) {
+    DAT_007fe9a4 = CurrentSurfaceDesc.lPitch;
+    SpriteClipOrigin.left = clip->left;
+    DrawClipExtent.width = clip->right - clip->left;
+    SpriteClipOrigin.top = clip->top;
+    DrawClipExtent.height = clip->bottom - clip->top;
+    if ((int)OverrideFrame < 0) {
         frame_index = lls->frame;
     } else {
-        frame_index = (int)DAT_004b9ca8;
+        frame_index = (int)OverrideFrame;
     }
     if (frame_index >= lls->frame_count) {
         frame_index = lls->frame_count - 1;
     }
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * DAT_0066809c.lPitch + DAT_00813a44.x * 2);
-    dst = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->y * DAT_0066809c.lPitch + (pos->x - DAT_007fea4c.left) * 2);
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * CurrentSurfaceDesc.lPitch + MousePos.x * 2);
+    dst = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + pos->y * CurrentSurfaceDesc.lPitch + (pos->x - SpriteClipOrigin.left) * 2);
     if (lls->flags & 1) {
         pixels = frame->pixels;
         off = frame->pixel_count * 2 + 0x10;
         runs = (unsigned char *)frame + off;
         mask = (unsigned int *)((unsigned char *)frame + (frame->run_bytes + off));
-        FUN_00468040(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+        FUN_00468040(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
         i = lls->frame + 1;
         while (i-- != 0) {
             frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
@@ -1622,7 +1622,7 @@ void FUN_00465ee0(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         off = frame->pixel_count * 2 + 0x10;
         runs = (unsigned char *)frame + off;
         mask = (unsigned int *)((unsigned char *)frame + (frame->run_bytes + off));
-        FUN_00468040(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+        FUN_00468040(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
     } else {
         i = frame_index;
         while (i-- != 0) {
@@ -1632,7 +1632,7 @@ void FUN_00465ee0(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         off = frame->pixel_count * 2 + 0x10;
         runs = (unsigned char *)frame + off;
         mask = (unsigned int *)((unsigned char *)frame + (frame->run_bytes + off));
-        FUN_00468040(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+        FUN_00468040(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
     }
 }
 
@@ -1647,7 +1647,7 @@ int FlipFrame(void) {
     LLSAuto();
     if (lpConfig->field_1e != 0 && DAT_00668148 != 0) {
         PushRenderingStatusAndLockVideoSurface();
-        PrintSprite(DAT_00668148, DAT_00813a44.x, DAT_00813a44.y, 0, 0);
+        PrintSprite(DAT_00668148, MousePos.x, MousePos.y, 0, 0);
         PopRenderingStatus();
     }
     tick = GetTickCount();
@@ -1660,7 +1660,7 @@ int FlipFrame(void) {
     while (result != 0) {
         if (result == 0x887601c2) {
             IDirectDrawSurface_Restore(PrimarySurface);
-            IDirectDrawSurface_Restore(DAT_00668078);
+            IDirectDrawSurface_Restore(OffscreenSurface);
             return 0;
         }
         if (result != 0x887601ae && result != 0x8876021c) {
@@ -1669,10 +1669,10 @@ int FlipFrame(void) {
         primary = PrimarySurface;
         result = IDirectDrawSurface_Flip(primary, NULL, 1);
     }
-    back = DAT_00668078;
+    back = OffscreenSurface;
     result = IDirectDrawSurface_GetFlipStatus(back, 2);
     while (result != 0) {
-        back = DAT_00668078;
+        back = OffscreenSurface;
         result = IDirectDrawSurface_GetFlipStatus(back, 2);
     }
     tick = GetTickCount();
@@ -1704,7 +1704,7 @@ int BlitFrameToWindow(void) {
     LLSAuto();
     if (lpConfig->field_1e != 0 && DAT_00668148 != 0) {
         PushRenderingStatusAndLockVideoSurface();
-        PrintSprite(DAT_00668148, DAT_00813a44.x, DAT_00813a44.y, 0, 0);
+        PrintSprite(DAT_00668148, MousePos.x, MousePos.y, 0, 0);
         PopRenderingStatus();
     }
     tick = GetTickCount();
@@ -1716,10 +1716,10 @@ int BlitFrameToWindow(void) {
     ClientToScreen(WNDENV_Gethwnd(), &client.pt[0]);
     OffsetRect(&dst, client.rect.left, client.rect.top);
     surface = PrimarySurface;
-    result = IDirectDrawSurface_Blt(surface, &dst, DAT_00668078, NULL, 0x1000000, NULL);
+    result = IDirectDrawSurface_Blt(surface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
     if (result == 0x887601c2) {
         IDirectDrawSurface_Restore(PrimarySurface);
-        result = IDirectDrawSurface_Blt(PrimarySurface, &dst, DAT_00668078, NULL, 0x1000000, NULL);
+        result = IDirectDrawSurface_Blt(PrimarySurface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
     }
     if (result != 0) {
         return 0;
@@ -1788,9 +1788,9 @@ void DrawWatchSprite(void) {
             ClientToScreen(WNDENV_Gethwnd(), &cursor.pt[0]);
             ClientToScreen(WNDENV_Gethwnd(), &cursor.pt[1]);
             surface = PrimarySurface;
-            if (IDirectDrawSurface_Blt(surface, &cursor.rect, DAT_00668078, &WatchRect, 0x1000000, NULL) == 0x887601c2) {
+            if (IDirectDrawSurface_Blt(surface, &cursor.rect, OffscreenSurface, &WatchRect, 0x1000000, NULL) == 0x887601c2) {
                 IDirectDrawSurface_Restore(PrimarySurface);
-                IDirectDrawSurface_Blt(PrimarySurface, &cursor, DAT_00668078, NULL, 0x1000000, NULL);
+                IDirectDrawSurface_Blt(PrimarySurface, &cursor, OffscreenSurface, NULL, 0x1000000, NULL);
             }
         }
     }
@@ -1820,8 +1820,8 @@ LEGO_EXPORT int RenderingComplete(void) {
         DAT_00813a2c += tsc;
     }
 #endif
-    DAT_00667d68 = GetTickCount();
-    result = DAT_004b9ca4();
+    LastRenderingCompleteTick = GetTickCount();
+    result = BlitFrameFunc();
     DAT_00813a2c = 0;
 #if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
     __asm {
@@ -1841,17 +1841,17 @@ LEGO_EXPORT void PushSetTarget(struct Sprite *sprite) {
     LPDIRECTDRAWSURFACE surface;
     int locked;
 
-    locked = DAT_00668144;
-    DAT_00668164[DAT_006681e4] = DAT_00668144;
-    DAT_006681e4 = DAT_006681e4 + 1;
+    locked = VideoSurfaceLocked;
+    DAT_00668164[RenderingStatusStackDepth] = VideoSurfaceLocked;
+    RenderingStatusStackDepth = RenderingStatusStackDepth + 1;
     if (locked != 0) {
         surface = renderEngine;
-        if (IDirectDrawSurface_Unlock(surface, DAT_0066809c.lpSurface) == 0x887601c2) {
+        if (IDirectDrawSurface_Unlock(surface, CurrentSurfaceDesc.lpSurface) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
-            IDirectDrawSurface_Unlock(renderEngine, DAT_0066809c.lpSurface);
+            IDirectDrawSurface_Unlock(renderEngine, CurrentSurfaceDesc.lpSurface);
         }
     }
-    DAT_00668144 = 0;
+    VideoSurfaceLocked = 0;
     renderEngineTargets[renderEngineTargetIdx] = renderEngine;
     renderEngine = sprite->surface;
     renderEngineTargetIdx++;
@@ -1929,12 +1929,12 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     int hit;
     int i;
 
-    DAT_007fe9a4 = DAT_0066809c.lPitch;
-    DAT_007fea4c.left = clip->left;
-    DAT_007febac.width = clip->right - clip->left;
-    DAT_007fea4c.top = clip->top;
-    DAT_007febac.height = clip->bottom - clip->top;
-    frame_index = (int)DAT_004b9ca8;
+    DAT_007fe9a4 = CurrentSurfaceDesc.lPitch;
+    SpriteClipOrigin.left = clip->left;
+    DrawClipExtent.width = clip->right - clip->left;
+    SpriteClipOrigin.top = clip->top;
+    DrawClipExtent.height = clip->bottom - clip->top;
+    frame_index = (int)OverrideFrame;
     if (frame_index < 0) {
         frame_index = lls->frame;
     }
@@ -1942,38 +1942,38 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         frame_index = lls->frame_count - 1;
     }
     hit = 0;
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)DAT_0066809c.lpSurface + DAT_00813a44.y * DAT_0066809c.lPitch + DAT_00813a44.x * 2);
-    if (DAT_00813a44.x >= pos->x && DAT_00813a44.x <= pos->x + lls->width && DAT_00813a44.y >= pos->y && DAT_00813a44.y <= pos->y + lls->height) {
+    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * CurrentSurfaceDesc.lPitch + MousePos.x * 2);
+    if (MousePos.x >= pos->x && MousePos.x <= pos->x + lls->width && MousePos.y >= pos->y && MousePos.y <= pos->y + lls->height) {
         hit = 1;
     }
-    dst = (unsigned short *)((unsigned char *)DAT_0066809c.lpSurface + pos->y * DAT_0066809c.lPitch + (pos->x - DAT_007fea4c.left) * 2);
+    dst = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + pos->y * CurrentSurfaceDesc.lPitch + (pos->x - SpriteClipOrigin.left) * 2);
     if (lls->flags & 1) {
         pixels = frame->pixels;
         runs = (unsigned char *)frame + frame->pixel_count * 2 + 0x10;
         mask = (unsigned int *)(runs + frame->run_bytes);
         if (hit) {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467640(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_00466d80(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467180(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_004673f0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         } else {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467f00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_004677b0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_00467d10(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         }
         i = lls->frame + 1;
@@ -1984,28 +1984,28 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         runs = (unsigned char *)frame + frame->pixel_count * 2 + 0x10;
         mask = (unsigned int *)(runs + frame->run_bytes);
         if (hit) {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467640(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_00466d80(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467180(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_004673f0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         } else {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467f00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_004677b0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_00467d10(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         }
     } else {
@@ -2017,28 +2017,28 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         runs = (unsigned char *)frame + frame->pixel_count * 2 + 0x10;
         mask = (unsigned int *)(runs + frame->run_bytes);
         if (hit) {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467640(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_00466d80(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467180(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_004673f0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         } else {
-            if (lls->width <= DAT_007febac.width - DAT_007fea4c.left) {
-                FUN_00467f00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top);
-            } else if (DAT_007fea4c.left != 0) {
-                if (lls->width - DAT_007fea4c.left > DAT_007febac.width) {
-                    FUN_004677b0(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+            if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
+                FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+            } else if (SpriteClipOrigin.left != 0) {
+                if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
+                    FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
-                FUN_00467d10(dst, pixels, runs, mask, DAT_007febac.height, DAT_0066809c.lPitch, DAT_007fea4c.top, DAT_007fea4c.left, DAT_007febac.width, 0, (unsigned short *)DAT_007fe9a8);
+                FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         }
     }

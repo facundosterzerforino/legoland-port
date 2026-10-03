@@ -352,7 +352,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
 void InsertSortNode(struct SortNode *node) {
     struct SortNode *l;
 
-    if (DAT_007fd600 == NULL) {
+    if (SortCursor == NULL) {
         // STRING: LEGOLAND 0x004bdd40
         DBPrintf("Oh drat, Bad stuff in the sprite sorter\n");
     }
@@ -365,36 +365,36 @@ void InsertSortNode(struct SortNode *node) {
         node->right = NULL;
         PrintListHead = node;
     } else {
-        if (node->key < DAT_007fd600->key) {
-            while (node->key < DAT_007fd600->key && DAT_007fd600->left != NULL) {
-                DAT_007fd600 = DAT_007fd600->left;
+        if (node->key < SortCursor->key) {
+            while (node->key < SortCursor->key && SortCursor->left != NULL) {
+                SortCursor = SortCursor->left;
             }
         } else {
-            while (node->key > DAT_007fd600->key && DAT_007fd600->right != NULL) {
-                DAT_007fd600 = DAT_007fd600->right;
+            while (node->key > SortCursor->key && SortCursor->right != NULL) {
+                SortCursor = SortCursor->right;
             }
         }
-        if (node->key < DAT_007fd600->key) {
-            l = DAT_007fd600->left;
+        if (node->key < SortCursor->key) {
+            l = SortCursor->left;
             node->left = l;
             if (l == NULL) {
                 PrintListHead = node;
             } else {
                 l->right = node;
             }
-            node->right = DAT_007fd600;
-            DAT_007fd600->left = node;
+            node->right = SortCursor;
+            SortCursor->left = node;
         } else {
-            l = DAT_007fd600->right;
+            l = SortCursor->right;
             node->right = l;
             if (l != NULL) {
                 l->left = node;
             }
-            node->left = DAT_007fd600;
-            DAT_007fd600->right = node;
+            node->left = SortCursor;
+            SortCursor->right = node;
         }
     }
-    DAT_007fd600 = node;
+    SortCursor = node;
     if (node == NULL) {
         DBPrintf("Oh drat, Bad stuff in the sprite sorter\n");
     }

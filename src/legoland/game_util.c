@@ -81,12 +81,12 @@ int FUN_00478890(struct CommandArgs *arg, int argc) {
     unsigned int n2;
 
     if (argc == 0) {
-        DAT_004bb5b0 = 1;
+        ScriptConditionActive = 1;
         return 1;
     }
     if (argc == 1) {
         n1 = atoi((char *)arg->field_4);
-        DAT_004bb5b0 = n1 <= CurrentProfile.field_20;
+        ScriptConditionActive = n1 <= CurrentProfile.field_20;
         return 1;
     }
     n1 = atoi((char *)arg->field_4);
@@ -94,15 +94,15 @@ int FUN_00478890(struct CommandArgs *arg, int argc) {
     if (n1 > n2) {
         return 0;
     }
-    if (CurrentProfile.field_20 < n1 || (DAT_004bb5b0 = 1, CurrentProfile.field_20 > n2)) {
-        DAT_004bb5b0 = 0;
+    if (CurrentProfile.field_20 < n1 || (ScriptConditionActive = 1, CurrentProfile.field_20 > n2)) {
+        ScriptConditionActive = 0;
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00478930
 int FUN_00478930(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 7) == 0) {
             return 0;
         }
@@ -116,7 +116,7 @@ int FUN_00478930(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00478980
 int FUN_00478980(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786a0(param_1, param_2, 2) == 0) {
@@ -128,7 +128,7 @@ int FUN_00478980(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x004789c0
 int FUN_004789c0(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786a0(param_1, param_2, 2) == 0) {
@@ -140,7 +140,7 @@ int FUN_004789c0(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00478a00
 int FUN_00478a00(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786a0(param_1, param_2, 2) == 0) {
@@ -153,7 +153,7 @@ int FUN_00478a00(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00478a40
 int FUN_00478a40(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786a0(param_1, param_2, 2) == 0) {
@@ -166,7 +166,7 @@ int FUN_00478a40(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00478a80
 int FUN_00478a80(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 2) == 0) {
             return 0;
         }
@@ -179,7 +179,7 @@ int FUN_00478a80(unsigned int param_1, unsigned int param_2) {
 int FUN_00478ac0(unsigned int param_1, unsigned int param_2) {
     unsigned int map;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_00478690(param_1, param_2, 1) == 0) {
@@ -214,7 +214,7 @@ int FUN_00478b20(unsigned int arg) {
 
 // FUNCTION: LEGOLAND 0x00478b70
 int FUN_00478b70(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0(param_1, param_2, 1, 1) == 0) {
@@ -232,7 +232,7 @@ unsigned int FUN_00478bc0(unsigned int param_1, unsigned int param_2, unsigned i
 unsigned int FUN_00478be0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     unsigned int name;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0(param_1, param_2, 5, 1) == 0) {
@@ -250,7 +250,7 @@ unsigned int FUN_00478be0(unsigned int param_1, unsigned int param_2, unsigned i
 
 // FUNCTION: LEGOLAND 0x00478c60
 int FUN_00478c60(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
             return 0;
         }
@@ -267,7 +267,7 @@ int FUN_00478c60(struct CommandArgs *arg, int argc) {
 int FUN_00478cd0(char **argv, int argc) {
     int *out;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)argv, argc, 5, 5) == 0) {
             return 0;
         }
@@ -291,14 +291,14 @@ int FUN_00478d30(int param_1, int param_2) {
     int a;
     int b;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     args = (char **)param_1;
     if (FUN_004786c0((int)args, param_2, 5, 2) == 0) {
         return 0;
     }
-    FUN_00478770(local, args, 1);
+    ParseIntPair(local, args, 1);
     local[0] <<= 8;
     local[1] <<= 8;
     if (DAT_00669054 == 1) {
@@ -318,7 +318,7 @@ int FUN_00478d30(int param_1, int param_2) {
 // FUNCTION: LEGOLAND 0x00478e20
 int FUN_00478e20(int param_1, int param_2) {
     char *name = DAT_004d8bb0;
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
@@ -337,7 +337,7 @@ int FUN_00478e20(int param_1, int param_2) {
 // FUNCTION: LEGOLAND 0x00478e90
 int FUN_00478e90(int param_1, int param_2) {
     char *name = DAT_004d8bb0;
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
@@ -358,7 +358,7 @@ int FUN_00478f00(struct CommandArgs *arg, int argc) {
     int v1;
     int v2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
@@ -384,7 +384,7 @@ int FUN_00478fa0(struct CommandArgs *arg, int argc) {
     int coords[2];
     int count;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
@@ -410,7 +410,7 @@ int FUN_00479060(struct CommandArgs *arg, int argc) {
     int coords[2];
     int count;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
@@ -433,7 +433,7 @@ int FUN_00479060(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479120
 int FUN_00479120(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 0) == 0) {
             return 0;
         }
@@ -452,7 +452,7 @@ int FUN_00479120(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004791a0
 int FUN_004791a0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
@@ -468,7 +468,7 @@ int FUN_004791f0(struct CommandArgs *arg, int argc) {
     unsigned int id;
     unsigned int count;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
@@ -484,7 +484,7 @@ int FUN_004791f0(struct CommandArgs *arg, int argc) {
         }
     }
     if (id != 0) {
-        FUN_0046bdd0(DAT_00669050, id, count);
+        FUN_0046bdd0(CurrentObjectiveEventFlags, id, count);
     }
     return 1;
 }
@@ -494,7 +494,7 @@ int FUN_00479270(struct CommandArgs *arg, int argc) {
     unsigned int id;
     unsigned int vals[2];
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 3) == 0) {
@@ -504,7 +504,7 @@ int FUN_00479270(struct CommandArgs *arg, int argc) {
     vals[0] = atoi(arg->field_8);
     vals[1] = atoi(arg->field_c);
     if (id != 0) {
-        FUN_0046be00(DAT_00669050, id, vals);
+        FUN_0046be00(CurrentObjectiveEventFlags, id, vals);
     }
     return 1;
 }
@@ -515,7 +515,7 @@ int FUN_00479300(struct CommandArgs *arg, int argc) {
     unsigned int v;
     struct Vec4 vec;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 6) == 0) {
@@ -523,9 +523,9 @@ int FUN_00479300(struct CommandArgs *arg, int argc) {
     }
     id = ElemID((const char *)arg->field_4);
     v = atoi(arg->field_8);
-    FUN_00478700((int *)&vec, (char **)arg, 3);
+    ParseRect((int *)&vec, (char **)arg, 3);
     if (id != 0) {
-        FUN_0046be40(DAT_00669050, id, v, &vec);
+        FUN_0046be40(CurrentObjectiveEventFlags, id, v, &vec);
     }
     return 1;
 }
@@ -534,13 +534,13 @@ int FUN_00479300(struct CommandArgs *arg, int argc) {
 int FUN_00479390(struct CommandArgs *arg, int argc) {
     unsigned int id;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
         id = ElemID((const char *)arg->field_4);
         if (id != 0) {
-            FUN_0046be90(DAT_00669050, id);
+            FUN_0046be90(CurrentObjectiveEventFlags, id);
         }
     }
     return 1;
@@ -550,7 +550,7 @@ int FUN_00479390(struct CommandArgs *arg, int argc) {
 int FUN_004793e0(struct CommandArgs *arg, int argc) {
     unsigned int id;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
@@ -563,7 +563,7 @@ int FUN_004793e0(struct CommandArgs *arg, int argc) {
                 return 0;
             }
         }
-        FUN_0046bec0(DAT_00669050, id);
+        FUN_0046bec0(CurrentObjectiveEventFlags, id);
     }
     return 1;
 }
@@ -574,7 +574,7 @@ int FUN_00479450(struct CommandArgs *arg, int argc) {
     int v1;
     unsigned int v2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -588,7 +588,7 @@ int FUN_00479450(struct CommandArgs *arg, int argc) {
         v2 = 0;
     }
     if (id != 0) {
-        FUN_0046bef0(DAT_00669050, id, v2, v1);
+        FUN_0046bef0(CurrentObjectiveEventFlags, id, v2, v1);
     }
     return 1;
 }
@@ -598,17 +598,17 @@ int FUN_004794d0(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 4) == 0) {
             return 0;
         }
-        FUN_00478700((int *)&vec, (char **)arg, 1);
+        ParseRect((int *)&vec, (char **)arg, 1);
         if (argc >= 5) {
             v = atoi(((char **)arg)[5]);
         } else {
             v = 0;
         }
-        FUN_0046bf30(DAT_00669050, &vec, v);
+        FUN_0046bf30(CurrentObjectiveEventFlags, &vec, v);
     }
     return 1;
 }
@@ -618,7 +618,7 @@ int FUN_00479550(struct CommandArgs *arg, int argc) {
     unsigned int id;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
             return 0;
         }
@@ -628,7 +628,7 @@ int FUN_00479550(struct CommandArgs *arg, int argc) {
         id = ElemID((const char *)arg->field_4);
         v = atoi(arg->field_8);
         if (id != 0) {
-            FUN_0046bf80(DAT_00669050, id, v);
+            FUN_0046bf80(CurrentObjectiveEventFlags, id, v);
         }
     }
     return 1;
@@ -640,7 +640,7 @@ int FUN_004795c0(struct CommandArgs *arg, int argc) {
     unsigned int v2;
     unsigned int v3;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -654,7 +654,7 @@ int FUN_004795c0(struct CommandArgs *arg, int argc) {
         v3 = 0xffffffff;
     }
     if (id != 0) {
-        FUN_0046bfb0(DAT_00669050, id, v3, v2);
+        FUN_0046bfb0(CurrentObjectiveEventFlags, id, v3, v2);
     }
     return 1;
 }
@@ -665,7 +665,7 @@ int FUN_00479640(struct CommandArgs *arg, int argc) {
     int n;
     unsigned int v;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -682,7 +682,7 @@ int FUN_00479640(struct CommandArgs *arg, int argc) {
         v = 0;
     }
     if (id != 0) {
-        FUN_0046bff0(DAT_00669050, id, n, v);
+        FUN_0046bff0(CurrentObjectiveEventFlags, id, n, v);
     }
     return 1;
 }
@@ -692,7 +692,7 @@ int FUN_004796d0(struct CommandArgs *arg, int argc) {
     unsigned int id;
     int count;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -704,7 +704,7 @@ int FUN_004796d0(struct CommandArgs *arg, int argc) {
         count = 1;
     }
     if (id != 0) {
-        FUN_0046c030(DAT_00669050, id, count);
+        FUN_0046c030(CurrentObjectiveEventFlags, id, count);
     }
     return 1;
 }
@@ -714,7 +714,7 @@ int FUN_00479740(struct CommandArgs *arg, int argc) {
     unsigned int id;
     unsigned int v;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -723,14 +723,14 @@ int FUN_00479740(struct CommandArgs *arg, int argc) {
     id = ElemID((const char *)arg->field_4);
     v = atoi(arg->field_8);
     if (id != 0) {
-        FUN_0046c060(DAT_00669050, id, v);
+        FUN_0046c060(CurrentObjectiveEventFlags, id, v);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x004797b0
 int FUN_004797b0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
@@ -744,13 +744,13 @@ int FUN_004797b0(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479800
 int FUN_00479800(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
-    FUN_0046c090(DAT_00669050, atoi((char *)arg->field_4));
+    FUN_0046c090(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     return 1;
 }
 
@@ -759,7 +759,7 @@ int FUN_00479850(struct CommandArgs *arg, int argc) {
     unsigned int id;
     int value;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -768,7 +768,7 @@ int FUN_00479850(struct CommandArgs *arg, int argc) {
     id = ElemID((const char *)arg->field_4);
     value = atoi(arg->field_8);
     if (id != 0) {
-        FUN_0046c0c0(DAT_00669050, id, value);
+        FUN_0046c0c0(CurrentObjectiveEventFlags, id, value);
     }
     return 1;
 }
@@ -778,7 +778,7 @@ int FUN_004798c0(struct CommandArgs *arg, int argc) {
     unsigned int id;
     unsigned int v;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -787,7 +787,7 @@ int FUN_004798c0(struct CommandArgs *arg, int argc) {
     id = ElemID((const char *)arg->field_4);
     v = atoi(arg->field_8);
     if (id != 0) {
-        FUN_0046c0f0(DAT_00669050, id, v);
+        FUN_0046c0f0(CurrentObjectiveEventFlags, id, v);
     }
     return 1;
 }
@@ -796,68 +796,68 @@ int FUN_004798c0(struct CommandArgs *arg, int argc) {
 int FUN_00479930(struct CommandArgs *arg, int argc) {
     int value;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
     value = atoi((char *)arg->field_4);
-    FUN_0046c120(DAT_00669050, value);
+    FUN_0046c120(CurrentObjectiveEventFlags, value);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479980
 int FUN_00479980(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
-        FUN_0046c150(DAT_00669050, atoi((char *)arg->field_4));
+        FUN_0046c150(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x004799d0
 int FUN_004799d0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
-        FUN_0046c180(DAT_00669050, atoi((char *)arg->field_4));
+        FUN_0046c180(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479a20
 int FUN_00479a20(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
-        FUN_0046c1b0(DAT_00669050, atoi((char *)arg->field_4));
+        FUN_0046c1b0(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479a70
 int FUN_00479a70(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
-        FUN_0046c1e0(DAT_00669050, atoi((char *)arg->field_4));
+        FUN_0046c1e0(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479ac0
 int FUN_00479ac0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
             return 0;
         }
-        FUN_0046c210(DAT_00669050, atoi((char *)arg->field_4));
+        FUN_0046c210(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     }
     return 1;
 }
@@ -869,7 +869,7 @@ int FUN_00479b10(struct CommandArgs *arg, int argc) {
 
     buf[0] = DAT_004d8bb0[0];
     memset(buf + 1, 0, sizeof(buf) - 1);
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 1, 0) == 0) {
@@ -897,26 +897,26 @@ int FUN_00479c40(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 5) == 0) {
             return 0;
         }
-        FUN_00478700((int *)&vec, (char **)arg, 1);
+        ParseRect((int *)&vec, (char **)arg, 1);
         v = atoi(((char **)arg)[5]);
-        FUN_0046c240(DAT_00669050, &vec, v);
+        FUN_0046c240(CurrentObjectiveEventFlags, &vec, v);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479cb0
 int FUN_00479cb0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
-    FUN_0046c290(DAT_00669050, atoi((char *)arg->field_4));
+    FUN_0046c290(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     return 1;
 }
 
@@ -925,7 +925,7 @@ int FUN_00479d00(struct CommandArgs *arg, int argc) {
     unsigned int v1;
     unsigned int v2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -933,31 +933,31 @@ int FUN_00479d00(struct CommandArgs *arg, int argc) {
     }
     v1 = atoi((char *)arg->field_4);
     v2 = atoi(arg->field_8);
-    FUN_0046c2c0(DAT_00669050, v1, v2);
+    FUN_0046c2c0(CurrentObjectiveEventFlags, v1, v2);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479d60
 int FUN_00479d60(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
-    FUN_0046c2f0(DAT_00669050, atoi((char *)arg->field_4));
+    FUN_0046c2f0(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479db0
 int FUN_00479db0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
-    FUN_0046c320(DAT_00669050, atoi((char *)arg->field_4));
+    FUN_0046c320(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     return 1;
 }
 
@@ -967,7 +967,7 @@ int FUN_00479e00(struct CommandArgs *arg, int argc) {
     unsigned int v2;
     int b;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -980,7 +980,7 @@ int FUN_00479e00(struct CommandArgs *arg, int argc) {
     } else {
         b = 0;
     }
-    FUN_0046c350(DAT_00669050, v1, v2, b);
+    FUN_0046c350(CurrentObjectiveEventFlags, v1, v2, b);
     return 1;
 }
 
@@ -989,7 +989,7 @@ int FUN_00479e80(struct CommandArgs *arg, int argc) {
     int n1;
     int n2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
@@ -997,19 +997,19 @@ int FUN_00479e80(struct CommandArgs *arg, int argc) {
     }
     n1 = atoi((char *)arg->field_4);
     n2 = atoi(arg->field_8);
-    FUN_0046c390(DAT_00669050, n1, n2);
+    FUN_0046c390(CurrentObjectiveEventFlags, n1, n2);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00479ee0
 int FUN_00479ee0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
         return 0;
     }
-    FUN_0046c3c0(DAT_00669050, atoi((char *)arg->field_4));
+    FUN_0046c3c0(CurrentObjectiveEventFlags, atoi((char *)arg->field_4));
     return 1;
 }
 
@@ -1018,7 +1018,7 @@ int FUN_00479f30(struct CommandArgs *arg, int argc) {
     int index;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 2) == 0) {
             return 0;
         }
@@ -1027,7 +1027,7 @@ int FUN_00479f30(struct CommandArgs *arg, int argc) {
             return 0;
         }
         v = atoi(arg->field_8);
-        FUN_0046c3f0(DAT_00669050, index, v);
+        FUN_0046c3f0(CurrentObjectiveEventFlags, index, v);
     }
     return 1;
 }
@@ -1037,7 +1037,7 @@ int FUN_00479fa0(struct CommandArgs *arg, int argc) {
     int n1;
     int n2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) == 0) {
@@ -1049,7 +1049,7 @@ int FUN_00479fa0(struct CommandArgs *arg, int argc) {
     } else {
         n2 = 1;
     }
-    FUN_0046c420(DAT_00669050, n1, n2);
+    FUN_0046c420(CurrentObjectiveEventFlags, n1, n2);
     return 1;
 }
 
@@ -1058,7 +1058,7 @@ int FUN_0047a020(struct CommandArgs *arg, int argc) {
     int v2;
     int v3;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
@@ -1083,7 +1083,7 @@ int FUN_0047a0b0(char **argv, int argc) {
     int v1;
     int v2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)argv, argc, 5, 1) == 0) {
@@ -1108,7 +1108,7 @@ int FUN_0047a140(struct CommandArgs *arg, int argc) {
     int v1;
     int v2;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
@@ -1138,7 +1138,7 @@ int FUN_0047a1d0(struct CommandArgs *arg, int argc) {
 
     buf[0] = DAT_004d8bb0[0];
     memset(buf + 1, 0, sizeof(buf) - 1);
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
             return 0;
         }
@@ -1161,7 +1161,7 @@ int FUN_0047a1d0(struct CommandArgs *arg, int argc) {
 int FUN_0047a2f0(struct CommandArgs *arg, int argc) {
     int index;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 0) != 0) {
@@ -1171,7 +1171,7 @@ int FUN_0047a2f0(struct CommandArgs *arg, int argc) {
             index = 0;
         }
         if (index != -1) {
-            FUN_0046c450(DAT_00669050, index);
+            FUN_0046c450(CurrentObjectiveEventFlags, index);
             return 1;
         }
     }
@@ -1182,7 +1182,7 @@ int FUN_0047a2f0(struct CommandArgs *arg, int argc) {
 int FUN_0047a360(struct CommandArgs *arg, int argc) {
     int index;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 0) != 0) {
@@ -1192,7 +1192,7 @@ int FUN_0047a360(struct CommandArgs *arg, int argc) {
             index = 0;
         }
         if (index != -1) {
-            FUN_0046c480(DAT_00669050, index);
+            FUN_0046c480(CurrentObjectiveEventFlags, index);
             return 1;
         }
     }
@@ -1203,7 +1203,7 @@ int FUN_0047a360(struct CommandArgs *arg, int argc) {
 int FUN_0047a3d0(struct CommandArgs *arg, int argc) {
     int index;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 2, 1) != 0) {
@@ -1211,7 +1211,7 @@ int FUN_0047a3d0(struct CommandArgs *arg, int argc) {
             index = FindStringNoCase((char *)arg->field_4, &DAT_004bb5e0, 5);
         }
         if (index != -1) {
-            FUN_0046c4b0(DAT_00669050, index);
+            FUN_0046c4b0(CurrentObjectiveEventFlags, index);
             return 1;
         }
     }
@@ -1220,11 +1220,11 @@ int FUN_0047a3d0(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a440
 int FUN_0047a440(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 2, 0) == 0) {
             return 0;
         }
-        FUN_0046c510(DAT_00669050);
+        FUN_0046c510(CurrentObjectiveEventFlags);
     }
     return 1;
 }
@@ -1234,7 +1234,7 @@ int FUN_0047a480(struct CommandArgs *arg, int argc) {
     unsigned int id;
     int popup = 1;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 4, 1) == 0) {
@@ -1257,7 +1257,7 @@ int FUN_0047a480(struct CommandArgs *arg, int argc) {
 int FUN_0047a500(struct CommandArgs *arg, int argc) {
     unsigned int id;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 4, 1) == 0) {
@@ -1274,7 +1274,7 @@ int FUN_0047a500(struct CommandArgs *arg, int argc) {
 int FUN_0047a550(struct CommandArgs *arg, int argc) {
     int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 1) == 0) {
             return 0;
         }
@@ -1292,14 +1292,14 @@ int FUN_0047a5a0(struct CommandArgs *arg, int argc) {
     unsigned int coords[2];
     unsigned int v;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 3) == 0) {
         return 0;
     }
     id = ElemID((const char *)arg->field_4);
-    FUN_00478770((int *)coords, (char **)arg, 2);
+    ParseIntPair((int *)coords, (char **)arg, 2);
     if (argc >= 4) {
         v = atoi(((char **)arg)[4]);
     } else {
@@ -1319,11 +1319,11 @@ int FUN_0047a5a0(struct CommandArgs *arg, int argc) {
 int FUN_0047a650(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 4) == 0) {
             return 0;
         }
-        FUN_00478700((int *)&vec, (char **)arg, 1);
+        ParseRect((int *)&vec, (char **)arg, 1);
         FUN_0046b8c0(&vec);
     }
     return 1;
@@ -1333,11 +1333,11 @@ int FUN_0047a650(struct CommandArgs *arg, int argc) {
 int FUN_0047a6a0(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 4) == 0) {
             return 0;
         }
-        FUN_00478700((int *)&vec, (char **)arg, 1);
+        ParseRect((int *)&vec, (char **)arg, 1);
         FUN_0046b900(&vec);
     }
     return 1;
@@ -1349,11 +1349,11 @@ int FUN_0047a6f0(struct CommandArgs *arg, int argc) {
     int x;
     int y;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 4) == 0) {
             return 0;
         }
-        FUN_00478700(rect, (char **)arg, 1);
+        ParseRect(rect, (char **)arg, 1);
         if (DAT_00669054 == 4) {
             FUN_0046b940((struct Vec4 *)rect);
             return 1;
@@ -1371,11 +1371,11 @@ int FUN_0047a6f0(struct CommandArgs *arg, int argc) {
 int FUN_0047a7b0(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 4) == 0) {
             return 0;
         }
-        FUN_00478700((int *)&vec, (char **)arg, 1);
+        ParseRect((int *)&vec, (char **)arg, 1);
         FUN_0046b980(&vec);
     }
     return 1;
@@ -1383,7 +1383,7 @@ int FUN_0047a7b0(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a800
 int FUN_0047a800(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
@@ -1399,7 +1399,7 @@ int FUN_0047a800(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a860
 int FUN_0047a860(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 1) == 0) {
             return 0;
         }
@@ -1410,7 +1410,7 @@ int FUN_0047a860(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a8a0
 int FUN_0047a8a0(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 4, 1) == 0) {
             return 0;
         }
@@ -1424,7 +1424,7 @@ int FUN_0047a8e0(struct CommandArgs *arg, int argc) {
     int index;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
@@ -1449,7 +1449,7 @@ int FUN_0047a960(struct CommandArgs *arg, int argc) {
     unsigned int v2;
     unsigned int v3;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
@@ -1496,7 +1496,7 @@ int FUN_0047aa90(struct CommandArgs *arg, int argc) {
     int n;
     int r;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 1, 2) == 0) {
@@ -1507,7 +1507,7 @@ int FUN_0047aa90(struct CommandArgs *arg, int argc) {
     if (r == -1) {
         return 0;
     }
-    FUN_00482d60(r, n);
+    SetMoodDelta(r, n);
     return 1;
 }
 
@@ -1516,7 +1516,7 @@ int FUN_0047ab00(struct CommandArgs *arg, int argc) {
     int index;
     int value;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
@@ -1528,7 +1528,7 @@ int FUN_0047ab00(struct CommandArgs *arg, int argc) {
         return 0;
     }
     if (DAT_00669054 == 1) {
-        FUN_00462e50(index, value);
+        SetClassPercent(index, value);
     } else {
         FUN_0046bbb0(index, value);
     }
@@ -1540,7 +1540,7 @@ int FUN_0047ab80(struct CommandArgs *arg, int argc) {
     int index;
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 2) == 0) {
             return 0;
         }
@@ -1550,7 +1550,7 @@ int FUN_0047ab80(struct CommandArgs *arg, int argc) {
             return 0;
         }
         if (DAT_00669054 == 1) {
-            FUN_00462e70(index, v);
+            SetClassLimit(index, v);
             return 1;
         }
         FUN_0046bbe0(index, v);
@@ -1564,7 +1564,7 @@ int FUN_0047ac00(struct CommandArgs *arg, int argc) {
     unsigned int v2;
     unsigned int v3;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 4, 2) == 0) {
@@ -1585,7 +1585,7 @@ int FUN_0047ac00(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047ac80
 int FUN_0047ac80(struct CommandArgs *arg, int argc) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 1, 1) == 0) {
             return 0;
         }
@@ -1600,7 +1600,7 @@ int FUN_0047ac80(struct CommandArgs *arg, int argc) {
 int FUN_0047ace0(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
             return 0;
         }
@@ -1618,7 +1618,7 @@ int FUN_0047ace0(struct CommandArgs *arg, int argc) {
 int FUN_0047ad40(struct CommandArgs *arg, int argc) {
     unsigned int value;
 
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
@@ -1637,7 +1637,7 @@ int FUN_0047ad40(struct CommandArgs *arg, int argc) {
 int FUN_0047ada0(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)arg, argc, 5, 1) == 0) {
             return 0;
         }
@@ -1658,7 +1658,7 @@ int FUN_0047ae00(char **argv, int argc) {
     unsigned int mask;
 
     mask = 0;
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)argv, argc, 5, 1) == 0) {
             return 0;
         }
@@ -1686,7 +1686,7 @@ int FUN_0047aea0(char **argv, int argc) {
     unsigned int mask;
 
     mask = 0;
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786c0((unsigned int)argv, argc, 5, 0) == 0) {
             return 0;
         }
@@ -1712,7 +1712,7 @@ int FUN_0047aea0(char **argv, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047af50
 int FUN_0047af50(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 == 0) {
+    if (ScriptConditionActive == 0) {
         return 1;
     }
     if (FUN_004786a0(param_1, param_2, 4) == 0) {
@@ -1724,7 +1724,7 @@ int FUN_0047af50(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x0047af80
 int FUN_0047af80(unsigned int param_1, unsigned int param_2) {
-    if (DAT_004bb5b0 != 0) {
+    if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 4) == 0) {
             return 0;
         }

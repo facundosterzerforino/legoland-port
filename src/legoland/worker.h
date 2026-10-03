@@ -41,7 +41,7 @@ struct WorkOrder {
 typedef struct RepairOrder RepairOrder;
 
 /* A repair nobody works on (the class needs no worker): paid from the brick
-   supply while drawn. List head DAT_0079a8d4. */
+   supply while drawn. List head RepairOrderList. */
 struct RepairOrder {
     /* 0x00 */ RepairOrder *next;
     /* 0x04 */ Footprint footprint;
@@ -105,7 +105,7 @@ LEGO_EXPORT void RemoveGardenersWorkOrderAt(int x, int y);
 LEGO_EXPORT void RemoveMechanicsWorkOrderAt(int x, int y);
 LEGO_EXPORT void RemoveNoneWorkersRepairOrderAT(int x, int y);
 LEGO_EXPORT void RemoveRepairOrderAT(Ride *ride, int x, int y);
-void FUN_0049b270(Ride *ride, TileId tile);
+void EraseWorkOrdersAtTile(Ride *ride, TileId tile);
 LEGO_EXPORT void EraseMechanicOrder(WorkOrder *order);
 LEGO_EXPORT void EraseGardenerOrder(WorkOrder *order);
 void FreeMechanicWorkOrder(WorkOrder *order);

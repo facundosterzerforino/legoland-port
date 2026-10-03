@@ -16,7 +16,7 @@
 #include "worker.h"
 
 // FUNCTION: LEGOLAND 0x0043d250
-void FUN_0043d250(Element *ctx) {
+void LoadMechHutMaskSprite(Element *ctx) {
     MechanicsHutRide = ctx->ride;
     MechanicsHutRide->flags |= 0x420;
     MechanicsHutLayer = MechanicsHutRide->layer;
@@ -26,12 +26,12 @@ void FUN_0043d250(Element *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d2a0
-unsigned int FUN_0043d2a0(unsigned int param1, unsigned int param2) {
+unsigned int MechanicsHutAddObject(unsigned int param1, unsigned int param2) {
     return AddBasicObject(param1, param2);
 }
 
 // FUNCTION: LEGOLAND 0x0043d2c0
-void FUN_0043d2c0(Element *obj, unsigned int tile, struct Cursor *cursor) {
+void MechanicsHutRemoveObject(Element *obj, unsigned int tile, struct Cursor *cursor) {
     StandardRemoveObject((Element *)obj, *(TileId *)&tile, cursor);
     FUN_0043d7c0(obj->ride, tile, 0);
 }
@@ -119,7 +119,7 @@ void FUN_0043d2f0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d580
-void FUN_0043d580(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile) {
+void RenderMechanicsHut(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile) {
     struct Ride *hut = obj->ride;
     struct RideNode *node = hut->riders;
     struct Bloke *blokes[30] = {0};
@@ -186,7 +186,7 @@ void KillMechHutMaskSprite(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d740
-void FUN_0043d740(void) {
+void MechanicsHutSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = MechanicsHutRide;
     DefaultCursor(&EditCursor);
@@ -194,7 +194,7 @@ void FUN_0043d740(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d780
-struct RideSpriteInfo *FUN_0043d780(void *ptr, unsigned short arg2) {
+struct RideSpriteInfo *GetMechanicsHutSpriteInfo(void *ptr, unsigned short arg2) {
     unsigned int *p = (unsigned int *)((unsigned int *)ptr)[3];
 
     DAT_0062fe30.sprite = p[25];

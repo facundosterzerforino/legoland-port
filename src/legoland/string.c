@@ -272,8 +272,8 @@ int UppercaseStringAndGetLength(char *str) {
 unsigned int PauseGameTimer(void) {
     if (GameTimerPaused == 0) {
         GameTimerPaused = 1;
-        DAT_0079a894 = GetTickCount();
-        DAT_0079a89c = FrameCounter;
+        GameTimerPausedTicks = GetTickCount();
+        GameTimerPausedFrame = FrameCounter;
         return 0;
     }
     return 1;
@@ -285,19 +285,19 @@ void ResumeGameTimer(void) {
         return;
     }
     GameTimerPaused = 0;
-    DAT_0079a898 += GetTickCount() - DAT_0079a894;
-    DAT_0079a8a0 += FrameCounter - DAT_0079a89c;
+    DAT_0079a898 += GetTickCount() - GameTimerPausedTicks;
+    DAT_0079a8a0 += FrameCounter - GameTimerPausedFrame;
 }
 
 // FUNCTION: LEGOLAND 0x00499410
-void FUN_00499410(void) {
+void ResetGameTimer(void) {
     unsigned int ticks;
     unsigned int counter;
 
     ticks = GetTicks();
-    DAT_0079a894 = ticks;
+    GameTimerPausedTicks = ticks;
     DAT_0079a898 = ticks;
     counter = FrameCounter;
-    DAT_0079a89c = counter;
+    GameTimerPausedFrame = counter;
     DAT_0079a8a0 = counter;
 }

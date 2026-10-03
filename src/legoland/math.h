@@ -42,8 +42,8 @@ struct RectNode {
 
 LEGO_EXPORT int ArcTan256(int dx, int dy);
 LEGO_EXPORT char CalcMoveLine(struct Point from, struct Point to, struct Navigator *nav);
-void FUN_00480840(struct Point *src, struct Point *dst, int dir);
-void FUN_004808d0(int *src, int *dst, int dir);
+void MovePointInDirection(struct Point *src, struct Point *dst, int dir);
+void StepPointByDirection(int *src, int *dst, int dir);
 LEGO_EXPORT int GetRectArea(struct RectNode *list);
 LEGO_EXPORT unsigned int Rand_Max(unsigned int max_value);
 LEGO_EXPORT unsigned int Rand_Tween(unsigned int min_val, unsigned int max_val);

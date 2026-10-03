@@ -473,11 +473,11 @@ LEGO_EXPORT void KLIBAUDIO_SetAVIVolume(struct AVISoundBuffer *buffer, int volum
 
 // FUNCTION: LEGOLAND 0x004964f0
 LEGO_EXPORT int InitSoundSystem(void) {
-    DAT_007988b0 = WNDENV_Gethwnd();
-    if (InitDirectSound(DAT_007988b0) == 0) {
+    SoundHwnd = WNDENV_Gethwnd();
+    if (InitDirectSound(SoundHwnd) == 0) {
         return 0;
     }
-    return StartMusicThread(DAT_007988b0) != 0;
+    return StartMusicThread(SoundHwnd) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x00496520
@@ -698,10 +698,10 @@ void AutoKillFinishedSamples(void) {
             }
             if (prev != 0) {
                 prev->next = sample->next;
-                FUN_00492b20(sample);
+                FreeSample(sample);
             } else {
                 SampleListHead = sample->next;
-                FUN_00492b20(sample);
+                FreeSample(sample);
             }
         } else {
             prev = sample;
@@ -711,7 +711,7 @@ void AutoKillFinishedSamples(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004969d0
-void FUN_004969d0(void) {
+void UpdateSound(void) {
     UpdateSfxCallbacks();
     FUN_00496760();
     UpdateSampleFades();
@@ -848,7 +848,7 @@ LEGO_EXPORT void KillAllSamplesFromSource(struct SampleSource *source) {
                 } else {
                     SampleListHead = next;
                 }
-                FUN_00492b20(sample);
+                FreeSample(sample);
                 continue;
             }
         }

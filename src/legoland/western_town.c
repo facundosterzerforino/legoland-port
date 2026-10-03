@@ -61,9 +61,9 @@ struct JailCell {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004375d0
-void FUN_004375d0(struct MapObject *obj) {
+void LoadGStoreMatteSpritesAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb30 = building;
+    GeneralStoreBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74a4
     GStoreMatteSprite = LoadSprite("G_Store Matte.LLS", 1);
@@ -73,22 +73,22 @@ void FUN_004375d0(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00437610
-void FUN_00437610(void) {
+void KillGStoreMatteSpritesAndMoneySFX(void) {
     KillSprite(GStoreMatteSprite);
     KillSprite(GStoreMatte2Sprite);
     KillMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00437630
-void FUN_00437630(void) {
+void GeneralStoreSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb30;
+    EditMode.unk8 = GeneralStoreBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00437670
-void FUN_00437670(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     char count = 0;
@@ -309,9 +309,9 @@ void FUN_004378e0(struct MapObject *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00437ba0
-void FUN_00437ba0(struct MapObject *obj) {
+void LoadSherifshutMatteSpriteAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb14 = building;
+    SheriffBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74b8
     SherifshutMatteSprite = LoadSprite("Sherifshut Matte.LLS", 1);
@@ -319,21 +319,21 @@ void FUN_00437ba0(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00437bd0
-void FUN_00437bd0(void) {
+void KillSherifshutMatteSpriteAndMoneySFX(void) {
     KillSprite(SherifshutMatteSprite);
     KillMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00437bf0
-void FUN_00437bf0(void) {
+void SheriffSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb14;
+    EditMode.unk8 = SheriffBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00437c30
-void FUN_00437c30(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
     struct Building *ride = param_1->building;
     struct RideListElem *elem = ride->list;
     int count = 0;
@@ -463,13 +463,13 @@ void FUN_00437f10(unsigned short *param) {
         cell->field_10 = 0;
         cell->field_14 = 0;
         cell->field_18 = 0;
-        cell->next = DAT_0062fd3c;
-        DAT_0062fd3c = cell;
+        cell->next = JailCellList;
+        JailCellList = cell;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00437f60
-void FUN_00437f60(struct EditObject *editObj, int *coords) {
+void JailCellAddObject(struct EditObject *editObj, int *coords) {
     unsigned char key[2];
     key[0] = (unsigned char)coords[0];
     key[1] = (unsigned char)coords[1];
@@ -481,7 +481,7 @@ void FUN_00437f60(struct EditObject *editObj, int *coords) {
 struct JailCell *FUN_00437f90(unsigned short *key) {
     struct JailCell *cell;
 
-    cell = DAT_0062fd3c;
+    cell = JailCellList;
     if (cell == NULL) {
         return NULL;
     }
@@ -499,11 +499,11 @@ void FUN_00437fc0(struct JailCell *cell) {
     struct JailCell *cur;
     struct JailCell *prev;
 
-    if (DAT_0062fd3c == cell) {
-        DAT_0062fd3c = cell->next;
+    if (JailCellList == cell) {
+        JailCellList = cell->next;
     } else {
-        cur = DAT_0062fd3c->next;
-        prev = DAT_0062fd3c;
+        cur = JailCellList->next;
+        prev = JailCellList;
         while (cur != cell) {
             prev = prev->next;
             if (prev == NULL) {
@@ -520,13 +520,13 @@ void FUN_00437fc0(struct JailCell *cell) {
 
 // FUNCTION: LEGOLAND 0x00438000
 void FUN_00438000(void) {
-    while (DAT_0062fd3c != NULL) {
-        FUN_00437fc0(DAT_0062fd3c);
+    while (JailCellList != NULL) {
+        FUN_00437fc0(JailCellList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00438020
-void FUN_00438020(struct MapObject *editObj, TileId coords, struct Cursor *cursor) {
+void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Cursor *cursor) {
     struct JailCell *cell = FUN_00437f90(&coords.id);
     if (cell != NULL) {
         FUN_00437fc0(cell);
@@ -556,7 +556,7 @@ void FUN_004380f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438110
-void FUN_00438110(void) {
+void JailCellSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = DAT_0081cb10;
     DefaultCursor(&EditCursor);
@@ -564,7 +564,7 @@ void FUN_00438110(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438150
-void FUN_00438150(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct Bloke *blokes[10] = {0};
@@ -761,7 +761,7 @@ void FUN_00438430(Element *obj) {
         cell->field_18 = field_18;
         node = next;
     }
-    for (jc = DAT_0062fd3c; jc != NULL; jc = jc->next) {
+    for (jc = JailCellList; jc != NULL; jc = jc->next) {
         field_14 = jc->field_14;
         field_6 = jc->field_6;
         field_8 = jc->field_8;
@@ -793,7 +793,7 @@ void FUN_00438430(Element *obj) {
 
 // FUNCTION: LEGOLAND 0x00438780
 LEGO_EXPORT unsigned int SaveJailCells(void) {
-    struct JailCell *cell = DAT_0062fd3c;
+    struct JailCell *cell = JailCellList;
     unsigned int marker = 1;
     unsigned int terminator = 0;
 
@@ -826,7 +826,7 @@ LEGO_EXPORT unsigned int LoadJailCells(void) {
         if (prev != NULL) {
             prev->next = cell;
         } else {
-            DAT_0062fd3c = cell;
+            JailCellList = cell;
         }
         prev = cell;
         if (SaveGameRead(&marker, 4) == 0) {
@@ -837,9 +837,9 @@ LEGO_EXPORT unsigned int LoadJailCells(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438870
-void FUN_00438870(struct MapObject *obj) {
+void LoadBankMatteSpriteAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb2c = building;
+    BankBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74e4
     BankMatteSprite = LoadSprite("Bank Matte.lls", 1);
@@ -847,21 +847,21 @@ void FUN_00438870(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004388a0
-void FUN_004388a0(void) {
+void KillBankMatteSpriteAndMoneySFX(void) {
     KillSprite(BankMatteSprite);
     KillMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x004388c0
-void FUN_004388c0(void) {
+void BankSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb2c;
+    EditMode.unk8 = BankBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00438900
-void FUN_00438900(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
     struct Building *ride = param_1->building;
     struct RideListElem *elem = ride->list;
     int count = 0;
@@ -995,9 +995,9 @@ void FUN_00438960(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00438c60
-void FUN_00438c60(struct MapObject *obj) {
+void LoadSaloonMatteSpritesAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb1c = building;
+    SaloonBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7508
     SaloonMatte1Sprite = LoadSprite("SaloonMatte1.LLS", 1);
@@ -1007,22 +1007,22 @@ void FUN_00438c60(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00438ca0
-void FUN_00438ca0(void) {
+void KillSaloonMatteSpritesAndMoneySFX(void) {
     KillSprite(SaloonMatte1Sprite);
     KillSprite(SaloonMatte2Sprite);
     KillMoneySFX();
 }
 
 // FUNCTION: LEGOLAND 0x00438cc0
-void FUN_00438cc0(void) {
+void SaloonSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb1c;
+    EditMode.unk8 = SaloonBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00438d00
-void FUN_00438d00(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderSaloon(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     char count = 0;
     struct RideNode *node = ride->riders;

@@ -288,7 +288,7 @@ void FUN_0044ebf0(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x0044ed00
-void FUN_0044ed00(char *msg) {
+void LogBlokeAiMessage(char *msg) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -366,7 +366,7 @@ void FUN_0044ed70(Bloke *bloke) {
         bloke->flags |= 8;
         // STRING: LEGOLAND 0x004b8434
         sprintf(msg, "Stuck, Routing Point To Point...");
-        FUN_0044ed00(msg);
+        LogBlokeAiMessage(msg);
         switch (PTPSuggestNextMove(&bloke->pos, &DAT_004b8320, &out)) {
         case 2:
             bloke->dest = out;
@@ -396,7 +396,7 @@ void FUN_0044ed70(Bloke *bloke) {
     case 6:
         // STRING: LEGOLAND 0x004b8424
         sprintf(msg, "Wandering...");
-        FUN_0044ed00(msg);
+        LogBlokeAiMessage(msg);
         bloke->low_level_action = 4;
         bloke->param_action = 5;
         return;
@@ -665,12 +665,12 @@ void FUN_0044f610(Bloke *bloke) {
                 if (bloke->last_ride == candidate->element) {
                     // STRING: LEGOLAND 0x004b858c
                     sprintf(msg, "I've just been on the %s.", candidate->name);
-                    FUN_0044ed00(msg);
+                    LogBlokeAiMessage(msg);
                 } else if (Calc_Item_Attractiveness(candidate, bloke, 0) > 10) {
                     // STRING: LEGOLAND 0x004b8554
                     sprintf(msg, "(%d) I'll go to the %s", Calc_Item_Attractiveness(candidate, bloke, 0), candidate->name);
                     bloke->target = candidate->element;
-                    FUN_0044ed00(msg);
+                    LogBlokeAiMessage(msg);
                     bloke->param_action = 1;
                     bloke->field_82 = 0;
                     if (more != 0) {
@@ -680,7 +680,7 @@ void FUN_0044f610(Bloke *bloke) {
                 } else {
                     // STRING: LEGOLAND 0x004b856c
                     sprintf(msg, "The %s is not worth going on.", candidate->name);
-                    FUN_0044ed00(msg);
+                    LogBlokeAiMessage(msg);
                     if (GetBlokeCounter(candidate, GetBlokeNum(bloke)) == 0) {
                         IncrementBlokeCounter(candidate, GetBlokeNum(bloke));
                     }
@@ -689,7 +689,7 @@ void FUN_0044f610(Bloke *bloke) {
             } while (more != 0);
             // STRING: LEGOLAND 0x004b8524
             sprintf(msg, "I've been on everything and I want to go home.");
-            FUN_0044ed00(msg);
+            LogBlokeAiMessage(msg);
             NewLongTermAction(bloke, 3);
             return;
         }
@@ -720,7 +720,7 @@ void FUN_0044f610(Bloke *bloke) {
                 if (object == NULL && (object = GetFirstObjectMatching(bloke->target)) == NULL) {
                     // STRING: LEGOLAND 0x004b8424
                     sprintf(msg, "Wandering...");
-                    FUN_0044ed00(msg);
+                    LogBlokeAiMessage(msg);
                     bloke->low_level_action = 4;
                     bloke->param_action++;
                     return;
@@ -758,7 +758,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 2:
     case 3:
         sprintf(msg, "Wandering...");
-        FUN_0044ed00(msg);
+        LogBlokeAiMessage(msg);
         bloke->low_level_action = 4;
         bloke->param_action++;
         return;
@@ -768,7 +768,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 5:
         // STRING: LEGOLAND 0x004b8434
         sprintf(msg, "Stuck, Routing Point To Point...");
-        FUN_0044ed00(msg);
+        LogBlokeAiMessage(msg);
         switch (PTPSuggestNextMove(&bloke->pos, &bloke->goal, &out)) {
         case 2:
             bloke->dest = out;
@@ -797,7 +797,7 @@ void FUN_0044f610(Bloke *bloke) {
         break;
     case 6:
         sprintf(msg, "Wandering...");
-        FUN_0044ed00(msg);
+        LogBlokeAiMessage(msg);
         bloke->low_level_action = 4;
         bloke->param_action = 5;
         return;
@@ -807,9 +807,9 @@ void FUN_0044f610(Bloke *bloke) {
             if (FUN_0044f400(bloke->target->data, &tile) != 0) {
                 // STRING: LEGOLAND 0x004b8500
                 sprintf(msg, "I can't go on this ride. It is full");
-                FUN_0044ed00(msg);
+                LogBlokeAiMessage(msg);
                 ride = bloke->target->data;
-                FUN_00482df0(bloke, 0, ride->field_3a);
+                ApplyMoodDelta(bloke, 0, ride->field_3a);
                 if (GetBlokeCounter(bloke->target->data, GetBlokeNum(bloke)) == 0) {
                     IncrementBlokeCounter(bloke->target->data, GetBlokeNum(bloke));
                 }
@@ -819,9 +819,9 @@ void FUN_0044f610(Bloke *bloke) {
             if (FUN_0044f360(bloke->target->data, &tile) == 0) {
                 // STRING: LEGOLAND 0x004b84d4
                 sprintf(msg, "I can't go on this ride. It's not working");
-                FUN_0044ed00(msg);
+                LogBlokeAiMessage(msg);
                 ride = bloke->target->data;
-                FUN_00482df0(bloke, 1, ride->field_3a);
+                ApplyMoodDelta(bloke, 1, ride->field_3a);
                 if (GetBlokeCounter(bloke->target->data, GetBlokeNum(bloke)) == 0) {
                     IncrementBlokeCounter(bloke->target->data, GetBlokeNum(bloke));
                 }
@@ -839,7 +839,7 @@ void FUN_0044f610(Bloke *bloke) {
             if ((instance->flags & 2) == 0) {
                 // STRING: LEGOLAND 0x004b84bc
                 sprintf(msg, "I'm going on the ride");
-                FUN_0044ed00(msg);
+                LogBlokeAiMessage(msg);
                 NewLongTermAction(bloke, 5);
                 /* reads the flags of the *next* LLIDB element; the ride's own flags were
                    presumably meant */
@@ -875,9 +875,9 @@ void FUN_0044f610(Bloke *bloke) {
             }
             // STRING: LEGOLAND 0x004b84a0
             sprintf(msg, "I can't get on the ride.");
-            FUN_0044ed00(msg);
+            LogBlokeAiMessage(msg);
             ride = bloke->target->data;
-            FUN_00482df0(bloke, 0, ride->field_3a);
+            ApplyMoodDelta(bloke, 0, ride->field_3a);
             if (GetBlokeCounter(bloke->target->data, GetBlokeNum(bloke)) == 0) {
                 IncrementBlokeCounter(bloke->target->data, GetBlokeNum(bloke));
             }
@@ -1301,14 +1301,14 @@ void FUN_00450530(Bloke *bloke) {
             }
         }
     }
-    FUN_00482df0(bloke, 2, blocked);
-    FUN_00482df0(bloke, 3, rides);
-    FUN_00482df0(bloke, 4, shops);
-    FUN_00482df0(bloke, 5, food_score);
-    FUN_00482df0(bloke, 6, toilets);
+    ApplyMoodDelta(bloke, 2, blocked);
+    ApplyMoodDelta(bloke, 3, rides);
+    ApplyMoodDelta(bloke, 4, shops);
+    ApplyMoodDelta(bloke, 5, food_score);
+    ApplyMoodDelta(bloke, 6, toilets);
     rate = FUN_0044eb10(bloke);
     if (rate >= 3) {
-        FUN_00482df0(bloke, 7, rate - 2);
+        ApplyMoodDelta(bloke, 7, rate - 2);
     }
 }
 
@@ -1333,7 +1333,7 @@ LEGO_EXPORT void ControlPeople(void) {
         } else {
             FUN_0044eae0(bloke);
             if ((++bloke->field_5c & 0xf) == 0) {
-                FUN_00482df0(bloke, 8, 1);
+                ApplyMoodDelta(bloke, 8, 1);
                 FUN_00450530(bloke);
             }
             if (bloke->low_level_action == 0) {
@@ -1388,7 +1388,7 @@ void FUN_00450a80(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00450b10
-void FUN_00450b10(void) {
+void LoadBuildObjArray(void) {
     int count;
     int i;
 

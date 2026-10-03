@@ -13,8 +13,8 @@ union SavedElement {
 LEGO_EXPORT int SaveGame(char *filename);
 LEGO_EXPORT int FindeIneList(union SavedElement *handle);
 LEGO_EXPORT struct Element *GeteListPtr(int idx);
-void FUN_0047f810(void);
-int FUN_0047f820(void);
+void MarkGameTimer(void);
+int GetGameTimerSinceMark(void);
 unsigned int OpenLogFile(const char *path);
 int CloseLogFile(void);
 void FUN_0047f850(void);

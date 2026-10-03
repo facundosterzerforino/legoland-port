@@ -463,7 +463,7 @@ int SpeechFillSoundBuffer(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498b00
-int FUN_00498b00(void) {
+int SpeechPlay(void) {
     if (SpeechState == 0 || SpeechState == 3) {
         return 0;
     }
@@ -521,6 +521,6 @@ int SpeechStreamUpdate(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498cf0
-int FUN_00498cf0(void) {
+int SpeechIsPlaying(void) {
     return SpeechState == 3;
 }

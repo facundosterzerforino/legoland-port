@@ -81,9 +81,9 @@ struct Coords {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00439200
-void FUN_00439200(struct MapObject *obj) {
+void LoadLegoShop1MatteSpriteAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb3c = building;
+    LegoShop1Building = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b751c
     LegoShop1MatteSprite = LoadSprite("Lego Shop 1 Matte.LLS", 1);
@@ -141,14 +141,14 @@ void FUN_004392b0(struct PathArea *area, struct Point *origin) {
 }
 
 // FUNCTION: LEGOLAND 0x00439320
-void FUN_00439320(struct MapObject *obj, void *param_2) {
+void LegoShop1AddObject(struct MapObject *obj, void *param_2) {
     struct Building *building = obj->building;
     AddBasicObject((unsigned int)obj, (unsigned int)param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00439350
-void FUN_00439350(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
+void LegoShop1RemoveObject(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
     void *ride = obj->ride;
     struct Point local;
 
@@ -161,9 +161,9 @@ void FUN_00439350(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x004393a0
-void FUN_004393a0(void) {
+void LegoShop1SetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb3c;
+    EditMode.unk8 = LegoShop1Building;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
@@ -177,7 +177,7 @@ void UnloadLegoShop1MatteSpriteAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439400
-void FUN_00439400(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
+void RenderLegoShop1(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
     struct ShopBuilding *building = obj->building;
     struct BlokeNode *node = building->blokes;
     int count = 0;
@@ -284,9 +284,9 @@ void FUN_00439460(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004396d0
-void FUN_004396d0(struct MapObject *obj) {
+void LoadLegoShop2MatteSpriteAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb4c = building;
+    LegoShop2Building = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7534
     LegoShop2MatteSprite = LoadSprite("Lego Shop 2 Matte.LLS", 1);
@@ -302,15 +302,15 @@ void UnloadLegoShop2MatteSpriteAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439720
-void FUN_00439720(void) {
+void LegoShop2SetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb4c;
+    EditMode.unk8 = LegoShop2Building;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00439760
-void FUN_00439760(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderLegoShop2(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *shop = obj->ride;
     struct RideNode *node = shop->riders;
     struct Bloke *blokes[10] = {0};
@@ -516,9 +516,9 @@ void FUN_00439950(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00439c20
-void FUN_00439c20(struct MapObject *obj) {
+void LoadLegMediaShopMaskSpritesAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb40 = building;
+    LegoMediaShopBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7564
     LegMediaShopMask1Sprite = LoadSprite("LegMediaShopMask1.LLS", 1);
@@ -528,14 +528,14 @@ void FUN_00439c20(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00439c60
-void FUN_00439c60(struct MapObject *obj, void *param_2) {
+void LegoMediaShopAddObject(struct MapObject *obj, void *param_2) {
     struct Building *building = obj->building;
     AddBasicObject((unsigned int)obj, (unsigned int)param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00439c90
-void FUN_00439c90(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
+void LegoMediaShopRemoveObject(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
     void *ride = obj->ride;
     struct Point local;
 
@@ -555,15 +555,15 @@ void UnloadLegMediaShopMaskSpritesAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439d00
-void FUN_00439d00(void) {
+void LegoMediaShopSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb40;
+    EditMode.unk8 = LegoMediaShopBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x00439d40
-void FUN_00439d40(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
+void RenderLegoMediaShop(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
     struct ShopBuilding *building = obj->building;
     char count = 0;
     char i;
@@ -727,9 +727,9 @@ void FUN_00439ef0(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a0f0
-void FUN_0043a0f0(struct MapObject *obj) {
+void LoadExplorersInstituteMatteSpriteAndMoneySFX(struct MapObject *obj) {
     struct Building *building = obj->building;
-    DAT_0081cb44 = building;
+    ExplorersInstituteBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b757c
     ExplorersInstituteMatteSprite = LoadSprite("Explorers Institute Matte.LLS", 1);
@@ -743,15 +743,15 @@ void UnloadExplorersInstituteMatteSpriteAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a140
-void FUN_0043a140(void) {
+void ExplorersInstituteSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb44;
+    EditMode.unk8 = ExplorersInstituteBuilding;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
 }
 
 // FUNCTION: LEGOLAND 0x0043a180
-void FUN_0043a180(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
+void RenderExplorersInstitute(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
     struct ShopBuilding *building = obj->building;
     struct BlokeNode *node = building->blokes;
     int count = 0;
@@ -836,18 +836,18 @@ void FUN_0043a1e0(struct Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a390
-unsigned int *FUN_0043a390(struct ShopRideObject *obj, unsigned short param_2) {
+unsigned int *GetShopSpriteInfo(struct ShopRideObject *obj, unsigned short param_2) {
     struct RideBuilding *building = obj->building;
-    DAT_0082c6a0.sprite = building->field_64;
-    DAT_0082c6a0.x = building->field_14;
-    DAT_0082c6a0.y = building->field_18;
-    DAT_0082c6a0.id = param_2;
+    RideSpriteInfoBuffer.sprite = building->field_64;
+    RideSpriteInfoBuffer.x = building->field_14;
+    RideSpriteInfoBuffer.y = building->field_18;
+    RideSpriteInfoBuffer.id = param_2;
     building->field_64->field_10 |= 0x2000;
-    return &DAT_0082c6a0;
+    return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x0043a3d0
-void FUN_0043a3d0(struct ShopRideObject *obj, TileId tile, void *param_3) {
+void RemoveObjectAndBlokes(struct ShopRideObject *obj, TileId tile, void *param_3) {
     StandardRemoveObject((unsigned int)obj, tile, (unsigned int)param_3);
     RemoveAllBlokesFromRide((unsigned int)obj->building, tile);
 }
@@ -856,105 +856,105 @@ void FUN_0043a3d0(struct ShopRideObject *obj, TileId tile, void *param_3) {
 void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     // STRING: LEGOLAND 0x004b75fc
     if (_stricmp("GENERAL STORE", name->name) == 0) {
-        ci->cb_a4 = FUN_004375d0;
-        ci->cb_ac = FUN_00437610;
-        ci->cb_8c = FUN_00437630;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_a4 = LoadGStoreMatteSpritesAndMoneySFX;
+        ci->cb_ac = KillGStoreMatteSpritesAndMoneySFX;
+        ci->cb_8c = GeneralStoreSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_004378e0;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_00437670;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderGeneralStore;
         return;
     }
     // STRING: LEGOLAND 0x004b75f4
     if (_stricmp("SHERIFF", name->name) == 0) {
-        ci->cb_a4 = FUN_00437ba0;
-        ci->cb_ac = FUN_00437bd0;
-        ci->cb_8c = FUN_00437bf0;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_a4 = LoadSherifshutMatteSpriteAndMoneySFX;
+        ci->cb_ac = KillSherifshutMatteSpriteAndMoneySFX;
+        ci->cb_8c = SheriffSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00437c90;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_00437c30;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderSheriff;
         return;
     }
     // STRING: LEGOLAND 0x004b75e8
     if (_stricmp("JAIL CELL", name->name) == 0) {
         ci->cb_a4 = FUN_00438070;
         ci->cb_ac = FUN_004380f0;
-        ci->cb_8c = FUN_00438110;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_8c = JailCellSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00438430;
-        ci->cb_98 = FUN_00437f60;
-        ci->cb_9c = FUN_00438020;
-        ci->cb_b0 = FUN_00438150;
+        ci->cb_98 = JailCellAddObject;
+        ci->cb_9c = JailCellRemoveObject;
+        ci->cb_b0 = RenderJailCell;
         ci->cb_b8 = LoadJailCells;
         ci->cb_bc = SaveJailCells;
         return;
     }
     // STRING: LEGOLAND 0x004b75e0
     if (_stricmp("BANK", name->name) == 0) {
-        ci->cb_a4 = FUN_00438870;
-        ci->cb_ac = FUN_004388a0;
-        ci->cb_8c = FUN_004388c0;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_a4 = LoadBankMatteSpriteAndMoneySFX;
+        ci->cb_ac = KillBankMatteSpriteAndMoneySFX;
+        ci->cb_8c = BankSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00438960;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_00438900;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderBank;
         return;
     }
     // STRING: LEGOLAND 0x004b75d8
     if (_stricmp("SALOON", name->name) == 0) {
-        ci->cb_a4 = FUN_00438c60;
-        ci->cb_ac = FUN_00438ca0;
-        ci->cb_8c = FUN_00438cc0;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_a4 = LoadSaloonMatteSpritesAndMoneySFX;
+        ci->cb_ac = KillSaloonMatteSpritesAndMoneySFX;
+        ci->cb_8c = SaloonSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00438f10;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_00438d00;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderSaloon;
         return;
     }
     // STRING: LEGOLAND 0x004b75c4
     if (_stricmp("EXPLORERS INSTITUTE", name->name) == 0) {
-        ci->cb_a4 = FUN_0043a0f0;
+        ci->cb_a4 = LoadExplorersInstituteMatteSpriteAndMoneySFX;
         ci->cb_ac = UnloadExplorersInstituteMatteSpriteAndMoneySFX;
-        ci->cb_8c = FUN_0043a140;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_8c = ExplorersInstituteSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_0043a1e0;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_0043a180;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderExplorersInstitute;
         return;
     }
     // STRING: LEGOLAND 0x004b75b8
     if (_stricmp("LEGO SHOP 1", name->name) == 0) {
-        ci->cb_a4 = FUN_00439200;
-        ci->cb_98 = FUN_00439320;
-        ci->cb_9c = FUN_00439350;
+        ci->cb_a4 = LoadLegoShop1MatteSpriteAndMoneySFX;
+        ci->cb_98 = LegoShop1AddObject;
+        ci->cb_9c = LegoShop1RemoveObject;
         ci->cb_ac = UnloadLegoShop1MatteSpriteAndMoneySFX;
-        ci->cb_8c = FUN_004393a0;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_8c = LegoShop1SetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00439460;
-        ci->cb_b0 = FUN_00439400;
+        ci->cb_b0 = RenderLegoShop1;
         return;
     }
     // STRING: LEGOLAND 0x004b75ac
     if (_stricmp("LEGO SHOP 2", name->name) == 0) {
-        ci->cb_a4 = FUN_004396d0;
+        ci->cb_a4 = LoadLegoShop2MatteSpriteAndMoneySFX;
         ci->cb_ac = UnloadLegoShop2MatteSpriteAndMoneySFX;
-        ci->cb_8c = FUN_00439720;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_8c = LegoShop2SetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00439950;
-        ci->cb_9c = FUN_0043a3d0;
-        ci->cb_b0 = FUN_00439760;
+        ci->cb_9c = RemoveObjectAndBlokes;
+        ci->cb_b0 = RenderLegoShop2;
         return;
     }
     // STRING: LEGOLAND 0x004b759c
     if (_stricmp("LEGO MEDIA SHOP", name->name) == 0) {
-        ci->cb_a4 = FUN_00439c20;
-        ci->cb_98 = FUN_00439c60;
-        ci->cb_9c = FUN_00439c90;
+        ci->cb_a4 = LoadLegMediaShopMaskSpritesAndMoneySFX;
+        ci->cb_98 = LegoMediaShopAddObject;
+        ci->cb_9c = LegoMediaShopRemoveObject;
         ci->cb_ac = UnloadLegMediaShopMaskSpritesAndMoneySFX;
-        ci->cb_8c = FUN_00439d00;
-        ci->cb_a0 = FUN_0043a390;
+        ci->cb_8c = LegoMediaShopSetEditMode;
+        ci->cb_a0 = GetShopSpriteInfo;
         ci->cb_a8 = FUN_00439ef0;
-        ci->cb_b0 = FUN_00439d40;
+        ci->cb_b0 = RenderLegoMediaShop;
     }
 }

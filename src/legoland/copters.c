@@ -227,7 +227,7 @@ void CoptersIndexToQueueTable(struct CopterItem *item) {
 }
 
 // FUNCTION: LEGOLAND 0x00403d90
-void FUN_00403d90(struct CopterEditObject *param_1) {
+void CoptersLoad(struct CopterEditObject *param_1) {
     struct CopterRide *ride;
     int i;
 
@@ -1029,7 +1029,7 @@ LEGO_EXPORT int Copters_Load(void) {
 void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces) {
     // STRING: LEGOLAND 0x004b43e4
     if (_stricmp("COPTERS", name->name) == 0) {
-        interfaces->cb_a4 = FUN_00403d90;
+        interfaces->cb_a4 = CoptersLoad;
         interfaces->cb_8c = CoptersSetEditMode;
         interfaces->cb_98 = CoptersAddObject;
         interfaces->cb_9c = CoptersRemoveObject;

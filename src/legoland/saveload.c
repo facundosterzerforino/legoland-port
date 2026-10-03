@@ -33,7 +33,7 @@
 #pragma auto_inline(off)
 static int LoadAbort(void) {
     _close(SaveFileHandle);
-    DAT_00667ca0 = 0;
+    LoadInProgress = 0;
     return 0;
 }
 #pragma auto_inline(on)
@@ -90,8 +90,8 @@ LEGO_EXPORT int EndMeasuredBlock(void) {
 LEGO_EXPORT int FindeIneList(union SavedElement *handle) {
     int i;
 
-    for (i = 0; i < DAT_006691b4; i++) {
-        if (handle->element == DAT_00669200[i]) {
+    for (i = 0; i < SavedElementCount; i++) {
+        if (handle->element == SavedElementTable[i]) {
             handle->index = i;
             return 1;
         }
@@ -105,7 +105,7 @@ LEGO_EXPORT struct Element *GeteListPtr(int idx) {
     if (idx == -1) {
         return 0;
     }
-    return DAT_00669200[idx];
+    return SavedElementTable[idx];
 }
 
 // FUNCTION: LEGOLAND 0x0047d8e0
@@ -165,25 +165,25 @@ LEGO_EXPORT int SaveGame(char *filename) {
         int len;
         unsigned int *fl;
         n_elems = LLIDB_GetCount();
-        DAT_006691b4 = 0;
+        SavedElementCount = 0;
         // STRING: LEGOLAND 0x004b8a70
         fl = &ElemID("PATH CONTROL")->flags;
         *fl |= 4;
         for (i = 0; i < n_elems; i++) {
             LLIDB_GetElement(i, &elem);
             if ((elem->flags & 4) != 0) {
-                DAT_006691b4++;
+                SavedElementCount++;
             }
         }
-        if (SaveGameWrite(&DAT_006691b4, 4) == 0) {
+        if (SaveGameWrite(&SavedElementCount, 4) == 0) {
             // STRING: LEGOLAND 0x004bca24
             LogPrintf("Num elements failed");
             goto fail;
         }
-        if (DAT_00669200 != 0) {
-            free(DAT_00669200);
+        if (SavedElementTable != 0) {
+            free(SavedElementTable);
         }
-        DAT_00669200 = malloc(DAT_006691b4 * 4);
+        SavedElementTable = malloc(SavedElementCount * 4);
         k = 0;
         for (i = 0; i < n_elems; i++) {
             DrawWatchSprite();
@@ -200,7 +200,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
                         goto fail;
                     }
                 }
-                DAT_00669200[k++] = elem;
+                SavedElementTable[k++] = elem;
                 flags = elem->flags & 0x3000e;
                 if (SaveGameWrite(&flags, 4) == 0) {
                     // STRING: LEGOLAND 0x004bc9c4
@@ -381,86 +381,86 @@ LEGO_EXPORT int SaveGame(char *filename) {
                     goto fail;
                 }
             }
-            DAT_007fda60.action = bloke->action;
-            DAT_007fda60.low_level_action = bloke->low_level_action;
-            DAT_007fda60.pending_action = bloke->pending_action;
+            BlokeSaveBuffer.action = bloke->action;
+            BlokeSaveBuffer.low_level_action = bloke->low_level_action;
+            BlokeSaveBuffer.pending_action = bloke->pending_action;
             if (bloke->target != 0) {
-                DAT_007fda60.target = (int)bloke->target;
-                FindeIneList((union SavedElement *)&DAT_007fda60.target);
+                BlokeSaveBuffer.target = (int)bloke->target;
+                FindeIneList((union SavedElement *)&BlokeSaveBuffer.target);
             } else {
-                DAT_007fda60.target = -1;
+                BlokeSaveBuffer.target = -1;
             }
             if (bloke->last_ride != 0) {
-                DAT_007fda60.last_ride = (int)bloke->last_ride;
-                FindeIneList((union SavedElement *)&DAT_007fda60.last_ride);
+                BlokeSaveBuffer.last_ride = (int)bloke->last_ride;
+                FindeIneList((union SavedElement *)&BlokeSaveBuffer.last_ride);
             } else {
-                DAT_007fda60.last_ride = -1;
+                BlokeSaveBuffer.last_ride = -1;
             }
-            DAT_007fda60.field_1c = bloke->field_1c;
-            DAT_007fda60.field_20 = bloke->field_20;
-            DAT_007fda60.dest.x = bloke->dest.x;
-            DAT_007fda60.dest.y = bloke->dest.y;
-            DAT_007fda60.goal.x = bloke->goal.x;
-            DAT_007fda60.goal.y = bloke->goal.y;
-            memcpy(DAT_007fda60.block_34, &bloke->field_34, sizeof(DAT_007fda60.block_34));
-            DAT_007fda60.field_5c = bloke->field_5c;
-            DAT_007fda60.param_action = bloke->param_action;
-            DAT_007fda60.flags = bloke->flags;
-            DAT_007fda60.field_64 = bloke->field_64;
-            DAT_007fda60.field_78 = bloke->field_78;
-            DAT_007fda60.mood = bloke->mood;
-            DAT_007fda60.field_7c = bloke->field_7c;
-            DAT_007fda60.field_7e = bloke->field_7e;
-            DAT_007fda60.speed = bloke->speed;
-            DAT_007fda60.field_80 = bloke->field_80;
-            DAT_007fda60.field_81 = bloke->field_81;
-            DAT_007fda60.field_82 = bloke->field_82;
-            DAT_007fda60.favourite[0] = (int)bloke->favourite_attraction_0;
-            FindeIneList((union SavedElement *)&DAT_007fda60.favourite[0]);
-            DAT_007fda60.favourite[1] = (int)bloke->favourite_attraction_1;
-            FindeIneList((union SavedElement *)&DAT_007fda60.favourite[1]);
-            DAT_007fda60.favourite[2] = (int)bloke->favourite_attraction_2;
-            FindeIneList((union SavedElement *)&DAT_007fda60.favourite[2]);
-            DAT_007fda60.favourite[3] = (int)bloke->favourite_food;
-            FindeIneList((union SavedElement *)&DAT_007fda60.favourite[3]);
-            DAT_007fda60.pos.x = bloke->pos.x;
-            DAT_007fda60.pos.y = bloke->pos.y;
-            DAT_007fda60.height = bloke->height;
-            DAT_007fda60.dir = bloke->dir;
-            DAT_007fda60.field_73 = bloke->field_73;
-            DAT_007fda60.frame = bloke->frame;
-            DAT_007fda60.field_75 = bloke->field_75;
-            DAT_007fda60.nav = bloke->nav;
-            DAT_007fda60.person_8 = bloke->person->field_8;
-            DAT_007fda60.scale = bloke->person->scale;
-            DAT_007fda60.screen = bloke->person->screen;
-            DAT_007fda60.offset = bloke->person->offset;
-            DAT_007fda60.field_34 = bloke->person->field_34;
-            DAT_007fda60.field_38 = bloke->person->field_38;
-            DAT_007fda60.depth = bloke->person->depth;
-            DAT_007fda60.rotation = bloke->person->rotation;
-            DAT_007fda60.person_4c = bloke->person->frame;
-            DAT_007fda60.anim = (unsigned int)bloke->person->anim;
-            DAT_007fda60.sort_id = bloke->person->sort_id;
-            DAT_007fda60.field_38 = bloke->person->field_38;
-            memcpy(DAT_007fda60.m, bloke->person->m, sizeof(DAT_007fda60.m));
-            DAT_007fda60.field_7c_p = bloke->person->field_7c;
-            DAT_007fda60.field_80_p = bloke->person->field_80;
-            DAT_007fda60.field_8c_p = bloke->person->field_8c;
-            DAT_007fda60.field_90_p = bloke->person->field_90;
-            DAT_007fda60.random = bloke->person->random;
-            DAT_007fda60.prev_param = bloke->prev_param;
-            DAT_007fda60.prev_action = bloke->prev_action;
-            DAT_007fda60.field_30 = bloke->person->field_30;
-            if (SaveGameWrite(&DAT_007fda60, sizeof(DAT_007fda60)) == 0) {
+            BlokeSaveBuffer.field_1c = bloke->field_1c;
+            BlokeSaveBuffer.field_20 = bloke->field_20;
+            BlokeSaveBuffer.dest.x = bloke->dest.x;
+            BlokeSaveBuffer.dest.y = bloke->dest.y;
+            BlokeSaveBuffer.goal.x = bloke->goal.x;
+            BlokeSaveBuffer.goal.y = bloke->goal.y;
+            memcpy(BlokeSaveBuffer.block_34, &bloke->field_34, sizeof(BlokeSaveBuffer.block_34));
+            BlokeSaveBuffer.field_5c = bloke->field_5c;
+            BlokeSaveBuffer.param_action = bloke->param_action;
+            BlokeSaveBuffer.flags = bloke->flags;
+            BlokeSaveBuffer.field_64 = bloke->field_64;
+            BlokeSaveBuffer.field_78 = bloke->field_78;
+            BlokeSaveBuffer.mood = bloke->mood;
+            BlokeSaveBuffer.field_7c = bloke->field_7c;
+            BlokeSaveBuffer.field_7e = bloke->field_7e;
+            BlokeSaveBuffer.speed = bloke->speed;
+            BlokeSaveBuffer.field_80 = bloke->field_80;
+            BlokeSaveBuffer.field_81 = bloke->field_81;
+            BlokeSaveBuffer.field_82 = bloke->field_82;
+            BlokeSaveBuffer.favourite[0] = (int)bloke->favourite_attraction_0;
+            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[0]);
+            BlokeSaveBuffer.favourite[1] = (int)bloke->favourite_attraction_1;
+            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[1]);
+            BlokeSaveBuffer.favourite[2] = (int)bloke->favourite_attraction_2;
+            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[2]);
+            BlokeSaveBuffer.favourite[3] = (int)bloke->favourite_food;
+            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[3]);
+            BlokeSaveBuffer.pos.x = bloke->pos.x;
+            BlokeSaveBuffer.pos.y = bloke->pos.y;
+            BlokeSaveBuffer.height = bloke->height;
+            BlokeSaveBuffer.dir = bloke->dir;
+            BlokeSaveBuffer.field_73 = bloke->field_73;
+            BlokeSaveBuffer.frame = bloke->frame;
+            BlokeSaveBuffer.field_75 = bloke->field_75;
+            BlokeSaveBuffer.nav = bloke->nav;
+            BlokeSaveBuffer.person_8 = bloke->person->field_8;
+            BlokeSaveBuffer.scale = bloke->person->scale;
+            BlokeSaveBuffer.screen = bloke->person->screen;
+            BlokeSaveBuffer.offset = bloke->person->offset;
+            BlokeSaveBuffer.field_34 = bloke->person->field_34;
+            BlokeSaveBuffer.field_38 = bloke->person->field_38;
+            BlokeSaveBuffer.depth = bloke->person->depth;
+            BlokeSaveBuffer.rotation = bloke->person->rotation;
+            BlokeSaveBuffer.person_4c = bloke->person->frame;
+            BlokeSaveBuffer.anim = (unsigned int)bloke->person->anim;
+            BlokeSaveBuffer.sort_id = bloke->person->sort_id;
+            BlokeSaveBuffer.field_38 = bloke->person->field_38;
+            memcpy(BlokeSaveBuffer.m, bloke->person->m, sizeof(BlokeSaveBuffer.m));
+            BlokeSaveBuffer.field_7c_p = bloke->person->field_7c;
+            BlokeSaveBuffer.field_80_p = bloke->person->field_80;
+            BlokeSaveBuffer.field_8c_p = bloke->person->field_8c;
+            BlokeSaveBuffer.field_90_p = bloke->person->field_90;
+            BlokeSaveBuffer.random = bloke->person->random;
+            BlokeSaveBuffer.prev_param = bloke->prev_param;
+            BlokeSaveBuffer.prev_action = bloke->prev_action;
+            BlokeSaveBuffer.field_30 = bloke->person->field_30;
+            if (SaveGameWrite(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
                 // STRING: LEGOLAND 0x004bc74c
                 {
                     LogPrintf("Bloke data failed (%d)", num);
                     goto fail;
                 }
             }
-            if (DAT_007fda60.block_34[8] != 0) {
-                if (SaveGameWrite((void *)DAT_007fda60.block_34[8], 0x48) == 0) {
+            if (BlokeSaveBuffer.block_34[8] != 0) {
+                if (SaveGameWrite((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
                     // STRING: LEGOLAND 0x004bc730
                     {
                         LogPrintf("Bloke BNV path data (%d)", num);
@@ -545,14 +545,14 @@ LEGO_EXPORT int SaveGame(char *filename) {
         LogPrintf("BuildObjList (size %dS) Save Failed", BuildObjCount);
         goto fail;
     }
-    for (i = 0; i < DAT_006691b4; i++) {
+    for (i = 0; i < SavedElementCount; i++) {
         struct Ride *ride;
         struct ObjInstance *inst;
         struct RideNode *rnode;
         int count;
         DrawWatchSprite();
-        if ((DAT_00669200[i]->flags & 0x10) != 0) {
-            ride = DAT_00669200[i]->ride;
+        if ((SavedElementTable[i]->flags & 0x10) != 0) {
+            ride = SavedElementTable[i]->ride;
             SaveGameWrite(ride->element->name, 8);
             if (ride->type != 2 && ride->type != 0) {
                 if (SaveGameWrite(ride->counters, lpConfig->max_blokes) == 0) {
@@ -644,7 +644,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
             }
         }
     }
-    if (SaveGameWrite(DAT_007cb3e0, sizeof(DAT_007cb3e0)) == 0) {
+    if (SaveGameWrite(ObjInstanceTable, sizeof(ObjInstanceTable)) == 0) {
         // STRING: LEGOLAND 0x004bc5e4
         LogPrintf("RideTotal");
         goto fail;
@@ -756,7 +756,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         return 0;
     }
     MeasuredBlockDepth = 0;
-    DAT_00667ca0 = 1;
+    LoadInProgress = 1;
     for (;;) {
         if (SaveGameRead(header, 0x20) == 0) {
             break;
@@ -771,15 +771,15 @@ LEGO_EXPORT int LoadGame(char *path) {
         if (SkipSaveGameDword() == 0) {
             break;
         }
-        if (SaveGameRead(&DAT_006691b4, 4) == 0) {
+        if (SaveGameRead(&SavedElementCount, 4) == 0) {
             break;
         }
-        if (DAT_00669200 != 0) {
-            free(DAT_00669200);
-            DAT_00669200 = 0;
+        if (SavedElementTable != 0) {
+            free(SavedElementTable);
+            SavedElementTable = 0;
         }
-        DAT_00669200 = malloc(DAT_006691b4 * 4);
-        for (i = 0; i < DAT_006691b4; i++) {
+        SavedElementTable = malloc(SavedElementCount * 4);
+        for (i = 0; i < SavedElementCount; i++) {
             DrawWatchSprite();
             if (SaveGameRead(&len, 4) == 0) {
                 LOAD_FAIL();
@@ -791,7 +791,7 @@ LEGO_EXPORT int LoadGame(char *path) {
             if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
                 LOAD_FAIL();
             }
-            DAT_00669200[i] = (struct Element *)n;
+            SavedElementTable[i] = (struct Element *)n;
             if (SaveGameRead(&m, 4) == 0) {
                 LOAD_FAIL();
             }
@@ -835,7 +835,7 @@ LEGO_EXPORT int LoadGame(char *path) {
                         LOAD_FAIL();
                     }
                     if ((tile->flags & 0x8a8) != 0) {
-                        tile->field_0 = DAT_00669200[(int)tile->field_0];
+                        tile->field_0 = SavedElementTable[(int)tile->field_0];
                     } else {
                         tile->field_0 = 0;
                     }
@@ -881,7 +881,7 @@ LEGO_EXPORT int LoadGame(char *path) {
             break;
         }
         DrawWatchSprite();
-        DAT_00667d50 = 1;
+        MapDataLoaded = 1;
         if (SkipSaveGameDword() == 0) {
             break;
         }
@@ -900,100 +900,100 @@ LEGO_EXPORT int LoadGame(char *path) {
             bloke = &BlokePool[m];
             bloke->next = FirstBloke;
             FirstBloke = bloke;
-            if (SaveGameRead(&DAT_007fda60, sizeof(DAT_007fda60)) == 0) {
+            if (SaveGameRead(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
                 LOAD_FAIL();
             }
-            if (DAT_007fda60.block_34[8] != 0) {
-                DAT_007fda60.block_34[8] = (unsigned int)malloc(0x48);
-                if (SaveGameRead((void *)DAT_007fda60.block_34[8], 0x48) == 0) {
+            if (BlokeSaveBuffer.block_34[8] != 0) {
+                BlokeSaveBuffer.block_34[8] = (unsigned int)malloc(0x48);
+                if (SaveGameRead((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
                     LOAD_FAIL();
                 }
             }
-            bloke->action = DAT_007fda60.action;
-            bloke->low_level_action = DAT_007fda60.low_level_action;
-            bloke->pending_action = DAT_007fda60.pending_action;
-            if (DAT_007fda60.target != -1) {
-                bloke->target = DAT_00669200[DAT_007fda60.target];
+            bloke->action = BlokeSaveBuffer.action;
+            bloke->low_level_action = BlokeSaveBuffer.low_level_action;
+            bloke->pending_action = BlokeSaveBuffer.pending_action;
+            if (BlokeSaveBuffer.target != -1) {
+                bloke->target = SavedElementTable[BlokeSaveBuffer.target];
             } else {
                 bloke->target = 0;
             }
-            if (DAT_007fda60.last_ride != -1) {
-                bloke->last_ride = DAT_00669200[DAT_007fda60.last_ride];
+            if (BlokeSaveBuffer.last_ride != -1) {
+                bloke->last_ride = SavedElementTable[BlokeSaveBuffer.last_ride];
             } else {
                 bloke->last_ride = 0;
             }
-            bloke->field_1c = DAT_007fda60.field_1c;
-            bloke->field_20 = DAT_007fda60.field_20;
-            bloke->dest.x = DAT_007fda60.dest.x;
-            bloke->dest.y = DAT_007fda60.dest.y;
-            bloke->goal.x = DAT_007fda60.goal.x;
-            bloke->goal.y = DAT_007fda60.goal.y;
-            memcpy(&bloke->field_34, DAT_007fda60.block_34, sizeof(DAT_007fda60.block_34));
-            bloke->field_5c = DAT_007fda60.field_5c;
-            bloke->param_action = DAT_007fda60.param_action;
-            bloke->flags = DAT_007fda60.flags;
-            bloke->field_64 = DAT_007fda60.field_64;
-            bloke->field_78 = DAT_007fda60.field_78;
-            bloke->mood = DAT_007fda60.mood;
-            bloke->field_7c = DAT_007fda60.field_7c;
-            bloke->field_7e = DAT_007fda60.field_7e;
-            bloke->speed = DAT_007fda60.speed;
-            bloke->field_80 = DAT_007fda60.field_80;
-            bloke->field_81 = DAT_007fda60.field_81;
-            bloke->field_82 = DAT_007fda60.field_82;
-            if (DAT_007fda60.favourite[0] < DAT_006691b4) {
-                bloke->favourite_attraction_0 = DAT_00669200[DAT_007fda60.favourite[0]];
+            bloke->field_1c = BlokeSaveBuffer.field_1c;
+            bloke->field_20 = BlokeSaveBuffer.field_20;
+            bloke->dest.x = BlokeSaveBuffer.dest.x;
+            bloke->dest.y = BlokeSaveBuffer.dest.y;
+            bloke->goal.x = BlokeSaveBuffer.goal.x;
+            bloke->goal.y = BlokeSaveBuffer.goal.y;
+            memcpy(&bloke->field_34, BlokeSaveBuffer.block_34, sizeof(BlokeSaveBuffer.block_34));
+            bloke->field_5c = BlokeSaveBuffer.field_5c;
+            bloke->param_action = BlokeSaveBuffer.param_action;
+            bloke->flags = BlokeSaveBuffer.flags;
+            bloke->field_64 = BlokeSaveBuffer.field_64;
+            bloke->field_78 = BlokeSaveBuffer.field_78;
+            bloke->mood = BlokeSaveBuffer.mood;
+            bloke->field_7c = BlokeSaveBuffer.field_7c;
+            bloke->field_7e = BlokeSaveBuffer.field_7e;
+            bloke->speed = BlokeSaveBuffer.speed;
+            bloke->field_80 = BlokeSaveBuffer.field_80;
+            bloke->field_81 = BlokeSaveBuffer.field_81;
+            bloke->field_82 = BlokeSaveBuffer.field_82;
+            if (BlokeSaveBuffer.favourite[0] < SavedElementCount) {
+                bloke->favourite_attraction_0 = SavedElementTable[BlokeSaveBuffer.favourite[0]];
             } else {
                 bloke->favourite_attraction_0 = 0;
             }
-            if (DAT_007fda60.favourite[1] < DAT_006691b4) {
-                bloke->favourite_attraction_1 = DAT_00669200[DAT_007fda60.favourite[1]];
+            if (BlokeSaveBuffer.favourite[1] < SavedElementCount) {
+                bloke->favourite_attraction_1 = SavedElementTable[BlokeSaveBuffer.favourite[1]];
             } else {
                 bloke->favourite_attraction_1 = 0;
             }
-            if (DAT_007fda60.favourite[2] < DAT_006691b4) {
-                bloke->favourite_attraction_2 = DAT_00669200[DAT_007fda60.favourite[2]];
+            if (BlokeSaveBuffer.favourite[2] < SavedElementCount) {
+                bloke->favourite_attraction_2 = SavedElementTable[BlokeSaveBuffer.favourite[2]];
             } else {
                 bloke->favourite_attraction_2 = 0;
             }
-            if (DAT_007fda60.favourite[3] < DAT_006691b4) {
-                bloke->favourite_food = DAT_00669200[DAT_007fda60.favourite[3]];
+            if (BlokeSaveBuffer.favourite[3] < SavedElementCount) {
+                bloke->favourite_food = SavedElementTable[BlokeSaveBuffer.favourite[3]];
             } else {
                 bloke->favourite_food = 0;
             }
-            bloke->pos.x = DAT_007fda60.pos.x;
-            bloke->pos.y = DAT_007fda60.pos.y;
-            bloke->height = DAT_007fda60.height;
-            bloke->dir = DAT_007fda60.dir;
-            bloke->field_73 = DAT_007fda60.field_73;
-            bloke->frame = DAT_007fda60.frame;
-            bloke->field_75 = DAT_007fda60.field_75;
-            bloke->nav = DAT_007fda60.nav;
+            bloke->pos.x = BlokeSaveBuffer.pos.x;
+            bloke->pos.y = BlokeSaveBuffer.pos.y;
+            bloke->height = BlokeSaveBuffer.height;
+            bloke->dir = BlokeSaveBuffer.dir;
+            bloke->field_73 = BlokeSaveBuffer.field_73;
+            bloke->frame = BlokeSaveBuffer.frame;
+            bloke->field_75 = BlokeSaveBuffer.field_75;
+            bloke->nav = BlokeSaveBuffer.nav;
             bloke->person = malloc(sizeof(Person));
             AddPersonToList(bloke->person);
             bloke->person->bloke = bloke;
-            bloke->person->field_8 = DAT_007fda60.person_8;
-            bloke->person->scale = DAT_007fda60.scale;
-            bloke->person->screen = DAT_007fda60.screen;
-            bloke->person->offset = DAT_007fda60.offset;
-            bloke->person->field_34 = DAT_007fda60.field_34;
-            bloke->person->field_38 = DAT_007fda60.field_38;
-            bloke->person->depth = DAT_007fda60.depth;
-            bloke->person->rotation = DAT_007fda60.rotation;
-            bloke->person->frame = DAT_007fda60.person_4c;
-            bloke->person->anim = DAT_007fda60.anim;
-            bloke->person->sort_id = DAT_007fda60.sort_id;
-            bloke->person->field_38 = DAT_007fda60.field_38;
-            memcpy(bloke->person->m, DAT_007fda60.m, sizeof(DAT_007fda60.m));
-            bloke->person->field_7c = DAT_007fda60.field_7c_p;
-            bloke->person->field_80 = DAT_007fda60.field_80_p;
-            bloke->person->field_8c = DAT_007fda60.field_8c_p;
-            bloke->person->field_90 = DAT_007fda60.field_90_p;
-            bloke->person->random = DAT_007fda60.random;
-            bloke->prev_param = DAT_007fda60.prev_param;
-            bloke->prev_action = DAT_007fda60.prev_action;
+            bloke->person->field_8 = BlokeSaveBuffer.person_8;
+            bloke->person->scale = BlokeSaveBuffer.scale;
+            bloke->person->screen = BlokeSaveBuffer.screen;
+            bloke->person->offset = BlokeSaveBuffer.offset;
+            bloke->person->field_34 = BlokeSaveBuffer.field_34;
+            bloke->person->field_38 = BlokeSaveBuffer.field_38;
+            bloke->person->depth = BlokeSaveBuffer.depth;
+            bloke->person->rotation = BlokeSaveBuffer.rotation;
+            bloke->person->frame = BlokeSaveBuffer.person_4c;
+            bloke->person->anim = BlokeSaveBuffer.anim;
+            bloke->person->sort_id = BlokeSaveBuffer.sort_id;
+            bloke->person->field_38 = BlokeSaveBuffer.field_38;
+            memcpy(bloke->person->m, BlokeSaveBuffer.m, sizeof(BlokeSaveBuffer.m));
+            bloke->person->field_7c = BlokeSaveBuffer.field_7c_p;
+            bloke->person->field_80 = BlokeSaveBuffer.field_80_p;
+            bloke->person->field_8c = BlokeSaveBuffer.field_8c_p;
+            bloke->person->field_90 = BlokeSaveBuffer.field_90_p;
+            bloke->person->random = BlokeSaveBuffer.random;
+            bloke->prev_param = BlokeSaveBuffer.prev_param;
+            bloke->prev_action = BlokeSaveBuffer.prev_action;
             bloke->person->field_2c = 0;
-            bloke->person->field_30 = DAT_007fda60.field_30;
+            bloke->person->field_30 = BlokeSaveBuffer.field_30;
             anim = GetBlokeAnim3DFromPerson(bloke->person);
             bloke->person->field_50 = FUN_00442580(bloke->person, VisitorLocData, (unsigned int)anim->field_8, anim->elems->shared->count, bloke->person->random);
         }
@@ -1027,14 +1027,14 @@ LEGO_EXPORT int LoadGame(char *path) {
         if (SaveGameRead(BuildObjArray, sizeof(BuildObjArray)) == 0) {
             break;
         }
-        for (i = 0; i < DAT_006691b4; i++) {
+        for (i = 0; i < SavedElementCount; i++) {
             DrawWatchSprite();
-            e = DAT_00669200[i];
+            e = SavedElementTable[i];
             if ((e->flags & 0x10) != 0) {
                 // STRING: LEGOLAND 0x004bcb94
                 char label[9] = "xxxxxxxx";
                 e->flags |= 4;
-                ride = DAT_00669200[i]->ride;
+                ride = SavedElementTable[i]->ride;
                 if (SaveGameRead(label, 8) == 0) {
                     LOAD_FAIL();
                 }
@@ -1108,7 +1108,7 @@ LEGO_EXPORT int LoadGame(char *path) {
                 }
             }
         }
-        if (SaveGameRead(DAT_007cb3e0, sizeof(DAT_007cb3e0)) == 0) {
+        if (SaveGameRead(ObjInstanceTable, sizeof(ObjInstanceTable)) == 0) {
             break;
         }
         DrawWatchSprite();
@@ -1121,7 +1121,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         if (SkipSaveGameDword() == 0) {
             break;
         }
-        FUN_00450b10();
+        LoadBuildObjArray();
         DrawWatchSprite();
         if (SkipSaveGameDword() == 0) {
             break;
@@ -1153,7 +1153,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         }
         _close(SaveFileHandle);
         DrawWatchSprite();
-        DAT_00667ca0 = 0;
+        LoadInProgress = 0;
         EditMode.unk0 = 0;
         GamePad |= 0x20;
         CalculateMapRenderOrder();
@@ -1180,12 +1180,12 @@ LEGO_EXPORT int LoadGame(char *path) {
 LEGO_EXPORT void UnloadSaveGameMap(void) {
     int i;
 
-    if (DAT_00669200 != 0) {
-        for (i = 0; i < DAT_006691b4; i++) {
-            LLIDB_UnLoadData(DAT_00669200[i]);
+    if (SavedElementTable != 0) {
+        for (i = 0; i < SavedElementCount; i++) {
+            LLIDB_UnLoadData(SavedElementTable[i]);
         }
-        free(DAT_00669200);
-        DAT_00669200 = 0;
+        free(SavedElementTable);
+        SavedElementTable = 0;
     }
 
     for (i = 0; i < DAT_007fdb84; i++) {
@@ -1199,17 +1199,17 @@ LEGO_EXPORT void UnloadSaveGameMap(void) {
     }
     ClearOverlays();
     FUN_004828f0();
-    DAT_00667d50 = 0;
+    MapDataLoaded = 0;
 }
 
 // FUNCTION: LEGOLAND 0x0047f810
-void FUN_0047f810(void) {
-    DAT_00669204 = GetGameTimer();
+void MarkGameTimer(void) {
+    GameTimerMark = GetGameTimer();
 }
 
 // FUNCTION: LEGOLAND 0x0047f820
-int FUN_0047f820(void) {
-    return GetGameTimer() - DAT_00669204;
+int GetGameTimerSinceMark(void) {
+    return GetGameTimer() - GameTimerMark;
 }
 
 // FUNCTION: LEGOLAND 0x0047f830

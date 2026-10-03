@@ -8,7 +8,7 @@
 
 // FUNCTION: LEGOLAND 0x0046d340
 void FUN_0046d340(unsigned int param_1) {
-    if (FUN_00498cf0() == 0) {
+    if (SpeechIsPlaying() == 0) {
         if (param_1 == 0) {
             return;
         }

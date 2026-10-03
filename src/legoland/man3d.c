@@ -380,7 +380,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
         if (GetVideoSurface(&vid) != 0) {
             ptr = (unsigned int)vid.bits + person->field_20 * vid.pitch + person->field_1c * 2;
             FUN_00485f30(ptr, vid.pitch, vid.field_4, vid.field_8);
-            FUN_00488700((unsigned int)vid.bits, &DAT_00813a44);
+            FUN_00488700((unsigned int)vid.bits, &MousePos);
             Render_SetViewport(&clip);
             __asm { fstcw word ptr [DAT_00638358] }
             __asm {fldcw word ptr[DAT_004b7abc]} FUN_00440a30(person);

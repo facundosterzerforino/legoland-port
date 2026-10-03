@@ -35,7 +35,7 @@ struct GardenTable {
 // FUNCTION: LEGOLAND 0x00432480
 void LoadHedgeImages(struct GardenLayer *arg0) {
     struct GardenInner *temp = arg0->field_c;
-    DAT_0081cd08 = temp;
+    HedgeObjectClass = temp;
     temp->field_1c |= 0x404;
     // STRING: LEGOLAND 0x004b7114
     if (LLIDB_FindElement("HEDGE IMAGES", &HedgeImagesHandle, 0) != 0) {
@@ -51,7 +51,7 @@ void UnloadHedgeImages(void) {
 
 // FUNCTION: LEGOLAND 0x004324d0
 void FUN_004324d0(void) {
-    void *var = DAT_0081cd08;
+    void *var = HedgeObjectClass;
     EditMode.unk0 = 1;
     EditMode.unk8 = var;
     DefaultCursor(&EditCursor);
@@ -59,28 +59,28 @@ void FUN_004324d0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432510
-void FUN_00432510(int x, int y) {
+void UpdateHedgeTileImage(int x, int y) {
     int pos[2];
     int mask = 0;
 
     pos[0] = x;
     pos[1] = y - 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
         mask = 1;
     }
     pos[0] = x + 1;
     pos[1] = y;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
         mask |= 2;
     }
     pos[0] = x;
     pos[1] = y + 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
         mask |= 4;
     }
     pos[0] = x - 1;
     pos[1] = y;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
         mask |= 8;
     }
     if (mask == 0) {
@@ -91,37 +91,37 @@ void FUN_00432510(int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x004325e0
-void FUN_004325e0(Element *obj, int *param_2) {
+void HedgeAddObject(Element *obj, int *param_2) {
     TileId packed;
     int pos[2];
     packed.pos.x = param_2[0];
     packed.pos.y = param_2[1];
     AddObjectToMap(obj, packed, 0);
-    FUN_00432510(param_2[0], param_2[1]);
+    UpdateHedgeTileImage(param_2[0], param_2[1]);
     pos[0] = param_2[0];
     pos[1] = param_2[1] - 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = param_2[0] + 1;
     pos[1] = param_2[1];
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = param_2[0];
     pos[1] = param_2[1] + 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = param_2[0] - 1;
     pos[1] = param_2[1];
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00432700
-void FUN_00432700(Element *obj, TileId tile, struct Cursor *cursor) {
+void HedgeRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     int pos[2];
     int x = tile.pos.x;
     int y = tile.pos.y;
@@ -129,37 +129,37 @@ void FUN_00432700(Element *obj, TileId tile, struct Cursor *cursor) {
     StandardRemoveObject(obj, tile, cursor);
     pos[0] = x;
     pos[1] = y - 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = x + 1;
     pos[1] = y;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = x;
     pos[1] = y + 1;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
     pos[0] = x - 1;
     pos[1] = y;
-    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)DAT_0081cd08) {
-        FUN_00432510(pos[0], pos[1]);
+    if (GetObjectClassAndInstance(pos, 0) == (unsigned int)HedgeObjectClass) {
+        UpdateHedgeTileImage(pos[0], pos[1]);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00432810
-struct RideSpriteInfo *FUN_00432810(int unused, TileId tile) {
+struct RideSpriteInfo *GetHedgeSpriteInfo(int unused, TileId tile) {
     struct GardenTable *t;
     int i;
 
     i = Get_UserFlags(tile.pos.x << 8, tile.pos.y << 8) & 0xffff;
     t = (struct GardenTable *)HedgeImagesData;
-    DAT_0082c6a0.sprite = (void *)t->a[(unsigned char)i];
-    DAT_0082c6a0.x = t->b[(unsigned char)i] >> 1;
-    DAT_0082c6a0.y = t->c[(unsigned char)i] >> 1;
-    return &DAT_0082c6a0;
+    RideSpriteInfoBuffer.sprite = (void *)t->a[(unsigned char)i];
+    RideSpriteInfoBuffer.x = t->b[(unsigned char)i] >> 1;
+    RideSpriteInfoBuffer.y = t->c[(unsigned char)i] >> 1;
+    return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x00432870
@@ -180,7 +180,7 @@ void UnloadFlowerImages(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004328c0
-void FUN_004328c0(void) {
+void FlowersSetEditMode(void) {
     void *var = DAT_0081cd04;
     EditMode.unk0 = 1;
     EditMode.unk8 = var;
@@ -189,7 +189,7 @@ void FUN_004328c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432900
-void FUN_00432900(int param_1, int *param_2) {
+void FlowersAddObject(int param_1, int *param_2) {
     TileId packed;
     packed.pos.x = param_2[0];
     packed.pos.y = param_2[1];
@@ -201,36 +201,36 @@ void FUN_00432900(int param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00432960
-struct RideSpriteInfo *FUN_00432960(int unused, TileId tile) {
+struct RideSpriteInfo *GetFlowerSpriteInfo(int unused, TileId tile) {
     struct GardenTable *t;
     int i;
 
     i = Get_UserFlags(tile.pos.x << 8, tile.pos.y << 8) & 0xffff;
     t = (struct GardenTable *)FlowerImagesData;
-    DAT_0082c6a0.sprite = (void *)t->a[(unsigned char)i];
-    DAT_0082c6a0.x = t->b[(unsigned char)i] >> 1;
-    DAT_0082c6a0.y = t->c[(unsigned char)i] >> 1;
-    return &DAT_0082c6a0;
+    RideSpriteInfoBuffer.sprite = (void *)t->a[(unsigned char)i];
+    RideSpriteInfoBuffer.x = t->b[(unsigned char)i] >> 1;
+    RideSpriteInfoBuffer.y = t->c[(unsigned char)i] >> 1;
+    return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x004329c0
-void FUN_004329c0(struct ClassNode *head, struct CallbackTable *iface) {
+void GardenGetInterfaces(struct ClassNode *head, struct CallbackTable *iface) {
     // STRING: LEGOLAND 0x004b7138
     if (strcmp(head->name, "HEDGE") == 0) {
         iface->cb_a4 = LoadHedgeImages;
         iface->cb_8c = FUN_004324d0;
-        iface->cb_98 = FUN_004325e0;
-        iface->cb_9c = FUN_00432700;
-        iface->cb_a0 = FUN_00432810;
+        iface->cb_98 = HedgeAddObject;
+        iface->cb_9c = HedgeRemoveObject;
+        iface->cb_a0 = GetHedgeSpriteInfo;
         iface->cb_ac = UnloadHedgeImages;
         return;
     }
     // STRING: LEGOLAND 0x004b7130
     if (strcmp(head->name, "FLOWERS") == 0) {
         iface->cb_a4 = LoadFlowerImages;
-        iface->cb_8c = FUN_004328c0;
-        iface->cb_98 = FUN_00432900;
-        iface->cb_a0 = FUN_00432960;
+        iface->cb_8c = FlowersSetEditMode;
+        iface->cb_98 = FlowersAddObject;
+        iface->cb_a0 = GetFlowerSpriteInfo;
         iface->cb_ac = UnloadFlowerImages;
     }
 }

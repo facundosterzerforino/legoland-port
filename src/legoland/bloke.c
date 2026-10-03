@@ -30,7 +30,7 @@ void UpdatePathLinks(int force) {
         return;
     }
     LastPathUpdateTime = now;
-    FUN_00482a90();
+    InitEntrance1Point();
     FUN_00482a40(&Entrance1Point);
 }
 
@@ -102,7 +102,7 @@ int GetBlokeMood(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x00482d60
-void FUN_00482d60(unsigned int index, int value) {
+void SetMoodDelta(unsigned int index, int value) {
     MapStats.mood_delta[index] = value;
 }
 
@@ -124,7 +124,7 @@ void FUN_00482d70(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00482df0
-int FUN_00482df0(Bloke *bloke, int index, int mul) {
+int ApplyMoodDelta(Bloke *bloke, int index, int mul) {
     int value = MapStats.mood_delta[index] * mul / 100 + bloke->mood;
     if (value < -30000) {
         value = -30000;

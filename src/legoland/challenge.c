@@ -468,8 +468,8 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
             DAT_00665eec++;
             // STRING: LEGOLAND 0x004b7d98
             DAT_00667c40 = "Exit Advisor";
-            if ((int)DAT_00813a44.x >= param_1->x && (int)DAT_00813a44.y >= param_1->y &&
-                (int)DAT_00813a44.x < frame->width + param_1->x && (int)DAT_00813a44.y < frame->height + param_1->y) {
+            if ((int)MousePos.x >= param_1->x && (int)MousePos.y >= param_1->y &&
+                (int)MousePos.x < frame->width + param_1->x && (int)MousePos.y < frame->height + param_1->y) {
                 Hover.type = state[0];
                 Hover.ptr = state[1];
                 Hover.data.value = state[2];
@@ -607,20 +607,20 @@ void FreeAdvisorAnims(void) {
 
 // FUNCTION: LEGOLAND 0x004441f0
 void FUN_004441f0(void) {
-    DAT_00665ff8 = 0;
+    ReportFlags = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444200
 unsigned int SaveReport(void) {
     unsigned int elapsed;
 
-    if (SaveGameWrite(&DAT_00665ff8, 0xa0) == 0) {
+    if (SaveGameWrite(&ReportFlags, 0xa0) == 0) {
         return 0;
     }
-    if (DAT_00666098 == 0) {
+    if (AppraisalDeadline == 0) {
         elapsed = 0xffffffff;
     } else {
-        elapsed = DAT_00666098 - GetGameTimer();
+        elapsed = AppraisalDeadline - GetGameTimer();
     }
     return SaveGameWrite(&elapsed, 0x4) != 0;
 }
@@ -629,17 +629,17 @@ unsigned int SaveReport(void) {
 unsigned int LoadReport(void) {
     unsigned int elapsed;
 
-    if (SaveGameRead(&DAT_00665ff8, 0xa0) == 0) {
+    if (SaveGameRead(&ReportFlags, 0xa0) == 0) {
         return 0;
     }
     if (SaveGameRead(&elapsed, 0x4) == 0) {
         return 0;
     }
     if (elapsed == 0xffffffff) {
-        DAT_00666098 = 0;
+        AppraisalDeadline = 0;
         return 1;
     }
-    DAT_00666098 = GetGameTimer() + elapsed;
+    AppraisalDeadline = GetGameTimer() + elapsed;
     return 1;
 }
 
@@ -702,268 +702,268 @@ unsigned int FUN_00444380(void) {
 unsigned int FUN_004443b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         DAT_00665ffc = param_1;
-        DAT_00665ff8 |= 1;
+        ReportFlags |= 1;
         return param_1;
     }
-    DAT_00665ff8 = (DAT_00665ff8 & 0xffffff00) | ((DAT_00665ff8 & 0xff) & 0xfe);
-    return DAT_00665ff8;
+    ReportFlags = (ReportFlags & 0xffffff00) | ((ReportFlags & 0xff) & 0xfe);
+    return ReportFlags;
 }
 
 // FUNCTION: LEGOLAND 0x004443e0
 unsigned int FUN_004443e0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         DAT_00666000 = param_1;
-        DAT_00665ff8 |= 2;
+        ReportFlags |= 2;
         return param_1;
     }
-    DAT_00665ff8 &= ~2;
-    return DAT_00665ff8;
+    ReportFlags &= ~2;
+    return ReportFlags;
 }
 
 // FUNCTION: LEGOLAND 0x00444410
 unsigned int FUN_00444410(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         DAT_00666004 = param_1;
-        DAT_00665ff8 |= 4;
+        ReportFlags |= 4;
         return param_1;
     }
-    DAT_00665ff8 &= ~4;
-    return DAT_00665ff8;
+    ReportFlags &= ~4;
+    return ReportFlags;
 }
 
 // FUNCTION: LEGOLAND 0x00444440
 void FUN_00444440(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 8;
+        ReportFlags |= 8;
         DAT_00666008 = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffffff00) | (DAT_00665ff8 & 0xf7);
+        ReportFlags = (ReportFlags & 0xffffff00) | (ReportFlags & 0xf7);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444470
 void FUN_00444470(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= (param_2 & 3) << 4;
+        ReportFlags |= (param_2 & 3) << 4;
         DAT_0066600c = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffffff00) | (DAT_00665ff8 & 0xcf);
+        ReportFlags = (ReportFlags & 0xffffff00) | (ReportFlags & 0xcf);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004444b0
 void FUN_004444b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= (param_2 & 3) << 6;
+        ReportFlags |= (param_2 & 3) << 6;
         DAT_00666010 = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffffff00) | (DAT_00665ff8 & 0x3f);
+        ReportFlags = (ReportFlags & 0xffffff00) | (ReportFlags & 0x3f);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004444f0
 void FUN_004444f0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= (param_2 & 3) << 8;
+        ReportFlags |= (param_2 & 3) << 8;
         DAT_00666014 = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffff00ff) | ((DAT_00665ff8 >> 8 & 0xfc) << 8);
+        ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xfc) << 8);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444530
 void FUN_00444530(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= (param_2 & 3) << 10;
+        ReportFlags |= (param_2 & 3) << 10;
         DAT_00666018 = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffff00ff) | ((DAT_00665ff8 >> 8 & 0xf3) << 8);
+        ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xf3) << 8);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444570
 void FUN_00444570(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= (param_2 & 3) << 12;
+        ReportFlags |= (param_2 & 3) << 12;
         DAT_0066601c = param_1;
     } else {
-        DAT_00665ff8 = (DAT_00665ff8 & 0xffff00ff) | ((DAT_00665ff8 >> 8 & 0xcf) << 8);
+        ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xcf) << 8);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004445b0
 void FUN_004445b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x4000;
+        ReportFlags |= 0x4000;
         DAT_00666020 = param_1;
         DAT_00666024 = param_2;
     } else {
-        DAT_00665ff8 &= ~0x4000;
+        ReportFlags &= ~0x4000;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004445f0
 void FUN_004445f0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x8000;
+        ReportFlags |= 0x8000;
         DAT_00666028 = param_1;
         DAT_0066602c = param_2;
     } else {
-        DAT_00665ff8 &= ~0x8000;
+        ReportFlags &= ~0x8000;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444630
 void FUN_00444630(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x40000;
+        ReportFlags |= 0x40000;
         DAT_00666030 = param_1;
         DAT_00666034 = param_2;
     } else {
-        DAT_00665ff8 &= 0xfffbffff;
+        ReportFlags &= 0xfffbffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444670
 void FUN_00444670(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x8000000;
+        ReportFlags |= 0x8000000;
         DAT_00666070 = param_1;
         DAT_00666074 = param_2;
     } else {
-        DAT_00665ff8 &= 0xf7ffffff;
+        ReportFlags &= 0xf7ffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004446b0
 void FUN_004446b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x10000000;
+        ReportFlags |= 0x10000000;
         DAT_00666078 = param_1;
         DAT_0066607c = param_2;
     } else {
-        DAT_00665ff8 &= 0xefffffff;
+        ReportFlags &= 0xefffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004446f0
 void FUN_004446f0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x20000000;
+        ReportFlags |= 0x20000000;
         DAT_00666080 = param_1;
         DAT_00666084 = param_2;
     } else {
-        DAT_00665ff8 &= 0xdfffffff;
+        ReportFlags &= 0xdfffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444730
 void FUN_00444730(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x10000;
+        ReportFlags |= 0x10000;
         DAT_00666040 = param_1;
         DAT_00666044 = param_2;
     } else {
-        DAT_00665ff8 &= 0xfffeffff;
+        ReportFlags &= 0xfffeffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444770
 void FUN_00444770(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x20000;
+        ReportFlags |= 0x20000;
         DAT_00666048 = param_1;
         DAT_0066604c = param_2;
     } else {
-        DAT_00665ff8 &= 0xfffdffff;
+        ReportFlags &= 0xfffdffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004447b0
 void FUN_004447b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x40000000;
+        ReportFlags |= 0x40000000;
         DAT_00666088 = param_1;
         DAT_0066608c = param_2;
     } else {
-        DAT_00665ff8 &= 0xbfffffff;
+        ReportFlags &= 0xbfffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004447f0
 void FUN_004447f0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x80000000;
+        ReportFlags |= 0x80000000;
         DAT_00666090 = param_1;
         DAT_00666094 = param_2;
     } else {
-        DAT_00665ff8 &= 0x7fffffff;
+        ReportFlags &= 0x7fffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444830
 void FUN_00444830(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x80000;
+        ReportFlags |= 0x80000;
         DAT_00666038 = param_1;
         DAT_0066603c = param_2;
     } else {
-        DAT_00665ff8 &= 0xfff7ffff;
+        ReportFlags &= 0xfff7ffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444870
 void FUN_00444870(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x1000000;
+        ReportFlags |= 0x1000000;
         DAT_00666050 = param_1;
         DAT_00666054 = param_2;
     } else {
-        DAT_00665ff8 &= 0xfeffffff;
+        ReportFlags &= 0xfeffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004448b0
 void FUN_004448b0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x4000000;
+        ReportFlags |= 0x4000000;
         DAT_00666050 = param_1;
         DAT_00666054 = param_2;
     } else {
-        DAT_00665ff8 &= 0xfbffffff;
+        ReportFlags &= 0xfbffffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004448f0
 void FUN_004448f0(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x200000;
+        ReportFlags |= 0x200000;
         DAT_00666058 = param_1;
         DAT_0066605c = param_2;
     } else {
-        DAT_00665ff8 &= 0xffdfffff;
+        ReportFlags &= 0xffdfffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444930
 void FUN_00444930(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x400000;
+        ReportFlags |= 0x400000;
         DAT_00666060 = param_1;
         DAT_00666064 = param_2;
     } else {
-        DAT_00665ff8 &= 0xffbfffff;
+        ReportFlags &= 0xffbfffff;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00444970
 void FUN_00444970(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
-        DAT_00665ff8 |= 0x800000;
+        ReportFlags |= 0x800000;
         DAT_00666068 = param_1;
         DAT_0066606c = param_2;
     } else {
-        DAT_00665ff8 &= 0xff7fffff;
+        ReportFlags &= 0xff7fffff;
     }
 }
 
@@ -1336,12 +1336,12 @@ void FUN_00445100(void) {
     int y;
 
     a = DAT_006660a8;
-    x = DAT_00813a44.x;
-    if (x < a->x || x > a->width + a->x || (y = DAT_00813a44.y, y < a->y || y > a->height + a->y)) {
+    x = MousePos.x;
+    if (x < a->x || x > a->width + a->x || (y = MousePos.y, y < a->y || y > a->height + a->y)) {
         SetIconSprite(a, NextPageSprite);
     }
-    x = DAT_00813a44.x;
-    y = DAT_00813a44.y;
+    x = MousePos.x;
+    y = MousePos.y;
     b = DAT_006660ac;
     if (x < b->x || x > b->width + b->x ||
         y < b->y || y > b->height + b->y) {
@@ -1472,7 +1472,7 @@ LAB_00445422:
     uVar9 = 0x83;
     iVar14 = iVar3;
     iVar4 = 0x6d;
-    if ((DAT_00665ff8 & 0xf) != 0) {
+    if ((ReportFlags & 0xf) != 0) {
         rep[iVar3 * 0x13 + 10] = xbase;
         rep[iVar3 * 0x13 + 9] = DAT_006660a0;
         rep[iVar3 * 0x13 + 10] = xbase;
@@ -1493,9 +1493,9 @@ LAB_00445422:
     }
     do {
         iVar12 = iVar14;
-        if ((DAT_00665ff8 & 0x4fff0) == 0) {
+        if ((ReportFlags & 0x4fff0) == 0) {
         LAB_0044672e:
-            if ((DAT_00665ff8 & 0x38000000) == 0)
+            if ((ReportFlags & 0x38000000) == 0)
                 goto LAB_00446b71;
             iVar14 = iVar12 * 0x4c;
             goto LAB_00446751;
@@ -1529,9 +1529,9 @@ LAB_00445422:
         rep[iVar14 * 0x13 + 19] = 0;
         iVar13 = xbase + 0x30;
         FUN_00444bf0((unsigned int *)&out58, (unsigned int *)&out5c);
-        if ((DAT_00665ff8 & 0x4000) == 0) {
+        if ((ReportFlags & 0x4000) == 0) {
         LAB_00445794:
-            if ((DAT_00665ff8 & 0x8000) != 0) {
+            if ((ReportFlags & 0x8000) != 0) {
                 total = total + 1;
                 passflag = (int)DAT_00666028 <= out58;
                 if (passflag == 0) {
@@ -1561,7 +1561,7 @@ LAB_00445422:
                 rep[(iVar12 - 1) * 0x13 + 19] = 0;
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0x40000) != 0) {
+            if ((ReportFlags & 0x40000) != 0) {
                 iVar6 = FUN_00444df0();
                 total = total + 1;
                 passflag = (int)DAT_00666030 <= iVar6;
@@ -1592,7 +1592,7 @@ LAB_00445422:
                 rep[(iVar12 - 1) * 0x13 + 19] = 0;
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0x30) != 0) {
+            if ((ReportFlags & 0x30) != 0) {
                 total = total + 1;
                 iVar6 = FUN_00444320();
                 passflag = (int)DAT_0066600c <= iVar6;
@@ -1601,7 +1601,7 @@ LAB_00445422:
                 } else {
                     passtotal = passtotal + 1;
                 }
-                uVar9 = DAT_00665ff8 >> 4 & 3;
+                uVar9 = ReportFlags >> 4 & 3;
                 if (uVar9 == 1) {
                     if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
                         if (iVar3 != iVar14)
@@ -1657,7 +1657,7 @@ LAB_00445422:
                 }
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0xc0) != 0) {
+            if ((ReportFlags & 0xc0) != 0) {
                 total = total + 1;
                 iVar6 = FUN_004442c0();
                 passflag = (int)DAT_00666010 <= iVar6;
@@ -1666,7 +1666,7 @@ LAB_00445422:
                 } else {
                     passtotal = passtotal + 1;
                 }
-                uVar9 = DAT_00665ff8 >> 6 & 3;
+                uVar9 = ReportFlags >> 6 & 3;
                 if (uVar9 == 1) {
                     if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
                         if (iVar3 != iVar14)
@@ -1722,7 +1722,7 @@ LAB_00445422:
                 }
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0x300) != 0) {
+            if ((ReportFlags & 0x300) != 0) {
                 total = total + 1;
                 iVar6 = FUN_00444350();
                 passflag = (int)DAT_00666014 <= iVar6;
@@ -1731,7 +1731,7 @@ LAB_00445422:
                 } else {
                     passtotal = passtotal + 1;
                 }
-                uVar9 = DAT_00665ff8 >> 8 & 3;
+                uVar9 = ReportFlags >> 8 & 3;
                 if (uVar9 == 1) {
                     if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
                         if (iVar3 != iVar14)
@@ -1787,7 +1787,7 @@ LAB_00445422:
                 }
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0xc00) != 0) {
+            if ((ReportFlags & 0xc00) != 0) {
                 total = total + 1;
                 iVar6 = FUN_004442f0();
                 passflag = (int)DAT_00666018 <= iVar6;
@@ -1796,7 +1796,7 @@ LAB_00445422:
                 } else {
                     passtotal = passtotal + 1;
                 }
-                uVar9 = DAT_00665ff8 >> 10 & 3;
+                uVar9 = ReportFlags >> 10 & 3;
                 if (uVar9 == 1) {
                     if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
                         if (iVar3 != iVar14)
@@ -1852,7 +1852,7 @@ LAB_00445422:
                 }
                 iVar4 = iVar4 + 0x18;
             }
-            if ((DAT_00665ff8 & 0x3000) != 0) {
+            if ((ReportFlags & 0x3000) != 0) {
                 total = total + 1;
                 iVar6 = FUN_00444380();
                 passflag = (int)DAT_0066601c <= iVar6;
@@ -1861,7 +1861,7 @@ LAB_00445422:
                 } else {
                     passtotal = passtotal + 1;
                 }
-                uVar9 = DAT_00665ff8 >> 0xc & 3;
+                uVar9 = ReportFlags >> 0xc & 3;
                 if (uVar9 == 1) {
                     if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
                         if (iVar3 != iVar14)
@@ -1987,9 +1987,9 @@ LAB_00446751:
             rep[iVar12 * 0x13 + 18] = 0;
             rep[iVar12 * 0x13 + 19] = 0;
             FUN_00444c70((unsigned int *)&out68, (unsigned int *)&out6c);
-            if ((DAT_00665ff8 & 0x8000000) == 0) {
+            if ((ReportFlags & 0x8000000) == 0) {
             LAB_004469ab:
-                if ((DAT_00665ff8 & 0x10000000) != 0) {
+                if ((ReportFlags & 0x10000000) != 0) {
                     total = total + 1;
                     flatp = (int *)((int)DAT_00666078 <= out6c);
                     if (flatp == (int *)0x0) {
@@ -2069,9 +2069,9 @@ LAB_00446751:
         uVar9 = wstart;
         iVar4 = ystart;
         iVar3 = iVar12;
-    } while ((DAT_00665ff8 & 0x38000000) != 0);
+    } while ((ReportFlags & 0x38000000) != 0);
 LAB_00446b71:
-    if ((DAT_00665ff8 & 0xc0000000) != 0) {
+    if ((ReportFlags & 0xc0000000) != 0) {
         do {
             rowp = &rep[iVar12 * 0x13 + 10];
             total = 0;
@@ -2094,9 +2094,9 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
                 FUN_00444cd0((unsigned int *)&out68, (unsigned int *)&out6c);
-                if ((DAT_00665ff8 & 0x40000000) == 0) {
+                if ((ReportFlags & 0x40000000) == 0) {
                 LAB_00446deb:
-                    if ((DAT_00665ff8 & 0x80000000) != 0) {
+                    if ((ReportFlags & 0x80000000) != 0) {
                         total = total + 1;
                         flatp = (int *)((int)DAT_00666090 <= out68);
                         if (flatp == (int *)0x0) {
@@ -2176,9 +2176,9 @@ LAB_00446b71:
             uVar9 = wstart;
             iVar4 = ystart;
             iVar3 = iVar12;
-        } while ((DAT_00665ff8 & 0xc0000000) != 0);
+        } while ((ReportFlags & 0xc0000000) != 0);
     }
-    if ((DAT_00665ff8 & 0x30000) != 0) {
+    if ((ReportFlags & 0x30000) != 0) {
         do {
             rowp = &rep[iVar12 * 0x13 + 10];
             total = 0;
@@ -2201,9 +2201,9 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
                 FUN_00444d20((unsigned int *)&out60, (unsigned int *)&out6c);
-                if ((DAT_00665ff8 & 0x10000) == 0) {
+                if ((ReportFlags & 0x10000) == 0) {
                 LAB_00447222:
-                    if ((DAT_00665ff8 & 0x20000) != 0) {
+                    if ((ReportFlags & 0x20000) != 0) {
                         total = total + 1;
                         flatp = (int *)((int)DAT_00666048 <= out60);
                         if (flatp == (int *)0x0) {
@@ -2283,9 +2283,9 @@ LAB_00446b71:
             uVar9 = wstart;
             iVar4 = ystart;
             iVar3 = iVar12;
-        } while ((DAT_00665ff8 & 0x30000) != 0);
+        } while ((ReportFlags & 0x30000) != 0);
     }
-    if ((DAT_00665ff8 & 0x5080000) != 0) {
+    if ((ReportFlags & 0x5080000) != 0) {
         do {
             rowp = &rep[iVar12 * 0x13 + 10];
             total = 0;
@@ -2308,7 +2308,7 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
                 FUN_00444d70((unsigned int *)&out58, (unsigned int *)&out5c, &out64);
-                if ((DAT_00665ff8 & 0x80000) != 0) {
+                if ((ReportFlags & 0x80000) != 0) {
                     total = 1;
                     flatp = (int *)((int)DAT_00666038 <= out80);
                     if (flatp == (int *)0x0) {
@@ -2317,9 +2317,9 @@ LAB_00446b71:
                     subpass = (flatp != (int *)0x0);
                     iVar6 = iVar4 + 0x30;
                 }
-                if ((DAT_00665ff8 & 0x1000000) == 0) {
+                if ((ReportFlags & 0x1000000) == 0) {
                 LAB_004476a1:
-                    if ((DAT_00665ff8 & 0x4000000) != 0) {
+                    if ((ReportFlags & 0x4000000) != 0) {
                         total = total + 1;
                         flatp = (int *)((int)DAT_00666050 <= out5c);
                         if (flatp == (int *)0x0) {
@@ -2400,9 +2400,9 @@ LAB_00446b71:
             uVar9 = wstart;
             iVar4 = ystart;
             iVar3 = iVar12;
-        } while ((DAT_00665ff8 & 0x5080000) != 0);
+        } while ((ReportFlags & 0x5080000) != 0);
     }
-    if ((DAT_00665ff8 & 0xe00000) != 0) {
+    if ((ReportFlags & 0xe00000) != 0) {
         do {
             rowp = &rep[iVar12 * 0x13 + 10];
             total = 0;
@@ -2426,9 +2426,9 @@ LAB_00446b71:
                 passtotal = (iVar12 + 1) * 0x13;
                 rep[iVar12 * 0x13 + 19] = 0;
                 iVar13 = xbase + 0x30;
-                if ((DAT_00665ff8 & 0x200000) == 0) {
+                if ((ReportFlags & 0x200000) == 0) {
                 LAB_00447b1b:
-                    if ((DAT_00665ff8 & 0x400000) != 0) {
+                    if ((ReportFlags & 0x400000) != 0) {
                         tmp8 = 0;
                         piVar10 = (int *)GetFirstRenderObject();
                         while (piVar10 != (int *)0x0) {
@@ -2467,7 +2467,7 @@ LAB_00446b71:
                         rep[passtotal + 19] = 0;
                         iVar6 = iVar6 + 0x18;
                     }
-                    if ((DAT_00665ff8 & 0x800000) != 0) {
+                    if ((ReportFlags & 0x800000) != 0) {
                         iVar4 = GetMapTileCount();
                         total = total + 1;
                         flatp = (int *)((int)DAT_00666068 <= iVar4);
@@ -2549,7 +2549,7 @@ LAB_00446b71:
             uVar9 = wstart;
             iVar4 = ystart;
             iVar3 = iVar12;
-        } while ((DAT_00665ff8 & 0xe00000) != 0);
+        } while ((ReportFlags & 0xe00000) != 0);
     }
 LAB_00447e73:
     do {
@@ -4423,7 +4423,7 @@ LAB_0044acbb:
                     flatp = (int *)(((char *)rep + 0x4c) + iVar6);
                     (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1f5;
                 } else {
-                    if ((iVar4 != 2) || ((DAT_00665ff8 & 0xf) == 0)) goto LAB_0044d010;
+                    if ((iVar4 != 2) || ((ReportFlags & 0xf) == 0)) goto LAB_0044d010;
                     if (0x1b5 < iVar12 + 0x16) {
                         if (iVar3 != iVar14) goto LAB_0044d594;
                         DAT_006660a0 = DAT_006660a0 + 1;
@@ -4787,7 +4787,7 @@ LAB_0044acbb:
                         DAT_0081c07c = 0;
                     }
                     if ((int)rowp < (int)flags) {
-                        iVar3 = FUN_00498cf0();
+                        iVar3 = SpeechIsPlaying();
                         iVar4 = flat[(int)rowp];
                         if ((iVar3 == 0) && (iVar4 != -1)) {
                             rowp = (int *)((int)rowp + 1);
@@ -4795,12 +4795,12 @@ LAB_0044acbb:
                             sprintf(wavbuf, "TEXT%04d.WAV", iVar4);
                             SpeechCloseFile();
                             SpeechLoadWavFile(wavbuf + 8);
-                            FUN_00498b00();
+                            SpeechPlay();
                         }
                     } else {
-                        iVar3 = FUN_00498cf0();
+                        iVar3 = SpeechIsPlaying();
                         if (iVar3 == 0) {
-                            FUN_0046d110();
+                            UpdateSpeechPlayback();
                         }
                     }
                     ProcessFrontEndHelp();
@@ -5044,13 +5044,13 @@ void FUN_0044db40(void) {
     } else {
         t = 0;
     }
-    DAT_00666098 = t;
+    AppraisalDeadline = t;
 }
 
 // FUNCTION: LEGOLAND 0x0044db80
 void FUN_0044db80(void) {
     MapStats.timer_minutes = 0;
-    DAT_00666098 = 0;
+    AppraisalDeadline = 0;
 }
 
 // FUNCTION: LEGOLAND 0x0044db90
@@ -5059,7 +5059,7 @@ int FUN_0044db90(void) {
     int v;
 
     now = GetGameTimer();
-    if (FUN_0046b280() == 0 && DAT_00666098 != 0 && (int)DAT_00666098 <= now) {
+    if (FUN_0046b280() == 0 && AppraisalDeadline != 0 && (int)AppraisalDeadline <= now) {
         PauseGameTimer();
         PauseAllSamples();
         SpeechCloseFile();
@@ -5085,7 +5085,7 @@ int FUN_0044db90(void) {
                 FUN_00459820(2);
             }
         }
-        DAT_00666098 = 0;
+        AppraisalDeadline = 0;
         FUN_0044db40();
         ResumeGameTimer();
         ResumeAllSamples();

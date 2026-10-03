@@ -18,7 +18,7 @@
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00406240
-void FUN_00406240(Element *elem) {
+void LoadFortMaskSprite(Element *elem) {
     struct Ride *ride = elem->ride;
     FortRide = ride;
     if (ride != NULL) {
@@ -41,7 +41,7 @@ void KillFortMaskSprite(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004062c0
-void FUN_004062c0(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int clip) {
+void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = elem->ride;
     struct Point pos = GetScreenCoordsForObject(tile, ride);
     int base = ride->x + tile->pos.x;
@@ -222,7 +222,7 @@ void FUN_00406660(Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x00406820
-void FUN_00406820(void) {
+void FortSetEditMode(void) {
     EditMode.unk8 = FortRide;
     EditMode.unk0 = 1;
     DefaultCursor(&EditCursor);
@@ -230,12 +230,12 @@ void FUN_00406820(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406860
-unsigned int FUN_00406860(unsigned int param1, unsigned int param2) {
+unsigned int FortAddObject(unsigned int param1, unsigned int param2) {
     return AddBasicObject(param1, param2);
 }
 
 // FUNCTION: LEGOLAND 0x00406880
-void FUN_00406880(Element *elem, TileId tile, struct Cursor *cursor) {
+void FortRemoveObject(Element *elem, TileId tile, struct Cursor *cursor) {
     StandardRemoveObject(elem, tile, cursor);
     RemoveAllBlokesFromRide(elem->ride, tile);
 }
@@ -246,11 +246,11 @@ void FortGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     if (_stricmp("FORT", name->name) != 0) {
         return;
     }
-    ci->cb_a4 = FUN_00406240;
+    ci->cb_a4 = LoadFortMaskSprite;
     ci->cb_ac = KillFortMaskSprite;
-    ci->cb_8c = FUN_00406820;
+    ci->cb_8c = FortSetEditMode;
     ci->cb_a8 = FUN_00406660;
-    ci->cb_b0 = FUN_004062c0;
-    ci->cb_9c = FUN_00406880;
-    ci->cb_98 = FUN_00406860;
+    ci->cb_b0 = RenderFort;
+    ci->cb_9c = FortRemoveObject;
+    ci->cb_98 = FortAddObject;
 }

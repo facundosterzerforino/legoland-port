@@ -39,7 +39,7 @@ LEGO_EXPORT char *GetGFXFName(const char *name, unsigned char type, char *out) {
         sprintf(result, "%s%s", GraphicsSmallPath, name);
         break;
     case 2:
-        sprintf(result, "%s%s", DAT_004b81c4, name);
+        sprintf(result, "%s%s", GraphicsPathPrefix, name);
         break;
     case 3:
         sprintf(result, "%s%s", GraphicsSmallPath, name);

@@ -85,7 +85,7 @@ void FUN_004776c0(struct QueryNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x004776e0
-void FUN_004776e0(struct EventNode *node) {
+void InsertOpenListSorted(struct EventNode *node) {
     struct EventNode *current;
     struct EventNode *previous;
 
@@ -130,7 +130,7 @@ struct GameMainNode *FUN_00477730(struct Point *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477760
-void FUN_00477760(struct QueryNode *ctx) {
+void RemoveQueryNode(struct QueryNode *ctx) {
     struct QueryNode *prev;
     struct QueryNode *node;
 
@@ -151,7 +151,7 @@ void FUN_00477760(struct QueryNode *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477790
-void FUN_00477790(struct EventNode *param_1) {
+void RemoveFromOpenList(struct EventNode *param_1) {
     struct EventNode *prev;
     struct EventNode *node;
 
@@ -361,7 +361,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
     DAT_004bb5a4 = b;
     nb = FUN_004777f0(&DAT_004bb598, &result);
     nb->field_14 = 0;
-    FUN_004776e0((struct EventNode *)nb);
+    InsertOpenListSorted((struct EventNode *)nb);
     while ((cur = DAT_00668fc0) != NULL) {
         DAT_00668fc0 = cur->next;
 
@@ -387,12 +387,12 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                             nb->field_14 = cost;
                             nb->field_1c = nb->field_18 + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
@@ -417,12 +417,12 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                             nb->field_14 = cost;
                             nb->field_1c = nb->field_18 + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
@@ -447,12 +447,12 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                             nb->field_14 = cost;
                             nb->field_1c = nb->field_18 + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
@@ -477,12 +477,12 @@ void FUN_00477bd0(int x, int y, int a, int b) {
                             nb->field_14 = cost;
                             nb->field_1c = nb->field_18 + cost;
                             if (result == 2) {
-                                FUN_00477760((struct QueryNode *)nb);
+                                RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
-                                FUN_00477790((struct EventNode *)nb);
+                                RemoveFromOpenList((struct EventNode *)nb);
                             }
-                            FUN_004776e0((struct EventNode *)nb);
+                            InsertOpenListSorted((struct EventNode *)nb);
                         }
                     }
                 }
@@ -507,7 +507,7 @@ void FUN_00477bd0(int x, int y, int a, int b) {
         nb = nb->field_4;
     }
     while (DAT_00668fc4 != NULL) {
-        FUN_00477760((struct QueryNode *)DAT_00668fc4);
+        RemoveQueryNode((struct QueryNode *)DAT_00668fc4);
     }
 }
 
@@ -646,7 +646,7 @@ void FUN_004784c0(void) {
     NEWFLC_CheckDuplicate = 1;
     DAT_00669054 = 0;
     DAT_004bb5ac = 1;
-    DAT_00669050 = 0;
+    CurrentObjectiveEventFlags = 0;
     DAT_0066879c = 0;
     DAT_00669098 = 0;
 
@@ -659,7 +659,7 @@ void FUN_004784c0(void) {
 
     FUN_004689a0();
     DAT_007fdca4 = FUN_004689f0(0, 0, 0);
-    DAT_004bb5b0 = 1;
+    ScriptConditionActive = 1;
 
     FUN_004441f0();
     FUN_0044db20();
@@ -671,7 +671,7 @@ void FUN_004784c0(void) {
     FUN_00482d70();
     FUN_00462e90();
     FUN_00476000();
-    FUN_00476050();
+    ClearButtonFlashStates();
     FUN_00490610(DAT_004d8bb0);
     FUN_00463560();
     ResetPathUpdateTimer();
@@ -696,16 +696,16 @@ void FUN_00478610(unsigned int param_1) {
     DAT_004bb5ac = param_1;
     switch (param_1) {
     case 1:
-        DAT_00669050 = 1;
+        CurrentObjectiveEventFlags = 1;
         break;
     case 2:
-        DAT_00669050 = 2;
+        CurrentObjectiveEventFlags = 2;
         break;
     case 3:
-        DAT_00669050 = 4;
+        CurrentObjectiveEventFlags = 4;
         break;
     default:
-        DAT_00669050 = 0;
+        CurrentObjectiveEventFlags = 0;
         break;
     }
 }
@@ -719,9 +719,9 @@ void FUN_00478650(unsigned int param_1, unsigned int param_2) {
     }
     // STRING: LEGOLAND 0x004bb9ec
     if (_stricmp(entry->name, "PURGE") == 0) {
-        DAT_00669050 |= 0x8;
+        CurrentObjectiveEventFlags |= 0x8;
     } else {
-        DAT_00669050 &= 0xf7;
+        CurrentObjectiveEventFlags &= 0xf7;
     }
 }
 
@@ -744,7 +744,7 @@ unsigned int FUN_004786c0(unsigned int param_1, unsigned int param_2, unsigned i
 }
 
 // FUNCTION: LEGOLAND 0x00478700
-void FUN_00478700(int *param_1, char **param_2, int param_3) {
+void ParseRect(int *param_1, char **param_2, int param_3) {
     int temp;
 
     param_1[0] = atoi(param_2[param_3 + 0]);
@@ -765,7 +765,7 @@ void FUN_00478700(int *param_1, char **param_2, int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00478770
-void FUN_00478770(int *param_1, char **param_2, int param_3) {
+void ParseIntPair(int *param_1, char **param_2, int param_3) {
     param_1[0] = atoi(param_2[param_3 + 0]);
     param_1[1] = atoi(param_2[param_3 + 1]);
 }

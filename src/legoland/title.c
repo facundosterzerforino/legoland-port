@@ -101,7 +101,7 @@ LEGO_EXPORT void InitTitleScreen(void) {
 unsigned char FUN_0048fe20(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        DAT_007cb328 = 1;
+        LoadMode = 1;
         DAT_007cb324 = 1;
         DAT_0080ff80.unk8 = 4;
     }
@@ -146,7 +146,7 @@ unsigned char FUN_0048ff70(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0048ffb0
-void FUN_0048ffb0(void) {
+void KillTitleScreenBkSpriteAndRemoveIconGroup7(void) {
     if (SPRITE_TitleScreenBk != 0) {
         KillSprite(SPRITE_TitleScreenBk);
         SPRITE_TitleScreenBk = 0;
@@ -171,7 +171,7 @@ unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2) {
 unsigned char FUN_00490050(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        FUN_0048ffb0();
+        KillTitleScreenBkSpriteAndRemoveIconGroup7();
         FUN_0048fa40(DAT_007cb30c, DAT_007cb300, DAT_007cb2f0);
     }
     return 1;
@@ -276,7 +276,7 @@ unsigned char FUN_004902c0(unsigned int param_1, unsigned int param_2) {
 unsigned char FUN_00490300(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
-        if (DAT_00798768 == 0 && DAT_0079876c == 0) {
+        if (CertificatePrintResultTimer == 0 && DAT_0079876c == 0) {
             DAT_0079876c = 2;
         }
     }
@@ -309,7 +309,7 @@ unsigned int FUN_00490350(void) {
     // STRING: LEGOLAND 0x004bf60c
     result = LoadSprite("printinfo.lls", 4);
     PrintInfoSprite = result;
-    DAT_00798768 = 0;
+    CertificatePrintResultTimer = 0;
     DAT_0079876c = 0;
     return (unsigned int)result;
 }
@@ -335,24 +335,24 @@ void FUN_00490410(void) {
             if (DAT_0079876c == 0) {
                 SpeechCloseFile();
                 DAT_006687b0 = 4;
-                DAT_00798768 = PrintCertificateWithCurrentDate() ? 0x8c : -0x8c;
+                CertificatePrintResultTimer = PrintCertificateWithCurrentDate() ? 0x8c : -0x8c;
             }
-        } else if (0 < DAT_00798768) {
+        } else if (0 < CertificatePrintResultTimer) {
             PrintSprite(PrintInfoSprite, 0xc6, 0x28, 0, hit);
             rc.top = 0x2d;
             rc.bottom = 0x43;
             rc.left = 0xc6;
             rc.right = (short)PrintInfoSprite->width + 0xc6;
             NewPrintCent(GetString(0x23b), 1, rc, 1);
-            DAT_00798768 = DAT_00798768 + -1;
-        } else if (DAT_00798768 < 0) {
+            CertificatePrintResultTimer = CertificatePrintResultTimer + -1;
+        } else if (CertificatePrintResultTimer < 0) {
             PrintSprite(PrintInfoSprite, 0xc6, 0x28, 0, hit);
             rc.top = 0x2d;
             rc.bottom = 0x43;
             rc.left = 0xc6;
             rc.right = (short)PrintInfoSprite->width + 0xc6;
             NewPrintCent(GetString(0x23c), 1, rc, 1);
-            DAT_00798768 = DAT_00798768 + 1;
+            CertificatePrintResultTimer = CertificatePrintResultTimer + 1;
         }
     }
 }
@@ -544,7 +544,7 @@ void FUN_00490a20(unsigned int param_1) {
     sprintf(buffer, "%s%02d.wav", DAT_007cae80, param_1 + 1);
     SpeechCloseFile();
     SpeechLoadWavFile(buffer);
-    FUN_00498b00();
+    SpeechPlay();
     FUN_0046d390();
 }
 
@@ -555,7 +555,7 @@ void FUN_00490a60(unsigned int param_1) {
     sprintf(buffer, "%s%02d.wav", DAT_007cb1e0, param_1 + 1);
     SpeechCloseFile();
     SpeechLoadWavFile(buffer);
-    FUN_00498b00();
+    SpeechPlay();
     FUN_0046d390();
 }
 
@@ -657,7 +657,7 @@ void FUN_00490c70(void) {
     icon->string = GetString(0x2d0);
     icon->event_handler = (void *)FUN_00490be0;
     icon->flags |= 0x6002;
-    DAT_007cb1c0 = icon;
+    RepHint1Icon = icon;
     if (DAT_00798880 == 0) {
         icon->flags |= 0x400;
     }
@@ -684,29 +684,29 @@ void FUN_00490c70(void) {
 
 // FUNCTION: LEGOLAND 0x00490ea0
 void FUN_00490ea0(void) {
-    unsigned int _x = DAT_00813a44.x;
-    unsigned int _y = DAT_00813a44.y;
+    unsigned int _x = MousePos.x;
+    unsigned int _y = MousePos.y;
     if ((int)_x < DAT_007cb2e4->x ||
-        (int)DAT_00813a44.x > DAT_007cb2e4->width + DAT_007cb2e4->x ||
-        (int)DAT_00813a44.y < DAT_007cb2e4->y ||
-        (int)DAT_00813a44.y > DAT_007cb2e4->height + DAT_007cb2e4->y) {
+        (int)MousePos.x > DAT_007cb2e4->width + DAT_007cb2e4->x ||
+        (int)MousePos.y < DAT_007cb2e4->y ||
+        (int)MousePos.y > DAT_007cb2e4->height + DAT_007cb2e4->y) {
         if (GetBlink() != 0) {
             SetIconSprite(DAT_007cb2e4, NextPageSprite);
         } else {
             SetIconSprite(DAT_007cb2e4, NextPageLitSprite);
         }
     }
-    if ((int)DAT_00813a44.x < DAT_007cb2e0->x ||
-        (int)DAT_00813a44.x > DAT_007cb2e0->width + DAT_007cb2e0->x ||
-        (int)DAT_00813a44.y < DAT_007cb2e0->y ||
-        (int)DAT_00813a44.y > DAT_007cb2e0->height + DAT_007cb2e0->y) {
+    if ((int)MousePos.x < DAT_007cb2e0->x ||
+        (int)MousePos.x > DAT_007cb2e0->width + DAT_007cb2e0->x ||
+        (int)MousePos.y < DAT_007cb2e0->y ||
+        (int)MousePos.y > DAT_007cb2e0->height + DAT_007cb2e0->y) {
         SetIconSprite(DAT_007cb2e0, PreviousPageSprite);
     }
-    if ((int)DAT_00813a44.x < DAT_007cb1c0->x ||
-        (int)DAT_00813a44.x > DAT_007cb1c0->width + DAT_007cb1c0->x ||
-        (int)DAT_00813a44.y < DAT_007cb1c0->y ||
-        (int)DAT_00813a44.y > DAT_007cb1c0->height + DAT_007cb1c0->y) {
-        SetIconSprite(DAT_007cb1c0, RepHint1Sprite);
+    if ((int)MousePos.x < RepHint1Icon->x ||
+        (int)MousePos.x > RepHint1Icon->width + RepHint1Icon->x ||
+        (int)MousePos.y < RepHint1Icon->y ||
+        (int)MousePos.y > RepHint1Icon->height + RepHint1Icon->y) {
+        SetIconSprite(RepHint1Icon, RepHint1Sprite);
     }
 }
 

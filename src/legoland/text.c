@@ -117,13 +117,13 @@ void UnloadBubbleHelpGFX(void) {
 LEGO_EXPORT HGDIOBJ SelectFont(HDC hdc, int font_id) {
     switch (font_id) {
     case 1:
-        return SelectObject(hdc, PTR_0066808c);
+        return SelectObject(hdc, LegoFont20Bold);
     case 2:
-        return SelectObject(hdc, PTR_00668094);
+        return SelectObject(hdc, LegoFont18SemiBold);
     case 3:
-        return SelectObject(hdc, PTR_00668098);
+        return SelectObject(hdc, LegoFont28Normal);
     default:
-        return SelectObject(hdc, PTR_00668090);
+        return SelectObject(hdc, LegoFont24Bold);
     }
 }
 
@@ -455,12 +455,12 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     RenderBlock(right4, width, left_corner_w + -1, mid_h, color);
     PrintTextCell(cell, box.left, box.top);
     hit_left = left4;
-    if (box.left <= (int)DAT_00813a44.x && (int)DAT_00813a44.x <= right4 && top4 <= (int)DAT_00813a44.y &&
-        (int)DAT_00813a44.y <= bottom4) {
+    if (box.left <= (int)MousePos.x && (int)MousePos.x <= right4 && top4 <= (int)MousePos.y &&
+        (int)MousePos.y <= bottom4) {
         Hover.type = 5;
     }
-    if (hit_left <= (int)DAT_00813a44.x && (int)DAT_00813a44.x <= left_corner_w + right4 &&
-        width <= (int)DAT_00813a44.y && (int)DAT_00813a44.y <= mid_top) {
+    if (hit_left <= (int)MousePos.x && (int)MousePos.x <= left_corner_w + right4 &&
+        width <= (int)MousePos.y && (int)MousePos.y <= mid_top) {
         Hover.type = 5;
     }
 }
