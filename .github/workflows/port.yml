@@ -15,6 +15,7 @@ jobs:
 
     env:
       XWIN_VERSION: "0.6.5"
+      LLVM_VERSION: "20"
       XWIN_DIR: /home/runner/xwin
       DEBIAN_FRONTEND: noninteractive
 
@@ -24,10 +25,14 @@ jobs:
 
       - name: Install clang, lld, llvm, ninja
         run: |
+          # clang 19 or newer: older ones report a bare `return;` in a non-void function as an error
+          # (-Wreturn-type) instead of -Wreturn-mismatch, which CMakeLists.txt keeps as a warning
           sudo apt-get update
-          sudo apt-get install -y clang lld llvm cmake ninja-build
+          sudo apt-get install -y cmake ninja-build
+          curl -sSfL https://apt.llvm.org/llvm.sh -o /tmp/llvm.sh
+          sudo bash /tmp/llvm.sh "$LLVM_VERSION"
           # clang-cl, lld-link, llvm-lib, llvm-rc and llvm-mt under their unversioned names
-          echo "$(llvm-config --bindir)" >> "$GITHUB_PATH"
+          echo "/usr/lib/llvm-$LLVM_VERSION/bin" >> "$GITHUB_PATH"
 
       - name: Cache Windows SDK and CRT (xwin)
         id: xwin-cache
