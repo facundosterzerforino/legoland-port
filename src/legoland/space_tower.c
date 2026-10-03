@@ -618,17 +618,17 @@ void *FUN_0043b4e0(int param_1, unsigned short param_2) {
     int ride;
 
     ride = *(int *)(param_1 + 0xc);
-    DAT_0062fd48 = *(unsigned int *)(ride + 0x64);
-    DAT_0062fd4c = *(unsigned int *)(ride + 0x14);
-    DAT_0062fd50 = *(unsigned int *)(ride + 0x18);
-    DAT_0062fd54 = param_2;
+    DAT_0062fd48.sprite = *(void **)(ride + 0x64);
+    DAT_0062fd48.x = *(int *)(ride + 0x14);
+    DAT_0062fd48.y = *(int *)(ride + 0x18);
+    DAT_0062fd48.id = param_2;
     *(unsigned int *)(*(int *)(ride + 0x64) + 0x10) |= 0x2000;
     HideLayer(SpaceTowerLayers, 6);
     HideLayer(SpaceTowerLayers, 4);
     HideLayer(SpaceTowerLayers, 0);
     HideLayer(SpaceTowerLayers, 2);
     HideLayer(SpaceTowerLayers, 5);
-    return &DAT_0062fd48;
+    return (void *)&DAT_0062fd48;
 }
 
 // FUNCTION: LEGOLAND 0x0043b570

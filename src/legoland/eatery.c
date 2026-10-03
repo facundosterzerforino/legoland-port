@@ -1533,13 +1533,13 @@ void FUN_0042fbb0(int param_1) {
 void *FUN_004304a0(struct EateryObj *obj, unsigned short a2) {
     struct EateryFX *fx = obj->fx_c;
     struct EateryInner *inner = fx->inner_64;
-    DAT_00616120 = (unsigned int)inner;
-    DAT_00616124 = fx->field_14;
-    DAT_00616128 = fx->field_18;
-    DAT_0061612c = a2;
+    DAT_00616120.sprite = inner;
+    DAT_00616120.x = fx->field_14;
+    DAT_00616120.y = fx->field_18;
+    DAT_00616120.id = a2;
     inner = fx->inner_64;
     inner->flags_10 |= 0x2000;
-    return &DAT_00616120;
+    return (void *)&DAT_00616120;
 }
 
 // FUNCTION: LEGOLAND 0x004304e0

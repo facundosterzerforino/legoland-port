@@ -259,15 +259,15 @@ unsigned int *FUN_00417300(struct SlideContext *ctx, unsigned short param) {
     struct SlideTrack *track = ctx->var_c;
     struct SlideCar *car = track->var_64;
 
-    DAT_004cbf98 = (unsigned int)car;
-    DAT_004cbf9c = track->var_14;
-    DAT_004cbfa0 = track->var_18;
-    DAT_004cbfa4 = param;
+    DAT_004cbf98.sprite = car;
+    DAT_004cbf98.x = track->var_14;
+    DAT_004cbf98.y = track->var_18;
+    DAT_004cbf98.id = param;
 
     car = track->var_64;
     car->var_10 |= 0x2000;
 
-    return &DAT_004cbf98;
+    return (void *)&DAT_004cbf98;
 }
 
 // FUNCTION: LEGOLAND 0x00417340

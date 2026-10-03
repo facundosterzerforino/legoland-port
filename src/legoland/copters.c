@@ -501,10 +501,10 @@ void CoptersSetEditMode(void) {
 unsigned int *FUN_00404490(struct CopterEditObject *editobj, unsigned short uid) {
     struct CopterRide *ride = editobj->field_c;
 
-    DAT_004c1170 = (int)ride->layer;
-    DAT_004c1174 = ride->field_14;
-    DAT_004c1178 = ride->field_18;
-    DAT_004c117c = uid;
+    DAT_004c1170.sprite = ride->layer;
+    DAT_004c1170.x = ride->field_14;
+    DAT_004c1170.y = ride->field_18;
+    DAT_004c1170.id = uid;
     ride->layer->field_10 |= 0x2000;
 
     if (CoptersFindNode((struct CopterSource *)&uid) != 0) {
@@ -520,7 +520,7 @@ unsigned int *FUN_00404490(struct CopterEditObject *editobj, unsigned short uid)
         HideLayer(CopterModelLayers, 4);
     }
 
-    return (unsigned int *)&DAT_004c1170;
+    return (void *)&DAT_004c1170;
 }
 
 // FUNCTION: LEGOLAND 0x00404580

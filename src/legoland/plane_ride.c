@@ -319,13 +319,13 @@ void PlaneRideAddObject(Element *a, int *p) {
 unsigned int *FUN_0043e010(struct PlaneRideRoot *param1, unsigned short param2) {
     struct PlaneRideBlock *block = param1->field_c;
 
-    DAT_0062fe60 = (unsigned int)block->layer;
-    DAT_0062fe64 = block->field_14;
-    DAT_0062fe68 = block->field_18;
-    DAT_0062fe6c = param2;
+    DAT_0062fe60.sprite = block->layer;
+    DAT_0062fe60.x = block->field_14;
+    DAT_0062fe60.y = block->field_18;
+    DAT_0062fe60.id = param2;
     block->layer->field_10 |= 0x2000;
 
-    return &DAT_0062fe60;
+    return (void *)&DAT_0062fe60;
 }
 
 // FUNCTION: LEGOLAND 0x0043e050

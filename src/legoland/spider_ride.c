@@ -337,13 +337,13 @@ void SpiderAddObject(Element *editObj, int *coords) {
 // FUNCTION: LEGOLAND 0x00416120
 unsigned int *FUN_00416120(unsigned int *a1, unsigned short a2) {
     struct CarNode *car = *(struct CarNode **)((unsigned char *)a1 + 0xc);
-    DAT_004cbf40 = (unsigned int)car->next;
-    DAT_004cbf44 = car->field_14;
-    DAT_004cbf48 = car->field_18;
-    DAT_004cbf4c = a2;
+    DAT_004cbf40.sprite = car->next;
+    DAT_004cbf40.x = car->field_14;
+    DAT_004cbf40.y = car->field_18;
+    DAT_004cbf40.id = a2;
     car = car->next;
     car->field_10 = car->field_10 | 0x2000;
-    return &DAT_004cbf40;
+    return (void *)&DAT_004cbf40;
 }
 
 // FUNCTION: LEGOLAND 0x00416160

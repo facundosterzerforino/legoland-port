@@ -277,14 +277,14 @@ void SpinningBarrelsAddObject(Element *editObj, int *coords) {
 unsigned int *FUN_0043c570(struct BarrelRoot *ride, unsigned short param2) {
     struct BarrelCarNode *target = ride->car;
 
-    DAT_0062fdb0 = (unsigned int)target->next;
-    DAT_0062fdb4 = target->field_14;
-    DAT_0062fdb8 = target->field_18;
-    DAT_0062fdbc = param2;
+    DAT_0062fdb0.sprite = target->next;
+    DAT_0062fdb0.x = target->field_14;
+    DAT_0062fdb0.y = target->field_18;
+    DAT_0062fdb0.id = param2;
 
     target = target->next;
     target->field_10 |= 0x2000;
-    return &DAT_0062fdb0;
+    return (void *)&DAT_0062fdb0;
 }
 
 // FUNCTION: LEGOLAND 0x0043c5b0

@@ -442,15 +442,15 @@ unsigned int *FUN_00418110(unsigned int *arg1, unsigned short arg2) {
     node = FUN_00417d10(&arg2);
     if (node != NULL) {
         idx = node->block_index;
-        DAT_004cbffc = arg2;
-        DAT_004cbff0 = *(int *)(*(int *)((char *)WaterWorksImageListData + 8) + (unsigned char)idx * 4);
-        DAT_004cbff4 = *(int *)(*(int *)((char *)WaterWorksImageListData + 0xc) + (unsigned char)idx * 4) >> 1;
-        DAT_004cbff8 = *(int *)(*(int *)((char *)WaterWorksImageListData + 0x10) + (unsigned char)idx * 4) >> 1;
-        DAT_004cc000 = 0;
-        *(unsigned int *)(DAT_004cbff0 + 0x10) |= 0x2000;
+        DAT_004cbff0.id = arg2;
+        DAT_004cbff0.sprite = *(void **)(*(int *)((char *)WaterWorksImageListData + 8) + (unsigned char)idx * 4);
+        DAT_004cbff0.x = *(int *)(*(int *)((char *)WaterWorksImageListData + 0xc) + (unsigned char)idx * 4) >> 1;
+        DAT_004cbff0.y = *(int *)(*(int *)((char *)WaterWorksImageListData + 0x10) + (unsigned char)idx * 4) >> 1;
+        DAT_004cbff0.field_10 = 0;
+        *(unsigned int *)((char *)DAT_004cbff0.sprite + 0x10) |= 0x2000;
         SetOverrideFrame(node->frame);
     }
-    return &DAT_004cbff0;
+    return (void *)&DAT_004cbff0;
 }
 
 // FUNCTION: LEGOLAND 0x004181a0
@@ -635,11 +635,11 @@ unsigned int *FUN_00418540(unsigned int *arg1, unsigned short arg2) {
     struct WaterListNode *node;
 
     sub = (struct WaterSub *)arg1[3];
-    DAT_004cbffc = arg2;
-    DAT_004cbff0 = sub->field_64;
-    DAT_004cbff4 = sub->field_14;
-    DAT_004cbff8 = sub->field_18;
-    DAT_004cc000 = 0;
+    DAT_004cbff0.id = arg2;
+    DAT_004cbff0.sprite = sub->field_64;
+    DAT_004cbff0.x = sub->field_14;
+    DAT_004cbff0.y = sub->field_18;
+    DAT_004cbff0.field_10 = 0;
     node = (struct WaterListNode *)FUN_004182c0(&arg2);
     if (node != NULL) {
         if (node->field_8 == 2) {
@@ -648,7 +648,7 @@ unsigned int *FUN_00418540(unsigned int *arg1, unsigned short arg2) {
             SetOverrideFrame(node->field_9);
         }
     }
-    return &DAT_004cbff0;
+    return (void *)&DAT_004cbff0;
 }
 
 // FUNCTION: LEGOLAND 0x004185c0
