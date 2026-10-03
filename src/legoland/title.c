@@ -369,7 +369,7 @@ void FUN_00490610(const char *param_1) {
         DAT_00798778[0xff] = 0;
     } else {
         strcpy(DAT_00798778, param_1);
-        (&DAT_00798777)[strlen(param_1) + 1] = 0;
+        DAT_00798778[strlen(param_1)] = 0; /* original: (&DAT_00798777)[strlen + 1] */
     }
 }
 

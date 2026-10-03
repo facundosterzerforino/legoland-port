@@ -1339,6 +1339,17 @@ void FUN_00476070(int mask, unsigned int value) {
 
 // FUNCTION: LEGOLAND 0x004760a0
 void DrawFlashingButtons(void) {
+    /* [port] the original indexes (&LegolandThemeOnSprite)[i] / (&LegolandThemeOffSprite)[i], relying on the nine
+     * button sprites being laid out one after another; list them explicitly instead */
+    static struct Sprite **const on_sprites[9] = {
+        &LegolandThemeOnSprite, &WesternThemeOnSprite, &CastleThemeOnSprite, &AdventurersThemeOnSprite,
+        &IfPathIconPressedSprite, &IfQueryIconPressedSprite, &IfEraserIconPressedSprite, &IfMapIconPressedSprite,
+        &IfOptionsIconPressedSprite,
+    };
+    static struct Sprite **const off_sprites[9] = {
+        &LegolandThemeOffSprite, &WesternThemeOffSprite, &CastleThemeOffSprite, &AdventurersThemeOffSprite,
+        &IfPathIconSprite, &IfQueryiconSprite, &IfEraserIconSprite, &IfMapiconSprite, &IfOptionsIconSprite,
+    };
     int *coords;
     int played;
     int i;
@@ -1351,10 +1362,10 @@ void DrawFlashingButtons(void) {
         do {
             if (ButtonFlashStates[i] != 0) {
                 if (GetBlink() != 0) {
-                    PrintSprite((&LegolandThemeOnSprite)[i], coords[0], coords[1], 0, 0);
+                    PrintSprite(*on_sprites[i], coords[0], coords[1], 0, 0);
                     played = 1;
                 } else {
-                    PrintSprite((&LegolandThemeOffSprite)[i], coords[0], coords[1], 0, 0);
+                    PrintSprite(*off_sprites[i], coords[0], coords[1], 0, 0);
                 }
             }
             coords = coords + 2;

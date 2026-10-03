@@ -450,7 +450,8 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
     while (list != NULL) {
         car = list->person;
         if (car->field_30 != 0) {
-            car->field_2c = (&Zoomer0nBinV)[car->field_30];
+            /* [port] the original reads (&Zoomer0nBinV)[field_30]; field_30 is 1 here, the global after it */
+            car->field_2c = car->field_30 == 1 ? (void *)DAT_0062fe98 : (&Zoomer0nBinV)[car->field_30];
         } else {
             car->field_2c = NULL;
             list->person->field_30 = 0;

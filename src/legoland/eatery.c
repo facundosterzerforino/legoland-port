@@ -1455,7 +1455,8 @@ void FUN_0042fbb0(int param_1) {
             case 2:
                 if (f7 < 0x21) {
                     f7 = f7 + 1;
-                    f38 = f38 - (&DAT_004b685c)[f7];
+                    /* [port] the original reads (&DAT_004b685c)[f7]: DAT_004b6860[f7 - 1], and DAT_004b68e0[0] for f7 == 0x21 */
+                    f38 = f38 - (f7 <= 0x20 ? DAT_004b6860[f7 - 1] : DAT_004b68e0[0]);
                     f3c = f3c + DAT_004b68e0[f7];
                 } else {
                     f30 = 1;

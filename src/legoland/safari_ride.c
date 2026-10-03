@@ -682,7 +682,8 @@ LEGO_EXPORT int LoadSafariRide(struct SafariLoadArg *arg) {
     while (list != NULL) {
         car = list->field_10;
         if (car->field_30 != 0) {
-            car->sprite = DAT_004cbf04[car->field_30];
+            /* [port] the original reads DAT_004cbf04[field_30]; field_30 is 1 here, the global after it */
+            car->sprite = car->field_30 == 1 ? DAT_004cbf08 : DAT_004cbf04[car->field_30];
         } else {
             car->sprite = NULL;
             list->field_10->field_30 = 0;
@@ -690,7 +691,9 @@ LEGO_EXPORT int LoadSafariRide(struct SafariLoadArg *arg) {
         data = list->field_8;
         tc = data->bnv;
         if (tc != NULL) {
-            tc->field_0 = (&DAT_004cbef8)[tc->field_4];
+            /* [port] the original reads (&DAT_004cbef8)[field_4], the three path BNVs laid out one after another */
+            void **const bnvs[3] = {&DAT_004cbef8, &DAT_004cbefc, &DAT_004cbf00};
+            tc->field_0 = *bnvs[tc->field_4];
         }
         list = list->next;
     }

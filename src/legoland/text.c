@@ -707,6 +707,12 @@ void FlushTextCells(int evict_all) {
 
 // FUNCTION: LEGOLAND 0x00455fc0
 void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
+    /* [port] the original indexes (&DAT_008139e0)[mood], relying on the eleven bubble-help sprites being laid out
+     * one after another; list them explicitly instead (mood is 1..5 or 10) */
+    static struct Sprite **const mood_sprites[11] = {
+        &DAT_008139e0, &MiHungrySprite, &MiHappySprite, &MiSadSprite, &MiHomeSprite, &MiEatSprite, &GreatSprite,
+        &PoorSprite, &FavouriteSprite, &OpinionSprite, &MiBoredSprite,
+    };
     RECT box;
     RECT frame;
     HDC hdc;
@@ -784,7 +790,7 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
         RenderBlock(frame.left, frame.top, 1, frame.bottom - frame.top, 0);
         RenderBlock(frame.right, frame.top, 1, frame.bottom - frame.top, 0);
         if (mood != 0) {
-            PrintSprite((&DAT_008139e0)[mood], frame.right - half_mood, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);
+            PrintSprite(*mood_sprites[mood], frame.right - half_mood, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);
         }
         PushRenderingStatusAndUnlockVideoSurface();
         ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->GetDC((LPDIRECTDRAWSURFACE)renderEngine, &ddhdc);
