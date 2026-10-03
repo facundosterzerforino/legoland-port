@@ -134,7 +134,7 @@ void FUN_004159e0(const unsigned char *arg0) {
     params.field_0 = 0x2;
     params.x = arg0[0];
     params.y = arg0[1];
-    PlayInstanceOfSample(DAT_004b4d90, 1, 1, &params);
+    PlayInstanceOfSample(SpiderRide_SFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00415a20

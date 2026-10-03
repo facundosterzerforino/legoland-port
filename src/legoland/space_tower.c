@@ -254,7 +254,7 @@ void FUN_0043aa10(unsigned char *arg) {
     buffer[0] = 2;
     buffer[2] = arg[0];
     buffer[3] = arg[1];
-    PlayInstanceOfSample(DAT_004b7620, 1, 1, buffer);
+    PlayInstanceOfSample(SPACE_TOWER_SFX[0].sample, 1, 1, buffer);
 }
 
 // FUNCTION: LEGOLAND 0x0043aa50

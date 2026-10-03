@@ -96,7 +96,7 @@ void FUN_0042bc90(struct CarouselNode *node) {
     params.x = *(unsigned char *)((char *)node + 4);
     params.y = *(unsigned char *)((char *)node + 5);
     node->frame = 1;
-    PlayInstanceOfSample(*(void **)(CAROUSSEL_SFX + 8), 1, 1, &params);
+    PlayInstanceOfSample(CAROUSSEL_SFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x0042c210

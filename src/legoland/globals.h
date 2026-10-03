@@ -745,17 +745,13 @@ extern unsigned int DAT_004b4bf0[5];
 // 0x004b4c04
 extern int DAT_004b4c04;
 // 0x004b4cb8
-extern unsigned char SAFARI_SFX[8];
-// 0x004b4cc0
-extern void *DAT_004b4cc0;
+extern struct FXItem SAFARI_SFX[1];
 // 0x004b4cc4
 extern int DAT_004b4cc4[8];
 // 0x004b4ce4
 extern int DAT_004b4ce4[8];
 // 0x004b4d88
-extern unsigned char SpiderRide_SFX[8];
-// 0x004b4d90
-extern void *DAT_004b4d90;
+extern struct FXItem SpiderRide_SFX[1];
 // 0x004b4d94
 struct SpiderBnv {
     char name[8];
@@ -913,7 +909,7 @@ extern float FLOAT_004ab494;
 // 0x004b64d4
 extern char DAT_004b64d4[4];
 // 0x004b64d8
-extern unsigned char CAROUSSEL_SFX[12];
+extern struct FXItem CAROUSSEL_SFX[2];
 // 0x004b65c0
 extern int DAT_004b65c0[8];
 // 0x004b6638
@@ -973,9 +969,7 @@ extern unsigned char DAT_004b72e4[0x190];
 // 0x004b7478
 extern struct Footprint DAT_004b7478;
 // 0x004b7618
-extern const unsigned char SPACE_TOWER_SFX[15];
-// 0x004b7620
-extern void *DAT_004b7620;
+extern struct FXItem SPACE_TOWER_SFX[1];
 // 0x004b76b8
 extern unsigned char DAT_004b76b8[16];
 // 0x004b7750
@@ -1040,13 +1034,12 @@ extern unsigned char FountainSFX[0x40];
 // 0x004b8750
 extern unsigned char PowerStationSFX[0x18];
 // 0x004b8768
-extern unsigned char DINO_SFX[0x18];
-// 0x004b8770
-extern void *PTR_004b8770[5];
+extern struct FXItem DINO_SFX[5];
 // 0x004b87a8
 extern unsigned char MONEY_SFX[12];
 // 0x004b87b0
 extern void *PTR_004b87b0[4];
+extern struct FXItem MONEY_SFX[2];
 // 0x004b8bbc
 extern unsigned char PercentSFormat[1];
 // 0x004b90f8

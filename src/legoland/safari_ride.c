@@ -142,7 +142,7 @@ void FUN_00414ab0(struct SafariSample *a1) {
     a1->frame_ticks = 0;
     src.x = a1->tile_x;
     src.y = a1->tile_y;
-    PlayInstanceOfSample(DAT_004b4cc0, 1, 1, &src);
+    PlayInstanceOfSample(SAFARI_SFX[0].sample, 1, 1, &src);
 }
 
 // FUNCTION: LEGOLAND 0x00414b10

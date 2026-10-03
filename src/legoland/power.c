@@ -114,5 +114,5 @@ void DinoAddObject(unsigned int param_1, int *param_2) {
     params.x = param_2[0];
     params.y = param_2[1];
     r = (unsigned int)rand() % 5;
-    PlayInstanceOfSample(PTR_004b8770[r * 3], 1, 1, &params);
+    PlayInstanceOfSample(DINO_SFX[r].sample, 1, 1, &params);
 }

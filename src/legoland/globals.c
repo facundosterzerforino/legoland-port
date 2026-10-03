@@ -338,10 +338,7 @@ int DAT_004b4c04;
 unsigned short DAT_004b4c08[15][4];
 
 // GLOBAL: LEGOLAND 0x004b4cb8
-unsigned char SAFARI_SFX[8];
-
-// GLOBAL: LEGOLAND 0x004b4cc0
-void *DAT_004b4cc0;
+struct FXItem SAFARI_SFX[1];
 
 // GLOBAL: LEGOLAND 0x004b4cc4
 int DAT_004b4cc4[8] = {0x42, 0x42, 0x2f, 0x2f, 0x50, 0x50, 0x30, 0x30};
@@ -350,10 +347,7 @@ int DAT_004b4cc4[8] = {0x42, 0x42, 0x2f, 0x2f, 0x50, 0x50, 0x30, 0x30};
 int DAT_004b4ce4[8] = {0x3f, 0x3f, 0x3f, 0x3f, 0x30, 0x30, 0x20, 0x20};
 
 // GLOBAL: LEGOLAND 0x004b4d88
-unsigned char SpiderRide_SFX[8];
-
-// GLOBAL: LEGOLAND 0x004b4d90
-void *DAT_004b4d90;
+struct FXItem SpiderRide_SFX[1];
 
 // GLOBAL: LEGOLAND 0x004b4d94
 struct SpiderBnv SpiderBnvInfo = {"manbox??", {0, 0x20, 0x1c, 0x14, 0x18, 0x0c, 0x10, 0x14, 0x0c, 0x14, 0x18, 0x1c, 0x21, 0x24, 0x21, 0x24}, {0x20, 0x14, 0x18, 0x20, 0x18, 0x20, 0x20, 0x18, 0x20, 0x14, 0x18, 0x10, 0x0c, 0x08, 0x0c, 0x12, 0x14}};
@@ -606,7 +600,7 @@ float FLOAT_004ab494;
 char DAT_004b64d4[4];
 
 // GLOBAL: LEGOLAND 0x004b64d8
-unsigned char CAROUSSEL_SFX[12];
+struct FXItem CAROUSSEL_SFX[2];
 
 // GLOBAL: LEGOLAND 0x004b65c0
 int DAT_004b65c0[8] = {0, 4, 0, 3, 0, 2, 0, 1};
@@ -696,10 +690,7 @@ unsigned char DAT_004b72e4[0x190];
 struct Footprint DAT_004b7478;
 
 // GLOBAL: LEGOLAND 0x004b7618
-const unsigned char SPACE_TOWER_SFX[15] = {0};
-
-// GLOBAL: LEGOLAND 0x004b7620
-void *DAT_004b7620;
+struct FXItem SPACE_TOWER_SFX[1];
 
 // GLOBAL: LEGOLAND 0x004b76b8
 unsigned char DAT_004b76b8[16];
@@ -807,16 +798,14 @@ unsigned char FountainSFX[0x40];
 unsigned char PowerStationSFX[0x18];
 
 // GLOBAL: LEGOLAND 0x004b8768
-unsigned char DINO_SFX[0x18];
-
-// GLOBAL: LEGOLAND 0x004b8770
-void *PTR_004b8770[5];
+struct FXItem DINO_SFX[5];
 
 // GLOBAL: LEGOLAND 0x004b87a8
 unsigned char MONEY_SFX[12];
 
 // GLOBAL: LEGOLAND 0x004b87b0
 void *PTR_004b87b0[4]; /* 4 dwords up to the strings at 0x4b87c0 */
+struct FXItem MONEY_SFX[2];
 
 // GLOBAL: LEGOLAND 0x004b8bbc
 unsigned char PercentSFormat[1];

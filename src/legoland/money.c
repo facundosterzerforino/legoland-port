@@ -38,7 +38,7 @@ LEGO_EXPORT void PlayMoneySFX(TileId *tile, int sfx, int a2) {
     config.field_0 = 2;
     config.x = tile->pos.x;
     config.y = tile->pos.y;
-    def = PTR_004b87b0[sfx * 3];
+    def = MONEY_SFX[sfx].sample;
     PlayInstanceOfSample(def, a2, 1, &config);
 }
 
