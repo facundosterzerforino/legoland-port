@@ -85,6 +85,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
     unsigned char *pixels;
     unsigned short *out;
     unsigned char *lut;
+    unsigned char *src;
     int i;
     int j;
 
@@ -207,7 +208,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
                 entry += 4;
             }
         }
-        free(pixels);
+        /* image->data is this buffer: the original doesn't free it here */
         RES_CloseFile(file);
         return 1;
     }
@@ -222,12 +223,13 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
         return 0;
     }
     out = (unsigned short *)image->data + (image->height - 1) * image->width;
+    src = pixels;
     if (DisplayPixelFormat == 2) {
         for (i = 0; i < image->height; i++) {
-            unsigned char *src = pixels;
             unsigned short *dst = out;
             out -= image->width;
-            pixels = (unsigned char *)(((unsigned int)(pixels + 3)) & 0xfffffffc);
+            /* rows are 4-byte aligned: carry on from the end of the previous row */
+            src = pixels + ((src - pixels + 3) & ~3);
             for (j = 0; j < image->width; j++) {
                 *dst++ = (unsigned short)(((((src[2] & 0xf8) << 5) | (src[1] & 0xfc)) << 3) | (src[0] >> 3));
                 src += 3;
@@ -235,10 +237,10 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
         }
     } else {
         for (i = 0; i < image->height; i++) {
-            unsigned char *src = pixels;
             unsigned short *dst = out;
             out -= image->width;
-            pixels = (unsigned char *)(((unsigned int)(pixels + 3)) & 0xfffffffc);
+            /* rows are 4-byte aligned: carry on from the end of the previous row */
+            src = pixels + ((src - pixels + 3) & ~3);
             for (j = 0; j < image->width; j++) {
                 *dst++ = (unsigned short)(((((src[2] & 0xf8) << 5) | (src[1] & 0xf8)) << 2) | (src[0] >> 3));
                 src += 3;
