@@ -614,7 +614,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
             for (i = 0; i < count; i++, cmd++) {
                 if (strcmp(tokens[0], cmd->name) == 0) {
                     found = 1;
-                    r = commands[i].fn(&tokens[1], ntok - 1, flags);
+                    r = commands[i].fn(tokens, ntok - 1, flags);
                     if (r == 0)
                         errors++;
                     break;
@@ -623,7 +623,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
             cmd = commands;
             if (!found) {
                 if (deflt)
-                    r = deflt(&tokens[1], ntok - 1, flags);
+                    r = deflt(tokens, ntok - 1, flags);
             }
         }
         if (r < 0)
