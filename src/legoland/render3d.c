@@ -974,7 +974,11 @@ LEGO_EXPORT int TMNegParity(float *param_1) {
     a.x = param_1[6];
     a.y = param_1[7];
     a.z = param_1[8];
-    if (DotProduct(&cross, &a) < DAT_004ab4c8) {
+    /* [port] the original compares on the x87 (fcomp; test ah, 1), where an unordered result (NaN) also counts
+     * as "less", so NaN returns 1. FUN_00440a30 passes the 16.16 fixed-point orientation read as floats, and
+     * its m[4] (-0x10000 = 0xffff0000) is a NaN, so there the original always gets 1. An SSE compare would say
+     * 0 and mirror every 3D person's triangles, so the back faces were drawn instead of the front ones. */
+    if (!(DotProduct(&cross, &a) >= DAT_004ab4c8)) {
         return 1;
     }
     return 0;

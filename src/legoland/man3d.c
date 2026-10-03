@@ -1136,8 +1136,8 @@ void FUN_00440a30(struct Person *person) {
         }
     }
 
-    /* The orientation is 16.16 ints here but TMNegParity reads floats (as in the original), so in practice
-     * this returns 0. */
+    /* The orientation is 16.16 ints here but TMNegParity reads floats (as in the original). m[4] (-0x10000)
+     * read as a float is a NaN, so the parity test is unordered and TMNegParity returns 1, as on the x87. */
     parity = TMNegParity(person->fm);
 
     /* smooth-shaded triangles: three normals each (9 ints) */
