@@ -1,0 +1,99 @@
+name: port
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: port-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build port (clang-cl x86)
+    runs-on: ubuntu-24.04
+
+    env:
+      XWIN_VERSION: "0.6.5"
+      XWIN_DIR: /home/runner/xwin
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clang, lld, llvm, ninja
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm cmake ninja-build
+          # clang-cl, lld-link, llvm-lib, llvm-rc and llvm-mt under their unversioned names
+          echo "$(llvm-config --bindir)" >> "$GITHUB_PATH"
+
+      - name: Cache Windows SDK and CRT (xwin)
+        id: xwin-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.XWIN_DIR }}
+          key: xwin-${{ env.XWIN_VERSION }}-x86
+
+      - name: Download Windows SDK and CRT (xwin)
+        if: steps.xwin-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -sSfL "https://github.com/Jake-Shadle/xwin/releases/download/${XWIN_VERSION}/xwin-${XWIN_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+            | tar xz -C /tmp
+          /tmp/xwin-${XWIN_VERSION}-x86_64-unknown-linux-musl/xwin --accept-license --arch x86 splat --output "$XWIN_DIR"
+
+      - name: Configure
+        run: cmake --preset clang-cl-x86
+
+      - name: Build
+        run: cmake --build build-clang-x86
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: legoland-port-x86
+          path: |
+            build-clang-x86/legoland.exe
+            build-clang-x86/legoland.pdb
+
+  selftest:
+    name: Self-test (-port-selftest)
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Download executable
+        uses: actions/download-artifact@v4
+        with:
+          name: legoland-port-x86
+
+      - name: Run self-test
+        shell: pwsh
+        run: |
+          # legoland.exe is a GUI-subsystem program: wait for it explicitly to get its exit code
+          $p = Start-Process -FilePath .\legoland.exe -ArgumentList '-port-selftest' -Wait -PassThru -NoNewWindow
+          $code = $p.ExitCode
+          if (-not (Test-Path port-selftest.txt)) {
+            Write-Output "::error::legoland.exe -port-selftest exited with $code and wrote no port-selftest.txt"
+            exit 1
+          }
+          $report = Get-Content port-selftest.txt
+          $report | Write-Output
+          foreach ($line in $report) {
+            if ($line -match '^(global|pointer) at original') { Write-Output "::error::$line" }
+            elseif ($line -match '^undersized: ') { Write-Output "::warning::$line" }
+          }
+          if ($code -ne 0 -or -not ($report[-1] -match '^OK: 0 problem')) {
+            Write-Output "::error::self-test failed (exit code $code): $($report[-1])"
+            exit 1
+          }
+
+      - name: Upload self-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: port-selftest
+          path: port-selftest.txt
+          if-no-files-found: ignore
