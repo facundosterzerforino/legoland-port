@@ -1026,7 +1026,7 @@ extern char DAT_004b8344;
 // 0x004b8348
 extern char *PTR_DAT_004b8348[8];
 // 0x004b8368
-extern void (*PTR_Bloke_DoNothing_004b8368[16])(struct Bloke *);
+extern void (*PTR_Bloke_DoNothing_004b8368[26])(struct Bloke *);
 // 0x004b85c4
 extern HANDLE DAT_004b85c4;
 // 0x004b8710
