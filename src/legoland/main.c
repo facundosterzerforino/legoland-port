@@ -12,6 +12,7 @@
 #ifdef LEGOLAND_PORT
 #include "port_data.h"
 #include "port_trace.h"
+#include "port_watchdog.h"
 #endif
 
 // FUNCTION: LEGOLAND 0x00453cd0
@@ -35,6 +36,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #ifdef LEGOLAND_PORT
     PortLoadData(); /* [port] the original started with its .data already initialized */
     PortTrace("WinMain: cmdline \"%s\"", lpCmdLine);
+    {
+        /* [port] keep 64 KB of stack for the crash handler: after a stack overflow, stackdump (5 KB of locals)
+         * faulted on entry and the process died without a report */
+        ULONG guarantee = 0x10000;
+        SetThreadStackGuarantee(&guarantee);
+    }
+    PortWatchdogStart(); /* [port] freeze and crash reports (port/port_watchdog.c) */
     if (strstr(lpCmdLine, "-port-selftest") != NULL) {
         /* [port] check the startup data and exit, without starting the game */
         return PortDataSelfTest("port-selftest.txt");

@@ -9,6 +9,9 @@
 #include "resource.h"
 #include "string.h"
 #include "wndenv.h"
+#ifdef LEGOLAND_PORT
+#include "port_watchdog.h"
+#endif
 
 struct MidiTrack {
     unsigned char pad_0[4];
@@ -83,6 +86,9 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
 
     WNDENV_Gethwnd();
     peeked = 0;
+#ifdef LEGOLAND_PORT
+    PortHeartbeat(); /* [port] the freeze watchdog */
+#endif
     do {
         while (PeekMessageA(&msg, WNDENV_Gethwnd(), 0, 0, 0) != 0) {
             if (GetMessageA(&msg, WNDENV_Gethwnd(), 0, 0) == 0) {
@@ -103,9 +109,15 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
                 DebugTrace("ProcessSystemEvents: inactive (field_1c=%x), waiting", lpConfig->field_1c);
             }
             peeked = 1;
+#ifdef LEGOLAND_PORT
+            PortSetPaused(1); /* [port] waiting for the window on purpose: not a freeze */
+#endif
             WaitMessage();
         }
     } while ((lpConfig->field_1c & 1) != 0);
+#ifdef LEGOLAND_PORT
+    PortSetPaused(0);
+#endif
     if (peeked) {
         ResendPalette();
     }

@@ -31,7 +31,7 @@ if(LEGOLAND_MODERN_BUILD)
     # use the repo's import library for it.
     target_link_libraries(legoland PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/libs/dinput.lib"
-        ddraw dsound dxguid winmm msacm32 vfw32 version winspool ole32 uuid advapi32 gdi32 user32 kernel32)
+        ddraw dsound dxguid winmm msacm32 vfw32 version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
 else()
     # The MSVC6 matching build (preset msvc6): links, carries symbols for reccmp, doesn't run.
     # (The match target; runnability is a non-goal there, see cmake/msvc6-toolchain.cmake.)

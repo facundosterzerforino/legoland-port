@@ -17,6 +17,9 @@
 #include "text.h"
 #include "timer.h"
 #include "wndenv.h"
+#ifdef LEGOLAND_PORT
+#include "port_watchdog.h"
+#endif
 
 #include "image_sprite.h"
 
@@ -1843,6 +1846,9 @@ void DrawWatchSprite(void) {
     LPDIRECTDRAWSURFACE surface;
     struct Image *image;
 
+#ifdef LEGOLAND_PORT
+    PortHeartbeat(); /* [port] loading screens call this between steps: not a freeze */
+#endif
     if (WatchActive != 0) {
         if ((int)(GetTicks() - LastWatchDrawTicks) > 0xc8) {
             cursor.rect.left = WatchRect.left;

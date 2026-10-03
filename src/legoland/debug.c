@@ -20,6 +20,7 @@
 #include "string.h"
 #ifdef LEGOLAND_PORT
 #include "port_trace.h"
+#include "port_watchdog.h"
 #endif
 
 // FUNCTION: LEGOLAND 0x0047f870
@@ -28,6 +29,7 @@ void DebugTrace(const char *fmt, ...) {
     /* [port] the original compiled its traces out; the port writes them to legoland-port-trace.txt */
     va_list ap;
 
+    PortSetPhase(fmt);
     va_start(ap, fmt);
     PortTraceV(fmt, ap);
     va_end(ap);
