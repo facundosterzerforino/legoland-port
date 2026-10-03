@@ -956,7 +956,7 @@ LEGO_EXPORT unsigned int ObjectLinkedList(unsigned int *entry) {
         exit(1);
     }
     count = LLIDB_GetCount();
-    for (menu_name = DAT_004baffc[0]; (int)menu_name < (int)DAT_004bb04c; menu_name += 0x14) {
+    for (menu_name = DAT_004baffc[0]; menu_name < DAT_004baffc[0] + sizeof(DAT_004baffc); menu_name += 0x14) {
         if (LLIDB_FindElement(menu_name, (unsigned int *)&menu_elem, 0) != 0) {
             exit(1);
         }
@@ -1359,7 +1359,7 @@ void DrawFlashingButtons(void) {
             }
             coords = coords + 2;
             i = i + 1;
-        } while ((int)coords < (int)&DAT_004bb094);
+        } while (coords < DAT_004bb04c + 18);
         if (played != 0 && DAT_00668ec0 == 0) {
             PlayInstanceOfSample(GameFX[FX_WARNING].sample, 0, 1, 0);
         }

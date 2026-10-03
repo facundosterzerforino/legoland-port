@@ -669,21 +669,21 @@ LEGO_EXPORT void UnInitMan(void) {
             FreeMesh(*p);
         }
         p++;
-    } while ((int)p < (int)WomanMeshes);
+    } while (p < ManMeshes + 6);
     p = WomanMeshes;
     do {
         if (*p != 0) {
             FreeMesh(*p);
         }
         p++;
-    } while ((int)p < (int)DAT_0062feec);
+    } while (p < WomanMeshes + 6);
     p = GeoffMeshes;
     do {
         if (*p != 0) {
             FreeMesh(*p);
         }
         p++;
-    } while ((int)p < (int)DAT_0062feb8);
+    } while (p < GeoffMeshes + 2);
     if (TracyWalkMesh != 0) {
         FreeMesh(TracyWalkMesh);
     }

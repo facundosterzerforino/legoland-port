@@ -530,7 +530,7 @@ void FUN_00488670(struct Image *image, unsigned int index) {
 
 // FUNCTION: LEGOLAND 0x004886a0
 void FUN_004886a0(void) {
-    struct TextureNode **slot = (struct TextureNode **)&DAT_00798190;
+    struct TextureNode **slot = (struct TextureNode **)DAT_00798190;
     do {
         if (*slot != 0) {
             free((*slot)->data_8);
@@ -539,7 +539,7 @@ void FUN_004886a0(void) {
             *slot = 0;
         }
         slot++;
-    } while ((int)slot < (int)&DAT_00798590);
+    } while (slot < (struct TextureNode **)(DAT_00798190 + 256));
 }
 
 // FUNCTION: LEGOLAND 0x004886e0

@@ -289,7 +289,7 @@ void FUN_0048bde0(void) {
         i++;
         mapping++;
         entry++;
-    } while ((int)mapping < (int)&DAT_007cb394);
+    } while (mapping < DAT_007cb380 + 5);
 }
 
 // FUNCTION: LEGOLAND 0x0048bf90

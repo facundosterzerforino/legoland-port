@@ -2677,7 +2677,7 @@ void FUN_0040c430(void) {
     LLIDB_UnLoadData(LogFlumeImageListId);
 
     ptr = LogFlumeTrackSprites;
-    while ((int)ptr < (int)&DAT_004c2ae4) {
+    while (ptr < LogFlumeTrackSprites + 10) {
         if (*ptr != NULL) {
             KillSprite(*ptr);
         }

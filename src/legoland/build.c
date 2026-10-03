@@ -40,7 +40,7 @@ void RemoveObjectFromBuildList(TileId coords) {
     BuildObj *b;
 
     i = 0;
-    for (b = BuildObjArray; (int)&b->coords < (int)&ButtonRepeatDelay; b++, i++) {
+    for (b = BuildObjArray; b < BuildObjArray + 256; b++, i++) {
         if (b->coords.id == coords.id) {
             BuildObjCount--;
             BuildObjArray[i].ride = NULL;
@@ -95,7 +95,7 @@ LEGO_EXPORT int GetBuildAnimFrame(Ride *ride, TileId coords) {
     LLS *lls;
 
     i = 0;
-    for (b = BuildObjArray; (int)&b->coords < (int)&ButtonRepeatDelay; b++, i++) {
+    for (b = BuildObjArray; b < BuildObjArray + 256; b++, i++) {
         if (b->coords.id == coords.id) {
             break;
         }
@@ -154,7 +154,7 @@ LEGO_EXPORT void DoBuildEffects(Ride *ride, TileId coords) {
         w = cx - x + 33;
         h = cy - y + 6;
         i = 0;
-        for (o = BuildObjArray; (int)&o->coords < (int)&ButtonRepeatDelay; o++, i++) {
+        for (o = BuildObjArray; o < BuildObjArray + 256; o++, i++) {
             if (o->coords.id == coords.id) {
                 if (i < 256) {
                     RenderBlock(x, y, w, h, 0);

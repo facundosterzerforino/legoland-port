@@ -1003,26 +1003,23 @@ void FUN_00444970(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x004449b0
 void LoadAppraisalSprites(void) {
     int i;
-    struct Sprite **slot;
     char buffer[0x20];
 
     buffer[0] = 0;
     memset(buffer + 1, 0, 0x1f);
-    i = 0;
-    slot = DAT_0081c054;
-    do {
+    // [port:rewrite] the original walked DAT_0081c054 with slot[-5] / slot[5] reaching into the neighbouring
+    // arrays and stopped at &DAT_0081c068; index the three arrays instead so it doesn't rely on their layout.
+    for (i = 0; i < 5; i++) {
         // STRING: LEGOLAND 0x004b8114
         sprintf(buffer, "App_tick%d.lls", i);
-        slot[-5] = LoadSprite(buffer, 4);
+        DAT_0081c040[i] = LoadSprite(buffer, 4);
         // STRING: LEGOLAND 0x004b8104
         sprintf(buffer, "App_cross%d.lls", i);
-        slot[0] = LoadSprite(buffer, 4);
+        DAT_0081c054[i] = LoadSprite(buffer, 4);
         // STRING: LEGOLAND 0x004b80f0
         sprintf(buffer, "App_bullet%d.lls", i);
-        slot[5] = LoadSprite(buffer, 4);
-        slot++;
-        i++;
-    } while ((int)slot < (int)DAT_0081c068);
+        DAT_0081c068[i] = LoadSprite(buffer, 4);
+    }
     // STRING: LEGOLAND 0x004b80dc
     AppBarMarkerSprite = LoadSprite("App_barmarker.lls", 4);
     // STRING: LEGOLAND 0x004b80d0
@@ -1306,29 +1303,23 @@ unsigned char FUN_00444f90(unsigned int param_1, unsigned char param_2) {
 
 // FUNCTION: LEGOLAND 0x00445000
 void FUN_00445000(void) {
-    unsigned int current;
-    unsigned int val1;
-    unsigned int val2;
-    unsigned int val3;
+    int i;
 
-    current = (unsigned int)&DAT_0081c054;
-    while ((int)current < (int)&DAT_0081c068) {
-        val1 = *(unsigned int *)(current - 0x14);
-        if (val1 != 0) {
-            KillSprite((struct Sprite *)val1);
-            *(unsigned int *)(current - 0x14) = 0;
+    // [port:rewrite] the original walked DAT_0081c054 by address, reaching DAT_0081c040 at -0x14 and
+    // DAT_0081c068 at +0x14; index the three arrays instead so it doesn't rely on their layout.
+    for (i = 0; i < 5; i++) {
+        if (DAT_0081c040[i] != 0) {
+            KillSprite(DAT_0081c040[i]);
+            DAT_0081c040[i] = 0;
         }
-        val2 = *(unsigned int *)current;
-        if (val2 != 0) {
-            KillSprite((struct Sprite *)val2);
-            *(unsigned int *)current = 0;
+        if (DAT_0081c054[i] != 0) {
+            KillSprite(DAT_0081c054[i]);
+            DAT_0081c054[i] = 0;
         }
-        val3 = *(unsigned int *)(current + 0x14);
-        if (val3 != 0) {
-            KillSprite((struct Sprite *)val3);
-            *(unsigned int *)(current + 0x14) = 0;
+        if (DAT_0081c068[i] != 0) {
+            KillSprite(DAT_0081c068[i]);
+            DAT_0081c068[i] = 0;
         }
-        current += 4;
     }
     if (AppBarMarkerSprite != 0) {
         KillSprite(AppBarMarkerSprite);

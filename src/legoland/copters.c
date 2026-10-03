@@ -208,7 +208,7 @@ int CoptersQueueTableToIndex(struct CopterItem *item) {
         }
         ptr++;
         index++;
-        if ((int)ptr < (int)&CopterModelSprites) {
+        if (ptr < CopterQueueTables + 5) {
             continue;
         }
         index = -1;
@@ -349,7 +349,7 @@ void CoptersUnload(void) {
     }
 
     current = CopterModelSprites;
-    while ((int)current < (int)&DAT_004c1164) {
+    while (current < CopterModelSprites + 10) {
         if (*current != NULL) {
             KillSprite(*current);
         }

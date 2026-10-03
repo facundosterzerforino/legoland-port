@@ -151,7 +151,7 @@ LEGO_EXPORT void DrawMapScreen(void) {
 
     PrintSprite(FullMapSprite, MapViewX, MapViewY, 0, 0);
     if (FrameCounter & 0x10) {
-        for (row = DAT_008119c0; (int)row < (int)DAT_008138c0; row++) {
+        for (row = DAT_008119c0; row < DAT_008119c0 + 31; row++) {
             m = *row;
             for (j = 0; j < 31; j++, m++) {
                 if (m->x != 0 || m->y != 0) {

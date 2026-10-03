@@ -1809,7 +1809,7 @@ struct DispatchTarget {
 unsigned int FUN_0041ebd0(unsigned int arg) {
     unsigned int index = 0;
     struct DispatchRow *row = (struct DispatchRow *)CastleDispatchTable;
-    while ((int)row < (int)&DAT_0082adb0) {
+    while (row < (struct DispatchRow *)(CastleDispatchTable + sizeof(CastleDispatchTable))) {
         struct DispatchTarget *target = (struct DispatchTarget *)row->field_0;
         if (target != NULL && arg == target->field_c) {
             return index;
@@ -1830,7 +1830,7 @@ unsigned int FUN_0041ec00(unsigned int param) {
 unsigned int FUN_0041ec20(unsigned int param) {
     unsigned int index = 0;
     struct DispatchRow *row = (struct DispatchRow *)CastleDispatchTable;
-    while ((int)row < (int)&DAT_0082adb0) {
+    while (row < (struct DispatchRow *)(CastleDispatchTable + sizeof(CastleDispatchTable))) {
         if (param == row->field_0) {
             return index;
         }
@@ -3384,7 +3384,7 @@ void FUN_00421470(void) {
 
     table = DAT_0082ac60;
     cur = DAT_004dcc00;
-    while ((int)cur < (int)&DAT_004dd5d8) {
+    while (cur < DAT_004dcc00 + sizeof(DAT_004dcc00)) {
         *table = cur;
         cur += 0x54;
         table += 1;
