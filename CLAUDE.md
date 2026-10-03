@@ -48,6 +48,17 @@ describe how `main` works.
      renamed; anything left is a real port change to resolve by hand.
   4. Fix what port-only code still calls by an old struct-field name (the build says where), regenerate
      `python3 tools/gen_data.py`, build both presets, run `legoland.exe -port-selftest`.
+  5. Run the data audits; each exits 1 and lists what's new. The decomp is checked only on its code, so a
+     guessed variable size or a wrong table entry never fails to match, but in the port it overwrites
+     neighbouring globals (most crashes found while making the game playable were this):
+     - `python3 tools/audit_globals.py`: globals declared smaller than their space in the original exe and
+       used as tables/buffers. Fix the declaration (in the decomp), or add a reviewed harmless case to
+       `tools/audit_globals_ok.txt`.
+     - `python3 tools/audit_tables.py`: every pointer table written out in C, entry by entry against the exe.
+     - `python3 tools/audit_values.py`: C initializers the startup loader doesn't replace (`static`,
+       `const`, opaque types), byte by byte against the exe.
+     - In the decomp: `./tools/verify --silent --json r.json && python3 ~/wt/port/tools/audit_effective.py
+       r.json` lists "100% effective" matches whose jumps moved (swapped if/else arms change behaviour).
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
   `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
 - **Publishing:** the local `port` branch is pushed to `main` of the `legoland-port` repo with `~/push-port.sh`
