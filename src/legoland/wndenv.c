@@ -57,6 +57,13 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
         }
         *(unsigned short *)&lpConfig->field_1c &= (unsigned short)~1;
         break;
+    case WM_SYSCOMMAND:
+        /* [library:window] in windowed mode (WINDEBUG) the window has a system menu: a lone Alt press made
+         * DefWindowProc enter its menu loop and the game stopped until the next click. The game has no menus. */
+        if ((wParam & 0xfff0) == SC_KEYMENU) {
+            return 0;
+        }
+        break;
     case WM_ACTIVATEAPP:
         /* [library:input] also pause when another program is activated (the game can't read its input then; see
          * ScanKeyboard); WM_SETFOCUS above resumes. Only pause once, or the timer would never resume. */
