@@ -74,6 +74,9 @@ struct ObjectClass {
 };
 
 #include "image_sprite.h"
+#ifdef LEGOLAND_PORT
+#include "port_movie.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x004434d0
 unsigned int LoadBmpIntoImage(struct Image *param_1) {
@@ -380,6 +383,9 @@ struct AnimHandle *OpenAviAnim(const char *filename) {
 
 // FUNCTION: LEGOLAND 0x00443d50
 void CloseAviAnim(struct AnimHandle *handle) {
+#ifdef LEGOLAND_PORT
+    PortMovieRelease(handle->stream); /* [library:movie] */
+#endif
     if (handle->getframe != NULL) {
         AVIStreamGetFrameClose(handle->getframe);
     }
@@ -460,9 +466,14 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
             // STRING: LEGOLAND 0x004b7db4
             DAT_00667c40 = "AVI GetFrame";
             /* [library:movie] the advisor animations are Indeo 5 AVIs: without that codec (not on Windows 11) there
-             * is no frame decompressor and no frame, which the original dereferenced. Skip drawing it until the
-             * port decodes Indeo itself. */
+             * is no frame decompressor and no frame, which the original dereferenced. The port decodes them itself
+             * (port_movie.c). */
             frame = anim->getframe != NULL ? (struct AviFrame *)AVIStreamGetFrame(anim->getframe, DAT_00665eec) : NULL;
+#ifdef LEGOLAND_PORT
+            if (frame == NULL) {
+                frame = (struct AviFrame *)PortMovieGetFrame(anim->stream, DAT_00665eec); /* [library:movie] */
+            }
+#endif
             // STRING: LEGOLAND 0x004b7da8
             DAT_00667c40 = "BltAdvisor";
             if (frame != NULL) {
