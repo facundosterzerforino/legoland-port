@@ -11,6 +11,7 @@ static int trace_tried;
 
 static FILE *OpenTraceFile(void) {
     char path[MAX_PATH];
+    char prev[MAX_PATH];
     char *slash;
 
     if (trace_tried) {
@@ -24,7 +25,11 @@ static FILE *OpenTraceFile(void) {
     if (slash == NULL) {
         return NULL;
     }
+    lstrcpyA(slash + 1, "legoland-port-trace-prev.txt");
+    lstrcpyA(prev, path);
     strcpy(slash + 1, "legoland-port-trace.txt");
+    /* keep the previous run's trace (a crash report is often in it) */
+    MoveFileExA(path, prev, MOVEFILE_REPLACE_EXISTING);
     trace_file = fopen(path, "w");
     return trace_file;
 }
