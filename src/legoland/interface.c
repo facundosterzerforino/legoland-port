@@ -110,6 +110,9 @@ struct PathControlElem {
 #include "imports.h"
 #include "mapscreen.h"
 #include "stream.h"
+#ifdef LEGOLAND_PORT
+#include "port_movie.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x004741f0
 LEGO_EXPORT void Load_Interface_ControlIcons(void) {
@@ -1601,6 +1604,9 @@ struct MovieHandle *OpenAviMovie(const char *filename) {
 
 // FUNCTION: LEGOLAND 0x00476630
 void CloseAviMovie(struct MovieHandle *h) {
+#ifdef LEGOLAND_PORT
+    PortMovieRelease(h->video_stream); /* [library:movie] */
+#endif
     if (h->frame != NULL) {
         AVIStreamGetFrameClose(h->frame);
     }
@@ -1641,6 +1647,18 @@ int GetPerformanceTime(void) {
     default:
         return GetTickCount();
     }
+}
+
+/* [library:movie] the movies are Indeo AVIs: without a Video for Windows decompressor for them (none on
+ * Windows 11) handle->frame is NULL, and the port decodes the frame itself (port_movie.c). */
+static void *MovieGetFrame(struct MovieHandle *handle, int position) {
+    void *frame = handle->frame != NULL ? AVIStreamGetFrame(handle->frame, position) : NULL;
+#ifdef LEGOLAND_PORT
+    if (frame == NULL) {
+        frame = PortMovieGetFrame(handle->video_stream, position);
+    }
+#endif
+    return frame;
 }
 
 // FUNCTION: LEGOLAND 0x004766f0
@@ -1691,7 +1709,7 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
             }
         }
         if (frame_index == -1) {
-            frame = AVIStreamGetFrame(handle->frame, target);
+            frame = MovieGetFrame(handle, target);
         }
         if (frame == NULL) {
             handle->frame = NULL;
@@ -1710,7 +1728,7 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
         if ((unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000 == target) {
             frame_index = target + 1;
             if (frame_index < (int)handle->frame_count) {
-                frame = AVIStreamGetFrame(handle->frame, frame_index);
+                frame = MovieGetFrame(handle, frame_index);
             }
         } else {
             frame_index = -1;
@@ -1728,7 +1746,9 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
         ProcessSystemEvents();
         ReadGameButtons();
     } while ((DAT_00813ac4 & 6) != 0);
-    AVIStreamGetFrameClose(handle->frame);
+    if (handle->frame != NULL) { /* [library:movie] NULL when the port decoded the frames */
+        AVIStreamGetFrameClose(handle->frame);
+    }
     handle->frame = NULL;
     return 1;
 }
