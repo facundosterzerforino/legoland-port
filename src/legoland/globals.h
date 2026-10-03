@@ -3216,7 +3216,11 @@ struct AcmHdr {
     unsigned char *pbDst;
     int cbDstLength;
     int cbDstLengthUsed;
-    unsigned char pad[0x8];
+    /* ACMSTREAMHEADER goes on to 0x54 bytes: the ACM driver keeps its state in these while the header is
+     * prepared. The original reserves 0x60 bytes here (0x7aac40..0x7aaca0). */
+    unsigned int dwDstUser;
+    unsigned int dwReservedDriver[10];
+    unsigned char pad_54[0x60 - 0x54];
 };
 extern struct AcmHdr SpeechAcmHeader;
 
