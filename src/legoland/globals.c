@@ -4469,7 +4469,7 @@ unsigned char CastleThemeCount;
 unsigned char AdventurersThemeCount;
 
 // GLOBAL: LEGOLAND 0x007fe120
-unsigned int ScriptStringTable[256];
+unsigned int ScriptStringTable[512];
 
 // GLOBAL: LEGOLAND 0x007fe920
 unsigned int DAT_007fe920;

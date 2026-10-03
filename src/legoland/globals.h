@@ -3472,7 +3472,7 @@ extern unsigned char CastleThemeCount;
 // 0x007fe117
 extern unsigned char AdventurersThemeCount;
 // 0x007fe120
-extern unsigned int ScriptStringTable[256];
+extern unsigned int ScriptStringTable[512];
 // 0x007fe920
 extern unsigned int DAT_007fe920;
 // 0x007fe930
