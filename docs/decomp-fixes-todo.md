@@ -10,7 +10,7 @@ against the original `legoland.exe`. Once a fix lands in the decomp and is merge
 | edac58e | `__BMPLoader` 0x0044e010 (`gfx.c`) | 24-bit path: each row aligns the buffer start instead of continuing from the previous row's end, so every row repeats the first; then frees the moved pointer | Keep a running `src`, align it per row, free the original buffer |
 | edac58e | `__BMPLoader` 0x0044e010 (`gfx.c`) | 8-bit path: `free(pixels)` after `image->data = pixels` (use after free); the original never frees it | Remove that `free` |
 | 0dcd546 | `DAT_004bed40` (`globals.c/.h`) | Typed `unsigned int`, but 0x4bed40..0x4bef9c is a pool of 28 sprite-name strings that `ProgressScreenTables` points into | Type it as `char[0x25c]` (the port also drops `DAT_004bed44`) |
-| (next) | `SpeechAcmHeader` 0x007aac40, `struct AcmHdr` (`globals.h`) | Declared 0x30 bytes, but it is an `ACMSTREAMHEADER` (0x54 bytes; the ACM driver writes its state into `dwReservedDriver`) and the original reserves 0x60 | Add `dwDstUser`, `dwReservedDriver[10]` and pad to 0x60 |
+| 724df01 | `SpeechAcmHeader` 0x007aac40, `struct AcmHdr` (`globals.h`) | Declared 0x30 bytes, but it is an `ACMSTREAMHEADER` (0x54 bytes; the ACM driver writes its state into `dwReservedDriver`) and the original reserves 0x60 | Add `dwDstUser`, `dwReservedDriver[10]` and pad to 0x60 |
 
 Also still open from the coordinator's survey: the undersized globals in
 `/mnt/project-files/notes/undersized-globals.md` (script keyword tables declared as single `uint`s, the visitor action
