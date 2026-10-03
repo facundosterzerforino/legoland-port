@@ -330,12 +330,6 @@ struct FlumeRunNode {
     struct FlumeRunNode *next;
 };
 
-struct FlumeStage {
-    unsigned char pad_0[4];
-    int count;
-    struct Sprite *sprite;
-};
-
 struct FlumeStageList {
     unsigned char pad_0[4];
     unsigned char *stages;
@@ -4162,8 +4156,8 @@ void LogFlumeSpecialCorner1LoadSprites(struct Obj *obj_ptr) {
     // STRING: LEGOLAND 0x004b4a4c
     LogFlumeFc1M2Sprite = LoadSprite("fc1_m2.lls", 1);
 
-    DAT_004b47f8 = LogFlumeFc1M1Sprite;
-    DAT_004b4804 = LogFlumeFc1M2Sprite;
+    FlumeStages_004b47f0[0].sprite = LogFlumeFc1M1Sprite;
+    FlumeStages_004b47f0[1].sprite = LogFlumeFc1M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040e920
@@ -4212,8 +4206,8 @@ void LogFlumeSpecialCorner3LoadSprites(struct Obj *obj_ptr) {
     // STRING: LEGOLAND 0x004b4a70
     LogFlumeFc3M2Sprite = LoadSprite("fc3_m2.lls", 1);
 
-    DAT_004b4818 = LogFlumeFc3M1Sprite;
-    DAT_004b4824 = LogFlumeFc3M2Sprite;
+    FlumeStages_004b4810[0].sprite = LogFlumeFc3M1Sprite;
+    FlumeStages_004b4810[1].sprite = LogFlumeFc3M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040e9e0
@@ -4944,8 +4938,8 @@ void LogFlumeHoldUpLoadSprites(struct Obj *obj_ptr) {
     LogFlumeHup1M1Sprite = LoadSprite("hup1_m1.lls", 1);
     // STRING: LEGOLAND 0x004b4aac
     LogFlumeHup1M2Sprite = LoadSprite("hup1_m2.lls", 1);
-    DAT_004b4838 = LogFlumeHup1M1Sprite;
-    DAT_004b4850 = LogFlumeHup1M2Sprite;
+    FlumeStages_004b4830[0].sprite = LogFlumeHup1M1Sprite;
+    FlumeStages_004b4830[2].sprite = LogFlumeHup1M2Sprite;
 }
 
 // FUNCTION: LEGOLAND 0x0040ffa0

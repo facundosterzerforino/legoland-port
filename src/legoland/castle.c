@@ -2510,7 +2510,7 @@ void FUN_0041fd30(void) {
         DAT_004d88f4[i] = (unsigned char)(i - 0x40);
     }
     for (i = 0; i < 16; i++) {
-        ((unsigned int *)DAT_004d8974)[i] = 0x3f3f3f3f;
+        ((unsigned int *)(DAT_004d88f4 + 0x80))[i] = 0x3f3f3f3f;
     }
 }
 
@@ -6704,18 +6704,15 @@ __declspec(naked) void HASM_lego_sqrtf(void) {
 void lego_sqrtf_init(void) {
     int i;
     float x;
-    struct {
-        float a;
-        float b;
-    } *t = (void *)&DAT_00610a18;
 
     for (i = 0; i < 64; i++) {
         if (i == 29) {
             i = 29;
         }
         x = (float)sqrt((float)i * 0.015625f + 1.0f);
-        t[i + 1].a = FLOAT_004ab43c / (x + x);
-        t[i + 1].b = FLOAT_004ab468 / (x * x * x * 2.0f);
+        /* the original addresses the table from 8 bytes before it (DAT_00610a18) with index i + 1 */
+        sqrtf_table[i * 2] = FLOAT_004ab43c / (x + x);
+        sqrtf_table[i * 2 + 1] = FLOAT_004ab468 / (x * x * x * 2.0f);
     }
     sqrtf_exp_table[0] = 1.0f;
     for (i = 1; i <= 255; i++) {

@@ -108,7 +108,7 @@ struct GoldSlot {
 #include "image_sprite.h"
 
 // GLOBAL: LEGOLAND 0x004b45b0
-static struct GoldSlot Gold_Slots[3] = {{0, 0.8f}, {1, 0.8f}, {2, 0.8f}};
+static struct GoldSlot Gold_Slots[6] = {{0, 0.8f}, {0, 0.2f}, {1, 0.8f}, {1, 0.2f}, {2, 0.8f}, {2, 0.2f}};
 
 // GLOBAL: LEGOLAND 0x004b45e0
 static struct PathPair Gold_PathPairs[5] = {{-2, 0}, {0, -6}, {-6, 0}, {0, 1}, {3, 0}};

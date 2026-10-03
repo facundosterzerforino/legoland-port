@@ -81,6 +81,12 @@ struct FlumeTemplate {
     int count;
     void *table;
 };
+
+struct FlumeStage {
+    unsigned char pad_0[4];
+    int count;
+    struct Sprite *sprite;
+};
 struct BinVFile;
 struct BalloonNode;
 struct Ride;
@@ -720,22 +726,16 @@ extern int DAT_004b474c[2];
 extern int DAT_004b4754[4];
 // 0x004b4764
 extern int DAT_004b4764;
-// 0x004b47f8
-extern struct Sprite *DAT_004b47f8;
-// 0x004b4804
-extern struct Sprite *DAT_004b4804;
+// 0x004b47f0
+extern struct FlumeStage FlumeStages_004b47f0[3];
 // 0x004b4808
 extern struct FlumeTemplate DAT_004b4808;
-// 0x004b4818
-extern struct Sprite *DAT_004b4818;
-// 0x004b4824
-extern struct Sprite *DAT_004b4824;
+// 0x004b4810
+extern struct FlumeStage FlumeStages_004b4810[3];
 // 0x004b4828
 extern struct FlumeTemplate DAT_004b4828;
-// 0x004b4838
-extern struct Sprite *DAT_004b4838;
-// 0x004b4850
-extern struct Sprite *DAT_004b4850;
+// 0x004b4830
+extern struct FlumeStage FlumeStages_004b4830[4];
 // 0x004b4858
 extern struct FlumeTemplate DAT_004b4858;
 // 0x004b4bd0
@@ -1672,9 +1672,7 @@ extern unsigned int DAT_004d8270;
 extern float DAT_004d829c[64];
 extern unsigned int DAT_004d83c0;
 // 0x004d88f4
-extern unsigned char DAT_004d88f4[0x80];
-// 0x004d8974
-extern unsigned char DAT_004d8974[0x40];
+extern unsigned char DAT_004d88f4[0xc0];
 // 0x004d89c4
 extern void *DAT_004d89c4;
 // 0x004d89c8
@@ -1716,9 +1714,9 @@ extern int DAT_0060f908;
 // 0x0060f90c
 extern int DAT_0060f90c;
 // 0x004e3870
-extern char DAT_004e3870[];
+extern char DAT_004e3870[0x96000];
 // 0x0060f914
-extern struct LSub DAT_0060f914[20];
+extern struct LSub DAT_0060f914[21];
 // 0x006102f8
 extern struct CastlePathObj DAT_006102f8[3];
 // 0x00610a04
@@ -3472,7 +3470,7 @@ extern unsigned char CastleThemeCount;
 // 0x007fe117
 extern unsigned char AdventurersThemeCount;
 // 0x007fe120
-extern unsigned int ScriptStringTable[256];
+extern unsigned int ScriptStringTable[512];
 // 0x007fe920
 extern unsigned int DAT_007fe920;
 // 0x007fe930
@@ -3978,7 +3976,7 @@ extern void *DAT_0081cdec;
 // 0x0081ce00
 extern struct Cursor DAT_0081ce00[8];
 // 0x00828fe0
-extern unsigned int DAT_00828fe0[2];
+extern unsigned int DAT_00828fe0[28 * 22];
 // 0x00829980
 extern void *BasicTilesData;
 // 0x00829990
@@ -4237,6 +4235,8 @@ extern float DAT_004b5628[3];
 extern int DAT_004d83c4[0x100];
 // 0x004d87c4
 extern int *DAT_004d87c4;
+// 0x004d87cc
+extern int *DAT_004d87cc[32];
 // 0x004d884c
 extern int *DAT_004d884c[32];
 // 0x004d88cc

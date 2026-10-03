@@ -298,29 +298,23 @@ int DAT_004b4754[4];
 // GLOBAL: LEGOLAND 0x004b4764
 int DAT_004b4764;
 
-// GLOBAL: LEGOLAND 0x004b47f8
-struct Sprite *DAT_004b47f8;
-
-// GLOBAL: LEGOLAND 0x004b4804
-struct Sprite *DAT_004b4804;
+/* [port] the original runs one stage past the end of these lists when a log chain is longer than the last stage's
+ * count, and reads the next template there as a huge count with no sprite; the extra sentinel element keeps that
+ * (port_data only fills each array up to the next global). */
+// GLOBAL: LEGOLAND 0x004b47f0
+struct FlumeStage FlumeStages_004b47f0[3] = {{0}, {0}, {0, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4808
 struct FlumeTemplate DAT_004b4808;
 
-// GLOBAL: LEGOLAND 0x004b4818
-struct Sprite *DAT_004b4818;
-
-// GLOBAL: LEGOLAND 0x004b4824
-struct Sprite *DAT_004b4824;
+// GLOBAL: LEGOLAND 0x004b4810
+struct FlumeStage FlumeStages_004b4810[3] = {{0}, {0}, {0, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4828
 struct FlumeTemplate DAT_004b4828;
 
-// GLOBAL: LEGOLAND 0x004b4838
-struct Sprite *DAT_004b4838;
-
-// GLOBAL: LEGOLAND 0x004b4850
-struct Sprite *DAT_004b4850;
+// GLOBAL: LEGOLAND 0x004b4830
+struct FlumeStage FlumeStages_004b4830[4] = {{0}, {0}, {0}, {0, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4858
 struct FlumeTemplate DAT_004b4858;
@@ -1796,10 +1790,7 @@ float DAT_004d829c[64];
 unsigned int DAT_004d83c0;
 
 // GLOBAL: LEGOLAND 0x004d88f4
-unsigned char DAT_004d88f4[0x80];
-
-// GLOBAL: LEGOLAND 0x004d8974
-unsigned char DAT_004d8974[0x40];
+unsigned char DAT_004d88f4[0xc0];
 
 // GLOBAL: LEGOLAND 0x004d89c4
 void *DAT_004d89c4;
@@ -1862,10 +1853,10 @@ int DAT_0060f908;
 int DAT_0060f90c;
 
 // GLOBAL: LEGOLAND 0x004e3870
-char DAT_004e3870[16];
+char DAT_004e3870[0x96000]; /* 640x480 16-bit depth buffer */
 
 // GLOBAL: LEGOLAND 0x0060f914
-struct LSub DAT_0060f914[20];
+struct LSub DAT_0060f914[21];
 
 // GLOBAL: LEGOLAND 0x006102f8
 struct CastlePathObj DAT_006102f8[3];
@@ -4469,7 +4460,7 @@ unsigned char CastleThemeCount;
 unsigned char AdventurersThemeCount;
 
 // GLOBAL: LEGOLAND 0x007fe120
-unsigned int ScriptStringTable[256];
+unsigned int ScriptStringTable[512];
 
 // GLOBAL: LEGOLAND 0x007fe920
 unsigned int DAT_007fe920;
@@ -5225,7 +5216,7 @@ void *DAT_0081cdec;
 struct Cursor DAT_0081ce00[8];
 
 // GLOBAL: LEGOLAND 0x00828fe0
-unsigned int DAT_00828fe0[2];
+unsigned int DAT_00828fe0[28 * 22]; /* 28 records of 0x58 bytes */
 
 // GLOBAL: LEGOLAND 0x00829980
 void *BasicTilesData;
@@ -5569,6 +5560,9 @@ int DAT_004d83c4[0x100];
 
 // GLOBAL: LEGOLAND 0x004d87c4
 int *DAT_004d87c4;
+
+// GLOBAL: LEGOLAND 0x004d87cc
+int *DAT_004d87cc[32]; /* second clip vertex buffer; DAT_004b5600[1] points here */
 
 // GLOBAL: LEGOLAND 0x004d884c
 int *DAT_004d884c[32];
