@@ -580,7 +580,7 @@ void FUN_00404630(struct CopterNode *node, int index) {
     if (layer->rider == NULL) {
         return;
     }
-    sprite_layer = layer->field_c;
+    sprite_layer = layer->active_layer;
     /* index is 0..4 for every caller; anything else falls through with track 1 and bias = index (as the original) */
     track = 1;
     y_bias = index;
