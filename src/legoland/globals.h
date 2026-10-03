@@ -3261,9 +3261,9 @@ extern char DAT_007cae80[0x100];
 // 0x007caf80
 extern struct Sprite *RepHint1Sprite;
 // 0x007cafa0
-extern void *DAT_007cafa0;
+extern char *DAT_007cafa0[104];
 // 0x007cb140
-extern void *DAT_007cb140;
+extern char *DAT_007cb140[32];
 // 0x007cb1c0
 extern struct IconNode *RepHint1Icon;
 // 0x007cb1c4

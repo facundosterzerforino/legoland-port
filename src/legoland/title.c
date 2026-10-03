@@ -440,7 +440,7 @@ unsigned int FUN_004907a0(const char *param_1) {
     FUN_00490850();
     // STRING: LEGOLAND 0x004bf678
     sprintf(buffer, "Intervals\\%s", param_1);
-    result = ReadResourceLines(buffer, &DAT_007cafa0, 100);
+    result = ReadResourceLines(buffer, (void **)DAT_007cafa0, 100);
     DAT_0079887c = result;
     if (result != 0) {
         DAT_004bf670 = 1;
@@ -457,13 +457,13 @@ void FUN_00490800(const char *param_1) {
     FUN_00490770(param_1);
     FUN_00490880();
     sprintf(buffer, "Intervals\\%s", param_1);
-    DAT_00798880 = ReadResourceLines(buffer, &DAT_007cb140, 32);
+    DAT_00798880 = ReadResourceLines(buffer, (void **)DAT_007cb140, 32);
 }
 
 // FUNCTION: LEGOLAND 0x00490850
 void FUN_00490850(void) {
     if (DAT_0079887c != 0) {
-        free(DAT_007cafa0);
+        free(DAT_007cafa0[0]);
     }
     DAT_0079887c = 0;
 }
@@ -471,7 +471,7 @@ void FUN_00490850(void) {
 // FUNCTION: LEGOLAND 0x00490880
 void FUN_00490880(void) {
     if (DAT_00798880 != 0) {
-        free(DAT_007cb140);
+        free(DAT_007cb140[0]);
     }
     DAT_00798880 = 0;
 }
@@ -610,7 +610,7 @@ unsigned char FUN_00490be0(struct IconNode *param_1, unsigned int param_2) {
             if ((int)DAT_00798884 >= (int)DAT_00798880) {
                 DAT_00798884 = 0;
             }
-        } while (strlen(((char **)&DAT_007cb140)[DAT_00798884]) == 0);
+        } while (strlen(DAT_007cb140[DAT_00798884]) == 0);
         DAT_00798888 = GetTicks() + 8000;
         FUN_00490a60(DAT_00798884);
     }
@@ -757,10 +757,10 @@ void FUN_004910f0(void) {
     int n;
     int idx;
 
-    FUN_00491080(DAT_007cafa0, 10, 0x45, 0x27, 1);
+    FUN_00491080(DAT_007cafa0[0], 10, 0x45, 0x27, 1);
     y = 0x6b;
     n = 0;
-    line = (char **)&DAT_007cafa0 + DAT_004bf670;
+    line = &DAT_007cafa0[DAT_004bf670];
     idx = DAT_004bf670;
     while (n < 0xe && idx <= (int)DAT_0079887c) {
         FUN_00491080(*line, 10, y, 0x16, 0);
@@ -778,7 +778,7 @@ void FUN_004910f0(void) {
         if ((int)GetTicks() > (int)DAT_00798888) {
             DAT_00798888 = 0;
         }
-        BubbleHelp(rc, ((char **)&DAT_007cb140)[DAT_00798884], 2);
+        BubbleHelp(rc, DAT_007cb140[DAT_00798884], 2);
     }
 }
 

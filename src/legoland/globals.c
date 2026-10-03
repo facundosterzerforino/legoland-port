@@ -4157,10 +4157,10 @@ char DAT_007cae80[0x100];
 struct Sprite *RepHint1Sprite;
 
 // GLOBAL: LEGOLAND 0x007cafa0
-void *DAT_007cafa0;
+char *DAT_007cafa0[104]; /* text lines (ReadResourceLines, up to 100) */
 
 // GLOBAL: LEGOLAND 0x007cb140
-void *DAT_007cb140;
+char *DAT_007cb140[32]; /* text lines (ReadResourceLines, up to 32) */
 
 // GLOBAL: LEGOLAND 0x007cb1c0
 struct IconNode *RepHint1Icon;
