@@ -3274,8 +3274,6 @@ extern struct PanelNode *DAT_007cb3d0;
 extern struct Sprite *FreePlayCoverSprite;
 // 0x007cb3e0
 extern struct ObjTableEntry ObjInstanceTable[128];
-// 0x007cb3e2
-extern struct ObjTableEntry DAT_007cb3e2[128];
 // 0x007cb5e0
 extern struct ObjTableEntry DAT_007cb5e0;
 // 0x007cb600

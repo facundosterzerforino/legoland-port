@@ -59,7 +59,7 @@ done:
 void FUN_00489ee0(void) {
     struct ObjTableEntry *entry;
 
-    for (entry = ObjInstanceTable; (int)entry < (int)&DAT_007cb5e0; entry++) {
+    for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
         entry->key = 0xffff;
     }
 }
@@ -70,10 +70,10 @@ int FUN_00489f00(const struct Point *pos) {
     struct ObjTableEntry *entry;
 
     index = 0;
-    for (entry = ObjInstanceTable; (int)entry < (int)&DAT_007cb5e0; entry++) {
+    for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
         if (entry->key == 0xffff) {
             ObjInstanceTable[index].key = (pos->x << 8) + pos->y;
-            DAT_007cb3e2[index].key = 0;
+            ObjInstanceTable[index].value = 0;
             return 1;
         }
         index++;
@@ -89,7 +89,7 @@ int FUN_00489f50(const struct Point *pos) {
 
     index = 0;
     target = (pos->x << 8) + pos->y;
-    for (entry = ObjInstanceTable; (int)entry < (int)&DAT_007cb5e0; entry++) {
+    for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
         if (entry->key == target) {
             ObjInstanceTable[index].key = 0xffff;
             return 1;
@@ -107,9 +107,9 @@ int FUN_00489f90(const struct Point *pos) {
 
     index = 0;
     target = (pos->x << 8) + pos->y;
-    for (entry = ObjInstanceTable; (int)entry < (int)&DAT_007cb5e0; entry++) {
+    for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
         if (entry->key == target) {
-            DAT_007cb3e2[index].key++;
+            ObjInstanceTable[index].value++;
             return 1;
         }
         index++;
@@ -125,9 +125,9 @@ unsigned short FUN_00489fd0(const struct Point *pos) {
 
     index = 0;
     target = (pos->x << 8) + pos->y;
-    for (entry = ObjInstanceTable; (int)entry < (int)&DAT_007cb5e0; entry++) {
+    for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
         if (entry->key == target) {
-            return DAT_007cb3e2[index].key;
+            return ObjInstanceTable[index].value;
         }
         index++;
     }

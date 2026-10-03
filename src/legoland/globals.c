@@ -4171,9 +4171,6 @@ struct Sprite *FreePlayCoverSprite;
 // GLOBAL: LEGOLAND 0x007cb3e0
 struct ObjTableEntry ObjInstanceTable[128];
 
-// GLOBAL: LEGOLAND 0x007cb3e2
-struct ObjTableEntry DAT_007cb3e2[128];
-
 // GLOBAL: LEGOLAND 0x007cb5e0
 struct ObjTableEntry DAT_007cb5e0;
 
