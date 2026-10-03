@@ -459,16 +459,21 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
             }
             // STRING: LEGOLAND 0x004b7db4
             DAT_00667c40 = "AVI GetFrame";
-            frame = (struct AviFrame *)AVIStreamGetFrame(anim->getframe, DAT_00665eec);
+            /* [library:movie] the advisor animations are Indeo 5 AVIs: without that codec (not on Windows 11) there
+             * is no frame decompressor and no frame, which the original dereferenced. Skip drawing it until the
+             * port decodes Indeo itself. */
+            frame = anim->getframe != NULL ? (struct AviFrame *)AVIStreamGetFrame(anim->getframe, DAT_00665eec) : NULL;
             // STRING: LEGOLAND 0x004b7da8
             DAT_00667c40 = "BltAdvisor";
-            PushRenderingStatusAndLockVideoSurface();
-            FUN_004659a0(frame, param_1->x, param_1->y);
-            PopRenderingStatus();
+            if (frame != NULL) {
+                PushRenderingStatusAndLockVideoSurface();
+                FUN_004659a0(frame, param_1->x, param_1->y);
+                PopRenderingStatus();
+            }
             DAT_00665eec++;
             // STRING: LEGOLAND 0x004b7d98
             DAT_00667c40 = "Exit Advisor";
-            if ((int)MousePos.x >= param_1->x && (int)MousePos.y >= param_1->y &&
+            if (frame != NULL && (int)MousePos.x >= param_1->x && (int)MousePos.y >= param_1->y &&
                 (int)MousePos.x < frame->width + param_1->x && (int)MousePos.y < frame->height + param_1->y) {
                 Hover.type = state[0];
                 Hover.ptr = state[1];
