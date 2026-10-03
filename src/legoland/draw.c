@@ -597,7 +597,10 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
      * stored with frame 0). Sets DAT_007feb14 bit 0 when a drawn run touches the mouse cursor (DAT_007fe9a8).
      * Quirks kept: when a transparent or copy run ends exactly at the left clip edge the decoder stays in its
      * left-margin state (so the next item is dropped); a single-pixel skip after the visible width is used up wraps
-     * the remaining width; a fill run that starts with no width left still stores one pixel. */
+     * the remaining width; a fill run that starts with no width left still stores one pixel.
+     * [port:rewrite] every pixel store is kept inside the row's visible span (row .. row + width): after the
+     * width wrap above, the original kept copying runs past the clip edge, which in the port ran off the end of
+     * the software screen (crash when the Space Tower popup was drawn). Pixels inside the clip are unchanged. */
     struct PortIdxBits bits;
     struct DrawLLSIdxFrame *first;
     struct DrawLLSIdxFrame *frame;
@@ -605,6 +608,7 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
     const unsigned char *src;
     unsigned short *row;
     unsigned short *dst;
+    unsigned short *row_end;
     unsigned short *cursor;
     unsigned short colour;
     unsigned int width;
@@ -667,6 +671,7 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
         }
         for (rows = height; rows != 0; rows--) {
             dst = row;
+            row_end = row + width;
             if (left != 0) {
                 rem = left;
                 state = PORT_IDX_LEFT;
@@ -785,18 +790,20 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
                     }
                     colour = palette[*src++];
                     if (rem <= run) {
-                        if (rem == 0) {
+                        if (rem == 0 && dst < row_end) {
                             *dst = colour;
                         }
-                        for (k = 0; k < rem; k++) {
+                        for (k = 0; k < rem && dst + k < row_end; k++) {
                             dst[k] = colour;
                         }
                         dst += rem;
                         state = PORT_IDX_END;
                     } else {
                         rem -= run;
-                        for (k = 0; k < run; k++) {
-                            *dst++ = colour;
+                        for (k = 0; k < run; k++, dst++) {
+                            if (dst < row_end) {
+                                *dst = colour;
+                            }
                         }
                         state = PORT_IDX_BODY;
                     }
@@ -809,8 +816,10 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
                         count = rem;
                         leftover = run - rem;
                         if (count != 0) {
-                            for (k = 0; k < count; k++) {
-                                *dst++ = palette[*src++];
+                            for (k = 0; k < count; k++, dst++, src++) {
+                                if (dst < row_end) {
+                                    *dst = palette[*src];
+                                }
                             }
                             if (hit && dst >= cursor) {
                                 DAT_007feb14 |= 1;
@@ -820,8 +829,10 @@ void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
                         state = PORT_IDX_END;
                     } else {
                         rem -= run;
-                        for (k = 0; k < run; k++) {
-                            *dst++ = palette[*src++];
+                        for (k = 0; k < run; k++, dst++, src++) {
+                            if (dst < row_end) {
+                                *dst = palette[*src];
+                            }
                         }
                         if (hit && dst >= cursor) {
                             DAT_007feb14 |= 1;
