@@ -136,6 +136,24 @@ void ReleaseMouseDevice(void) {
 LEGO_EXPORT void ScanMouse(void) {
     HRESULT hr;
 
+    if (WinDebugMode != 0) {
+        /* [library:input] windowed mode: the exclusive DirectInput mouse reported motion that made the game's
+         * cursor drift to the bottom-right. Use the window's own cursor instead (position in
+         * UpdateControllerFromMouseData, buttons here); no wheel. */
+        memset(&MouseState, 0, sizeof(MouseState));
+        if (GetForegroundWindow() == WNDENV_Gethwnd()) {
+            if ((GetAsyncKeyState(GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON) & 0x8000) != 0) {
+                MouseState.rgbButtons[0] = 0x80;
+            }
+            if ((GetAsyncKeyState(GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON) & 0x8000) != 0) {
+                MouseState.rgbButtons[1] = 0x80;
+            }
+            if ((GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0) {
+                MouseState.rgbButtons[2] = 0x80;
+            }
+        }
+        return;
+    }
     if (dintput_mouse != NULL) {
         hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dintput_mouse, 0x10, &MouseState);
         if (hr != DI_OK) {
@@ -186,6 +204,19 @@ LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
     mode = buffer->mouse_accel;
     dx = MouseState.lX;
     dy = MouseState.lY;
+    if (WinDebugMode != 0) {
+        /* [library:input] windowed mode: the game's cursor follows the window's cursor (see ScanMouse) */
+        POINT pos;
+
+        if (GetForegroundWindow() == WNDENV_Gethwnd() && GetCursorPos(&pos) && ScreenToClient(WNDENV_Gethwnd(), &pos)) {
+            dx = pos.x - buffer->x;
+            dy = pos.y - buffer->y;
+        } else {
+            dx = 0;
+            dy = 0;
+        }
+        mode = 0;
+    }
     if (mode != 0) {
         if (abs(dx) > buffer->mouse_threshold1 || abs(dy) > buffer->mouse_threshold1) {
             dx += dx;
