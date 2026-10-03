@@ -570,16 +570,15 @@ LEGO_EXPORT int KillSoundSampleSystem(void) {
 
 // FUNCTION: LEGOLAND 0x00492c60
 void SuspendMusicThread(void) {
-    if (MusicEnabled != 0) {
-        SuspendThread(MusicThread);
-    }
+    /* [library:thread] was SuspendThread(MusicThread). The game calls this at boot while the music thread is still
+     * loading DirectMusic (DLL loads, COM, heap allocations); freezing it inside the loader or heap lock left the
+     * main thread blocked on its next allocation or DLL load (the intermittent boot hang in DirectInput, AVIFile,
+     * TSF). The thread is left running: it only loads music then, and the boot waits for it anyway. */
 }
 
 // FUNCTION: LEGOLAND 0x00492c80
 void ResumeMusicThread(void) {
-    if (MusicEnabled != 0) {
-        ResumeThread(MusicThread);
-    }
+    /* [library:thread] was ResumeThread(MusicThread); see SuspendMusicThread */
 }
 
 // FUNCTION: LEGOLAND 0x00492ca0
