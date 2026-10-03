@@ -2273,7 +2273,7 @@ extern unsigned int MoneySFXLoadCount;
 // 0x00667128
 extern char LogBuffer[512];
 // 0x0066752c
-extern unsigned int ProductVersionString;
+extern char ProductVersionString[0x88];
 // 0x006675b4
 extern unsigned int BubbleHelpGFXLoaded;
 // 0x006675b8

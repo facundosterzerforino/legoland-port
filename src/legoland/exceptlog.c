@@ -289,7 +289,7 @@ void WriteErrorTimeAndSystemInfo(HANDLE file) {
         lstrcpyA(computer, "Unknown");
     }
     // STRING: LEGOLAND 0x004b8d88
-    WriteFileFormatted(file, "%s (Version %s)\r\n", path, (char *)&ProductVersionString);
+    WriteFileFormatted(file, "%s (Version %s)\r\n", path, ProductVersionString);
     // STRING: LEGOLAND 0x004b8d6c
     WriteFileFormatted(file, "Run by %s on machine %s.\r\n", user, computer);
     GetSystemInfo(&si);
