@@ -33,6 +33,40 @@ struct CtrlBuffer;
 // layout comes from gamemap.h, used by the EditCursor / QueryCursor instances.)
 // ---------------------------------------------------------------------------
 struct Sprite;
+struct SampleDef;
+/* One entry of the game's sound-effect list (GameFX), loaded by Load_FXList. */
+struct FXItem {
+    /* 0x00 */ char *name; /* file name under .\sfx\ */
+    /* 0x04 */ unsigned char pad_4[0x8 - 0x4];
+    /* 0x08 */ struct SampleDef *sample;
+};
+/* Indices into GameFX, named after the .wav each entry loads. */
+enum GameFXIndex {
+    FX_FLOWERS, /* Flowers.wav */
+    FX_DRILL, /* RabOld\Drill.wav */
+    FX_PUNCH, /* RabOld\Punch4.wav */
+    FX_BUILDING1, /* Building 01.wav */
+    FX_BUILDING2, /* Building 02.wav */
+    FX_BUILDING3, /* Building 03.wav */
+    FX_HAMMER, /* RabOld\Hammer.wav */
+    FX_DRILLING, /* Drilling.wav */
+    FX_BUILDING4, /* Building 04.wav */
+    FX_CLICK1, /* Click01.wav */
+    FX_CLICK2, /* Click02.wav */
+    FX_CLICK3, /* Click03.wav */
+    FX_BUTTON4, /* Button04.wav */
+    FX_BUTTON14, /* Button14.wav */
+    FX_RASP, /* Rasp1.wav */
+    FX_GARDENER_LIFT, /* gardener lift up3.wav */
+    FX_INVENTORY_IN, /* inventory slide away.wav */
+    FX_INVENTORY_OUT, /* inventory slide out.wav */
+    FX_MECHANIC_LIFT, /* mechanic lift2.wav */
+    FX_THEME_CLICK, /* theme button click3.wav */
+    FX_GARDENER_DROP, /* alroight then gardener put down.wav */
+    FX_MECHANIC_DROP, /* tut tut for mechanic put down.wav */
+    FX_WARNING, /* warning01.wav */
+    FX_COUNT
+};
 struct FlumeDims {
     int field1;
     int field2;
@@ -1030,29 +1064,7 @@ extern int DAT_004b921c;
 // 0x004b9220
 extern LEGO_EXPORT unsigned int BGFullUpdate;
 // 0x004b9228
-extern const unsigned char DAT_004b9228[1];
-// 0x004b9230
-extern void *DAT_004b9230[6];
-// 0x004b9248
-extern void *DAT_004b9248;
-// 0x004b929c
-extern void *DAT_004b929c;
-// 0x004b92c0
-extern void *PTR_004b92c0;
-extern void *PTR_004b9314;
-extern void *DAT_004b9320;
-extern void *DAT_004b932c;
-extern void *PTR_004b9338;
-// 0x004b92cc
-extern void *DAT_004b92cc;
-// 0x004b92d8
-extern void *DAT_004b92d8;
-// 0x004b92e4
-extern void *DAT_004b92e4;
-// 0x004b92fc
-extern void *DAT_004b92fc;
-// 0x004b9308
-extern void *DAT_004b9308;
+extern struct FXItem GameFX[FX_COUNT];
 // 0x004b95f0
 extern struct DeferredSprite *PTR_DAT_004b95f0;
 // 0x004b9550

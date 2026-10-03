@@ -217,7 +217,7 @@ unsigned char FUN_0048ac60(unsigned int param_1, unsigned int param_2) {
         LoadWatchSprite(0x127, 0x170);
         SpeechCloseFile();
         DAT_006687b0 = 0x4;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         FUN_0048abb0();
         CleanUpFreePlay();
         KillTitleScreenSprites();
@@ -359,13 +359,13 @@ unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
             if (icon->field_18 == 0) {
                 if (FUN_0048aef0((unsigned int)icon->field_1c, (struct Element *)icon->field_20p) != 0) {
                     if (DAT_00798648 == 0) {
-                        PlayInstanceOfSample(DAT_004b929c, 0, 1, 0);
+                        PlayInstanceOfSample(GameFX[FX_CLICK1].sample, 0, 1, 0);
                     }
                     FUN_0048af40((unsigned int)icon->field_1c);
                     icon->field_18 = 1;
                     ElemID((const char *)icon->field_1c)->flags |= 0x4;
                 } else {
-                    PlayInstanceOfSample(DAT_004b92d8, 0, 1, 0);
+                    PlayInstanceOfSample(GameFX[FX_RASP].sample, 0, 1, 0);
                 }
             } else {
                 elem = ElemID((const char *)icon->field_1c);
@@ -375,7 +375,7 @@ unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
                         node->field_18 = 0;
                     }
                 }
-                PlayInstanceOfSample(DAT_004b92cc, 0, 1, 0);
+                PlayInstanceOfSample(GameFX[FX_BUTTON14].sample, 0, 1, 0);
                 FUN_0048afa0((unsigned int)icon->field_1c);
                 icon->field_18 = 0;
                 ElemID((const char *)icon->field_1c)->flags &= ~0x4u;

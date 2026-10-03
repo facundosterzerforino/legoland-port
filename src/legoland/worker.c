@@ -1000,7 +1000,7 @@ LEGO_EXPORT int WorkOrderBuildObject(Element *element, Point *pos) {
         source.x = pos->x;
         source.type = 2;
         source.y = pos->y;
-        PlayInstanceOfSample(DAT_004b9248, 0, 1, &source);
+        PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, &source);
     }
     return result;
 }

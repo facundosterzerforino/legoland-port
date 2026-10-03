@@ -536,7 +536,7 @@ unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
         }
         SpeechCloseFile();
         DAT_006687b0 = 4;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_0080ff80.unk8 = 1;
     }
     return 1;

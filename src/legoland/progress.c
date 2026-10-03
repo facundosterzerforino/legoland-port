@@ -145,7 +145,7 @@ unsigned char FUN_0048bb60(unsigned char *arg0, unsigned int arg1, unsigned int 
         }
         DAT_0079866c = GetTicks();
         ProgressScreenTables.last_clicked = arg0[0x18];
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         lpConfig->level = arg0[0x18] + 1;
         DAT_0080ff80.unk4 = 0xffffffff;
     }
@@ -160,7 +160,7 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
             DAT_006687bc = 0;
             SpeechCloseFile();
             DAT_006687b0 = 4;
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
             FUN_0048b770();
             if ((int)lpConfig->level <= 0xf) {
                 LoadWatchSprite(0xfa, 0x181);
@@ -295,7 +295,7 @@ unsigned char FUN_0048bf90(unsigned char *arg0, unsigned int arg1, unsigned int 
         DAT_006687bc = 0;
         SpeechCloseFile();
         DAT_006687b0 = 4;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         FUN_0048bd70();
         LoadWatchSprite(0x186, 0x18b);
         DAT_00668e38 = 0;
@@ -317,7 +317,7 @@ unsigned char FUN_0048c020(unsigned int a1, unsigned int a2, unsigned int a3, un
     if ((a2 & 2) != 0) {
         DAT_006687c0 = 0;
         DAT_006687bc = 0;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         temp = DAT_00798664;
         DAT_00798660 = 0;
         DAT_00798668 = 0;
@@ -337,7 +337,7 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
         DAT_00798660 = 0;
         DAT_00798668 = 1;
         DAT_0080ff80.unk4 = 0xffffffff;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (DAT_00798664 != 0) {
             FUN_0048bd70();
             lpConfig->level = 6;

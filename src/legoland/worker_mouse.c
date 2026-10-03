@@ -120,7 +120,7 @@ int FUN_00470270(void) {
         WorkerOnMouse->dest.y = WorkerOnMouse->pos.y;
         WorkerOnMouse->action = 5;
         WorkerOnMouse->param_action = 100;
-        PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_GARDENER_DROP].sample, 0, 1, 0);
         return 1;
     }
     if (ride->element == (Element *)MechanicsHutHandle && WorkerOnMouseType == 0x308) {
@@ -131,7 +131,7 @@ int FUN_00470270(void) {
         WorkerOnMouse->dest.y = WorkerOnMouse->pos.y;
         WorkerOnMouse->action = 5;
         WorkerOnMouse->param_action = 100;
-        PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_MECHANIC_DROP].sample, 0, 1, 0);
         return 1;
     }
     return ride->element == (Element *)PathControlHandle;
@@ -155,9 +155,9 @@ WorkOrder *FUN_00470410(Point *out) {
             out->y = order->footprints->y1 + order->pos.y;
         }
         if (WorkerOnMouseType == 0x307) {
-            PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_GARDENER_DROP].sample, 0, 1, 0);
         } else {
-            PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_MECHANIC_DROP].sample, 0, 1, 0);
         }
         return order;
     }
@@ -204,9 +204,9 @@ WorkOrder *FUN_004704b0(Point *out) {
                         out->y = order->footprints->y1 + order->pos.y;
                     }
                     if (WorkerOnMouseType == 0x307) {
-                        PlayInstanceOfSample(DAT_004b9320, 0, 1, 0);
+                        PlayInstanceOfSample(GameFX[FX_GARDENER_DROP].sample, 0, 1, 0);
                     } else {
-                        PlayInstanceOfSample(DAT_004b932c, 0, 1, 0);
+                        PlayInstanceOfSample(GameFX[FX_MECHANIC_DROP].sample, 0, 1, 0);
                     }
                 }
             } while (0);

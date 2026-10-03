@@ -2926,19 +2926,19 @@ LEGO_EXPORT void PlayAppropriateBuildEffect(struct ObjClass *obj, int *coords) {
     }
     flags = ((struct MapObject *)obj)->flags;
     if (flags & 0x40000) {
-        PlayInstanceOfSample(DAT_004b9230[3], 0, 1, param);
+        PlayInstanceOfSample(GameFX[FX_DRILL].sample, 0, 1, param);
         return;
     }
     if (flags & 0x80000) {
         if (flags & 0x200000) {
-            PlayInstanceOfSample(DAT_004b9230[0], 0, 1, param);
+            PlayInstanceOfSample(GameFX[FX_FLOWERS].sample, 0, 1, param);
             return;
         }
         i = rand() % 5 + 3;
-        PlayInstanceOfSample(DAT_004b9230[i * 3], 0, 1, param);
+        PlayInstanceOfSample(GameFX[i].sample, 0, 1, param);
         return;
     }
-    PlayInstanceOfSample(DAT_004b9230[0], 0, 1, param);
+    PlayInstanceOfSample(GameFX[FX_FLOWERS].sample, 0, 1, param);
 }
 
 // FUNCTION: LEGOLAND 0x00462dd0

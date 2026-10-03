@@ -158,7 +158,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
 // FUNCTION: LEGOLAND 0x0048ef10
 unsigned char FUN_0048ef10(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         UpDateCurrentProfile();
         DAT_0080ff80.unk8 = 1;
     }
@@ -168,7 +168,7 @@ unsigned char FUN_0048ef10(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048ef40
 unsigned char FUN_0048ef40(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         CurrentProfile.speech_volume = DAT_007cb314;
         CurrentProfile.music_volume = DAT_007cb31c;
         CurrentProfile.fx_volume = DAT_007cb315;
@@ -180,7 +180,7 @@ unsigned char FUN_0048ef40(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048ef90
 unsigned char FUN_0048ef90(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         CloseFontEndCheckBox();
         EditMode.unk4 = 0;
         RemoveIconGroup(7);
@@ -193,7 +193,7 @@ unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         SpeechCloseFile();
         DAT_006687b0 = 4;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (CurrentProfile.save_slot != 0) {
             UpDateCurrentSaveSlotInfo();
         }
@@ -211,7 +211,7 @@ unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_
 // FUNCTION: LEGOLAND 0x0048f050
 unsigned char OptionsSaveIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         LoadMode = 0;
         DAT_007cb324 = 0;
         DAT_0080ff80.unk8 = 4;
@@ -222,7 +222,7 @@ unsigned char OptionsSaveIconHandler(unsigned int param_1, unsigned int param_2)
 // FUNCTION: LEGOLAND 0x0048f0a0
 unsigned char FUN_0048f0a0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         InitExitCheckBox(0xfa, 0x28);
         DAT_007cb320 = 1;
         DAT_004bef9c = 0;
@@ -319,7 +319,7 @@ LEGO_EXPORT void PrintExitCheckBox(void) {
 // FUNCTION: LEGOLAND 0x0048f440
 unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_007cb320 = 0;
         CloseFontEndCheckBox();
         MapStats.field_3a0 = 3;
@@ -337,7 +337,7 @@ unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048f4b0
 unsigned char FUN_0048f4b0(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(DAT_004b929c, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_CLICK1].sample, 0, 1, 0);
         DAT_007cb320 = 0;
         CloseFontEndCheckBox();
         FUN_0048eb40();
@@ -348,7 +348,7 @@ unsigned char FUN_0048f4b0(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048f4f0
 unsigned char FUN_0048f4f0(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_007cb320 = 0;
         CloseFontEndCheckBox();
         DAT_007cb310 = 1;
@@ -362,7 +362,7 @@ unsigned char FUN_0048f4f0(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048f550
 unsigned char OptionsLoadIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         LoadMode = 1;
         DAT_007cb324 = 0;
         DAT_0080ff80.unk8 = 4;
@@ -373,7 +373,7 @@ unsigned char OptionsLoadIconHandler(unsigned int param_1, unsigned int param_2)
 // FUNCTION: LEGOLAND 0x0048f5a0
 unsigned char FUN_0048f5a0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         StoreNewSaveGameToDisk();
     }
     return 1;
@@ -382,7 +382,7 @@ unsigned char FUN_0048f5a0(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048f5d0
 unsigned char FUN_0048f5d0(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
     }
     return 1;
 }
@@ -395,11 +395,11 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
 
     if (DAT_004bef9c != 0) {
         if ((param_2 & 1) != 0) {
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         }
         if ((param_2 & 4) != 0) {
             if (param_1->field_18s == 8) {
-                sample = PlayInstanceOfSample(PTR_004b92c0, 1, 1, 0);
+                sample = PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 1, 1, 0);
             } else {
                 sample = 0;
             }
@@ -455,11 +455,11 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
 
     if (DAT_004bef9c != 0) {
         if ((param_2 & 1) != 0) {
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         }
         if ((param_2 & 4) != 0) {
             if (param_1->field_18s == 7) {
-                sample = PlayInstanceOfSample(PTR_004b92c0, 1, 1, 0);
+                sample = PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 1, 1, 0);
             } else {
                 sample = 0;
             }
@@ -516,7 +516,7 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
 
     if (DAT_004bef9c != 0 && (param_2 & 4) != 0) {
         if (param_1->field_18s == 9) {
-            sample = PlayInstanceOfSample(PTR_004b92c0, 1, 1, 0);
+            sample = PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 1, 1, 0);
         } else {
             sample = 0;
         }
@@ -617,7 +617,7 @@ LEGO_EXPORT void RenderScreen(void) {
 // FUNCTION: LEGOLAND 0x0048fb80
 unsigned char FUN_0048fb80(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (DAT_00668e38 != 0) {
             DAT_00668e38 = 0;
         }
@@ -629,7 +629,7 @@ unsigned char FUN_0048fb80(unsigned int param_1, unsigned int param_2, unsigned 
 // FUNCTION: LEGOLAND 0x0048fbd0
 unsigned char FUN_0048fbd0(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_0080ff80.unk8 = 5;
     }
     return 1;

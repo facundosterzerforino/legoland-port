@@ -1137,7 +1137,7 @@ int FUN_00469c80(struct MapRectArg *arg) {
     void *saved_class;
     int phase;
 
-    sample = PlayInstanceOfSample(DAT_004b92fc, 1, 1, 0);
+    sample = PlayInstanceOfSample(GameFX[FX_INVENTORY_OUT].sample, 1, 1, 0);
     FUN_00496d10(sample);
     AddSFX_Callback((struct CallbackEntry *)sample, 3000, (unsigned int (*)(struct CallbackEntry *))FUN_00469c60);
     for (phase = 0; phase < 3; phase++) {
@@ -1198,7 +1198,7 @@ int FUN_00469c80(struct MapRectArg *arg) {
         }
     }
     CalculateMapRenderOrder();
-    PlayInstanceOfSample(DAT_004b92fc, 0, 1, 0);
+    PlayInstanceOfSample(GameFX[FX_INVENTORY_OUT].sample, 0, 1, 0);
     return 1;
 }
 

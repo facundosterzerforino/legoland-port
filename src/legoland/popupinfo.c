@@ -545,7 +545,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     switch (t.type) {
     case 0x307:
         if (*(short *)((char *)t.ptr + 0xc) != 5) {
-            PlayInstanceOfSample(DAT_004b92e4, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_GARDENER_LIFT].sample, 0, 1, 0);
             PickUpWorker(0x307, t.ptr);
         }
         break;
@@ -603,7 +603,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
                 *(unsigned short *)(iVar5 + 0xc) = *(unsigned short *)(iVar5 + 0xc) & 0xbfff;
                 FreeMechanicWorkOrder((WorkOrder *)iVar4);
             }
-            PlayInstanceOfSample(DAT_004b9308, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_MECHANIC_LIFT].sample, 0, 1, 0);
             PickUpWorker(0x308, t.ptr);
         }
         break;

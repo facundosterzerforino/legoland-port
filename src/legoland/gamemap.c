@@ -75,12 +75,12 @@ struct RemBlock {
 LEGO_EXPORT void InitGameMap(void) {
     // STRING: LEGOLAND 0x004b5c0c
     CastleObjElem = ElemID("CASTLE OBJ");
-    Load_FXList(DAT_004b9228, 0x17);
+    Load_FXList(GameFX, FX_COUNT);
 }
 
 // FUNCTION: LEGOLAND 0x00459870
 LEGO_EXPORT void KillGameMap(void) {
-    Kill_FXList(DAT_004b9228, 0x17);
+    Kill_FXList(GameFX, FX_COUNT);
 }
 
 // FUNCTION: LEGOLAND 0x00459880
@@ -243,7 +243,7 @@ LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileI
         blk.f8 = tile.pos.x;
         blk.fc = tile.pos.y;
         blk.f0 = 2;
-        PlayInstanceOfSample(DAT_004b9248, 0, 1, &blk);
+        PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, &blk);
     } else {
         DAT_00667cdc = 1;
     }

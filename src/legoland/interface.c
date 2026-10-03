@@ -611,7 +611,7 @@ unsigned char FUN_00474fc0(void *a, unsigned int flags) {
         return 1;
     }
     if (flags & 2) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         SetEditObject(*(struct EditObject **)((char *)a + 8));
     }
     return 1;
@@ -621,7 +621,7 @@ unsigned char FUN_00474fc0(void *a, unsigned int flags) {
 unsigned char FUN_00475000(unsigned int a, unsigned int flags) {
     if (EditMode.unk4 != 1) {
         if (flags & 2) {
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
             GamePad = (GamePad & 0xffff00ff) | ((GamePad & 0xff00) & 0xef00);
             EditMode.unk0 = 0;
         }
@@ -637,7 +637,7 @@ unsigned char FUN_00475040(unsigned int a, unsigned int flags) {
     if ((flags & 2) == 0) {
         return 1;
     }
-    PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+    PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
     GamePad &= ~0x400;
     EditMode.unk0 = 2;
     return 1;
@@ -647,7 +647,7 @@ unsigned char FUN_00475040(unsigned int a, unsigned int flags) {
 unsigned char FUN_00475080(unsigned int a, unsigned char flags) {
     if ((flags & 2) != 0) {
         do {
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
             if (EditMode.unk4 != 1) {
                 SpeechCloseFile();
                 DAT_00667c60 = EditMode.unk4;
@@ -671,7 +671,7 @@ unsigned char FUN_00475080(unsigned int a, unsigned char flags) {
 unsigned char FUN_00475120(unsigned int a, unsigned int flags, unsigned int c, unsigned int d) {
     if ((flags & 2) != 0 && EditMode.unk4 != 1) {
         if (DAT_00668954 == 0) {
-            PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
             GamePad = (GamePad & 0xffff00ff) | ((GamePad & 0xff00) & 0xeb00);
             EditMode.unk0 = 0;
             DAT_00668e38 = 1;
@@ -697,7 +697,7 @@ unsigned char FUN_004751a0(struct IconNode *param_1, unsigned char flags) {
         do {
             EditMode.unk0 = 0;
             GamePad = GamePad & 0xffffebff;
-            PlayInstanceOfSample(PTR_004b9314, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_THEME_CLICK].sample, 0, 1, 0);
             if (DAT_004baff8 != 0) {
                 DAT_004baff8 = 0;
                 DAT_00668e34 = 0;
@@ -735,7 +735,7 @@ unsigned char FUN_004752a0(struct IconNode *param_1, unsigned char flags) {
     if (EditMode.unk4 != 1 && (flags & 2) != 0) {
         GamePad = GamePad & 0xffffebff;
         EditMode.unk0 = 0;
-        PlayInstanceOfSample(PTR_004b9314, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_THEME_CLICK].sample, 0, 1, 0);
         if (DAT_004baff8 != 3) {
             DAT_004baff8 = 3;
             DAT_00668e34 = 0;
@@ -772,7 +772,7 @@ unsigned char FUN_004753a0(struct IconNode *param_1, unsigned char flags) {
     if (EditMode.unk4 != 1 && (flags & 2) != 0) {
         GamePad = GamePad & 0xffffebff;
         EditMode.unk0 = 0;
-        PlayInstanceOfSample(PTR_004b9314, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_THEME_CLICK].sample, 0, 1, 0);
         if (DAT_004baff8 != 2) {
             DAT_004baff8 = 2;
             DAT_00668e34 = 0;
@@ -813,7 +813,7 @@ unsigned char FUN_004754b0(struct IconNode *param_1, unsigned char flags) {
     if (EditMode.unk4 != 1 && (flags & 2) != 0) {
         GamePad = GamePad & 0xffffebff;
         EditMode.unk0 = 0;
-        PlayInstanceOfSample(PTR_004b9314, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_THEME_CLICK].sample, 0, 1, 0);
         if (DAT_004baff8 != 1) {
             DAT_004baff8 = 1;
             DAT_00668e34 = 0;
@@ -1358,7 +1358,7 @@ void DrawFlashingButtons(void) {
             i = i + 1;
         } while ((int)coords < (int)&DAT_004bb094);
         if (played != 0 && DAT_00668ec0 == 0) {
-            PlayInstanceOfSample(PTR_004b9338, 0, 1, 0);
+            PlayInstanceOfSample(GameFX[FX_WARNING].sample, 0, 1, 0);
         }
         DAT_00668ec0 = played;
     }

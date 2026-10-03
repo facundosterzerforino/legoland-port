@@ -5,6 +5,7 @@
 #include "legoland.h"
 
 struct Sample;
+struct FXItem;
 struct CallbackEntry;
 struct AVISoundBuffer;
 
@@ -28,8 +29,8 @@ LEGO_EXPORT void KillAllSamplesFromSource(struct SampleSource *source);
 LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
     unsigned int oneshot, void *config);
 LEGO_EXPORT void UnSourceAndFadeAllSamplesFromSource(void *source, int fade);
-LEGO_EXPORT void Load_FXList(const unsigned char *list, int count);
-LEGO_EXPORT void Kill_FXList(const unsigned char *list, int count);
+LEGO_EXPORT void Load_FXList(struct FXItem *list, int count);
+LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count);
 void UpdateSound(void);
 void FUN_00496e60(int param_1, int param_2);
 void FUN_00496d10(struct Sample *sample);

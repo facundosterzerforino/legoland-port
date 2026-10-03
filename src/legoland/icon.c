@@ -1954,9 +1954,9 @@ unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons) {
                     sub[2] = flags & 0xfffdffff;
                     RemoveNewObject(node->field_8);
                 }
-                PlayInstanceOfSample(DAT_004b929c, 0, 1, 0);
+                PlayInstanceOfSample(GameFX[FX_CLICK1].sample, 0, 1, 0);
             } else {
-                PlayInstanceOfSample(DAT_004b92d8, 0, 1, 0);
+                PlayInstanceOfSample(GameFX[FX_RASP].sample, 0, 1, 0);
             }
         } while (0);
         return 2;

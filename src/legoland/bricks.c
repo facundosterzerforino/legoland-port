@@ -257,7 +257,7 @@ void FUN_00457a70(void) {
                     }
                 }
                 if (DAT_00667cdc != 0) {
-                    PlayInstanceOfSample(DAT_004b9248, 0, 1, 0);
+                    PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, 0);
                     CalculateMapRenderOrder();
                 }
                 DAT_00667cd8 = 0;
@@ -350,7 +350,7 @@ void FUN_00457a70(void) {
                     DAT_00667cd8 = 0;
                     if (DAT_00667cdc != 0) {
                         PlayAppropriateBuildEffect((struct ObjClass *)EditMode.unk8, NULL);
-                        PlayInstanceOfSample(DAT_004b9248, 0, 1, 0);
+                        PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, 0);
                         CalculateMapRenderOrder();
                     }
                     DAT_00667cd8 = 0;

@@ -1218,7 +1218,7 @@ int FUN_00444df0(void) {
 // FUNCTION: LEGOLAND 0x00444eb0
 unsigned char FUN_00444eb0(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     if ((param_2 & 2) != 0) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_0081c038 = 0;
         DAT_006660a8 = 0;
         DAT_006660ac = 0;
@@ -1245,7 +1245,7 @@ unsigned char FUN_00444ef0(unsigned int param_1, unsigned int param_2) {
         return (unsigned char)FUN_00444eb0(0, param_2, 0, 0);
     }
     DAT_0081c07c = 1;
-    PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+    PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
     SpeechCloseFile();
     DAT_006687b0 = 4;
     if (DAT_006660a4 < DAT_006660a0 - 1) {
@@ -1260,7 +1260,7 @@ unsigned char FUN_00444f90(unsigned int param_1, unsigned char param_2) {
     SetIconSprite(DAT_006660ac, PreviousPageLitSprite);
     if ((param_2 & 2) != 0) {
         DAT_0081c07c = 1;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (DAT_006660a4 != 0) {
             DAT_006660a4 = DAT_006660a4 - 1;
         }

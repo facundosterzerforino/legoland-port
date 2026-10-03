@@ -213,7 +213,7 @@ unsigned char FUN_0048d970(unsigned int a1, unsigned char flags) {
     if (DAT_004bef9c != 0 && (flags & 2) && CurrentProfile.save_slot != 0) {
         SpeechCloseFile();
         DAT_006687b0 = 4;
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (LoadDateIntoTempProfile(CurrentProfile.profile_slot, CurrentProfile.save_slot & 0xff) != 0) {
             CurrentProfile.field_45 = TempProfile.field_24;
             CurrentProfile.field_20 = TempProfile.field_20;
@@ -247,7 +247,7 @@ unsigned char FUN_0048da50(unsigned int a1, unsigned int flags, unsigned int a3,
         if (!(flags & 2) || CurrentProfile.save_slot == 0) {
             return 1;
         }
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         SpeechCloseFile();
         DAT_006687b0 = 4;
         StoreNewSaveGameToDisk();
@@ -265,7 +265,7 @@ unsigned char FUN_0048da50(unsigned int a1, unsigned int flags, unsigned int a3,
 // FUNCTION: LEGOLAND 0x0048db10
 unsigned char FUN_0048db10(int param1, unsigned char flags) {
     if (DAT_004bef9c != 0 && (flags & 0x2)) {
-        PlayInstanceOfSample(PTR_004b92c0, 0, 1, 0);
+        PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_0080ff80.unk8 = 5;
     }
     return 1;

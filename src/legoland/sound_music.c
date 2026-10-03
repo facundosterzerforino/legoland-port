@@ -23,7 +23,6 @@ struct BandObj;
 struct BandVtbl;
 struct CallbackEntry;
 struct SampleDef;
-struct FXItem;
 struct FXList;
 struct SampleConfig;
 struct MusicLoader;
@@ -146,12 +145,6 @@ struct SampleConfig {
     unsigned int bloke;
     unsigned int source_x;
     unsigned int source_y;
-};
-
-struct FXItem {
-    /* 0x00 */ char *name;
-    /* 0x04 */ unsigned char pad_4[0x8 - 0x4];
-    /* 0x08 */ struct SampleDef *sample;
 };
 
 // FUNCTION: LEGOLAND 0x00495b90
@@ -941,13 +934,13 @@ LEGO_EXPORT void AddSFX_Callback(struct CallbackEntry *entry, unsigned int delay
 }
 
 // FUNCTION: LEGOLAND 0x00496dd0
-LEGO_EXPORT void Load_FXList(const unsigned char *list, int count) {
+LEGO_EXPORT void Load_FXList(struct FXItem *list, int count) {
     char path[100];
     struct FXItem *item;
     int i;
 
     for (i = 0; i < count; i++) {
-        item = &((struct FXItem *)list)[i];
+        item = &list[i];
         // STRING: LEGOLAND 0x004bfea0
         sprintf(path, ".\\sfx\\%s", item->name);
         item->sample = CreateSampleFromWAV(path);
@@ -961,13 +954,13 @@ LEGO_EXPORT void Load_FXList(const unsigned char *list, int count) {
 }
 
 // FUNCTION: LEGOLAND 0x00496e30
-LEGO_EXPORT void Kill_FXList(const unsigned char *list, int count) {
+LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count) {
     struct FXItem *item;
 
     if (count <= 0) {
         return;
     }
-    item = (struct FXItem *)list;
+    item = list;
     do {
         if (item->sample != 0) {
             DeleteSampleDef(item->sample);
