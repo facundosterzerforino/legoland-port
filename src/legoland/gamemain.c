@@ -596,12 +596,6 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
     struct ScriptCommand *cmd;
 
     DAT_00668fcc = 0;
-    /* [port] handlers read their arguments without checking the count (e.g. "[INIT]" alone on a line makes
-     * FUN_00478870 strcpy tokens[1]). In the original the unused slots held whatever was left on the stack; here
-     * they start out as empty strings (and, as before, keep the previous line's tokens after that). */
-    for (i = 0; i < 20; i++) {
-        tokens[i] = "";
-    }
     cmd = commands;
     // STRING: LEGOLAND 0x004bbdcc
     if (strcmp(cmd->name, "none") == 0)
