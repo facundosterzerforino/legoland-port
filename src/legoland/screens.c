@@ -494,7 +494,7 @@ void FUN_00458ee0(void) {
     }
     saved_value = Hover.ptr;
     saved_action = Hover.data.value;
-    PrintSprite(InterfaceBgSprite, Hover.type, saved_value, saved_action, frame.outgoing);
+    PrintSprite(InterfaceBgSprite, 0, 0, 0, frame.outgoing);
     FUN_0046f100(0x2c3);
     FUN_0046ee00();
     // STRING: LEGOLAND 0x004b91b0
