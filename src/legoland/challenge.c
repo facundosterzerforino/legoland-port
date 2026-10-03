@@ -469,6 +469,23 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
                 PushRenderingStatusAndLockVideoSurface();
                 FUN_004659a0(frame, param_1->x, param_1->y);
                 PopRenderingStatus();
+            } else {
+                /* [library:movie] nothing else paints the advisor window, so without a frame it showed whatever
+                 * an earlier screen left in the back buffer. Clear it to black (112x96, the size the advisor
+                 * AVIs are decoded to, see FUN_00443d90). */
+                unsigned short *row;
+                int x;
+                int y;
+
+                PushRenderingStatusAndLockVideoSurface();
+                for (y = 0; y < 0x60 && param_1->y + y < lpConfig->screen_height; y++) {
+                    row = (unsigned short *)((char *)CurrentSurfaceDesc.lpSurface +
+                        CurrentSurfaceDesc.lPitch * (param_1->y + y) + param_1->x * 2);
+                    for (x = 0; x < 0x70 && param_1->x + x < lpConfig->screen_width; x++) {
+                        row[x] = 0;
+                    }
+                }
+                PopRenderingStatus();
             }
             DAT_00665eec++;
             // STRING: LEGOLAND 0x004b7d98
