@@ -523,19 +523,16 @@ unsigned int DAT_004b5cc8;
 char RollerCoasterSavePath[32] = "RollerCoaster\\RollerCoaster.sav";
 
 // GLOBAL: LEGOLAND 0x004b5d20
-const unsigned char DAT_004b5d20[1];
+unsigned int DAT_004b5d20[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
 
 // GLOBAL: LEGOLAND 0x004b5d58
-const unsigned char DAT_004b5d58[1];
+unsigned int DAT_004b5d58[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
 
 // GLOBAL: LEGOLAND 0x004b5d90
-const unsigned char DAT_004b5d90[1];
+unsigned int DAT_004b5d90[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
 
 // GLOBAL: LEGOLAND 0x004b5dc8
-const unsigned char DAT_004b5dc8[1];
-
-// GLOBAL: LEGOLAND 0x004b5df0
-unsigned int DAT_004b5df0[4] = {0x427ff0, 0x427f70, 1, 0};
+unsigned int DAT_004b5dc8[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
 
 // GLOBAL: LEGOLAND 0x004b5e00
 float DAT_004b5e00[4][3] = {{1.0f, 0.0f, 0.0f}, {2.0f, 1.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {0.0f, 1.0f, 0.0f}};

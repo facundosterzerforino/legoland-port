@@ -7683,7 +7683,7 @@ void FUN_00427b20(Element *obj, int x, unsigned int y) {
     EditCursor.field_1828 |= 8;
     tile.a = (unsigned short)EditCursor.tile_x;
     tile.b = (unsigned short)EditCursor.tile_y;
-    result = FUN_0041d3b0(DAT_004b5d20, (unsigned int)&tile);
+    result = FUN_0041d3b0((const unsigned char *)DAT_004b5d20, (unsigned int)&tile);
     if (result->field_0 != 0) {
         FUN_0045f460(&EditCursor);
     } else {
@@ -7708,7 +7708,7 @@ void FUN_00427bc0(unsigned int unused, const struct Struct427bc0Src *src) {
     unsigned int *entry;
     pair.a = src->field_0;
     pair.b = src->field_4;
-    entry = (unsigned int *)FUN_0041d700(DAT_00829c08, DAT_004b5d20, (unsigned int)&pair);
+    entry = (unsigned int *)FUN_0041d700(DAT_00829c08, (const unsigned char *)DAT_004b5d20, (unsigned int)&pair);
     if (entry != NULL) {
         *entry |= 6;
     }

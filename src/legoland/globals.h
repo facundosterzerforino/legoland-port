@@ -857,18 +857,16 @@ extern unsigned int DAT_004b5cc4;
 extern unsigned int DAT_004b5cc8;
 // 0x004b5d20
 extern char RollerCoasterSavePath[32];
-extern const unsigned char DAT_004b5d20[1];
+extern unsigned int DAT_004b5d20[14];
 
 // 0x004b5d58
-extern const unsigned char DAT_004b5d58[1];
+extern unsigned int DAT_004b5d58[14];
 
 // 0x004b5d90
-extern const unsigned char DAT_004b5d90[1];
+extern unsigned int DAT_004b5d90[14];
 
 // 0x004b5dc8
-extern const unsigned char DAT_004b5dc8[1];
-// 0x004b5df0
-extern unsigned int DAT_004b5df0[4];
+extern unsigned int DAT_004b5dc8[14];
 // 0x004b5e00
 extern float DAT_004b5e00[4][3];
 // 0x004b5e30
