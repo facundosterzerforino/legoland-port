@@ -1772,6 +1772,32 @@ int FlipFrame(void) {
     return 1;
 }
 
+#ifdef LEGOLAND_PORT
+/* [library:video] port-only helper. Back from Alt+Tab, Windows can leave the screen in the desktop's mode (32-bit)
+ * instead of the game's: the 16-bit frame then came out shifted and in the wrong colours. When the game's window
+ * is in front and the mode isn't the one it set, set it again and restore the surfaces. */
+static void KeepDisplayMode(void) {
+    DDSURFACEDESC desc;
+
+    if (WinDebugMode != 0 || DisplayPixelFormat == 0 || GetForegroundWindow() != WNDENV_Gethwnd()) {
+        return;
+    }
+    desc.dwSize = sizeof(desc);
+    if (IDirectDraw2_GetDisplayMode(DDRAWENV.ddraw2, &desc) != 0) {
+        return;
+    }
+    if ((int)desc.dwWidth == PortDisplayWidth && (int)desc.dwHeight == PortDisplayHeight &&
+        desc.ddpfPixelFormat.dwRGBBitCount == 16) {
+        return;
+    }
+    DebugTrace("KeepDisplayMode: display is %lux%lu %lu bpp, setting %dx%d 16 bpp again", desc.dwWidth, desc.dwHeight,
+        desc.ddpfPixelFormat.dwRGBBitCount, PortDisplayWidth, PortDisplayHeight);
+    IDirectDraw2_SetDisplayMode(DDRAWENV.ddraw2, PortDisplayWidth, PortDisplayHeight, 16, 0, 0);
+    IDirectDrawSurface_Restore(PrimarySurface);
+    IDirectDrawSurface_Restore(OffscreenSurface);
+}
+#endif
+
 // FUNCTION: LEGOLAND 0x004661d0
 int BlitFrameToWindow(void) {
     RECT dst;
@@ -1797,6 +1823,7 @@ int BlitFrameToWindow(void) {
     }
     LastPresentTicks = GetTickCount();
 #ifdef LEGOLAND_PORT
+    KeepDisplayMode();
     if (WinDebugMode != 0 || PortDisplayScaled()) {
         /* [library:video] windowed (RGB565 frame through GDI) or another resolution: the frame is scaled to the
          * window or display mode (port_display.c) */

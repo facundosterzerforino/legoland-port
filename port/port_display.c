@@ -87,8 +87,12 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
         return hr;
     }
     bytes = (int)(pd.ddpfPixelFormat.dwRGBBitCount / 8);
-    if (bytes != 1 && bytes != 2) {
-        bytes = 2;
+    if (pd.ddpfPixelFormat.dwRGBBitCount != fd.ddpfPixelFormat.dwRGBBitCount || (bytes != 1 && bytes != 2)) {
+        /* the screen isn't in the frame's format (e.g. the desktop's 32-bit mode after Alt+Tab): copying would
+         * show garbage; the caller sets the mode again (KeepDisplayMode in draw.c) */
+        IDirectDrawSurface_Unlock(primary, pd.lpSurface);
+        IDirectDrawSurface_Unlock(frame, fd.lpSurface);
+        return DDERR_WRONGMODE;
     }
     PortDisplayDestRect((int)pd.dwWidth, (int)pd.dwHeight, &dest);
     dw = dest.right - dest.left;

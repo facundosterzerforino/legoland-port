@@ -122,6 +122,31 @@ int main(void) {
         IDirectDrawSurface_Release(out);
     }
     {
+        /* a screen in another format (the desktop's 32-bit mode after Alt+Tab) is refused and left alone */
+        DDSURFACEDESC desc;
+        LPDIRECTDRAWSURFACE out = NULL;
+        HRESULT hr;
+        memset(&desc, 0, sizeof(desc));
+        desc.dwSize = sizeof(desc);
+        desc.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
+        desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+        desc.dwWidth = 1024;
+        desc.dwHeight = 768;
+        desc.ddpfPixelFormat.dwSize = sizeof(desc.ddpfPixelFormat);
+        desc.ddpfPixelFormat.dwFlags = DDPF_RGB;
+        desc.ddpfPixelFormat.dwRGBBitCount = 32;
+        desc.ddpfPixelFormat.dwRBitMask = 0xff0000;
+        desc.ddpfPixelFormat.dwGBitMask = 0xff00;
+        desc.ddpfPixelFormat.dwBBitMask = 0xff;
+        IDirectDraw_CreateSurface(dd, &desc, &out, NULL);
+        PortDisplayWidth = 1024;
+        PortDisplayHeight = 768;
+        hr = PortPresent(NULL, frame, out, NULL);
+        printf("%s 32-bit screen refused (hr %lx)\n", hr == DDERR_WRONGMODE ? "ok  " : "FAIL", hr);
+        failures += hr != DDERR_WRONGMODE;
+        IDirectDrawSurface_Release(out);
+    }
+    {
         /* cost of one full present at the largest size (the game presents at most every 28 ms) */
         LPDIRECTDRAWSURFACE out = MakeSurface(2560, 1920);
         LARGE_INTEGER f, t0, t1;
