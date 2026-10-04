@@ -96,9 +96,15 @@ LEGO_EXPORT unsigned int SetPointer(unsigned int param_1) {
  * format, which on Windows 11 is 32-bit: its own surfaces are always RGB565, the format the 16-bit renderer
  * draws, and BlitFrameToWindow converts to the desktop with GDI. */
 static void SetWindowedSurfaceFormat(DDSURFACEDESC *desc) {
+#ifdef LEGOLAND_PORT
+    if (WinDebugMode == 0 && PortDisplayBpp != 32) { /* also full screen in a 32-bit mode (port_display.c) */
+        return;
+    }
+#else
     if (WinDebugMode == 0) {
         return;
     }
+#endif
     desc->dwFlags |= DDSD_PIXELFORMAT;
     memset(&desc->ddpfPixelFormat, 0, sizeof(desc->ddpfPixelFormat));
     desc->ddpfPixelFormat.dwSize = sizeof(desc->ddpfPixelFormat);
@@ -221,6 +227,7 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x800;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
+        SetWindowedSurfaceFormat(&desc); /* [library:video] RGB565 on a 32-bit display mode */
         if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &OffscreenSurface, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
@@ -231,6 +238,13 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x4000;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
+#ifdef LEGOLAND_PORT
+        if (PortDisplayBpp == 32) {
+            /* [library:video] RGB565 on a 32-bit display mode: a plain off-screen surface, as in windowed mode */
+            desc.ddsCaps.dwCaps = 0x40;
+            SetWindowedSurfaceFormat(&desc);
+        }
+#endif
         if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &DAT_00668074, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
@@ -264,9 +278,17 @@ LEGO_EXPORT int InitScreen(void) {
             window_rect.bottom = h - 1;
         }
 #endif
-        WNDENV_Sethwnd(CreateWindowExA(0, "LEGOLANDMAIN",
-            // STRING: LEGOLAND 0x004b9cf0
-            "Lego Land", 0x10cf0000, 0, 0, window_rect.right - window_rect.left + 1, window_rect.bottom - window_rect.top + 1, NULL, NULL, WNDENV_GethInstance(), NULL));
+#ifdef LEGOLAND_PORT
+        if (PortDisplayBorderless) {
+            /* [library:video] full screen at the desktop's resolution: a borderless window over the whole
+             * monitor, the display mode is left alone (port_display.h) */
+            WNDENV_Sethwnd(CreateWindowExA(0, "LEGOLANDMAIN", "Lego Land", WS_POPUP | WS_VISIBLE, 0,
+                0, PortDisplayWidth, PortDisplayHeight, NULL, NULL, WNDENV_GethInstance(), NULL));
+        } else
+#endif
+            WNDENV_Sethwnd(CreateWindowExA(0, "LEGOLANDMAIN",
+                // STRING: LEGOLAND 0x004b9cf0
+                "Lego Land", 0x10cf0000, 0, 0, window_rect.right - window_rect.left + 1, window_rect.bottom - window_rect.top + 1, NULL, NULL, WNDENV_GethInstance(), NULL));
         if (WNDENV_Gethwnd() == NULL) {
             DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
@@ -332,6 +354,14 @@ int SetDisplayModeAndDetectPixelFormat(void) {
 #ifdef LEGOLAND_PORT
         /* [library:video] the chosen display mode; the frame stays 640x480 and is scaled (port_display.h).
          * If the mode is refused, the original 640x480. */
+        if (IDirectDraw2_SetDisplayMode(ddraw2, PortDisplayWidth, PortDisplayHeight, 32, 0, 0) == 0) {
+            /* 32-bit: no 16-bit mode for Windows to emulate; the game's surfaces stay RGB565 and the frame is
+             * converted when shown (SetWindowedSurfaceFormat, port_display.c) */
+            PortDisplayBpp = 32;
+            goto mode_set;
+        }
+        DebugTrace("SetDisplayMode: %dx%d 32bpp refused, trying 16bpp", PortDisplayWidth, PortDisplayHeight);
+        PortDisplayBpp = 16;
         if (PortDisplayScaled()) {
             if (IDirectDraw2_SetDisplayMode(ddraw2, PortDisplayWidth, PortDisplayHeight, 0x10, 0, 0) == 0) {
                 goto mode_set;
@@ -360,9 +390,14 @@ mode_set:
     DebugTrace("SetDisplayMode: display is %lux%lu %lu bpp (masks %lx %lx %lx)", desc.dwWidth, desc.dwHeight,
         desc.ddpfPixelFormat.dwRGBBitCount, desc.ddpfPixelFormat.dwRBitMask, desc.ddpfPixelFormat.dwGBitMask,
         desc.ddpfPixelFormat.dwBBitMask);
+#ifdef LEGOLAND_PORT
+    if (WinDebugMode != 0 || PortDisplayBpp == 32) {
+#else
     if (WinDebugMode != 0) {
+#endif
         /* [library:video] windowed mode can't change the desktop's format (32-bit on Windows 11, which the
-         * original refused); the game's surfaces are RGB565 instead (SetWindowedSurfaceFormat). */
+         * original refused), and full screen uses a 32-bit mode too; the game's surfaces are RGB565 instead
+         * (SetWindowedSurfaceFormat). */
         DisplayPixelFormat = 2;
         return 1;
     }
@@ -1787,12 +1822,12 @@ static void KeepDisplayMode(void) {
         return;
     }
     if ((int)desc.dwWidth == PortDisplayWidth && (int)desc.dwHeight == PortDisplayHeight &&
-        desc.ddpfPixelFormat.dwRGBBitCount == 16) {
+        (int)desc.ddpfPixelFormat.dwRGBBitCount == PortDisplayBpp) {
         return;
     }
-    DebugTrace("KeepDisplayMode: display is %lux%lu %lu bpp, setting %dx%d 16 bpp again", desc.dwWidth, desc.dwHeight,
-        desc.ddpfPixelFormat.dwRGBBitCount, PortDisplayWidth, PortDisplayHeight);
-    IDirectDraw2_SetDisplayMode(DDRAWENV.ddraw2, PortDisplayWidth, PortDisplayHeight, 16, 0, 0);
+    DebugTrace("KeepDisplayMode: display is %lux%lu %lu bpp, setting %dx%d %d bpp again", desc.dwWidth, desc.dwHeight,
+        desc.ddpfPixelFormat.dwRGBBitCount, PortDisplayWidth, PortDisplayHeight, PortDisplayBpp);
+    IDirectDraw2_SetDisplayMode(DDRAWENV.ddraw2, PortDisplayWidth, PortDisplayHeight, PortDisplayBpp, 0, 0);
     IDirectDrawSurface_Restore(PrimarySurface);
     IDirectDrawSurface_Restore(OffscreenSurface);
 }
@@ -1824,7 +1859,7 @@ int BlitFrameToWindow(void) {
     LastPresentTicks = GetTickCount();
 #ifdef LEGOLAND_PORT
     KeepDisplayMode();
-    if (WinDebugMode != 0 || PortDisplayScaled()) {
+    if (PortDisplayCustomPresent()) {
         /* [library:video] windowed (RGB565 frame through GDI) or another resolution: the frame is scaled to the
          * window or display mode (port_display.c) */
         result = PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, NULL);
@@ -1914,7 +1949,7 @@ void DrawWatchSprite(void) {
             PrintSprite(WatchSprite, WatchRect.left, WatchRect.top, 0, 0);
             PopRenderingStatus();
 #ifdef LEGOLAND_PORT
-            if (WinDebugMode != 0 || PortDisplayScaled()) {
+            if (PortDisplayCustomPresent()) {
                 /* [library:video] only the watch's part of the frame, scaled (port_display.c) */
                 PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, &WatchRect);
                 return;

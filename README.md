@@ -81,14 +81,22 @@ The port reads data from an original LEGOLAND installation (the `.res` volumes, 
 
 ## Resolution and window mode
 
-A small launcher opens before the game: pick a 4:3 resolution (640x480 is the original; 800x600, 1024x768,
-1280x960 and more, as far as the display or desktop allows) and full screen or a window. The game still draws its
-640x480 picture and the port scales it up with sharp pixels (1280x960 and 1920x1440 are exact 2x and 3x), with
-black bars on screens that aren't 4:3; a window can also be resized. Nothing about the game changes.
+A small launcher opens before the game with three choices:
+
+- **Full screen (keep the desktop's resolution)**, the default: the picture fills the screen, 4:3 and centred, and
+  the display mode is never changed (Alt+Tab is instant).
+- **Full screen (change the resolution)**: a 4:3 display mode (640x480 is the original; 800x600, 1024x768,
+  1280x960 and more, as far as the display allows), in 32-bit colour.
+- **In a window** of a chosen 4:3 size; the window can be resized.
+
+The game still draws its 640x480, 16-bit picture and the port scales it up with sharp pixels (1280x960 and
+1920x1440 are exact 2x and 3x) and converts it to the screen's colours, with black bars on screens that aren't 4:3.
+Nothing about the game changes.
 
 The choice is saved next to the exe (`legoland-port.ini`). "Don't show this again" skips the launcher; hold
-Shift while starting the game to see it again. Command line: `-res 1024x768`, `-fullscreen`, `-windowed` (or the
-original `WINDEBUG`) choose without the launcher, `-launcher` always shows it.
+Shift while starting the game to see it again. Command line: `-fullscreen` (desktop resolution), `-res 1024x768`
+(full screen in that mode), `-windowed` (or the original `WINDEBUG`) choose without the launcher, `-launcher`
+always shows it.
 
 ## More documentation
 

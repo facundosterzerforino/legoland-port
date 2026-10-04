@@ -14,10 +14,16 @@
 
 extern int PortDisplayWidth; /* fullscreen display mode, or the window's client size */
 extern int PortDisplayHeight;
-extern int PortDisplayWindowed; /* 1: a window (same as the WINDEBUG switch) */
+extern int PortDisplayWindowed; /* 1: a window (same as the WINDEBUG switch), also for PortDisplayBorderless */
+extern int PortDisplayBorderless; /* 1: full screen at the desktop's resolution, a borderless window covering it */
+extern int PortDisplayBpp; /* full screen with a mode change: 32 (the game's RGB565 frame is converted when
+                                   * shown) or 16 when the display refused 32 (copied as is) */
 
 /* 1 when the frame is shown at another size than 640x480. */
 int PortDisplayScaled(void);
+
+/* 1 when frames go through PortPresent (window, scaled, or a 32-bit display); 0: the original Blt. */
+int PortDisplayCustomPresent(void);
 
 /* Where the 640x480 frame goes inside an area of the given size (4:3, centred). */
 void PortDisplayDestRect(int area_width, int area_height, RECT *dest);

@@ -9,9 +9,18 @@
 #include "port_trace.h"
 
 #define ID_RESOLUTION 101
-#define ID_FULLSCREEN 102
-#define ID_WINDOWED 103
-#define ID_DONT_ASK 104
+#define ID_DESKTOP 102
+#define ID_CHANGE 103
+#define ID_WINDOWED 104
+#define ID_DONT_ASK 105
+
+/* the three ways to show the game */
+enum {
+    MODE_DESKTOP,
+    MODE_CHANGE,
+    MODE_WINDOW
+};
+static const char *const mode_names[] = {"desktop", "change", "window"};
 
 struct Resolution {
     int width;
@@ -41,7 +50,7 @@ static int done;
 static int accepted;
 static int chosen_width;
 static int chosen_height;
-static int chosen_windowed;
+static int chosen_mode;
 static int listed[RESOLUTION_COUNT]; /* combo item -> resolutions[] index */
 
 /* Fullscreen: the display offers this size (in any colour depth; Windows adds 16-bit itself). */
@@ -78,22 +87,34 @@ static int WindowFits(int width, int height) {
     return frame.right - frame.left <= work.right - work.left && frame.bottom - frame.top <= work.bottom - work.top;
 }
 
-static int Available(int i, int windowed) {
-    return windowed ? WindowFits(resolutions[i].width, resolutions[i].height)
-                    : DisplayHasMode(resolutions[i].width, resolutions[i].height);
+static int Available(int i, int mode) {
+    return mode == MODE_WINDOW ? WindowFits(resolutions[i].width, resolutions[i].height)
+                               : DisplayHasMode(resolutions[i].width, resolutions[i].height);
 }
 
-static void FillCombo(int windowed) {
+static void FillCombo(int mode) {
     int count = 0;
     int select = -1;
     int fallback = 0;
     int i;
 
     SendMessageA(combo, CB_RESETCONTENT, 0, 0);
+    if (mode == MODE_DESKTOP) {
+        /* the picture fills the screen (4:3, centred); no resolution to choose */
+        char text[96];
+        RECT pic;
+        PortDisplayDestRect(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), &pic);
+        sprintf(text, "%d x %d  (fills the screen)", (int)(pic.right - pic.left), (int)(pic.bottom - pic.top));
+        SendMessageA(combo, CB_ADDSTRING, 0, (LPARAM)text);
+        SendMessageA(combo, CB_SETCURSEL, 0, 0);
+        EnableWindow(combo, FALSE);
+        return;
+    }
+    EnableWindow(combo, TRUE);
     for (i = 0; i < RESOLUTION_COUNT; i++) {
         char text[64];
 
-        if (!Available(i, windowed)) {
+        if (!Available(i, mode)) {
             continue;
         }
         if (resolutions[i].note != NULL) {
@@ -117,21 +138,24 @@ static void FillCombo(int windowed) {
 static void ReadChoice(void) {
     int item = (int)SendMessageA(combo, CB_GETCURSEL, 0, 0);
 
-    if (item >= 0 && item < RESOLUTION_COUNT) {
+    if (chosen_mode != MODE_DESKTOP && item >= 0 && item < RESOLUTION_COUNT) {
         chosen_width = resolutions[listed[item]].width;
         chosen_height = resolutions[listed[item]].height;
     }
-    chosen_windowed = SendDlgItemMessageA(launcher, ID_WINDOWED, BM_GETCHECK, 0, 0) == BST_CHECKED;
+    chosen_mode = IsDlgButtonChecked(launcher, ID_WINDOWED) == BST_CHECKED ? MODE_WINDOW
+        : IsDlgButtonChecked(launcher, ID_CHANGE) == BST_CHECKED           ? MODE_CHANGE
+                                                                           : MODE_DESKTOP;
 }
 
 static LRESULT CALLBACK LauncherProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     switch (msg) {
     case WM_COMMAND:
         switch (LOWORD(wparam)) {
-        case ID_FULLSCREEN:
+        case ID_DESKTOP:
+        case ID_CHANGE:
         case ID_WINDOWED:
             ReadChoice();
-            FillCombo(chosen_windowed);
+            FillCombo(chosen_mode);
             return 0;
         case IDOK:
             ReadChoice();
@@ -181,7 +205,7 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
         ReleaseDC(NULL, screen);
     }
     cw = S(330);
-    ch = S(196);
+    ch = S(268);
 
     memset(&metrics, 0, sizeof(metrics));
     metrics.cbSize = sizeof(metrics);
@@ -217,18 +241,25 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
         }
     }
 
-    Control("STATIC", "Screen resolution:", 0, 16, 16, 298, 18, -1, font);
-    combo = Control("COMBOBOX", "", CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP, 16, 36, 298, 300, ID_RESOLUTION, font);
-    Control("BUTTON", "Full screen", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 16, 72, 140, 20, ID_FULLSCREEN, font);
-    Control("BUTTON", "In a window", BS_AUTORADIOBUTTON, 170, 72, 140, 20, ID_WINDOWED, font);
-    Control("BUTTON", "Don't show this again", BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 16, 104, 298, 20, ID_DONT_ASK,
+    Control("STATIC", "Show the game:", 0, 16, 14, 298, 18, -1, font);
+    Control("BUTTON", "Full screen (keep the desktop's resolution)", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 16,
+        34, 298, 20, ID_DESKTOP, font);
+    Control("BUTTON", "Full screen (change the resolution)", BS_AUTORADIOBUTTON, 16, 56, 298, 20, ID_CHANGE, font);
+    Control("BUTTON", "In a window", BS_AUTORADIOBUTTON, 16, 78, 298, 20, ID_WINDOWED, font);
+    Control("STATIC", "Resolution:", 0, 16, 110, 298, 18, -1, font);
+    combo = Control("COMBOBOX", "", CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_GROUP, 16, 130, 298, 300,
+        ID_RESOLUTION, font);
+    Control("BUTTON", "Don't show this again", BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 16, 170, 298, 20, ID_DONT_ASK,
         font);
-    Control("STATIC", "(hold Shift while starting the game to see it again)", 0, 34, 124, 290, 18, -1, font);
-    Control("BUTTON", "Play", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 136, 156, 86, 28, IDOK, font);
-    Control("BUTTON", "Quit", WS_TABSTOP, 228, 156, 86, 28, IDCANCEL, font);
+    Control("STATIC", "(hold Shift while starting the game to see it again)", 0, 34, 190, 290, 18, -1, font);
+    Control("BUTTON", "Play", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 136, 226, 86, 28, IDOK, font);
+    Control("BUTTON", "Quit", WS_TABSTOP, 228, 226, 86, 28, IDCANCEL, font);
 
-    CheckDlgButton(launcher, chosen_windowed ? ID_WINDOWED : ID_FULLSCREEN, BST_CHECKED);
-    FillCombo(chosen_windowed);
+    CheckDlgButton(launcher,
+        chosen_mode == MODE_WINDOW ? ID_WINDOWED : chosen_mode == MODE_CHANGE ? ID_CHANGE
+                                                                              : ID_DESKTOP,
+        BST_CHECKED);
+    FillCombo(chosen_mode);
     ShowWindow(launcher, SW_SHOW);
     SetForegroundWindow(launcher);
     SetFocus(GetDlgItem(launcher, IDOK));
@@ -279,18 +310,32 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
     dot = strrchr(ini_path, '.');
     strcpy(dot != NULL && strchr(dot, '\\') == NULL ? dot : ini_path + strlen(ini_path), ".ini");
 
-    /* saved choice; the first time 1024x768 full screen */
+    /* saved choice; the first time full screen at the desktop's resolution (an older .ini has only "windowed") */
     chosen_width = GetPrivateProfileIntA("display", "width", 1024, ini_path);
     chosen_height = GetPrivateProfileIntA("display", "height", 768, ini_path);
-    chosen_windowed = GetPrivateProfileIntA("display", "windowed", 0, ini_path) != 0;
+    {
+        char mode[16];
+        int i;
+        chosen_mode = GetPrivateProfileIntA("display", "windowed", 0, ini_path) != 0 ? MODE_WINDOW : MODE_DESKTOP;
+        GetPrivateProfileStringA("display", "mode", "", mode, sizeof(mode), ini_path);
+        for (i = 0; i < 3; i++) {
+            if (strcmp(mode, mode_names[i]) == 0) {
+                chosen_mode = i;
+            }
+        }
+    }
     ask = GetPrivateProfileIntA("display", "show_launcher", 1, ini_path) != 0;
 
-    if (strstr(cmdline, "WINDEBUG") != NULL || strstr(cmdline, "-windowed") != NULL) {
-        chosen_windowed = 1;
-    } else if (strstr(cmdline, "-fullscreen") != NULL) {
-        chosen_windowed = 0;
-    }
     from_cmdline = ParseResolution(cmdline, &chosen_width, &chosen_height);
+    if (strstr(cmdline, "WINDEBUG") != NULL || strstr(cmdline, "-windowed") != NULL) {
+        chosen_mode = MODE_WINDOW;
+        from_cmdline = 1;
+    } else if (from_cmdline) {
+        chosen_mode = MODE_CHANGE; /* -res WxH: full screen in that mode */
+    } else if (strstr(cmdline, "-fullscreen") != NULL) {
+        chosen_mode = MODE_DESKTOP;
+        from_cmdline = 1;
+    }
     if (strstr(cmdline, "-launcher") != NULL || (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0) {
         ask = 1;
     } else if (from_cmdline) {
@@ -304,22 +349,31 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
         }
         WriteInt("width", chosen_width);
         WriteInt("height", chosen_height);
-        WriteInt("windowed", chosen_windowed);
+        WritePrivateProfileStringA("display", "mode", mode_names[chosen_mode], ini_path);
+        WritePrivateProfileStringA("display", "windowed", NULL, ini_path); /* replaced by "mode" */
         WriteInt("show_launcher", !dont_ask);
     }
-    if (!(chosen_windowed ? WindowFits(chosen_width, chosen_height) : DisplayHasMode(chosen_width, chosen_height))) {
+    if (chosen_mode == MODE_DESKTOP) {
+        /* a borderless window over the whole (primary) screen; the display mode isn't touched */
+        chosen_width = GetSystemMetrics(SM_CXSCREEN);
+        chosen_height = GetSystemMetrics(SM_CYSCREEN);
+    } else if (!(chosen_mode == MODE_WINDOW ? WindowFits(chosen_width, chosen_height)
+                                            : DisplayHasMode(chosen_width, chosen_height))) {
         PortTrace("launcher: %dx%d isn't available %s, using 640x480", chosen_width, chosen_height,
-            chosen_windowed ? "in a window" : "on this display");
+            chosen_mode == MODE_WINDOW ? "in a window" : "on this display");
         chosen_width = PORT_GAME_WIDTH;
         chosen_height = PORT_GAME_HEIGHT;
     }
     PortDisplayWidth = chosen_width;
     PortDisplayHeight = chosen_height;
-    PortDisplayWindowed = chosen_windowed;
+    PortDisplayWindowed = chosen_mode != MODE_CHANGE;
+    PortDisplayBorderless = chosen_mode == MODE_DESKTOP;
     {
+        static const char *const described[] = {"full screen at the desktop's resolution",
+            "full screen, display mode changed", "windowed"};
         HDC screen = GetDC(NULL);
-        PortTrace("launcher: %dx%d %s (screen %d dpi)", PortDisplayWidth, PortDisplayHeight,
-            chosen_windowed ? "windowed" : "full screen", screen != NULL ? GetDeviceCaps(screen, LOGPIXELSY) : 0);
+        PortTrace("launcher: %dx%d %s (screen %d dpi)", PortDisplayWidth, PortDisplayHeight, described[chosen_mode],
+            screen != NULL ? GetDeviceCaps(screen, LOGPIXELSY) : 0);
         if (screen != NULL) {
             ReleaseDC(NULL, screen);
         }

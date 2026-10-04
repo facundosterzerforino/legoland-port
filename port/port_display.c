@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "port_display.h"
@@ -9,6 +10,12 @@
 int PortDisplayWidth = PORT_GAME_WIDTH;
 int PortDisplayHeight = PORT_GAME_HEIGHT;
 int PortDisplayWindowed = 0;
+int PortDisplayBorderless = 0;
+int PortDisplayBpp = 16;
+
+/* RGB565 -> the 32-bit screen's format, one entry per 16-bit colour (built for the screen's channel masks) */
+static uint32_t *rgb565_to_32;
+static DWORD table_masks[3];
 
 /* Source column for each destination column of the current fullscreen destination (rebuilt when it changes). */
 static int column_map[4096];
@@ -16,6 +23,55 @@ static int column_map_width;
 
 int PortDisplayScaled(void) {
     return PortDisplayWidth != PORT_GAME_WIDTH || PortDisplayHeight != PORT_GAME_HEIGHT;
+}
+
+int PortDisplayCustomPresent(void) {
+    return PortDisplayWindowed || PortDisplayScaled() || PortDisplayBpp == 32;
+}
+
+static int LowestBit(DWORD mask) {
+    int shift = 0;
+    while (shift < 32 && (mask & (1u << shift)) == 0) {
+        shift++;
+    }
+    return shift;
+}
+
+/* The table for a 32-bit screen with 8-bit channels at these masks; 0 if the format is anything else. Each 5- or
+ * 6-bit channel is widened by repeating its top bits (31 -> 255, 0 -> 0), as a 16-bit display shows it. */
+static int Build565Table(const DDPIXELFORMAT *pf) {
+    int rs = LowestBit(pf->dwRBitMask);
+    int gs = LowestBit(pf->dwGBitMask);
+    int bs = LowestBit(pf->dwBBitMask);
+    unsigned v;
+
+    if (pf->dwRGBBitCount != 32 || pf->dwRBitMask != (0xffu << rs) || pf->dwGBitMask != (0xffu << gs) ||
+        pf->dwBBitMask != (0xffu << bs)) {
+        return 0;
+    }
+    if (rgb565_to_32 != NULL && table_masks[0] == pf->dwRBitMask && table_masks[1] == pf->dwGBitMask &&
+        table_masks[2] == pf->dwBBitMask) {
+        return 1;
+    }
+    if (rgb565_to_32 == NULL) {
+        rgb565_to_32 = (uint32_t *)malloc(0x10000 * sizeof(uint32_t));
+        if (rgb565_to_32 == NULL) {
+            return 0;
+        }
+    }
+    for (v = 0; v < 0x10000; v++) {
+        unsigned r = (v >> 11) & 0x1f;
+        unsigned g = (v >> 5) & 0x3f;
+        unsigned b = v & 0x1f;
+        r = (r << 3) | (r >> 2);
+        g = (g << 2) | (g >> 4);
+        b = (b << 3) | (b >> 2);
+        rgb565_to_32[v] = (uint32_t)((r << rs) | (g << gs) | (b << bs));
+    }
+    table_masks[0] = pf->dwRBitMask;
+    table_masks[1] = pf->dwGBitMask;
+    table_masks[2] = pf->dwBBitMask;
+    return 1;
 }
 
 void PortDisplayDestRect(int area_width, int area_height, RECT *dest) {
@@ -61,7 +117,8 @@ static void FillRows(unsigned char *base, LONG pitch, int bytes, int x0, int x1,
     }
 }
 
-/* Fullscreen: nearest-neighbour copy of the frame into the primary surface (both in the display's format). */
+/* Fullscreen: nearest-neighbour copy of the frame into the primary surface, either in the same format (a 16- or
+ * 8-bit display mode) or from the RGB565 frame to a 32-bit display mode. */
 static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src) {
     DDSURFACEDESC fd;
     DDSURFACEDESC pd;
@@ -70,6 +127,7 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
     RECT part;
     HRESULT hr;
     int bytes;
+    int convert;
     int dw;
     int dh;
     int x;
@@ -87,9 +145,11 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
         return hr;
     }
     bytes = (int)(pd.ddpfPixelFormat.dwRGBBitCount / 8);
-    if (pd.ddpfPixelFormat.dwRGBBitCount != fd.ddpfPixelFormat.dwRGBBitCount || (bytes != 1 && bytes != 2)) {
-        /* the screen isn't in the frame's format (e.g. the desktop's 32-bit mode after Alt+Tab): copying would
-         * show garbage; the caller sets the mode again (KeepDisplayMode in draw.c) */
+    convert = fd.ddpfPixelFormat.dwRGBBitCount == 16 && fd.ddpfPixelFormat.dwGBitMask == 0x07e0 &&
+        Build565Table(&pd.ddpfPixelFormat);
+    if (!convert && (pd.ddpfPixelFormat.dwRGBBitCount != fd.ddpfPixelFormat.dwRGBBitCount || (bytes != 1 && bytes != 2))) {
+        /* the screen is in a format the frame can't be copied or converted to (e.g. a 16-bit game on the
+         * desktop's 32-bit mode after Alt+Tab): the caller sets the mode again (KeepDisplayMode in draw.c) */
         IDirectDrawSurface_Unlock(primary, pd.lpSurface);
         IDirectDrawSurface_Unlock(frame, fd.lpSurface);
         return DDERR_WRONGMODE;
@@ -121,7 +181,13 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
         const unsigned char *srow = (const unsigned char *)fd.lpSurface + (size_t)sy * fd.lPitch;
         unsigned char *drow = (unsigned char *)pd.lpSurface + (size_t)y * pd.lPitch;
 
-        if (bytes == 2) {
+        if (convert) {
+            const uint16_t *s = (const uint16_t *)srow;
+            uint32_t *d = (uint32_t *)drow;
+            for (x = part.left; x < part.right; x++) {
+                d[x] = rgb565_to_32[s[column_map[x - dest.left]]];
+            }
+        } else if (bytes == 2) {
             const uint16_t *s = (const uint16_t *)srow;
             uint16_t *d = (uint16_t *)drow;
             for (x = part.left; x < part.right; x++) {
