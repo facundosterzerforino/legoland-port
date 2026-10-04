@@ -361,6 +361,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     int mid_top;
     int mid_h;
     int hit_left;
+    int frame_left;
     struct Sprite *top_sprite;
     int fits_above;
 
@@ -425,12 +426,13 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     top4 = row_y + -4;
     bottom4 = box.bottom + 4;
     box.top = row_y;
-    box.left = left4;
+    frame_left = left4;
     RenderBlock(left4, top4, width, 1, 0);
     color = GetNearestColour(0xde, 0xde, 0xd6);
     RenderBlock(left4, row_y + -3, width, (bottom4 - top4) + -1, color);
     RenderBlock(left4, bottom4, width, 1, 0);
     if (fits_above) {
+        row_y = bottom4; /* the tail hangs under the bubble, pointing down at the speaker */
         top_sprite = sprites[1];
     } else {
         row_y = top4 - corner_h;
@@ -455,7 +457,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     RenderBlock(right4, width, left_corner_w + -1, mid_h, color);
     PrintTextCell(cell, box.left, box.top);
     hit_left = left4;
-    if (box.left <= (int)MousePos.x && (int)MousePos.x <= right4 && top4 <= (int)MousePos.y &&
+    if (frame_left <= (int)MousePos.x && (int)MousePos.x <= right4 && top4 <= (int)MousePos.y &&
         (int)MousePos.y <= bottom4) {
         Hover.type = 5;
     }
