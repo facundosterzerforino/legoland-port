@@ -41,6 +41,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         /* [port] check the startup data and exit, without starting the game (or touching its trace file) */
         return PortDataSelfTest("port-selftest.txt");
     }
+    {
+        /* [library:window] already running (the game's own check, in wWinMain, comes after the launcher): bring
+         * that window to the front instead of showing a launcher and overwriting the running game's trace */
+        HANDLE running = OpenMutexA(SYNCHRONIZE, FALSE, "LegolandGameMutex");
+        if (running != NULL) {
+            HWND hwnd = FindWindowA("LEGOLANDMAIN", NULL);
+            CloseHandle(running);
+            if (hwnd != NULL) {
+                ShowWindow(hwnd, IsIconic(hwnd) ? SW_RESTORE : SW_SHOW);
+                SetForegroundWindow(hwnd);
+            }
+            return 0;
+        }
+    }
     PortTrace("WinMain: cmdline \"%s\"", lpCmdLine);
     if (!PortLauncherRun(hInstance, lpCmdLine)) {
         /* [library:config] resolution and window mode (port/port_launcher.c); before the watchdog, which

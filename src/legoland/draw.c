@@ -186,6 +186,13 @@ LEGO_EXPORT int InitScreen(void) {
             DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
         }
+#ifdef LEGOLAND_PORT
+        /* [library:window] after the launcher closed, Windows gave the focus to another program: the game pauses
+         * while its window is inactive (ProcessSystemEvents), so a full-screen game sat paused behind it */
+        SetForegroundWindow(WNDENV_Gethwnd());
+        DebugTrace("InitScreen: full screen %dx%d, window %s", PortDisplayWidth, PortDisplayHeight,
+            GetForegroundWindow() == WNDENV_Gethwnd() ? "active" : "NOT active");
+#endif
         if ((hr = IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 0x11)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_SetCooperativeLevel failed hr=%lx", hr);
             return 0;
@@ -264,6 +271,9 @@ LEGO_EXPORT int InitScreen(void) {
             DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
         }
+#ifdef LEGOLAND_PORT
+        SetForegroundWindow(WNDENV_Gethwnd()); /* [library:window] see the full-screen case */
+#endif
         if ((hr = IDirectDraw2_SetCooperativeLevel(DDRAWENV.ddraw2, WNDENV_Gethwnd(), 8)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_SetCooperativeLevel failed hr=%lx", hr);
             DestroyWindow(WNDENV_Gethwnd());
