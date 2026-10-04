@@ -1129,8 +1129,8 @@ void JungleCruiseSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = JungleCruiseRide;
     DefaultCursor(&EditCursor);
-    DAT_00629c50 = &JungleCruiseStartFootprint;
-    DAT_004b7288 = &DAT_004b7260;
+    JungleCruiseFootprint.next = &JungleCruiseStartFootprint;
+    JungleCruiseStartFootprint.next = &DAT_004b7260;
     SetEditCursorFootPrint(&JungleCruiseFootprint);
 }
 
@@ -1186,8 +1186,8 @@ void JungleCruiseAddObject(struct EditObject *obj, int *coords) {
 void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
     memcpy(EditCursor.field_1414, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
     EditCursor.field_1830 = 0;
-    DAT_00629c50 = &JungleCruiseStartFootprint;
-    DAT_004b7288 = &DAT_004b7260;
+    JungleCruiseFootprint.next = &JungleCruiseStartFootprint;
+    JungleCruiseStartFootprint.next = &DAT_004b7260;
     DAT_004b7260.v[4] = 0;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     FUN_0045f460(&EditCursor);

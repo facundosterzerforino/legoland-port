@@ -949,7 +949,6 @@ extern struct Footprint DAT_004b7260;
 // 0x004b7278
 extern struct Footprint JungleCruiseStartFootprint;
 // 0x004b7288
-extern struct Footprint *DAT_004b7288;
 // 0x004b7148
 extern struct BoatDirStep DAT_004b7148[4];
 // 0x004b7188
@@ -1631,13 +1630,11 @@ extern struct Footprint DAT_004cc048;
 // 0x004cc060
 extern struct Footprint BoatingSchoolStartFootprint;
 // 0x004cc070
-extern int *DAT_004cc070;
 // 0x004cc074
 extern struct BoatRideNode *BoatRideNodeList;
 // 0x004cc078
 extern struct Footprint BoatingSchoolFootprint;
 // 0x004cc088
-extern int *DAT_004cc088;
 // 0x004cc08c
 extern unsigned int BoatingSchoolAnimTick;
 // 0x004cc090
@@ -1928,7 +1925,6 @@ extern struct JungleScore *JungleScoreList;
 // 0x00629c40
 extern struct Footprint JungleCruiseFootprint;
 // 0x00629c50
-extern struct Footprint *DAT_00629c50;
 // 0x00629c54
 extern int JungleCruiseStep;
 // 0x00629c58

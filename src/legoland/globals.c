@@ -653,9 +653,6 @@ struct Footprint DAT_004b7260;
 // GLOBAL: LEGOLAND 0x004b7278
 struct Footprint JungleCruiseStartFootprint;
 
-// GLOBAL: LEGOLAND 0x004b7288
-struct Footprint *DAT_004b7288;
-
 // GLOBAL: LEGOLAND 0x004b7148
 struct BoatDirStep DAT_004b7148[4];
 
@@ -1738,17 +1735,11 @@ struct Footprint DAT_004cc048;
 // GLOBAL: LEGOLAND 0x004cc060
 struct Footprint BoatingSchoolStartFootprint;
 
-// GLOBAL: LEGOLAND 0x004cc070
-int *DAT_004cc070;
-
 // GLOBAL: LEGOLAND 0x004cc074
 struct BoatRideNode *BoatRideNodeList;
 
 // GLOBAL: LEGOLAND 0x004cc078
 struct Footprint BoatingSchoolFootprint;
-
-// GLOBAL: LEGOLAND 0x004cc088
-int *DAT_004cc088;
 
 // GLOBAL: LEGOLAND 0x004cc08c
 unsigned int BoatingSchoolAnimTick;
@@ -2187,9 +2178,6 @@ struct JungleScore *JungleScoreList;
 
 // GLOBAL: LEGOLAND 0x00629c40
 struct Footprint JungleCruiseFootprint;
-
-// GLOBAL: LEGOLAND 0x00629c50
-struct Footprint *DAT_00629c50;
 
 // GLOBAL: LEGOLAND 0x00629c54
 int JungleCruiseStep;

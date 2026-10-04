@@ -614,8 +614,8 @@ void FUN_0041a000(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = BoatingSchoolRide;
     DefaultCursor(&EditCursor);
-    DAT_004cc088 = BoatingSchoolStartFootprint.v;
-    DAT_004cc070 = DAT_004cc048.v;
+    BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
+    BoatingSchoolStartFootprint.next = &DAT_004cc048;
     SetEditCursorFootPrint(BoatingSchoolFootprint.v);
 }
 
@@ -673,9 +673,9 @@ void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
 void FUN_0041a2f0(int param_1, unsigned int param_2, unsigned int param_3) {
     struct Cursor *cursor = *(struct Cursor **)(param_1 + 0xc);
 
-    DAT_004cc088 = BoatingSchoolStartFootprint.v;
-    DAT_004cc070 = DAT_004cc048.v;
-    DAT_004cc070[4] = 0;
+    BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
+    BoatingSchoolStartFootprint.next = &DAT_004cc048;
+    BoatingSchoolStartFootprint.next->next = NULL;
     memcpy(EditCursor.field_1414, BoatingSchoolFootprint.v, 20);
     EditCursor.field_1830 = 0;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
