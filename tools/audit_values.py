@@ -93,7 +93,9 @@ def main():
     bad = checked = 0
     with tempfile.TemporaryDirectory() as tmp:
         for f, names in sorted(per_file.items()):
-            todo = [a for a, g in found.items() if g["file"] == f and g["name"] not in filled and "=" in g["decl"]]
+            # a const or static global without an initializer is zero and never filled either (DAT_004b5d58 was one)
+            todo = [a for a, g in found.items() if g["file"] == f and g["name"] not in filled
+                    and ("=" in g["decl"] or re.match(r"\s*(static|const)\b", g["decl"]))]
             if not todo:
                 continue
             asm_path = Path(tmp) / f"{f}.asm"
