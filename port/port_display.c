@@ -119,49 +119,29 @@ static void FillRows(unsigned char *base, LONG pitch, int bytes, int x0, int x1,
     }
 }
 
-/* Fullscreen: nearest-neighbour copy of the frame into the primary surface, either in the same format (a 16- or
- * 8-bit display mode) or from the RGB565 frame to a 32-bit display mode. */
-static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src) {
-    DDSURFACEDESC fd;
-    DDSURFACEDESC pd;
+/* Scales the part src (game coordinates; NULL: all, with black bars around the picture) of the locked frame fd
+ * into a destination of dwidth x dheight pixels: nearest-neighbour, either copied (bytes 1 or 2, same format) or
+ * converted from RGB565 to 32-bit (convert, through rgb565_to_32). The same code for every mode, so a pixel always
+ * comes from the same source pixel. */
+static void Scale(const DDSURFACEDESC *fd, unsigned char *dst, LONG dpitch, int dwidth, int dheight, int bytes,
+    int convert, const RECT *src) {
     RECT dest;
     RECT area;
     RECT part;
-    HRESULT hr;
-    int bytes;
-    int convert;
     int dw;
     int dh;
     int x;
     int y;
 
-    fd.dwSize = sizeof(fd);
-    hr = IDirectDrawSurface_Lock(frame, NULL, &fd, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
-    if (hr != DD_OK) {
-        return hr;
-    }
-    pd.dwSize = sizeof(pd);
-    hr = IDirectDrawSurface_Lock(primary, NULL, &pd, DDLOCK_WAIT | DDLOCK_WRITEONLY, NULL);
-    if (hr != DD_OK) {
-        IDirectDrawSurface_Unlock(frame, fd.lpSurface);
-        return hr;
-    }
-    bytes = (int)(pd.ddpfPixelFormat.dwRGBBitCount / 8);
-    convert = fd.ddpfPixelFormat.dwRGBBitCount == 16 && fd.ddpfPixelFormat.dwGBitMask == 0x07e0 &&
-        Build565Table(&pd.ddpfPixelFormat);
-    if (!convert && (pd.ddpfPixelFormat.dwRGBBitCount != fd.ddpfPixelFormat.dwRGBBitCount || (bytes != 1 && bytes != 2))) {
-        /* the screen is in a format the frame can't be copied or converted to (e.g. a 16-bit game on the
-         * desktop's 32-bit mode after Alt+Tab): the caller sets the mode again (KeepDisplayMode in draw.c) */
-        IDirectDrawSurface_Unlock(primary, pd.lpSurface);
-        IDirectDrawSurface_Unlock(frame, fd.lpSurface);
-        return DDERR_WRONGMODE;
-    }
-    PortDisplayDestRect((int)pd.dwWidth, (int)pd.dwHeight, &dest);
+    PortDisplayDestRect(dwidth, dheight, &dest);
     dw = dest.right - dest.left;
     dh = dest.bottom - dest.top;
     if (dw > (int)(sizeof(column_map) / sizeof(column_map[0]))) {
         dw = sizeof(column_map) / sizeof(column_map[0]);
         dest.right = dest.left + dw;
+    }
+    if (dw <= 0 || dh <= 0) {
+        return;
     }
     if (column_map_width != dw) {
         for (x = 0; x < dw; x++) {
@@ -172,16 +152,16 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
     ClampToFrame(src, &area);
     MapRect(&dest, &area, &part);
     if (src == NULL) {
-        /* black bars around a 4:3 picture on a wider (or taller) mode */
-        FillRows(pd.lpSurface, pd.lPitch, bytes, 0, (int)pd.dwWidth, 0, dest.top);
-        FillRows(pd.lpSurface, pd.lPitch, bytes, 0, (int)pd.dwWidth, dest.bottom, (int)pd.dwHeight);
-        FillRows(pd.lpSurface, pd.lPitch, bytes, 0, dest.left, dest.top, dest.bottom);
-        FillRows(pd.lpSurface, pd.lPitch, bytes, dest.right, (int)pd.dwWidth, dest.top, dest.bottom);
+        /* black bars around a 4:3 picture on a wider (or taller) screen or window */
+        FillRows(dst, dpitch, bytes, 0, dwidth, 0, dest.top);
+        FillRows(dst, dpitch, bytes, 0, dwidth, dest.bottom, dheight);
+        FillRows(dst, dpitch, bytes, 0, dest.left, dest.top, dest.bottom);
+        FillRows(dst, dpitch, bytes, dest.right, dwidth, dest.top, dest.bottom);
     }
     for (y = part.top; y < part.bottom; y++) {
         int sy = (y - dest.top) * PORT_GAME_HEIGHT / dh;
-        const unsigned char *srow = (const unsigned char *)fd.lpSurface + (size_t)sy * fd.lPitch;
-        unsigned char *drow = (unsigned char *)pd.lpSurface + (size_t)y * pd.lPitch;
+        const unsigned char *srow = (const unsigned char *)fd->lpSurface + (size_t)sy * fd->lPitch;
+        unsigned char *drow = dst + (size_t)y * dpitch;
 
         if (convert) {
             const uint16_t *s = (const uint16_t *)srow;
@@ -201,18 +181,96 @@ static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE 
             }
         }
     }
+}
+
+/* Fullscreen: the frame scaled into the primary surface, either in the same format (a 16- or 8-bit display mode)
+ * or from the RGB565 frame to a 32-bit display mode. */
+static HRESULT PresentFullscreen(LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src) {
+    DDSURFACEDESC fd;
+    DDSURFACEDESC pd;
+    HRESULT hr;
+    int bytes;
+    int convert;
+
+    fd.dwSize = sizeof(fd);
+    hr = IDirectDrawSurface_Lock(frame, NULL, &fd, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
+    if (hr != DD_OK) {
+        return hr;
+    }
+    pd.dwSize = sizeof(pd);
+    hr = IDirectDrawSurface_Lock(primary, NULL, &pd, DDLOCK_WAIT | DDLOCK_WRITEONLY, NULL);
+    if (hr != DD_OK) {
+        IDirectDrawSurface_Unlock(frame, fd.lpSurface);
+        return hr;
+    }
+    bytes = (int)(pd.ddpfPixelFormat.dwRGBBitCount / 8);
+    convert = fd.ddpfPixelFormat.dwRGBBitCount == 16 && fd.ddpfPixelFormat.dwGBitMask == 0x07e0 &&
+        Build565Table(&pd.ddpfPixelFormat);
+    if (!convert &&
+        (pd.ddpfPixelFormat.dwRGBBitCount != fd.ddpfPixelFormat.dwRGBBitCount || (bytes != 1 && bytes != 2))) {
+        /* the screen is in a format the frame can't be copied or converted to (e.g. a 16-bit game on the
+         * desktop's 32-bit mode after Alt+Tab): the caller sets the mode again (KeepDisplayMode in draw.c) */
+        IDirectDrawSurface_Unlock(primary, pd.lpSurface);
+        IDirectDrawSurface_Unlock(frame, fd.lpSurface);
+        return DDERR_WRONGMODE;
+    }
+    Scale(&fd, (unsigned char *)pd.lpSurface, pd.lPitch, (int)pd.dwWidth, (int)pd.dwHeight, bytes, convert, src);
     IDirectDrawSurface_Unlock(primary, pd.lpSurface);
     IDirectDrawSurface_Unlock(frame, fd.lpSurface);
     return DD_OK;
 }
 
-/* Windowed: the RGB565 frame (SetWindowedSurfaceFormat) is copied into the client area with GDI, which also
- * converts it to the desktop's format. */
+/* Windowed (and full screen at the desktop's resolution): the frame is scaled and converted into this 32-bit
+ * bitmap of the client area's size, which GDI then copies 1:1. Letting GDI stretch (StretchDIBits) flickered: from
+ * one call to the next it mapped some screen rows and columns to a neighbouring source pixel. */
+static HDC window_dc;
+static HBITMAP window_bitmap;
+static HGDIOBJ window_old_bitmap;
+static uint32_t *window_bits;
+static int window_width;
+static int window_height;
+
+static int WindowImage(int width, int height) {
+    BITMAPINFO info;
+    void *bits = NULL;
+
+    if (window_bits != NULL && window_width == width && window_height == height) {
+        return 1;
+    }
+    if (window_dc != NULL) {
+        SelectObject(window_dc, window_old_bitmap);
+        DeleteObject(window_bitmap);
+        DeleteDC(window_dc);
+        window_dc = NULL;
+        window_bits = NULL;
+    }
+    memset(&info, 0, sizeof(info));
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = width;
+    info.bmiHeader.biHeight = -height; /* top-down */
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    window_dc = CreateCompatibleDC(NULL);
+    window_bitmap = CreateDIBSection(window_dc, &info, DIB_RGB_COLORS, &bits, NULL, 0);
+    if (window_dc == NULL || window_bitmap == NULL || bits == NULL) {
+        if (window_bitmap != NULL) {
+            DeleteObject(window_bitmap);
+        }
+        if (window_dc != NULL) {
+            DeleteDC(window_dc);
+        }
+        window_dc = NULL;
+        return 0;
+    }
+    window_old_bitmap = SelectObject(window_dc, window_bitmap);
+    window_bits = (uint32_t *)bits;
+    window_width = width;
+    window_height = height;
+    return 1;
+}
+
 static HRESULT PresentWindowed(HWND hwnd, LPDIRECTDRAWSURFACE frame, const RECT *src) {
-    struct {
-        BITMAPINFOHEADER header;
-        DWORD masks[3];
-    } bmi;
+    DDPIXELFORMAT xrgb;
     DDSURFACEDESC desc;
     RECT client;
     RECT dest;
@@ -221,6 +279,18 @@ static HRESULT PresentWindowed(HWND hwnd, LPDIRECTDRAWSURFACE frame, const RECT 
     HRESULT hr;
     HDC dc;
 
+    memset(&xrgb, 0, sizeof(xrgb));
+    xrgb.dwSize = sizeof(xrgb);
+    xrgb.dwFlags = DDPF_RGB;
+    xrgb.dwRGBBitCount = 32;
+    xrgb.dwRBitMask = 0xff0000;
+    xrgb.dwGBitMask = 0xff00;
+    xrgb.dwBBitMask = 0xff;
+    GetClientRect(hwnd, &client);
+    if (client.right <= 0 || client.bottom <= 0 || !WindowImage(client.right, client.bottom) ||
+        !Build565Table(&xrgb)) {
+        return DD_OK; /* minimized */
+    }
     desc.dwSize = sizeof(desc);
     hr = IDirectDrawSurface_Lock(frame, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
     if (hr == DDERR_SURFACELOST) {
@@ -230,45 +300,29 @@ static HRESULT PresentWindowed(HWND hwnd, LPDIRECTDRAWSURFACE frame, const RECT 
     if (hr != DD_OK) {
         return hr;
     }
-    GetClientRect(hwnd, &client);
-    PortDisplayDestRect(client.right, client.bottom, &dest);
-    ClampToFrame(src, &area);
-    MapRect(&dest, &area, &part);
-    memset(&bmi, 0, sizeof(bmi));
-    bmi.header.biSize = sizeof(bmi.header);
-    bmi.header.biWidth = desc.lPitch / 2;
-    /* top-down, starting at the first row of the part (StretchDIBits' source y is awkward for top-down DIBs) */
-    bmi.header.biHeight = -(area.bottom - area.top);
-    bmi.header.biPlanes = 1;
-    bmi.header.biBitCount = 16;
-    bmi.header.biCompression = BI_BITFIELDS;
-    bmi.masks[0] = 0xf800;
-    bmi.masks[1] = 0x07e0;
-    bmi.masks[2] = 0x001f;
+    Scale(&desc, (unsigned char *)window_bits, (LONG)window_width * 4, window_width, window_height, 4, 1, src);
+    IDirectDrawSurface_Unlock(frame, desc.lpSurface);
+    GdiFlush();
+    if (src == NULL) {
+        part = client;
+    } else {
+        PortDisplayDestRect(client.right, client.bottom, &dest);
+        ClampToFrame(src, &area);
+        MapRect(&dest, &area, &part);
+    }
     dc = GetDC(hwnd);
     if (dc != NULL) {
-        if (src == NULL) {
-            HBRUSH black = (HBRUSH)GetStockObject(BLACK_BRUSH);
-            RECT bar;
-
-            SetRect(&bar, 0, 0, client.right, dest.top);
-            FillRect(dc, &bar, black);
-            SetRect(&bar, 0, dest.bottom, client.right, client.bottom);
-            FillRect(dc, &bar, black);
-            SetRect(&bar, 0, dest.top, dest.left, dest.bottom);
-            FillRect(dc, &bar, black);
-            SetRect(&bar, dest.right, dest.top, client.right, dest.bottom);
-            FillRect(dc, &bar, black);
-        }
-        SetStretchBltMode(dc, COLORONCOLOR); /* nearest-neighbour */
-        StretchDIBits(dc, part.left, part.top, part.right - part.left, part.bottom - part.top, area.left, 0,
-            area.right - area.left, area.bottom - area.top,
-            (const unsigned char *)desc.lpSurface + (size_t)area.top * desc.lPitch, (BITMAPINFO *)&bmi,
-            DIB_RGB_COLORS, SRCCOPY);
+        BitBlt(dc, part.left, part.top, part.right - part.left, part.bottom - part.top, window_dc, part.left, part.top,
+            SRCCOPY);
         ReleaseDC(hwnd, dc);
     }
-    IDirectDrawSurface_Unlock(frame, desc.lpSurface);
     return DD_OK;
+}
+
+const unsigned int *PortDisplayWindowImage(int *width, int *height) {
+    *width = window_width;
+    *height = window_height;
+    return (const unsigned int *)window_bits;
 }
 
 HRESULT PortPresent(HWND hwnd, LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src) {

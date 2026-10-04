@@ -32,6 +32,9 @@ void PortDisplayDestRect(int area_width, int area_height, RECT *dest);
  * fullscreen primary surface, or with GDI into the window. Returns a DirectDraw result. */
 HRESULT PortPresent(HWND hwnd, LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src);
 
+/* Windowed: the last picture copied to the window (32-bit, the client area's size), for tools/test_display. */
+const unsigned int *PortDisplayWindowImage(int *width, int *height);
+
 /* Windowed: turns a point in the window's client area into game coordinates (0..639, 0..479). */
 void PortDisplayClientToGame(HWND hwnd, POINT *pt);
 

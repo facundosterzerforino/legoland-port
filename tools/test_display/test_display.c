@@ -146,6 +146,68 @@ int main(void) {
         IDirectDrawSurface_Release(out);
     }
     {
+        /* windowed / desktop-resolution full screen: the picture is scaled by the same code into a 32-bit image the
+         * size of the client area (a window that is never shown), the same every time (GDI's own stretching mapped
+         * some rows and columns differently from one present to the next: flicker) */
+        static const int clients[][2] = {{1920, 1200}, {1400, 1050}, {1152, 864}, {1000, 900}};
+        WNDCLASSA wc;
+        int k;
+        memset(&wc, 0, sizeof(wc));
+        wc.lpfnWndProc = DefWindowProcA;
+        wc.hInstance = GetModuleHandleA(NULL);
+        wc.lpszClassName = "TestDisplay";
+        RegisterClassA(&wc);
+        PortDisplayWindowed = 1;
+        for (k = 0; k < 4; k++) {
+            int cw = clients[k][0], ch = clients[k][1], w, h, x, y, bad = 0, pass;
+            HWND hwnd = CreateWindowExA(0, "TestDisplay", "", WS_POPUP, 0, 0, cw, ch, NULL, NULL, wc.hInstance, NULL);
+            RECT dest;
+            const unsigned int *img;
+            PortDisplayDestRect(cw, ch, &dest);
+            for (pass = 0; pass < 3; pass++) {
+                PortPresent(hwnd, frame, NULL, pass == 2 ? &watch : NULL);
+                img = PortDisplayWindowImage(&w, &h);
+                if (img == NULL || w != cw || h != ch) {
+                    printf("FAIL window %dx%d: no image\n", cw, ch);
+                    bad++;
+                    break;
+                }
+                for (y = 0; y < ch; y++) {
+                    for (x = 0; x < cw; x++) {
+                        unsigned want = 0;
+                        if (x >= dest.left && x < dest.right && y >= dest.top && y < dest.bottom) {
+                            unsigned v = Pattern((x - dest.left) * 640 / (dest.right - dest.left),
+                                (y - dest.top) * 480 / (dest.bottom - dest.top));
+                            unsigned r = (v >> 11) & 31, g = (v >> 5) & 63, b = v & 31;
+                            want = (((r << 3) | (r >> 2)) << 16) | (((g << 2) | (g >> 4)) << 8) | ((b << 3) | (b >> 2));
+                        }
+                        if ((img[y * cw + x] & 0xffffff) != want && bad++ < 3) {
+                            printf("FAIL window %dx%d pass %d: (%d,%d) = %06x, want %06x\n", cw, ch, pass, x, y,
+                                img[y * cw + x] & 0xffffff, want);
+                        }
+                    }
+                }
+            }
+            printf("%s window %dx%d: picture (%ld,%ld)-(%ld,%ld), same in 3 presents\n", bad ? "FAIL" : "ok  ", cw, ch,
+                dest.left, dest.top, dest.right, dest.bottom);
+            if (k == 0) {
+                /* cost of one windowed present at full-screen size (the game presents at most every 28 ms) */
+                LARGE_INTEGER f, t0, t1;
+                QueryPerformanceFrequency(&f);
+                QueryPerformanceCounter(&t0);
+                for (pass = 0; pass < 50; pass++) {
+                    PortPresent(hwnd, frame, NULL, NULL);
+                }
+                QueryPerformanceCounter(&t1);
+                printf("present window %dx%d: %.2f ms\n", cw, ch,
+                    (double)(t1.QuadPart - t0.QuadPart) * 1000.0 / f.QuadPart / 50);
+            }
+            failures += bad != 0;
+            DestroyWindow(hwnd);
+        }
+        PortDisplayWindowed = 0;
+    }
+    {
         /* a 32-bit screen: every pixel converted from RGB565 (channels widened by repeating their top bits) */
         LPDIRECTDRAWSURFACE out = MakeSurfaceFormat(1024, 768, 32, 0xff0000, 0xff00, 0xff);
         DDSURFACEDESC d;
@@ -227,48 +289,6 @@ int main(void) {
         QueryPerformanceCounter(&t1);
         printf("present 2560x1920: %.2f ms\n", (double)(t1.QuadPart - t0.QuadPart) * 1000.0 / f.QuadPart / 50);
         IDirectDrawSurface_Release(out);
-    }
-    {
-        /* borderless full screen and windowed mode use GDI: 640x480 RGB565 stretched to 1600x1200 on a 32-bit
-         * bitmap, as StretchDIBits does into the window */
-        struct {
-            BITMAPINFOHEADER header;
-            DWORD masks[3];
-        } bmi;
-        BITMAPINFO target;
-        void *bits = NULL;
-        static uint16_t pixels[640 * 480];
-        HDC dc = CreateCompatibleDC(NULL);
-        HBITMAP bmp;
-        LARGE_INTEGER f, t0, t1;
-        memset(&target, 0, sizeof(target));
-        target.bmiHeader.biSize = sizeof(target.bmiHeader);
-        target.bmiHeader.biWidth = 1920;
-        target.bmiHeader.biHeight = -1200;
-        target.bmiHeader.biPlanes = 1;
-        target.bmiHeader.biBitCount = 32;
-        bmp = CreateDIBSection(dc, &target, DIB_RGB_COLORS, &bits, NULL, 0);
-        SelectObject(dc, bmp);
-        memset(&bmi, 0, sizeof(bmi));
-        bmi.header.biSize = sizeof(bmi.header);
-        bmi.header.biWidth = 640;
-        bmi.header.biHeight = -480;
-        bmi.header.biPlanes = 1;
-        bmi.header.biBitCount = 16;
-        bmi.header.biCompression = BI_BITFIELDS;
-        bmi.masks[0] = 0xf800;
-        bmi.masks[1] = 0x07e0;
-        bmi.masks[2] = 0x001f;
-        SetStretchBltMode(dc, COLORONCOLOR);
-        QueryPerformanceFrequency(&f);
-        QueryPerformanceCounter(&t0);
-        for (i = 0; i < 50; i++) {
-            StretchDIBits(dc, 160, 0, 1600, 1200, 0, 0, 640, 480, pixels, (BITMAPINFO *)&bmi, DIB_RGB_COLORS, SRCCOPY);
-        }
-        QueryPerformanceCounter(&t1);
-        printf("GDI 640x480 -> 1600x1200: %.2f ms\n", (double)(t1.QuadPart - t0.QuadPart) * 1000.0 / f.QuadPart / 50);
-        DeleteDC(dc);
-        DeleteObject(bmp);
     }
     {
         /* the surfaces InitScreen creates with the forced RGB565 format (windowed, and full screen in a 32-bit
