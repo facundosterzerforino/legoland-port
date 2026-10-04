@@ -270,6 +270,37 @@ int main(void) {
         DeleteDC(dc);
         DeleteObject(bmp);
     }
+    {
+        /* the surfaces InitScreen creates with the forced RGB565 format (windowed, and full screen in a 32-bit
+         * mode): DirectDraw must accept each caps/format pair (it refused 0x800 alone) */
+        static const DWORD caps[] = {0x40, 0x840, 0x4000 | 0x40, 0x40 | 0x800};
+        static const char *const what[] = {"windowed frame / sprites", "32-bit full screen frame / extra surface",
+            "video-memory off-screen", "sprites (system memory retry)"};
+        int k;
+        for (k = 0; k < 4; k++) {
+            DDSURFACEDESC desc;
+            LPDIRECTDRAWSURFACE surf = NULL;
+            HRESULT hr;
+            memset(&desc, 0, sizeof(desc));
+            desc.dwSize = sizeof(desc);
+            desc.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
+            desc.ddsCaps.dwCaps = caps[k];
+            desc.dwWidth = 640;
+            desc.dwHeight = 480;
+            desc.ddpfPixelFormat.dwSize = sizeof(desc.ddpfPixelFormat);
+            desc.ddpfPixelFormat.dwFlags = DDPF_RGB;
+            desc.ddpfPixelFormat.dwRGBBitCount = 16;
+            desc.ddpfPixelFormat.dwRBitMask = 0xf800;
+            desc.ddpfPixelFormat.dwGBitMask = 0x07e0;
+            desc.ddpfPixelFormat.dwBBitMask = 0x001f;
+            hr = IDirectDraw_CreateSurface(dd, &desc, &surf, NULL);
+            printf("%s RGB565 surface caps %04lx (%s): hr %lx\n", hr == DD_OK ? "ok  " : "FAIL", caps[k], what[k], hr);
+            failures += hr != DD_OK;
+            if (surf != NULL) {
+                IDirectDrawSurface_Release(surf);
+            }
+        }
+    }
     printf(failures ? "%d FAILED\n" : "all ok\n", failures);
     return failures != 0;
 }

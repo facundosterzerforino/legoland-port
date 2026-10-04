@@ -227,7 +227,14 @@ LEGO_EXPORT int InitScreen(void) {
         desc.ddsCaps.dwCaps = 0x800;
         desc.dwWidth = lpConfig->screen_width;
         desc.dwHeight = lpConfig->screen_height;
-        SetWindowedSurfaceFormat(&desc); /* [library:video] RGB565 on a 32-bit display mode */
+#ifdef LEGOLAND_PORT
+        if (PortDisplayBpp == 32) {
+            /* [library:video] RGB565 on a 32-bit display mode. A system-memory surface with its own pixel format
+             * must also be off-screen plain (0x800 alone: DDERR_INVALIDPIXELFORMAT; tools/test_display) */
+            desc.ddsCaps.dwCaps = 0x840;
+            SetWindowedSurfaceFormat(&desc);
+        }
+#endif
         if ((hr = IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc, &OffscreenSurface, NULL)) != 0) {
             DebugTrace("InitScreen: IDirectDraw2_CreateSurface failed hr=%lx", hr);
             return 0;
