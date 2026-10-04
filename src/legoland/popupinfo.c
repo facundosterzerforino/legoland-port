@@ -524,6 +524,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     unsigned int uVar3;
     unsigned char *iVar4;
     int iVar5;
+    int hut[2]; /* [port] see the potting shed case */
 
     uVar3 = t.data.value & 0xffff;
     x = uVar3 & 0xff;
@@ -559,23 +560,26 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
             if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == PottingShedHandle) {
                 DAT_007fdfa0 = 0;
                 DAT_007fdf9c = 10;
-                param_4 = iVar4[4];
-                (&param_4)[1] = iVar4[5];
+                /* [port] the decomp builds the hut's {x, y} in param_4 and (&param_4)[1] (param_5's stack slot,
+                 * as MSVC6 did); a modern compiler doesn't keep the parameters adjacent, so y was garbage and the
+                 * gardener's map cell NULL (crash when buying a gardener). Use a real two-int array. */
+                hut[0] = iVar4[4];
+                hut[1] = iVar4[5];
                 if (BuyGardener() == 0) {
                     return;
                 }
-                GenerateGardener((int *)&param_4, 1);
+                GenerateGardener(hut, 1);
                 return;
             }
             if (*(unsigned int *)(DAT_007fdf7c + 0xc4) == MechanicsHutHandle) {
                 DAT_007fdfa0 = 0;
                 DAT_007fdf9c = 0x14;
-                param_4 = iVar4[4];
-                (&param_4)[1] = iVar4[5];
+                hut[0] = iVar4[4]; /* [port] as for the gardener */
+                hut[1] = iVar4[5];
                 if (BuyMechanic() == 0) {
                     return;
                 }
-                GenerateMechanic((int *)&param_4, 1);
+                GenerateMechanic(hut, 1);
                 return;
             }
             DAT_007fdf9c = 0x103;
