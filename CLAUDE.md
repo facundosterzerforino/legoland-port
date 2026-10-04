@@ -65,6 +65,38 @@ describe how `main` works.
   (remote `port-repo` in `~/legoland`). Decomp work still goes to the `legoland` repo; never push port changes
   there.
 
+## Working with the maintainer (handoff, 2026-10-04)
+
+- **Never launch, click or type into the game.** The maintainer does all in-game testing. You may run only
+  `legoland-port.exe -port-selftest` (no window).
+- **After every fix:** build both presets, run the selftest, copy `build-clang-x86/legoland.exe` (+ `.pdb`)
+  into `C:\Users\fsterzer\Dropbox\legoland pc port\run\` as both `legoland-port.exe` and
+  `legoland-windowed.exe` (only if no `legoland*` process is running), push with `~/push-port.sh`, and report
+  the commit and the exe's sha256. Push validated fixes without asking.
+- **Decomp-side bugs:** fix them in `~/legoland` (commit on `main`, check `./tools/verify`), then merge `main`
+  into `port`. The maintainer pushes the decomp fork himself. Port-only fixes are listed in
+  `docs/decomp-fixes-todo.md` when they also belong in the decomp.
+- **Debugging a crash/freeze:** read `run\legoland-port-trace.txt` (the previous run is
+  `legoland-port-trace-prev.txt`). The watchdog (`port/port_watchdog.c`) writes `CRASH:`/`FREEZE detected` with a
+  symbolized stack and saves `run\crash-*.dmp` / `freeze-*.dmp`. For crashes the in-game handler can't catch,
+  `tools/dbgrun` is a small debugger (`dbgrun.exe <log> <exe> args`). Work from the code; ask the maintainer to
+  reproduce.
+- **Windowed mode:** `run\legoland-windowed.exe WINDEBUG`, working directory `installed\`. (Windows keeps
+  "16-bit colour, 640x480" compatibility flags on `legoland-port.exe`, which change the desktop resolution.)
+- **Most bugs so far were data, not code:** globals declared smaller than in the original exe, tables with
+  missing or wrong entries, unfinished functions, and MSVC6 tricks that are undefined behaviour in modern C (e.g.
+  `(&param_4)[1]`). Run the audits in step 5 of the merge steps above after every decomp merge.
+
+Status (phase 4, `ROADMAP.md`): boot, menus, tutorial, building, music, sound, speech, movies (Indeo via FFmpeg),
+windowed mode all work on Windows 11. Fixed on 2026-10-04: lesson-2 tree objective, greenhouse crash, copters
+crash (NULL sample). Open:
+- Why the Copters "Helicopter Flying" sound returns no sample: the trace logs the reason (`PlayInstanceOfSample:`
+  lines).
+- Playtesting still to do: other lessons, the three parks, gallery, save/load, end screens, certificate
+  printing.
+- A reference setup to compare with the original (Windows 98 VM or a DirectDraw wrapper); then mark phase 4
+  done in `ROADMAP.md`.
+
 ---
 
 # Matching rules (from `main`)
