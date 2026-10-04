@@ -2,6 +2,7 @@
 #include <dsound.h>
 #include <stdio.h>
 #include <string.h>
+#include "debug.h"
 #include "legoland.h"
 
 #include "debug_alloc.h"
@@ -896,6 +897,9 @@ LEGO_EXPORT void UnSourceAndFadeAllSamplesFromSource(void *source, int fade) {
 
 // FUNCTION: LEGOLAND 0x00496d10
 void FUN_00496d10(struct Sample *sample) {
+    if (sample == 0) {
+        return; /* [port] PlayInstanceOfSample can return NULL; several callers pass it on unchecked */
+    }
     sample->flags |= 0x20;
 }
 
@@ -905,6 +909,15 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
 
     sample = CreatePlayableSample((unsigned int)def);
     if (sample == 0) {
+#ifdef LEGOLAND_PORT
+        /* [port] say why no sample could be played (callers often don't check) */
+        static void *last_def;
+        if (def != last_def) {
+            last_def = def;
+            DebugTrace("PlayInstanceOfSample: no sample for %s (%s)", def != 0 && ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?",
+                def == 0 ? "the sound was never loaded" : "DuplicateSoundBuffer failed or the sample pool is full");
+        }
+#endif
         return 0;
     }
     if (config != 0) {
@@ -914,6 +927,9 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
         FUN_00496660(sample);
     }
     if (PlaySample(sample, looping, oneshot) == 0) {
+#ifdef LEGOLAND_PORT
+        DebugTrace("PlayInstanceOfSample: playing %s failed", ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?");
+#endif
         KillPlayableSample(sample);
         return 0;
     }
@@ -927,6 +943,9 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
 LEGO_EXPORT void AddSFX_Callback(struct CallbackEntry *entry, unsigned int delay, unsigned int (*callback)(struct CallbackEntry *self)) {
     unsigned int now;
 
+    if (entry == 0) {
+        return; /* [port] the entry is a sample from PlayInstanceOfSample, which can be NULL */
+    }
     now = GetTicks();
     entry->timeout = now + delay;
     entry->flags |= 0x10;
@@ -949,6 +968,9 @@ LEGO_EXPORT void Load_FXList(struct FXItem *list, int count) {
         } else {
             // STRING: LEGOLAND 0x004bfe88
             DBPrintf("Failed to load SFX %s\n", item->name);
+#ifdef LEGOLAND_PORT
+            DebugTrace("Failed to load SFX %s", item->name); /* [port] DBPrintf isn't traced */
+#endif
         }
     }
 }

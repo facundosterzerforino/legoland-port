@@ -296,6 +296,9 @@ int StopSampleBuffer(struct Sample *sample) {
 }
 // FUNCTION: LEGOLAND 0x00492800
 LEGO_EXPORT int PauseSingleSample(struct Sample *sample) {
+    if (sample == 0) {
+        return 0; /* [port] PlayInstanceOfSample can return NULL; several callers pass it on unchecked */
+    }
     if ((sample->flags & 1) == 0 && StopSampleBuffer(sample) != 0) {
         sample->flags |= 1;
         return 1;
@@ -469,6 +472,10 @@ struct Sample *GetSampleFrequency(struct Sample *sample) {
 LEGO_EXPORT void AdjustPSampleFreq(struct Sample *sample, unsigned int param_2) {
     unsigned short range = (unsigned short)param_2;
     int percent = rand() % (range * 2) - range + 100;
+
+    if (sample == 0) {
+        return; /* [port] PlayInstanceOfSample can return NULL; several callers pass it on unchecked */
+    }
 
     SetSampleFrequency(sample, (int)GetSampleFrequency(sample) * percent / 100);
 }
