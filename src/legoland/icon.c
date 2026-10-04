@@ -405,7 +405,7 @@ void FUN_0046d850(struct ScrollRegion *r, int param_2, int param_3) {
     }
 
     dy = FUN_0046dd10(0xffff, (short)((r->clip.top - r->content_top) - param_3), (short)(r->content_top + param_3), r->field_0, param_3);
-    dx = param_3;
+    dx = param_2;
     l = r->content_left;
     t = r->content_top;
     nl = l + dx;
