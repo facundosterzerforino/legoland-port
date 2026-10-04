@@ -36,6 +36,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     result = -1;
 #ifdef LEGOLAND_PORT
+    /* [library:window] DPI-aware: with display scaling above 100%, Windows otherwise zooms everything the game
+     * shows (full screen: only the top-left part of the picture fits, and the cursor is mostly off screen) */
+    SetProcessDPIAware();
     PortLoadData(); /* [port] the original started with its .data already initialized */
     if (strstr(lpCmdLine, "-port-selftest") != NULL) {
         /* [port] check the startup data and exit, without starting the game (or touching its trace file) */

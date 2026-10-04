@@ -150,8 +150,15 @@ static LRESULT CALLBACK LauncherProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
     return DefWindowProcA(hwnd, msg, wparam, lparam);
 }
 
+static int dpi = 96;
+
+/* layout in 96-DPI units, scaled to the screen's DPI (the process is DPI-aware) */
+static int S(int v) {
+    return MulDiv(v, dpi, 96);
+}
+
 static HWND Control(const char *cls, const char *text, DWORD style, int x, int y, int w, int h, int id, HFONT font) {
-    HWND hwnd = CreateWindowExA(0, cls, text, WS_CHILD | WS_VISIBLE | style, x, y, w, h, launcher,
+    HWND hwnd = CreateWindowExA(0, cls, text, WS_CHILD | WS_VISIBLE | style, S(x), S(y), S(w), S(h), launcher,
         (HMENU)(INT_PTR)id, GetModuleHandleA(NULL), NULL);
     SendMessageA(hwnd, WM_SETFONT, (WPARAM)font, TRUE);
     return hwnd;
@@ -165,8 +172,16 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
     RECT frame;
     MSG msg;
     DWORD style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-    int cw = 330;
-    int ch = 196;
+    int cw;
+    int ch;
+    HDC screen = GetDC(NULL);
+
+    if (screen != NULL) {
+        dpi = GetDeviceCaps(screen, LOGPIXELSY);
+        ReleaseDC(NULL, screen);
+    }
+    cw = S(330);
+    ch = S(196);
 
     memset(&metrics, 0, sizeof(metrics));
     metrics.cbSize = sizeof(metrics);
@@ -301,6 +316,13 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
     PortDisplayWidth = chosen_width;
     PortDisplayHeight = chosen_height;
     PortDisplayWindowed = chosen_windowed;
-    PortTrace("launcher: %dx%d %s", PortDisplayWidth, PortDisplayHeight, chosen_windowed ? "windowed" : "full screen");
+    {
+        HDC screen = GetDC(NULL);
+        PortTrace("launcher: %dx%d %s (screen %d dpi)", PortDisplayWidth, PortDisplayHeight,
+            chosen_windowed ? "windowed" : "full screen", screen != NULL ? GetDeviceCaps(screen, LOGPIXELSY) : 0);
+        if (screen != NULL) {
+            ReleaseDC(NULL, screen);
+        }
+    }
     return 1;
 }
