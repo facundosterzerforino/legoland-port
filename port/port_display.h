@@ -39,8 +39,11 @@ void PortDisplayClientToGame(HWND hwnd, POINT *pt);
  * (keeping 4:3) to fit the desktop's work area. */
 void PortDisplayWindowSize(DWORD style, int *width, int *height);
 
-/* Debugging: Ctrl+F12 in the game saves the next 8 presented frames into capture\ next to the exe, each twice:
- * frame-N.bmp (the game's 640x480 picture) and screen-N.bmp (what the window shows). Call after each present. */
+/* Debugging: Ctrl+F12 in the game saves the next 4 presented frames into capture\ next to the exe: frame-N.bmp
+ * (the game's 640x480 picture), screen-N.bmp (the window's own image) and desktop-N-after/before.bmp (what the
+ * screen shows over the window right after the present and just before the next one). PortDisplayCapture goes
+ * after each present, PortDisplayCaptureBefore before it. */
 void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame);
+void PortDisplayCaptureBefore(HWND hwnd);
 
 #endif

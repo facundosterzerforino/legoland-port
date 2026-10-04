@@ -1866,6 +1866,7 @@ int BlitFrameToWindow(void) {
     LastPresentTicks = GetTickCount();
 #ifdef LEGOLAND_PORT
     KeepDisplayMode();
+    PortDisplayCaptureBefore(WNDENV_Gethwnd()); /* [library:video] Ctrl+F12 (port_display.h) */
     if (PortDisplayCustomPresent()) {
         /* [library:video] windowed (RGB565 frame through GDI) or another resolution: the frame is scaled to the
          * window or display mode (port_display.c) */

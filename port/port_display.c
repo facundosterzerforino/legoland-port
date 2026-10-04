@@ -324,7 +324,7 @@ void PortDisplayWindowSize(DWORD style, int *width, int *height) {
 
 /* ---- Ctrl+F12: capture frames for debugging (see port_display.h) ---- */
 
-#define CAPTURE_FRAMES 8
+#define CAPTURE_FRAMES 4
 
 static int capture_left;
 static int capture_index;
@@ -388,6 +388,45 @@ static void CaptureFrame(LPDIRECTDRAWSURFACE frame, int index) {
     WriteBmp32(name, pixels, PORT_GAME_WIDTH, PORT_GAME_HEIGHT);
 }
 
+/* What the screen shows over the window's client area (the desktop as composed by Windows, not the window's own
+ * image): read just after a present ("after") and just before the next one ("before"). */
+static void CaptureScreen(HWND hwnd, int index, const char *when) {
+    BITMAPINFO info;
+    RECT client;
+    POINT origin = {0, 0};
+    void *bits = NULL;
+    HBITMAP bmp;
+    HDC dc;
+    HDC mem;
+    char name[40];
+
+    GetClientRect(hwnd, &client);
+    ClientToScreen(hwnd, &origin);
+    if (client.right <= 0 || client.bottom <= 0) {
+        return;
+    }
+    memset(&info, 0, sizeof(info));
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = client.right;
+    info.bmiHeader.biHeight = -client.bottom;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    dc = GetDC(NULL);
+    mem = CreateCompatibleDC(dc);
+    bmp = CreateDIBSection(dc, &info, DIB_RGB_COLORS, &bits, NULL, 0);
+    if (bmp != NULL && bits != NULL) {
+        HGDIOBJ old = SelectObject(mem, bmp);
+        BitBlt(mem, 0, 0, client.right, client.bottom, dc, origin.x, origin.y, SRCCOPY);
+        GdiFlush();
+        sprintf(name, "desktop-%d-%s.bmp", index, when);
+        WriteBmp32(name, (const uint32_t *)bits, client.right, client.bottom);
+        SelectObject(mem, old);
+        DeleteObject(bmp);
+    }
+    DeleteDC(mem);
+    ReleaseDC(NULL, dc);
+}
+
 /* What the window shows (its client area), read back with GDI. */
 static void CaptureWindow(HWND hwnd, int index) {
     BITMAPINFO info;
@@ -447,6 +486,14 @@ void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame) {
     PortTrace("capture: %d at %lu ms", capture_index, GetTickCount());
     CaptureFrame(frame, capture_index);
     CaptureWindow(hwnd, capture_index);
+    CaptureScreen(hwnd, capture_index, "after");
     capture_index++;
     capture_left--;
+}
+
+void PortDisplayCaptureBefore(HWND hwnd) {
+    if (capture_left > 0 && capture_index > 0) {
+        /* the screen during the time since the last present, just before the next one */
+        CaptureScreen(hwnd, capture_index - 1, "before");
+    }
 }
