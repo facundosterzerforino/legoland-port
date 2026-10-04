@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "controller.h"
+#include "debug.h"
 #include "globals.h"
 #include "legoland.h"
 
@@ -315,6 +316,10 @@ LEGO_EXPORT void IncrementObjectCount(struct ObjectCount *count) {
 
 // FUNCTION: LEGOLAND 0x00480d60
 LEGO_EXPORT void DecrementObjectCount(struct ObjectCount *count) {
+#ifdef LEGOLAND_PORT
+    /* [port] log removals, to debug objectives that count objects */
+    DebugTrace("object count down: class %p now %u", (void *)count, count->count - 1);
+#endif
     count->count--;
     count->holder->count--;
 }

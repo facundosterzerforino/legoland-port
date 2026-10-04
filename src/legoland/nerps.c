@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "debug.h"
 #include "globals.h"
 #include "legoland.h"
 
@@ -355,6 +356,19 @@ unsigned int FUN_0046a4f0(struct NerpsArg *arg) {
     /* TODO: fold into NerpsArg — field_4 is used both as a class_id (unsigned int)
        and, here, as the ObjCountWrap* that ObjCount() dereferences */
     count = ObjCount((struct ObjCountWrap *)arg->field_4);
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] log NEED objectives' progress, to debug objectives that don't complete */
+        static unsigned int last_class;
+        static int last_count = -1;
+        if (arg->field_4 != last_class || count != last_count) {
+            last_class = arg->field_4;
+            last_count = count;
+            DebugTrace("objective NEED \"%s\": %d of %d", arg->field_4 ? *(const char **)(arg->field_4 + 4) : "?",
+                count, (int)arg->field_1c);
+        }
+    }
+#endif
     if (count < (int)arg->field_1c) {
         FUN_00468d80(arg, arg->field_4, arg->field_1c - count);
         DAT_0066878c = arg->field_1c - count;
