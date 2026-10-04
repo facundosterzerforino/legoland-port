@@ -2,10 +2,12 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "port_display.h"
+#include "port_trace.h"
 
 int PortDisplayWidth = PORT_GAME_WIDTH;
 int PortDisplayHeight = PORT_GAME_HEIGHT;
@@ -318,4 +320,133 @@ void PortDisplayWindowSize(DWORD style, int *width, int *height) {
     }
     *width = frame.right - frame.left;
     *height = frame.bottom - frame.top;
+}
+
+/* ---- Ctrl+F12: capture frames for debugging (see port_display.h) ---- */
+
+#define CAPTURE_FRAMES 8
+
+static int capture_left;
+static int capture_index;
+static int capture_key_down;
+static char capture_dir[MAX_PATH];
+
+/* A top-down 32-bit BMP. */
+static void WriteBmp32(const char *name, const uint32_t *pixels, int width, int height) {
+    BITMAPFILEHEADER file;
+    BITMAPINFOHEADER info;
+    char path[MAX_PATH];
+    FILE *f;
+
+    sprintf(path, "%s%s", capture_dir, name);
+    f = fopen(path, "wb");
+    if (f == NULL) {
+        return;
+    }
+    memset(&file, 0, sizeof(file));
+    memset(&info, 0, sizeof(info));
+    file.bfType = 0x4d42;
+    file.bfOffBits = sizeof(file) + sizeof(info);
+    file.bfSize = file.bfOffBits + (DWORD)width * height * 4;
+    info.biSize = sizeof(info);
+    info.biWidth = width;
+    info.biHeight = -height;
+    info.biPlanes = 1;
+    info.biBitCount = 32;
+    fwrite(&file, sizeof(file), 1, f);
+    fwrite(&info, sizeof(info), 1, f);
+    fwrite(pixels, 4, (size_t)width * height, f);
+    fclose(f);
+}
+
+/* The game's 640x480 frame, RGB565 widened to 32-bit. */
+static void CaptureFrame(LPDIRECTDRAWSURFACE frame, int index) {
+    static uint32_t pixels[PORT_GAME_WIDTH * PORT_GAME_HEIGHT];
+    DDSURFACEDESC desc;
+    char name[32];
+    int x;
+    int y;
+
+    desc.dwSize = sizeof(desc);
+    if (IDirectDrawSurface_Lock(frame, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL) != DD_OK) {
+        PortTrace("capture: frame %d: can't lock the frame", index);
+        return;
+    }
+    for (y = 0; y < PORT_GAME_HEIGHT; y++) {
+        const uint16_t *row = (const uint16_t *)((const char *)desc.lpSurface + (size_t)y * desc.lPitch);
+        for (x = 0; x < PORT_GAME_WIDTH; x++) {
+            unsigned v = desc.ddpfPixelFormat.dwRGBBitCount == 16 ? row[x] : 0;
+            unsigned r = (v >> 11) & 31;
+            unsigned g = (v >> 5) & 63;
+            unsigned b = v & 31;
+            pixels[y * PORT_GAME_WIDTH + x] =
+                (((r << 3) | (r >> 2)) << 16) | (((g << 2) | (g >> 4)) << 8) | ((b << 3) | (b >> 2));
+        }
+    }
+    IDirectDrawSurface_Unlock(frame, desc.lpSurface);
+    sprintf(name, "frame-%d.bmp", index);
+    WriteBmp32(name, pixels, PORT_GAME_WIDTH, PORT_GAME_HEIGHT);
+}
+
+/* What the window shows (its client area), read back with GDI. */
+static void CaptureWindow(HWND hwnd, int index) {
+    BITMAPINFO info;
+    RECT client;
+    void *bits = NULL;
+    HBITMAP bmp;
+    HDC dc;
+    HDC mem;
+    char name[32];
+
+    GetClientRect(hwnd, &client);
+    if (client.right <= 0 || client.bottom <= 0) {
+        return;
+    }
+    memset(&info, 0, sizeof(info));
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = client.right;
+    info.bmiHeader.biHeight = -client.bottom;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    dc = GetDC(hwnd);
+    mem = CreateCompatibleDC(dc);
+    bmp = CreateDIBSection(dc, &info, DIB_RGB_COLORS, &bits, NULL, 0);
+    if (bmp != NULL && bits != NULL) {
+        HGDIOBJ old = SelectObject(mem, bmp);
+        BitBlt(mem, 0, 0, client.right, client.bottom, dc, 0, 0, SRCCOPY);
+        GdiFlush();
+        sprintf(name, "screen-%d.bmp", index);
+        WriteBmp32(name, (const uint32_t *)bits, client.right, client.bottom);
+        SelectObject(mem, old);
+        DeleteObject(bmp);
+    }
+    DeleteDC(mem);
+    ReleaseDC(hwnd, dc);
+}
+
+void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame) {
+    int down = (GetAsyncKeyState(VK_F12) & 0x8000) != 0 && (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
+    if (capture_left == 0) {
+        if (down && !capture_key_down && GetForegroundWindow() == hwnd) {
+            char *slash;
+            GetModuleFileNameA(NULL, capture_dir, sizeof(capture_dir) - 16);
+            slash = strrchr(capture_dir, '\\');
+            strcpy(slash != NULL ? slash + 1 : capture_dir, "capture\\");
+            CreateDirectoryA(capture_dir, NULL);
+            capture_left = CAPTURE_FRAMES;
+            capture_index = 0;
+            PortTrace("capture: %d frames to %s (mode %dx%d, windowed %d, borderless %d, %d bpp)", CAPTURE_FRAMES,
+                capture_dir, PortDisplayWidth, PortDisplayHeight, PortDisplayWindowed, PortDisplayBorderless,
+                PortDisplayBpp);
+        }
+        capture_key_down = down;
+        return;
+    }
+    capture_key_down = down;
+    PortTrace("capture: %d at %lu ms", capture_index, GetTickCount());
+    CaptureFrame(frame, capture_index);
+    CaptureWindow(hwnd, capture_index);
+    capture_index++;
+    capture_left--;
 }

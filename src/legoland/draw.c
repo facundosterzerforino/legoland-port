@@ -1875,6 +1875,7 @@ int BlitFrameToWindow(void) {
             IDirectDrawSurface_Restore(OffscreenSurface);
             result = PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, NULL);
         }
+        PortDisplayCapture(WNDENV_Gethwnd(), OffscreenSurface); /* [library:video] Ctrl+F12 (port_display.h) */
     } else
 #endif
     {
