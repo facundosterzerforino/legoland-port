@@ -44,3 +44,6 @@ report.json
 *.z
 *.cab
 gamedata/
+
+# built by tools/test_display/build.sh
+tools/test_display/*.exe

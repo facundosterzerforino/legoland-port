@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
+#include "port_display.h"
 #include "port_watchdog.h"
 #endif
 
@@ -174,7 +175,13 @@ LEGO_EXPORT int InitScreen(void) {
         DisplayPixelFormat = 2;
         WNDENV_Sethwnd(CreateWindowExA(8, "LEGOLANDMAIN",
             // STRING: LEGOLAND 0x004b86d0
-            "LEGOLAND", 0x90000000, 0, 0, lpConfig->screen_width, lpConfig->screen_height, GetDesktopWindow(), NULL, WNDENV_GethInstance(), NULL));
+            "LEGOLAND", 0x90000000, 0, 0,
+#ifdef LEGOLAND_PORT
+            PortDisplayWidth, PortDisplayHeight, /* [library:video] the chosen display mode (port_display.h) */
+#else
+            lpConfig->screen_width, lpConfig->screen_height,
+#endif
+            GetDesktopWindow(), NULL, WNDENV_GethInstance(), NULL));
         if (WNDENV_Gethwnd() == NULL) {
             DebugTrace("InitScreen: CreateWindowExA failed err=%lu", GetLastError());
             return 0;
@@ -238,6 +245,18 @@ LEGO_EXPORT int InitScreen(void) {
         window_rect.right = lpConfig->screen_width - 1;
         window_rect.bottom = lpConfig->screen_height - 1;
         AdjustWindowRect(&window_rect, 0x10cf0000, 0);
+#ifdef LEGOLAND_PORT
+        /* [library:video] the window's client area is the chosen size (port_display.h) */
+        {
+            int w;
+            int h;
+            PortDisplayWindowSize(0x10cf0000, &w, &h);
+            window_rect.left = 0;
+            window_rect.top = 0;
+            window_rect.right = w - 1;
+            window_rect.bottom = h - 1;
+        }
+#endif
         WNDENV_Sethwnd(CreateWindowExA(0, "LEGOLANDMAIN",
             // STRING: LEGOLAND 0x004b9cf0
             "Lego Land", 0x10cf0000, 0, 0, window_rect.right - window_rect.left + 1, window_rect.bottom - window_rect.top + 1, NULL, NULL, WNDENV_GethInstance(), NULL));
@@ -300,6 +319,19 @@ int SetDisplayModeAndDetectPixelFormat(void) {
 
     if (WinDebugMode == 0) {
         ddraw2 = DDRAWENV.ddraw2;
+#ifdef LEGOLAND_PORT
+        /* [library:video] the chosen display mode; the frame stays 640x480 and is scaled (port_display.h).
+         * If the mode is refused, the original 640x480. */
+        if (PortDisplayScaled()) {
+            if (IDirectDraw2_SetDisplayMode(ddraw2, PortDisplayWidth, PortDisplayHeight, 0x10, 0, 0) == 0) {
+                goto mode_set;
+            }
+            DebugTrace("SetDisplayMode: %dx%d 16bpp refused, using 640x480", PortDisplayWidth, PortDisplayHeight);
+            PortDisplayWidth = PORT_GAME_WIDTH;
+            PortDisplayHeight = PORT_GAME_HEIGHT;
+            MoveWindow(WNDENV_Gethwnd(), 0, 0, PortDisplayWidth, PortDisplayHeight, FALSE);
+        }
+#endif
         if (IDirectDraw2_SetDisplayMode(ddraw2, lpConfig->screen_width, lpConfig->screen_height, 0x10, 0, 0) != 0) {
             DebugTrace("SetDisplayMode: %dx%d 16bpp refused", lpConfig->screen_width, lpConfig->screen_height);
             ddraw2 = DDRAWENV.ddraw2;
@@ -309,6 +341,9 @@ int SetDisplayModeAndDetectPixelFormat(void) {
             }
         }
     }
+#ifdef LEGOLAND_PORT
+mode_set:
+#endif
     desc.dwSize = 0x6c;
     ddraw2 = DDRAWENV.ddraw2;
     IDirectDraw2_GetDisplayMode(ddraw2, &desc);
@@ -1727,46 +1762,6 @@ int FlipFrame(void) {
     return 1;
 }
 
-/* [library:video] port-only helper for windowed mode: the RGB565 frame can't be blitted to a primary surface in
- * another format (DirectDraw doesn't convert), so GDI copies it into the window's client area instead. */
-static HRESULT PresentWindowedFrame(int width, int height) {
-    struct {
-        BITMAPINFOHEADER header;
-        DWORD masks[3];
-    } bmi;
-    DDSURFACEDESC desc;
-    HRESULT hr;
-    HDC dc;
-
-    desc.dwSize = sizeof(desc);
-    hr = IDirectDrawSurface_Lock(OffscreenSurface, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
-    if (hr == DDERR_SURFACELOST) {
-        IDirectDrawSurface_Restore(OffscreenSurface);
-        hr = IDirectDrawSurface_Lock(OffscreenSurface, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
-    }
-    if (hr != DD_OK) {
-        return hr;
-    }
-    memset(&bmi, 0, sizeof(bmi));
-    bmi.header.biSize = sizeof(bmi.header);
-    bmi.header.biWidth = desc.lPitch / 2;
-    bmi.header.biHeight = -height; /* top-down */
-    bmi.header.biPlanes = 1;
-    bmi.header.biBitCount = 16;
-    bmi.header.biCompression = BI_BITFIELDS;
-    bmi.masks[0] = 0xf800;
-    bmi.masks[1] = 0x07e0;
-    bmi.masks[2] = 0x001f;
-    dc = GetDC(WNDENV_Gethwnd());
-    if (dc != NULL) {
-        StretchDIBits(dc, 0, 0, width, height, 0, 0, width, height, desc.lpSurface, (BITMAPINFO *)&bmi, DIB_RGB_COLORS,
-            SRCCOPY);
-        ReleaseDC(WNDENV_Gethwnd(), dc);
-    }
-    IDirectDrawSurface_Unlock(OffscreenSurface, desc.lpSurface);
-    return DD_OK;
-}
-
 // FUNCTION: LEGOLAND 0x004661d0
 int BlitFrameToWindow(void) {
     RECT dst;
@@ -1791,19 +1786,28 @@ int BlitFrameToWindow(void) {
         tick = GetTickCount();
     }
     LastPresentTicks = GetTickCount();
-    if (WinDebugMode != 0) {
-        /* [library:video] the RGB565 frame goes to the window through GDI (PresentWindowedFrame) */
-        result = PresentWindowedFrame(dst.right, dst.bottom);
-    } else {
+#ifdef LEGOLAND_PORT
+    if (WinDebugMode != 0 || PortDisplayScaled()) {
+        /* [library:video] windowed (RGB565 frame through GDI) or another resolution: the frame is scaled to the
+         * window or display mode (port_display.c) */
+        result = PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, NULL);
+        if (result == 0x887601c2) {
+            IDirectDrawSurface_Restore(PrimarySurface);
+            IDirectDrawSurface_Restore(OffscreenSurface);
+            result = PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, NULL);
+        }
+    } else
+#endif
+    {
         GetClientRect(WNDENV_Gethwnd(), &client.rect);
         ClientToScreen(WNDENV_Gethwnd(), &client.pt[0]);
         OffsetRect(&dst, client.rect.left, client.rect.top);
         surface = PrimarySurface;
         result = IDirectDrawSurface_Blt(surface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
-    }
-    if (result == 0x887601c2) {
-        IDirectDrawSurface_Restore(PrimarySurface);
-        result = IDirectDrawSurface_Blt(PrimarySurface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
+        if (result == 0x887601c2) {
+            IDirectDrawSurface_Restore(PrimarySurface);
+            result = IDirectDrawSurface_Blt(PrimarySurface, &dst, OffscreenSurface, NULL, 0x1000000, NULL);
+        }
     }
     if (result != 0) {
         return 0;
@@ -1872,6 +1876,13 @@ void DrawWatchSprite(void) {
             PushRenderingStatusAndLockVideoSurface();
             PrintSprite(WatchSprite, WatchRect.left, WatchRect.top, 0, 0);
             PopRenderingStatus();
+#ifdef LEGOLAND_PORT
+            if (WinDebugMode != 0 || PortDisplayScaled()) {
+                /* [library:video] only the watch's part of the frame, scaled (port_display.c) */
+                PortPresent(WNDENV_Gethwnd(), OffscreenSurface, PrimarySurface, &WatchRect);
+                return;
+            }
+#endif
             ClientToScreen(WNDENV_Gethwnd(), &cursor.pt[0]);
             ClientToScreen(WNDENV_Gethwnd(), &cursor.pt[1]);
             surface = PrimarySurface;

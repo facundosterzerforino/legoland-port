@@ -79,6 +79,17 @@ More presets (x64, Linux, Android) come with later milestones.
 The port reads data from an original LEGOLAND installation (the `.res` volumes, sounds, movies, and
 `legoland.exe` itself for the initialized data). No proprietary files are committed to this repository.
 
+## Resolution and window mode
+
+A small launcher opens before the game: pick a 4:3 resolution (640x480 is the original; 800x600, 1024x768,
+1280x960 and more, as far as the display or desktop allows) and full screen or a window. The game still draws its
+640x480 picture and the port scales it up with sharp pixels (1280x960 and 1920x1440 are exact 2x and 3x), with
+black bars on screens that aren't 4:3; a window can also be resized. Nothing about the game changes.
+
+The choice is saved next to the exe (`legoland-port.ini`). "Don't show this again" skips the launcher; hold
+Shift while starting the game to see it again. Command line: `-res 1024x768`, `-fullscreen`, `-windowed` (or the
+original `WINDEBUG`) choose without the launcher, `-launcher` always shows it.
+
 ## More documentation
 
 - `ROADMAP.md`: the phase-by-phase plan, from finishing the assembly replacements to Android.

@@ -19,6 +19,7 @@
 #include "stream.h"
 #include "string.h"
 #ifdef LEGOLAND_PORT
+#include "port_display.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
 #endif
@@ -251,7 +252,12 @@ int __cdecl wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
     // STRING: LEGOLAND 0x004bcd70
+#ifdef LEGOLAND_PORT
+    if (StrIStr(lpCmdLine, "WINDEBUG") || PortDisplayWindowed) { /* [library:config] or chosen in the launcher */
+        PortDisplayWindowed = 1;
+#else
     if (StrIStr(lpCmdLine, "WINDEBUG")) {
+#endif
         BlitFrameFunc = BlitFrameToWindow;
         WinDebugMode = 1;
         // STRING: LEGOLAND 0x004bcd6c

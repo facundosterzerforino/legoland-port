@@ -12,6 +12,7 @@
 #ifdef LEGOLAND_PORT
 #include "extensions.h"
 #include "port_data.h"
+#include "port_launcher.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
 #endif
@@ -41,6 +42,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return PortDataSelfTest("port-selftest.txt");
     }
     PortTrace("WinMain: cmdline \"%s\"", lpCmdLine);
+    if (!PortLauncherRun(hInstance, lpCmdLine)) {
+        /* [library:config] resolution and window mode (port/port_launcher.c); before the watchdog, which
+         * would take the open launcher for a frozen game */
+        return 0;
+    }
     {
         /* [port] keep 64 KB of stack for the crash handler: after a stack overflow, stackdump (5 KB of locals)
          * faulted on entry and the process died without a report */

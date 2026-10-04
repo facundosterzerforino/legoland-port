@@ -18,6 +18,9 @@
 #include "screens.h"
 #include "sound_sfx.h"
 #include "wndenv.h"
+#ifdef LEGOLAND_PORT
+#include "port_display.h"
+#endif
 
 struct DInputDeviceVtbl {
     void *pad_0[2];
@@ -209,6 +212,9 @@ LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
         POINT pos;
 
         if (GetForegroundWindow() == WNDENV_Gethwnd() && GetCursorPos(&pos) && ScreenToClient(WNDENV_Gethwnd(), &pos)) {
+#ifdef LEGOLAND_PORT
+            PortDisplayClientToGame(WNDENV_Gethwnd(), &pos); /* [library:video] the frame is scaled in the window */
+#endif
             dx = pos.x - buffer->x;
             dy = pos.y - buffer->y;
         } else {
