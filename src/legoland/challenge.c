@@ -8,6 +8,7 @@
 #include "challenge.h"
 #include "clipping.h"
 #include "controller.h"
+#include "debug.h"
 #include "debug_alloc.h"
 #include "draw.h"
 #include "gamemain.h"
@@ -5069,6 +5070,10 @@ void FUN_0044db40(void) {
         t = 0;
     }
     AppraisalDeadline = t;
+#ifdef LEGOLAND_PORT
+    /* [port] log the inspector's timer, to tell a waiting level from a stuck one */
+    DebugTrace("appraisal: next in %u min (deadline %u, game time %u)", MapStats.timer_minutes, t, GetGameTimer());
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x0044db80
@@ -5089,6 +5094,11 @@ int FUN_0044db90(void) {
         SpeechCloseFile();
         DAT_006687b0 = 4;
         DAT_0066609c = FUN_004453a0();
+#ifdef LEGOLAND_PORT
+        /* [port] log each appraisal's result (field_39c: passes > 0, failures < 0; field_17c: failures allowed) */
+        DebugTrace("appraisal: %s (streak before this %d, failures allowed %d)", DAT_0066609c != 0 ? "PASSED" : "failed",
+            MapStats.field_39c, MapStats.field_17c);
+#endif
         if (DAT_0066609c != 0) {
             v = MapStats.field_39c;
             if (v > 0) {
