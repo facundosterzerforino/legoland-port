@@ -573,21 +573,21 @@ int FUN_0041d210(short *pos, struct SprEnt *ent, struct SprInfo *info) {
     short p[2];
     int r;
 
-    if (DAT_00829ae0 != 2) {
+    if (DAT_00829ae0.field_0 != 2) {
         ent->owner = (struct SprOwner *)&DAT_00829ae0;
         p[0] = info->x18 + pos[0];
         p[1] = info->y18 + pos[1];
-        r = FUN_0041cd40((unsigned int *)p, &DAT_00829b8c);
+        r = FUN_0041cd40((unsigned int *)p, &DAT_00829ae0.field_ac);
         ent->id_a = r;
         if (r != -1) {
-            *(unsigned int *)(DAT_00829b88 + 0x20) = FUN_0041cc90(r);
+            *(unsigned int *)(DAT_00829ae0.field_a8 + 0x20) = FUN_0041cc90(r);
         }
         p[0] = info->x10 + pos[0];
         p[1] = info->y10 + pos[1];
-        r = FUN_0041cd40((unsigned int *)p, &DAT_00829ba4);
+        r = FUN_0041cd40((unsigned int *)p, &DAT_00829ae0.field_c4);
         ent->id_b = r;
         if (r != -1) {
-            *(unsigned int *)(DAT_00829ba0 + 0x14) = FUN_0041cc90(r);
+            *(unsigned int *)(DAT_00829ae0.field_c0 + 0x14) = FUN_0041cc90(r);
         }
         if (ent->id_a != -1 || ent->id_b != -1) {
             return 1;
@@ -794,9 +794,9 @@ void FUN_0041d760(unsigned char *obj) {
 
 // FUNCTION: LEGOLAND 0x0041d7c0
 unsigned int FUN_0041d7c0(unsigned int value) {
-    if (DAT_00829ae0 != 2) {
-        if (value != DAT_00829b88) {
-            if (value != DAT_00829ba0) {
+    if (DAT_00829ae0.field_0 != 2) {
+        if (value != DAT_00829ae0.field_a8) {
+            if (value != DAT_00829ae0.field_c0) {
                 return 0;
             }
         }
@@ -816,9 +816,9 @@ void FUN_0041d7f0(void *arg) {
             ResetAnim((struct Anim *)&obj->next->dir_a);
             ResetAnim((struct Anim *)&obj->prev->dir_b);
             owner->f_a8 = obj->prev;
-            FUN_0041d170(obj->prev, (unsigned int)&DAT_00829b8c);
+            FUN_0041d170(obj->prev, (unsigned int)&DAT_00829ae0.field_ac);
             owner->f_c0 = obj->next;
-            FUN_0041d190(obj->next, (unsigned int)&DAT_00829ba4);
+            FUN_0041d190(obj->next, (unsigned int)&DAT_00829ae0.field_c4);
             FUN_004299e0((struct PathSeg *)owner->f_a8);
             FUN_00429a30((struct PathSeg *)owner->f_c0);
             FUN_0041cfc0((struct HandlerHost1 *)owner->f_a8);
@@ -828,18 +828,18 @@ void FUN_0041d7f0(void *arg) {
         } else if (obj == owner->f_a8) {
             ResetAnim((struct Anim *)&obj->prev->dir_b);
             owner->f_a8 = obj->prev;
-            FUN_0041d170(obj->prev, (unsigned int)&DAT_00829b8c);
+            FUN_0041d170(obj->prev, (unsigned int)&DAT_00829ae0.field_ac);
             FUN_004299e0((struct PathSeg *)owner->f_a8);
             FUN_0041cfc0((struct HandlerHost1 *)owner->f_a8);
         } else {
             ResetAnim((struct Anim *)&obj->next->dir_a);
             owner->f_c0 = obj->next;
-            FUN_0041d190(obj->next, (unsigned int)&DAT_00829ba4);
+            FUN_0041d190(obj->next, (unsigned int)&DAT_00829ae0.field_c4);
             FUN_00429a30((struct PathSeg *)owner->f_c0);
             FUN_0041cfc0((struct HandlerHost1 *)owner->f_c0);
         }
-        FUN_0041d1c0(&DAT_00829b8c);
-        FUN_0041d1c0(&DAT_00829ba4);
+        FUN_0041d1c0(&DAT_00829ae0.field_ac);
+        FUN_0041d1c0(&DAT_00829ae0.field_c4);
         ((struct SprKey *)obj->key)->method_2c(obj);
         FUN_004775d0(obj);
     }
@@ -4836,9 +4836,9 @@ void PlotClippedPoints(int *points, int count, short c) {
     if (GetSprite((unsigned int *)&surf, NULL)) {
         while (count-- > 0) {
             x = points[0];
-            if (x > DAT_008299ac && x < DAT_008299b4) {
+            if (x > DAT_008299ac[0] && x < DAT_008299ac[2]) {
                 y = points[1];
-                if (y > DAT_008299b0 && y < DAT_008299b8) {
+                if (y > DAT_008299ac[1] && y < DAT_008299ac[3]) {
                     surf.bits[x + (surf.pitch >> 1) * y] = c;
                 }
             }
@@ -5055,19 +5055,19 @@ void FUN_00423e20(void) {
     DAT_00829a80.next = &DAT_0060f914[1];
     DAT_0060f914[DAT_00610a08].next = 0;
     tail = &DAT_0060f914[DAT_00610a08];
-    if (DAT_00829ae0 == 2) {
-        for (n = (struct LNode *)DAT_00829b0c; n != (struct LNode *)&DAT_00829ae4; n = n->next28) {
+    if (DAT_00829ae0.field_0 == 2) {
+        for (n = (struct LNode *)DAT_00829ae0.field_2c; n != (struct LNode *)&DAT_00829ae0.field_4; n = n->next28) {
             tail->next = &n->sub;
             tail = &n->sub;
         }
         tail->next = 0;
         return;
     }
-    for (n = (struct LNode *)DAT_00829b0c; n != 0; n = n->next28) {
+    for (n = (struct LNode *)DAT_00829ae0.field_2c; n != 0; n = n->next28) {
         tail->next = &n->sub;
         tail = &n->sub;
     }
-    for (n = (struct LNode *)DAT_00829af8[2]; n != 0; n = n->next1c) {
+    for (n = (struct LNode *)DAT_00829ae0.field_18[2]; n != 0; n = n->next1c) {
         tail->next = &n->sub;
         tail = &n->sub;
     }
@@ -5080,23 +5080,23 @@ void FUN_00423ec0(char *param1) {
     struct LNode *next;
     struct LNode *end;
 
-    if (DAT_00829ae0 == 2) {
-        n = (struct LNode *)DAT_00829b0c;
-        while (n != (struct LNode *)&DAT_00829ae4) {
+    if (DAT_00829ae0.field_0 == 2) {
+        n = (struct LNode *)DAT_00829ae0.field_2c;
+        while (n != (struct LNode *)&DAT_00829ae0.field_4) {
             next = n->next28;
             FUN_0041d7f0(n);
             n = next;
         }
         return;
     }
-    n = (struct LNode *)DAT_00829ba0;
+    n = (struct LNode *)DAT_00829ae0.field_c0;
     end = (struct LNode *)(param1 + 4);
     while (n != end) {
         next = n->next28;
         FUN_0041d7f0(n);
         n = next;
     }
-    n = (struct LNode *)DAT_00829b88;
+    n = (struct LNode *)DAT_00829ae0.field_a8;
     while (n != end) {
         next = n->next1c;
         FUN_0041d7f0(n);
@@ -5128,13 +5128,13 @@ int FUN_00423f40(struct Point *pos, float *a2, struct Point *a3, float *a4, stru
     struct Curve *c;
     struct LNode *n2;
 
-    *a6 = node->next1c == (struct LNode *)&DAT_00829ae4;
+    *a6 = node->next1c == (struct LNode *)&DAT_00829ae0.field_4;
     c = (struct Curve *)FUN_0041cff0((unsigned int)node, (unsigned int *)&a);
     c->vt->method_8(c, (c->end + c->start) * 0.5f, &b.x);
     b.z += a.z;
     *a2 = b.z * -2.0f;
     n2 = node->next28;
-    if (n2 != 0 && n2 != (struct LNode *)&DAT_00829ae4) {
+    if (n2 != 0 && n2 != (struct LNode *)&DAT_00829ae0.field_4) {
         c = (struct Curve *)FUN_0041cff0((unsigned int)n2, (unsigned int *)&a);
         c->vt->method_8(c, (c->end + c->start) * 0.5f, &b.x);
         b.z += a.z;
@@ -5144,7 +5144,7 @@ int FUN_00423f40(struct Point *pos, float *a2, struct Point *a3, float *a4, stru
         return 1;
     }
     *a3 = *pos;
-    if (node->next28 == (struct LNode *)&DAT_00829ae4) {
+    if (node->next28 == (struct LNode *)&DAT_00829ae0.field_4) {
         a3->y -= 16;
     }
     *a4 = 0.0f;
@@ -5156,9 +5156,9 @@ int FUN_00424050(struct Point *pos, void *a2, void *a3, void *a4, void *a5) {
     struct LNode *n;
     struct LNode *next;
 
-    if (DAT_00829ae0 == 2) {
-        n = (struct LNode *)DAT_00829b0c;
-        while (n != (struct LNode *)&DAT_00829ae4) {
+    if (DAT_00829ae0.field_0 == 2) {
+        n = (struct LNode *)DAT_00829ae0.field_2c;
+        while (n != (struct LNode *)&DAT_00829ae0.field_4) {
             next = n->next28;
             if (n->x == pos->x && n->y == pos->y) {
                 return FUN_00423f40(pos, a2, a3, a4, n, a5);
@@ -5167,16 +5167,16 @@ int FUN_00424050(struct Point *pos, void *a2, void *a3, void *a4, void *a5) {
         }
         return 0;
     }
-    n = (struct LNode *)DAT_00829ba0;
-    while (n != (struct LNode *)&DAT_00829ae4) {
+    n = (struct LNode *)DAT_00829ae0.field_c0;
+    while (n != (struct LNode *)&DAT_00829ae0.field_4) {
         next = n->next28;
         if (n->x == pos->x && n->y == pos->y) {
             return FUN_00423f40(pos, a2, a3, a4, n, a5);
         }
         n = next;
     }
-    n = (struct LNode *)DAT_00829b88;
-    while (n != (struct LNode *)&DAT_00829ae4) {
+    n = (struct LNode *)DAT_00829ae0.field_a8;
+    while (n != (struct LNode *)&DAT_00829ae0.field_4) {
         next = n->next1c;
         if (n->x == pos->x && n->y == pos->y) {
             return FUN_00423f40(pos, a2, a3, a4, n, a5);
@@ -5219,15 +5219,15 @@ void FUN_00424150(struct Element *param_1) {
 // FUNCTION: LEGOLAND 0x004241e0
 void FUN_004241e0(void) {
     KillSprite(CastleMatteSprite);
-    DAT_00829b8c = 0;
-    DAT_00829ba4 = 0;
-    FUN_0041d1b0(&DAT_00829b8c);
-    FUN_0041d1b0(&DAT_00829ba4);
-    DAT_00829b88 = 0;
-    DAT_00829ba0 = 0;
-    ResetAnim((struct Anim *)&DAT_00829af8);
-    ResetAnim((struct Anim *)&DAT_00829b04);
-    DAT_00829ae0 = 0;
+    DAT_00829ae0.field_ac = 0;
+    DAT_00829ae0.field_c4 = 0;
+    FUN_0041d1b0(&DAT_00829ae0.field_ac);
+    FUN_0041d1b0(&DAT_00829ae0.field_c4);
+    DAT_00829ae0.field_a8 = 0;
+    DAT_00829ae0.field_c0 = 0;
+    ResetAnim((struct Anim *)&DAT_00829ae0.field_18);
+    ResetAnim((struct Anim *)&DAT_00829ae0.field_24);
+    DAT_00829ae0.field_0 = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00424240
@@ -5272,26 +5272,26 @@ void FUN_00424320(unsigned int obj, short *pt) {
     v[0] = pt[0];
     v[1] = pt[2];
     FUN_004245b0(v);
-    FUN_0041ce30((struct AnimPair *)&DAT_00829ae4);
-    DAT_00829ae0 = 1;
-    DAT_00829ae8[0] = pt[0];
-    DAT_00829ae8[1] = pt[2];
-    DAT_00829af0 = (unsigned int)&DAT_004b5b48;
-    DAT_00829af4 = (unsigned int)&DAT_00829ae0;
-    DAT_00829aec = DAT_00829bf8;
-    DAT_00829b88 = (unsigned int)&DAT_00829ae4;
-    DAT_00829ba0 = (unsigned int)&DAT_00829ae4;
-    DAT_00829b8c = 0;
-    DAT_00829ba4 = 0;
-    FUN_0041d170((struct Indexed *)&DAT_00829ae4, (unsigned int)&DAT_00829b8c);
-    FUN_0041d190((struct Indexed *)&DAT_00829ae4, (unsigned int)&DAT_00829ba4);
-    FUN_0041d1c0(&DAT_00829b8c);
-    FUN_0041d1c0(&DAT_00829ba4);
-    FUN_0041cfc0((struct HandlerHost1 *)&DAT_00829ae4);
-    FUN_0041cfd0((struct HandlerHost2 *)&DAT_00829ae4, 0);
+    FUN_0041ce30((struct AnimPair *)&DAT_00829ae0.field_4);
+    DAT_00829ae0.field_0 = 1;
+    DAT_00829ae0.field_8[0] = pt[0];
+    DAT_00829ae0.field_8[1] = pt[2];
+    DAT_00829ae0.field_10 = (unsigned int)&DAT_004b5b48;
+    DAT_00829ae0.field_14 = (unsigned int)&DAT_00829ae0;
+    DAT_00829ae0.field_c = DAT_00829bf8;
+    DAT_00829ae0.field_a8 = (unsigned int)&DAT_00829ae0.field_4;
+    DAT_00829ae0.field_c0 = (unsigned int)&DAT_00829ae0.field_4;
+    DAT_00829ae0.field_ac = 0;
+    DAT_00829ae0.field_c4 = 0;
+    FUN_0041d170((struct Indexed *)&DAT_00829ae0.field_4, (unsigned int)&DAT_00829ae0.field_ac);
+    FUN_0041d190((struct Indexed *)&DAT_00829ae0.field_4, (unsigned int)&DAT_00829ae0.field_c4);
+    FUN_0041d1c0(&DAT_00829ae0.field_ac);
+    FUN_0041d1c0(&DAT_00829ae0.field_c4);
+    FUN_0041cfc0((struct HandlerHost1 *)&DAT_00829ae0.field_4);
+    FUN_0041cfd0((struct HandlerHost2 *)&DAT_00829ae0.field_4, 0);
     FUN_004249e0((struct CastleSub *)&DAT_00829ae0);
     FUN_00424b10((struct ListHost *)&DAT_00829ae0);
-    DAT_00829ae4 |= 6;
+    DAT_00829ae0.field_4 |= 6;
     DAT_00610a04 = 1;
 }
 
@@ -5301,9 +5301,9 @@ void FUN_00424440(unsigned int param_1, unsigned int param_2) {
     int y;
 
     FUN_00423e20();
-    x = DAT_00829ae8[0];
+    x = DAT_00829ae0.field_8[0];
     memcpy(QueryCursor.field_1414, &DAT_00829a80, 20);
-    y = DAT_00829ae8[1];
+    y = DAT_00829ae0.field_8[1];
     QueryCursor.tile_x = x;
     QueryCursor.tile_y = y;
     // STRING: LEGOLAND 0x004b5b7c
@@ -5321,24 +5321,24 @@ void FUN_004244b0(unsigned int param_1, TileId param_2, unsigned int param_3) {
     unsigned int handle;
 
     if (DAT_00610a04 != 0) {
-        tile.pos.x = DAT_00829ae8[0];
-        tile.pos.y = DAT_00829ae8[1];
+        tile.pos.x = DAT_00829ae0.field_8[0];
+        tile.pos.y = DAT_00829ae0.field_8[1];
         cursor.tile_x = tile.pos.x;
         cursor.tile_y = tile.pos.y;
         cursor.footprint = *(struct Footprint *)(DAT_00829bf8 + 0x3c);
         cursor.field_1414[4] = 0;
         FUN_00424ab0((struct CastleSub *)&DAT_00829ae0);
         FUN_00423ec0(&DAT_00829ae0);
-        FUN_0041d1b0(&DAT_00829b8c);
-        FUN_0041d1b0(&DAT_00829ba4);
-        DAT_00829b88 = 0;
-        DAT_00829ba0 = 0;
+        FUN_0041d1b0(&DAT_00829ae0.field_ac);
+        FUN_0041d1b0(&DAT_00829ae0.field_c4);
+        DAT_00829ae0.field_a8 = 0;
+        DAT_00829ae0.field_c0 = 0;
         FUN_00424a00((struct CastleSub *)&DAT_00829ae0);
         FUN_00424df0((struct ListHost *)&DAT_00829ae0);
         FUN_00424e20();
         handle = FUN_0041ec40(0);
         FUN_0041edb0(handle, tile, (unsigned int)&cursor);
-        FUN_00424620(DAT_00829ae8);
+        FUN_00424620(DAT_00829ae0.field_8);
         DAT_00610a04 = 0;
         FUN_004775f0();
         FUN_00477410();
@@ -5380,7 +5380,7 @@ void FUN_00424620(short *param_1) {
 
 // FUNCTION: LEGOLAND 0x004246e0
 unsigned int FUN_004246e0(unsigned int param_1, unsigned int param_2) {
-    if (param_2 != 0 && DAT_00829ae0 != 2) {
+    if (param_2 != 0 && DAT_00829ae0.field_0 != 2) {
         return 0;
     }
     return FUN_0041d6f0();
@@ -5401,13 +5401,13 @@ void FUN_00424700(unsigned int a1, unsigned int a2, unsigned int a3, unsigned ch
     int want;
     int i;
 
-    FUN_00425cb0((struct Int16Pair *)DAT_00829ae8, (float)DAT_004b5b50, &buf);
+    FUN_00425cb0((struct Int16Pair *)DAT_00829ae0.field_8, (float)DAT_004b5b50, &buf);
     key[0] = p[0];
     key[1] = p[1];
     want = *(int *)key;
     for (i = 0; i < (int)DAT_00610a08; i++) {
-        key[0] = DAT_0060f914[i].xy.x + DAT_00829ae8[0];
-        key[1] = DAT_0060f914[i].xy.y + DAT_00829ae8[1];
+        key[0] = DAT_0060f914[i].xy.x + DAT_00829ae0.field_8[0];
+        key[1] = DAT_0060f914[i].xy.y + DAT_00829ae0.field_8[1];
         if (want == *(int *)key) {
             obj = ((struct Obj58 *)&DAT_006102f8)[DAT_0060f914[i].k];
             obj.f44 = DAT_0060f914[i].a;
@@ -5416,7 +5416,7 @@ void FUN_00424700(unsigned int a1, unsigned int a2, unsigned int a3, unsigned ch
             break;
         }
     }
-    FUN_00424a20((struct CastleOuter *)&DAT_00829ae4);
+    FUN_00424a20((struct CastleOuter *)&DAT_00829ae0.field_4);
 }
 
 // FUNCTION: LEGOLAND 0x00424800
@@ -5671,7 +5671,7 @@ void FUN_00424c70(struct CastleSub *param_1) {
     int found;
     int now = GetGameTimer();
 
-    if (DAT_00829ae0 == 2) {
+    if (DAT_00829ae0.field_0 == 2) {
         if (FUN_0041e4a0((struct FlagWord *)param_1->field_d8) != 0) {
             if (FUN_0041e4b0((struct FlagWord *)param_1->field_d8) == 0) {
                 return;
@@ -6260,16 +6260,16 @@ void FUN_00425e20(void) {
     DAT_008299a0[1] = dy * a[3] + dx * a[2];
     DAT_008299a0[0] += (float)ref.x * FLOAT_004ab45c;
     DAT_008299a0[1] += (float)ref.y * FLOAT_004ab45c;
-    DAT_008299ac = lpConfig->view_x;
-    DAT_008299b0 = lpConfig->view_y;
-    DAT_008299b4 = lpConfig->view_width + lpConfig->view_x;
-    DAT_008299b8 = lpConfig->view_height + lpConfig->view_y;
+    DAT_008299ac[0] = lpConfig->view_x;
+    DAT_008299ac[1] = lpConfig->view_y;
+    DAT_008299ac[2] = lpConfig->view_width + lpConfig->view_x;
+    DAT_008299ac[3] = lpConfig->view_height + lpConfig->view_y;
     Mat4Identity(m.m);
     m.m[0][3] = -DAT_008299a0[0];
     m.m[1][3] = -DAT_008299a0[1];
     m.m[2][3] = -DAT_008299a0[2];
     Mat4Multiply(DAT_008299bc.m, m.m, DAT_008299fc.m);
-    FUN_0041ef20(DAT_008299ac, DAT_008299b0, DAT_008299b4, DAT_008299b8);
+    FUN_0041ef20(DAT_008299ac[0], DAT_008299ac[1], DAT_008299ac[2], DAT_008299ac[3]);
 }
 
 // FUNCTION: LEGOLAND 0x00426000
@@ -6283,10 +6283,10 @@ void FUN_00426000(int flag) {
     }
     DAT_008299bc.m[0][3] = 0.0f;
     DAT_008299bc.m[1][3] = 0.0f;
-    DAT_008299ac = lpConfig->view_x;
-    DAT_008299b0 = lpConfig->view_y;
-    DAT_008299b4 = lpConfig->view_width + lpConfig->view_x;
-    DAT_008299b8 = lpConfig->view_height + lpConfig->view_y;
+    DAT_008299ac[0] = lpConfig->view_x;
+    DAT_008299ac[1] = lpConfig->view_y;
+    DAT_008299ac[2] = lpConfig->view_width + lpConfig->view_x;
+    DAT_008299ac[3] = lpConfig->view_height + lpConfig->view_y;
     DAT_008299a0[0] = 0.0f;
     DAT_008299a0[1] = 0.0f;
     DAT_008299a0[2] = 0.0f;
@@ -7458,12 +7458,12 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
     EditCursor.footprint = *fp;
     EditCursor.field_1830 = 0;
     ScreenToMapRef((int *)x, (int *)&EditCursor.tile_x, y);
-    if (DAT_00829ae0 != 2) {
+    if (DAT_00829ae0.field_0 != 2) {
         bit = 1;
         for (i = 0; i <= 3; i++) {
-            if ((bit & DAT_00829b8c) && EditCursor.tile_x - DAT_00829b90[i][0] >= -1 && EditCursor.tile_x - DAT_00829b90[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829b90[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829b90[i][1] <= 1) {
-                EditCursor.tile_x = DAT_00829b90[i][0];
-                EditCursor.tile_y = DAT_00829b90[i][1];
+            if ((bit & DAT_00829ae0.field_ac) && EditCursor.tile_x - DAT_00829ae0.field_b0[i][0] >= -1 && EditCursor.tile_x - DAT_00829ae0.field_b0[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829ae0.field_b0[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829ae0.field_b0[i][1] <= 1) {
+                EditCursor.tile_x = DAT_00829ae0.field_b0[i][0];
+                EditCursor.tile_y = DAT_00829ae0.field_b0[i][1];
                 found = 1;
                 break;
             }
@@ -7472,9 +7472,9 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         if (!found) {
             bit = 1;
             for (i = 0; i <= 3; i++) {
-                if ((bit & DAT_00829ba4) && EditCursor.tile_x - DAT_00829ba8[i][0] >= -1 && EditCursor.tile_x - DAT_00829ba8[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829ba8[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829ba8[i][1] <= 1) {
-                    EditCursor.tile_x = DAT_00829ba8[i][0];
-                    EditCursor.tile_y = DAT_00829ba8[i][1];
+                if ((bit & DAT_00829ae0.field_c4) && EditCursor.tile_x - DAT_00829ae0.field_c8[i][0] >= -1 && EditCursor.tile_x - DAT_00829ae0.field_c8[i][0] <= 1 && (int)EditCursor.tile_y - DAT_00829ae0.field_c8[i][1] >= -1 && (int)EditCursor.tile_y - DAT_00829ae0.field_c8[i][1] <= 1) {
+                    EditCursor.tile_x = DAT_00829ae0.field_c8[i][0];
+                    EditCursor.tile_y = DAT_00829ae0.field_c8[i][1];
                     found = 1;
                     break;
                 }
@@ -7484,12 +7484,12 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         ValidateCursor(&EditCursor, (unsigned int)ride);
         bit = 1;
         for (i = 0; i <= 3; i++) {
-            if (bit & DAT_00829b8c) {
+            if (bit & DAT_00829ae0.field_ac) {
                 DefaultCursor(&DAT_0081ce00[n]);
                 DAT_0081ce00[n].next = EditCursor.next;
                 EditCursor.next = &DAT_0081ce00[n];
-                DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
-                DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
+                DAT_0081ce00[n].tile_x = DAT_00829ae0.field_b0[i][0];
+                DAT_0081ce00[n].tile_y = DAT_00829ae0.field_b0[i][1];
                 DAT_0081ce00[n].footprint = *fp;
                 DAT_0081ce00[n].field_1828 = 0x2032;
                 FUN_0045f460(&DAT_0081ce00[n]);
@@ -7499,12 +7499,12 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         }
         bit = 1;
         for (i = 0; i <= 3; i++) {
-            if (bit & DAT_00829ba4) {
+            if (bit & DAT_00829ae0.field_c4) {
                 DefaultCursor(&DAT_0081ce00[n]);
                 DAT_0081ce00[n].next = EditCursor.next;
                 EditCursor.next = &DAT_0081ce00[n];
-                DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
-                DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
+                DAT_0081ce00[n].tile_x = DAT_00829ae0.field_c8[i][0];
+                DAT_0081ce00[n].tile_y = DAT_00829ae0.field_c8[i][1];
                 DAT_0081ce00[n].footprint = *fp;
                 DAT_0081ce00[n].field_1828 = 0x2032;
                 FUN_0045f460(&DAT_0081ce00[n]);
@@ -7528,12 +7528,12 @@ void FUN_004275d0(Element *obj, int x, unsigned int y) {
         if (FUN_0045f4b0(&EditCursor)) {
             FUN_0045f480(&EditCursor, 0xe);
             bit = 1;
-            mask = &DAT_00829b8c;
+            mask = &DAT_00829ae0.field_ac;
             c = DAT_0081ce00;
             for (i = 0; i < 8; i++) {
                 if (i == 4) {
                     bit = 1;
-                    mask = &DAT_00829ba4;
+                    mask = &DAT_00829ae0.field_c4;
                 }
                 if (bit & *mask) {
                     if (EditCursor.tile_x == c->tile_x && EditCursor.tile_y == c->tile_y) {
@@ -7784,12 +7784,12 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
     n = 0;
     bit = 1;
     for (i = 0; i <= 3; i++) {
-        if (bit & DAT_00829b8c) {
+        if (bit & DAT_00829ae0.field_ac) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
-            DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ae0.field_b0[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ae0.field_b0[i][1];
             DAT_0081ce00[n].footprint = ride->footprint;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7799,12 +7799,12 @@ void FUN_00427c90(Element *obj, int x, unsigned int y) {
     }
     bit = 1;
     for (i = 0; i <= 3; i++) {
-        if (bit & DAT_00829ba4) {
+        if (bit & DAT_00829ae0.field_c4) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
-            DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ae0.field_c8[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ae0.field_c8[i][1];
             DAT_0081ce00[n].footprint = ride->footprint;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7961,12 +7961,12 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
     n = 0;
     bit = 1;
     for (i = 0; i <= 3; i++) {
-        if (bit & DAT_00829b8c) {
+        if (bit & DAT_00829ae0.field_ac) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].tile_x = DAT_00829b90[i][0];
-            DAT_0081ce00[n].tile_y = DAT_00829b90[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ae0.field_b0[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ae0.field_b0[i][1];
             DAT_0081ce00[n].footprint = *fp;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);
@@ -7976,12 +7976,12 @@ void FUN_004280b0(Element *obj, int x, unsigned int y) {
     }
     bit = 1;
     for (i = 0; i <= 3; i++) {
-        if (bit & DAT_00829ba4) {
+        if (bit & DAT_00829ae0.field_c4) {
             DefaultCursor(&DAT_0081ce00[n]);
             DAT_0081ce00[n].next = EditCursor.next;
             EditCursor.next = &DAT_0081ce00[n];
-            DAT_0081ce00[n].tile_x = DAT_00829ba8[i][0];
-            DAT_0081ce00[n].tile_y = DAT_00829ba8[i][1];
+            DAT_0081ce00[n].tile_x = DAT_00829ae0.field_c8[i][0];
+            DAT_0081ce00[n].tile_y = DAT_00829ae0.field_c8[i][1];
             DAT_0081ce00[n].footprint = *fp;
             DAT_0081ce00[n].field_1828 = 0x2032;
             FUN_0045f460(&DAT_0081ce00[n]);

@@ -5222,16 +5222,7 @@ struct FMat4 DAT_008299bc;
 struct FMat4 DAT_008299fc;
 
 // GLOBAL: LEGOLAND 0x008299ac
-int DAT_008299ac;
-
-// GLOBAL: LEGOLAND 0x008299b0
-int DAT_008299b0;
-
-// GLOBAL: LEGOLAND 0x008299b4
-int DAT_008299b4;
-
-// GLOBAL: LEGOLAND 0x008299b8
-int DAT_008299b8;
+int DAT_008299ac[4]; /* view rect: left, top, right, bottom */
 
 // GLOBAL: LEGOLAND 0x00829a3c
 struct ListLink DAT_00829a3c;
@@ -5254,52 +5245,13 @@ struct EditFootPrint DAT_00829a80;
 // GLOBAL: LEGOLAND 0x00829abc
 struct Element *DAT_00829abc;
 
+// One object of 0x10c bytes: the castle code reaches its parts both by name and through struct
+// views of its address (sentinel list node at +4, anims, list hosts), so they must keep these offsets.
 // GLOBAL: LEGOLAND 0x00829ae0
-unsigned int DAT_00829ae0;
-
-// GLOBAL: LEGOLAND 0x00829ae4
-unsigned int DAT_00829ae4;
-// GLOBAL: LEGOLAND 0x00829ae8
-short DAT_00829ae8[2];
-
-// GLOBAL: LEGOLAND 0x00829af8
-unsigned int DAT_00829af8[3];
-
-// GLOBAL: LEGOLAND 0x00829b04
-unsigned int DAT_00829b04[3];
-
-// GLOBAL: LEGOLAND 0x00829b0c
-unsigned int DAT_00829b0c;
-
-// GLOBAL: LEGOLAND 0x00829aec
-unsigned int DAT_00829aec;
-
-// GLOBAL: LEGOLAND 0x00829af0
-unsigned int DAT_00829af0;
-
-// GLOBAL: LEGOLAND 0x00829af4
-unsigned int DAT_00829af4;
+struct CastleState DAT_00829ae0;
 
 // GLOBAL: LEGOLAND 0x004b5b48
 unsigned int DAT_004b5b48;
-
-// GLOBAL: LEGOLAND 0x00829b88
-unsigned int DAT_00829b88;
-
-// GLOBAL: LEGOLAND 0x00829b8c
-unsigned int DAT_00829b8c;
-
-// GLOBAL: LEGOLAND 0x00829ba0
-unsigned int DAT_00829ba0;
-
-// GLOBAL: LEGOLAND 0x00829ba4
-unsigned int DAT_00829ba4;
-
-// GLOBAL: LEGOLAND 0x00829b90
-short DAT_00829b90[4][2];
-
-// GLOBAL: LEGOLAND 0x00829ba8
-short DAT_00829ba8[4][2];
 
 // GLOBAL: LEGOLAND 0x00829bec
 void *DAT_00829bec;

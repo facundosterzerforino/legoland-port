@@ -3984,13 +3984,7 @@ extern struct FMat4 DAT_008299bc;
 // 0x008299fc
 extern struct FMat4 DAT_008299fc;
 // 0x008299ac
-extern int DAT_008299ac;
-// 0x008299b0
-extern int DAT_008299b0;
-// 0x008299b4
-extern int DAT_008299b4;
-// 0x008299b8
-extern int DAT_008299b8;
+extern int DAT_008299ac[4];
 // 0x00829a3c
 extern struct ListLink DAT_00829a3c;
 // 0x00829a58
@@ -4006,38 +4000,29 @@ extern unsigned int DAT_00829a64;
 extern struct EditFootPrint DAT_00829a80;
 // 0x00829abc
 extern struct Element *DAT_00829abc;
+struct CastleState {
+    /* 0x00 */ unsigned int field_0;
+    /* 0x04 */ unsigned int field_4;
+    /* 0x08 */ short field_8[2];
+    /* 0x0c */ unsigned int field_c;
+    /* 0x10 */ unsigned int field_10;
+    /* 0x14 */ unsigned int field_14;
+    /* 0x18 */ unsigned int field_18[3];
+    /* 0x24 */ unsigned int field_24[2];
+    /* 0x2c */ unsigned int field_2c;
+    /* 0x30 */ unsigned char pad_30[0xa8 - 0x30];
+    /* 0xa8 */ unsigned int field_a8;
+    /* 0xac */ unsigned int field_ac;
+    /* 0xb0 */ short field_b0[4][2];
+    /* 0xc0 */ unsigned int field_c0;
+    /* 0xc4 */ unsigned int field_c4;
+    /* 0xc8 */ short field_c8[4][2];
+    /* 0xd8 */ unsigned char pad_d8[0x10c - 0xd8];
+};
 // 0x00829ae0
-extern unsigned int DAT_00829ae0;
-// 0x00829ae4
-extern unsigned int DAT_00829ae4;
-// 0x00829ae8
-extern short DAT_00829ae8[2];
-// 0x00829af8
-extern unsigned int DAT_00829af8[3];
-// 0x00829b04
-extern unsigned int DAT_00829b04[3];
-// 0x00829b0c
-extern unsigned int DAT_00829b0c;
-// 0x00829aec
-extern unsigned int DAT_00829aec;
-// 0x00829af0
-extern unsigned int DAT_00829af0;
-// 0x00829af4
-extern unsigned int DAT_00829af4;
+extern struct CastleState DAT_00829ae0;
 // 0x004b5b48
 extern unsigned int DAT_004b5b48;
-// 0x00829b88
-extern unsigned int DAT_00829b88;
-// 0x00829b8c
-extern unsigned int DAT_00829b8c;
-// 0x00829ba0
-extern unsigned int DAT_00829ba0;
-// 0x00829ba4
-extern unsigned int DAT_00829ba4;
-// 0x00829b90
-extern short DAT_00829b90[4][2];
-// 0x00829ba8
-extern short DAT_00829ba8[4][2];
 // 0x00829bec
 extern void *DAT_00829bec;
 // 0x00829bf0
