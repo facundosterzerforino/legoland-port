@@ -26,6 +26,11 @@ if(LEGOLAND_MODERN_BUILD)
     # Static C runtime, debug info in the objects, a PDB for debuggers.
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     target_compile_options(legoland PRIVATE /Z7
+        # The decompiled code often writes "if (in bounds) p = &tbl[i]; else p = NULL;" then uses p. MSVC6 kept
+        # the check and the NULL access crashed; clang treats it as impossible and deletes the check, so the
+        # port silently uses tbl[i] out of bounds instead. Keep the checks: the access faults as in the
+        # original and the watchdog logs it (see tools/audit_null.py for where this can happen).
+        -fno-delete-null-pointer-checks
         # The decompiled code mixes pointers and 32-bit integers the way MSVC6 allowed. That is fine in this
         # 32-bit build, so these stay warnings (counted, not hidden); phase 8 (64-bit) fixes them for real.
         -Wno-error=int-conversion

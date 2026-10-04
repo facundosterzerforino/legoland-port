@@ -59,6 +59,8 @@ describe how `main` works.
      - `python3 tools/audit_tables.py`: every pointer table written out in C, entry by entry against the exe.
      - `python3 tools/audit_values.py`: C initializers the startup loader doesn't replace (`static`,
        `const`, opaque types), byte by byte against the exe.
+     - `python3 tools/audit_null.py`: places that set a pointer to NULL and then use it. The original crashed
+       there; clang would delete the check and write out of bounds, hence `-fno-delete-null-pointer-checks`.
      - In the decomp: `./tools/verify --silent --json r.json && python3 ~/wt/port/tools/audit_effective.py
        r.json` lists "100% effective" matches whose jumps moved (swapped if/else arms change behaviour).
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
