@@ -6410,7 +6410,7 @@ unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int st
         for (k = 0; k < 3; k++) {
             rec[k] = PortRound(FLOAT_004ab390 + in[i][0] * mat[k][0] + in[i][1] * mat[k][1] + in[i][2] * mat[k][2] + mat[k][3]);
         }
-        rec[3] = PortOutCode(rec[0], rec[1], DAT_008299ac, DAT_008299b0, DAT_008299b4, DAT_008299b8);
+        rec[3] = PortOutCode(rec[0], rec[1], DAT_008299ac[0], DAT_008299ac[1], DAT_008299ac[2], DAT_008299ac[3]);
         for (node = (struct FlagNode *)DAT_00829a3c.var_18; node != (struct FlagNode *)&DAT_00829a3c; node = node->next) {
             r = (struct ClearRect *)node;
             if ((node->kind & PortOutCode(rec[0], rec[1], r->left, r->top, r->right, r->bottom)) == 0xf) {

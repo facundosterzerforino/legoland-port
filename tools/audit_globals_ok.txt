@@ -87,3 +87,19 @@
 0x00829c54 DAT_00829c54 (0x4 of 0xc): reviewed, harmless
 0x0082c6e0 DAT_0082c6e0 (0x1834 of 0x1840): reviewed, harmless
 0x0082df20 DAT_0082df20 (0x1834 of 0x1840): reviewed, harmless
+0x004e3870 DAT_004e3870 (0x96000 of 0x96008): depth buffer, cleared with exactly 0x96000 bytes; the rest is padding
+# Overlaps (a global declared bigger than its space in the original), reviewed 2026-10-04: the code never
+# reaches the following global through it, so the port's extra size is unused space.
+overlap:0x004b4140 Helicopter_SFX: Load_FXList(.., 4) uses 4 entries of 12 bytes = the original 0x30
+overlap:0x004b43f8 DRIVING_SCHOOL_SFX: 6 entries of 12 bytes = the original 0x48
+overlap:0x004b47f0 FlumeStages_004b47f0: the {0, 0x7fffffff, NULL} entry stands in for the bytes the original reads past the table (a huge count, no sprite)
+overlap:0x004b4810 FlumeStages_004b4810: as above
+overlap:0x004b4830 FlumeStages_004b4830: as above
+overlap:0x004b51d8 DAT_004b51d8: indexed (x & 0xf) * 2 + 1, at most 0x80 bytes
+overlap:0x004b7750 DAT_004b7750: an 8-byte AnimLayout, only its address is compared
+overlap:0x004d8bb0 DAT_004d8bb0: the empty string, only read
+overlap:0x0060f914 DAT_0060f914: entries filled up to a data-dependent count; the original's neighbour would be overwritten by the same overflow
+overlap:0x00615f70 DAT_00615f70: material table never written (zero); reaching +0x10 needs a second material
+overlap:0x00643ee8 DAT_00643ee8: vertex buffer, data-dependent count as in the original
+overlap:0x00667d70 DDRAWENV: the original's CheckHostSystemGPU also zeroes the globals after it (0x3d8 bytes); called once at startup, when they are zero anyway
+overlap:0x0081c0c0 DAT_0081c0c0: image sizes indexed by image count, data-dependent as in the original

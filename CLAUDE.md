@@ -52,8 +52,10 @@ describe how `main` works.
      guessed variable size or a wrong table entry never fails to match, but in the port it overwrites
      neighbouring globals (most crashes found while making the game playable were this):
      - `python3 tools/audit_globals.py`: globals declared smaller than their space in the original exe and
-       used as tables/buffers. Fix the declaration (in the decomp), or add a reviewed harmless case to
-       `tools/audit_globals_ok.txt`.
+       used as tables/buffers, and the reverse: one object of the original split into several globals
+       (`overlap`: a global reaching past the next one; `cast`: `(struct T *)&G` bigger than G's space).
+       The boating-school erase crash and the castle state block were this. Fix the declaration (in the
+       decomp), or add a reviewed harmless case to `tools/audit_globals_ok.txt`.
      - `python3 tools/audit_tables.py`: every pointer table written out in C, entry by entry against the exe.
      - `python3 tools/audit_values.py`: C initializers the startup loader doesn't replace (`static`,
        `const`, opaque types), byte by byte against the exe.
