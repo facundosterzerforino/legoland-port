@@ -2947,7 +2947,8 @@ int FUN_0040ca60(struct FlumeEntry *entry, int arg) {
             if (par->tile.pos.x != entry->tile.pos.x) {
                 FUN_0040ca30(&DAT_004c8d74, (int)entry);
                 if (spr != NULL) {
-                    PrintSprite(spr, pos.x, pos.y, (unsigned int)par, 0);
+                    /* arg, from the parameter slot next to the one par reuses (0x40cb5c) */
+                    PrintSprite(spr, pos.x, pos.y, arg, 0);
                 }
                 FUN_0040ca30(&DAT_004ca5ac, (int)entry);
             } else {
@@ -2961,7 +2962,7 @@ int FUN_0040ca60(struct FlumeEntry *entry, int arg) {
             if (par->tile.pos.x == entry->tile.pos.x) {
                 FUN_0040ca30(&DAT_004c8d74, (int)entry);
                 if (spr != NULL) {
-                    PrintSprite(spr, pos.x, pos.y, (unsigned int)par, 0);
+                    PrintSprite(spr, pos.x, pos.y, 0, 0); /* 0x40cba3 */
                 }
                 FUN_0040ca30(&DAT_004ca5ac, (int)entry);
             } else {
