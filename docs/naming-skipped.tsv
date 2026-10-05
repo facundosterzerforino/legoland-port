@@ -378,7 +378,7 @@ DAT_0082c684	skipped-no-evidence
 DAT_0082c6e0	rejected-by-verifier	DrivingSchoolCursor	one of several chained driving school cursors (f760, df20); name ambiguous
 DAT_0082df20	skipped-no-evidence		
 FUN_00401000	named	RotateOffset	
-FUN_00401f30	skipped-no-evidence		
+FUN_00401f30	named	PickQueueTurn	
 FUN_00404630	skipped-no-evidence		
 FUN_00405310	skipped-no-evidence		
 FUN_00408ec0	named	FindFlumeEntryByTile	
@@ -436,7 +436,7 @@ FUN_0041bab0	skipped-no-evidence
 FUN_0041c4c0	skipped-no-evidence		
 FUN_0041c690	skipped-no-evidence		
 FUN_0041c890	named	FindBoatPathAt	
-FUN_0041c940	skipped-no-evidence		
+FUN_0041c940	named	SearchBoatPathConnected	
 FUN_0041cc50	named	GetOppositeDirection	
 FUN_0041cca0	named	DirMaskToIndex	
 FUN_0041ce10	named	ResetAnim	
@@ -1086,3 +1086,29 @@ FUN_0047af80	named	ScriptCmdEndLevel	parser for script keyword ENDLEVEL (keyword
 FUN_00492d80	named	StopInteractiveMusic	music thread command 1 (cheat :STOP)
 FUN_004428f0	named	Get3DDataListString	string param_3 of section param_2 (0 faces, 1 chests) in a Load3DDataFile list (visitor altman/altwoman)
 FUN_0040ca60	named	RenderLogFlumeCorner	draws log flume corners 0/2 (fc1/fc3 + matte fc1_m3/fc3_m3) with the boats split behind/in front; track sprites fc1-4 corners, fs straights, fe ends
+FUN_0042a020	named	FindPathPosAtRangeAhead	
+FUN_00429f30	named	FindPathPosAtRangeBehind	
+FUN_00411680	named	AdvanceFlumeMover	
+FUN_004064d0	named	FortWanderUpdate	
+FUN_00406660	named	FortUpdate	
+FUN_004227c0	named	EdgeMeshRemoveBackfaces	
+FUN_00433840	named	JungleCruiseBuildStepPath	
+FUN_004198a0	named	BoatingSchoolBuildStepPath	
+FUN_00402150	named	GetQueueTurn	
+FUN_0043e410	named	PlaneRideUpdate	
+FUN_0040bf70	named	LogFlumeEntranceUpdate	
+FUN_00405bd0	named	DrivingSchoolUpdate	
+FUN_00417430	named	TempleSlideUpdate	
+FUN_00415220	named	SafariRideUpdate	
+FUN_0043a1e0	named	ExplorersInstituteUpdate	
+FUN_00477bd0	named	FindMapPathAStar	
+FUN_0043f0b0	named	FileSelectDialog	
+FUN_0043ea30	named	ListBoxDialog	
+FUN_004025d0	named	SetPersonYawFromDir16	
+FUN_00439950	named	LegoShop2Update	
+FUN_0043bac0	named	SpaceTowerUpdate	
+FUN_00442040	named	RemapTexCoordsToCell	
+FUN_0043c950	named	SpinningBarrelsUpdate	
+FUN_004316f0	named	OctopusCafeUpdate	
+FUN_0042fbb0	named	Restaurant2Update	
+FUN_00407c30	named	JoustUpdate	

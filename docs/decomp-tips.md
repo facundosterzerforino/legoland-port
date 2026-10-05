@@ -20,7 +20,8 @@
 - `push $0x0` (immediate) vs `push %reg` (register holding zero): determined by whether the compiler decided to materialize a zero register. More zero-uses in a function = more likely to use a dedicated zero register.
 - `dec %eax` / `inc %eax` generated from `x + -1` / `x + 1` (or `x - 1`).
 - MSVC6 C89 mode: no mid-block declarations. All variables must be declared at top of block.
-- The `register` keyword and inline `__asm` are NOT needed for matching -- pure C source order changes suffice.
+- The `register` keyword and inline `__asm` are NOT needed for matching compiler-generated code -- pure C source
+  order changes suffice. `__asm` is only for functions that were hand-written assembly (see below).
 
 ## Signedness and Extension
 - `signed char` → `int` assignment generates a single `movsbl` (movsx) instruction.
@@ -141,7 +142,7 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
 1. **Inline asm in the function.** Fingerprints: `fistp DWORD` behind `fstp [x]; fld [x]` (fast float->int
    macro), `shrd`/`shld` (fixed-point), `rdtsc` wrapped in `push eax; push edx` (timing macro), `pusha/popa`,
    `xchg`, `fstcw/fldcw`, `push eax; lea eax,[func]; mov [g],eax; pop eax`. MSVC never emits these; the
-   function cannot be matched in pure C.
+   function cannot be matched in pure C: write those parts with inline `__asm`.
 2. **Unoptimized code** (every local in `[ebp-N]`, loops as `jmp` to the condition, no register
    allocation). Wrap the function in `#pragma optimize("", off)` / `#pragma optimize("", on)`, placing the
    first pragma *above* the `// FUNCTION:` annotation (a line between the annotation and the function makes
@@ -188,4 +189,4 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   The 8 draw.c sprite blitters (0x466d80-0x468410) have no frame but use `rol`, `rep movsw`/`rep stosw` and a
   decode block repeated like an asm macro, and they reuse argument slots as scratch.
 - Each one carries a `// Hand-written assembly in the original (...)` comment above its `// FUNCTION:` line.
-  They can only be matched with `__asm`, which the project does not allow.
+  They can only be matched with `__asm`, which is allowed for exactly these functions.

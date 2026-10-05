@@ -21,7 +21,7 @@ from reccmp.parser.marker import MarkerType, match_marker
 from reccmp.project.detect import RecCmpProject
 
 # Instructions MSVC6 never emits from C. A function whose original code contains one
-# was written with inline __asm, so pure C cannot byte-match it.
+# was hand-written assembly and needs inline __asm to byte-match.
 INLINE_ASM = {
     "pushal", "popal", "rdtsc", "fnstcw", "fldcw", "fist", "fistp", "shrd", "shld",
     "movsw", "rep stosw", "rep movsw", "lodsb", "lodsw", "lodsd", "cld", "std",
@@ -195,8 +195,8 @@ def print_split(functions: dict, inline_asm: set[int]):
             f"   {label:<10}  {len(ratios):>5}  {count['matched']:>7}  {count['partial']:>7}  {count['unmatched']:>9}  {count['matched'] / n * 100:>5.1f}%  {sum(ratios) / n * 100:>7.2f}%"
         )
     print(
-        "   Inline asm: the original uses instructions MSVC6 never emits from C,"
-        " so pure C cannot reach 100%."
+        "   Inline asm: the original uses instructions MSVC6 never emits from C;"
+        " match these with __asm."
     )
 
 

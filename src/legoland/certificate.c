@@ -60,7 +60,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         hInfo = GlobalAlloc(GHND, ncolors * 4 + 40);
         if (hInfo != NULL) {
             pInfo = (BITMAPINFO *)GlobalLock(hInfo);
-            if (pInfo != NULL) {
+            if (pInfo == NULL) {
+                GlobalFree(hInfo);
+            } else {
                 pInfo->bmiHeader.biSize = bmih.biSize;
                 pInfo->bmiHeader.biWidth = bmih.biWidth;
                 pInfo->bmiHeader.biHeight = bmih.biHeight;
@@ -218,7 +220,6 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 DeleteObject(hBitmap);
                 return 1;
             }
-            GlobalFree(hInfo);
         }
         _close(fd);
     }

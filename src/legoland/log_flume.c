@@ -1579,9 +1579,9 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
     int last;
     int i;
 
-    ride = elem->ride;
     t.pos.x = pt[0];
     t.pos.y = pt[1];
+    ride = elem->ride;
     AddBasicObject(elem, pt);
     FUN_00408e40(t);
     entry = FindFlumeEntryByTile(&t);

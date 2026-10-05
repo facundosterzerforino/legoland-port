@@ -791,13 +791,14 @@ void CoptersUpdate(struct Element *elem) {
     struct Bloke *b;
     struct CopterNode *cn;
     struct CopterChainNode *link;
-    struct Ride *volatile ride = elem->ride;
+    struct Ride *ride = elem->ride;
     struct RideNode *next;
-    struct RideNode *volatile node;
+    struct RideNode *node;
     TileId *tile;
     struct RideNode *cur;
     int spr;
     int spr2;
+    int qi;
 
     CoptersUpdateNodes();
     node = ride->riders;
@@ -846,8 +847,8 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 2:
-                spr = (int)FUN_004122f0((struct RideSlot *)b);
-                FUN_00412300((struct QueueTable *)CopterQueueTables[spr], x, y, b);
+                qi = (int)FUN_004122f0((struct RideSlot *)b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 3:
             case 7:
@@ -894,8 +895,8 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 9:
-                spr = (int)FUN_004122f0((struct RideSlot *)b);
-                FUN_00412300((struct QueueTable *)CopterQueueTables[spr], x, y, b);
+                qi = (int)FUN_004122f0((struct RideSlot *)b);
+                FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 10:
                 b->dest.x = (x << 8) + 0x80;

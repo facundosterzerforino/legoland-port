@@ -395,8 +395,8 @@ void LegoShop2Update(Element *obj) {
         next = node->next;
         bloke = node->rider;
         tile = &node->tile;
-        x = tile->pos.x + ride->x;
         y = tile->pos.y + ride->y;
+        x = tile->pos.x + ride->x;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:

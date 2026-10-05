@@ -583,12 +583,12 @@ void PlaneRideUpdate(struct Element *elem) {
                 ix = bloke->pos.x;
                 iy = bloke->pos.y;
                 GetTileDimensions(&tw, &th);
-                iv13 = (ix + iy) * th;
-                iv12 = (ix - iy) * tw;
+                iv13 = ((ix + iy) * th) >> 9;
+                iv12 = ((ix - iy) * tw) >> 9;
                 sXs = Get_XScroll();
                 sYs = Get_YScroll();
-                coords[0] = ((((unsigned int)lpConfig->view_x - (int)sXs) + (iv12 >> 9)) - DAT_0081cae8 / 2 - sc.x) * 2;
-                coords[1] = (((iv13 >> 9) + ((unsigned int)lpConfig->view_y - (int)sYs)) - DAT_0081caec / 2 - sc.y) * 2;
+                coords[0] = ((((unsigned int)lpConfig->view_x - (int)sXs) + iv12) - DAT_0081cae8 / 2 - sc.x) * 2;
+                coords[1] = ((iv13 + ((unsigned int)lpConfig->view_y - (int)sYs)) - DAT_0081caec / 2 - sc.y) * 2;
                 bloke->flags |= 0x80;
                 bloke->person->sprite = DAT_0062fe98;
                 bloke->person->field_30 = 1;

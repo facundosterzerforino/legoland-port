@@ -807,6 +807,13 @@ void FUN_00471f10(void) {
 void FUN_00472090(void) {
 }
 
+// Inlined in the original: the position is computed before the hide flag is cleared.
+static __inline void ShowPopUpIconAt(struct IconNode **icon, int x, int y) {
+    (*icon)->flags &= 0xfffffbff;
+    (*icon)->x = x;
+    (*icon)->y = y;
+}
+
 // FUNCTION: LEGOLAND 0x004720a0
 void DrawNewObjectPopup(void) {
     struct NewObjInfo *obj;
@@ -814,15 +821,9 @@ void DrawNewObjectPopup(void) {
     char local_80[128];
 
     PrintSprite(NewPopMockSprite, 0xbe, 0x28, 0, (int *)&ctx);
-    PrevPopUpIcon->flags = PrevPopUpIcon->flags & 0xfffffbff;
-    PrevPopUpIcon->x = 0xc1;
-    PrevPopUpIcon->y = 0x46;
-    NextPopUpIcon->flags = NextPopUpIcon->flags & 0xfffffbff;
-    NextPopUpIcon->x = NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb;
-    NextPopUpIcon->y = 0x46;
-    ClosePopUpIcon->flags = ClosePopUpIcon->flags & 0xfffffbff;
-    ClosePopUpIcon->x = NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb;
-    ClosePopUpIcon->y = NewPopMockSprite->height - ClosePopUpIcon->height + 0x25;
+    ShowPopUpIconAt(&PrevPopUpIcon, 0xc1, 0x46);
+    ShowPopUpIconAt(&NextPopUpIcon, NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb, 0x46);
+    ShowPopUpIconAt(&ClosePopUpIcon, NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb, NewPopMockSprite->height - ClosePopUpIcon->height + 0x25);
     PushRenderingStatusAndUnlockVideoSurface();
     if (NewObjects.count == 1) {
         // STRING: LEGOLAND 0x004bad04

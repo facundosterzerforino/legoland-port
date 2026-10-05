@@ -309,9 +309,10 @@ LEGO_EXPORT struct ResFile *RES_OpenFileFromVolume(const char *path, const char 
     prefix[0] = '\0';
     memset(prefix + 1, 0, sizeof(prefix) - 1);
     src = path_copy;
+    scan = path_copy;
     strcpy(src, path);
 
-    for (scan = path_copy; scan != 0; scan++) {
+    for (; scan != 0; scan++) {
         if (*scan == '\0') {
             break;
         }
@@ -320,22 +321,17 @@ LEGO_EXPORT struct ResFile *RES_OpenFileFromVolume(const char *path, const char 
         }
     }
 
-    if (last_bs == 0) {
-        last_bs = path_copy;
-    } else {
+    if (last_bs != 0) {
         prefix_len = (int)(last_bs - path_copy) + 1;
-        if (path_copy[0] == '.') {
-            while (src[1] == '\\') {
-                src += 2;
-                prefix_len -= 2;
-                if (src[0] != '.') {
-                    break;
-                }
-            }
+        while (*src == '.' && src[1] == '\\') {
+            src += 2;
+            prefix_len -= 2;
         }
         memcpy(prefix, src, prefix_len);
         prefix[prefix_len] = '\0';
         last_bs++;
+    } else {
+        last_bs = path_copy;
     }
 
     dir = FUN_00489550(vol_name, prefix, &entry);
@@ -350,7 +346,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFileFromVolume(const char *path, const char 
                 file->size = entry->size;
                 file->base = entry->base;
                 file->volume = entry->volume;
-                entry->volume->refcount++;
+                file->volume->refcount++;
                 file->position = 0;
                 return file;
             }
@@ -375,6 +371,9 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
 
     base_name[0] = '\0';
     memset(base_name + 1, 0, sizeof(base_name) - 1);
+    last_slash = 0;
+    prefix = orig_str;
+    scan = orig_str;
 
     if (WaitForLegolandCd(0) == 0) {
         exit(1);
@@ -382,9 +381,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
 
     strcpy(orig_str, path);
 
-    last_slash = 0;
-    prefix = orig_str;
-    for (scan = orig_str; scan != 0; scan++) {
+    for (; scan != 0; scan++) {
         if (*scan == '\0') {
             break;
         }
@@ -399,14 +396,9 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
 
     if (last_slash != 0) {
         prefix_len = (int)(last_slash - orig_str) + 1;
-        if (orig_str[0] == '.') {
-            while (prefix[1] == '\\') {
-                prefix += 2;
-                prefix_len -= 2;
-                if (prefix[0] != '.') {
-                    break;
-                }
-            }
+        while (*prefix == '.' && prefix[1] == '\\') {
+            prefix += 2;
+            prefix_len -= 2;
         }
         memcpy(base_name, prefix, prefix_len);
         base_name[prefix_len] = '\0';
@@ -426,7 +418,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
             file->size = entry->size;
             file->base = entry->base;
             file->volume = entry->volume;
-            entry->volume->refcount++;
+            file->volume->refcount++;
             file->position = 0;
             return file;
         }

@@ -9189,13 +9189,13 @@ void FindPathPosAtRangeBehind(float *center, float r, struct Struct42a110 *src, 
 }
 
 // FUNCTION: LEGOLAND 0x0042a020
-void FindPathPosAtRangeAhead(float *center, float r, struct Struct42a110 *src, float hi, float x, struct Struct42a110 *dst, float *out) {
+void FindPathPosAtRangeAhead(float *center, float r, struct Struct42a110 *src, float start, float x, struct Struct42a110 *dst, float *out) {
     struct Struct42a110 cur;
-    float lo;
+    float end;
     int found;
 
     cur = *src;
-    lo = *(float *)&cur.field_4->f48;
+    end = *(float *)&cur.field_4->f48;
     DAT_00615fd8 = r * r;
     DAT_00615f8c = center;
     DAT_00615fd0 = r;
@@ -9203,13 +9203,12 @@ void FindPathPosAtRangeAhead(float *center, float r, struct Struct42a110 *src, f
     DAT_00615f84 = &cur;
     DAT_00615fdc = (r + x) * (r + x);
     DAT_00615fe0 = (r - x) * (r - x);
-    found = DAT_004b63fc(FUN_00429cf0, lo, hi, out);
+    found = DAT_004b63fc(FUN_00429cf0, start, end, out);
     while (!found) {
-        float hi2;
         FUN_0041f850((struct AnimWalker *)&cur);
-        lo = *(float *)&cur.field_4->f44;
-        hi2 = *(float *)&cur.field_4->f48;
-        found = DAT_004b63fc(FUN_00429cf0, lo, hi2, out);
+        start = *(float *)&cur.field_4->f44;
+        end = *(float *)&cur.field_4->f48;
+        found = DAT_004b63fc(FUN_00429cf0, start, end, out);
     }
     *dst = cur;
 }

@@ -769,16 +769,15 @@ LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node) {
                 // STRING: LEGOLAND 0x004ba888
                 if (strcmp("Path", *(char **)((char *)EditMode.unk8 + 0x78)) != 0 &&
                     *(unsigned int **)((char *)EditMode.unk8 + 0xc4) == *(unsigned int **)((char *)node->field_8 + 0xc4)) {
-                    struct Sprite *s = GetBlink() != 0 ? AttractHighlightOffSprite : AttractHighlightOnSprite;
+                    struct Sprite *s = AttractHighlightOnSprite;
+                    if (GetBlink() != 0) {
+                        s = AttractHighlightOffSprite;
+                    }
                     PrintSprite(s, node->x, node->y, 0, 0);
                 }
             }
             if ((*(unsigned int **)((char *)node->field_8 + 0xc4))[2] & 0x20000) {
-                struct Sprite *s = AttractNewOffSprite;
-                if (GetBlink() == 0) {
-                    s = AttractNewOnSprite;
-                }
-                PrintSprite(s, node->x, node->y, 0, 0);
+                PrintSprite(GetBlink() != 0 ? AttractNewOffSprite : AttractNewOnSprite, node->x, node->y, 0, 0);
             }
         } while (0);
     }

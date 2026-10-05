@@ -155,12 +155,18 @@ struct assignment, etc.).
 - One `.c` per TU (translation unit) under `src/legoland/`, named from `ghidra/functions.csv`'s `tu`
   column (`TU_RIDE_BLOKE` → `ride_bloke.c`). Functions appear in **address order**.
 - Every function is tagged `// FUNCTION: LEGOLAND 0x<addr>` immediately above it.
-- Unmatched functions have a `STUB();` body (macro in `legoland.h`). Remaining work: `grep -rn 'STUB()' src/`.
+- Unmatched functions have a `STUB();` body (macro in `legoland.h`). **Every game function still at `STUB()` is
+  hand-written assembly in the original** and cannot match from pure C: match them with inline `__asm` (below).
+  `docs/remaining-work.md` lists them and the partial matches nobody has worked on yet.
 - When you decompile a function: replace its `STUB()` body with real C, build, run reccmp, iterate to 100%.
 - No `ctx.h` — include real MSVC6 headers; shared decls go in `src/legoland/legoland.h`.
 - **No forward declarations in `.c` files** — put all declarations in the TU's `.h` header.
   Run `uv run tools/needsdecl.py` to check.
-- **No `__declspec(naked)` or inline `__asm`** — achieve matches through pure C only.
+- **Inline `__asm` and `__declspec(naked)` only where the original is hand-written assembly** — i.e. it
+  contains instructions MSVC6 never emits from C (`rdtsc`, `xchg`, `pusha`, `shrd`, `fistp` after `fstp/fld`, …;
+  see "Functions With an ebp Frame" in `docs/decomp-tips.md`). `uv run tools/progress.py <tu>` flags them.
+  Everything else stays pure C. Keep the `__asm` to the parts C can't produce. The port replaces these
+  functions with plain-C equivalents tagged `// [library:asm]`.
 - **`goto` only with named labels** — cleanup/error paths like `goto fail;` are fine (the original code
   used them, and they often match better than duplicated cleanup). No Ghidra-style `goto LAB_00446b71;`:
   give the label a meaningful name or restructure with `if`/loops.

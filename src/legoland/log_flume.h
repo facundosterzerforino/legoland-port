@@ -18,6 +18,9 @@ int FUN_00411650(struct FlumeSlot *slot);
 int AdvanceFlumeMover(struct FlumeMover *mover);
 void FUN_00411810(struct FlumeMover *m);
 void FUN_0040d090(struct FlumeEntry *entry, struct Footprint **out, TileId *tile);
+int AdvanceFlumeMover(struct FlumeSlot *slot);
+void FUN_00411810(struct FlumeSlot *slot);
+void FUN_0040d090(struct FlumeEntry *entry, unsigned int *fp, void *unused);
 
 struct FlumeDims FUN_004112c0(void);
 

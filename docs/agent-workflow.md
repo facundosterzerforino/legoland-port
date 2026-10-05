@@ -59,7 +59,7 @@ Patterns that did match something: wrap a body in `do { ... } while (0)` to move
 `for(;;)` with the early `return` inside the loop; `switch` instead of `if` for `dec/je` chains; reusing a pointer parameter as
 a spill slot (ugly, "effective" match); replacing a temp pointer with an explicit if/else.
 Best remaining value: partials between 60% and 95% in files not yet worked (see `tools/agent/partials.py`), then the
-inline-asm stubs are out of scope (CLAUDE.md).
+inline-asm stubs, which need `__asm` (CLAUDE.md).
 
 ### Round 3 (single session, no subagents)
 Matched: FUN_004766f0, FUN_00441830, FUN_0042e560, FUN_00481170, FUN_0046da20, FindCarouselNode, FindWaterNodeByKey,
