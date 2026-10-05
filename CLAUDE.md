@@ -61,6 +61,9 @@ describe how `main` works.
        `const`, opaque types), byte by byte against the exe.
      - `python3 tools/audit_null.py`: places that set a pointer to NULL and then use it. The original crashed
        there; clang would delete the check and write out of bounds, hence `-fno-delete-null-pointer-checks`.
+     - `python3 tools/audit_locals.py`: `&local` passed where the callee writes past element 0 (`p[1] = ...`),
+       or a scalar local cast to a struct pointer. MSVC6 kept the locals adjacent, so it matched; modern
+       compilers don't (the earth slide's visitor target was this).
      - In the decomp: `./tools/verify --silent --json r.json && python3 ~/wt/port/tools/audit_effective.py
        r.json` lists "100% effective" matches whose jumps moved (swapped if/else arms change behaviour).
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of

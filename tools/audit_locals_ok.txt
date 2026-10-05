@@ -1,0 +1,2 @@
+# Reviewed findings of tools/audit_locals.py ("file.c:Caller->Callee").
+safari_ride.c:SafariAddObject->FUN_004149c0  # the callee only reads tile_id, the 2 bytes `local` holds
