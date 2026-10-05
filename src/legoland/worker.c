@@ -1413,7 +1413,7 @@ LEGO_EXPORT void RemoveMechanicsWorkOrderAt(int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x0049b690
-void AddRepairOrder(Footprint *footprint, int *coords, float rate) {
+RepairOrder *AddRepairOrder(Footprint *footprint, int *coords, float rate) {
     RepairOrder *order = malloc(sizeof(RepairOrder));
 
     order->next = RepairOrderList;
@@ -1423,6 +1423,7 @@ void AddRepairOrder(Footprint *footprint, int *coords, float rate) {
     order->pos.y = coords[1];
     order->bricks = 1.5f * rate;
     order->bricks_per_step = rate;
+    return order;
 }
 
 // FUNCTION: LEGOLAND 0x0049b6e0
@@ -1550,7 +1551,7 @@ LEGO_EXPORT WorkOrder *AddRepairOrderForObject(Ride *ride, struct Point pos) {
     if ((ride->flags & 0x400000) != 0 && lpConfig->mechanics_enabled != 0) {
         return FUN_00499830(ride->element, &pos.x, 2);
     }
-    AddRepairOrder(&ride->footprint, &pos.x, rate);
+    return (WorkOrder *)AddRepairOrder(&ride->footprint, &pos.x, rate);
 }
 
 // FUNCTION: LEGOLAND 0x0049ba10

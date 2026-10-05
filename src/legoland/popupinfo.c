@@ -867,6 +867,7 @@ void DrawNewObjectPopup(void) {
 
 // FUNCTION: LEGOLAND 0x004723f0
 int FUN_004723f0(void) {
+    int result;
     unsigned int local_8[2];
     struct Cursor local_cursor;
     void *saved_class;
@@ -884,9 +885,10 @@ int FUN_004723f0(void) {
     QueryCursor.tile_x = v & 0xff;
     cls->method_94(cls->element, local_8);
     BuildCursorPtr(&QueryCursor, 0, 0);
-    FUN_0045f4b0(&QueryCursor);
+    result = FUN_0045f4b0(&QueryCursor);
     memcpy(&QueryCursor, &local_cursor, sizeof(struct Cursor));
     QueryClass = saved_class;
+    return result;
 }
 
 /* Draws the info popup: the title/info text for the selected object or bloke, the mood

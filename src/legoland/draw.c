@@ -63,7 +63,7 @@ LEGO_EXPORT int InitHostSystemGPU(void) {
 // FUNCTION: LEGOLAND 0x004637c0
 LEGO_EXPORT int CheckHostSystemGPU(void) {
     memset(&DDRAWENV, 0, sizeof(DDRAWENV));
-    InitHostSystemGPU();
+    return InitHostSystemGPU();
 }
 
 // FUNCTION: LEGOLAND 0x004637e0

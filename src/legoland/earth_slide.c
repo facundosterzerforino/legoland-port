@@ -430,8 +430,7 @@ void FUN_0042d610(struct EarthRideObj *param_1) {
     char cx;
     char cy;
     char cv;
-    int local_8;
-    int local_4;
+    int target[2]; /* FUN_0042cec0 writes x and y */
 
     elem = *(struct EarthBlokeElem **)((char *)ride + 0xcc);
     FUN_0042d5f0();
@@ -455,10 +454,10 @@ void FUN_0042d610(struct EarthRideObj *param_1) {
             switch (*(unsigned char *)((char *)bloke + 0x60)) {
             case 0:
                 *(unsigned char *)((char *)bloke + 0x62) |= 8;
-                FUN_0042cec0(ride, &elem->id_x, &local_8);
+                FUN_0042cec0(ride, &elem->id_x, target);
                 FUN_0042ce50(node, elem);
-                *(int *)((char *)bloke + 0x24) = local_8;
-                *(int *)((char *)bloke + 0x28) = local_4;
+                *(int *)((char *)bloke + 0x24) = target[0];
+                *(int *)((char *)bloke + 0x28) = target[1];
                 cv = CalcMoveLine(*(struct Point *)((char *)bloke + 0x68), *(struct Point *)((char *)bloke + 0x24), (struct Navigator *)((char *)bloke + 0x98));
                 *(short *)((char *)bloke + 0xe) = 7;
                 *(unsigned char *)((char *)bloke + 0x73) = cv + 0x10;
