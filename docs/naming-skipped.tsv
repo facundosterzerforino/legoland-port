@@ -1084,3 +1084,4 @@ FUN_0047aea0	named	ScriptCmdFlashButtonOff	parser for script keyword FLASHBUTTOF
 FUN_0047af50	named	ScriptCmdPurge	parser for script keyword PURGE (keyword table 0x4bb9d0)
 FUN_0047af80	named	ScriptCmdEndLevel	parser for script keyword ENDLEVEL (keyword table 0x4bb9d8)
 FUN_00492d80	named	StopInteractiveMusic	music thread command 1 (cheat :STOP)
+FUN_004428f0	named	Get3DDataListString	string param_3 of section param_2 (0 faces, 1 chests) in a Load3DDataFile list (visitor altman/altwoman)
