@@ -4701,8 +4701,11 @@ LAB_0044acbb:
                     int row;
                     DebugTrace("appraisal report: %d row(s) on %d page(s)", iVar13, AppraisalPageCount);
                     for (row = 0; row < iVar13; row++) {
-                        DebugTrace("  row %d: page %d x %d kind %d bar %d text \"%s\"", row, rep[row * 0x13 + 9],
-                            rep[row * 0x13 + 10], rep[row * 0x13 + 11], rep[row * 0x13 + 15],
+                        /* kind: 1 tick, 0 cross (fails the appraisal), -1 bullet, -2 text; bar: value, maximum, pass
+                         * mark (as DrawAppraisalBar gets them) */
+                        DebugTrace("  row %d: page %d kind %d bar %d (value %d max %d pass %d) \"%s\"", row,
+                            rep[row * 0x13 + 9], rep[row * 0x13 + 11], rep[row * 0x13 + 15], rep[row * 0x13 + 16],
+                            rep[row * 0x13 + 18], rep[row * 0x13 + 17],
                             rep[row * 0x13 + 13] != 0 ? (const char *)rep[row * 0x13 + 13] : "");
                     }
                 }
