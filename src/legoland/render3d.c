@@ -730,7 +730,7 @@ unsigned char *GetNthStringInList(unsigned char *str, int count) {
 }
 
 // FUNCTION: LEGOLAND 0x004428f0
-unsigned char *FUN_004428f0(char *param_1, int param_2, int param_3) {
+unsigned char *Get3DDataListString(char *param_1, int param_2, int param_3) {
     char *names;
     char *values;
     char *p;
@@ -1215,7 +1215,7 @@ LEGO_EXPORT char *GetFaceTextureNameOfBloke(struct BlokeSex0 *param_1) {
         ptr = AltWomanFileData;
         break;
     }
-    name = (char *)FUN_004428f0((char *)ptr, 0, inner->field_80);
+    name = (char *)Get3DDataListString((char *)ptr, 0, inner->field_80);
     // STRING: LEGOLAND 0x004b7d24
     _stricmp(name, "chest girly1");
     // STRING: LEGOLAND 0x004b7d14
@@ -1235,7 +1235,7 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
         ptr = AltWomanFileData;
         break;
     }
-    name = (char *)FUN_004428f0((char *)ptr, 1, inner->field_80);
+    name = (char *)Get3DDataListString((char *)ptr, 1, inner->field_80);
     _stricmp(name, "chest girly1");
     return "chest girly2";
 }
