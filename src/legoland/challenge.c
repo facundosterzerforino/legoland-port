@@ -1452,6 +1452,7 @@ unsigned int FUN_004453a0(void) {
     unsigned int wstart;
     int ysave;
     int rowy;
+    int closing_text;
     int *flatp;
     unsigned int subpass;
     unsigned int flags;
@@ -3732,6 +3733,8 @@ LAB_0044a70c:
             rep[iVar7 * 0x13 + 11] = 0xfffffffe;
             iVar12 = rand();
             rep[iVar7 * 0x13 + 12] = iVar12 % 5;
+            /* last chance gone: "appraisal. The park will now be closed" (0x44ac5e) */
+            closing_text = 0x238;
         } else {
             sprintf(fmtbuf, GetString(0x235), GetString(iVar6 + 0x514));
             if (0x1b5 < ysave) {
@@ -3787,8 +3790,10 @@ LAB_0044a70c:
             rep[iVar7 * 0x13 + 11] = 0xfffffffe;
             iVar12 = rand();
             rep[iVar7 * 0x13 + 12] = iVar12 % 5;
+            /* chances left: "...an appraisal before the park is closed" (0x44aa88) */
+            closing_text = 0x236;
         }
-        uVar5 = GetString(0x238);
+        uVar5 = GetString(closing_text);
         iVar14 = iVar14 + 2;
         rep[iVar7 * 0x13 + 13] = (int)uVar5;
         rep[iVar7 * 0x13 + 14] = 0;
