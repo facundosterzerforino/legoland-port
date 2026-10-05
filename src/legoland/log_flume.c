@@ -2904,7 +2904,7 @@ void FUN_0040ca30(void *a1, int a2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ca60
-int FUN_0040ca60(struct FlumeEntry *entry, int arg) {
+int RenderLogFlumeCorner(struct FlumeEntry *entry, int arg) {
     struct FlumeEntry *par = entry->parent;
     int count = 0;
     int i;
@@ -3003,7 +3003,7 @@ int RenderLogFlumeTrack(int a, int b, int c, TileId *tile, int e, int arg) {
     struct FlumeEntry *entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
         if (entry->mode == 2 && (entry->submode == 0 || entry->submode == 2)) {
-            return FUN_0040ca60(entry, arg);
+            return RenderLogFlumeCorner(entry, arg);
         }
         FUN_0040cc00(entry, arg);
     }

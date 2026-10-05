@@ -52,12 +52,12 @@ ignores the value. A cleanup would add the return.
 | `Catapult_AddNode`, `InitGameInterface`, `FUN_00455a50` (`text.c`) | 100% | no caller uses it |
 | `UnloadPopUpSprites` | 100% | `UnLoad_PopUpInfo`, called as a statement |
 | `AcquireWaterWorksSfx` | 100% | `FUN_00417c00`, a `cb_a4` "load resources" callback; that slot is never called with its result used (it isn't the save-load hook, see below) |
-| `FUN_0040ca60`, `RenderLogFlumeTrack` (`log_flume.c`) | 53% / 100% effective | the 0xb0 render callback, called through a void function pointer (`print_sprite.c`) |
+| `RenderLogFlumeCorner`, `RenderLogFlumeTrack` (`log_flume.c`) | 53% / 100% effective | the 0xb0 render callback, called through a void function pointer (`print_sprite.c`) |
 | `FUN_0040d6f0` (`log_flume.c`) | 97.7% (scheduling only) | the 0x90 callback, result unused (`map_object.c`) |
 | `AddBasicObject` | 99.0% (reccmp shows the constant 0x800000 as `EditCursor+5184`) | the 0x98 add-object callbacks, result unused (`gamemap.c`) |
 | `FUN_00415a90` (`spider_ride.c`) | 96.2% (two stores swapped) | `AddSpiderNode`, called as a statement |
 
-Checking the five that don't match 100% found one real decomp mistake, fixed: `FUN_0040ca60` (log flume
+Checking the five that don't match 100% found one real decomp mistake, fixed: `RenderLogFlumeCorner` (log flume
 curves) passed a track entry as `PrintSprite`'s clip argument in two of four branches; the original passes the
 caller's clip (`arg`) or 0.
 
