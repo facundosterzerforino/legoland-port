@@ -29,7 +29,7 @@ the game. Type a command and press Enter.
 |---|---|
 | `help` (or `?`) | Lists the commands. |
 | `status` | Level, game time, money, visitors, ride wear, whether the level script is running, the inspector's timer (time to the next appraisal) and the appraisal record (passes or failures in a row, and how many failures lose the level). |
-| `objectives` (or `obj`) | What the level script is waiting for right now: each objective with its kind (`one-off`, `ongoing`, `PERMANENT`, `REMINDER`), its script keyword (`NEED`, `LINK`, `RANGE`...), the object and number, and whether it is met. Also says when this is the level's last step. |
+| `objectives` (or `obj`) | What the level script is waiting for right now: each objective with its kind (`one-off`, `ongoing`, `PERMANENT`, `REMINDER`), its script keyword (`NEED`, `LINK`, `RANGE`...), the object and number, and whether it is met. For `RANGE` (a theme area) it shows the different kinds of objects needed and placed, and what you have now. Also says when this is the level's last step. |
 | `note <text>` | Writes `NOTE: <text>` into the trace, to mark what you were doing when something went wrong. |
 
 ### Level flow

@@ -15,6 +15,7 @@
 #include "../src/legoland/globals.h"
 #include "../src/legoland/map_object.h"
 #include "../src/legoland/nerps.h"
+#include "../src/legoland/obj_instance.h"
 #include "../src/legoland/objectives.h"
 #include "../src/legoland/profile_io.h"
 #include "../src/legoland/screens.h"
@@ -258,6 +259,23 @@ static int IsLastStep(void) {
     return current != NULL && (unsigned int)current == DAT_0066879c && current->next == NULL;
 }
 
+/* What RANGE counts (FUN_0046a900): the object classes of a theme that have objects in the park, and how many
+ * objects they have in all. 0x08 is the class's object count, 0x5c its theme (struct ObjectClass in nerps.c). */
+static void RangeCount(unsigned int theme, int *kinds, int *placed) {
+    struct Ride *cls;
+    unsigned int count;
+
+    *kinds = 0;
+    *placed = 0;
+    for (cls = ObjectClassList; cls != NULL; cls = cls->next) {
+        count = *(const unsigned int *)((const char *)cls + 0x08);
+        if (*(const unsigned int *)((const char *)cls + 0x5c) == theme && count != 0) {
+            *kinds += 1;
+            *placed += (int)count;
+        }
+    }
+}
+
 static const char *EventKind(unsigned char flags) {
     if (flags & 2) {
         return "PERMANENT";
@@ -360,7 +378,14 @@ static void CmdObjectives(void) {
                 snprintf(what, sizeof(what), " ALL");
             }
         }
-        if (node->type != 0x45 && node->type != 0x41 && node->type != 0x42 && node->type != 0x43) {
+        if (node->type == 0x26) {
+            size_t len = strlen(what);
+            int kinds;
+            int placed;
+            RangeCount(node->field_4, &kinds, &placed);
+            snprintf(what + len, sizeof(what) - len, ": %d different kinds (have %d), %d placed in all (have %d)",
+                (int)node->field_14, kinds, (int)node->field_1c, placed);
+        } else if (node->type != 0x45 && node->type != 0x41 && node->type != 0x42 && node->type != 0x43) {
             size_t len = strlen(what);
             snprintf(what + len, sizeof(what) - len, " %d", (int)node->field_1c);
         }
