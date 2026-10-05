@@ -10,6 +10,7 @@
 #include "string.h"
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
+#include "ext_console.h"
 #include "port_watchdog.h"
 #endif
 
@@ -111,6 +112,7 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
             peeked = 1;
 #ifdef LEGOLAND_PORT
             PortSetPaused(1); /* [port] waiting for the window on purpose: not a freeze */
+            ExtConsolePoll(); /* [port] extensions/: debug console commands also run while the window is inactive */
 #endif
             WaitMessage();
         }
@@ -125,6 +127,9 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
     ScanMouse();
     UpdateControllerFromMouseData(CONTROLLERBUFFER);
     UpdateControllerFromKeyboardData(CONTROLLERBUFFER);
+#ifdef LEGOLAND_PORT
+    ExtConsolePoll(); /* [port] extensions/: debug console commands, where the original cheat keys run */
+#endif
     return 1;
 }
 

@@ -8,6 +8,8 @@
  * On by default at Facu's request (2026-10-03); -no-skip-logo turns it off. */
 extern int ExtSkipLogo;
 
+/* -console opens a debug console for playtesting (ext_console.h; commands in docs/debug-console.md). */
+
 /* Reads the switches from the command line. */
 void ExtensionsParseCommandLine(const char *cmdline);
 
