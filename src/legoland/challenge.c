@@ -4687,6 +4687,18 @@ LAB_0044acbb:
                     iVar13 = iVar13 + -1;
                 }
                 DAT_006660a0 = DAT_006660a0 + 1;
+#ifdef LEGOLAND_PORT
+                {
+                    /* [port] log the report's rows (page, x, kind, text) to debug its layout */
+                    int row;
+                    DebugTrace("appraisal report: %d row(s) on %d page(s)", iVar13, DAT_006660a0);
+                    for (row = 0; row < iVar13; row++) {
+                        DebugTrace("  row %d: page %d x %d kind %d bar %d text \"%s\"", row, rep[row * 0x13 + 9],
+                            rep[row * 0x13 + 10], rep[row * 0x13 + 11], rep[row * 0x13 + 15],
+                            rep[row * 0x13 + 13] != 0 ? (const char *)rep[row * 0x13 + 13] : "");
+                    }
+                }
+#endif
                 FUN_00445190();
                 LoadAppraisalSprites();
                 do {
