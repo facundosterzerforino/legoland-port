@@ -1451,6 +1451,7 @@ unsigned int FUN_004453a0(void) {
     int rectr;
     unsigned int wstart;
     int ysave;
+    int rowy;
     int *flatp;
     unsigned int subpass;
     unsigned int flags;
@@ -4740,6 +4741,8 @@ LAB_0044acbb:
                         rowp = (int *)0x0;
                         flags = 0;
                     }
+                    /* each frame the rows start at the top of the page (0x50,0x6d)-(0x1a4,0x83) and go down 0x18 */
+                    rowy = 0x6d;
                     if ((int)passtotacc < iVar13) {
                         piVar10 = (int *)((char *)flat + flags * 4);
                         piVar11 = (int *)(((char *)rep + 0x4c) + passtotacc * 0x4c);
@@ -4790,20 +4793,21 @@ LAB_0044acbb:
                             if (piVar11[-8] == -2) {
                                 iVar4 = piVar11[-9] + 0x28;
                             } else {
-                                iVar4 = piVar11[-9] + colstep;
+                                iVar4 = piVar11[-9] + 0x50;
                             }
-                            FUN_00444b70(iVar4 - 0x28, ysave, piVar11[-8], piVar11[-7]);
+                            FUN_00444b70(iVar4 - 0x28, rowy, piVar11[-8], piVar11[-7]);
                             {
                                 RECT rcRow;
                                 rcRow.left = iVar4;
-                                rcRow.top = subpass;
-                                rcRow.right = rectr;
-                                rcRow.bottom = subpass + 0x16;
+                                rcRow.top = rowy;
+                                rcRow.right = 0x1a4;
+                                rcRow.bottom = rowy + 0x16;
                                 DrawTextOnRenderSurface((char *)piVar11[-6], 2, rcRow, piVar11[-5]);
                             }
                             if (piVar11[-4] != 0) {
-                                FUN_00444a70(0x126, ysave, rectr, ysave + 8, piVar11[-3], piVar11[-2], piVar11[-1]);
+                                FUN_00444a70(0x126, rowy, 0x1a4, rowy + 8, piVar11[-3], piVar11[-1], piVar11[-2]);
                             }
+                            rowy = rowy + 0x18;
                             passtotacc = passtotacc + 1;
                             piVar11 = piVar11 + 0x13;
                         } while ((int)passtotacc < iVar13);
