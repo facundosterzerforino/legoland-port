@@ -3769,6 +3769,9 @@ LAB_0044a70c:
             rep[iVar15 * 0x13] = iVar6 + 1;
             (rep + 1)[iVar6 + 1 + (int)rowp] = 0x236;
             rep[iVar15 * 0x13] = rep[iVar15 * 0x13] + 1;
+            /* the second row is the next one (the original keeps its offset in [esp+0x18]); iVar7 was stale
+             * here and the closing text overwrote the first row */
+            iVar7 = iVar15;
         joined_r0x0044aa07:
             if (0x1b5 < ysave) {
                 if (iVar3 != iVar12) {
