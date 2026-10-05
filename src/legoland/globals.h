@@ -710,14 +710,8 @@ extern unsigned int DAT_004b4458[5];
 extern unsigned int DAT_004b4470[5];
 // 0x004b4688
 extern unsigned char JOUST_SFX[12];
-// 0x004b4728
-extern unsigned int LogFlumeFootprint;
-// 0x004b472c
-extern unsigned int DAT_004b472c;
-// 0x004b4730
-extern unsigned int DAT_004b4730;
-// 0x004b4734
-extern unsigned int DAT_004b4734;
+// 0x004b4728 (20 bytes: copied whole into cursors and rides, including the NULL next)
+extern struct Footprint LogFlumeFootprint;
 // 0x004b473c
 extern int DAT_004b473c[4];
 // 0x004b474c

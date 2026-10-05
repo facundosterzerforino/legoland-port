@@ -274,16 +274,7 @@ struct FortRect DAT_004b4580 = {-1, -3, 3, 3};
 unsigned char JOUST_SFX[12];
 
 // GLOBAL: LEGOLAND 0x004b4728
-unsigned int LogFlumeFootprint;
-
-// GLOBAL: LEGOLAND 0x004b472c
-unsigned int DAT_004b472c;
-
-// GLOBAL: LEGOLAND 0x004b4730
-unsigned int DAT_004b4730;
-
-// GLOBAL: LEGOLAND 0x004b4734
-unsigned int DAT_004b4734;
+struct Footprint LogFlumeFootprint;
 // 0x008003e8 is EditCursor.field_1828 — see struct Cursor in gamemap.h.
 
 // GLOBAL: LEGOLAND 0x004b473c
