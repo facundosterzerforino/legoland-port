@@ -450,7 +450,7 @@ struct CellEntry {
 };
 
 // FUNCTION: LEGOLAND 0x00442040
-void FUN_00442040(struct CellContainer *param_1, int param_2, int param_3, float *param_4, int param_5) {
+void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_3, float *param_4, int param_5) {
     struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->entries + param_2 * 6);
     struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->entries + param_3 * 6);
     unsigned char bVar3 = entry1->field_4;
@@ -664,8 +664,8 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
     if (mem != 0) {
         memcpy(mem, (void *)src, size);
         if ((int)person->character < 2) {
-            FUN_00442040(context, valC, arrA[idxI], (float *)mem, count);
-            FUN_00442040(context, valE, arrD[idxJ], (float *)mem, count);
+            RemapTexCoordsToCell(context, valC, arrA[idxI], (float *)mem, count);
+            RemapTexCoordsToCell(context, valE, arrD[idxJ], (float *)mem, count);
         }
         FUN_004424e0(&z0, &z1, &z3, &z2, (int)mem, count);
     }

@@ -515,7 +515,7 @@ void RenderDrivingSchool(Element *obj, unsigned int param_2, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00405bd0
-void FUN_00405bd0(Element *obj) {
+void DrivingSchoolUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;

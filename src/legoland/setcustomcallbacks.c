@@ -94,7 +94,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = FUN_004058a0;
         iface->cb_98 = DrivingSchoolAddObject;
         iface->cb_9c = DrivingSchoolRemoveObject;
-        iface->cb_a8 = FUN_00405bd0;
+        iface->cb_a8 = DrivingSchoolUpdate;
         iface->cb_a0 = GetDrivingSchoolSpriteInfo;
         iface->cb_b0 = RenderDrivingSchool;
         iface->cb_bc = DrivingSchool_Save;
@@ -225,7 +225,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadOctopusCafeResources;
         iface->cb_98 = OctopusCafeAddObject;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_004316f0;
+        iface->cb_a8 = OctopusCafeUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = RenderOctopusCafe;
         iface->cb_ac = UnloadOctopusCafeResources;
@@ -246,7 +246,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("RESTAURANT 2", head->name) == 0) {
         iface->cb_a4 = LoadRestaurant2Resources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_0042fbb0;
+        iface->cb_a8 = Restaurant2Update;
         iface->cb_98 = Restaurant2AddObject;
         iface->cb_9c = Restaurant2RemoveObject;
         iface->cb_a0 = FUN_004304a0;

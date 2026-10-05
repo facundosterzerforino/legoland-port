@@ -103,7 +103,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
 }
 
 // FUNCTION: LEGOLAND 0x004064d0
-void FUN_004064d0(RideNode *node, Bloke *bloke) {
+void FortWanderUpdate(RideNode *node, Bloke *bloke) {
     int h, r;
     float fx, fy;
     char dir;
@@ -147,7 +147,7 @@ void FUN_004064d0(RideNode *node, Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x00406660
-void FUN_00406660(Element *elem) {
+void FortUpdate(Element *elem) {
     struct Ride *ride = elem->ride;
     struct Sprite *spr;
     short *lls;
@@ -190,7 +190,7 @@ void FUN_00406660(Element *elem) {
                     bloke->param_action++;
                     break;
                 case 1:
-                    FUN_004064d0(node, bloke);
+                    FortWanderUpdate(node, bloke);
                     break;
                 case 2:
                     bloke->dest.x = (tx << 8) + 0x80;
@@ -249,7 +249,7 @@ void FortGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     ci->cb_a4 = LoadFortMaskSprite;
     ci->cb_ac = KillFortMaskSprite;
     ci->cb_8c = FortSetEditMode;
-    ci->cb_a8 = FUN_00406660;
+    ci->cb_a8 = FortUpdate;
     ci->cb_b0 = RenderFort;
     ci->cb_9c = FortRemoveObject;
     ci->cb_98 = FortAddObject;

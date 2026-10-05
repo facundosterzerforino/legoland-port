@@ -14,7 +14,7 @@ boating_school.c:FUN_0041c130 baseline
 boating_school.c:FUN_0041c4c0 baseline
 bricks.c:FUN_00457a70 baseline
 gamemain.c:FUN_004777f0 baseline
-gamemain.c:FUN_00477bd0 baseline
+gamemain.c:FindMapPathAStar baseline
 gamemap.c:AddObjectsPowerStats baseline
 gamemap.c:CalculateMapRenderOrder baseline
 gamemap.c:FUN_0045a660 baseline

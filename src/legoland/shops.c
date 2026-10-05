@@ -380,7 +380,7 @@ void RenderLegoShop2(Element *obj, unsigned int param_2, unsigned int param_3, u
 }
 
 // FUNCTION: LEGOLAND 0x00439950
-void FUN_00439950(Element *obj) {
+void LegoShop2Update(Element *obj) {
     Ride *ride = obj->ride;
     RideNode *node = ride->riders;
     RideNode *next;
@@ -772,7 +772,7 @@ void RenderExplorersInstitute(struct ShopObject *obj, unsigned int param2, unsig
 }
 
 // FUNCTION: LEGOLAND 0x0043a1e0
-void FUN_0043a1e0(struct Element *obj) {
+void ExplorersInstituteUpdate(struct Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *elem = ride->riders;
     struct RideNode *next;
@@ -918,7 +918,7 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_ac = UnloadExplorersInstituteMatteSpriteAndMoneySFX;
         ci->cb_8c = ExplorersInstituteSetEditMode;
         ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = FUN_0043a1e0;
+        ci->cb_a8 = ExplorersInstituteUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderExplorersInstitute;
         return;
@@ -941,7 +941,7 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_ac = UnloadLegoShop2MatteSpriteAndMoneySFX;
         ci->cb_8c = LegoShop2SetEditMode;
         ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = FUN_00439950;
+        ci->cb_a8 = LegoShop2Update;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderLegoShop2;
         return;

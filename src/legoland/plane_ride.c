@@ -473,7 +473,7 @@ void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface
         iface->cb_a4 = FUN_0043dda0;
         iface->cb_ac = FUN_0043dee0;
         iface->cb_8c = PlaneRideSetEditMode;
-        iface->cb_a8 = FUN_0043e410;
+        iface->cb_a8 = PlaneRideUpdate;
         iface->cb_b0 = RenderPlaneRide;
         iface->cb_9c = PlaneRideRemoveObject;
         iface->cb_98 = PlaneRideAddObject;
@@ -548,7 +548,7 @@ void FUN_0043e3f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e410
-void FUN_0043e410(struct Element *elem) {
+void PlaneRideUpdate(struct Element *elem) {
     struct Ride *ride = elem->ride;
     struct RideNode *rn = ride->riders;
     struct RideNode *next;

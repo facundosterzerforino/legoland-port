@@ -206,7 +206,7 @@ void FUN_00419300(void) {
 // FUNCTION: LEGOLAND 0x004193c0
 void FUN_004193c0(struct BoatRide *param_1) {
     struct BoatRideNode *node = BoatRideNodeList;
-    FUN_004198a0(param_1, param_1->field_3dc, 4);
+    BoatingSchoolBuildStepPath(param_1, param_1->field_3dc, 4);
     param_1->field_3e4 = 4;
     param_1->next_y = param_1->tile_y + 5;
     for (; node != NULL; node = node->next) {
@@ -233,7 +233,7 @@ struct BoatRide *FUN_00419420(struct BoatRide *param_1) {
         FUN_00418f90(param_1);
         return result;
     }
-    FUN_004198a0(param_1, 1, 4);
+    BoatingSchoolBuildStepPath(param_1, 1, 4);
     param_1->field_3dc = 1;
     if (param_1->field_3e8 == 3) {
         i = 0x10;
@@ -297,7 +297,7 @@ void FUN_00419520(struct BoatRide *ride, int param_2) {
     } else if (path->tile.id == score->end.id) {
         ride->field_3e4 = 0x10;
         ride->field_3e8 = 3;
-        FUN_004198a0(ride, ride->field_3dc, 4);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, 4);
         ride->field_3dc = 1;
         ride->next_y = ride->tile_y + 5;
         return;
@@ -333,7 +333,7 @@ void FUN_00419520(struct BoatRide *ride, int param_2) {
         }
     }
     if (mask == 0) {
-        FUN_004198a0(ride, ride->field_3dc, -1);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, -1);
         ride->field_3dc = -1;
         return;
     }
@@ -372,25 +372,25 @@ void FUN_00419520(struct BoatRide *ride, int param_2) {
     case 1:
         ride->next_x = ride->tile_x;
         ride->next_y = ride->tile_y - 5;
-        FUN_004198a0(ride, ride->field_3dc, dir);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, dir);
         ride->field_3dc = 4;
         break;
     case 2:
         ride->next_x = ride->tile_x + 5;
         ride->next_y = ride->tile_y;
-        FUN_004198a0(ride, ride->field_3dc, dir);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, dir);
         ride->field_3dc = 8;
         break;
     case 4:
         ride->next_x = ride->tile_x;
         ride->next_y = ride->tile_y + 5;
-        FUN_004198a0(ride, ride->field_3dc, dir);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, dir);
         ride->field_3dc = 1;
         break;
     case 8:
         ride->next_x = ride->tile_x - 5;
         ride->next_y = ride->tile_y;
-        FUN_004198a0(ride, ride->field_3dc, dir);
+        BoatingSchoolBuildStepPath(ride, ride->field_3dc, dir);
         ride->field_3dc = 2;
         break;
     }
@@ -400,7 +400,7 @@ void FUN_00419520(struct BoatRide *ride, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004198a0
-void FUN_004198a0(struct BoatRide *ride, int from, int to) {
+void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
     struct BoatArc *arc = NULL;
     int *p;
     int i;
@@ -1921,12 +1921,12 @@ int FUN_0041c8c0(int a, int b, int c, int d) {
         return 0;
     }
     key.id = node->owner.id;
-    FUN_0041c940(a, b, c, d, &key, &result);
+    SearchBoatPathConnected(a, b, c, d, &key, &result);
     return result;
 }
 
 // FUNCTION: LEGOLAND 0x0041c940
-void FUN_0041c940(int x, int y, int tx, int ty, TileId *owner, int *found) {
+void SearchBoatPathConnected(int x, int y, int tx, int ty, TileId *owner, int *found) {
     struct PathNode *node;
     struct PathNode *next;
 
@@ -1943,16 +1943,16 @@ void FUN_0041c940(int x, int y, int tx, int ty, TileId *owner, int *found) {
     }
     node->visited = 1;
     if ((node->dir_mask & 1) != 0 && (next = FindBoatPathAt(x, y - 5)) != NULL && next->visited == 0) {
-        FUN_0041c940(x, y - 5, tx, ty, owner, found);
+        SearchBoatPathConnected(x, y - 5, tx, ty, owner, found);
     }
     if ((node->dir_mask & 2) != 0 && (next = FindBoatPathAt(x + 5, y)) != NULL && next->visited == 0) {
-        FUN_0041c940(x + 5, y, tx, ty, owner, found);
+        SearchBoatPathConnected(x + 5, y, tx, ty, owner, found);
     }
     if ((node->dir_mask & 4) != 0 && (next = FindBoatPathAt(x, y + 5)) != NULL && next->visited == 0) {
-        FUN_0041c940(x, y + 5, tx, ty, owner, found);
+        SearchBoatPathConnected(x, y + 5, tx, ty, owner, found);
     }
     if ((node->dir_mask & 8) != 0 && (next = FindBoatPathAt(x - 5, y)) != NULL && next->visited == 0) {
-        FUN_0041c940(x - 5, y, tx, ty, owner, found);
+        SearchBoatPathConnected(x - 5, y, tx, ty, owner, found);
     }
 }
 

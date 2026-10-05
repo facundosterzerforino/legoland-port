@@ -744,7 +744,7 @@ void SpaceTowerRide(struct ClassNode *name, struct CallbackTable *obj) {
     if (_stricmp("SPACE TOWER RIDE", name->name) == 0) {
         obj->cb_a4 = FUN_0043b2b0;
         obj->cb_8c = SpaceTowerSetEditMode;
-        obj->cb_a8 = FUN_0043bac0;
+        obj->cb_a8 = SpaceTowerUpdate;
         obj->cb_a0 = FUN_0043b4e0;
         obj->cb_b0 = RenderSpaceTower;
         obj->cb_9c = SpaceTowerRemoveObject;
@@ -868,7 +868,7 @@ void FUN_0043baa0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043bac0
-void FUN_0043bac0(struct SpaceTowerCtx *param_1) {
+void SpaceTowerUpdate(struct SpaceTowerCtx *param_1) {
     struct SpaceTowerRide *ride;
     struct SpaceTowerRideNode *node;
     struct SpaceTowerRideNode *next;

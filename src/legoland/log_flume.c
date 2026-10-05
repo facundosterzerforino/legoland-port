@@ -2299,7 +2299,7 @@ void FUN_0040bbb0(struct FlumeSlotSet *set, int index) {
         if (slot->flags & 1) {
             if (slot->owner->a != NULL) {
                 if (FUN_0040bab0(set, index)) {
-                    if (FUN_00411680(slot)) {
+                    if (AdvanceFlumeMover(slot)) {
                         slot->owner = slot->owner->a;
                         if (FUN_00411650(slot)) {
                             slot->flags |= 2;
@@ -2327,7 +2327,7 @@ void FUN_0040bbb0(struct FlumeSlotSet *set, int index) {
                     if (slot->owner->a != NULL) {
                         if (FUN_0040bab0(set, index)) {
                             slot->flags |= 1;
-                            if (FUN_00411680(slot)) {
+                            if (AdvanceFlumeMover(slot)) {
                                 slot->owner = slot->owner->a;
                                 if (slot->owner == set->field_c->a) {
                                     if (slot->busy != NULL) {
@@ -2443,7 +2443,7 @@ void FUN_0040bf50(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040bf70
-void FUN_0040bf70(Element *obj) {
+void LogFlumeEntranceUpdate(Element *obj) {
     Ride *ride = obj->ride;
     RideNode *elem = ride->riders;
     RideNode *next;
@@ -5475,7 +5475,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_94 = FUN_0040aac0;
         vtbl->cb_98 = LogFlumeEntranceAddObject;
         vtbl->cb_9c = LogFlumeEntranceRemoveObject;
-        vtbl->cb_a8 = FUN_0040bf70;
+        vtbl->cb_a8 = LogFlumeEntranceUpdate;
         vtbl->cb_b0 = RenderLogFlumeEntrance;
         vtbl->cb_ac = FUN_0040a410;
         vtbl->cb_bc = LogFlumeEntrance_Save;
@@ -5778,7 +5778,7 @@ int FUN_00411650(struct FlumeSlot *slot) {
 }
 
 // FUNCTION: LEGOLAND 0x00411680
-int FUN_00411680(struct FlumeMover *mover) {
+int AdvanceFlumeMover(struct FlumeMover *mover) {
     struct FlumeNode *node = mover->node;
     struct FlumeNode *next;
     int rev = 0;
@@ -5915,7 +5915,7 @@ void FUN_00411810(struct FlumeMover *m) {
         return;
     }
     entry = m->node->entry;
-    if (FUN_00411680(m)) {
+    if (AdvanceFlumeMover(m)) {
         m->node = (struct FlumeNode *)m->node->field_8;
         if (m->node == (struct FlumeNode *)((struct FlumeNode *)entry->field_34)->field_8) {
             m->flags &= ~2;

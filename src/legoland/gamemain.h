@@ -16,7 +16,7 @@ void RemoveQueryNode(struct QueryNode *ctx);
 void RemoveFromOpenList(struct EventNode *param_1);
 
 void FUN_004779d0(struct Point *p);
-void FUN_00477bd0(int x, int y, int a, int b);
+void FindMapPathAStar(int x, int y, int a, int b);
 int FindStringNoCase(const char *param_1, const void *param_2, int param_3);
 int ParseScriptFile(const char *name, struct ScriptCommand *commands, int count, int flags);
 int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int count, int flags);

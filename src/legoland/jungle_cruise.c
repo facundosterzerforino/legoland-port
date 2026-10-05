@@ -306,7 +306,7 @@ void FUN_004332f0(void) {
 
 // FUNCTION: LEGOLAND 0x004333b0
 void FUN_004333b0(struct JungleRide *param_1) {
-    FUN_00433840(param_1, param_1->from_dir, 4);
+    JungleCruiseBuildStepPath(param_1, param_1->from_dir, 4);
     param_1->field_3e0 = 4;
     param_1->next_y = param_1->cur_y + 5;
 }
@@ -322,7 +322,7 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
         FUN_00432cb0(param_1);
         return result;
     }
-    FUN_00433840(param_1, 1, 4);
+    JungleCruiseBuildStepPath(param_1, 1, 4);
     param_1->from_dir = 1;
     if (param_1->field_3e4 == 3) {
         p = &param_1->step_offsets[0x81];
@@ -386,7 +386,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     } else if (path->tile.id == score->end.id) {
         ride->field_3e0 = 0x10;
         ride->field_3e4 = 3;
-        FUN_00433840(ride, ride->from_dir, 4);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, 4);
         ride->from_dir = 1;
         ride->next_y = ride->cur_y + 5;
         return;
@@ -422,7 +422,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
         }
     }
     if (mask == 0) {
-        FUN_00433840(ride, ride->from_dir, -1);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, -1);
         ride->from_dir = -1;
         return;
     }
@@ -461,25 +461,25 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
     case 1:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y - 5;
-        FUN_00433840(ride, ride->from_dir, dir);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, dir);
         ride->from_dir = 4;
         break;
     case 2:
         ride->next_x = ride->cur_x + 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->from_dir, dir);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, dir);
         ride->from_dir = 8;
         break;
     case 4:
         ride->next_x = ride->cur_x;
         ride->next_y = ride->cur_y + 5;
-        FUN_00433840(ride, ride->from_dir, dir);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, dir);
         ride->from_dir = 1;
         break;
     case 8:
         ride->next_x = ride->cur_x - 5;
         ride->next_y = ride->cur_y;
-        FUN_00433840(ride, ride->from_dir, dir);
+        JungleCruiseBuildStepPath(ride, ride->from_dir, dir);
         ride->from_dir = 2;
         break;
     }
@@ -489,7 +489,7 @@ void FUN_004334c0(struct JungleRide *ride, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00433840
-void FUN_00433840(struct JungleRide *ride, int from, int to) {
+void JungleCruiseBuildStepPath(struct JungleRide *ride, int from, int to) {
     struct BoatArc *arc = NULL;
     int *p;
     int i;

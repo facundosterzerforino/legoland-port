@@ -17,8 +17,8 @@ struct HistBuf {
 
 void FUN_00401e00(struct HistBuf *p);
 struct PathPair;
-int FUN_00401f30(unsigned short id, struct PathPair *p, int dir);
-int FUN_00402150(unsigned short id, struct PathPair *p, int dir);
+int PickQueueTurn(unsigned short id, struct PathPair *p, int dir);
+int GetQueueTurn(unsigned short id, struct PathPair *p, int dir);
 int FUN_00401ae0(unsigned short id, int bloke);
 unsigned int FUN_00401c40(unsigned short arg0);
 void FUN_00401c60(struct RideBloke *b);

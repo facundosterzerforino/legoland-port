@@ -48,7 +48,7 @@ void KillRestMaskSpritesAndMoneySFX();
 void LoadRestaurant2Resources(struct EateryObj *obj);
 void Restaurant2AddObject(unsigned int param_1, unsigned char *param_2);
 void Restaurant2RemoveObject(unsigned int arg1, TileId tile, unsigned int arg3, unsigned int arg4, unsigned int arg5);
-void FUN_0042fbb0(int param_1);
+void Restaurant2Update(int param_1);
 void *FUN_004304a0(struct EateryObj *obj, unsigned short a2);
 void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6);
 void UnloadRestaurant2Resources();
@@ -57,7 +57,7 @@ void EateryRemoveObject(unsigned int param_1, TileId tile, unsigned int param_3)
 void LoadOctopusCafeResources(struct EateryObj *obj);
 void OctopusCafeAddObject(unsigned int param_1, struct UserFlagsArg *param_2);
 void UnloadOctopusCafeResources();
-void FUN_004316f0(int param_1);
+void OctopusCafeUpdate(int param_1);
 void RenderOctopusCafe(int param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6);
 int Restaurant1_Save(void);
 int Restaurant1_Load(void);

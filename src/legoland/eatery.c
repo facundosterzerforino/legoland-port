@@ -1145,7 +1145,7 @@ void FUN_0042fb60(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042fbb0
-void FUN_0042fbb0(int param_1) {
+void Restaurant2Update(int param_1) {
     unsigned char *pos;
     char cv;
     int bloke;
@@ -2009,7 +2009,7 @@ void UnloadOctopusCafeResources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004316f0
-void FUN_004316f0(int param_1) {
+void OctopusCafeUpdate(int param_1) {
     unsigned char *pos;
     int bloke;
     unsigned int *node;

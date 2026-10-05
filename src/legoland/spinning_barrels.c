@@ -416,7 +416,7 @@ void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct CallbackTable *r
     if (_stricmp("SPINNING BARRELS RIDE", str->name) == 0) {
         ride->cb_a4 = FUN_0043c340;
         ride->cb_8c = SpinningBarrelsSetEditMode;
-        ride->cb_a8 = FUN_0043c950;
+        ride->cb_a8 = SpinningBarrelsUpdate;
         ride->cb_b0 = RenderSpinningBarrels;
         ride->cb_9c = SpinningBarrelsRemoveObject;
         ride->cb_98 = SpinningBarrelsAddObject;
@@ -489,7 +489,7 @@ void FUN_0043c930(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c950
-void FUN_0043c950(struct Element *elem) {
+void SpinningBarrelsUpdate(struct Element *elem) {
     struct Ride *ride = elem->ride;
     struct RideNode *rn = ride->riders;
     struct RideNode *next;

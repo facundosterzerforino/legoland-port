@@ -325,7 +325,7 @@ void FUN_00417400(unsigned int index, void *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417430
-void FUN_00417430(Element *obj) {
+void TempleSlideUpdate(Element *obj) {
     Ride *ride;
     Bloke *bloke;
     TileId *tile;
@@ -569,7 +569,7 @@ LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct Callbac
         interfaces->cb_a4 = FUN_00417150;
         interfaces->cb_ac = FUN_00417200;
         interfaces->cb_8c = TempleSlideSetEditMode;
-        interfaces->cb_a8 = FUN_00417430;
+        interfaces->cb_a8 = TempleSlideUpdate;
         interfaces->cb_b0 = RenderTempleSlide;
         interfaces->cb_9c = RemoveSlideObject;
         interfaces->cb_98 = TempleSlideAddObject;

@@ -211,7 +211,7 @@ char FUN_00407c20(unsigned char param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00407c30
-void FUN_00407c30(struct Element *elem) {
+void JoustUpdate(struct Element *elem) {
     struct Ride *ride = elem->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -863,7 +863,7 @@ LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct CallbackTabl
         iface->cb_a4 = JoustLoadResources;
         iface->cb_ac = JoustFreeResources;
         iface->cb_8c = JoustSetEditMode;
-        iface->cb_a8 = FUN_00407c30;
+        iface->cb_a8 = JoustUpdate;
         iface->cb_b0 = RenderJoust;
         iface->cb_9c = JoustRemoveObject;
         iface->cb_98 = JoustAddObject;

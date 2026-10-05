@@ -343,7 +343,7 @@ void FUN_004779d0(struct Point *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00477bd0
-void FUN_00477bd0(int x, int y, int a, int b) {
+void FindMapPathAStar(int x, int y, int a, int b) {
     struct GameMainNode *best;
     struct GameMainNode *cur;
     struct GameMainNode *nb;

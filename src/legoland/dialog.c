@@ -46,7 +46,7 @@ int FUN_0043e930(RECT *rc, int min, int max, int value, int step) {
 }
 
 // FUNCTION: LEGOLAND 0x0043ea30
-int FUN_0043ea30(char **names, char *title, struct Sprite *bg, RECT *box, void (*callback)(int), struct Sprite **icons, int w, int h, int flag) {
+int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void (*callback)(int), struct Sprite **icons, int w, int h, int flag) {
     RECT clip;
     RECT bar;
     RECT saved;
@@ -249,7 +249,7 @@ struct Element *FUN_0043eee0(char *title, struct Sprite *bg, RECT *box, unsigned
             icons[k] = poor;
         }
     }
-    r = FUN_0043ea30(names, title, bg, box, 0, icons, 0x2e, 0x28, flag);
+    r = ListBoxDialog(names, title, bg, box, 0, icons, 0x2e, 0x28, flag);
     if (r != -1) {
         result = list[r];
     } else {
@@ -264,7 +264,7 @@ struct Element *FUN_0043eee0(char *title, struct Sprite *bg, RECT *box, unsigned
 }
 
 // FUNCTION: LEGOLAND 0x0043f0b0
-char *FUN_0043f0b0(char *title, struct Sprite *bg, RECT *box, char *path) {
+char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
     struct Sprite *drive;
     struct Sprite *folder;
     struct Sprite *file;
@@ -357,7 +357,7 @@ char *FUN_0043f0b0(char *title, struct Sprite *bg, RECT *box, char *path) {
             names[i] = nodes[i]->name;
             icons[i] = (nodes[i]->attrib & 0x10) ? folder : file;
         }
-        r = FUN_0043ea30(names, title, bg, box, 0, icons, 0x1c, 0x18, 0);
+        r = ListBoxDialog(names, title, bg, box, 0, icons, 0x1c, 0x18, 0);
         if (r != -1) {
             if (nodes[r]->attrib & 0x10) {
                 chdirFlag = 1;

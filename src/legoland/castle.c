@@ -867,7 +867,7 @@ void FUN_0041d950(void *obj, float val, void *b) {
         t = cur->f40;
         elem = cur->e44;
         FUN_0041e930((struct ObjAt40 *)cur, (unsigned int)tmp);
-        FUN_00429f30(tmp, 30.0f, &elem, t, 4.8f, &out, &f);
+        FindPathPosAtRangeBehind(tmp, 30.0f, &elem, t, 4.8f, &out, &f);
         FUN_0041e8f0((unsigned char *)next, &out, f);
         cur = next;
         next = next->next;
@@ -896,7 +896,7 @@ void FUN_0041da10(void *obj, float val, void *b) {
         t = cur->f40;
         elem = cur->e44;
         FUN_0041e930((struct ObjAt40 *)cur, (unsigned int)tmp);
-        FUN_00429f30(tmp, 30.0f, &elem, t, 4.8f, &out, &f);
+        FindPathPosAtRangeBehind(tmp, 30.0f, &elem, t, 4.8f, &out, &f);
         FUN_0041e820((unsigned char *)next, &out, f);
         cur = next;
         next = next->next;
@@ -1662,7 +1662,7 @@ void FUN_0041e820(unsigned char *obj, struct Elem20 *e, float t) {
 
     FUN_0042a620((unsigned int *)(obj + 8), (unsigned int *)e, *(unsigned int *)&t);
     FUN_0042a640(obj + 8, 2, (unsigned int)vA);
-    FUN_00429f30((unsigned int *)vA, 30.0f, (struct Elem20 *)(obj + 0xc), *(float *)(obj + 8), 4.8f, &k, &f);
+    FindPathPosAtRangeBehind((unsigned int *)vA, 30.0f, (struct Elem20 *)(obj + 0xc), *(float *)(obj + 8), 4.8f, &k, &f);
     FUN_0042a620((unsigned int *)(obj + 0x40), (unsigned int *)&k, *(unsigned int *)&f);
     FUN_0042a640(obj + 0x40, 2, (unsigned int)vB);
     *(float *)(obj + 0xb8) = (vA[0] + vB[0]) * 0.5f;
@@ -4321,7 +4321,7 @@ struct EdgeMesh {
 };
 
 // FUNCTION: LEGOLAND 0x004227c0
-struct EdgeMesh *FUN_004227c0(struct EdgeMesh *src) {
+struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
     int *triFlag;
     int nV = 0;
     int *edgeFlag;
@@ -9163,7 +9163,7 @@ int FUN_00429e20(float (*fn)(unsigned int), float lo, float hi, float *out) {
 }
 
 // FUNCTION: LEGOLAND 0x00429f30
-void FUN_00429f30(float *center, float r, struct Struct42a110 *src, float hi, float x, struct Struct42a110 *dst, float *out) {
+void FindPathPosAtRangeBehind(float *center, float r, struct Struct42a110 *src, float hi, float x, struct Struct42a110 *dst, float *out) {
     struct Struct42a110 cur;
     float lo;
     int found;
@@ -9189,7 +9189,7 @@ void FUN_00429f30(float *center, float r, struct Struct42a110 *src, float hi, fl
 }
 
 // FUNCTION: LEGOLAND 0x0042a020
-void FUN_0042a020(float *center, float r, struct Struct42a110 *src, float hi, float x, struct Struct42a110 *dst, float *out) {
+void FindPathPosAtRangeAhead(float *center, float r, struct Struct42a110 *src, float hi, float x, struct Struct42a110 *dst, float *out) {
     struct Struct42a110 cur;
     float lo;
     int found;

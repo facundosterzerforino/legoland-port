@@ -322,7 +322,7 @@ void SafariRideGetInterfaces(struct ClassNode *name, struct CallbackTable *inter
         interfaces->cb_a4 = FUN_00414d90;
         interfaces->cb_ac = FUN_00414ea0;
         interfaces->cb_8c = SafariSetEditMode;
-        interfaces->cb_a8 = FUN_00415220;
+        interfaces->cb_a8 = SafariRideUpdate;
         interfaces->cb_b0 = RenderSafari;
         interfaces->cb_9c = SafariRemoveObject;
         interfaces->cb_98 = SafariAddObject;
@@ -411,7 +411,7 @@ void FUN_00415200(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00415220
-void FUN_00415220(Element *obj) {
+void SafariRideUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct RideNode *next;

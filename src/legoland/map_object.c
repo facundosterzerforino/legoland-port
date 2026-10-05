@@ -711,7 +711,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
             InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
-            FUN_00477bd0(out.x, out.y, effect->x, effect->y);
+            FindMapPathAStar(out.x, out.y, effect->x, effect->y);
         }
         if (DAT_00667cd8 == 0) {
             CalculateMapRenderOrder();
@@ -729,7 +729,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
             InitEntrance1Point();
             UpdatePathLinks(1);
             effect = GetEntrance1Point();
-            FUN_00477bd0(out.x, out.y, effect->x, effect->y);
+            FindMapPathAStar(out.x, out.y, effect->x, effect->y);
         }
     }
     FUN_0045e770((struct ObjNode *)editObj, coords);

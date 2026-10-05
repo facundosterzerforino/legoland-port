@@ -722,7 +722,7 @@ void FUN_00401e00(struct HistBuf *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00401f30
-int FUN_00401f30(unsigned short id, struct PathPair *p, int dir) {
+int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     struct RideQueueEntry *e;
     struct RideQueueEntry *q;
     struct RideQueueEntry *t1;
@@ -789,7 +789,7 @@ int FUN_00401f30(unsigned short id, struct PathPair *p, int dir) {
 }
 
 // FUNCTION: LEGOLAND 0x00402150
-int FUN_00402150(unsigned short id, struct PathPair *p, int dir) {
+int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     struct RideQueueEntry *e;
     struct RideQueueEntry *q;
     struct RideQueueEntry *s;
@@ -798,22 +798,22 @@ int FUN_00402150(unsigned short id, struct PathPair *p, int dir) {
     e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
     if (e != NULL) {
         if (e->field_18 == NULL) {
-            return FUN_00401f30(id, p, dir);
+            return PickQueueTurn(id, p, dir);
         }
         StepPointByDirection(&e->x, &pt.a, dir);
         q = FUN_004125a0(pt.a, pt.b);
         if (q == NULL) {
-            return FUN_00401f30(id, p, dir);
+            return PickQueueTurn(id, p, dir);
         }
         if (q->id != id) {
-            return FUN_00401f30(id, p, dir);
+            return PickQueueTurn(id, p, dir);
         }
         if ((q->field_14 & 0xf) == 6) {
             return 5;
         }
         s = FUN_00412650(id);
         if ((s->y != q->y || s->x + 4 != q->x) && (q->field_14 & 0xf) != 4 && (q->field_14 & 0xf) != 5) {
-            return FUN_00401f30(id, p, dir);
+            return PickQueueTurn(id, p, dir);
         }
         s = q->field_18;
         StepPointByDirection(&e->x, &pt.a, dir);
@@ -944,7 +944,7 @@ void FUN_00402550(struct BlokeSprite *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x004025d0
-void FUN_004025d0(struct Person *person, unsigned int direction) {
+void SetPersonYawFromDir16(struct Person *person, unsigned int direction) {
     person->field_48 = person->field_40 = 0.0f;
     switch (direction) {
     case 0:
@@ -1074,7 +1074,7 @@ void FUN_00402780(struct NewBloke *b) {
     scr->x = lpConfig->view_x + b->bloke->pos.x + 0x10;
     scr->y = lpConfig->view_y + b->bloke->pos.y + 8;
     AdjustBlokePosition(scr);
-    FUN_004025d0(person, b->bloke->dir);
+    SetPersonYawFromDir16(person, b->bloke->dir);
     for (;;) {
         if (FUN_00402490((struct NearBloke *)b) != NULL) {
             b->f_c8 = b->f_c6 >> 1;
@@ -1114,12 +1114,12 @@ void FUN_00402780(struct NewBloke *b) {
         if (b->f_c4 == 0) {
             b->f_c2 = 0;
             if (b->f_c0 != 0) {
-                b->f_c4 = FUN_00401f30(b->id, &b->tp, b->f_ba);
+                b->f_c4 = PickQueueTurn(b->id, &b->tp, b->f_ba);
                 if (b->f_c4 == 0) {
                     b->f_c8 = 0;
                 }
             } else {
-                b->f_c4 = FUN_00402150(b->id, &b->tp, b->f_ba);
+                b->f_c4 = GetQueueTurn(b->id, &b->tp, b->f_ba);
                 if (b->f_c4 == 0) {
                     b->f_c8 = 0;
                 }
