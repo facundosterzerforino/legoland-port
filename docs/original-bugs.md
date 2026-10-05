@@ -42,15 +42,33 @@ error message).
 
 ## Missing return values nobody reads
 
-These functions end without a `return` on some path. The original returned whatever was in `eax`; the callers
-(or the callbacks' callers) ignore the value, so it doesn't matter. A cleanup would add the return.
-`FUN_0041eaf0`, `FUN_0041d1d0`, `FUN_00426750`, `FUN_0042a640` (`castle.c`), `Catapult_AddNode`,
-`InitGameInterface`, `FUN_0040ca60`, `RenderLogFlumeTrack`, `FUN_0040d6f0` (`log_flume.c`), `AddBasicObject`
-(the add-object callbacks' result, unused), `UnloadPopUpSprites`, `FUN_00415a90` (`spider_ride.c`),
-`FUN_00455a50` (`text.c`), `AcquireWaterWorksSfx`.
+These functions end without a `return` on some path. Checked on 2026-10-05: in the original every `ret` follows a
+call, so they return whatever that call left in `eax`, as the decomp does; and every caller (or callback slot)
+ignores the value. A cleanup would add the return.
 
-The ones whose value *is* used were fixed in the decomp (2026-10-05): `AddRepairOrder` /
-`AddRepairOrderForObject`, `FUN_004723f0` (the info popup's Delete button), `CheckHostSystemGPU`.
+| Function | Match | Who ignores the value |
+|---|---|---|
+| `FUN_0041eaf0`, `FUN_0041d1d0`, `FUN_00426750`, `FUN_0042a640` (`castle.c`) | 100% | `ForEachRingNode` (void visitor) and plain statement calls |
+| `Catapult_AddNode`, `InitGameInterface`, `FUN_00455a50` (`text.c`) | 100% | no caller uses it |
+| `UnloadPopUpSprites` | 100% | `UnLoad_PopUpInfo`, called as a statement |
+| `AcquireWaterWorksSfx` | 100% | `FUN_00417c00`, a `cb_a4` "load resources" callback; that slot is never called with its result used (it isn't the save-load hook, see below) |
+| `FUN_0040ca60`, `RenderLogFlumeTrack` (`log_flume.c`) | 53% / 100% effective | the 0xb0 render callback, called through a void function pointer (`print_sprite.c`) |
+| `FUN_0040d6f0` (`log_flume.c`) | 97.7% (scheduling only) | the 0x90 callback, result unused (`map_object.c`) |
+| `AddBasicObject` | 99.0% (reccmp shows the constant 0x800000 as `EditCursor+5184`) | the 0x98 add-object callbacks, result unused (`gamemap.c`) |
+| `FUN_00415a90` (`spider_ride.c`) | 96.2% (two stores swapped) | `AddSpiderNode`, called as a statement |
+
+Checking the five that don't match 100% found one real decomp mistake, fixed: `FUN_0040ca60` (log flume
+curves) passed a track entry as `PrintSprite`'s clip argument in two of four branches; the original passes the
+caller's clip (`arg`) or 0.
+
+The save-load hook is different: `LoadGame` fails if a ride's `load_hook` (ride +0xb8) returns 0. All 15
+functions the original installs there (`Catapult_Load`, `Copters_Load`, `LoadGoldWash`, `LoadJoust`,
+`LogFlumeEntrance_Load`, `LoadSafariRide`, `LoadSpider`, `LoadTempleSlide`, `Load_WaterBlock`,
+`Load_ElephantF`, `FUN_00426c20`, `LoadJailCells`, `SpaceTower_Load`, `LoadSBarrel`, `LoadZoomer`) return 1 or
+0 explicitly on every path.
+
+The ones whose value *is* used were fixed in the decomp: `AddRepairOrder` / `AddRepairOrderForObject`,
+`FUN_004723f0` (the info popup's Delete button), `CheckHostSystemGPU`.
 
 ## Analyzer findings not reviewed one by one
 
