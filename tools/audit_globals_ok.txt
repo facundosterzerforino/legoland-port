@@ -52,7 +52,7 @@
 0x00667c20 MapCenterOffsetY (0x4 of 0x8): reviewed, harmless
 0x00667c54 QueryObj (0x2 of 0x4): reviewed, harmless
 0x00668da8 DAT_00668da8 (0x3b of 0x3c): reviewed, harmless
-0x00668de4 DAT_00668de4 (0x3b of 0x3c): reviewed, harmless
+0x00668de4 CheatKeyState (0x3b of 0x3c): reviewed, harmless
 0x00668e20 DAT_00668e20 (0x10 of 0x14): reviewed, harmless
 0x00668e64 DAT_00668e64 (0x1 of 0x4): reviewed, harmless
 0x00668f3c AviSoundBytesPerFrame (0x4 of 0x8): reviewed, harmless

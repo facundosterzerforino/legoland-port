@@ -322,7 +322,7 @@ unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_007cb320 = 0;
         CloseFontEndCheckBox();
-        MapStats.field_3a0 = 3;
+        MapStats.level_end = 3;
         DAT_00668e38 = 0;
         RemoveIconGroup(7);
         DestroyIconGroup(0xd2);

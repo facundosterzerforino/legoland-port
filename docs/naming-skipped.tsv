@@ -36,13 +36,13 @@ DAT_00629c54	named	JungleCruiseStep
 DAT_00629c58	skipped-no-evidence		scratch Cursor struct shared by boating_school.c and jungle_cruise.c
 DAT_0062fd2c	named	JunglePathList	
 DAT_00665ff8	named	ReportFlags	
-DAT_006660a0	rejected-by-verifier	ChallengePageCount	page count semantics ambiguous (count-1 compares, 260 uses)
+DAT_006660a0	named	AppraisalPageCount	report pages
 DAT_00667ca4	skipped-no-evidence		
 DAT_00668078	named	OffscreenSurface	
 DAT_0066809c	named	CurrentSurfaceDesc	
 DAT_00668108	skipped-no-evidence		
-DAT_00668610	skipped-no-evidence		
-DAT_0066879c	rejected-by-verifier	ActiveObjectiveEventList	holds list/script object also used as SortNode/TimedList/Ctx; role unclear (created per id, 'Closed' state)
+DAT_00668610	named	ScriptDirtyCategories	event categories to re-check now (ANDed with ScriptEventCategories)
+DAT_0066879c	named	CurrentScriptSection	the section being run
 DAT_006687b0	skipped-no-evidence		
 DAT_006687bc	rejected-by-verifier	ScreenEventHandler	handler also copied into OK icon event_handler; dual role, unclear
 DAT_006687c0	skipped-no-evidence		
@@ -132,7 +132,7 @@ FUN_00444410	skipped-no-evidence
 FUN_004444b0	skipped-no-evidence		
 FUN_00444870	skipped-no-evidence		
 FUN_00444930	skipped-no-evidence		
-FUN_00444ef0	skipped-no-evidence		
+FUN_00444ef0	named	AppraisalNextPageClicked	next report page
 FUN_0044dc70	skipped-no-evidence		
 FUN_0044eb10	skipped-no-evidence		
 FUN_00450a40	skipped-no-evidence		
@@ -145,19 +145,19 @@ FUN_004598d0	skipped-no-evidence
 FUN_0045e850	skipped-no-evidence		
 FUN_00461080	skipped-no-evidence		
 FUN_00469a80	skipped-no-evidence		
-FUN_0046a120	skipped-no-evidence		
+FUN_0046a120	named	ScriptEventFeature	handler for type-0xf events (Feature), DAT_004b9d44[15]
 FUN_0046a190	named	GenerateWorkers	
-FUN_0046a460	skipped-no-evidence		
-FUN_0046a4f0	skipped-no-evidence		
-FUN_0046aa70	skipped-no-evidence		
+FUN_0046a460	named	ScriptEventBridges	handler for type-0x1b events (Bridges), DAT_004b9d44[27]
+FUN_0046a4f0	named	ScriptEventNeed	handler for type-0x21 events (Need), DAT_004b9d44[33]
+FUN_0046aa70	named	ScriptEventRemoveRange	handler for type-0x29 events (RemoveRange), DAT_004b9d44[41]
 FUN_0046aec0	named	AdjustGardenerCount	
-FUN_0046b790	skipped-no-evidence		
+FUN_0046b790	named	NewScriptGiveEvent	builds the type-0x2 event for GIVE
 FUN_0046bb80	skipped-no-evidence		
-FUN_0046bda0	skipped-no-evidence		
-FUN_0046c090	skipped-no-evidence		
-FUN_0046c0f0	skipped-no-evidence		
-FUN_0046c450	skipped-no-evidence		
-FUN_0046c510	skipped-no-evidence		
+FUN_0046bda0	named	NewScriptLookAtEvent	builds the type-0x17 event for LOOKAT
+FUN_0046c090	named	NewScriptParkVisitorsEvent	builds the type-0x2d event for PARKVISITORS
+FUN_0046c0f0	named	NewScriptRidersEvent	builds the type-0x2f event for RIDERS
+FUN_0046c450	named	NewScriptSelectThemeEvent	builds the type-0x41 event for SELECTTHEME
+FUN_0046c510	named	NewScriptForeverEvent	builds the type-0x45 event for FOREVER
 FUN_0046c540	named	AppendObjectiveEventList	
 FUN_004730f0	named	ClosePopUpEventHandler	
 FUN_00473130	named	TryClosePopUp	
@@ -166,8 +166,8 @@ FUN_00474820	skipped-no-evidence
 FUN_00476000	skipped-no-evidence		
 FUN_004760a0	named	DrawFlashingButtons	
 FUN_00478770	named	ParseIntPair	
-FUN_00478870	skipped-no-evidence		
-FUN_0047ad40	skipped-no-evidence		
+FUN_00478870	named	ScriptCmdInit	parser for script keyword [INIT] (keyword table 0x4bb708)
+FUN_0047ad40	named	ScriptCmdMinCapacity	parser for script keyword MINVISITORS (keyword table 0x4bb9a0)
 FUN_004821e0	named	FreeDirNodeList	
 FUN_00482a90	named	InitEntrance1Point	
 FUN_00482df0	named	ApplyMoodDelta	
@@ -256,9 +256,9 @@ DAT_0062fe58	named	PlaneRide
 DAT_0062fe7c	named	PlaneRideLayer	
 DAT_0062fea0	named	DialogListScrollY	
 DAT_00666098	named	AppraisalDeadline	
-DAT_006660a4	skipped-no-evidence		
-DAT_006660a8	dropped-collision	NextPageIcon	dup new name
-DAT_006660ac	dropped-collision	PreviousPageIcon	dup new name
+DAT_006660a4	named	AppraisalPage	report page shown
+DAT_006660a8	named	AppraisalNextIcon	next page icon
+DAT_006660ac	named	AppraisalPrevIcon	previous page icon
 DAT_00667c00	named	MapWorldMinX	
 DAT_00667c04	skipped-no-evidence		
 DAT_00667c14	rejected-by-verifier	MapScaledTileHeight	also used as scratch for sprite heights at mapscreen.c:448,508,573,611; conflicting use
@@ -283,8 +283,8 @@ DAT_0066861c	skipped-no-evidence
 DAT_00668720	named	ScriptStringCount	
 DAT_00668724	skipped-no-evidence		
 DAT_00668728	named	ObjectiveEventList	
-DAT_00668784	skipped-no-evidence		
-DAT_00668798	skipped-no-evidence		
+DAT_00668784	named	ScriptEventList	active level-script events
+DAT_00668798	named	ScriptSectionList	level-script sections still to run, current one at the head
 DAT_006687a0	named	ScriptLoadErrorCount	
 DAT_006687a4	skipped-no-evidence		
 DAT_006687a8	skipped-no-evidence		
@@ -495,7 +495,7 @@ FUN_00455d40	skipped-no-evidence
 FUN_00455e50	skipped-no-evidence		
 FUN_00458a50	skipped-no-evidence		
 FUN_00458b20	named	UnloadMap	
-FUN_00459820	skipped-no-evidence		
+FUN_00459820	named	EndLevel	MapStats.level_end = 1 win / 2 lose and shows the ENDSCREENS text
 FUN_0045a060	skipped-no-evidence		
 FUN_0045a3e0	skipped-no-evidence		
 FUN_0045ce10	skipped-no-evidence		
@@ -517,18 +517,18 @@ FUN_00468d80	skipped-no-evidence
 FUN_00469310	skipped-no-evidence		
 FUN_00469900	skipped-no-evidence		
 FUN_0046a140	skipped-no-evidence		
-FUN_0046b240	skipped-no-evidence		
+FUN_0046b240	named	SetScriptStopped	stops the level script (cheat IMPROVISE); usually wins the level
 FUN_0046b610	rejected-by-verifier	InsertTimedNodeAtHead	DAT_007fdca4 is an objective handle not a time; nodes are ObjectiveEvents; Timed unsupported
 FUN_0046b6b0	skipped-no-evidence		
 FUN_0046b760	skipped-no-evidence		
 FUN_0046c5c0	skipped-no-evidence		
 FUN_0046c620	named	SaveGameWriteString	
 FUN_0046c680	skipped-no-evidence		
-FUN_0046ce20	skipped-no-evidence		
+FUN_0046ce20	named	ClearAdvisorHelp	frees the advisor text and stops its speech
 FUN_0046d110	named	UpdateSpeechPlayback	
 FUN_0046d230	skipped-no-evidence		
 FUN_0046d4e0	skipped-no-evidence		
-FUN_0046d850	skipped-no-evidence		
+FUN_0046d850	named	ScrollIconRegion	scrolls a ScrollRegion's icons by (dx,dy), clamped to its clip rect (object list arrows)
 FUN_0046fb40	named	DestroyIconGroup	
 FUN_00471610	named	SetPopUpIconSprites	
 FUN_00471d60	named	SetPopUpOkCloseIconSprites	
@@ -544,7 +544,7 @@ FUN_004777f0	skipped-no-evidence
 FUN_004779a0	skipped-no-evidence		
 FUN_004779d0	skipped-no-evidence		
 FUN_004785d0	skipped-no-evidence		
-FUN_00478610	skipped-no-evidence		
+FUN_00478610	named	SetScriptObjectiveKind	[ONEOFF]/[ONGOING]/[PERMANENT]/[REMINDER] -> CurrentObjectiveEventFlags 0/1/2/4
 FUN_004786c0	skipped-no-evidence		
 FUN_00478700	named	ParseRect	
 FUN_00478b20	skipped-no-evidence		
@@ -852,3 +852,235 @@ FUN_0041ec50	skipped-no-evidence		castle cb_8c shared by 7+ castle elements; gen
 FUN_0041ece0	skipped-no-evidence		castle cb_98 shared by 7+ castle elements; generic shared helper, specific name unclear
 FUN_0041ed50	skipped-no-evidence		castle cb_9c shared by 7+ castle elements; generic shared helper, specific name unclear
 FUN_00426c20	skipped-no-evidence		used as both castle cb_b8 and cb_8c (castle.c:5424,5524); likely a shared no-op, role ambiguous
+DAT_004b9d44	named	ScriptEventHandlers	handler per event type
+DAT_004b9e5c	named	ScriptEventCategories	per event type category mask
+DAT_004bad58	named	CheatKeyMap	scan code -> character for the cheat buffer
+DAT_006661bc	named	ParkVisitorCount	visitors in the park (PARKVISITORS)
+DAT_00668788	named	ScriptPurgePending	set by PURGE; RunLevelScript frees the purged events
+DAT_00668790	named	ScriptSectionStarted	a new section was appended: check everything, post its intros
+DAT_00668794	named	ScriptEvalTime	game time of this RunLevelScript pass
+DAT_00668de4	named	CheatKeyState	previous key states for ReadCheatKey
+DAT_0081c038	named	AppraisalScreenActive	report loop runs while set; back clears it
+DAT_0081c040	named	AppTickSprites	App_tick0..4.lls
+DAT_0081c054	named	AppCrossSprites	App_cross0..4.lls
+DAT_0081c068	named	AppBulletSprites	App_bullet0..4.lls
+DAT_0081c07c	named	AppraisalPageChanged	page changed: queue its speech again
+FUN_00444a70	named	DrawAppraisalBar	report bar: value, maximum, pass mark; green if passed
+FUN_00444b70	named	DrawAppraisalMark	report tick / cross / bullet sprite
+FUN_00444eb0	named	AppraisalBackClicked	closes the report
+FUN_00444f90	named	AppraisalPrevPageClicked	previous report page
+FUN_00445000	named	KillAppraisalSprites	frees what LoadAppraisalSprites loaded
+FUN_00445100	named	UnlightAppraisalPageButtons	unlit next/previous sprites when the mouse is not over them
+FUN_00445190	named	InitAppraisalScreen	loads AppraisalBK and the back/next/previous page icons
+FUN_00445310	named	UpdateAppraisalPageButtons	enables next/previous page icons for AppraisalPage
+FUN_004453a0	named	RunAppraisal	builds and shows the inspector's report; returns 1 if every criterion passed
+FUN_0044db40	named	StartAppraisalTimer	AppraisalDeadline = now + timer_minutes * 60000
+FUN_0044db80	named	StopAppraisalTimer	clears timer_minutes and AppraisalDeadline
+FUN_0044db90	named	CheckAppraisalDue	runs the appraisal when AppraisalDeadline passes; counts passes/failures, loses the level
+FUN_00469b20	named	ScriptEventGive	handler for type-0x2 events (Give), DAT_004b9d44[2]
+FUN_00469b70	named	ScriptEventTake	handler for type-0x4 events (Take), DAT_004b9d44[4]
+FUN_00469c40	named	ScriptEventPlace	handler for type-0x7 events (Place), DAT_004b9d44[7]
+FUN_00469c80	named	ScriptEventClear	handler for type-0x8 events (Clear), DAT_004b9d44[8]
+FUN_00469ed0	named	ScriptEventUnglue	handler for type-0x9 events (Unglue), DAT_004b9d44[9]
+FUN_00469f20	named	ScriptEventGlue	handler for type-0xa events (Glue), DAT_004b9d44[10]
+FUN_00469f70	named	ScriptEventExtendPark	handler for type-0xb events (ExtendPark), DAT_004b9d44[11]
+FUN_00469f80	named	ScriptEventFmv	handler for type-0xc events (Fmv), DAT_004b9d44[12]
+FUN_00469fc0	named	ScriptEventInterval	handler for type-0xd events (Interval), DAT_004b9d44[13]
+FUN_0046a030	named	ScriptEventMessage	handler for type-0xe events (Message), DAT_004b9d44[14]
+FUN_0046a040	named	SetScriptFeature	FEATURE switch (ride wear, inspector timer, autorepair...)
+FUN_0046a170	named	ScriptEventReport	handler for type-0x18 events (Report), DAT_004b9d44[24]
+FUN_0046a1f0	named	ScriptEventWorkers	handler for type-0x11 events (Workers), DAT_004b9d44[17]
+FUN_0046a230	named	ScriptEventDegrade	handler for type-0x12 events (Degrade), DAT_004b9d44[18]
+FUN_0046a330	named	ScriptEventCapacityScale	handler for type-0x14 events (CapacityScale), DAT_004b9d44[20]
+FUN_0046a350	named	ScriptEventCapacityCap	handler for type-0x15 events (CapacityCap), DAT_004b9d44[21]
+FUN_0046a390	named	ScriptEventEndLevel	handler for type-0x20 events (EndLevel), DAT_004b9d44[32]
+FUN_0046a3b0	named	ScriptEventLookAt	handler for type-0x17 events (LookAt), DAT_004b9d44[23]
+FUN_0046a420	named	ScriptEventThemeIcon	handler for type-0x19 events (ThemeIcon), DAT_004b9d44[25]
+FUN_0046a440	named	ScriptEventAddFlag	handler for type-0x1a events (AddFlag), DAT_004b9d44[26]
+FUN_0046a480	named	ScriptEventBriefingFile	handler for type-0x1c events (BriefingFile), DAT_004b9d44[28]
+FUN_0046a4a0	named	ScriptEventHintsFile	handler for type-0x1d events (HintsFile), DAT_004b9d44[29]
+FUN_0046a4e0	named	ScriptEventPurge	handler for type-0x1f events (Purge), DAT_004b9d44[31]
+FUN_0046a540	named	ScriptEventNeedAt	handler for type-0x22 events (NeedAt), DAT_004b9d44[34]
+FUN_0046a5b0	named	ScriptEventNeedIn	handler for type-0x23 events (NeedIn), DAT_004b9d44[35]
+FUN_0046a690	named	ScriptEventConnect	handler for type-0x24 events (Connect), DAT_004b9d44[36]
+FUN_0046a750	named	ScriptEventLink	handler for type-0x25 events (Link), DAT_004b9d44[37]
+FUN_0046a900	named	ScriptEventRange	handler for type-0x26 events (Range), DAT_004b9d44[38]
+FUN_0046a960	named	ScriptEventClearArea	handler for type-0x27 events (ClearArea), DAT_004b9d44[39]
+FUN_0046aa30	named	ScriptEventRemove	handler for type-0x28 events (Remove), DAT_004b9d44[40]
+FUN_0046aae0	named	ScriptEventComposite	handler for type-0x2a events (Composite), DAT_004b9d44[42]
+FUN_0046ab70	named	ScriptEventLoopComposite	handler for type-0x2b events (LoopComposite), DAT_004b9d44[43]
+FUN_0046abc0	named	ScriptEventTechLevel	handler for type-0x2c events (TechLevel), DAT_004b9d44[44]
+FUN_0046abd0	named	ScriptEventParkVisitors	handler for type-0x2d events (ParkVisitors), DAT_004b9d44[45]
+FUN_0046ac00	named	ScriptEventRiders	handler for type-0x2f events (Riders), DAT_004b9d44[47]
+FUN_0046ac50	named	ScriptEventRideVisitors	handler for type-0x2e events (RideVisitors), DAT_004b9d44[46]
+FUN_0046ad00	named	ScriptEventSceneryCoverage	handler for type-0x30 events (SceneryCoverage), DAT_004b9d44[48]
+FUN_0046ad30	named	ScriptEventPathScenery	handler for type-0x31 events (PathScenery), DAT_004b9d44[49]
+FUN_0046ad60	named	ScriptEventRideCoverage	handler for type-0x32 events (RideCoverage), DAT_004b9d44[50]
+FUN_0046ad90	named	ScriptEventShopCoverage	handler for type-0x33 events (ShopCoverage), DAT_004b9d44[51]
+FUN_0046adc0	named	ScriptEventFoodCoverage	handler for type-0x34 events (FoodCoverage), DAT_004b9d44[52]
+FUN_0046adf0	named	ScriptEventTotalCoverage	handler for type-0x35 events (TotalCoverage), DAT_004b9d44[53]
+FUN_0046ae30	named	ScriptEventStudArea	handler for type-0x37 events (StudArea), DAT_004b9d44[55]
+FUN_0046ae40	named	ScriptEventSave	handler for type-0x38 events (Save), DAT_004b9d44[56]
+FUN_0046ae70	named	ScriptEventHappiness	handler for type-0x39 events (Happiness), DAT_004b9d44[57]
+FUN_0046af10	named	ScriptEventNeedMechanics	handler for type-0x3b events (NeedMechanics), DAT_004b9d44[59]
+FUN_0046af60	named	ScriptEventHunger	handler for type-0x3c events (Hunger), DAT_004b9d44[60]
+FUN_0046afe0	named	ScriptEventFixRides	handler for type-0x3d events (FixRides), DAT_004b9d44[61]
+FUN_0046b080	named	ScriptEventPowerRides	handler for type-0x3e events (PowerRides), DAT_004b9d44[62]
+FUN_0046b0b0	named	ScriptEventZoning	handler for type-0x3f events (Zoning), DAT_004b9d44[63]
+FUN_0046b0c0	named	ScriptEventCheckFlag	handler for type-0x40 events (CheckFlag), DAT_004b9d44[64]
+FUN_0046b100	named	ScriptEventSelectTheme	handler for type-0x41 events (SelectTheme), DAT_004b9d44[65]
+FUN_0046b130	named	ScriptEventSelectTab	handler for type-0x42 events (SelectTab), DAT_004b9d44[66]
+FUN_0046b180	named	ScriptEventSelectMode	handler for type-0x43 events (SelectMode), DAT_004b9d44[67]
+FUN_0046b1f0	named	ScriptEventForever	handler for type-0x45 events (Forever), DAT_004b9d44[69]
+FUN_0046b200	named	IsScriptEventDue	event re-checked when its category is dirty or 5 s of game time passed
+FUN_0046b280	named	IsScriptStopped	returns MapStats.script_stopped
+FUN_0046b290	named	FreePurgedScriptEvents	frees events marked by PURGE (flag 8)
+FUN_0046b2d0	named	RunLevelScript	evaluates the script's events each frame and moves to the next section
+FUN_0046b590	named	InsertScriptSection	inserts a section into ScriptSectionList, sorted
+FUN_0046b5d0	named	RemoveScriptSection	unlinks a section from ScriptSectionList
+FUN_0046b7f0	named	NewScriptTakeEvent	builds the type-0x4 event for TAKE
+FUN_0046b820	named	NewScriptAddBricksEvent	builds the type-0x5 event for ADDBRICKS
+FUN_0046b850	named	NewScriptCurrencyEvent	builds the type-0x6 event for CURRENCY
+FUN_0046b880	named	NewScriptPlaceEvent	builds the type-0x7 event for PLACE
+FUN_0046b8c0	named	NewScriptClearEvent	builds the type-0x8 event for CLEAR
+FUN_0046b900	named	NewScriptUnglueEvent	builds the type-0x9 event for UNGLUE
+FUN_0046b940	named	NewScriptGlueEvent	builds the type-0xa event for GLUE
+FUN_0046b980	named	NewScriptExtendParkEvent	builds the type-0xb event for EXTENDPARK
+FUN_0046b9c0	named	NewScriptFmvEvent	builds the type-0xc event for FMV
+FUN_0046b9f0	named	NewScriptIntervalEvent	builds the type-0xd event for INTERVAL
+FUN_0046ba30	named	NewScriptMessageEvent	builds the type-0xe event for MESSAGE
+FUN_0046ba60	named	NewScriptFeatureEvent	builds the type-0xf event for FEATURE
+FUN_0046ba90	named	NewScriptReportEvent	builds the type-0x18 event for REPORT
+FUN_0046bb10	named	NewScriptWorkersEvent	builds the type-0x11 event for WORKERS
+FUN_0046bb40	named	NewScriptDegradeEvent	builds the type-0x12 event for DEGRADE
+FUN_0046bbb0	named	NewScriptCapacityScaleEvent	builds the type-0x14 event for CAPACITYSCALE
+FUN_0046bbe0	named	NewScriptCapacityCapEvent	builds the type-0x15 event for CAPACITYCAP
+FUN_0046bc10	named	NewScriptEntranceFeeEvent	builds the type-0x16 event for ENTRANCEFEE
+FUN_0046bc40	named	NewScriptEndLevelEvent	builds the type-0x20 event for ENDLEVEL
+FUN_0046bc60	named	NewScriptPurgeEvent	builds the type-0x1f event for PURGE
+FUN_0046bc80	named	NewScriptThemeIconEvent	builds the type-0x19 event for THEMEICON
+FUN_0046bcb0	named	NewScriptAddFlagEvent	builds the type-0x1a event for ADDFLAG
+FUN_0046bce0	named	NewScriptBridgesEvent	builds the type-0x1b event for BRIDGES
+FUN_0046bd10	named	NewScriptBriefingFileEvent	builds the type-0x1c event for BRIEFINGFILE
+FUN_0046bd40	named	NewScriptHintsFileEvent	builds the type-0x1d event for HINTSFILE
+FUN_0046bdd0	named	NewScriptNeedEvent	builds the type-0x21 event for NEED
+FUN_0046be00	named	NewScriptNeedAtEvent	builds the type-0x22 event for NEEDAT
+FUN_0046be40	named	NewScriptNeedInEvent	builds the type-0x23 event for NEEDIN
+FUN_0046be90	named	NewScriptConnectEvent	builds the type-0x24 event for CONNECT
+FUN_0046bec0	named	NewScriptLinkEvent	builds the type-0x25 event for LINK
+FUN_0046bef0	named	NewScriptRangeEvent	builds the type-0x26 event for RANGE
+FUN_0046bf30	named	NewScriptClearAreaEvent	builds the type-0x27 event for CLEARAREA
+FUN_0046bf80	named	NewScriptRemoveEvent	builds the type-0x28 event for REMOVE
+FUN_0046bfb0	named	NewScriptRemoveRangeEvent	builds the type-0x29 event for REMOVERANGE
+FUN_0046bff0	named	NewScriptCompositeEvent	builds the type-0x2a event for COMPOSITE
+FUN_0046c030	named	NewScriptLoopCompositeEvent	builds the type-0x2b event for LOOPCOMPOSITE
+FUN_0046c060	named	NewScriptTechLevelEvent	builds the type-0x2c event for TECHLEVEL
+FUN_0046c0c0	named	NewScriptRideVisitorsEvent	builds the type-0x2e event for RIDEVISITORS
+FUN_0046c120	named	NewScriptSceneryCoverageEvent	builds the type-0x30 event for SCENERYCOVERAGE
+FUN_0046c150	named	NewScriptPathSceneryEvent	builds the type-0x31 event for PATHSCENERY
+FUN_0046c180	named	NewScriptRideCoverageEvent	builds the type-0x32 event for RIDECOVERAGE
+FUN_0046c1b0	named	NewScriptShopCoverageEvent	builds the type-0x33 event for SHOPCOVERAGE
+FUN_0046c1e0	named	NewScriptFoodCoverageEvent	builds the type-0x34 event for FOODCOVERAGE
+FUN_0046c210	named	NewScriptTotalCoverageEvent	builds the type-0x35 event for TOTCOVERAGE
+FUN_0046c240	named	NewScriptStudAreaEvent	builds the type-0x37 event for STUDAREA
+FUN_0046c290	named	NewScriptSaveEvent	builds the type-0x38 event for SAVE
+FUN_0046c2c0	named	NewScriptHappinessEvent	builds the type-0x39 event for HAPPINESS
+FUN_0046c2f0	named	NewScriptNeedGardenersEvent	builds the type-0x3a event for NEEDGARDENERS
+FUN_0046c320	named	NewScriptNeedMechanicsEvent	builds the type-0x3b event for NEEDMECHANICS
+FUN_0046c350	named	NewScriptHungerEvent	builds the type-0x3c event for HUNGER
+FUN_0046c390	named	NewScriptFixRidesEvent	builds the type-0x3d event for FIXRIDES
+FUN_0046c3c0	named	NewScriptPowerRidesEvent	builds the type-0x3e event for POWERRIDES
+FUN_0046c3f0	named	NewScriptZoningEvent	builds the type-0x3f event for ZONING
+FUN_0046c420	named	NewScriptCheckFlagEvent	builds the type-0x40 event for CHECKFLAG
+FUN_0046c480	named	NewScriptSelectTabEvent	builds the type-0x42 event for SELECTTAB
+FUN_0046c4b0	named	NewScriptSelectModeEvent	builds the type-0x43 event for SELECTMODE
+FUN_0046c580	named	AppendSectionRewards	appends a finished section's reward events to ScriptEventList
+FUN_00474130	named	ReadCheatKey	edge-detects the cheat keys through CheatKeyMap; Shift types ':'
+FUN_00478840	named	ScriptCmdEnd	parser for script keyword [END] (keyword table 0x4bb740)
+FUN_00478890	named	ScriptCmdAges	parser for script keyword AGES (keyword table 0x4bb700)
+FUN_00478930	named	ScriptCmdObjective	parser for script keyword [OBJECTIVE] (keyword table 0x4bb710)
+FUN_00478980	named	ScriptCmdOneOff	parser for script keyword [ONEOFF] (keyword table 0x4bb718)
+FUN_004789c0	named	ScriptCmdOngoing	parser for script keyword [ONGOING] (keyword table 0x4bb720)
+FUN_00478a00	named	ScriptCmdPermanent	parser for script keyword [PERMANENT] (keyword table 0x4bb728)
+FUN_00478a40	named	ScriptCmdReminder	parser for script keyword [REMINDER] (keyword table 0x4bb730)
+FUN_00478a80	named	ScriptCmdReward	parser for script keyword [REWARD] (keyword table 0x4bb738)
+FUN_00478ac0	named	ScriptCmdMap	parser for script keyword MAP (keyword table 0x4bb748)
+FUN_00478b70	named	ScriptCmdLoad	parser for script keyword LOAD (keyword table 0x4bb750)
+FUN_00478bc0	named	ScriptCmdBlueprint	parser for script keyword BLUEPRINT (keyword table 0x4bb790)
+FUN_00478be0	named	ScriptCmdEnable	parser for script keyword ENABLE (keyword table 0x4bb758)
+FUN_00478c60	named	ScriptCmdCurrency	parser for script keyword CURRENCY (keyword table 0x4bb760)
+FUN_00478cd0	named	ScriptCmdHappinessEnv	parser for script keyword HAPPINESS_ENV (keyword table 0x4bb768)
+FUN_00478d30	named	ScriptCmdLookAt	parser for script keyword LOOKAT (keyword table 0x4bb770)
+FUN_00478e20	named	ScriptCmdBriefingFile	parser for script keyword BRIEFINGFILE (keyword table 0x4bb780)
+FUN_00478e90	named	ScriptCmdHintsFile	parser for script keyword HINTSFILE (keyword table 0x4bb788)
+FUN_00478f00	named	ScriptCmdWorkers	parser for script keyword WORKERS (keyword table 0x4bb7a8)
+FUN_00478fa0	named	ScriptCmdGardener	parser for script keyword GARDENER (keyword table 0x4bb798)
+FUN_00479060	named	ScriptCmdMechanic	parser for script keyword MECHANIC (keyword table 0x4bb7a0)
+FUN_00479120	named	ScriptCmdPrompt	parser for script keyword PROMPT (keyword table 0x4bb7e0)
+FUN_004791a0	named	ScriptCmdIntro	parser for script keyword INTRO (keyword table 0x4bb7e8)
+FUN_004791f0	named	ScriptCmdNeed	parser for script keyword NEED (keyword table 0x4bb7f0)
+FUN_00479270	named	ScriptCmdNeedAt	parser for script keyword NEEDAT (keyword table 0x4bb7f8)
+FUN_00479300	named	ScriptCmdNeedIn	parser for script keyword NEEDIN (keyword table 0x4bb800)
+FUN_00479390	named	ScriptCmdConnect	parser for script keyword CONNECT (keyword table 0x4bb808)
+FUN_004793e0	named	ScriptCmdLink	parser for script keyword LINK (keyword table 0x4bb810)
+FUN_00479450	named	ScriptCmdRange	parser for script keyword RANGE (keyword table 0x4bb818)
+FUN_004794d0	named	ScriptCmdClearArea	parser for script keyword CLEARAREA (keyword table 0x4bb820)
+FUN_00479550	named	ScriptCmdRemove	parser for script keyword REMOVE (keyword table 0x4bb828)
+FUN_004795c0	named	ScriptCmdRemoveRange	parser for script keyword REMOVERANGE (keyword table 0x4bb830)
+FUN_00479640	named	ScriptCmdComposite	parser for script keyword COMPOSITE (keyword table 0x4bb838)
+FUN_004796d0	named	ScriptCmdLoopComposite	parser for script keyword LOOPCOMPOSITE (keyword table 0x4bb840)
+FUN_00479740	named	ScriptCmdTechLevel	parser for script keyword TECHLEVEL (keyword table 0x4bb848)
+FUN_004797b0	named	ScriptCmdResearch	parser for script keyword RESEARCH (keyword table 0x4bb850)
+FUN_00479800	named	ScriptCmdParkVisitors	parser for script keyword PARKVISITORS (keyword table 0x4bb858)
+FUN_00479850	named	ScriptCmdRideVisitors	parser for script keyword RIDEVISITORS (keyword table 0x4bb860)
+FUN_004798c0	named	ScriptCmdRiders	parser for script keyword RIDERS (keyword table 0x4bb868)
+FUN_00479930	named	ScriptCmdSceneryCoverage	parser for script keyword SCENERYCOVERAGE (keyword table 0x4bb870)
+FUN_00479980	named	ScriptCmdPathScenery	parser for script keyword PATHSCENERY (keyword table 0x4bb878)
+FUN_004799d0	named	ScriptCmdRideCoverage	parser for script keyword RIDECOVERAGE (keyword table 0x4bb880)
+FUN_00479a20	named	ScriptCmdShopCoverage	parser for script keyword SHOPCOVERAGE (keyword table 0x4bb888)
+FUN_00479a70	named	ScriptCmdFoodCoverage	parser for script keyword FOODCOVERAGE (keyword table 0x4bb890)
+FUN_00479ac0	named	ScriptCmdTotalCoverage	parser for script keyword TOTCOVERAGE (keyword table 0x4bb898)
+FUN_00479b10	named	ScriptCmdAppraisal	parser for script keyword APPRAISAL (keyword table 0x4bb8a0)
+FUN_00479c40	named	ScriptCmdStudArea	parser for script keyword STUDAREA (keyword table 0x4bb8a8)
+FUN_00479cb0	named	ScriptCmdSave	parser for script keyword SAVE (keyword table 0x4bb8b0)
+FUN_00479d00	named	ScriptCmdHappiness	parser for script keyword HAPPINESS (keyword table 0x4bb8b8)
+FUN_00479d60	named	ScriptCmdNeedGardeners	parser for script keyword NEEDGARDENERS (keyword table 0x4bb8c0)
+FUN_00479db0	named	ScriptCmdNeedMechanics	parser for script keyword NEEDMECHANICS (keyword table 0x4bb8c8)
+FUN_00479e00	named	ScriptCmdHunger	parser for script keyword HUNGER (keyword table 0x4bb8d0)
+FUN_00479e80	named	ScriptCmdFixRides	parser for script keyword FIXRIDES (keyword table 0x4bb8d8)
+FUN_00479ee0	named	ScriptCmdPowerRides	parser for script keyword POWERRIDES (keyword table 0x4bb8e0)
+FUN_00479f30	named	ScriptCmdZoning	parser for script keyword ZONING (keyword table 0x4bb8e8)
+FUN_00479fa0	named	ScriptCmdCheckFlag	parser for script keyword CHECKFLAG (keyword table 0x4bb8f0)
+FUN_0047a020	named	ScriptCmdThemeIcon	parser for script keyword THEMEICON (keyword table 0x4bb9b0)
+FUN_0047a0b0	named	ScriptCmdAddFlag	parser for script keyword ADDFLAG (keyword table 0x4bb9b8)
+FUN_0047a140	named	ScriptCmdBridges	parser for script keyword BRIDGES (keyword table 0x4bb9c0)
+FUN_0047a1d0	named	ScriptCmdEndScreens	parser for script keyword ENDSCREENS (keyword table 0x4bb9c8)
+FUN_0047a2f0	named	ScriptCmdSelectTheme	parser for script keyword SELECTTHEME (keyword table 0x4bb8f8)
+FUN_0047a360	named	ScriptCmdSelectTab	parser for script keyword SELECTTAB (keyword table 0x4bb900)
+FUN_0047a3d0	named	ScriptCmdSelectMode	parser for script keyword SELECTMODE (keyword table 0x4bb908)
+FUN_0047a440	named	ScriptCmdForever	parser for script keyword FOREVER (keyword table 0x4bb910)
+FUN_0047a480	named	ScriptCmdGive	parser for script keyword GIVE (keyword table 0x4bb918)
+FUN_0047a500	named	ScriptCmdTake	parser for script keyword TAKE (keyword table 0x4bb920)
+FUN_0047a550	named	ScriptCmdAddBricks	parser for script keyword ADDBRICKS (keyword table 0x4bb928)
+FUN_0047a5a0	named	ScriptCmdPlace	parser for script keyword PLACE (keyword table 0x4bb930)
+FUN_0047a650	named	ScriptCmdClear	parser for script keyword CLEAR (keyword table 0x4bb938)
+FUN_0047a6a0	named	ScriptCmdUnglue	parser for script keyword UNGLUE (keyword table 0x4bb940)
+FUN_0047a6f0	named	ScriptCmdGlue	parser for script keyword GLUE (keyword table 0x4bb948)
+FUN_0047a7b0	named	ScriptCmdExtendPark	parser for script keyword EXTENDPARK (keyword table 0x4bb950)
+FUN_0047a800	named	ScriptCmdFmv	parser for script keyword FMV (keyword table 0x4bb958)
+FUN_0047a860	named	ScriptCmdInterval	parser for script keyword INTERVAL (keyword table 0x4bb960)
+FUN_0047a8a0	named	ScriptCmdMessage	parser for script keyword MESSAGE (keyword table 0x4bb968)
+FUN_0047a8e0	named	ScriptCmdFeature	parser for script keyword FEATURE (keyword table 0x4bb970)
+FUN_0047a960	named	ScriptCmdReport	parser for script keyword REPORT (keyword table 0x4bb978)
+FUN_0047aa90	named	ScriptCmdHapFactor	parser for script keyword HAP_FACTOR (keyword table 0x4bb7b8)
+FUN_0047ab00	named	ScriptCmdCapacityScale	parser for script keyword CAPACITYSCALE (keyword table 0x4bb7c0)
+FUN_0047ab80	named	ScriptCmdCapacityCap	parser for script keyword CAPACITYCAP (keyword table 0x4bb7c8)
+FUN_0047ac00	named	ScriptCmdDegrade	parser for script keyword DEGRADE (keyword table 0x4bb980)
+FUN_0047ac80	named	ScriptCmdMaxBlokes	parser for script keyword MAXBLOKES (keyword table 0x4bb7b0)
+FUN_0047ace0	named	ScriptCmdMaxCapacity	parser for script keyword MAXVISITORS (keyword table 0x4bb990)
+FUN_0047ada0	named	ScriptCmdEntranceFee	parser for script keyword ENTRANCEFEE (keyword table 0x4bb9a8)
+FUN_0047ae00	named	ScriptCmdFlashButton	parser for script keyword FLASHBUTTON (keyword table 0x4bb7d0)
+FUN_0047aea0	named	ScriptCmdFlashButtonOff	parser for script keyword FLASHBUTTOFF (keyword table 0x4bb7d8)
+FUN_0047af50	named	ScriptCmdPurge	parser for script keyword PURGE (keyword table 0x4bb9d0)
+FUN_0047af80	named	ScriptCmdEndLevel	parser for script keyword ENDLEVEL (keyword table 0x4bb9d8)
+FUN_00492d80	named	StopInteractiveMusic	music thread command 1 (cheat :STOP)

@@ -678,8 +678,8 @@ void FUN_004784c0(void) {
     FUN_00459960();
 
     MapStats.brick_meter_max = 1000;
-    MapStats.field_194 = 0;
-    MapStats.field_180 = 0;
+    MapStats.show_capacity = 0;
+    MapStats.ride_wear = 0;
     MapStats.field_3a8 = 1;
 
     SetScriptStopped(0);

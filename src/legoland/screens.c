@@ -288,7 +288,7 @@ void FUN_00458a50(void) {
         AllocBlokeCounters(lpConfig->max_blokes);
         FUN_00458940();
         FUN_00489ee0();
-        MapStats.field_3a0 = 0;
+        MapStats.level_end = 0;
         UpdateMenu();
         FUN_00490600(1);
         FUN_004911c0(DAT_0066861c, 0);
@@ -393,7 +393,7 @@ int FUN_00458c00(void) {
         }
         UpdateSoundVols();
         DAT_00667c64 = 0;
-        MapStats.field_3a0 = 0;
+        MapStats.level_end = 0;
         EditMode.unk4 = 3;
         FUN_00474880();
         ResumeGameTimer();
@@ -426,15 +426,15 @@ int FUN_00458c00(void) {
         UpdateSound();
         ReadGameButtons();
         FrameCounter = FrameCounter + 1;
-        if (MapStats.field_3a0 != 0 && EditMode.unk4 == 3) {
+        if (MapStats.level_end != 0 && EditMode.unk4 == 3) {
             if (MapStats.field_3ac != 0) {
                 SetPointer(0);
                 PlayMovie(DAT_008100c0, 1, 1);
                 MapStats.field_3ac = 0;
                 SetPointer(5);
             }
-            if (MapStats.field_3a0 != 3) {
-                if (MapStats.field_3a0 == 1) {
+            if (MapStats.level_end != 3) {
+                if (MapStats.level_end == 1) {
                     ((struct ScreenConfig *)lpConfig)->slot += 1;
                 }
                 FUN_0048a750();
@@ -609,7 +609,7 @@ void FUN_00458ee0(void) {
         RenderWorkerOnMouse();
     }
     PopRenderingStatus();
-    if (MapStats.field_194 != 0) {
+    if (MapStats.show_capacity != 0) {
         if (IsLeftShiftDown() != 0 && IsRightShiftDown() != 0) {
             PrintCapacityStats();
         }
@@ -851,7 +851,7 @@ void FUN_004597e0(int param0, const char *param1) {
 
 // FUNCTION: LEGOLAND 0x00459820
 void EndLevel(unsigned int a1) {
-    MapStats.field_3a0 = a1;
+    MapStats.level_end = a1;
     if (a1 == 1) {
         FUN_00459710(MapStats.field_198);
         return;

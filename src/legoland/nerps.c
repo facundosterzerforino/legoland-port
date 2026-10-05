@@ -81,7 +81,7 @@ void SetScriptFeature(unsigned int param_1, unsigned int param_2) {
         MapStats.field_184 = param_2;
         break;
     case 1:
-        MapStats.field_180 = param_2;
+        MapStats.ride_wear = param_2;
         break;
     case 3:
         MapStats.field_188 = param_2;
@@ -106,7 +106,7 @@ void SetScriptFeature(unsigned int param_1, unsigned int param_2) {
         MapStats.brick_meter_max = param_2;
         break;
     case 10:
-        MapStats.field_194 = param_2;
+        MapStats.show_capacity = param_2;
         break;
     case 0xb:
         MapStats.field_3a8 = param_2;
@@ -1066,7 +1066,7 @@ unsigned int IsScriptEventDue(struct TimedEvent *event) {
 
 // FUNCTION: LEGOLAND 0x0046b240
 void SetScriptStopped(unsigned int param_1) {
-    MapStats.field_3a4 = param_1;
+    MapStats.script_stopped = param_1;
     FUN_004748a0((void *)1);
     if (param_1 != 0) {
         FUN_00458be0();
@@ -1079,7 +1079,7 @@ void SetScriptStopped(unsigned int param_1) {
 
 // FUNCTION: LEGOLAND 0x0046b280
 unsigned int IsScriptStopped(void) {
-    return MapStats.field_3a4;
+    return MapStats.script_stopped;
 }
 
 // FUNCTION: LEGOLAND 0x0046b290

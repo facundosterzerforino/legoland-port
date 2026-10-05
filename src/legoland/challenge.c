@@ -3658,11 +3658,11 @@ LAB_0044a658:
     *piVar10 = *piVar10 + 1;
     ysave = iVar6 + 0x2e;
 LAB_0044a70c:
-    if ((flags != 0) && (MapStats.field_17c != 0)) {
-        if (MapStats.field_39c < 0) {
-            iVar6 = MapStats.field_39c + -1 + MapStats.field_17c;
+    if ((flags != 0) && (MapStats.appraisal_fail_limit != 0)) {
+        if (MapStats.appraisal_streak < 0) {
+            iVar6 = MapStats.appraisal_streak + -1 + MapStats.appraisal_fail_limit;
         } else {
-            iVar6 = MapStats.field_17c + -1;
+            iVar6 = MapStats.appraisal_fail_limit + -1;
         }
         if (iVar6 < 2) {
             if (0 < iVar6) {
@@ -5081,7 +5081,7 @@ LAB_0044acbb:
 
 // FUNCTION: LEGOLAND 0x0044db20
 void FUN_0044db20(void) {
-    MapStats.field_39c = 0;
+    MapStats.appraisal_streak = 0;
 }
 
 // FUNCTION: LEGOLAND 0x0044db40
@@ -5119,27 +5119,27 @@ int CheckAppraisalDue(void) {
         DAT_006687b0 = 4;
         DAT_0066609c = RunAppraisal();
 #ifdef LEGOLAND_PORT
-        /* [port] log each appraisal's result (field_39c: passes > 0, failures < 0; field_17c: failures allowed) */
+        /* [port] log each appraisal's result (appraisal_streak: passes > 0, failures < 0) */
         DebugTrace("appraisal: %s (streak before this %d, failures allowed %d)", DAT_0066609c != 0 ? "PASSED" : "failed",
-            MapStats.field_39c, MapStats.field_17c);
+            MapStats.appraisal_streak, MapStats.appraisal_fail_limit);
 #endif
         if (DAT_0066609c != 0) {
-            v = MapStats.field_39c;
+            v = MapStats.appraisal_streak;
             if (v > 0) {
-                MapStats.field_39c = v + 1;
+                MapStats.appraisal_streak = v + 1;
             } else {
-                MapStats.field_39c = 1;
+                MapStats.appraisal_streak = 1;
             }
             SetScriptStopped(1);
             lpConfig->field_30 = 1;
             FUN_0048a750();
         } else {
-            if (MapStats.field_39c < 0) {
-                MapStats.field_39c = MapStats.field_39c - 1;
+            if (MapStats.appraisal_streak < 0) {
+                MapStats.appraisal_streak = MapStats.appraisal_streak - 1;
             } else {
-                MapStats.field_39c = -1;
+                MapStats.appraisal_streak = -1;
             }
-            if (MapStats.field_17c != 0 && MapStats.field_39c <= -MapStats.field_17c) {
+            if (MapStats.appraisal_fail_limit != 0 && MapStats.appraisal_streak <= -MapStats.appraisal_fail_limit) {
                 EndLevel(2);
             }
         }
@@ -5154,7 +5154,7 @@ int CheckAppraisalDue(void) {
 
 // FUNCTION: LEGOLAND 0x0044dc70
 void FUN_0044dc70(unsigned int param_1, unsigned int param_2) {
-    MapStats.field_17c = param_1;
+    MapStats.appraisal_fail_limit = param_1;
     FUN_0044db20();
     FUN_004597e0(0, (const char *)param_2);
 }

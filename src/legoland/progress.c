@@ -27,12 +27,12 @@ LEGO_EXPORT void InitProgressScreen(void) {
     }
     if (DAT_00798660 == 0) {
         FUN_0048b6d0();
-        if (MapStats.field_3a0 == 0) {
+        if (MapStats.level_end == 0) {
             if (DAT_00798668 == 0) {
                 lpConfig->level = DAT_007cb394 + 1;
             }
         }
-        if (MapStats.field_3a0 == 1 && (int)lpConfig->level <= 0xf) {
+        if (MapStats.level_end == 1 && (int)lpConfig->level <= 0xf) {
             CurrentProfile.flags[3 + lpConfig->level] = 1;
             UpDateCurrentProfile();
         }
@@ -55,8 +55,8 @@ LEGO_EXPORT void InitProgressScreen(void) {
     SPRITE_TitleScreenBk = LoadSprite("Progress_ScreenBK.lls", 4);
     flags = 0x6002;
     if (DAT_00798660 == 0) {
-        if (MapStats.field_3a0 == 1 && lpConfig->level == 6) {
-            MapStats.field_3a0 = 2;
+        if (MapStats.level_end == 1 && lpConfig->level == 6) {
+            MapStats.level_end = 2;
         }
         FUN_0048b700();
         // STRING: LEGOLAND 0x004bef2c
@@ -71,7 +71,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         icon->string = GetString(0x26);
         icon->flags |= flags;
         icon->event_handler = (void *)FUN_0048c020;
-        if (MapStats.field_3a0 != 1) {
+        if (MapStats.level_end != 1) {
             // STRING: LEGOLAND 0x004beef8
             icon = LoadSpriteIcon("Tutorial_On_Progress.lls", 4, 0x174, 0x16d, 0x23);
             icon->string_id = 0x258;
@@ -82,7 +82,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
     }
     FUN_0048b740();
     RemoveIconGroup(0x1c);
-    if (MapStats.field_3a0 == 1) {
+    if (MapStats.level_end == 1) {
         flags = 0x200a;
 
         for (i = 0; i < 10; i++) {

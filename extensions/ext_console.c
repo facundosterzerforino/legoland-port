@@ -250,16 +250,16 @@ static int EventIsCondition(unsigned int type) {
     return type >= 0x21 && type <= 0x45;
 }
 
-/* The steps still to run are DAT_00668798, sorted, with the current one (DAT_0066879c) at its head until it
- * is done (FUN_0046b2d0). */
+/* The steps still to run are ScriptSectionList, sorted, with the current one (CurrentScriptSection) at its head until it
+ * is done (RunLevelScript). */
 static int IsLastStep(void) {
     struct SortNode *current;
 
-    current = (struct SortNode *)DAT_00668798;
-    return current != NULL && (unsigned int)current == DAT_0066879c && current->next == NULL;
+    current = (struct SortNode *)ScriptSectionList;
+    return current != NULL && (unsigned int)current == CurrentScriptSection && current->next == NULL;
 }
 
-/* What RANGE counts (FUN_0046a900): the object classes of a theme that have objects in the park, and how many
+/* What RANGE counts (ScriptEventRange): the object classes of a theme that have objects in the park, and how many
  * objects they have in all. 0x08 is the class's object count, 0x5c its theme (struct ObjectClass in nerps.c). */
 static void RangeCount(unsigned int theme, int *kinds, int *placed) {
     struct Ride *cls;
@@ -333,9 +333,9 @@ static void CmdStatus(void) {
     } else {
         ConPrintf("money: unlimited");
     }
-    ConPrintf("visitors: %d", DAT_006661bc);
-    ConPrintf("ride wear: %u", MapStats.field_180);
-    ConPrintf("script: %s", FUN_0046b280() != 0 ? "stopped" : "running");
+    ConPrintf("visitors: %d", ParkVisitorCount);
+    ConPrintf("ride wear: %u", MapStats.ride_wear);
+    ConPrintf("script: %s", IsScriptStopped() != 0 ? "stopped" : "running");
     if (MapStats.timer_minutes == 0 || AppraisalDeadline == 0) {
         ConPrintf("inspector: off");
     } else {
@@ -346,13 +346,13 @@ static void CmdStatus(void) {
         ConPrintf("inspector: every %u min, next in %d:%02d (game time)", MapStats.timer_minutes, left / 60000,
             (left / 1000) % 60);
     }
-    if (MapStats.field_39c > 0) {
-        ConPrintf("appraisals: %d passed in a row", MapStats.field_39c);
-    } else if (MapStats.field_39c < 0) {
-        ConPrintf("appraisals: %d failed in a row, the level is lost at %d", -MapStats.field_39c,
-            MapStats.field_17c);
+    if (MapStats.appraisal_streak > 0) {
+        ConPrintf("appraisals: %d passed in a row", MapStats.appraisal_streak);
+    } else if (MapStats.appraisal_streak < 0) {
+        ConPrintf("appraisals: %d failed in a row, the level is lost at %d", -MapStats.appraisal_streak,
+            MapStats.appraisal_fail_limit);
     } else {
-        ConPrintf("appraisals: none yet (the level is lost after %d failed in a row)", MapStats.field_17c);
+        ConPrintf("appraisals: none yet (the level is lost after %d failed in a row)", MapStats.appraisal_fail_limit);
     }
 }
 
@@ -366,7 +366,7 @@ static void CmdObjectives(void) {
     }
     shown = 0;
     waiting = 0;
-    for (node = (struct ObjectiveEvent *)DAT_00668784; node != NULL; node = node->next) {
+    for (node = (struct ObjectiveEvent *)ScriptEventList; node != NULL; node = node->next) {
         char what[160];
         const char *state;
 
@@ -427,8 +427,8 @@ static void CmdSkip(int permanent_too) {
     blocking = 0;
     /* Don't free nodes here (a popup may be running the message loop from inside the script runner, which
      * is walking this list): make them type 0, which has no handler. The runner then skips them, doesn't
-     * count them, and frees the step's nodes itself when it moves on (FUN_0046b2d0). */
-    for (node = (struct ObjectiveEvent *)DAT_00668784; node != NULL; node = node->next) {
+     * count them, and frees the step's nodes itself when it moves on (RunLevelScript). */
+    for (node = (struct ObjectiveEvent *)ScriptEventList; node != NULL; node = node->next) {
         if (!EventIsCondition(node->type) || (node->flags_10 & 0x80) != 0 || (node->flags_10 & 4) != 0) {
             continue;
         }
@@ -470,7 +470,7 @@ static void CmdLevel(const char *arg) {
     }
     /* as the original cheat ILIKETOTRAVEL (input.c) */
     lpConfig->level = level;
-    MapStats.field_3a0 = 2;
+    MapStats.level_end = 2;
     ConPrintf("Going to %s.", LevelName(level));
 }
 
@@ -479,7 +479,7 @@ static void CmdMusic(const char *arg) {
     int i;
 
     if (_stricmp(arg, "stop") == 0) {
-        FUN_00492d80();
+        StopInteractiveMusic();
         ConPrintf("Music stopped.");
         return;
     }
@@ -541,12 +541,12 @@ static void RunCommand(char *line) {
         CmdSkip(_stricmp(arg, "perm") == 0);
     } else if (_stricmp(cmd, "win") == 0) {
         if (NeedLevel()) {
-            FUN_00459820(1);
+            EndLevel(1);
             ConPrintf("Level won.");
         }
     } else if (_stricmp(cmd, "lose") == 0) {
         if (NeedLevel()) {
-            FUN_00459820(2);
+            EndLevel(2);
             ConPrintf("Level lost.");
         }
     } else if (_stricmp(cmd, "level") == 0) {
@@ -562,13 +562,13 @@ static void RunCommand(char *line) {
                 ConPrintf("usage: inspector <minutes>");
             } else {
                 MapStats.timer_minutes = (unsigned int)atoi(arg);
-                FUN_0044db40();
+                StartAppraisalTimer();
                 ConPrintf("Inspector: %s.", MapStats.timer_minutes != 0 ? "timer restarted" : "off");
             }
         }
     } else if (_stricmp(cmd, "stopscript") == 0) {
         if (NeedLevel()) {
-            FUN_0046b240(1); /* as the original cheat IMPROVISE */
+            SetScriptStopped(1); /* as the original cheat IMPROVISE */
             ConPrintf("Script stopped.");
         }
     } else if (_stricmp(cmd, "money") == 0) {
@@ -588,13 +588,13 @@ static void RunCommand(char *line) {
             if (arg[0] == 0) {
                 ConPrintf("usage: ridewear <n>");
             } else {
-                MapStats.field_180 = (unsigned int)atoi(arg);
-                ConPrintf("Ride wear: %u.", MapStats.field_180);
+                MapStats.ride_wear = (unsigned int)atoi(arg);
+                ConPrintf("Ride wear: %u.", MapStats.ride_wear);
             }
         }
     } else if (_stricmp(cmd, "capacity") == 0) {
         if (NeedLevel()) {
-            MapStats.field_194 = 1;
+            MapStats.show_capacity = 1;
             ConPrintf("Capacity calculations visible.");
         }
     } else if (_stricmp(cmd, "switches") == 0) {

@@ -118,7 +118,6 @@ extern char CopterPathTable4[];
 extern char DAT_004b4608[];
 extern char DAT_004b47b8[];
 extern char DAT_004b47e8[];
-extern char DAT_004b9d44[];
 void FUN_00423940();
 void FUN_00423970();
 void FUN_00423990();
@@ -141,145 +140,10 @@ void FUN_0044fe80();
 void FUN_00450250();
 void FUN_00450330();
 void FUN_00450450();
-void FUN_0046a120();
-void FUN_0046a170();
-void FUN_0046a1f0();
-void FUN_0046a230();
 void FUN_0046a300();
-void FUN_0046a330();
-void FUN_0046a350();
-void FUN_0046a390();
-void FUN_0046a3b0();
-void FUN_0046a420();
-void FUN_0046a440();
-void FUN_0046a460();
-void FUN_0046a480();
-void FUN_0046a4a0();
 void FUN_0046a4c0();
-void FUN_0046a4e0();
-void FUN_0046a4f0();
-void FUN_0046a540();
-void FUN_0046a5b0();
-void FUN_0046a690();
-void FUN_0046a750();
-void FUN_0046a900();
-void FUN_0046a960();
-void FUN_0046aa30();
-void FUN_0046aa70();
-void FUN_0046aae0();
-void FUN_0046ab70();
-void FUN_0046abc0();
-void FUN_0046abd0();
-void FUN_0046ac00();
-void FUN_0046ac50();
-void FUN_0046ad00();
-void FUN_0046ad30();
-void FUN_0046ad60();
-void FUN_0046ad90();
-void FUN_0046adc0();
-void FUN_0046adf0();
 void FUN_0046ae20();
-void FUN_0046ae30();
-void FUN_0046ae40();
-void FUN_0046ae70();
-void FUN_0046af10();
-void FUN_0046af60();
-void FUN_0046afe0();
-void FUN_0046b080();
-void FUN_0046b0b0();
-void FUN_0046b0c0();
-void FUN_0046b100();
-void FUN_0046b130();
-void FUN_0046b180();
 void FUN_0046b1e0();
-void FUN_0046b1f0();
-void FUN_00478840();
-void FUN_00478870();
-void FUN_00478890();
-void FUN_00478930();
-void FUN_00478980();
-void FUN_004789c0();
-void FUN_00478a00();
-void FUN_00478a40();
-void FUN_00478a80();
-void FUN_00478ac0();
-void FUN_00478b70();
-void FUN_00478bc0();
-void FUN_00478c60();
-void FUN_00478cd0();
-void FUN_00478d30();
-void FUN_00478e20();
-void FUN_00478e90();
-void FUN_00478f00();
-void FUN_00478fa0();
-void FUN_00479060();
-void FUN_00479120();
-void FUN_004791a0();
-void FUN_004791f0();
-void FUN_00479270();
-void FUN_00479300();
-void FUN_00479390();
-void FUN_004793e0();
-void FUN_00479450();
-void FUN_004794d0();
-void FUN_00479550();
-void FUN_004795c0();
-void FUN_00479640();
-void FUN_004796d0();
-void FUN_00479740();
-void FUN_004797b0();
-void FUN_00479800();
-void FUN_00479850();
-void FUN_004798c0();
-void FUN_00479930();
-void FUN_00479980();
-void FUN_004799d0();
-void FUN_00479a20();
-void FUN_00479a70();
-void FUN_00479ac0();
-void FUN_00479b10();
-void FUN_00479c40();
-void FUN_00479cb0();
-void FUN_00479d00();
-void FUN_00479d60();
-void FUN_00479db0();
-void FUN_00479e00();
-void FUN_00479e80();
-void FUN_00479ee0();
-void FUN_00479f30();
-void FUN_00479fa0();
-void FUN_0047a020();
-void FUN_0047a0b0();
-void FUN_0047a140();
-void FUN_0047a1d0();
-void FUN_0047a2f0();
-void FUN_0047a360();
-void FUN_0047a3d0();
-void FUN_0047a440();
-void FUN_0047a500();
-void FUN_0047a550();
-void FUN_0047a5a0();
-void FUN_0047a650();
-void FUN_0047a6a0();
-void FUN_0047a6f0();
-void FUN_0047a7b0();
-void FUN_0047a800();
-void FUN_0047a860();
-void FUN_0047a8a0();
-void FUN_0047a8e0();
-void FUN_0047a960();
-void FUN_0047aa90();
-void FUN_0047ab00();
-void FUN_0047ab80();
-void FUN_0047ac00();
-void FUN_0047ac80();
-void FUN_0047ace0();
-void FUN_0047ad40();
-void FUN_0047ada0();
-void FUN_0047ae00();
-void FUN_0047aea0();
-void FUN_0047af50();
-void FUN_0047af80();
 void FUN_0049a4a0();
 void FUN_0049a4d0();
 void FlipFrame();
@@ -294,6 +158,142 @@ void Mechanic_Idle();
 void Mechanics_Repair();
 void NerpsSetEntranceFee();
 extern char PTR_FUN_004b7e38[];
+void ScriptCmdAddBricks();
+void ScriptCmdAddFlag();
+void ScriptCmdAges();
+void ScriptCmdAppraisal();
+void ScriptCmdBlueprint();
+void ScriptCmdBridges();
+void ScriptCmdBriefingFile();
+void ScriptCmdCapacityCap();
+void ScriptCmdCapacityScale();
+void ScriptCmdCheckFlag();
+void ScriptCmdClear();
+void ScriptCmdClearArea();
+void ScriptCmdComposite();
+void ScriptCmdConnect();
+void ScriptCmdCurrency();
+void ScriptCmdDegrade();
+void ScriptCmdEnd();
+void ScriptCmdEndLevel();
+void ScriptCmdEndScreens();
+void ScriptCmdEntranceFee();
+void ScriptCmdExtendPark();
+void ScriptCmdFeature();
+void ScriptCmdFixRides();
+void ScriptCmdFlashButton();
+void ScriptCmdFlashButtonOff();
+void ScriptCmdFmv();
+void ScriptCmdFoodCoverage();
+void ScriptCmdForever();
+void ScriptCmdGardener();
+void ScriptCmdGlue();
+void ScriptCmdHapFactor();
+void ScriptCmdHappiness();
+void ScriptCmdHappinessEnv();
+void ScriptCmdHintsFile();
+void ScriptCmdHunger();
+void ScriptCmdInit();
+void ScriptCmdInterval();
+void ScriptCmdIntro();
+void ScriptCmdLink();
+void ScriptCmdLoad();
+void ScriptCmdLookAt();
+void ScriptCmdLoopComposite();
+void ScriptCmdMap();
+void ScriptCmdMaxBlokes();
+void ScriptCmdMaxCapacity();
+void ScriptCmdMechanic();
+void ScriptCmdMessage();
+void ScriptCmdMinCapacity();
+void ScriptCmdNeed();
+void ScriptCmdNeedAt();
+void ScriptCmdNeedGardeners();
+void ScriptCmdNeedIn();
+void ScriptCmdNeedMechanics();
+void ScriptCmdObjective();
+void ScriptCmdOneOff();
+void ScriptCmdOngoing();
+void ScriptCmdParkVisitors();
+void ScriptCmdPathScenery();
+void ScriptCmdPermanent();
+void ScriptCmdPlace();
+void ScriptCmdPowerRides();
+void ScriptCmdPrompt();
+void ScriptCmdPurge();
+void ScriptCmdRange();
+void ScriptCmdReminder();
+void ScriptCmdRemove();
+void ScriptCmdRemoveRange();
+void ScriptCmdReport();
+void ScriptCmdResearch();
+void ScriptCmdReward();
+void ScriptCmdRideCoverage();
+void ScriptCmdRideVisitors();
+void ScriptCmdRiders();
+void ScriptCmdSave();
+void ScriptCmdSceneryCoverage();
+void ScriptCmdSelectMode();
+void ScriptCmdSelectTab();
+void ScriptCmdSelectTheme();
+void ScriptCmdShopCoverage();
+void ScriptCmdStudArea();
+void ScriptCmdTake();
+void ScriptCmdTechLevel();
+void ScriptCmdThemeIcon();
+void ScriptCmdTotalCoverage();
+void ScriptCmdUnglue();
+void ScriptCmdWorkers();
+void ScriptCmdZoning();
+void ScriptEventAddFlag();
+void ScriptEventBridges();
+void ScriptEventBriefingFile();
+void ScriptEventCapacityCap();
+void ScriptEventCapacityScale();
+void ScriptEventCheckFlag();
+void ScriptEventClearArea();
+void ScriptEventComposite();
+void ScriptEventConnect();
+void ScriptEventDegrade();
+void ScriptEventEndLevel();
+void ScriptEventFeature();
+void ScriptEventFixRides();
+void ScriptEventFoodCoverage();
+void ScriptEventForever();
+extern char ScriptEventHandlers[];
+void ScriptEventHappiness();
+void ScriptEventHintsFile();
+void ScriptEventHunger();
+void ScriptEventLink();
+void ScriptEventLookAt();
+void ScriptEventLoopComposite();
+void ScriptEventNeed();
+void ScriptEventNeedAt();
+void ScriptEventNeedIn();
+void ScriptEventNeedMechanics();
+void ScriptEventParkVisitors();
+void ScriptEventPathScenery();
+void ScriptEventPowerRides();
+void ScriptEventPurge();
+void ScriptEventRange();
+void ScriptEventRemove();
+void ScriptEventRemoveRange();
+void ScriptEventReport();
+void ScriptEventRideCoverage();
+void ScriptEventRideVisitors();
+void ScriptEventRiders();
+void ScriptEventSave();
+void ScriptEventSceneryCoverage();
+void ScriptEventSelectMode();
+void ScriptEventSelectTab();
+void ScriptEventSelectTheme();
+void ScriptEventShopCoverage();
+void ScriptEventStudArea();
+void ScriptEventTechLevel();
+void ScriptEventThemeIcon();
+void ScriptEventTotalCoverage();
+void ScriptEventWorkers();
+void ScriptEventZoning();
 
 #define PORT_DATA_VA 0x004ab000u
 #define PORT_DATA_SIZE 0x17000u
@@ -4622,74 +4622,74 @@ static const struct PortFixup port_fixups[] = {
     {0xe5e0, 'G', (void *)&MapRenderOrderList, sizeof(MapRenderOrderList), 0x19f, ~0u},
     {0xe5f0, 'G', (void *)&DAT_00801420, sizeof(DAT_00801420), 0x0, ~0u},
     {0xeca4, 'F', (void *)FlipFrame, 0, 0, ~0u},
-    {0xed4c, 'F', (void *)FUN_00469b20, 0, 0, ~0u},
+    {0xed4c, 'F', (void *)ScriptEventGive, 0, 0, ~0u},
     {0xed50, 'F', (void *)FUN_00469b50, 0, 0, ~0u},
-    {0xed54, 'F', (void *)FUN_00469b70, 0, 0, ~0u},
+    {0xed54, 'F', (void *)ScriptEventTake, 0, 0, ~0u},
     {0xed58, 'F', (void *)ObjectiveEventAddBricks, 0, 0, ~0u},
     {0xed5c, 'F', (void *)ObjectiveEventSetBricks, 0, 0, ~0u},
-    {0xed60, 'F', (void *)FUN_00469c40, 0, 0, ~0u},
-    {0xed64, 'F', (void *)FUN_00469c80, 0, 0, ~0u},
-    {0xed68, 'F', (void *)FUN_00469ed0, 0, 0, ~0u},
-    {0xed6c, 'F', (void *)FUN_00469f20, 0, 0, ~0u},
-    {0xed70, 'F', (void *)FUN_00469f70, 0, 0, ~0u},
-    {0xed74, 'F', (void *)FUN_00469f80, 0, 0, ~0u},
-    {0xed78, 'F', (void *)FUN_00469fc0, 0, 0, ~0u},
-    {0xed7c, 'F', (void *)FUN_0046a030, 0, 0, ~0u},
-    {0xed80, 'F', (void *)FUN_0046a120, 0, 0, ~0u},
+    {0xed60, 'F', (void *)ScriptEventPlace, 0, 0, ~0u},
+    {0xed64, 'F', (void *)ScriptEventClear, 0, 0, ~0u},
+    {0xed68, 'F', (void *)ScriptEventUnglue, 0, 0, ~0u},
+    {0xed6c, 'F', (void *)ScriptEventGlue, 0, 0, ~0u},
+    {0xed70, 'F', (void *)ScriptEventExtendPark, 0, 0, ~0u},
+    {0xed74, 'F', (void *)ScriptEventFmv, 0, 0, ~0u},
+    {0xed78, 'F', (void *)ScriptEventInterval, 0, 0, ~0u},
+    {0xed7c, 'F', (void *)ScriptEventMessage, 0, 0, ~0u},
+    {0xed80, 'F', (void *)ScriptEventFeature, 0, 0, ~0u},
     {0xed84, 'F', (void *)GenerateWorkers, 0, 0, ~0u},
-    {0xed88, 'F', (void *)FUN_0046a1f0, 0, 0, ~0u},
-    {0xed8c, 'F', (void *)FUN_0046a230, 0, 0, ~0u},
+    {0xed88, 'F', (void *)ScriptEventWorkers, 0, 0, ~0u},
+    {0xed8c, 'F', (void *)ScriptEventDegrade, 0, 0, ~0u},
     {0xed90, 'F', (void *)FUN_0046a300, 0, 0, ~0u},
-    {0xed94, 'F', (void *)FUN_0046a330, 0, 0, ~0u},
-    {0xed98, 'F', (void *)FUN_0046a350, 0, 0, ~0u},
+    {0xed94, 'F', (void *)ScriptEventCapacityScale, 0, 0, ~0u},
+    {0xed98, 'F', (void *)ScriptEventCapacityCap, 0, 0, ~0u},
     {0xed9c, 'F', (void *)NerpsSetEntranceFee, 0, 0, ~0u},
-    {0xeda0, 'F', (void *)FUN_0046a3b0, 0, 0, ~0u},
-    {0xeda4, 'F', (void *)FUN_0046a170, 0, 0, ~0u},
-    {0xeda8, 'F', (void *)FUN_0046a420, 0, 0, ~0u},
-    {0xedac, 'F', (void *)FUN_0046a440, 0, 0, ~0u},
-    {0xedb0, 'F', (void *)FUN_0046a460, 0, 0, ~0u},
-    {0xedb4, 'F', (void *)FUN_0046a480, 0, 0, ~0u},
-    {0xedb8, 'F', (void *)FUN_0046a4a0, 0, 0, ~0u},
+    {0xeda0, 'F', (void *)ScriptEventLookAt, 0, 0, ~0u},
+    {0xeda4, 'F', (void *)ScriptEventReport, 0, 0, ~0u},
+    {0xeda8, 'F', (void *)ScriptEventThemeIcon, 0, 0, ~0u},
+    {0xedac, 'F', (void *)ScriptEventAddFlag, 0, 0, ~0u},
+    {0xedb0, 'F', (void *)ScriptEventBridges, 0, 0, ~0u},
+    {0xedb4, 'F', (void *)ScriptEventBriefingFile, 0, 0, ~0u},
+    {0xedb8, 'F', (void *)ScriptEventHintsFile, 0, 0, ~0u},
     {0xedbc, 'F', (void *)FUN_0046a4c0, 0, 0, ~0u},
-    {0xedc0, 'F', (void *)FUN_0046a4e0, 0, 0, ~0u},
-    {0xedc4, 'F', (void *)FUN_0046a390, 0, 0, ~0u},
-    {0xedc8, 'F', (void *)FUN_0046a4f0, 0, 0, ~0u},
-    {0xedcc, 'F', (void *)FUN_0046a540, 0, 0, ~0u},
-    {0xedd0, 'F', (void *)FUN_0046a5b0, 0, 0, ~0u},
-    {0xedd4, 'F', (void *)FUN_0046a690, 0, 0, ~0u},
-    {0xedd8, 'F', (void *)FUN_0046a750, 0, 0, ~0u},
-    {0xeddc, 'F', (void *)FUN_0046a900, 0, 0, ~0u},
-    {0xede0, 'F', (void *)FUN_0046a960, 0, 0, ~0u},
-    {0xede4, 'F', (void *)FUN_0046aa30, 0, 0, ~0u},
-    {0xede8, 'F', (void *)FUN_0046aa70, 0, 0, ~0u},
-    {0xedec, 'F', (void *)FUN_0046aae0, 0, 0, ~0u},
-    {0xedf0, 'F', (void *)FUN_0046ab70, 0, 0, ~0u},
-    {0xedf4, 'F', (void *)FUN_0046abc0, 0, 0, ~0u},
-    {0xedf8, 'F', (void *)FUN_0046abd0, 0, 0, ~0u},
-    {0xedfc, 'F', (void *)FUN_0046ac50, 0, 0, ~0u},
-    {0xee00, 'F', (void *)FUN_0046ac00, 0, 0, ~0u},
-    {0xee04, 'F', (void *)FUN_0046ad00, 0, 0, ~0u},
-    {0xee08, 'F', (void *)FUN_0046ad30, 0, 0, ~0u},
-    {0xee0c, 'F', (void *)FUN_0046ad60, 0, 0, ~0u},
-    {0xee10, 'F', (void *)FUN_0046ad90, 0, 0, ~0u},
-    {0xee14, 'F', (void *)FUN_0046adc0, 0, 0, ~0u},
-    {0xee18, 'F', (void *)FUN_0046adf0, 0, 0, ~0u},
+    {0xedc0, 'F', (void *)ScriptEventPurge, 0, 0, ~0u},
+    {0xedc4, 'F', (void *)ScriptEventEndLevel, 0, 0, ~0u},
+    {0xedc8, 'F', (void *)ScriptEventNeed, 0, 0, ~0u},
+    {0xedcc, 'F', (void *)ScriptEventNeedAt, 0, 0, ~0u},
+    {0xedd0, 'F', (void *)ScriptEventNeedIn, 0, 0, ~0u},
+    {0xedd4, 'F', (void *)ScriptEventConnect, 0, 0, ~0u},
+    {0xedd8, 'F', (void *)ScriptEventLink, 0, 0, ~0u},
+    {0xeddc, 'F', (void *)ScriptEventRange, 0, 0, ~0u},
+    {0xede0, 'F', (void *)ScriptEventClearArea, 0, 0, ~0u},
+    {0xede4, 'F', (void *)ScriptEventRemove, 0, 0, ~0u},
+    {0xede8, 'F', (void *)ScriptEventRemoveRange, 0, 0, ~0u},
+    {0xedec, 'F', (void *)ScriptEventComposite, 0, 0, ~0u},
+    {0xedf0, 'F', (void *)ScriptEventLoopComposite, 0, 0, ~0u},
+    {0xedf4, 'F', (void *)ScriptEventTechLevel, 0, 0, ~0u},
+    {0xedf8, 'F', (void *)ScriptEventParkVisitors, 0, 0, ~0u},
+    {0xedfc, 'F', (void *)ScriptEventRideVisitors, 0, 0, ~0u},
+    {0xee00, 'F', (void *)ScriptEventRiders, 0, 0, ~0u},
+    {0xee04, 'F', (void *)ScriptEventSceneryCoverage, 0, 0, ~0u},
+    {0xee08, 'F', (void *)ScriptEventPathScenery, 0, 0, ~0u},
+    {0xee0c, 'F', (void *)ScriptEventRideCoverage, 0, 0, ~0u},
+    {0xee10, 'F', (void *)ScriptEventShopCoverage, 0, 0, ~0u},
+    {0xee14, 'F', (void *)ScriptEventFoodCoverage, 0, 0, ~0u},
+    {0xee18, 'F', (void *)ScriptEventTotalCoverage, 0, 0, ~0u},
     {0xee1c, 'F', (void *)FUN_0046ae20, 0, 0, ~0u},
-    {0xee20, 'F', (void *)FUN_0046ae30, 0, 0, ~0u},
-    {0xee24, 'F', (void *)FUN_0046ae40, 0, 0, ~0u},
-    {0xee28, 'F', (void *)FUN_0046ae70, 0, 0, ~0u},
+    {0xee20, 'F', (void *)ScriptEventStudArea, 0, 0, ~0u},
+    {0xee24, 'F', (void *)ScriptEventSave, 0, 0, ~0u},
+    {0xee28, 'F', (void *)ScriptEventHappiness, 0, 0, ~0u},
     {0xee2c, 'F', (void *)AdjustGardenerCount, 0, 0, ~0u},
-    {0xee30, 'F', (void *)FUN_0046af10, 0, 0, ~0u},
-    {0xee34, 'F', (void *)FUN_0046af60, 0, 0, ~0u},
-    {0xee38, 'F', (void *)FUN_0046afe0, 0, 0, ~0u},
-    {0xee3c, 'F', (void *)FUN_0046b080, 0, 0, ~0u},
-    {0xee40, 'F', (void *)FUN_0046b0b0, 0, 0, ~0u},
-    {0xee44, 'F', (void *)FUN_0046b0c0, 0, 0, ~0u},
-    {0xee48, 'F', (void *)FUN_0046b100, 0, 0, ~0u},
-    {0xee4c, 'F', (void *)FUN_0046b130, 0, 0, ~0u},
-    {0xee50, 'F', (void *)FUN_0046b180, 0, 0, ~0u},
+    {0xee30, 'F', (void *)ScriptEventNeedMechanics, 0, 0, ~0u},
+    {0xee34, 'F', (void *)ScriptEventHunger, 0, 0, ~0u},
+    {0xee38, 'F', (void *)ScriptEventFixRides, 0, 0, ~0u},
+    {0xee3c, 'F', (void *)ScriptEventPowerRides, 0, 0, ~0u},
+    {0xee40, 'F', (void *)ScriptEventZoning, 0, 0, ~0u},
+    {0xee44, 'F', (void *)ScriptEventCheckFlag, 0, 0, ~0u},
+    {0xee48, 'F', (void *)ScriptEventSelectTheme, 0, 0, ~0u},
+    {0xee4c, 'F', (void *)ScriptEventSelectTab, 0, 0, ~0u},
+    {0xee50, 'F', (void *)ScriptEventSelectMode, 0, 0, ~0u},
     {0xee54, 'F', (void *)FUN_0046b1e0, 0, 0, ~0u},
-    {0xee58, 'F', (void *)FUN_0046b1f0, 0, 0, ~0u},
+    {0xee58, 'F', (void *)ScriptEventForever, 0, 0, ~0u},
     {0xf87c, 'G', (void *)&IconListHead, sizeof(IconListHead), 0x0, ~0u},
     {0xf880, 'G', (void *)&DAT_006687cc, sizeof(DAT_006687cc), 0x0, ~0u},
     {0x100a4, 'G', (void *)&DAT_004b5b62, sizeof(DAT_004b5b62), 0xaa, 0xac0cu},
@@ -4825,189 +4825,189 @@ static const struct PortFixup port_fixups[] = {
     {0x106f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6d4, 0x10dccu},
     {0x106fc, 'F', (void *)IsStringEmpty, 0, 0, ~0u},
     {0x10700, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6cc, 0x10dc4u},
-    {0x10704, 'F', (void *)FUN_00478890, 0, 0, ~0u},
+    {0x10704, 'F', (void *)ScriptCmdAges, 0, 0, ~0u},
     {0x10708, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6c4, 0x10dbcu},
-    {0x1070c, 'F', (void *)FUN_00478870, 0, 0, ~0u},
+    {0x1070c, 'F', (void *)ScriptCmdInit, 0, 0, ~0u},
     {0x10710, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6b8, 0x10db0u},
-    {0x10714, 'F', (void *)FUN_00478930, 0, 0, ~0u},
+    {0x10714, 'F', (void *)ScriptCmdObjective, 0, 0, ~0u},
     {0x10718, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6ac, 0x10da4u},
-    {0x1071c, 'F', (void *)FUN_00478980, 0, 0, ~0u},
+    {0x1071c, 'F', (void *)ScriptCmdOneOff, 0, 0, ~0u},
     {0x10720, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6a0, 0x10d98u},
-    {0x10724, 'F', (void *)FUN_004789c0, 0, 0, ~0u},
+    {0x10724, 'F', (void *)ScriptCmdOngoing, 0, 0, ~0u},
     {0x10728, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x694, 0x10d8cu},
-    {0x1072c, 'F', (void *)FUN_00478a00, 0, 0, ~0u},
+    {0x1072c, 'F', (void *)ScriptCmdPermanent, 0, 0, ~0u},
     {0x10730, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x688, 0x10d80u},
-    {0x10734, 'F', (void *)FUN_00478a40, 0, 0, ~0u},
+    {0x10734, 'F', (void *)ScriptCmdReminder, 0, 0, ~0u},
     {0x10738, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x67c, 0x10d74u},
-    {0x1073c, 'F', (void *)FUN_00478a80, 0, 0, ~0u},
+    {0x1073c, 'F', (void *)ScriptCmdReward, 0, 0, ~0u},
     {0x10740, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x674, 0x10d6cu},
-    {0x10744, 'F', (void *)FUN_00478840, 0, 0, ~0u},
+    {0x10744, 'F', (void *)ScriptCmdEnd, 0, 0, ~0u},
     {0x10748, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x930, 0x11028u},
-    {0x1074c, 'F', (void *)FUN_00478ac0, 0, 0, ~0u},
+    {0x1074c, 'F', (void *)ScriptCmdMap, 0, 0, ~0u},
     {0x10750, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x66c, 0x10d64u},
-    {0x10754, 'F', (void *)FUN_00478b70, 0, 0, ~0u},
+    {0x10754, 'F', (void *)ScriptCmdLoad, 0, 0, ~0u},
     {0x10758, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x664, 0x10d5cu},
-    {0x1075c, 'F', (void *)FUN_00478be0, 0, 0, ~0u},
+    {0x1075c, 'F', (void *)ScriptCmdEnable, 0, 0, ~0u},
     {0x10760, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x658, 0x10d50u},
-    {0x10764, 'F', (void *)FUN_00478c60, 0, 0, ~0u},
+    {0x10764, 'F', (void *)ScriptCmdCurrency, 0, 0, ~0u},
     {0x10768, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x648, 0x10d40u},
-    {0x1076c, 'F', (void *)FUN_00478cd0, 0, 0, ~0u},
+    {0x1076c, 'F', (void *)ScriptCmdHappinessEnv, 0, 0, ~0u},
     {0x10770, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x640, 0x10d38u},
-    {0x10774, 'F', (void *)FUN_00478d30, 0, 0, ~0u},
+    {0x10774, 'F', (void *)ScriptCmdLookAt, 0, 0, ~0u},
     {0x10778, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x630, 0x10d28u},
-    {0x1077c, 'F', (void *)FUN_00478e20, 0, 0, ~0u},
+    {0x1077c, 'F', (void *)ScriptCmdBriefingFile, 0, 0, ~0u},
     {0x10780, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x620, 0x10d18u},
-    {0x10784, 'F', (void *)FUN_00478e20, 0, 0, ~0u},
+    {0x10784, 'F', (void *)ScriptCmdBriefingFile, 0, 0, ~0u},
     {0x10788, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x614, 0x10d0cu},
-    {0x1078c, 'F', (void *)FUN_00478e90, 0, 0, ~0u},
+    {0x1078c, 'F', (void *)ScriptCmdHintsFile, 0, 0, ~0u},
     {0x10790, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x608, 0x10d00u},
-    {0x10794, 'F', (void *)FUN_00478bc0, 0, 0, ~0u},
+    {0x10794, 'F', (void *)ScriptCmdBlueprint, 0, 0, ~0u},
     {0x10798, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5fc, 0x10cf4u},
-    {0x1079c, 'F', (void *)FUN_00478fa0, 0, 0, ~0u},
+    {0x1079c, 'F', (void *)ScriptCmdGardener, 0, 0, ~0u},
     {0x107a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5f0, 0x10ce8u},
-    {0x107a4, 'F', (void *)FUN_00479060, 0, 0, ~0u},
+    {0x107a4, 'F', (void *)ScriptCmdMechanic, 0, 0, ~0u},
     {0x107a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5e8, 0x10ce0u},
-    {0x107ac, 'F', (void *)FUN_00478f00, 0, 0, ~0u},
+    {0x107ac, 'F', (void *)ScriptCmdWorkers, 0, 0, ~0u},
     {0x107b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5dc, 0x10cd4u},
-    {0x107b4, 'F', (void *)FUN_0047ac80, 0, 0, ~0u},
+    {0x107b4, 'F', (void *)ScriptCmdMaxBlokes, 0, 0, ~0u},
     {0x107b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5d0, 0x10cc8u},
-    {0x107bc, 'F', (void *)FUN_0047aa90, 0, 0, ~0u},
+    {0x107bc, 'F', (void *)ScriptCmdHapFactor, 0, 0, ~0u},
     {0x107c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5c0, 0x10cb8u},
-    {0x107c4, 'F', (void *)FUN_0047ab00, 0, 0, ~0u},
+    {0x107c4, 'F', (void *)ScriptCmdCapacityScale, 0, 0, ~0u},
     {0x107c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5b4, 0x10cacu},
-    {0x107cc, 'F', (void *)FUN_0047ab80, 0, 0, ~0u},
+    {0x107cc, 'F', (void *)ScriptCmdCapacityCap, 0, 0, ~0u},
     {0x107d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5a8, 0x10ca0u},
-    {0x107d4, 'F', (void *)FUN_0047ae00, 0, 0, ~0u},
+    {0x107d4, 'F', (void *)ScriptCmdFlashButton, 0, 0, ~0u},
     {0x107d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x598, 0x10c90u},
-    {0x107dc, 'F', (void *)FUN_0047aea0, 0, 0, ~0u},
+    {0x107dc, 'F', (void *)ScriptCmdFlashButtonOff, 0, 0, ~0u},
     {0x107e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x590, 0x10c88u},
-    {0x107e4, 'F', (void *)FUN_00479120, 0, 0, ~0u},
+    {0x107e4, 'F', (void *)ScriptCmdPrompt, 0, 0, ~0u},
     {0x107e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x588, 0x10c80u},
-    {0x107ec, 'F', (void *)FUN_004791a0, 0, 0, ~0u},
+    {0x107ec, 'F', (void *)ScriptCmdIntro, 0, 0, ~0u},
     {0x107f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x580, 0x10c78u},
-    {0x107f4, 'F', (void *)FUN_004791f0, 0, 0, ~0u},
+    {0x107f4, 'F', (void *)ScriptCmdNeed, 0, 0, ~0u},
     {0x107f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x578, 0x10c70u},
-    {0x107fc, 'F', (void *)FUN_00479270, 0, 0, ~0u},
+    {0x107fc, 'F', (void *)ScriptCmdNeedAt, 0, 0, ~0u},
     {0x10800, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x570, 0x10c68u},
-    {0x10804, 'F', (void *)FUN_00479300, 0, 0, ~0u},
+    {0x10804, 'F', (void *)ScriptCmdNeedIn, 0, 0, ~0u},
     {0x10808, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x568, 0x10c60u},
-    {0x1080c, 'F', (void *)FUN_00479390, 0, 0, ~0u},
+    {0x1080c, 'F', (void *)ScriptCmdConnect, 0, 0, ~0u},
     {0x10810, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x560, 0x10c58u},
-    {0x10814, 'F', (void *)FUN_004793e0, 0, 0, ~0u},
+    {0x10814, 'F', (void *)ScriptCmdLink, 0, 0, ~0u},
     {0x10818, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x558, 0x10c50u},
-    {0x1081c, 'F', (void *)FUN_00479450, 0, 0, ~0u},
+    {0x1081c, 'F', (void *)ScriptCmdRange, 0, 0, ~0u},
     {0x10820, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x54c, 0x10c44u},
-    {0x10824, 'F', (void *)FUN_004794d0, 0, 0, ~0u},
+    {0x10824, 'F', (void *)ScriptCmdClearArea, 0, 0, ~0u},
     {0x10828, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x544, 0x10c3cu},
-    {0x1082c, 'F', (void *)FUN_00479550, 0, 0, ~0u},
+    {0x1082c, 'F', (void *)ScriptCmdRemove, 0, 0, ~0u},
     {0x10830, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x538, 0x10c30u},
-    {0x10834, 'F', (void *)FUN_004795c0, 0, 0, ~0u},
+    {0x10834, 'F', (void *)ScriptCmdRemoveRange, 0, 0, ~0u},
     {0x10838, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x52c, 0x10c24u},
-    {0x1083c, 'F', (void *)FUN_00479640, 0, 0, ~0u},
+    {0x1083c, 'F', (void *)ScriptCmdComposite, 0, 0, ~0u},
     {0x10840, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x51c, 0x10c14u},
-    {0x10844, 'F', (void *)FUN_004796d0, 0, 0, ~0u},
+    {0x10844, 'F', (void *)ScriptCmdLoopComposite, 0, 0, ~0u},
     {0x10848, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x510, 0x10c08u},
-    {0x1084c, 'F', (void *)FUN_00479740, 0, 0, ~0u},
+    {0x1084c, 'F', (void *)ScriptCmdTechLevel, 0, 0, ~0u},
     {0x10850, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x504, 0x10bfcu},
-    {0x10854, 'F', (void *)FUN_004797b0, 0, 0, ~0u},
+    {0x10854, 'F', (void *)ScriptCmdResearch, 0, 0, ~0u},
     {0x10858, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4f4, 0x10becu},
-    {0x1085c, 'F', (void *)FUN_00479800, 0, 0, ~0u},
+    {0x1085c, 'F', (void *)ScriptCmdParkVisitors, 0, 0, ~0u},
     {0x10860, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4e4, 0x10bdcu},
-    {0x10864, 'F', (void *)FUN_00479850, 0, 0, ~0u},
+    {0x10864, 'F', (void *)ScriptCmdRideVisitors, 0, 0, ~0u},
     {0x10868, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4dc, 0x10bd4u},
-    {0x1086c, 'F', (void *)FUN_004798c0, 0, 0, ~0u},
+    {0x1086c, 'F', (void *)ScriptCmdRiders, 0, 0, ~0u},
     {0x10870, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4cc, 0x10bc4u},
-    {0x10874, 'F', (void *)FUN_00479930, 0, 0, ~0u},
+    {0x10874, 'F', (void *)ScriptCmdSceneryCoverage, 0, 0, ~0u},
     {0x10878, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4c0, 0x10bb8u},
-    {0x1087c, 'F', (void *)FUN_00479980, 0, 0, ~0u},
+    {0x1087c, 'F', (void *)ScriptCmdPathScenery, 0, 0, ~0u},
     {0x10880, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4b0, 0x10ba8u},
-    {0x10884, 'F', (void *)FUN_004799d0, 0, 0, ~0u},
+    {0x10884, 'F', (void *)ScriptCmdRideCoverage, 0, 0, ~0u},
     {0x10888, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4a0, 0x10b98u},
-    {0x1088c, 'F', (void *)FUN_00479a20, 0, 0, ~0u},
+    {0x1088c, 'F', (void *)ScriptCmdShopCoverage, 0, 0, ~0u},
     {0x10890, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x490, 0x10b88u},
-    {0x10894, 'F', (void *)FUN_00479a70, 0, 0, ~0u},
+    {0x10894, 'F', (void *)ScriptCmdFoodCoverage, 0, 0, ~0u},
     {0x10898, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x484, 0x10b7cu},
-    {0x1089c, 'F', (void *)FUN_00479ac0, 0, 0, ~0u},
+    {0x1089c, 'F', (void *)ScriptCmdTotalCoverage, 0, 0, ~0u},
     {0x108a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x478, 0x10b70u},
-    {0x108a4, 'F', (void *)FUN_00479b10, 0, 0, ~0u},
+    {0x108a4, 'F', (void *)ScriptCmdAppraisal, 0, 0, ~0u},
     {0x108a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x46c, 0x10b64u},
-    {0x108ac, 'F', (void *)FUN_00479c40, 0, 0, ~0u},
+    {0x108ac, 'F', (void *)ScriptCmdStudArea, 0, 0, ~0u},
     {0x108b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x464, 0x10b5cu},
-    {0x108b4, 'F', (void *)FUN_00479cb0, 0, 0, ~0u},
+    {0x108b4, 'F', (void *)ScriptCmdSave, 0, 0, ~0u},
     {0x108b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x458, 0x10b50u},
-    {0x108bc, 'F', (void *)FUN_00479d00, 0, 0, ~0u},
+    {0x108bc, 'F', (void *)ScriptCmdHappiness, 0, 0, ~0u},
     {0x108c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x448, 0x10b40u},
-    {0x108c4, 'F', (void *)FUN_00479d60, 0, 0, ~0u},
+    {0x108c4, 'F', (void *)ScriptCmdNeedGardeners, 0, 0, ~0u},
     {0x108c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x438, 0x10b30u},
-    {0x108cc, 'F', (void *)FUN_00479db0, 0, 0, ~0u},
+    {0x108cc, 'F', (void *)ScriptCmdNeedMechanics, 0, 0, ~0u},
     {0x108d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x430, 0x10b28u},
-    {0x108d4, 'F', (void *)FUN_00479e00, 0, 0, ~0u},
+    {0x108d4, 'F', (void *)ScriptCmdHunger, 0, 0, ~0u},
     {0x108d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x424, 0x10b1cu},
-    {0x108dc, 'F', (void *)FUN_00479e80, 0, 0, ~0u},
+    {0x108dc, 'F', (void *)ScriptCmdFixRides, 0, 0, ~0u},
     {0x108e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x418, 0x10b10u},
-    {0x108e4, 'F', (void *)FUN_00479ee0, 0, 0, ~0u},
+    {0x108e4, 'F', (void *)ScriptCmdPowerRides, 0, 0, ~0u},
     {0x108e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x410, 0x10b08u},
-    {0x108ec, 'F', (void *)FUN_00479f30, 0, 0, ~0u},
+    {0x108ec, 'F', (void *)ScriptCmdZoning, 0, 0, ~0u},
     {0x108f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x404, 0x10afcu},
-    {0x108f4, 'F', (void *)FUN_00479fa0, 0, 0, ~0u},
+    {0x108f4, 'F', (void *)ScriptCmdCheckFlag, 0, 0, ~0u},
     {0x108f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3f8, 0x10af0u},
-    {0x108fc, 'F', (void *)FUN_0047a2f0, 0, 0, ~0u},
+    {0x108fc, 'F', (void *)ScriptCmdSelectTheme, 0, 0, ~0u},
     {0x10900, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3ec, 0x10ae4u},
-    {0x10904, 'F', (void *)FUN_0047a360, 0, 0, ~0u},
+    {0x10904, 'F', (void *)ScriptCmdSelectTab, 0, 0, ~0u},
     {0x10908, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3e0, 0x10ad8u},
-    {0x1090c, 'F', (void *)FUN_0047a3d0, 0, 0, ~0u},
+    {0x1090c, 'F', (void *)ScriptCmdSelectMode, 0, 0, ~0u},
     {0x10910, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3d8, 0x10ad0u},
-    {0x10914, 'F', (void *)FUN_0047a440, 0, 0, ~0u},
+    {0x10914, 'F', (void *)ScriptCmdForever, 0, 0, ~0u},
     {0x10918, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3d0, 0x10ac8u},
-    {0x1091c, 'F', (void *)FUN_0047a480, 0, 0, ~0u},
+    {0x1091c, 'F', (void *)ScriptCmdGive, 0, 0, ~0u},
     {0x10920, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3c8, 0x10ac0u},
-    {0x10924, 'F', (void *)FUN_0047a500, 0, 0, ~0u},
+    {0x10924, 'F', (void *)ScriptCmdTake, 0, 0, ~0u},
     {0x10928, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3bc, 0x10ab4u},
-    {0x1092c, 'F', (void *)FUN_0047a550, 0, 0, ~0u},
+    {0x1092c, 'F', (void *)ScriptCmdAddBricks, 0, 0, ~0u},
     {0x10930, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3b4, 0x10aacu},
-    {0x10934, 'F', (void *)FUN_0047a5a0, 0, 0, ~0u},
+    {0x10934, 'F', (void *)ScriptCmdPlace, 0, 0, ~0u},
     {0x10938, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3ac, 0x10aa4u},
-    {0x1093c, 'F', (void *)FUN_0047a650, 0, 0, ~0u},
+    {0x1093c, 'F', (void *)ScriptCmdClear, 0, 0, ~0u},
     {0x10940, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3a4, 0x10a9cu},
-    {0x10944, 'F', (void *)FUN_0047a6a0, 0, 0, ~0u},
+    {0x10944, 'F', (void *)ScriptCmdUnglue, 0, 0, ~0u},
     {0x10948, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x39c, 0x10a94u},
-    {0x1094c, 'F', (void *)FUN_0047a6f0, 0, 0, ~0u},
+    {0x1094c, 'F', (void *)ScriptCmdGlue, 0, 0, ~0u},
     {0x10950, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x390, 0x10a88u},
-    {0x10954, 'F', (void *)FUN_0047a7b0, 0, 0, ~0u},
+    {0x10954, 'F', (void *)ScriptCmdExtendPark, 0, 0, ~0u},
     {0x10958, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x38c, 0x10a84u},
-    {0x1095c, 'F', (void *)FUN_0047a800, 0, 0, ~0u},
+    {0x1095c, 'F', (void *)ScriptCmdFmv, 0, 0, ~0u},
     {0x10960, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x380, 0x10a78u},
-    {0x10964, 'F', (void *)FUN_0047a860, 0, 0, ~0u},
+    {0x10964, 'F', (void *)ScriptCmdInterval, 0, 0, ~0u},
     {0x10968, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x378, 0x10a70u},
-    {0x1096c, 'F', (void *)FUN_0047a8a0, 0, 0, ~0u},
+    {0x1096c, 'F', (void *)ScriptCmdMessage, 0, 0, ~0u},
     {0x10970, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x370, 0x10a68u},
-    {0x10974, 'F', (void *)FUN_0047a8e0, 0, 0, ~0u},
+    {0x10974, 'F', (void *)ScriptCmdFeature, 0, 0, ~0u},
     {0x10978, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x368, 0x10a60u},
-    {0x1097c, 'F', (void *)FUN_0047a960, 0, 0, ~0u},
+    {0x1097c, 'F', (void *)ScriptCmdReport, 0, 0, ~0u},
     {0x10980, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x360, 0x10a58u},
-    {0x10984, 'F', (void *)FUN_0047ac00, 0, 0, ~0u},
+    {0x10984, 'F', (void *)ScriptCmdDegrade, 0, 0, ~0u},
     {0x10988, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x354, 0x10a4cu},
-    {0x1098c, 'F', (void *)FUN_0047ace0, 0, 0, ~0u},
+    {0x1098c, 'F', (void *)ScriptCmdMaxCapacity, 0, 0, ~0u},
     {0x10990, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x348, 0x10a40u},
-    {0x10994, 'F', (void *)FUN_0047ace0, 0, 0, ~0u},
+    {0x10994, 'F', (void *)ScriptCmdMaxCapacity, 0, 0, ~0u},
     {0x10998, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x33c, 0x10a34u},
-    {0x1099c, 'F', (void *)FUN_0047ad40, 0, 0, ~0u},
+    {0x1099c, 'F', (void *)ScriptCmdMinCapacity, 0, 0, ~0u},
     {0x109a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x330, 0x10a28u},
-    {0x109a4, 'F', (void *)FUN_0047ad40, 0, 0, ~0u},
+    {0x109a4, 'F', (void *)ScriptCmdMinCapacity, 0, 0, ~0u},
     {0x109a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x324, 0x10a1cu},
-    {0x109ac, 'F', (void *)FUN_0047ada0, 0, 0, ~0u},
+    {0x109ac, 'F', (void *)ScriptCmdEntranceFee, 0, 0, ~0u},
     {0x109b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x318, 0x10a10u},
-    {0x109b4, 'F', (void *)FUN_0047a020, 0, 0, ~0u},
+    {0x109b4, 'F', (void *)ScriptCmdThemeIcon, 0, 0, ~0u},
     {0x109b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x310, 0x10a08u},
-    {0x109bc, 'F', (void *)FUN_0047a0b0, 0, 0, ~0u},
+    {0x109bc, 'F', (void *)ScriptCmdAddFlag, 0, 0, ~0u},
     {0x109c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x308, 0x10a00u},
-    {0x109c4, 'F', (void *)FUN_0047a140, 0, 0, ~0u},
+    {0x109c4, 'F', (void *)ScriptCmdBridges, 0, 0, ~0u},
     {0x109c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2fc, 0x109f4u},
-    {0x109cc, 'F', (void *)FUN_0047a1d0, 0, 0, ~0u},
+    {0x109cc, 'F', (void *)ScriptCmdEndScreens, 0, 0, ~0u},
     {0x109d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2f4, 0x109ecu},
-    {0x109d4, 'F', (void *)FUN_0047af50, 0, 0, ~0u},
+    {0x109d4, 'F', (void *)ScriptCmdPurge, 0, 0, ~0u},
     {0x109d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2e8, 0x109e0u},
-    {0x109dc, 'F', (void *)FUN_0047af80, 0, 0, ~0u},
+    {0x109dc, 'F', (void *)ScriptCmdEndLevel, 0, 0, ~0u},
     {0x11ba4, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x24, 0x11c18u},
     {0x11ba8, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x14, 0x11c08u},
     {0x11bac, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x4, 0x11bf8u},
@@ -5894,7 +5894,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b9610, sizeof(DAT_004b9610), 0xe610, 0x694},
     {(void *)&BlitFrameFunc, sizeof(BlitFrameFunc), 0xeca4, 0x4},
     {(void *)&OverrideFrame, sizeof(OverrideFrame), 0xeca8, 0x9c},
-    {(void *)&DAT_004b9e5c, sizeof(DAT_004b9e5c), 0xee5c, 0x11c},
+    {(void *)&ScriptEventCategories, sizeof(ScriptEventCategories), 0xee5c, 0x11c},
     {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
     {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
     {(void *)&DAT_004b9f8c, sizeof(DAT_004b9f8c), 0xef8c, 0x8f0},
@@ -5904,7 +5904,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004ba8e0, sizeof(DAT_004ba8e0), 0xf8e0, 0xcc},
     {(void *)&DAT_004ba9ac, sizeof(DAT_004ba9ac), 0xf9ac, 0x3a8},
     {(void *)&mouse_granularity, sizeof(mouse_granularity), 0xfd54, 0x4},
-    {(void *)&DAT_004bad58, sizeof(DAT_004bad58), 0xfd58, 0x250},
+    {(void *)&CheatKeyMap, sizeof(CheatKeyMap), 0xfd58, 0x250},
     {(void *)&DAT_004bafa8, sizeof(DAT_004bafa8), 0xffa8, 0x50},
     {(void *)&DAT_004baff8, sizeof(DAT_004baff8), 0xfff8, 0x4},
     {(void *)&DAT_004baffc, sizeof(DAT_004baffc), 0xfffc, 0x50},

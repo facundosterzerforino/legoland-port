@@ -3195,12 +3195,12 @@ int FUN_00463520(void) {
     int diff;
     int quotient;
 
-    if (MapStats.field_180 == 0) {
+    if (MapStats.ride_wear == 0) {
         return 0;
     }
     curr = GetGameTimerFrames();
     diff = curr - DAT_00667d58;
-    quotient = 0x168 / (int)MapStats.field_180;
+    quotient = 0x168 / (int)MapStats.ride_wear;
     if (diff > quotient) {
         DAT_00667d58 = GetGameTimerFrames();
         return 1;

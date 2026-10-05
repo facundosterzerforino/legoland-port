@@ -195,7 +195,7 @@ void FUN_0048abb0(void) {
     FUN_0048ab60();
     AllocBlokeCounters(lpConfig->max_blokes);
     FUN_00458940();
-    MapStats.field_3a0 = 0;
+    MapStats.level_end = 0;
     FUN_00489ee0();
     UpdateMenu();
     UnloadWatchSprite();

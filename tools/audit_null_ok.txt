@@ -31,10 +31,10 @@ map_object.c:LoadBaseMap baseline
 map_object.c:ProcessDamage baseline
 map_object.c:RemoveObjectFromMap baseline
 map_object.c:StandardRemoveObject baseline
-nerps.c:FUN_0046a230 baseline
-nerps.c:FUN_0046a540 baseline
-nerps.c:FUN_0046a5b0 baseline
-nerps.c:FUN_0046a960 baseline
+nerps.c:ScriptEventDegrade baseline
+nerps.c:ScriptEventNeedAt baseline
+nerps.c:ScriptEventNeedIn baseline
+nerps.c:ScriptEventClearArea baseline
 obj_instance.c:RemoveBlokeFromRide baseline
 objclass.c:BuildObjInfoList baseline
 popupinfo.c:PopUpInfoSetUp baseline
