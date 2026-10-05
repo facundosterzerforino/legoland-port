@@ -14,6 +14,6 @@ int CreateKeyboardDevice(void);
 int CreateMouseDevice(void);
 unsigned int IsLeftShiftDown(void);
 unsigned int IsRightShiftDown(void);
-char FUN_00474130(void);
+char ReadCheatKey(void);
 void FUN_00474190(void);
 void FUN_004741c0(void);

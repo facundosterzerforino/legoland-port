@@ -619,7 +619,7 @@ void SetInteractiveMusicTheme(int theme) {
 }
 
 // FUNCTION: LEGOLAND 0x00492d80
-BOOL FUN_00492d80(void) {
+BOOL StopInteractiveMusic(void) {
     MusicCommand = 1;
     return SetEvent(MusicCommandEvent);
 }
@@ -673,7 +673,7 @@ void FUN_00492da0(void) {
 
 /* Interactive music thread (IMT). Sets up DirectMusic, loads the five themes (two segments each)
  * and the 5x5 transition segments, then serves the commands posted by FUN_00492ca0/SetInteractiveMusicTheme/
- * FUN_00492d80 (MusicCommand, signalled through MusicCommandEvent) and DirectMusic notifications.
+ * StopInteractiveMusic (MusicCommand, signalled through MusicCommandEvent) and DirectMusic notifications.
  * Setup failures jump into one release chain, as in the original. */
 // FUNCTION: LEGOLAND 0x00492db0
 DWORD WINAPI MusicThreadProc(LPVOID param) {

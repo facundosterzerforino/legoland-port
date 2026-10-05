@@ -24,7 +24,7 @@ struct HelpAdvisor {
 #include "stream.h"
 
 // FUNCTION: LEGOLAND 0x0046ce20
-void FUN_0046ce20(void) {
+void ClearAdvisorHelp(void) {
     if ((DAT_007fe040 & 0x3) != 0) {
         free((void *)AdvisorHelpText);
         FUN_004748a0((void *)1);
@@ -89,13 +89,13 @@ LEGO_EXPORT void ProcessInGameHelp(void) {
 
     delta = (int)(GetGameTimer() - DAT_007fe054);
     if (delta > 0xc8) {
-        FUN_0046b2d0();
+        RunLevelScript();
         DAT_007fe054 = GetGameTimer();
     }
 
     if ((DAT_007fe040 & 0x1) != 0) {
         if (FUN_0046cf20() != 0) {
-            FUN_0046ce20();
+            ClearAdvisorHelp();
             DAT_007fe050 = GetGameTimer();
         } else {
             BubbleHelp(DAT_004b9f78, AdvisorHelpText, 2);

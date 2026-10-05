@@ -592,12 +592,12 @@ void FUN_00458ee0(void) {
         }
     }
     if (Hover.type == 5 && (DAT_00813ac4 & 2) != 0) {
-        FUN_0046ce20();
+        ClearAdvisorHelp();
         DAT_00667c48 = 1;
     }
     // STRING: LEGOLAND 0x004b91a4
     DAT_00667c40 = "Appraisals";
-    FUN_0044db90();
+    CheckAppraisalDue();
     // STRING: LEGOLAND 0x004b9194
     DAT_00667c40 = "Appraisals Over";
     UpdateFocussedIconPtr();
@@ -850,7 +850,7 @@ void FUN_004597e0(int param0, const char *param1) {
 }
 
 // FUNCTION: LEGOLAND 0x00459820
-void FUN_00459820(unsigned int a1) {
+void EndLevel(unsigned int a1) {
     MapStats.field_3a0 = a1;
     if (a1 == 1) {
         FUN_00459710(MapStats.field_198);

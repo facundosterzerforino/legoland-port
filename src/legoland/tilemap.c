@@ -1766,7 +1766,7 @@ void FUN_0045d770(struct Cursor *param_1) {
                                     pb = (unsigned char *)((char *)GameMap[y] + 0x10 + x * 0x14);
                                     *pb = *pb & 0xfc;
                                     AddPathTileGFX(&local_18, *(unsigned short *)PathSprite);
-                                    DAT_00668610 = DAT_00668610 | 0x10;
+                                    ScriptDirtyCategories = ScriptDirtyCategories | 0x10;
                                     AddPathSquare((struct Point *)&local_18);
                                     x = x + 1;
                                 } while (x <= DAT_00801a80[i].x1);

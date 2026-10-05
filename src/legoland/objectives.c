@@ -1058,7 +1058,7 @@ int ProcessUnimplementedObjective(struct RewardArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469b20
-int FUN_00469b20(struct ObjectiveEvent *event) {
+int ScriptEventGive(struct ObjectiveEvent *event) {
     struct NerpsArg *object;
 
     object = (struct NerpsArg *)event->field_4;
@@ -1075,7 +1075,7 @@ int FUN_00469b50(struct ObjectiveEvent *event) {
 }
 
 // FUNCTION: LEGOLAND 0x00469b70
-int FUN_00469b70(struct ObjectiveEvent *event) {
+int ScriptEventTake(struct ObjectiveEvent *event) {
     FUN_00469ab0((struct NerpsArg *)event->field_4);
     return 1;
 }
@@ -1111,7 +1111,7 @@ void FUN_00469bd0(unsigned int a, void *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00469c40
-int FUN_00469c40(struct ObjectiveEvent *event) {
+int ScriptEventPlace(struct ObjectiveEvent *event) {
     FUN_00469bd0(event->field_4, &event->field_20);
     return 1;
 }
@@ -1123,7 +1123,7 @@ int FUN_00469c60(unsigned int handle) {
 }
 
 // FUNCTION: LEGOLAND 0x00469c80
-int FUN_00469c80(struct MapRectArg *arg) {
+int ScriptEventClear(struct MapRectArg *arg) {
     struct SweepInstance *next;
     RECT rect;
     struct SweepInstance *current;
@@ -1203,7 +1203,7 @@ int FUN_00469c80(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469ed0
-int FUN_00469ed0(struct MapRectArg *arg) {
+int ScriptEventUnglue(struct MapRectArg *arg) {
     int y;
     int x;
 
@@ -1220,7 +1220,7 @@ int FUN_00469ed0(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469f20
-int FUN_00469f20(struct MapRectArg *arg) {
+int ScriptEventGlue(struct MapRectArg *arg) {
     int y;
     int x;
 
@@ -1237,24 +1237,24 @@ int FUN_00469f20(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469f70
-int FUN_00469f70(struct RewardArg *arg) {
+int ScriptEventExtendPark(struct RewardArg *arg) {
     return ProcessUnimplementedReward(arg);
 }
 
 // FUNCTION: LEGOLAND 0x00469f80
-int FUN_00469f80(struct RewardArg *arg) {
+int ScriptEventFmv(struct RewardArg *arg) {
     PauseGameTimer();
     SetPointer(0);
     FUN_00496e60(1, 0xf);
     PlayMovie(arg->field_8, 1, 1);
     ResumeGameTimer();
-    FUN_0046ce20();
+    ClearAdvisorHelp();
     FUN_0046b760();
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469fc0
-int FUN_00469fc0(struct RewardArg *arg) {
+int ScriptEventInterval(struct RewardArg *arg) {
     int retries;
 
     FUN_00490600(0);
@@ -1276,6 +1276,6 @@ int FUN_00469fc0(struct RewardArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046a030
-int FUN_0046a030(struct RewardArg *arg) {
+int ScriptEventMessage(struct RewardArg *arg) {
     return ProcessUnimplementedReward(arg);
 }

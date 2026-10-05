@@ -222,7 +222,7 @@ LEGO_EXPORT void DeleteSampleDef(struct SampleDef *def);
 LEGO_EXPORT int KillSoundSampleSystem(void);
 void FreeSample(struct Sample *sample);
 void SetInteractiveMusicTheme(int param_1);
-BOOL FUN_00492d80(void);
+BOOL StopInteractiveMusic(void);
 void FUN_00492da0(void);
 int FUN_00495a50(int param_1);
 int StartMusicThread(void *hwnd);

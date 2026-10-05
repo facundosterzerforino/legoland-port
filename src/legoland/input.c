@@ -270,7 +270,7 @@ LEGO_EXPORT void UpdateControllerFromKeyboardData(struct CtrlBuffer *buffer) {
     int arg;
 
     buffer->buttons = buffer->buttons & 0xfffff807;
-    c = FUN_00474130();
+    c = ReadCheatKey();
     if (c != 0) {
         memcpy(CheatKeyBuffer, CheatKeyBuffer + 1, 19);
         CheatKeyBuffer[0x13] = c;
@@ -301,7 +301,7 @@ LEGO_EXPORT void UpdateControllerFromKeyboardData(struct CtrlBuffer *buffer) {
             DBPrintf("CHEATTHEME=WEST\n");
             // STRING: LEGOLAND 0x004baefc
         } else if (_memicmp(":STOP", &CheatKeyBuffer[0xf], 5) == 0) {
-            FUN_00492d80();
+            StopInteractiveMusic();
             // STRING: LEGOLAND 0x004baee8
             DBPrintf("CHEAT:STOPMUSIC\n");
             // STRING: LEGOLAND 0x004baee0
@@ -351,12 +351,12 @@ LEGO_EXPORT void UpdateControllerFromKeyboardData(struct CtrlBuffer *buffer) {
             } else if (_memicmp(":WELOVELEGOLAND", &CheatKeyBuffer[5], 0xf) == 0) {
                 // STRING: LEGOLAND 0x004bae3c
                 DBPrintf("CHEAT:Win Level\n", lpConfig->level);
-                FUN_00459820(1);
+                EndLevel(1);
                 // STRING: LEGOLAND 0x004bae30
             } else if (memcmp(":IMPROVISE", &CheatKeyBuffer[10], 10) == 0) {
                 // STRING: LEGOLAND 0x004bae1c
                 DBPrintf("CHEAT:Stop Script\n", lpConfig->level);
-                FUN_0046b240(1);
+                SetScriptStopped(1);
                 // STRING: LEGOLAND 0x004bae14
             } else if (_memicmp(":DIGGER", &CheatKeyBuffer[0xd], 7) == 0) {
                 // STRING: LEGOLAND 0x004bae00
@@ -421,7 +421,7 @@ LEGO_EXPORT char GetInputChar(void) {
     i = 0;
     do {
         prev = (char)DAT_00668da8[i];
-        state = KeyboardState[DAT_004bad58[i].flags];
+        state = KeyboardState[CheatKeyMap[i].flags];
         prev = (prev >> 7) & 1;
         DAT_00668da8[i] = state;
         if ((state & 0x80) != 0 && prev == 0) {
@@ -429,7 +429,7 @@ LEGO_EXPORT char GetInputChar(void) {
             if (IsLeftShiftDown() != 0 || IsRightShiftDown() != 0) {
                 alt = (alt == 0);
             }
-            result = DAT_004bad58[i].code;
+            result = CheatKeyMap[i].code;
             if (alt == 0) {
                 result = tolower(result);
             }
@@ -440,7 +440,7 @@ LEGO_EXPORT char GetInputChar(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00474130
-char FUN_00474130(void) {
+char ReadCheatKey(void) {
     int i;
     int result;
     unsigned char state;
@@ -449,12 +449,12 @@ char FUN_00474130(void) {
     result = 0;
     i = 0;
     do {
-        prev = (char)DAT_00668de4[i];
-        state = KeyboardState[DAT_004bad58[i].flags];
+        prev = (char)CheatKeyState[i];
+        state = KeyboardState[CheatKeyMap[i].flags];
         prev = (prev >> 7) & 1;
-        DAT_00668de4[i] = state;
+        CheatKeyState[i] = state;
         if ((state & 0x80) != 0 && prev == 0) {
-            result = DAT_004bad58[i].code;
+            result = CheatKeyMap[i].code;
         }
         i = i + 1;
     } while (i < 0x3b);

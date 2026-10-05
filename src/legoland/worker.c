@@ -668,7 +668,7 @@ LEGO_EXPORT Bloke *GenerateGardener(int *coords, int in_hut) {
             worker->pos.y = coords[1] << 8;
             NewLongTermAction(worker, 0x10);
         }
-        DAT_00668610 |= 0x80;
+        ScriptDirtyCategories |= 0x80;
     } else {
         // STRING: LEGOLAND 0x004c0060
         DBPrintf("   Failed to Generate Gardener\n");
@@ -698,7 +698,7 @@ LEGO_EXPORT void RemoveAGardener(Bloke *worker) {
             return;
         }
     }
-    DAT_00668610 |= 0x80;
+    ScriptDirtyCategories |= 0x80;
 }
 
 // FUNCTION: LEGOLAND 0x0049a340
@@ -1517,7 +1517,7 @@ LEGO_EXPORT void IterateNoneWorkersRepairOrders(void) {
                 tile = NULL;
             }
             ride = tile->field_0->ride;
-            DAT_00668610 |= 0x200;
+            ScriptDirtyCategories |= 0x200;
             FUN_0049b0d0(tile, ride);
             if (tile->durability_level >= ride->durability) {
                 tile->flags &= 0xbfff;
@@ -1636,7 +1636,7 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
             order->bricks = order->bricks - cost + order->bricks_per_step;
             tile = GetTileAtPoint(&order->pos);
             ride = tile->field_0->ride;
-            DAT_00668610 |= 0x200;
+            ScriptDirtyCategories |= 0x200;
             FUN_0049b0d0(tile, ride);
             if (tile->durability_level >= ride->durability) {
                 tile->flags &= 0xbfff;
@@ -1740,7 +1740,7 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
                 order->bricks = order->bricks - cost + order->bricks_per_step;
                 tile = GetTileAtPoint(&order->pos);
                 ride = tile->field_0->ride;
-                DAT_00668610 |= 0x200;
+                ScriptDirtyCategories |= 0x200;
                 FUN_0049b0d0(tile, ride);
                 if (tile->durability_level >= ride->durability) {
                     tile->flags &= 0xbfff;

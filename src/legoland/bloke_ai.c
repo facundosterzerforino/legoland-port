@@ -137,7 +137,7 @@ LEGO_EXPORT void InitBlokeAI(Bloke *bloke) {
     if (Entrance1Elem == 0) {
         Entrance1Elem = ElemID("ENTRANCE 1");
     }
-    DAT_006661bc++;
+    ParkVisitorCount++;
     bloke->speed = Rand_Tween(12, 24);
     bloke->field_78 = Rand_Max(MapStats.total_tiles);
     bloke->mood = Rand_Tween(10, 50);
@@ -168,7 +168,7 @@ int GetMapCapacity(void) {
 void FUN_0044ea50(void) {
     Bloke *bloke;
 
-    if (++DAT_006661c8 >= 0x1e && DAT_006661bc < GetMapCapacity()) {
+    if (++DAT_006661c8 >= 0x1e && ParkVisitorCount < GetMapCapacity()) {
         bloke = MakeBloke(0);
         if (bloke != NULL) {
             DAT_006661c8 = 0;
@@ -276,7 +276,7 @@ void FUN_0044ebf0(Bloke *bloke) {
             bloke->param_action++;
             PushLongTermAction(bloke);
             NewLongTermAction(bloke, 5);
-            DAT_00668610 |= 0x40;
+            ScriptDirtyCategories |= 0x40;
             return;
         }
         break;
@@ -435,7 +435,7 @@ void FUN_0044ed70(Bloke *bloke) {
         // STRING: LEGOLAND 0x004b840c
         DBPrintf("Killing MiniFig: $%x\n", bloke);
         DestroyBloke(bloke);
-        DAT_006661bc--;
+        ParkVisitorCount--;
     }
 }
 
@@ -626,7 +626,7 @@ int FUN_0044f4a0(Bloke *bloke, Ride *ride, int wait) {
             }
             element->flags |= 4;
             PutBlokeInList(ride, node);
-            DAT_00668610 |= 0x20;
+            ScriptDirtyCategories |= 0x20;
             return 1;
         }
         // STRING: LEGOLAND 0x004b8480

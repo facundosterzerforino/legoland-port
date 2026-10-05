@@ -360,7 +360,7 @@ void FUN_004748a0(void *a) {
     if (ScriptEndIcon == 0) {
         return;
     }
-    if (FUN_0046b280() == 0) {
+    if (IsScriptStopped() == 0) {
         if (a != NULL) {
             ((struct InterfaceObj *)ScriptEndIcon)->flags |= 0x2002;
         } else {
@@ -523,16 +523,16 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->render_func = (void *)FUN_00443e30;
         ScriptEndIcon = (unsigned int)icon;
         if (a != 0) {
-            FUN_0046b240(0);
+            SetScriptStopped(0);
             if (CurrentProfile.field_45 == 2) {
                 FUN_004748a0((void *)0);
             } else {
                 FUN_004748a0((void *)1);
             }
-        } else if (FUN_0046b280() != 0) {
-            FUN_0046b240(1);
+        } else if (IsScriptStopped() != 0) {
+            SetScriptStopped(1);
         } else {
-            FUN_0046b240(0);
+            SetScriptStopped(0);
             if (CurrentProfile.field_45 == 2) {
                 FUN_004748a0((void *)0);
             } else {
@@ -593,7 +593,7 @@ unsigned char FUN_00474f40(void *context, unsigned int flags, const char *a, con
 // FUNCTION: LEGOLAND 0x00474f80
 unsigned char FUN_00474f80(unsigned int a, unsigned int flags) {
     if ((flags & 2) != 0) {
-        FUN_00459820(1);
+        EndLevel(1);
     }
     return 1;
 }
@@ -2046,7 +2046,7 @@ int PlayMovie(char *filename, unsigned int param_2, int param_3) {
             DebugTrace("Movie openned OK (%s)", path);
             FUN_0047f850();
             PauseAllSamples();
-            FUN_00492d80();
+            StopInteractiveMusic();
             PushRenderingStatusAndUnlockVideoSurface();
             // STRING: LEGOLAND 0x004bb538
             DebugTrace("Attempting to play movie..");

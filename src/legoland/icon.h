@@ -77,7 +77,7 @@ LEGO_EXPORT int RenderFreePlayIcons(struct IconNode *node);
 LEGO_EXPORT struct IconNode *AddFreePlayIcon(unsigned int param_1, struct InfoSource *src, int a3, int a4, int a5, short a6, void *a7);
 LEGO_EXPORT struct IconNode *AddGBarClassIcon(unsigned int param_1, struct InfoSource *src, int a3, int a4, int a5, short a6);
 LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node);
-void FUN_0046d850(struct ScrollRegion *r, int param_2, int param_3);
+void ScrollIconRegion(struct ScrollRegion *r, int param_2, int param_3);
 unsigned char FUN_0046d980(struct IconNode *icon, unsigned char buttons, int a3, int a4);
 unsigned char FUN_0046da20(struct IconNode *icon, unsigned char buttons, int a3, int a4);
 int FUN_0046dd10(unsigned short param_1, short param_2, short param_3, unsigned short param_4, int param_5);

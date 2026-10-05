@@ -383,7 +383,7 @@ LEGO_EXPORT struct IconNode *LoadSpriteIcon(const char *filename, unsigned int p
 }
 
 // FUNCTION: LEGOLAND 0x0046d850
-void FUN_0046d850(struct ScrollRegion *r, int param_2, int param_3) {
+void ScrollIconRegion(struct ScrollRegion *r, int param_2, int param_3) {
     int dy;
     int dx;
     int l;
@@ -445,9 +445,9 @@ unsigned char FUN_0046d980(struct IconNode *icon, unsigned char buttons, int a3,
             region = (struct ScrollRegion *)icon->field_30;
             LastScrollIconTick = GetTickCount();
             if ((region->field_4 & 1) != 0) {
-                FUN_0046d850(region, 0, 6);
+                ScrollIconRegion(region, 0, 6);
             } else {
-                FUN_0046d850(region, 0x20, 0);
+                ScrollIconRegion(region, 0x20, 0);
             }
         } while (0);
         return 2;
@@ -458,9 +458,9 @@ unsigned char FUN_0046d980(struct IconNode *icon, unsigned char buttons, int a3,
                 region = (struct ScrollRegion *)icon->field_30;
                 LastScrollIconTick = GetTickCount();
                 if ((region->field_4 & 1) != 0) {
-                    FUN_0046d850(region, 0, 6);
+                    ScrollIconRegion(region, 0, 6);
                 } else {
-                    FUN_0046d850(region, 0x20, 0);
+                    ScrollIconRegion(region, 0x20, 0);
                 }
             }
         } while (0);
@@ -476,10 +476,10 @@ unsigned char FUN_0046da20(struct IconNode *icon, unsigned char buttons, int a3,
         region = (struct ScrollRegion *)icon->field_30;
         LastScrollIconTick = GetTickCount();
         if ((region->field_4 & 1) != 0) {
-            FUN_0046d850(region, 0, -6);
+            ScrollIconRegion(region, 0, -6);
             return 2;
         }
-        FUN_0046d850(region, -0x20, 0);
+        ScrollIconRegion(region, -0x20, 0);
         return 2;
     }
     if ((buttons & 4) != 0) {
@@ -487,9 +487,9 @@ unsigned char FUN_0046da20(struct IconNode *icon, unsigned char buttons, int a3,
             region = (struct ScrollRegion *)icon->field_30;
             LastScrollIconTick = GetTickCount();
             if ((region->field_4 & 1) != 0) {
-                FUN_0046d850(region, 0, -6);
+                ScrollIconRegion(region, 0, -6);
             } else {
-                FUN_0046d850(region, -0x20, 0);
+                ScrollIconRegion(region, -0x20, 0);
             }
         }
         return 2;

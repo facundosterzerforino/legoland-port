@@ -2,7 +2,7 @@
 
 #include "legoland.h"
 
-void FUN_0046ce20(void);
+void ClearAdvisorHelp(void);
 LEGO_EXPORT int DisplayAdvisorHelp(char *param_1, unsigned int param_2, unsigned int param_3);
 LEGO_EXPORT void ProcessFrontEndHelp(void);
 void UpdateSpeechPlayback(void);

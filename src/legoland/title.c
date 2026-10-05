@@ -530,7 +530,7 @@ unsigned char FUN_00490970(unsigned int param_1, unsigned char param_2, unsigned
         DAT_006687b0 = 4;
         ResumeGameTimer();
         ResumeAllSamples();
-        FUN_0046ce20();
+        ClearAdvisorHelp();
         FUN_0046b760();
     }
     return 1;

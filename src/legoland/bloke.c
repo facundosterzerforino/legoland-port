@@ -233,7 +233,7 @@ void DestroyAllBlokes(void) {
     while (FirstBloke != NULL) {
         DestroyBloke(FirstBloke);
     }
-    DAT_006661bc = 0;
+    ParkVisitorCount = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004830c0

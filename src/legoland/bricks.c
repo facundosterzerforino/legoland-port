@@ -341,7 +341,7 @@ void FUN_00457a70(void) {
                             pt.y = y - EditMode.unk8->footprint.y0;
                             if (FUN_00457970(pt.x, pt.y)) {
                                 if (WorkOrderBuildObject(EditMode.unk8->element, &pt)) {
-                                    DAT_00668610 |= 0x10;
+                                    ScriptDirtyCategories |= 0x10;
                                 }
                                 PathUpdateNeeded = 1;
                             }
@@ -356,7 +356,7 @@ void FUN_00457a70(void) {
                     DAT_00667cd8 = 0;
                 } else if (WorkOrderBuildObject(EditMode.unk8->element, (Point *)&EditCursor.tile_x)) {
                     FUN_00475f40();
-                    DAT_00668610 |= 2;
+                    ScriptDirtyCategories |= 2;
                 }
             } else {
                 FUN_00473640(EditCursor.field_1410);

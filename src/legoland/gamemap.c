@@ -223,7 +223,7 @@ LEGO_EXPORT void PutObjOnMap(struct ObjClass *obj, unsigned int classid, struct 
         DAT_004b8320.y = ((unsigned int)(entrance->footprint.v[3] - entrance->footprint.v[1]) >> 1) * 0x100 +
             (cell->src.b.byte_5 + entrance->footprint.v[1]) * 0x100;
     }
-    DAT_00668610 = DAT_00668610 | 1;
+    ScriptDirtyCategories = ScriptDirtyCategories | 1;
 }
 
 // FUNCTION: LEGOLAND 0x00459c90
@@ -311,7 +311,7 @@ LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileI
         }
         query = (struct Cursor *)query->field_1830;
     }
-    DAT_00668610 = DAT_00668610 | 4;
+    ScriptDirtyCategories = ScriptDirtyCategories | 4;
 }
 
 // GLOBAL: LEGOLAND 0x004b9340

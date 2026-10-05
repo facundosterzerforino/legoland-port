@@ -892,7 +892,7 @@ int (*BlitFrameFunc)(void);
 unsigned int OverrideFrame;
 
 // GLOBAL: LEGOLAND 0x004b9e5c
-unsigned int DAT_004b9e5c[71];
+unsigned int ScriptEventCategories[71];
 
 // GLOBAL: LEGOLAND 0x004b9f78
 int DAT_004b9f78[4] = {0x1f4, 0x190, 0x280, 0x1e0};
@@ -922,7 +922,7 @@ unsigned int DAT_004ba9ac[234];
 int mouse_granularity;
 
 // GLOBAL: LEGOLAND 0x004bad58
-struct KeyMapping DAT_004bad58[0x3c];
+struct KeyMapping CheatKeyMap[0x3c];
 
 // GLOBAL: LEGOLAND 0x004bafa8
 unsigned int DAT_004bafa8[20];
@@ -2522,22 +2522,22 @@ unsigned int AppraisalDeadline;
 int DAT_0066609c;
 
 // GLOBAL: LEGOLAND 0x006660a0
-int DAT_006660a0;
+int AppraisalPageCount;
 
 // GLOBAL: LEGOLAND 0x006660a4
-int DAT_006660a4;
+int AppraisalPage;
 
 // GLOBAL: LEGOLAND 0x006660a8
-struct IconNode *DAT_006660a8;
+struct IconNode *AppraisalNextIcon;
 
 // GLOBAL: LEGOLAND 0x006660ac
-struct IconNode *DAT_006660ac;
+struct IconNode *AppraisalPrevIcon;
 
 // GLOBAL: LEGOLAND 0x006660b0
 char DAT_006660b0[256];
 
 // GLOBAL: LEGOLAND 0x006661bc
-int DAT_006661bc;
+int ParkVisitorCount;
 
 // GLOBAL: LEGOLAND 0x006661c0
 struct Element *SharkCafeBrollyElem;
@@ -2909,7 +2909,7 @@ struct Sprite *WatchSprite;
 char DAT_0066820c[0x404];
 
 // GLOBAL: LEGOLAND 0x00668610
-unsigned int DAT_00668610;
+unsigned int ScriptDirtyCategories;
 
 // GLOBAL: LEGOLAND 0x00668614
 unsigned int DAT_00668614;
@@ -2942,25 +2942,25 @@ unsigned int DAT_0066872c[0x15];
 unsigned int DAT_00668780;
 
 // GLOBAL: LEGOLAND 0x00668784
-void *DAT_00668784;
+void *ScriptEventList;
 
 // GLOBAL: LEGOLAND 0x00668788
-unsigned int DAT_00668788;
+unsigned int ScriptPurgePending;
 
 // GLOBAL: LEGOLAND 0x0066878c
 int DAT_0066878c;
 
 // GLOBAL: LEGOLAND 0x00668790
-unsigned int DAT_00668790;
+unsigned int ScriptSectionStarted;
 
 // GLOBAL: LEGOLAND 0x00668794
-unsigned int DAT_00668794;
+unsigned int ScriptEvalTime;
 
 // GLOBAL: LEGOLAND 0x00668798
-void *DAT_00668798;
+void *ScriptSectionList;
 
 // GLOBAL: LEGOLAND 0x0066879c
-unsigned int DAT_0066879c;
+unsigned int CurrentScriptSection;
 
 // GLOBAL: LEGOLAND 0x006687a0
 unsigned int ScriptLoadErrorCount;
@@ -3182,7 +3182,7 @@ char CheatKeyBuffer[0x14];
 unsigned char DAT_00668da8[0x3b];
 
 // GLOBAL: LEGOLAND 0x00668de4
-unsigned char DAT_00668de4[0x3b];
+unsigned char CheatKeyState[0x3b];
 
 // GLOBAL: LEGOLAND 0x00668e20
 unsigned int DAT_00668e20[4];
@@ -4856,19 +4856,19 @@ struct Sprite *AppBarMarkerSprite;
 struct Sprite *NextPageLitSprite;
 
 // GLOBAL: LEGOLAND 0x0081c038
-unsigned int DAT_0081c038;
+unsigned int AppraisalScreenActive;
 
 // GLOBAL: LEGOLAND 0x0081c040
-struct Sprite *DAT_0081c040[5];
+struct Sprite *AppTickSprites[5];
 
 // GLOBAL: LEGOLAND 0x0081c054
-struct Sprite *DAT_0081c054[5];
+struct Sprite *AppCrossSprites[5];
 
 // GLOBAL: LEGOLAND 0x0081c068
-struct Sprite *DAT_0081c068[5];
+struct Sprite *AppBulletSprites[5];
 
 // GLOBAL: LEGOLAND 0x0081c07c
-unsigned int DAT_0081c07c;
+unsigned int AppraisalPageChanged;
 
 // GLOBAL: LEGOLAND 0x0081c080
 struct Sprite *PreviousPageSprite;
