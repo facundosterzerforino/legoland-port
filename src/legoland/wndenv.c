@@ -52,6 +52,14 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
         return 0;
     case 8:
     case 0x1f:
+#ifdef LEGOLAND_PORT
+        /* [library:window] already paused for this deactivation (WM_ACTIVATEAPP below comes first when another
+         * program is clicked): pausing again returns 1 into PauseGameTimerResult, and WM_SETFOCUS then never
+         * resumed the game timer (scripts and the inspector stopped for the rest of the session) */
+        if ((lpConfig->field_1c & 1) != 0) {
+            break;
+        }
+#endif
         PauseGameTimerResult = PauseGameTimer();
         lpConfig->field_1c |= 1;
         break;

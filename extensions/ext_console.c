@@ -324,7 +324,10 @@ static void CmdStatus(void) {
     if (!InLevel()) {
         return;
     }
-    ConPrintf("game time: %u:%02u", now / 60000, (now / 1000) % 60);
+    ConPrintf("game time: %u:%02u%s", now / 60000, (now / 1000) % 60,
+        GameTimerPaused == 0                ? ""
+            : (lpConfig->field_1c & 1) != 0 ? " (paused while the game window is in the background)"
+                                            : " (game clock PAUSED: scripts and the inspector wait)");
     if (AreBricksLimited()) {
         ConPrintf("money: %d coins", GetBrickCount());
     } else {
