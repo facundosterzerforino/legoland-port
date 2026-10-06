@@ -1,6 +1,7 @@
 #include <windows.h>
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -54,4 +55,8 @@ void PortTrace(const char *fmt, ...) {
     va_start(ap, fmt);
     PortTraceV(fmt, ap);
     va_end(ap);
+}
+
+unsigned long PortRva(const void *address) {
+    return (unsigned long)((uintptr_t)address - (uintptr_t)GetModuleHandleA(NULL));
 }

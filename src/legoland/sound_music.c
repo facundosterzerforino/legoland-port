@@ -9,6 +9,9 @@
 #include "globals.h"
 #include "math.h"
 #include "profile_io.h"
+#ifdef LEGOLAND_PORT
+#include "port_trace.h"
+#endif
 #include "sound_music.h"
 #include "sound_sfx.h"
 #include "stream.h"
@@ -910,12 +913,20 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
     sample = CreatePlayableSample((unsigned int)def);
     if (sample == 0) {
 #ifdef LEGOLAND_PORT
-        /* [port] say why no sample could be played (callers often don't check) */
-        static void *last_def;
-        if (def != last_def) {
-            last_def = def;
-            DebugTrace("PlayInstanceOfSample: no sample for %s (%s)", def != 0 && ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?",
-                def == 0 ? "the sound was never loaded" : "DuplicateSoundBuffer failed or the sample pool is full");
+        /* [port] say why no sample could be played (callers often don't check), and who asked (rva of the
+         * caller, to symbolize with the .pdb). Each caller is reported once. */
+        static unsigned long reported[64];
+        static int nreported;
+        unsigned long caller = PortRva(PORT_CALLER());
+        int k;
+        for (k = 0; k < nreported && reported[k] != caller; k++) {
+        }
+        if (k == nreported && nreported < 64) {
+            reported[nreported++] = caller;
+            DebugTrace("PlayInstanceOfSample: no sample for %s (%s), called from rva %08lx",
+                def != 0 && ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?",
+                def == 0 ? "the sound was never loaded" : "DuplicateSoundBuffer failed or the sample pool is full",
+                caller);
         }
 #endif
         return 0;
@@ -936,6 +947,29 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
     if (DAT_007988c8 != 0) {
         PauseSingleSample(sample);
     }
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] trace the first plays of each sound: where it plays from and the volume/pan it got, to
+         * debug rides that stay silent. */
+        static const void *seen[256];
+        static unsigned char count[256];
+        int k;
+        for (k = 0; k < 256 && seen[k] != NULL && seen[k] != def; k++) {
+        }
+        if (k < 256 && (seen[k] == NULL || count[k] < 3)) {
+            int vol = 0;
+            int pan = 0;
+            seen[k] = def;
+            count[k]++;
+            sample->buffer->vtable->method_0x18(sample->buffer, &vol);
+            ((LPDIRECTSOUNDBUFFER)sample->buffer)->lpVtbl->GetPan((LPDIRECTSOUNDBUFFER)sample->buffer, (LONG *)&pan);
+            DebugTrace("PlayInstanceOfSample: %s source %u (%d,%d) loop %u vol %d pan %d paused %u, called from rva %08lx",
+                ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?", sample->source_type,
+                (int)sample->source_x, (int)sample->source_y, looping, vol, pan, DAT_007988c8 != 0,
+                PortRva(PORT_CALLER()));
+        }
+    }
+#endif
     return sample;
 }
 
@@ -965,6 +999,9 @@ LEGO_EXPORT void Load_FXList(struct FXItem *list, int count) {
         item->sample = CreateSampleFromWAV(path);
         if (item->sample != 0) {
             item->sample->name = item->name;
+#ifdef LEGOLAND_PORT
+            DebugTrace("Loaded SFX %s", item->name); /* [port] to see which ride sounds were loaded */
+#endif
         } else {
             // STRING: LEGOLAND 0x004bfe88
             DBPrintf("Failed to load SFX %s\n", item->name);
@@ -985,6 +1022,9 @@ LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count) {
     item = list;
     do {
         if (item->sample != 0) {
+#ifdef LEGOLAND_PORT
+            DebugTrace("Killed SFX %s", item->name); /* [port] pairs with "Loaded SFX" */
+#endif
             DeleteSampleDef(item->sample);
         }
         item->sample = 0;
