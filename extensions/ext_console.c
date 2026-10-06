@@ -13,7 +13,10 @@
 #include "../src/legoland/challenge.h"
 #include "../src/legoland/clipping.h"
 #include "../src/legoland/debug.h"
+#include "../src/legoland/game_util.h"
 #include "../src/legoland/globals.h"
+#include "../src/legoland/interface.h"
+#include "../src/legoland/llidb.h"
 #include "../src/legoland/map_object.h"
 #include "../src/legoland/nerps.h"
 #include "../src/legoland/obj_instance.h"
@@ -313,7 +316,7 @@ static void CmdHelp(void) {
     ConPrintf("  switches             original cheat DIGGER (sets map switches 0-3)");
     ConPrintf("Other:");
     ConPrintf("  music theme|egypt|inca|castle|west|stop");
-    ConPrintf("  unlock               mark all 15 levels completed and unlock every free play object (saved!)");
+    ConPrintf("  unlock               complete all levels, unlock all themes and free play objects (saved!); in a level, give every object");
 }
 
 static void CmdStatus(void) {
@@ -610,11 +613,19 @@ static void RunCommand(char *line) {
         CmdMusic(arg);
     } else if (_stricmp(cmd, "unlock") == 0) {
         struct ClipQueryResult *entry;
+        struct Element *elem;
         int unlocked;
+        int given;
         int level;
+        int i;
 
         for (level = 1; level <= 15; level++) {
             CurrentProfile.flags[3 + level] = 1;
+        }
+        /* flags[0..3]: the Legoland, Western, Castle and Adventurers theme tabs of the build menu, which level
+         * scripts unlock (FUN_00468860 -> FUN_00476140); InitGameInterface applies them when a level starts. */
+        for (i = 0; i < 4; i++) {
+            CurrentProfile.flags[i] = 1;
         }
         /* Free play lists an object once its byte in field_46 is set, which the game does the first time the
          * object is built in a level (FUN_0048a6e0): set it for every object in that table. */
@@ -627,8 +638,34 @@ static void RunCommand(char *line) {
             }
         }
         UpDateCurrentProfile();
-        ConPrintf("All levels marked as completed and %d more free play objects unlocked in the current profile.",
+        ConPrintf("All levels completed, all four themes and %d more free play objects unlocked in the current "
+                  "profile.",
             unlocked);
+        if (InLevel()) {
+            /* In a level (or a free play game) the build menu only shows objects the script has given: load and
+             * give every object, as the script's ENABLE command does (ScriptCmdEnable), then enable all four
+             * theme tabs and rebuild the menu. */
+            given = 0;
+            for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
+                entry++) {
+                if (FUN_00478b20((unsigned int)entry->name) == 0) {
+                    continue;
+                }
+                elem = ElemID(entry->name);
+                if (elem == NULL) {
+                    continue;
+                }
+                given += (elem->flags & 0x10002) != 2;
+                FUN_00469900((struct NerpsArg *)elem, 0, 1);
+            }
+            if (DAT_007fdd70[0] != NULL) {
+                FUN_00476180();
+            }
+            UpdateMenu();
+            ConPrintf("Gave %d more objects in this level; all theme tabs enabled.", given);
+        } else {
+            ConPrintf("Run it again inside a level or free play game to give every object there too.");
+        }
     } else {
         ConPrintf("Unknown command \"%s\". Type \"help\".", cmd);
     }
