@@ -37,7 +37,7 @@ void LoadBalloonzResources(Element *obj) {
     BZBlueCarM1Sprite = LoadSprite("BZBlueCarM1.lls", 1);
     // STRING: LEGOLAND 0x004b6448
     ZBalloon2Sprite = LoadSprite("z_Balloon2.lls", 1);
-    DAT_00616040 = ZBalloon2Sprite;
+    DAT_0061603c[1] = ZBalloon2Sprite;
     // STRING: LEGOLAND 0x004b6430
     BalloonzBinV = LoadBinV("Zbuffers\\balloonz.bnv");
     DAT_00616018[0] = BalloonzBinV;
@@ -313,7 +313,7 @@ void FUN_0042aa90(Element *obj) {
                 break;
             case 9:
                 bloke->flags |= 0x80;
-                bloke->person->sprite = DAT_00616040;
+                bloke->person->sprite = DAT_0061603c[1];
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617692.375f, -1617904.25f);
                 sprintf(&buf[5], "%02d", bloke->field_36);

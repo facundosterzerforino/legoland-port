@@ -134,13 +134,13 @@ void LoadCarouselResources(struct CarouselRideObj *param_1) {
     DAT_006160c0 = ZCarouselSprite;
     // STRING: LEGOLAND 0x004b658c
     CarouselOnBinV = LoadBinV("Zbuffers\\CarouselOn.bnv");
-    DAT_00616090 = CarouselOnBinV;
+    DAT_00616090[0] = CarouselOnBinV;
     // STRING: LEGOLAND 0x004b6574
     CarouselBinV = LoadBinV("Zbuffers\\Carousel.bnv");
-    DAT_00616094 = CarouselBinV;
+    DAT_00616090[1] = CarouselBinV;
     // STRING: LEGOLAND 0x004b6558
     CarouselOffBinV = LoadBinV("Zbuffers\\CarouselOff.bnv");
-    DAT_00616098 = CarouselOffBinV;
+    DAT_00616090[2] = CarouselOffBinV;
     // STRING: LEGOLAND 0x004b653c
     CarouselEntranceMatteSprite = LoadSprite("Carousel Entrance Matte.lls", 1);
     // STRING: LEGOLAND 0x004b651c
@@ -162,9 +162,9 @@ void UnloadCarouselResources(struct CarouselRideObj *input) {
     KillSprite(DAT_006160c0);
     FreeAllCarouselNodes();
     Kill_FXList(CAROUSSEL_SFX, 2);
-    FreeBinV(DAT_00616090);
-    FreeBinV(DAT_00616094);
-    FreeBinV(DAT_00616098);
+    FreeBinV(DAT_00616090[0]);
+    FreeBinV(DAT_00616090[1]);
+    FreeBinV(DAT_00616090[2]);
 }
 
 // FUNCTION: LEGOLAND 0x0042c460
@@ -275,7 +275,7 @@ int Carousel_Load(struct CarouselRideObj *param_1) {
         {
             unsigned int *h = *(unsigned int **)((char *)elem->bloke + 0x54);
             if (h != NULL) {
-                *h = ((unsigned int *)&DAT_00616090)[h[1]];
+                *h = ((unsigned int *)DAT_00616090)[h[1]];
             }
         }
     }
@@ -406,7 +406,7 @@ void FUN_0042c820(struct CarouselRideObj *param_1) {
                 *(float *)(*(int *)(blokepos + 4) + 0x3c) = GetUnitDepth(-1617853.25f, -1618109.0f);
                 *(unsigned char *)(blokepos + 0x35) = 0;
                 sprintf(DAT_004b64d4, "%02d", FUN_0042cd20(elem, (struct CarouselNode *)bloke, *(unsigned char *)((char *)DAT_006160bc + 0x2e)));
-                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616090, 0, "BlokeBox??", -1617853.25f, -1618109.0f, &local_18);
+                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616090[0], 0, "BlokeBox??", -1617853.25f, -1618109.0f, &local_18);
                 UpdateBlokeFromBNVPath(blokepos, *(unsigned int *)(blokepos + 0x54));
                 *(unsigned char *)(blokepos + 0x62) |= 0x80;
                 *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
@@ -445,7 +445,7 @@ void FUN_0042c820(struct CarouselRideObj *param_1) {
                 *(float *)(*(int *)(blokepos + 4) + 0x3c) = GetUnitDepth(-1617853.25f, -1618109.0f);
                 *(unsigned char *)(blokepos + 0x35) = 2;
                 sprintf(DAT_004b64d4, "%02d", *(unsigned char *)(blokepos + 0x36));
-                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616098, 2, "BlokeBox??", -1617853.25f, -1618109.0f, &local_c);
+                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616090[2], 2, "BlokeBox??", -1617853.25f, -1618109.0f, &local_c);
                 *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
                 break;
             case 8:

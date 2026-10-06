@@ -541,10 +541,10 @@ unsigned int DAT_004b6150[12];
 struct CastleFloatEnt DAT_004b61e0[8];
 
 // GLOBAL: LEGOLAND 0x004b62f0
-unsigned int DAT_004b62f0;
+unsigned int DAT_004b62f0[4];
 
 // GLOBAL: LEGOLAND 0x004b6300
-unsigned int DAT_004b6300;
+unsigned int DAT_004b6300[12]; /* mesh header like DAT_004b6150: vertex count, vertices, faces */
 
 // GLOBAL: LEGOLAND 0x004b6398
 float DAT_004b6398[4][3] = {{20.0f, 0.0f, 0.0f}, {40.0f, 20.0f, 0.0f}, {20.0f, 40.0f, 0.0f}, {0.0f, 20.0f, 0.0f}};
@@ -1214,10 +1214,7 @@ unsigned int JoustRide;
 struct RideSpriteInfo DAT_004c1228;
 
 // GLOBAL: LEGOLAND 0x004c123c
-void *DAT_004c123c[1];
-
-// GLOBAL: LEGOLAND 0x004c1240
-struct Sprite *DAT_004c1240;
+void *DAT_004c123c[2]; /* rider sprite by field_30: [1] is the joust z-sprite */
 
 // GLOBAL: LEGOLAND 0x004c1244
 struct Sprite *JoustFMaskSprite;
@@ -1979,10 +1976,7 @@ struct BinVFile *BalloonzBinV;
 struct BinVFile *DAT_00616018[4];
 
 // GLOBAL: LEGOLAND 0x0061603c
-struct Sprite *DAT_0061603c[1];
-
-// GLOBAL: LEGOLAND 0x00616040
-struct Sprite *DAT_00616040;
+struct Sprite *DAT_0061603c[2]; /* rider sprite by field_30: [1] is ZBalloon2Sprite */
 
 // GLOBAL: LEGOLAND 0x00616044
 struct Sprite *BalloonzLayer;
@@ -2033,13 +2027,7 @@ void *CarouselOffBinV;
 void *CarouselBinV;
 
 // GLOBAL: LEGOLAND 0x00616090
-void *DAT_00616090;
-
-// GLOBAL: LEGOLAND 0x00616094
-void *DAT_00616094;
-
-// GLOBAL: LEGOLAND 0x00616098
-void *DAT_00616098;
+void *DAT_00616090[3]; /* carousel BinVs (on, ride, off), indexed by the saved path index */
 
 // GLOBAL: LEGOLAND 0x006160b8
 struct Sprite *ZCarouselSprite;
@@ -2228,10 +2216,7 @@ void *DAT_0062fdf0[3];
 void *BoxBlokesOn1BNV;
 
 // GLOBAL: LEGOLAND 0x0062fe00
-void *DAT_0062fe00[1];
-
-// GLOBAL: LEGOLAND 0x0062fe04
-struct Sprite *ZSpinningBarrelsSprite;
+void *DAT_0062fe00[2]; /* rider sprite by field_30: [1] is ZSpinningBarrelsSprite */
 
 // GLOBAL: LEGOLAND 0x0062fe08
 struct BarrelNode *SpinningBarrelList;
@@ -5269,22 +5254,10 @@ unsigned char CastleDispatchTable[0x90];
 unsigned int DAT_0082adb0[6];
 
 // GLOBAL: LEGOLAND 0x0082add0
-unsigned int CoasterTrainHeadCarLms;
-
-// GLOBAL: LEGOLAND 0x0082add4
-unsigned int CoasterTrainMidCarLms;
-
-// GLOBAL: LEGOLAND 0x0082add8
-unsigned int CoasterTrainTailCarLms;
+unsigned int CoasterTrainCarLms[3]; /* head, mid, tail; indexed by car type */
 
 // GLOBAL: LEGOLAND 0x0082ade0
-unsigned int CoasterTrainHeadCarLfm;
-
-// GLOBAL: LEGOLAND 0x0082ade4
-unsigned int CoasterTrainMidCarLfm;
-
-// GLOBAL: LEGOLAND 0x0082ade8
-unsigned int CoasterTrainTailCarLfm;
+unsigned int CoasterTrainCarLfm[3]; /* head, mid, tail; indexed by car type */
 
 // GLOBAL: LEGOLAND 0x0082adec
 unsigned int DAT_0082adec;

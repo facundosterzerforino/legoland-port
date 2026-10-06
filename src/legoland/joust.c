@@ -197,7 +197,7 @@ void JoustLoadResources(struct JoustRoot *root) {
     // STRING: LEGOLAND 0x004b46cc
     JoustSpecLMSprite = LoadSprite("Joust_SpecL_m.lls", 1);
     // STRING: LEGOLAND 0x004b46c0
-    DAT_004c1240 = ZJoustSprite = LoadSprite("z_joust.lls", 1);
+    DAT_004c123c[1] = ZJoustSprite = LoadSprite("z_joust.lls", 1);
     // STRING: LEGOLAND 0x004b46a8
     JoustRideBnv = LoadBinV("Zbuffers\\joustride.bnv");
     HideLayer((struct Sprite *)JoustLayer, 1);
@@ -305,7 +305,7 @@ void JoustUpdate(struct Element *elem) {
                 break;
             case 3:
                 b->flags |= 0x80;
-                b->person->sprite = DAT_004c1240;
+                b->person->sprite = DAT_004c123c[1];
                 b->person->field_30 = 1;
                 // STRING: LEGOLAND 0x004b4704
                 sprintf(name + 6, "%02d", b->field_44 + 1);
@@ -752,7 +752,7 @@ void JoustFreeResources(void) {
     KillSprite(JoustSpecRMSprite);
     KillSprite(JoustSpecLMSprite);
     FreeBinV(JoustRideBnv);
-    KillSprite(DAT_004c1240);
+    KillSprite(DAT_004c123c[1]);
     FreeJoustNodeList();
 }
 

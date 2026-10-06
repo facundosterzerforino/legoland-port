@@ -1719,7 +1719,7 @@ void FUN_0041e990(unsigned char *obj) {
     } s;
 
     FUN_0041e9e0(obj, s.loc1);
-    FUN_00420fb0((unsigned char *)CoasterTrainHeadCarLms, (unsigned int)s.loc1, (unsigned int)s.b, (unsigned int)&s.r);
+    FUN_00420fb0((unsigned char *)CoasterTrainCarLms[0], (unsigned int)s.loc1, (unsigned int)s.b, (unsigned int)&s.r);
     FUN_00426700((struct RectI *)(obj + 0xc8), &s.r);
 }
 
@@ -1748,7 +1748,7 @@ void FUN_0041ea70(unsigned int a) {
     FUN_0042a680(o + 8);
     FUN_0042a680(o + 0x40);
     FUN_0041e9e0(o, x);
-    FUN_00420e90(((unsigned int *)&CoasterTrainHeadCarLms)[*(unsigned int *)(o + 4)], ((unsigned int *)&CoasterTrainHeadCarLfm)[*(unsigned int *)(o + 4)], x, x + 3, 0);
+    FUN_00420e90(CoasterTrainCarLms[*(unsigned int *)(o + 4)], CoasterTrainCarLfm[*(unsigned int *)(o + 4)], x, x + 3, 0);
     (*(void (**)(unsigned char *, float *))(o + 0x94))(o + 0x78, x);
     (*(void (**)(unsigned char *, float *))(o + 0xb4))(o + 0x98, x);
 }
@@ -1781,14 +1781,14 @@ void FUN_0041eb60(unsigned int param_1) {
 // FUNCTION: LEGOLAND 0x0041eb70
 void LoadCoasterTrainCarModels(void) {
     // STRING: LEGOLAND 0x004b55d8
-    CoasterTrainHeadCarLms = GetLmsByName("coastertrain.headcar");
+    CoasterTrainCarLms[0] = GetLmsByName("coastertrain.headcar");
     // STRING: LEGOLAND 0x004b55c4
-    CoasterTrainMidCarLms = GetLmsByName("coastertrain.midcar");
+    CoasterTrainCarLms[1] = GetLmsByName("coastertrain.midcar");
     // STRING: LEGOLAND 0x004b55ac
-    CoasterTrainTailCarLms = GetLmsByName("coastertrain.tailcar");
-    CoasterTrainHeadCarLfm = GetLfmByName("coastertrain.headcar");
-    CoasterTrainMidCarLfm = GetLfmByName("coastertrain.midcar");
-    CoasterTrainTailCarLfm = GetLfmByName("coastertrain.tailcar");
+    CoasterTrainCarLms[2] = GetLmsByName("coastertrain.tailcar");
+    CoasterTrainCarLfm[0] = GetLfmByName("coastertrain.headcar");
+    CoasterTrainCarLfm[1] = GetLfmByName("coastertrain.midcar");
+    CoasterTrainCarLfm[2] = GetLfmByName("coastertrain.tailcar");
 }
 
 struct DispatchRow {
@@ -8651,7 +8651,7 @@ void FUN_004292f0(struct FVec3 *pos, struct FVec3 *basis) {
 
 // FUNCTION: LEGOLAND 0x00429490
 void FUN_00429490(unsigned int param_1, unsigned int param_2) {
-    FUN_00420e90((unsigned int)&DAT_004b6300, (unsigned int)&DAT_004b62f0, (void *)param_1, (void *)param_2, 1);
+    FUN_00420e90((unsigned int)DAT_004b6300, (unsigned int)DAT_004b62f0, (void *)param_1, (void *)param_2, 1);
 }
 
 // FUNCTION: LEGOLAND 0x004294b0

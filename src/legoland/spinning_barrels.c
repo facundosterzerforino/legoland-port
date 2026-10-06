@@ -217,7 +217,7 @@ void FUN_0043c340(struct Element *elem) {
     SpinningBarrelsLayer = SpinningBarrelsRide->layer;
     SpinningBarrelsLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b7960
-    ZSpinningBarrelsSprite = DAT_0062fe00[0] = LoadSprite("z_SpinningBarrels.lls", 1);
+    DAT_0062fe00[1] = DAT_0062fe00[0] = LoadSprite("z_SpinningBarrels.lls", 1);
     // STRING: LEGOLAND 0x004b7944
     BoxBlokesOn1BNV = DAT_0062fdf0[0] = LoadBinV("Zbuffers\\BoxBlokesOn1.bnv");
     // STRING: LEGOLAND 0x004b7924
@@ -291,7 +291,7 @@ unsigned int *FUN_0043c570(struct BarrelRoot *ride, unsigned short param2) {
 void FUN_0043c5b0(void) {
     KillSprite(SpinningBarrelsEntranceMatteSprite);
     KillSprite(SpinningBarrelsEntranceMatte2Sprite);
-    KillSprite(ZSpinningBarrelsSprite);
+    KillSprite(DAT_0062fe00[1]);
     if (SpinningBarrelsBNV != NULL) {
         FreeBinV(SpinningBarrelsBNV);
     }
@@ -542,7 +542,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 iv13 >>= 9;
                 coords[0] = ((((unsigned int)lpConfig->view_x - Get_XScroll()) + iv12) - DAT_0062fdd8.x / 2 - sc.x) * 2;
                 coords[1] = ((iv13 + ((unsigned int)lpConfig->view_y - Get_YScroll())) - DAT_0062fdd8.y / 2 - sc.y) * 2;
-                bloke->person->sprite = ZSpinningBarrelsSprite;
+                bloke->person->sprite = DAT_0062fe00[1];
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617922.25f, -1618065.75f);
                 bloke->field_35 = 0;
@@ -573,7 +573,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 coords2[1] = bloke->screen_y * 2;
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                bloke->person->sprite = ZSpinningBarrelsSprite;
+                bloke->person->sprite = DAT_0062fe00[1];
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617922.25f, -1618065.75f);
                 bloke->field_35 = 2;
