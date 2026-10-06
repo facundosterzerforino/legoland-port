@@ -103,3 +103,20 @@ overlap:0x00615f70 DAT_00615f70: material table never written (zero); reaching +
 overlap:0x00643ee8 DAT_00643ee8: vertex buffer, data-dependent count as in the original
 overlap:0x00667d70 DDRAWENV: the original's CheckHostSystemGPU also zeroes the globals after it (0x3d8 bytes); called once at startup, when they are zero anyway
 overlap:0x0081c0c0 DAT_0081c0c0: image sizes indexed by image count, data-dependent as in the original
+codeptr:0x004b5648 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+codeptr:0x004b564c rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5658 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+codeptr:0x004b565c rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5f50 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5f54 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+0x0082add0 CoasterTrainCarLms (0xc of 0x10): car type is 0..2; the fourth word is padding: reviewed, harmless
+indexed:0x004b42c4 sign table of FUN_00404630 (copters), inline asm the port rewrote with its own tables: reviewed, harmless
+indexed:0x004b7b04 sign table of FUN_00441980 (render3d), inline asm the port rewrote with its own tables: reviewed, harmless
+indexed:0x004cbef8 LoadSafariRide: port lists the globals explicitly (47661c1): reviewed, harmless
+indexed:0x004cbf04 LoadSafariRide: port reads DAT_004cbf08 for index 1 (47661c1): reviewed, harmless
+indexed:0x004cbfcc temple slide load: port reads ZTempSlideSprite for index 1 (int + pointer, not one array): reviewed, harmless
+indexed:0x00610a18 lego_sqrtf_init: port writes sqrtf_table directly (7fe1f7b): reviewed, harmless
+indexed:0x00610a1c lego_sqrtf_init: port writes sqrtf_table directly (7fe1f7b): reviewed, harmless
+indexed:0x006160bc carousel load: port reads DAT_006160c0 for index 1 (ride + sprite, not one array): reviewed, harmless
+indexed:0x0062fe94 LoadZoomer: port reads DAT_0062fe98 for index 1 (47661c1): reviewed, harmless
+indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites explicitly (47661c1): reviewed, harmless

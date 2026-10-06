@@ -546,7 +546,9 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
         struct SlidePath *path;
 
         if (render->field_30 != 0) {
-            render->field_2c = DAT_004cbfcc[render->field_30];
+            /* [port] the original reads DAT_004cbfcc[field_30]; field_30 is 1 here, the global after it (an int and
+             * a sprite pointer, so they can't be one array) */
+            render->field_2c = render->field_30 == 1 ? (unsigned int)ZTempSlideSprite : (unsigned int)DAT_004cbfcc[render->field_30];
         } else {
             render->field_2c = 0;
             node->render->field_30 = 0;

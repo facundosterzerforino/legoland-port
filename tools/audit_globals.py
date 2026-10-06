@@ -17,6 +17,8 @@ It also lists the opposite mistake, one object of the original split into severa
   - codeptr: a function pointer in the original's data that no port global covers, so the startup loader
     never copies it (a handler table declared as one `unsigned int`; the castle's 0x4b5b48 was this), and
 
+  - indexed: a `base(,reg,scale)` operand in the original's code (a table indexed by a variable) whose global
+    holds one element in the port: the decomp split the table into scalars (ride z-sprites, coaster cars), and
   - overlap: a global whose port size reaches past the next annotated global (the next one is really a field
     or element of it, e.g. Footprint.next declared as its own pointer), and
   - cast: `(struct T *)&G` (or an array G) where T is bigger than G's space in the original, so the code
@@ -230,6 +232,42 @@ def orphan_code_pointers(found, sizes):
     return out
 
 
+def indexed_globals(found, sizes):
+    """(key, text) for each `base(,%reg,scale)` operand in the original's code whose base global has room for at most
+    one element in the port (or lies past its end): the original indexes a table there, but the decomp split it into
+    separate scalars, so in the port every index but 0 reads an unrelated global (ride z-sprites, coaster cars)."""
+    asm = subprocess.run(["llvm-objdump", "-d", "--no-show-raw-insn", str(EXE)], capture_output=True, text=True).stdout
+    game = sorted(int(m, 16) for p in SRC.glob("*.c") if p.name not in ("crt.c", "imports.c")
+                  for m in re.findall(r"// FUNCTION: LEGOLAND (0x[0-9a-f]+)", p.read_text(encoding="latin-1")))
+    crt = sorted(int(m, 16) for p in SRC.glob("*.c") if p.name in ("crt.c", "imports.c")
+                 for m in re.findall(r"// STUB: LEGOLAND (0x[0-9a-f]+)", p.read_text(encoding="latin-1")))
+    addrs = sorted(found)
+    uses = collections.defaultdict(set)
+    for m in re.finditer(r"^\s*([0-9a-f]+):[^\n]*?\b(0x[0-9a-f]+)\(%?[a-z]*,%[a-z]+,(\d)\)", asm, re.M):
+        at, base, scale = int(m.group(1), 16), int(m.group(2), 16), int(m.group(3))
+        if not 0x4ab000 <= base < 0x836000:  # a displacement that isn't a data address (float constants, offsets)
+            continue
+        # skip CRT code: the port links a real CRT
+        g = game[bisect.bisect_right(game, at) - 1] if game and at >= game[0] else -1
+        c = crt[bisect.bisect_right(crt, at) - 1] if crt and at >= crt[0] else -1
+        if g > c:
+            uses[base].add((at, scale))
+    out = []
+    for base, sites in sorted(uses.items()):
+        j = bisect.bisect_right(addrs, base) - 1
+        if j < 0:
+            continue
+        ga = addrs[j]
+        g, size = found[ga], sizes.get(found[ga]["name"])
+        scale = max(s for _, s in sites)
+        if size is None or base - ga + 2 * scale <= size:
+            continue
+        where = ", ".join(f"{a:#x}" for a, _ in sorted(sites)[:3])
+        out.append((f"indexed:{base:#010x}", f"{base:#010x} indexed by the original (scale {scale}, code at {where}): "
+                    f"{g['name']}+{base - ga:#x} is {size:#x} bytes in the port ({g['file']}): {g['decl'][:80]}"))
+    return out
+
+
 def usage(name, code):
     n = re.escape(name)
     pats = {
@@ -270,7 +308,7 @@ def main():
         print(f"{flag}{key} {g['name']}: {size:#x} bytes in the port, {gap:#x} in the original "
               f"({','.join(use)}; {g['file']}): {g['decl'][:100]}")
     gaps = {a: addrs[i + 1] - a for i, a in enumerate(addrs[:-1])}
-    for key, text in split_objects(found, sizes, gaps) + orphan_code_pointers(found, sizes):
+    for key, text in split_objects(found, sizes, gaps) + orphan_code_pointers(found, sizes) + indexed_globals(found, sizes):
         if key in reviewed and not show_all:
             continue
         new += key not in reviewed

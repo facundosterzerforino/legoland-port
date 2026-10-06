@@ -267,7 +267,9 @@ int Carousel_Load(struct CarouselRideObj *param_1) {
     for (elem = ride->list; elem != NULL; elem = elem->next) {
         unsigned int *comp = *(unsigned int **)((char *)elem + 0x10);
         if (comp[0xc] != 0) {
-            comp[0xb] = ((unsigned int *)&DAT_006160bc)[comp[0xc]];
+            /* [port] the original reads (&DAT_006160bc)[field]; the saved index is 1 here, the global after it (the
+             * ride, then its z-sprite, so they can't be one array) */
+            comp[0xb] = comp[0xc] == 1 ? (unsigned int)DAT_006160c0 : ((unsigned int *)&DAT_006160bc)[comp[0xc]];
         } else {
             comp[0xb] = 0;
             (*(unsigned int **)((char *)elem + 0x10))[0xc] = 0;
