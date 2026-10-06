@@ -4865,15 +4865,15 @@ struct Struct3940 {
 // FUNCTION: LEGOLAND 0x00423940
 void FUN_00423940(struct Struct3940 *arg1) {
     arg1->field_14 = 2;
-    arg1->field_18 = (float)DAT_004b5b50;
+    arg1->field_18 = (float)DAT_004b5b48.field_8;
     arg1->field_20 = 8;
-    arg1->field_24 = (float)DAT_004b5b4c;
+    arg1->field_24 = (float)DAT_004b5b48.field_4;
 }
 
 // FUNCTION: LEGOLAND 0x00423970
 void FUN_00423970(unsigned char *param_1) {
-    *(float *)(param_1 + 0x18) = (float)DAT_004b5b50;
-    *(float *)(param_1 + 0x24) = (float)DAT_004b5b4c;
+    *(float *)(param_1 + 0x18) = (float)DAT_004b5b48.field_8;
+    *(float *)(param_1 + 0x24) = (float)DAT_004b5b48.field_4;
 }
 
 // FUNCTION: LEGOLAND 0x00423990
@@ -5012,10 +5012,10 @@ void FUN_00423d40(void) {
     a.y = 0;
     FUN_004239b0(&a, &b);
     FUN_004239e0(&a, &c);
-    DAT_004b5b58 = b.x;
-    DAT_004b5b5a = b.y;
-    DAT_004b5b60 = c.x;
-    DAT_004b5b62 = c.y;
+    DAT_004b5b48.field_10 = b.x;
+    DAT_004b5b48.field_12 = b.y;
+    DAT_004b5b48.field_18 = c.x;
+    DAT_004b5b48.field_1a = c.y;
     FUN_00423a10();
 }
 
@@ -5401,7 +5401,7 @@ void FUN_00424700(unsigned int a1, unsigned int a2, unsigned int a3, unsigned ch
     int want;
     int i;
 
-    FUN_00425cb0((struct Int16Pair *)DAT_00829ae0.field_8, (float)DAT_004b5b50, &buf);
+    FUN_00425cb0((struct Int16Pair *)DAT_00829ae0.field_8, (float)DAT_004b5b48.field_8, &buf);
     key[0] = p[0];
     key[1] = p[1];
     want = *(int *)key;
@@ -5447,7 +5447,7 @@ void FUN_00424830(int param_1) {
 void FUN_00424850(unsigned char *p1, unsigned int *p2, unsigned int *p3, struct FVec3 *p4) {
     *p2 = (unsigned int)&DAT_006102f8[2];
     *p3 = 0x3dcccccd;
-    FUN_00425cb0((struct Int16Pair *)(p1 + 8), (float)DAT_004b5b50, p4);
+    FUN_00425cb0((struct Int16Pair *)(p1 + 8), (float)DAT_004b5b48.field_8, p4);
 }
 
 // FUNCTION: LEGOLAND 0x00424890
@@ -5466,7 +5466,7 @@ void FUN_004248b0(unsigned char *obj, unsigned int unused, struct AnimOut *out) 
 
     FUN_0041de10(obj, unused, out);
     t = FUN_0041dd50(e);
-    FUN_00425cb0((struct Int16Pair *)(sub + 8), (float)DAT_004b5b50, &v);
+    FUN_00425cb0((struct Int16Pair *)(sub + 8), (float)DAT_004b5b48.field_8, &v);
     r = t * t;
     s[0] = (unsigned int)(sub + 4);
     s[1] = (unsigned int)&DAT_006102f8[2];

@@ -801,24 +801,12 @@ extern void *DAT_004b5b20;
 extern unsigned short *DAT_004b5b24;
 // 0x004b5b28
 extern int DAT_004b5b28;
-// 0x004b5b4c
-extern int DAT_004b5b4c;
-// 0x004b5b50
-extern int DAT_004b5b50;
 // 0x004b59e8
 extern char SitLoGirlSitName[];
 // 0x004b59f8
 extern char SitLoManSitName[];
 // 0x004b5abc
 extern float DAT_004b5abc[4][4];
-// 0x004b5b58
-extern unsigned short DAT_004b5b58;
-// 0x004b5b5a
-extern unsigned short DAT_004b5b5a;
-// 0x004b5b60
-extern unsigned short DAT_004b5b60;
-// 0x004b5b62
-extern unsigned short DAT_004b5b62;
 // 0x004b5b3c
 extern struct RecBuf *DAT_004b5b3c;
 // 0x004b5988
@@ -4015,8 +4003,23 @@ struct CastleState {
 };
 // 0x00829ae0
 extern struct CastleState DAT_00829ae0;
-// 0x004b5b48
-extern unsigned int DAT_004b5b48;
+// 0x004b5b48: the castle object's class (DAT_00829ae0.field_10 points here): data, then three methods the
+// code calls through it (+0x1c FUN_00423940, +0x20 FUN_00423970, +0x24 FUN_00423990).
+struct CastleClass {
+    int field_0;
+    int field_4;
+    int field_8;
+    int field_c;
+    unsigned short field_10;
+    unsigned short field_12;
+    int field_14;
+    unsigned short field_18;
+    unsigned short field_1a;
+    void *method_1c;
+    void *method_20;
+    void *method_24;
+};
+extern struct CastleClass DAT_004b5b48;
 // 0x00829bec
 extern void *DAT_00829bec;
 // 0x00829bf0

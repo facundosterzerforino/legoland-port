@@ -415,12 +415,6 @@ unsigned short *DAT_004b5b24;
 // GLOBAL: LEGOLAND 0x004b5b28
 int DAT_004b5b28;
 
-// GLOBAL: LEGOLAND 0x004b5b4c
-int DAT_004b5b4c;
-
-// GLOBAL: LEGOLAND 0x004b5b50
-int DAT_004b5b50;
-
 // GLOBAL: LEGOLAND 0x004b59e8
 char SitLoGirlSitName[16] = "sit.logirlsit";
 
@@ -432,18 +426,6 @@ char SitLoManSitName[] = "sit.lomansit";
 
 // GLOBAL: LEGOLAND 0x004b5abc
 float DAT_004b5abc[4][4];
-
-// GLOBAL: LEGOLAND 0x004b5b58
-unsigned short DAT_004b5b58;
-
-// GLOBAL: LEGOLAND 0x004b5b5a
-unsigned short DAT_004b5b5a;
-
-// GLOBAL: LEGOLAND 0x004b5b60
-unsigned short DAT_004b5b60;
-
-// GLOBAL: LEGOLAND 0x004b5b62
-unsigned short DAT_004b5b62;
 
 // GLOBAL: LEGOLAND 0x004b5b3c
 struct RecBuf *DAT_004b5b3c;
@@ -5242,7 +5224,7 @@ struct Element *DAT_00829abc;
 struct CastleState DAT_00829ae0;
 
 // GLOBAL: LEGOLAND 0x004b5b48
-unsigned int DAT_004b5b48;
+struct CastleClass DAT_004b5b48;
 
 // GLOBAL: LEGOLAND 0x00829bec
 void *DAT_00829bec;
