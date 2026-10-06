@@ -11,6 +11,7 @@
 
 #include "../src/legoland/bricks.h"
 #include "../src/legoland/challenge.h"
+#include "../src/legoland/clipping.h"
 #include "../src/legoland/debug.h"
 #include "../src/legoland/globals.h"
 #include "../src/legoland/map_object.h"
@@ -312,7 +313,7 @@ static void CmdHelp(void) {
     ConPrintf("  switches             original cheat DIGGER (sets map switches 0-3)");
     ConPrintf("Other:");
     ConPrintf("  music theme|egypt|inca|castle|west|stop");
-    ConPrintf("  unlock               mark all 15 levels as completed in the current profile (saved!)");
+    ConPrintf("  unlock               mark all 15 levels completed and unlock every free play object (saved!)");
 }
 
 static void CmdStatus(void) {
@@ -608,12 +609,26 @@ static void RunCommand(char *line) {
     } else if (_stricmp(cmd, "music") == 0) {
         CmdMusic(arg);
     } else if (_stricmp(cmd, "unlock") == 0) {
+        struct ClipQueryResult *entry;
+        int unlocked;
         int level;
+
         for (level = 1; level <= 15; level++) {
             CurrentProfile.flags[3 + level] = 1;
         }
+        /* Free play lists an object once its byte in field_46 is set, which the game does the first time the
+         * object is built in a level (FUN_0048a6e0): set it for every object in that table. */
+        unlocked = 0;
+        for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
+            entry++) {
+            if (entry->id < sizeof(CurrentProfile.field_46)) {
+                unlocked += CurrentProfile.field_46[entry->id] == 0;
+                CurrentProfile.field_46[entry->id] = 1;
+            }
+        }
         UpDateCurrentProfile();
-        ConPrintf("All levels marked as completed in the current profile.");
+        ConPrintf("All levels marked as completed and %d more free play objects unlocked in the current profile.",
+            unlocked);
     } else {
         ConPrintf("Unknown command \"%s\". Type \"help\".", cmd);
     }
