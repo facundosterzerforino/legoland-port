@@ -14,6 +14,9 @@ runs) is smaller than its extent in the original (the gap to the next annotated 
 
 It also lists the opposite mistake, one object of the original split into several globals:
 
+  - codeptr: a function pointer in the original's data that no port global covers, so the startup loader
+    never copies it (a handler table declared as one `unsigned int`; the castle's 0x4b5b48 was this), and
+
   - overlap: a global whose port size reaches past the next annotated global (the next one is really a field
     or element of it, e.g. Footprint.next declared as its own pointer), and
   - cast: `(struct T *)&G` (or an array G) where T is bigger than G's space in the original, so the code
@@ -24,6 +27,7 @@ tools/audit_globals_ok.txt and not reported again. Run after merging the decomp;
 
 Usage: python3 tools/audit_globals.py [--all]      (needs clang-cl and the xwin SDK, as the clang-cl-x86 build)
 """
+import bisect
 import collections
 import os
 import re
@@ -185,6 +189,47 @@ def split_objects(found, sizes, gaps):
     return out
 
 
+def orphan_code_pointers(found, sizes):
+    """(key, text) for each function pointer in the original's .data that no port global covers.
+
+    The startup loader copies the original's bytes only into the globals the port declares, each up to its
+    sizeof. A function pointer outside all of them (a handler table declared as `unsigned int`, a struct split
+    into scalars) is never loaded: code that reaches it through a neighbour calls whatever the port put there.
+    """
+    d = EXE.read_bytes()
+    pe = struct.unpack_from("<I", d, 0x3c)[0]
+    nsec = struct.unpack_from("<H", d, pe + 6)[0]
+    optsz = struct.unpack_from("<H", d, pe + 20)[0]
+    base = struct.unpack_from("<I", d, pe + 24 + 28)[0]
+    secs, o = {}, pe + 24 + optsz
+    for _ in range(nsec):
+        vsz, va, rsz, rptr = struct.unpack_from("<IIII", d, o + 8)
+        secs[d[o:o + 8].rstrip(b"\0")] = (base + va, vsz, rsz, rptr)
+        o += 40
+    dva, _, drsz, dptr = secs[b".data"]
+    covered = sorted((a, a + sizes[g["name"]]) for a, g in found.items() if g["name"] in sizes)
+    starts = [c[0] for c in covered]
+    addrs = sorted(found)
+    # Only exact starts of game functions: text that happens to look like an address ("ING\0") and the CRT's
+    # own tables (the port links a real CRT) are not function pointers the game calls.
+    funcs = {int(m, 16) for p in SRC.glob("*.c") if p.name not in ("crt.c", "imports.c")
+             for m in re.findall(r"// FUNCTION: LEGOLAND (0x[0-9a-f]+)", p.read_text(encoding="latin-1"))}
+    out = []
+    for k in range(0, drsz - 3, 4):
+        v = struct.unpack_from("<I", d, dptr + k)[0]
+        if v not in funcs:
+            continue
+        a = dva + k
+        i = bisect.bisect_right(starts, a) - 1
+        if i >= 0 and covered[i][0] <= a < covered[i][1]:
+            continue
+        j = bisect.bisect_right(addrs, a) - 1
+        owner = f"{a - addrs[j]:#x} past {found[addrs[j]]['name']} ({sizes.get(found[addrs[j]]['name'], 0):#x} bytes " \
+                f"in the port, {found[addrs[j]]['file']})" if j >= 0 else "before every annotated global"
+        out.append((f"codeptr:{a:#010x}", f"{a:#010x} holds {v:#010x} (code), loaded by no port global: {owner}"))
+    return out
+
+
 def usage(name, code):
     n = re.escape(name)
     pats = {
@@ -225,7 +270,7 @@ def main():
         print(f"{flag}{key} {g['name']}: {size:#x} bytes in the port, {gap:#x} in the original "
               f"({','.join(use)}; {g['file']}): {g['decl'][:100]}")
     gaps = {a: addrs[i + 1] - a for i, a in enumerate(addrs[:-1])}
-    for key, text in split_objects(found, sizes, gaps):
+    for key, text in split_objects(found, sizes, gaps) + orphan_code_pointers(found, sizes):
         if key in reviewed and not show_all:
             continue
         new += key not in reviewed
