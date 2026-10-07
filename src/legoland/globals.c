@@ -1787,13 +1787,13 @@ unsigned int DAT_004dd5d8;
 void *DAT_004dd5e0[24];
 
 // GLOBAL: LEGOLAND 0x004dd758
-unsigned int CoasterTxtFile;
+struct CoasterTextFile CoasterTxtFile;
 
 // GLOBAL: LEGOLAND 0x004dd760
 char DAT_004dd760[256];
 
 // GLOBAL: LEGOLAND 0x004dd860
-unsigned int CoasterObjFile;
+struct CoasterTextFile CoasterObjFile;
 
 // GLOBAL: LEGOLAND 0x004dd868
 unsigned int DAT_004dd868;
@@ -4415,7 +4415,7 @@ unsigned char ObjectiveCounters[10];
 unsigned int DAT_007fe994;
 
 // GLOBAL: LEGOLAND 0x007fe998
-unsigned int DAT_007fe998;
+unsigned short DAT_007fe998;
 
 // GLOBAL: LEGOLAND 0x007fe9a8
 unsigned int DAT_007fe9a8;
@@ -5446,12 +5446,6 @@ unsigned int *DAT_004d88cc[5];
 
 // GLOBAL: LEGOLAND 0x004b5660
 float DAT_004b5660[4][2];
-
-// GLOBAL: LEGOLAND 0x004dd75c
-unsigned int DAT_004dd75c;
-
-// GLOBAL: LEGOLAND 0x004dd864
-unsigned int DAT_004dd864;
 
 // GLOBAL: LEGOLAND 0x004dd644
 struct Struct1e40 *DAT_004dd644;

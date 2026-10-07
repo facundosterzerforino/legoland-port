@@ -4240,7 +4240,7 @@ void *FUN_00422470(const char *fileName, unsigned int *bytesReadPtr) {
 
 // FUNCTION: LEGOLAND 0x00422590
 unsigned int FUN_00422590(const char *s) {
-    return FUN_00422400(&CoasterObjFile, (unsigned int)s);
+    return FUN_00422400((unsigned int *)&CoasterObjFile, (unsigned int)s);
 }
 
 // FUNCTION: LEGOLAND 0x004225b0
@@ -4255,7 +4255,7 @@ unsigned int FUN_004225d0(void) {
 
 // FUNCTION: LEGOLAND 0x00422600
 unsigned int FUN_00422600(unsigned int param) {
-    return FUN_00422400(&CoasterTxtFile, param);
+    return FUN_00422400((unsigned int *)&CoasterTxtFile, param);
 }
 
 // FUNCTION: LEGOLAND 0x00422620
@@ -4275,27 +4275,27 @@ int LoadObjAndTxtFiles(const char *name) {
 
     // STRING: LEGOLAND 0x004b5b04
     wsprintfA(buffer, "%s.obj", name);
-    CoasterObjFile = (unsigned int)FUN_00422470(buffer, &DAT_004dd864);
-    if (CoasterObjFile == 0) {
+    CoasterObjFile.data = (unsigned int)FUN_00422470(buffer, &CoasterObjFile.size);
+    if (CoasterObjFile.data == 0) {
         return 0;
     }
     // STRING: LEGOLAND 0x004b5b0c
     wsprintfA(buffer, "%s.txt", name);
-    CoasterTxtFile = (unsigned int)FUN_00422470(buffer, &DAT_004dd75c);
-    if (CoasterTxtFile == 0) {
-        FUN_004775d0((void *)CoasterObjFile);
+    CoasterTxtFile.data = (unsigned int)FUN_00422470(buffer, &CoasterTxtFile.size);
+    if (CoasterTxtFile.data == 0) {
+        FUN_004775d0((void *)CoasterObjFile.data);
         return 0;
     }
-    DAT_004dd868 = FUN_004223c0(&CoasterObjFile);
-    DAT_004dd86c = FUN_004223c0(&CoasterTxtFile);
+    DAT_004dd868 = FUN_004223c0((unsigned int *)&CoasterObjFile);
+    DAT_004dd86c = FUN_004223c0((unsigned int *)&CoasterTxtFile);
     strcpy(DAT_004dd760, name);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x004227a0
 void FreeObjAndTxtFiles(void) {
-    FUN_004775d0(CoasterTxtFile);
-    FUN_004775d0(CoasterObjFile);
+    FUN_004775d0((void *)CoasterTxtFile.data);
+    FUN_004775d0((void *)CoasterObjFile.data);
 }
 
 struct MVert {

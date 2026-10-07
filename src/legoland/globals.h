@@ -1673,11 +1673,17 @@ extern unsigned int DAT_004dd5d8;
 // 0x004dd5e0
 extern void *DAT_004dd5e0[24];
 // 0x004dd758
-extern unsigned int CoasterTxtFile;
+/* A text file read whole: its bytes and their count (FUN_004223c0 and FindLineStart read both through the
+ * address). */
+struct CoasterTextFile {
+    unsigned int data;
+    unsigned int size;
+};
+extern struct CoasterTextFile CoasterTxtFile;
 // 0x004dd760
 extern char DAT_004dd760[256];
 // 0x004dd860
-extern unsigned int CoasterObjFile;
+extern struct CoasterTextFile CoasterObjFile;
 // 0x004dd868
 extern unsigned int DAT_004dd868;
 // 0x004dd86c
@@ -3444,7 +3450,7 @@ extern unsigned char ObjectiveCounters[10];
 // 0x007fe994
 extern unsigned int DAT_007fe994;
 // 0x007fe998
-extern unsigned int DAT_007fe998;
+extern unsigned short DAT_007fe998;
 // 0x007fe9a8
 extern unsigned int DAT_007fe9a8;
 // 0x007fe9c0
@@ -4199,11 +4205,6 @@ extern unsigned int *DAT_004d88cc[5];
 
 // 0x004b5660
 extern float DAT_004b5660[4][2];
-
-// 0x004dd75c
-extern unsigned int DAT_004dd75c;
-// 0x004dd864
-extern unsigned int DAT_004dd864;
 
 struct Struct1e40;
 // 0x004dd644
