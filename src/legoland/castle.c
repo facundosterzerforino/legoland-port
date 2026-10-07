@@ -20,6 +20,7 @@
 #include "path_control.h"
 #include "print_sprite.h"
 #include "render3d.h"
+#include "screens.h"
 #include "tilemap.h"
 #include "timer.h"
 
@@ -3153,6 +3154,12 @@ unsigned int FUN_00420fb0(unsigned char *param_1, unsigned int param_2, unsigned
     return FUN_00426750(param_1 + 0x30, param_2, param_3, param_4);
 }
 
+// GLOBAL: LEGOLAND 0x004b5648
+void *DAT_004b5648[2] = {FUN_0041f8d0, FUN_0041fba0};
+
+// GLOBAL: LEGOLAND 0x004b5658
+void *DAT_004b5658[2] = {FUN_0041fd80, FUN_0041ff80};
+
 // GLOBAL: LEGOLAND 0x004b5700
 float DAT_004b5700[6][3] = {
     {0.0f, 0.0f, -1.0f},
@@ -3197,6 +3204,9 @@ BoxFace DAT_004b5808[12] = {
 
 // GLOBAL: LEGOLAND 0x004b58c8
 struct BoxSolid DAT_004b58c8 = {8, 0, 12, NULL, DAT_004b5700, NULL, DAT_004b5748, 12};
+
+// GLOBAL: LEGOLAND 0x004b5f50
+void *DAT_004b5f50[2] = {FUN_00428860, FUN_00428860};
 
 // FUNCTION: LEGOLAND 0x00420fd0
 void FUN_00420fd0(struct BoxSolid *box, struct FVec3 *verts, struct FVec3 *xverts, int unused, float w, float h, float d) {
@@ -4654,8 +4664,12 @@ void FUN_00423200(int n, int x, struct RecIdx *idx, struct RecSrc *src) {
 
 // FUNCTION: LEGOLAND 0x004232b0
 void FUN_004232b0(struct RecBuf *rb) {
-    struct RecIdx idx[8];
-    struct RecSrc src[8];
+    /* The edge tables are one block: the fill reads the last line from the high half of src[n - 1].f0, and
+     * writes idx[n].v (src[0] when n == 8). */
+    struct {
+        struct RecIdx idx[8];
+        struct RecSrc src[8];
+    } poly;
     int n = rb->n;
     int i;
 
@@ -4664,18 +4678,18 @@ void FUN_004232b0(struct RecBuf *rb) {
         short w2 = rb->ent[i].w;
 
         if (w < 0) {
-            src[i].flag = 1;
-            idx[i].v = -w;
+            poly.src[i].flag = 1;
+            poly.idx[i].v = -w;
         } else {
-            src[i].flag = 0;
-            idx[i].v = w2;
+            poly.src[i].flag = 0;
+            poly.idx[i].v = w2;
         }
-        idx[i].k = i;
-        src[i].fx = rb->ent[i - 1].s0n << 16;
-        src[i].d = rb->ent[i].d;
+        poly.idx[i].k = i;
+        poly.src[i].fx = rb->ent[i - 1].s0n << 16;
+        poly.src[i].d = rb->ent[i].d;
     }
-    *(short *)((char *)idx + i * 0x30 + 0x12) = (short)(rb->x - 1);
-    FUN_00423350(n, idx, src);
+    ((short *)&poly.src[i - 1].f0)[1] = (short)(rb->x - 1);
+    FUN_00423350(n, poly.idx, poly.src);
 }
 
 // FUNCTION: LEGOLAND 0x00423350

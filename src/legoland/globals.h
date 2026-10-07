@@ -580,18 +580,28 @@ extern float DAT_004ab3f8;
 extern float DAT_004ab3fc;
 // 0x004ab478
 extern double DOUBLE_004ab478;
+// 0x004ab488
+extern double DOUBLE_004ab488;
 // 0x004ab4a0
 extern float DAT_004ab4a0;
 // 0x004ab4a8
 extern double DAT_004ab4a8;
 // 0x004ab4b0
 extern double DAT_004ab4b0;
+// 0x004ab4b8
+extern float FLOAT_004ab4b8;
 // 0x004ab430
 extern float DAT_004ab430;
 // 0x004ab43c
 extern float FLOAT_004ab43c;
 // 0x004ab418
 extern double DAT_004ab418;
+// 0x004ab424
+extern float FLOAT_004ab424;
+// 0x004ab428
+extern float FLOAT_004ab428;
+// 0x004ab42c
+extern float FLOAT_004ab42c;
 // 0x004ab444
 extern float FLOAT_004ab444;
 // 0x004ab550
@@ -867,8 +877,6 @@ extern unsigned int DAT_004b5ef4[4][2];
 extern unsigned int DAT_004b5f14[4][2];
 // 0x004b5f60
 extern struct TexMesh DAT_004b5f60;
-// 0x004b6150
-extern unsigned int DAT_004b6150[12];
 // 0x004b61e0
 extern struct CastleFloatEnt DAT_004b61e0[8];
 
@@ -886,6 +894,8 @@ extern int DAT_004b6408[3];
 extern float FLOAT_004ab490;
 // 0x004ab494
 extern float FLOAT_004ab494;
+// 0x004ab49c
+extern float FLOAT_004ab49c;
 // 0x004b64d4
 extern char DAT_004b64d4[4];
 // 0x004b64d8
@@ -966,6 +976,16 @@ extern unsigned char DAT_004b79d0[0x18];
 extern unsigned short DAT_004b7abc;
 // 0x004b7ac0
 extern unsigned char BlokeColours[0x18];
+// 0x004b7ae0
+extern int DAT_004b7ae0[3];
+// 0x004b7aec
+extern int DAT_004b7aec[3];
+// 0x004b7af8
+extern int DAT_004b7af8[3];
+// 0x004b7b04
+extern int DAT_004b7b04[3];
+// 0x004b7b10
+extern const char Path3DFormat[];
 // 0x004b7d70
 extern unsigned int DAT_004b7d70;
 // 0x004b7d74
@@ -1076,6 +1096,8 @@ extern int DAT_004b9610;
 extern int (*BlitFrameFunc)(void);
 // 0x004b9ca8
 extern unsigned int OverrideFrame;
+// 0x004b9d0c
+extern const char BltFastNoSpriteFmt[];
 // 0x004b9e5c
 extern unsigned int ScriptEventCategories[71];
 // 0x004b9f78
@@ -1487,8 +1509,12 @@ extern int DAT_0079a6b0;
 extern int DAT_007fe9a4;
 // 0x007fea14
 extern int DAT_007fea14;
+// 0x007fea18
+extern unsigned char DAT_007fea18;
 // 0x007fea1c
 extern int DAT_007fea1c;
+// 0x007fea20
+extern unsigned int DAT_007fea20;
 // 0x007fea4c
 extern struct DrawClipOrigin SpriteClipOrigin;
 // 0x007febac
@@ -1648,6 +1674,8 @@ extern float DAT_004d829c[64];
 extern unsigned int DAT_004d83c0;
 // 0x004d88f4
 extern unsigned char DAT_004d88f4[0xc0];
+// 0x004d89b4
+extern unsigned int DAT_004d89b4[4];
 // 0x004d89c4
 extern void *DAT_004d89c4;
 // 0x004d89c8
@@ -1662,6 +1690,8 @@ extern unsigned int LfmFileSizes[30];
 extern unsigned int RollercoasterLpt;
 // 0x004d8bb0
 extern char DAT_004d8bb0[0x100];
+// 0x004dcbb8
+extern float DAT_004dcbb8[3];
 // 0x004dcbd0
 extern void *DAT_004dcbd0[10];
 // 0x004dcbf8
@@ -1689,7 +1719,7 @@ extern unsigned int DAT_004dd868;
 // 0x004dd86c
 extern unsigned int DAT_004dd86c;
 // 0x004dd870
-extern char DAT_004dd870[0x6000];
+extern unsigned char DAT_004dd870[0x6000];
 // 0x0060f908
 extern int DAT_0060f908;
 // 0x0060f90c
@@ -1743,6 +1773,12 @@ extern unsigned char DAT_00611780[0x40];
 extern Vector3 DAT_006117c0[34];
 // 0x00611958
 extern unsigned int DAT_00611958;
+// 0x0061195c
+extern unsigned int DAT_0061195c;
+// 0x00611960
+extern unsigned char DAT_00611960[0x800];
+// 0x00612160
+extern unsigned int DAT_00612160[6];
 // 0x00612178
 extern int DAT_00612178[20];
 // 0x006122a0
@@ -1779,6 +1815,8 @@ extern void *DAT_00615f80;
 extern int DAT_00615ff0;
 extern float DAT_00615ff4;
 extern struct CastleFloatEnt DAT_004b5f80[3][4];
+// 0x004b6150
+extern unsigned int DAT_004b6150[36];
 extern struct CastleFloatEnt DAT_00612210[3][4];
 // 0x00615f90
 extern int DAT_00615f90;
@@ -2373,6 +2411,8 @@ extern int VideoSurfaceLocked;
 extern struct Sprite *DAT_00668148;
 // 0x0066814c
 extern unsigned int DAT_0066814c;
+// 0x00668160
+extern unsigned int DAT_00668160;
 // 0x00668164
 extern int DAT_00668164[32];
 // 0x006681e4
@@ -3455,14 +3495,20 @@ extern unsigned short DAT_007fe998;
 extern unsigned int DAT_007fe9a8;
 // 0x007fe9c0
 extern struct Sprite *PointerSprites[9];
+// 0x007fea10
+extern unsigned int DAT_007fea10;
 // 0x007fea30
 extern RECT WatchRect;
+// 0x007fea40
+extern unsigned int DAT_007fea40;
 // 0x007fea44
 extern unsigned int StoredTransparentColour;
 // 0x007fea48
 extern LEGO_EXPORT unsigned int FramesPerSecond;
 // 0x007feb14
 extern unsigned int DAT_007feb14;
+// 0x007feb18
+extern unsigned int DAT_007feb18;
 // 0x007febb8
 extern unsigned short DAT_007febb8;
 // 0x007febc0
@@ -4319,3 +4365,11 @@ extern int DAT_004b8a88;
 extern int DAT_004b8a8c;
 // 0x004b8a90
 extern int DAT_004b8a90;
+// 0x004b42a0
+extern int DAT_004b42a0[3];
+// 0x004b42ac
+extern int DAT_004b42ac[3];
+// 0x004b42b8
+extern int DAT_004b42b8[3];
+// 0x004b42c4
+extern int DAT_004b42c4[3];

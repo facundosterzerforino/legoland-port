@@ -120,3 +120,5 @@ indexed:0x00610a1c lego_sqrtf_init: port writes sqrtf_table directly (7fe1f7b): 
 indexed:0x006160bc carousel load: port reads DAT_006160c0 for index 1 (ride + sprite, not one array): reviewed, harmless
 indexed:0x0062fe94 LoadZoomer: port reads DAT_0062fe98 for index 1 (47661c1): reviewed, harmless
 indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites explicitly (47661c1): reviewed, harmless
+0x004b7ac0 BlokeColours (0x18 of 0x20): reviewed, harmless (8 RGB triples, then alignment padding before DAT_004b7ae0)
+0x007fe9c0 PointerSprites (0x24 of 0x50): reviewed, harmless (the 9 cursors debug.c loads; SetPointer indexes only those)

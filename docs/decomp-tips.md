@@ -182,11 +182,25 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   Nested ifs or duplicated cleanup code give the wrong block layout (SaveGame: 62.77% -> 91.55% with `goto fail`).
 
 
-## Remaining STUB()s Are Hand-Written Assembly
-- All 44 functions still left as `STUB()` (copters.c, castle.c, man3d.c, render3d.c, draw.c, render.c) were checked
-  against the original bytes: each is hand-written assembly. 36 have an `ebp` frame plus instructions MSVC6 never
-  emits from C (`rdtsc` timing, `xchg`, `fistp` fast float->int, `pusha/popa`, `shrd` fixed point, `fldcw/fstcw`).
-  The 8 draw.c sprite blitters (0x466d80-0x468410) have no frame but use `rol`, `rep movsw`/`rep stosw` and a
-  decode block repeated like an asm macro, and they reuse argument slots as scratch.
-- Each one carries a `// Hand-written assembly in the original (...)` comment above its `// FUNCTION:` line.
-  They can only be matched with `__asm`, which is allowed for exactly these functions.
+## Matching Hand-Written Assembly
+- The original's asm was MSVC inline `__asm` inside C functions, so the frame, register saves and the C around
+  it were compiled. Rebuild that shape first; transcribe the whole function as `__declspec(naked)` only when
+  the C around the asm won't converge (see CLAUDE.md).
+- An asm block that names a variable keeps that variable in memory. If the original reloads a parameter at
+  every use (or keeps a float temp and an `fistp` result in its slot), name the parameter in the asm
+  (`fld dword ptr index` / `fistp index`). `volatile` gets the same reloads in C. MSVC6 packs other locals into
+  dead parameter slots, so the original's asm often uses `[ebp+8]` / `[ebp+0xc]` as scratch.
+- A float literal in a double expression is folded to a `qword` constant. `(float)(x * d) * 5.0f` keeps the
+  4-byte literal (the cast emits no code). reccmp pairs the original's float constants (type FLOAT) with
+  compiler literals only, never with a declared global of the same value.
+- When code addresses one array through its neighbour (`DAT_00612210 - 8`), the two must be adjacent in our
+  image too: initialise both (`= {0}`) and define them next to each other, so they go into .data in order.
+- Converting a disassembly listing (capstone) to MSVC inline-asm syntax: `pushal`/`popal` are `pushad`/`popad`;
+  `faddp st(1)` must be `faddp st(1), st` and `fadd st(1)` must be `fadd st, st(1)`; string ops take no operands
+  (`rep movsw`); MSVC encodes `xchg a, b` with the operands the other way round, so write `xchg b, a`; imports
+  are called as `call dword ptr [IsBadReadPtr]`; any function or global the asm names needs a prototype or
+  `extern` before it (asm will not use an implicit declaration).
+- reccmp treats an immediate as an address when it falls inside any known symbol. A constant like `0x500000`
+  can land inside a big array in one image and not the other, and is then shown as a diff on a byte-identical
+  line.
+

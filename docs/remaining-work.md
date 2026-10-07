@@ -1,33 +1,34 @@
-# Remaining work (as of 2026-10-05, after round 6)
+# Remaining work (as of 2026-10-07, after the inline-asm round)
 
-`./tools/verify` reported `Progress: 94.72%` for this build. That figure is the sum of every function's match score divided
+`./tools/verify` reported `Progress: 95.96%` for this build. That figure is the sum of every function's match score divided
 by all 3634 functions reccmp counts, which include CRT and import entries. Counted per game function (`// FUNCTION:`):
 
 | State | Functions |
 |---|---|
-| 100% (exact or "effective") | 2958 |
-| Pure-C partials (1-99%) | 248 |
-| Inline asm, partial | 5 + 3 (see below) |
-| Inline asm, still `STUB()` (0%) | 44 |
+| 100% (exact or "effective") | 3002 |
+| Pure-C partials (1-99%) | 246 |
+| Inline asm, partial | 7 (see below) |
+| Still `STUB()` (0%) | 0 |
 | Total | 3255 |
 
 Recount with `uv run tools/agent/status.py` (per function) and `uv run tools/agent/partials.py` (pure-C partials).
 
-## Inline-asm functions: match with `__asm`
+## Inline-asm functions (the former `STUB()`s, matched 2026-10-07)
 
-**All 44 functions still at 0% are hand-written assembly in the original.** MSVC6 never emits these instructions, so pure C
-cannot match them (see "Functions With an ebp Frame" in `decomp-tips.md`); they need inline `__asm`, allowed since
-2026-10-05. Each still at `STUB()` has a comment that names the fingerprint. The port replaces them with plain-C equivalents tagged `// [library:asm]`.
-`find_inline_asm` in `tools/progress.py` detects them, and `partials.py` leaves them out.
+The 44 functions that were hand-written assembly in the original, and so stayed `STUB()` while the project was
+pure C, are done. `find_inline_asm` in `tools/progress.py` detects such functions, and `partials.py` leaves them out.
 
-| TU | Count | Functions (fingerprint) |
-|---|---|---|
-| castle | 21 | FUN_0041e130, FUN_00420e90, FUN_00423140, FUN_004234e0, FUN_00428cb0, FUN_004292f0 (rdtsc); FUN_0041f8d0, FUN_0041fa10, FUN_0041fba0, FUN_0041fd80, FUN_0041ff80, FUN_00423350, FUN_00428860 (xchg); FUN_00420810, FUN_00420a20, FUN_00420c40 (fistp + rdtsc); FUN_004236f0, FUN_00423730 (fldcw/fstcw); FUN_00426250, FUN_004263a0, FUN_0042a2f0 (fistp) |
-| draw | 13 | FUN_00464480 (xchg, rep movsw/stosw); ZBufferHelper, FUN_00465240 (pusha, shrd, xchg); FUN_00464ee0, SoftPrint_XBltFast (pusha); FUN_00466d80, FUN_00467180, FUN_004673f0, FUN_004677b0, FUN_00467b00, FUN_00467d10, FUN_00468040, FUN_00468410 (rol, rep movsw/stosw) |
-| render | 4 | FUN_00486590, FUN_004877b0 (shrd, xchg); FUN_00486c70, FUN_00487d40 (fistp, shrd, xchg) |
-| man3d | 3 | FUN_0043fa80, SetPersonRotation (fistp); FUN_00440a30 (fistp, shrd) |
-| render3d | 2 | FUN_00441980 (fistp); TransformVectorsL (shrd) |
-| copters | 1 | FUN_00404630 (fistp) |
+- **C with small `__asm` blocks, 100%:** FUN_004236f0, FUN_00423730 (FPU control word) and FUN_004292f0 (two
+  `rdtsc` timing blocks).
+- **Transcribed whole as `__declspec(naked)`, 100%:** the other 39 in castle, draw, render, render3d and man3d.
+  For SetPersonRotation, FUN_00441980 and FUN_0043fa80 a C + `__asm` version got the structure and every
+  instruction right, but MSVC6 kept picking different registers or stack slots around the asm.
+- **Byte-identical, but reccmp reports < 100%:** FUN_00440a30 (and the older naked FUN_00426980, FUN_00426ab0).
+  They load plain constants (0x500000, 0x5a0000, 0x7fffff) that fall inside a data symbol in only one of the two
+  images, so reccmp shows a symbol on that side. Needs a reccmp change, not a source change.
+- **Not matched:** FUN_00404630 (copters) at 54%, C with the `fistp` macro in `__asm`. It has a `switch` jump
+  table, so it cannot be naked; what is left is a register permutation (the original keeps entry/layer/sprite in
+  edi/ebx/esi and spills entry to the `node` slot).
 
 Inline asm, partly written in C (finish with `__asm`): Render3DPerson 51.6%, RenderTransSprite 18.8%, SoftPrint_Clear 18.9%,
 FUN_00488730 17.5%, ApplyObjectOrientationToPerson 7.0%; HASM_lego_sqrtf and HASM_lego_invsqrtf 95.2% (`__declspec(naked)`),

@@ -195,8 +195,7 @@ void *LoadLocFile(const char *param_1, const char *param_2) {
     unsigned int size;
     void *buffer;
 
-    // STRING: LEGOLAND 0x004b7b10
-    sprintf(path, ".\\3ddata\\new\\%s\\%s", param_2, param_1);
+    sprintf(path, Path3DFormat, param_2, param_1);
     file = RES_OpenFile(path);
     if (file != 0) {
         size = RES_GetFileSize(file);
