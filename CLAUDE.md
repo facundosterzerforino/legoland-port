@@ -86,8 +86,10 @@ describe how `main` works.
 - **Debugging a crash/freeze:** read `run\legoland-port-trace.txt` (the previous run is
   `legoland-port-trace-prev.txt`). The watchdog (`port/port_watchdog.c`) writes `CRASH:`/`FREEZE detected` with a
   symbolized stack and saves `run\crash-*.dmp` / `freeze-*.dmp`. For crashes the in-game handler can't catch,
-  `tools/dbgrun` is a small debugger (`dbgrun.exe <log> <exe> args`). Work from the code; ask the maintainer to
-  reproduce.
+  `tools/dbgrun` is a small debugger (`dbgrun.exe <log> <exe> args`). `tools/minidump.py` reads a dump from WSL by
+  global name (values, neighbours, zeroed runs, value search; pass the .pdb of the exe that crashed). The watchdog
+  arms hardware write watchpoints (`watch:` lines in the trace, `ArmWatches` in `port/port_watchdog.c`) to catch
+  code that overwrites globals it doesn't own. Work from the code; ask the maintainer to reproduce.
 - **Windowed mode:** `run\legoland-windowed.exe WINDEBUG`, working directory `installed\`. (Windows keeps
   "16-bit colour, 640x480" compatibility flags on `legoland-port.exe`, which change the desktop resolution.)
 - **Most bugs so far were data, not code:** globals declared smaller than in the original exe, tables with
