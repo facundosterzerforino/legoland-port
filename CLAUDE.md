@@ -97,8 +97,8 @@ describe how `main` works.
 Status (phase 4, `ROADMAP.md`): boot, menus, tutorial, building, music, sound, speech, movies (Indeo via FFmpeg),
 windowed mode all work on Windows 11. Fixed on 2026-10-04: lesson-2 tree objective, greenhouse crash, copters
 crash (NULL sample). Open:
-- Why the Copters "Helicopter Flying" sound returns no sample: the trace logs the reason (`PlayInstanceOfSample:`
-  lines).
+- Copters sounds: fixed 2026-10-07 (gen_data aimed their name pointers past the 8-byte `CopterPathTable4`);
+  confirm in game that the helicopter sounds and copter models load ("Loaded SFX Helicopter ..." in the trace).
 - Playtesting still to do: other lessons, the three parks, gallery, save/load, end screens, certificate
   printing.
 - A reference setup to compare with the original (Windows 98 VM or a DirectDraw wrapper); then mark phase 4
