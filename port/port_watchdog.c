@@ -32,6 +32,18 @@ static CONTEXT report_context;
 static DWORD report_stack[STACK_WORDS];
 static int report_stack_words;
 
+/* Hardware write watchpoints (debug registers DR0/DR1) on globals that only level loading should write. A write
+ * from anywhere else is logged with the writing code's rva and the stack's exe addresses, to find code that
+ * overruns its own buffer into them (the map state was wiped this way while placing rides). */
+extern void *GameMapRawBlock;
+extern unsigned int DAT_00667ca4;
+static struct {
+    void *address;
+    const char *name;
+} watches[2];
+static volatile LONG watch_reports;
+#define MAX_WATCH_REPORTS 40
+
 void PortHeartbeat(void) { InterlockedIncrement(&heartbeat); }
 
 void PortSetPhase(const char *phase) {
@@ -156,11 +168,66 @@ static void WriteDump(const char *prefix, DWORD thread_id, EXCEPTION_POINTERS *p
     PortTrace("  minidump %s: %s", ok ? "written" : "FAILED", path);
 }
 
+/* Set the debug registers on the main thread (a thread can't reliably set its own): DR0/DR1 = the watched
+ * addresses, break on 4-byte writes. */
+static void ArmWatches(void) {
+    CONTEXT ctx;
+    int i;
+
+    watches[0].address = &GameMapRawBlock;
+    watches[0].name = "GameMapRawBlock";
+    watches[1].address = &DAT_00667ca4;
+    watches[1].name = "DAT_00667ca4";
+    if (SuspendThread(main_thread) == (DWORD)-1) {
+        return;
+    }
+    memset(&ctx, 0, sizeof(ctx));
+    ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+    if (GetThreadContext(main_thread, &ctx)) {
+        ctx.Dr0 = (DWORD)watches[0].address;
+        ctx.Dr1 = (DWORD)watches[1].address;
+        ctx.Dr7 = (ctx.Dr7 & ~0x00ff000fu) | 0x1 | 0x4 /* L0, L1 */ | (0x1u << 16) | (0x3u << 18) /* DR0: write, 4 bytes */ |
+            (0x1u << 20) | (0x3u << 22) /* DR1: write, 4 bytes */;
+        if (SetThreadContext(main_thread, &ctx)) {
+            for (i = 0; i < 2; i++) {
+                PortTrace("watch: armed on %s (%p)", watches[i].name, watches[i].address);
+            }
+        }
+    }
+    ResumeThread(main_thread);
+}
+
+/* A watched global was written: log the value, the writing code and the stack, then carry on. */
+static LONG WatchHit(EXCEPTION_POINTERS *pointers) {
+    CONTEXT *ctx = pointers->ContextRecord;
+    DWORD *sp = (DWORD *)ctx->Esp;
+    int i;
+    int shown = 0;
+
+    for (i = 0; i < 2; i++) {
+        if ((ctx->Dr6 & (1u << i)) != 0 && InterlockedIncrement(&watch_reports) <= MAX_WATCH_REPORTS) {
+            PortTrace("watch: %s = %08lx, written by the instruction before rva %08lx (phase \"%s\")", watches[i].name,
+                *(DWORD *)watches[i].address, ctx->Eip - module_base, current_phase);
+            for (shown = 0; shown < 16 && (DWORD)(sp + 1) < (DWORD)ctx->Esp + 0x4000; sp++) {
+                if (!IsBadReadPtr(sp, 4) && InModule(*sp)) {
+                    PortTrace("  stack+%04lx rva %08lx", (DWORD)sp - ctx->Esp, *sp - module_base);
+                    shown++;
+                }
+            }
+        }
+    }
+    ctx->Dr6 = 0;
+    return EXCEPTION_CONTINUE_EXECUTION;
+}
+
 /* First-chance access violation or stack overflow in the exe: hand it to the watchdog thread, which has a
  * healthy stack, and wait until it has written the report. Then let the game's own handler run as before. */
 static LONG CALLBACK FirstChanceHandler(EXCEPTION_POINTERS *pointers) {
     DWORD code = pointers->ExceptionRecord->ExceptionCode;
 
+    if (code == EXCEPTION_SINGLE_STEP && (pointers->ContextRecord->Dr6 & 3) != 0) {
+        return WatchHit(pointers);
+    }
     if (code != EXCEPTION_ACCESS_VIOLATION && code != EXCEPTION_STACK_OVERFLOW) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
@@ -216,6 +283,7 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
     EXCEPTION_RECORD *record;
 
     (void)unused;
+    ArmWatches();
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     symbols_ready = SymInitialize(GetCurrentProcess(), exe_dir, TRUE);
     for (;;) {
