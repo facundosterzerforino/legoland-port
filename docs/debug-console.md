@@ -29,7 +29,8 @@ the game. Type a command and press Enter.
 |---|---|
 | `help` (or `?`) | Lists the commands. |
 | `status` | Level, game time, money, visitors, ride wear, whether the level script is running, the inspector's timer (time to the next appraisal) and the appraisal record (passes or failures in a row, and how many failures lose the level). |
-| `objectives` (or `obj`) | What the level script is waiting for right now: each objective with its kind (`one-off`, `ongoing`, `PERMANENT`, `REMINDER`), its script keyword (`NEED`, `LINK`, `RANGE`...), the object and number, and whether it is met. For `RANGE` (a theme area) it shows the different kinds of objects needed and placed, and what you have now. Also says when this is the level's last step. |
+| `objectives` (or `obj`) | What the level script is waiting for right now: each objective with its kind (`one-off`, `ongoing`, `PERMANENT`, `REMINDER`), its script keyword (`NEED`, `LINK`, `RANGE`...), the object and number, and whether it is met. For `RANGE` (a theme area) it shows the different kinds of objects needed and placed, and what you have now. Also says when this is the level's last step. Then the appraisal targets: for attractions, scenery, shops and food stores, the amount and variety the inspector wants (the level script's `REPORT` lines) next to what the park has. |
+| `variety` | Per category (attractions, scenery, shops, food stores): the variety and amount the inspector counts, with the targets, then every kind it counts with how many are placed (`PALM TREE x12`), the kinds loaded in this level that have none placed, and placed scenery it doesn't count (water and track pieces, huts...). The names are the game's internal ones. |
 | `note <text>` | Writes `NOTE: <text>` into the trace, to mark what you were doing when something went wrong. |
 
 ### Level flow
@@ -60,7 +61,7 @@ the game. Type a command and press Enter.
 
 | Command | What it does |
 |---|---|
-| `music theme` / `egypt` / `inca` / `castle` / `west` | Switches the music theme. |
+| `music theme` / `egypt` / `inca` / `castle` / `west` | Switches the music theme. (With the launcher's level music on, the next level start or return to the menus switches it again.) |
 | `music stop` | Stops the music. |
 | `unlock` | Marks all 15 levels as completed in the current profile. **This is saved in the profile.** |
 
@@ -75,6 +76,9 @@ Tap Shift once (it types the `:`), then type the word, while a level is running:
 
 - Commands run on the main thread in `ProcessSystemEvents` (`src/legoland/wndenv.c`), right after the
   original cheat keys are read, and also while it waits for the window to become active again.
+- `variety` and the appraisal part of `obj` count the way the inspector does (`challenge.c`): object class type 1
+  and 3 are attractions, 2 scenery (minus the 22 classes in `DAT_004b7e9c`), 4 shops, 5 food stores; a check
+  passes when its target is <= what the park has.
 - `skip` doesn't free script events (a popup can run the message loop from inside the script runner while it
   walks the list): it turns them into type 0, which has no handler, and the runner frees them when the step
   ends.

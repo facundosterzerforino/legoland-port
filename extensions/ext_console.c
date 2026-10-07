@@ -293,12 +293,199 @@ static const char *EventKind(unsigned char flags) {
     return "one-off";
 }
 
+/* ---- what the inspector counts ----
+ * The appraisal (challenge.c) sorts the object classes in the park by their type: 1 and 3 attractions
+ * (FUN_00444bf0), 2 scenery except the classes in DAT_004b7e9c (FUN_00444c70, FUN_00444c40), 4 shops (FUN_00444cd0),
+ * 5 food stores (FUN_00444d20). "Variety" is how many classes of a kind have at least one object placed, "amount" how
+ * many objects they have in all. The level script's REPORT lines set the targets (FUN_004445b0 and the setters after
+ * it); the inspector passes a check when target <= what the park has. */
+
+enum {
+    CAT_ATTRACTIONS,
+    CAT_SCENERY,
+    CAT_SHOPS,
+    CAT_FOOD,
+    CAT_COUNT
+};
+
+static const char *const CategoryNames[CAT_COUNT] = {"Attractions", "Scenery", "Shops", "Food stores"};
+
+/* REPORT NUM_x / VAR_x for each category: the ReportFlags bit that turns the check on, and its target */
+static const struct {
+    unsigned int amount_flag;
+    unsigned int *amount;
+    unsigned int variety_flag;
+    unsigned int *variety;
+} Targets[CAT_COUNT] = {
+    {0x4000, &DAT_00666020, 0x8000, &DAT_00666028}, /* NUM_ATTRACTIONS, VAR_ATTRACTIONS */
+    {0x8000000, &DAT_00666070, 0x10000000, &DAT_00666078}, /* NUM_SCENERY, VAR_SCENERY */
+    {0x40000000, &DAT_00666088, 0x80000000, &DAT_00666090}, /* NUM_SHOPS, VAR_SHOPS */
+    {0x10000, &DAT_00666040, 0x20000, &DAT_00666048}, /* NUM_FOOD, VAR_FOOD */
+};
+
+static const char *ClassName(const struct Ride *cls) {
+    return cls->element != NULL && cls->element->name != NULL ? cls->element->name : "?";
+}
+
+/* FUN_00444c40: scenery classes the count leaves out (water and track pieces, the workers' huts...) */
+static int SceneryExcluded(const struct Ride *cls) {
+    int i;
+
+    for (i = 0; i < 22; i++) {
+        if (DAT_004b7e9c[i] != NULL && _stricmp(ClassName(cls), DAT_004b7e9c[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* The category the inspector counts a class in, or -1. */
+static int ClassCategory(const struct Ride *cls) {
+    switch (cls->type) {
+    case 1:
+    case 3:
+        return CAT_ATTRACTIONS;
+    case 2:
+        return SceneryExcluded(cls) ? -1 : CAT_SCENERY;
+    case 4:
+        return CAT_SHOPS;
+    case 5:
+        return CAT_FOOD;
+    }
+    return -1;
+}
+
+static void CountCategory(int cat, int *kinds, int *placed) {
+    struct Ride *cls;
+
+    *kinds = 0;
+    *placed = 0;
+    for (cls = ObjectClassList; cls != NULL; cls = cls->next) {
+        if (cls->field_8 != 0 && ClassCategory(cls) == cat) {
+            *kinds += 1;
+            *placed += (int)cls->field_8;
+        }
+    }
+}
+
+/* "have / target ok" for one check; "" when the script doesn't set it */
+static const char *CheckText(char *buf, size_t size, unsigned int flag, const unsigned int *target, int have) {
+    if ((ReportFlags & flag) == 0) {
+        snprintf(buf, size, "%d (not checked)", have);
+    } else {
+        snprintf(buf, size, "%d / %d needed %s", have, (int)*target, (int)*target <= have ? "ok" : "NOT met");
+    }
+    return buf;
+}
+
+static void PrintAppraisalTargets(void) {
+    int shown = 0;
+    int cat;
+
+    for (cat = 0; cat < CAT_COUNT; cat++) {
+        char amount[48];
+        char variety[48];
+        int kinds;
+        int placed;
+
+        if ((ReportFlags & (Targets[cat].amount_flag | Targets[cat].variety_flag)) == 0) {
+            continue;
+        }
+        if (shown++ == 0) {
+            ConPrintf("Appraisal (what the inspector checks; \"variety\" lists the kinds):");
+        }
+        CountCategory(cat, &kinds, &placed);
+        ConPrintf("  %-12s amount %-24s variety %s", CategoryNames[cat],
+            CheckText(amount, sizeof(amount), Targets[cat].amount_flag, Targets[cat].amount, placed),
+            CheckText(variety, sizeof(variety), Targets[cat].variety_flag, Targets[cat].variety, kinds));
+    }
+    if (shown == 0) {
+        ConPrintf("Appraisal: this level sets no amount or variety targets for the inspector.");
+    }
+}
+
+/* Prints "  <label>: a, b, c" wrapped to the console's width. */
+static void PrintList(const char *label, const char *const *items, int count) {
+    char line[CON_LINE];
+    int len;
+    int i;
+
+    if (count == 0) {
+        return;
+    }
+    len = snprintf(line, sizeof(line), "  %s:", label);
+    for (i = 0; i < count; i++) {
+        int need = (int)strlen(items[i]) + 2;
+        if (len + need > 110) {
+            ConPrintf("%s", line);
+            len = snprintf(line, sizeof(line), "   ");
+        }
+        len += snprintf(line + len, sizeof(line) - (size_t)len, " %s%s", items[i], i + 1 < count ? "," : "");
+    }
+    ConPrintf("%s", line);
+}
+
+#define MAX_LISTED 128
+
+static void CmdVariety(void) {
+    static char texts[MAX_LISTED][64];
+    const char *placed_items[MAX_LISTED];
+    const char *unplaced_items[MAX_LISTED];
+    const char *excluded_items[MAX_LISTED];
+    struct Ride *cls;
+    int used;
+    int cat;
+
+    if (!NeedLevel()) {
+        return;
+    }
+    used = 0;
+    for (cat = 0; cat < CAT_COUNT; cat++) {
+        char amount[48];
+        char variety[48];
+        int n_placed = 0;
+        int n_unplaced = 0;
+        int kinds;
+        int placed;
+
+        CountCategory(cat, &kinds, &placed);
+        ConPrintf("%s: variety %s, amount %s", CategoryNames[cat],
+            CheckText(variety, sizeof(variety), Targets[cat].variety_flag, Targets[cat].variety, kinds),
+            CheckText(amount, sizeof(amount), Targets[cat].amount_flag, Targets[cat].amount, placed));
+        for (cls = ObjectClassList; cls != NULL; cls = cls->next) {
+            if (ClassCategory(cls) != cat) {
+                continue;
+            }
+            if (cls->field_8 != 0 && n_placed < MAX_LISTED && used < MAX_LISTED) {
+                snprintf(texts[used], sizeof(texts[used]), "%s x%u", ClassName(cls), cls->field_8);
+                placed_items[n_placed++] = texts[used++];
+            } else if (cls->field_8 == 0 && n_unplaced < MAX_LISTED) {
+                unplaced_items[n_unplaced++] = ClassName(cls);
+            }
+        }
+        PrintList("counted", placed_items, n_placed);
+        PrintList("loaded in this level but none placed", unplaced_items, n_unplaced);
+        used = 0;
+    }
+    {
+        int n_excluded = 0;
+        for (cls = ObjectClassList; cls != NULL; cls = cls->next) {
+            if (cls->type == 2 && cls->field_8 != 0 && SceneryExcluded(cls) && n_excluded < MAX_LISTED) {
+                excluded_items[n_excluded++] = ClassName(cls);
+            }
+        }
+        PrintList("placed scenery the inspector doesn't count", excluded_items, n_excluded);
+    }
+    ConPrintf("(Names are the game's internal ones. A kind counts once however many you place.)");
+}
+
 /* ---- commands ---- */
 
 static void CmdHelp(void) {
     ConPrintf("Info:");
     ConPrintf("  status               level, money, visitors, script and inspector state");
-    ConPrintf("  objectives (obj)     what the level script is waiting for right now");
+    ConPrintf("  objectives (obj)     what the level script is waiting for right now, and the appraisal targets");
+    ConPrintf("  variety              the object kinds the inspector counts for variety and amount, per category");
     ConPrintf("  note <text>          write a marker line into legoland-port-trace.txt");
     ConPrintf("Level flow (need a level loaded):");
     ConPrintf("  skip                 complete the current step (its rewards are given as normal)");
@@ -417,6 +604,7 @@ static void CmdObjectives(void) {
     if (IsLastStep()) {
         ConPrintf("This is the last step of the level script.");
     }
+    PrintAppraisalTargets();
 }
 
 static void CmdSkip(int permanent_too) {
@@ -539,6 +727,8 @@ static void RunCommand(char *line) {
         CmdStatus();
     } else if (_stricmp(cmd, "objectives") == 0 || _stricmp(cmd, "obj") == 0) {
         CmdObjectives();
+    } else if (_stricmp(cmd, "variety") == 0) {
+        CmdVariety();
     } else if (_stricmp(cmd, "note") == 0) {
         ConPrintf("NOTE: %s%s%s", arg, arg2 != NULL ? " " : "", arg2 != NULL ? arg2 : "");
     } else if (_stricmp(cmd, "skip") == 0) {
