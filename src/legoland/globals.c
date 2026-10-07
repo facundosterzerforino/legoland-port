@@ -561,7 +561,6 @@ unsigned int DAT_004b5f14[4][2] = {{0x3fc00000, 0x3f000000}, {0x3f000000, 0x3fc0
 // GLOBAL: LEGOLAND 0x004b5f60
 struct TexMesh DAT_004b5f60 = {0, 0, 0, 0, (struct MeshVert *)DAT_006139c8, DAT_006148b8, (unsigned int (*)[3])DAT_00612708};
 
-
 // GLOBAL: LEGOLAND 0x004b61e0
 struct CastleFloatEnt DAT_004b61e0[8];
 
@@ -5477,7 +5476,6 @@ int DAT_00641004[3001];
 
 // GLOBAL: LEGOLAND 0x00643ee8
 int DAT_00643ee8[3048][3];
-
 
 // GLOBAL: LEGOLAND 0x0063810c
 int DAT_0063810c;
