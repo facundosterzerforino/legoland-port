@@ -141,9 +141,17 @@ def is_opaque(g):
     return not declared_in_headers(g["name"]) or re.search(r"\b%s\s*\[\s*\]" % re.escape(g["name"]), headers)
 
 
+opaque_sizes = {}  # name -> sizeof in the port, for opaque globals that pointers point into (filled below)
+
+
 def size_expr(a):
     g = globals_[a]
-    return ("0x%xu" % gap_of(a)) if is_opaque(g) else "sizeof(%s)" % g["name"]
+    if not is_opaque(g):
+        return "sizeof(%s)" % g["name"]
+    # Its real size, measured with clang (an 8-byte struct must not be treated as owning its whole original gap,
+    # or pointers into the rest of the gap get aimed past it: the copters' sound names were). The gap is only
+    # the fallback when it couldn't be measured.
+    return "0x%xu" % opaque_sizes.get(g["name"], gap_of(a))
 
 
 def usable_global(a):
@@ -295,6 +303,23 @@ out.append("struct PortFixup {\n    unsigned int slot;   /* offset of the pointe
            "    unsigned int size;   /* sizeof the global ('G') */\n"
            "    unsigned int offset; /* offset into the global ('G') or into port_data ('I') */\n"
            "    unsigned int data;   /* the original target's offset in port_data, or ~0u if outside it */\n};\n\n")
+# measure the opaque globals that 'G' fixups point into (tools/audit_globals.py does the clang sizing)
+_opaque = {}
+for off, kind, name, x in fixups:
+    if kind == "G":
+        ga = global_containing(struct.unpack_from("<I", image, off)[0])
+        if is_opaque(globals_[ga]) and not globals_[ga]["static"]:
+            _opaque.setdefault(globals_[ga]["file"], set()).add(globals_[ga]["name"])
+if _opaque:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        import audit_globals
+        opaque_sizes.update(audit_globals.port_sizes({f: sorted(n) for f, n in _opaque.items()}))
+    except Exception as e:  # no clang-cl / xwin: fall back to the gaps
+        print("warning: could not measure opaque globals (%s); using their original gaps" % e, file=sys.stderr)
+    missing = sorted(n for ns in _opaque.values() for n in ns if n not in opaque_sizes)
+    if missing:
+        print("warning: unmeasured opaque globals, using their gaps: %s" % ", ".join(missing), file=sys.stderr)
 out.append("static const struct PortFixup port_fixups[] = {\n")
 for off, kind, name, x in fixups:
     v = struct.unpack_from("<I", image, off)[0]
