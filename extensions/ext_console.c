@@ -649,10 +649,12 @@ static void RunCommand(char *line) {
             for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
                 entry++) {
                 if (FUN_00478b20((unsigned int)entry->name) == 0) {
+                    ConPrintf("  not given: %s (its class failed to load)", entry->name);
                     continue;
                 }
                 elem = ElemID(entry->name);
                 if (elem == NULL) {
+                    ConPrintf("  not given: %s (no such element)", entry->name);
                     continue;
                 }
                 given += (elem->flags & 0x10002) != 2;
