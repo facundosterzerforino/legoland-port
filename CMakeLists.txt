@@ -43,6 +43,24 @@ if(LEGOLAND_MODERN_BUILD)
     target_link_libraries(legoland PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/libs/dinput.lib"
         ddraw dsound dxguid winmm msacm32 vfw32 version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
+    # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
+    # external/legoland.exe at build time rather than committed (tools/extract_resources.py).
+    set(LEGOLAND_ORIGINAL_EXE "${CMAKE_CURRENT_SOURCE_DIR}/external/legoland.exe")
+    if(EXISTS "${LEGOLAND_ORIGINAL_EXE}")
+        find_package(Python3 REQUIRED COMPONENTS Interpreter)
+        set(LEGOLAND_RES "${CMAKE_CURRENT_BINARY_DIR}/legoland_original.res")
+        add_custom_command(OUTPUT "${LEGOLAND_RES}"
+            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/extract_resources.py"
+                    "${LEGOLAND_ORIGINAL_EXE}" "${LEGOLAND_RES}"
+            DEPENDS "${LEGOLAND_ORIGINAL_EXE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/extract_resources.py"
+            COMMENT "Extracting the original exe's resources")
+        add_custom_target(legoland_resources DEPENDS "${LEGOLAND_RES}")
+        add_dependencies(legoland legoland_resources)
+        target_link_options(legoland PRIVATE "${LEGOLAND_RES}")
+        set_property(TARGET legoland APPEND PROPERTY LINK_DEPENDS "${LEGOLAND_RES}")
+    else()
+        message(WARNING "external/legoland.exe not found: the port exe gets no icon, cursor or dialog resources")
+    endif()
 else()
     # The MSVC6 matching build (preset msvc6): links, carries symbols for reccmp, doesn't run.
     # (The match target; runnability is a non-goal there, see cmake/msvc6-toolchain.cmake.)
