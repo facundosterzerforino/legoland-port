@@ -11,6 +11,12 @@
 #include "print_sprite.h"
 #include "render.h"
 #include "timer.h"
+#ifdef LEGOLAND_PORT
+#include <stdint.h>
+#include "debug.h"
+#include "llidb.h"
+#include "port_trace.h"
+#endif
 
 struct SortNode {
     /* 0x00 */ struct SortNode *left;
@@ -38,6 +44,25 @@ struct SpriteExArg {
     /* 0x10 */ unsigned int mode;
     /* 0x14 */ unsigned int mask;
 };
+
+#ifdef LEGOLAND_PORT
+/* [port] Whether p is one of the resource database's elements (an object class), for PrintSprite's check. */
+static int PortIsElement(const void *p) {
+    unsigned int count = LLIDB_GetCount();
+    unsigned int i;
+    struct Element *e;
+
+    if (p == NULL) {
+        return 0;
+    }
+    for (i = 0; i < count; i++) {
+        if (LLIDB_GetElement(i, &e) == 0 && e == p) {
+            return 1;
+        }
+    }
+    return 0;
+}
+#endif
 
 // FUNCTION: LEGOLAND 0x004853a0
 LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsigned int y, unsigned int param_4, int *param_5) {
@@ -110,6 +135,25 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
         }
     }
     if (param_5 != NULL && DAT_007feb14 != 0 && *param_5 != 0x100) {
+#ifdef LEGOLAND_PORT
+        /* [port] an object hit (0x103 placed, 0x104 being built) must carry the object's class element: the
+         * hover code dereferences it (FUN_00457a70) and a garbage one crashed there. Drop such a hit and say
+         * who passed it, so the caller can be found and fixed. */
+        if ((*param_5 == 0x103 || *param_5 == 0x104) && !PortIsElement((void *)(uintptr_t)(unsigned int)param_5[1])) {
+            static unsigned long reported[16];
+            static int nreported;
+            unsigned long caller = PortRva(PORT_CALLER());
+            int k;
+            for (k = 0; k < nreported && reported[k] != caller; k++) {
+            }
+            if (k == nreported && nreported < 16) {
+                reported[nreported++] = caller;
+                DebugTrace("PrintSprite: hit %x with no class element (%08x, tile %04x), called from rva %08lx",
+                    param_5[0], param_5[1], param_5[2] & 0xffff, caller);
+            }
+            return result;
+        }
+#endif
         Hover = *(struct HoverInfo *)param_5;
     }
     return result;
