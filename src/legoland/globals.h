@@ -3990,6 +3990,9 @@ struct CastleState {
     /* 0xc4 */ unsigned int field_c4;
     /* 0xc8 */ short field_c8[4][2];
     /* 0xd8 */ unsigned char pad_d8[0x10c - 0xd8];
+    /* 0x10c */ void *method_10c; /* FUN_00424850: called through it by FUN_0041e500 */
+    /* 0x110 */ void *method_110; /* FUN_00424890: FUN_0041e0e0 */
+    /* 0x114 */ void *method_114; /* FUN_00424990: FUN_0041e100 */
 };
 // 0x00829ae0
 extern struct CastleState DAT_00829ae0;
@@ -4010,12 +4013,6 @@ struct CastleClass {
     void *method_24;
 };
 extern struct CastleClass DAT_004b5b48;
-// 0x00829bec
-extern void *DAT_00829bec;
-// 0x00829bf0
-extern void *DAT_00829bf0;
-// 0x00829bf4
-extern void *DAT_00829bf4;
 // 0x00829bf8
 extern unsigned int DAT_00829bf8;
 // 0x00829bfc

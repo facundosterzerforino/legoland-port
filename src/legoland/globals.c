@@ -5203,22 +5203,13 @@ struct EditFootPrint DAT_00829a80;
 // GLOBAL: LEGOLAND 0x00829abc
 struct Element *DAT_00829abc;
 
-// One object of 0x10c bytes: the castle code reaches its parts both by name and through struct
+// One object of 0x118 bytes (0x10c of data, then three methods): the castle code reaches its parts both by name and through struct
 // views of its address (sentinel list node at +4, anims, list hosts), so they must keep these offsets.
 // GLOBAL: LEGOLAND 0x00829ae0
 struct CastleState DAT_00829ae0;
 
 // GLOBAL: LEGOLAND 0x004b5b48
 struct CastleClass DAT_004b5b48;
-
-// GLOBAL: LEGOLAND 0x00829bec
-void *DAT_00829bec;
-
-// GLOBAL: LEGOLAND 0x00829bf0
-void *DAT_00829bf0;
-
-// GLOBAL: LEGOLAND 0x00829bf4
-void *DAT_00829bf4;
 
 // GLOBAL: LEGOLAND 0x00829bf8
 unsigned int DAT_00829bf8;
