@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ext_music.h"
 #include "port_display.h"
 #include "port_launcher.h"
 #include "port_trace.h"
@@ -13,6 +14,7 @@
 #define ID_CHANGE 103
 #define ID_WINDOWED 104
 #define ID_DONT_ASK 105
+#define ID_LEVEL_MUSIC 106
 
 /* the three ways to show the game */
 enum {
@@ -205,7 +207,7 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
         ReleaseDC(NULL, screen);
     }
     cw = S(330);
-    ch = S(268);
+    ch = S(300);
 
     memset(&metrics, 0, sizeof(metrics));
     metrics.cbSize = sizeof(metrics);
@@ -249,16 +251,19 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
     Control("STATIC", "Resolution:", 0, 16, 110, 298, 18, -1, font);
     combo = Control("COMBOBOX", "", CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_GROUP, 16, 130, 298, 300,
         ID_RESOLUTION, font);
-    Control("BUTTON", "Don't show this again", BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 16, 170, 298, 20, ID_DONT_ASK,
+    Control("BUTTON", "Music follows the level (new in this port)", BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 16,
+        166, 298, 20, ID_LEVEL_MUSIC, font);
+    Control("BUTTON", "Don't show this again", BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 16, 202, 298, 20, ID_DONT_ASK,
         font);
-    Control("STATIC", "(hold Shift while starting the game to see it again)", 0, 34, 190, 290, 18, -1, font);
-    Control("BUTTON", "Play", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 136, 226, 86, 28, IDOK, font);
-    Control("BUTTON", "Quit", WS_TABSTOP, 228, 226, 86, 28, IDCANCEL, font);
+    Control("STATIC", "(hold Shift while starting the game to see it again)", 0, 34, 222, 290, 18, -1, font);
+    Control("BUTTON", "Play", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 136, 258, 86, 28, IDOK, font);
+    Control("BUTTON", "Quit", WS_TABSTOP, 228, 258, 86, 28, IDCANCEL, font);
 
     CheckDlgButton(launcher,
         chosen_mode == MODE_WINDOW ? ID_WINDOWED : chosen_mode == MODE_CHANGE ? ID_CHANGE
                                                                               : ID_DESKTOP,
         BST_CHECKED);
+    CheckDlgButton(launcher, ID_LEVEL_MUSIC, ExtLevelMusic ? BST_CHECKED : BST_UNCHECKED);
     FillCombo(chosen_mode);
     ShowWindow(launcher, SW_SHOW);
     SetForegroundWindow(launcher);
@@ -273,6 +278,7 @@ static int ShowLauncher(HINSTANCE instance, int *dont_ask) {
         }
     }
     *dont_ask = IsDlgButtonChecked(launcher, ID_DONT_ASK) == BST_CHECKED;
+    ExtLevelMusic = IsDlgButtonChecked(launcher, ID_LEVEL_MUSIC) == BST_CHECKED;
     DestroyWindow(launcher);
     launcher = NULL;
     UnregisterClassA("LEGOLANDLAUNCHER", instance);
@@ -325,6 +331,7 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
         }
     }
     ask = GetPrivateProfileIntA("display", "show_launcher", 1, ini_path) != 0;
+    ExtLevelMusic = GetPrivateProfileIntA("extensions", "level_music", 0, ini_path) != 0; /* extensions/ext_music.h */
 
     from_cmdline = ParseResolution(cmdline, &chosen_width, &chosen_height);
     if (strstr(cmdline, "WINDEBUG") != NULL || strstr(cmdline, "-windowed") != NULL) {
@@ -352,6 +359,7 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
         WritePrivateProfileStringA("display", "mode", mode_names[chosen_mode], ini_path);
         WritePrivateProfileStringA("display", "windowed", NULL, ini_path); /* replaced by "mode" */
         WriteInt("show_launcher", !dont_ask);
+        WritePrivateProfileStringA("extensions", "level_music", ExtLevelMusic ? "1" : "0", ini_path);
     }
     if (chosen_mode == MODE_DESKTOP) {
         /* a borderless window over the whole (primary) screen; the display mode isn't touched */

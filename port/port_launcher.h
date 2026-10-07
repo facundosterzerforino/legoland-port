@@ -8,6 +8,7 @@
  *   - full screen at the desktop's resolution (default): a borderless window over the screen, no mode change;
  *   - full screen changing the resolution: a 4:3 display mode (32-bit; 16-bit if refused);
  *   - in a window of a chosen 4:3 size.
+ * It also has the box for the level music extension (extensions/ext_music.h, off by default).
  * The choice is saved next to the exe (<exe name>.ini) and the launcher can be skipped from then on ("Don't show
  * this again"; hold Shift while starting to see it again).
  *

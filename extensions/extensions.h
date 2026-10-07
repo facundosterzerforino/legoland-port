@@ -10,7 +10,14 @@ extern int ExtSkipLogo;
 
 /* -console opens a debug console for playtesting (ext_console.h; commands in docs/debug-console.md). */
 
-/* Reads the switches from the command line. */
+/* Level music (ext_music.h): each level plays the music theme that fits it. Off by default; the launcher's "Music
+ * changes with the level" box saves the choice, and -level-music / -no-level-music override it. */
+
+/* Reads the switches from the command line (after the launcher, so they override its saved choices). */
 void ExtensionsParseCommandLine(const char *cmdline);
+
+/* The extensions' per-frame work (console commands, level music). Main thread, where the original reads its cheat
+ * keys (ProcessSystemEvents). */
+void ExtensionsPoll(void);
 
 #endif

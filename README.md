@@ -98,6 +98,18 @@ Shift while starting the game to see it again. Command line: `-fullscreen` (desk
 (full screen in that mode), `-windowed` (or the original `WINDEBUG`) choose without the launcher, `-launcher`
 always shows it.
 
+## Optional features
+
+These are new in the port and off unless you turn them on (`extensions/`):
+
+- **Music follows the level** (a box in the launcher, or `-level-music` / `-no-level-music`): the game has
+  five music themes, but the original only plays the main one; the other four were only reachable with cheat
+  codes. With this on, each level plays the theme that fits its story (Western, Castle, Egypt or Inca; the
+  tutorials and some levels keep the main theme), and the menus go back to the main theme. The table is in
+  `extensions/ext_music.c`.
+- **Debug console** (`-console`): see `docs/debug-console.md`.
+- The LEGO Media logo at startup can be skipped with a click (on by default; `-no-skip-logo` turns it off).
+
 ## More documentation
 
 - `ROADMAP.md`: the phase-by-phase plan, from finishing the assembly replacements to Android.

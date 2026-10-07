@@ -11,6 +11,7 @@
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
 #include "ext_console.h"
+#include "extensions.h"
 #include "port_watchdog.h"
 #endif
 
@@ -136,7 +137,7 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
     UpdateControllerFromMouseData(CONTROLLERBUFFER);
     UpdateControllerFromKeyboardData(CONTROLLERBUFFER);
 #ifdef LEGOLAND_PORT
-    ExtConsolePoll(); /* [port] extensions/: debug console commands, where the original cheat keys run */
+    ExtensionsPoll(); /* [port] extensions/: debug console commands and level music, where the original cheat keys run */
 #endif
     return 1;
 }
