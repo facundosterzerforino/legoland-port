@@ -339,6 +339,11 @@ static int SceneryExcluded(const struct Ride *cls) {
     return 0;
 }
 
+/* The build menu lists a class once its element has flags 0x13 (ObjectLinkedList): the script has given it. */
+static int InBuildMenu(const struct Ride *cls) {
+    return cls->element != NULL && (cls->element->flags & 0x13) == 0x13;
+}
+
 /* The category the inspector counts a class in, or -1. */
 static int ClassCategory(const struct Ride *cls) {
     switch (cls->type) {
@@ -431,6 +436,7 @@ static void CmdVariety(void) {
     static char texts[MAX_LISTED][64];
     const char *placed_items[MAX_LISTED];
     const char *unplaced_items[MAX_LISTED];
+    const char *ungiven_items[MAX_LISTED];
     const char *excluded_items[MAX_LISTED];
     struct Ride *cls;
     int used;
@@ -445,6 +451,7 @@ static void CmdVariety(void) {
         char variety[48];
         int n_placed = 0;
         int n_unplaced = 0;
+        int n_ungiven = 0;
         int kinds;
         int placed;
 
@@ -459,12 +466,15 @@ static void CmdVariety(void) {
             if (cls->field_8 != 0 && n_placed < MAX_LISTED && used < MAX_LISTED) {
                 snprintf(texts[used], sizeof(texts[used]), "%s x%u", ClassName(cls), cls->field_8);
                 placed_items[n_placed++] = texts[used++];
-            } else if (cls->field_8 == 0 && n_unplaced < MAX_LISTED) {
+            } else if (cls->field_8 == 0 && InBuildMenu(cls) && n_unplaced < MAX_LISTED) {
                 unplaced_items[n_unplaced++] = ClassName(cls);
+            } else if (cls->field_8 == 0 && !InBuildMenu(cls) && n_ungiven < MAX_LISTED) {
+                ungiven_items[n_ungiven++] = ClassName(cls);
             }
         }
         PrintList("counted", placed_items, n_placed);
-        PrintList("loaded in this level but none placed", unplaced_items, n_unplaced);
+        PrintList("in your build menu, none placed yet", unplaced_items, n_unplaced);
+        PrintList("not given to you yet (the level script gives them later, or never)", ungiven_items, n_ungiven);
         used = 0;
     }
     {
@@ -579,6 +589,12 @@ static void CmdObjectives(void) {
             RangeCount(node->field_4, &kinds, &placed);
             snprintf(what + len, sizeof(what) - len, ": %d different kinds (have %d), %d placed in all (have %d)",
                 (int)node->field_14, kinds, (int)node->field_1c, placed);
+        } else if (node->type >= 0x30 && node->type <= 0x35) {
+            /* the coverage checks (nerps.c ScriptEvent*Coverage, ScriptEventPathScenery): target % in field_14 */
+            static int *const now[6] = {
+                &DAT_00667cf8, &DAT_00667d08, &DAT_00667ce4, &DAT_00667ce8, &DAT_00667cec, &DAT_00667ce0};
+            size_t len = strlen(what);
+            snprintf(what + len, sizeof(what) - len, " %d%% (now %d%%)", (int)node->field_14, *now[node->type - 0x30]);
         } else if (node->type != 0x45 && node->type != 0x41 && node->type != 0x42 && node->type != 0x43) {
             size_t len = strlen(what);
             snprintf(what + len, sizeof(what) - len, " %d", (int)node->field_1c);
