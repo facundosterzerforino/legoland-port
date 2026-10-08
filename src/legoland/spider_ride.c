@@ -250,7 +250,7 @@ void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, unsi
 }
 
 // FUNCTION: LEGOLAND 0x00415e80
-void FUN_00415e80(struct CarNode *param_1) {
+void SpiderRideLoad(struct CarNode *param_1) {
     DAT_004cbf20 = ((unsigned int *)param_1)[3];
     ((unsigned int *)DAT_004cbf20)[7] |= 0x420;
     SpiderRideLayer = (struct Sprite *)((unsigned int *)DAT_004cbf20)[25];
@@ -283,7 +283,7 @@ void FUN_00415e80(struct CarNode *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00415fd0
-void FUN_00415fd0(struct CarNode *param_1) {
+void SpiderRideUnload(struct CarNode *param_1) {
     DAT_004cbf20 = ((unsigned int *)param_1)[3];
 
     if (ZSpiderSprite != NULL) {
@@ -335,7 +335,7 @@ void SpiderAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00416120
-unsigned int *FUN_00416120(unsigned int *a1, unsigned short a2) {
+unsigned int *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
     struct CarNode *car = *(struct CarNode **)((unsigned char *)a1 + 0xc);
     DAT_004cbf40.sprite = car->next;
     DAT_004cbf40.x = car->field_14;
@@ -350,14 +350,14 @@ unsigned int *FUN_00416120(unsigned int *a1, unsigned short a2) {
 void SpiderRide(struct ClassNode *name_ptr, struct CallbackTable *obj) {
     // STRING: LEGOLAND 0x004b4eb8
     if (_stricmp("SPIDER RIDE", name_ptr->name) == 0) {
-        obj->cb_a4 = FUN_00415e80;
-        obj->cb_ac = FUN_00415fd0;
+        obj->cb_a4 = SpiderRideLoad;
+        obj->cb_ac = SpiderRideUnload;
         obj->cb_8c = SpiderSetEditMode;
-        obj->cb_a8 = FUN_00416330;
+        obj->cb_a8 = SpiderRideUpdate;
         obj->cb_b0 = RenderSpider;
         obj->cb_9c = SpiderRemoveObject;
         obj->cb_98 = SpiderAddObject;
-        obj->cb_a0 = FUN_00416120;
+        obj->cb_a0 = GetSpiderRideSpriteInfo;
         obj->cb_bc = SaveSpider;
         obj->cb_b8 = LoadSpider;
     }
@@ -420,7 +420,7 @@ void FUN_00416310(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00416330
-void FUN_00416330(Element *obj) {
+void SpiderRideUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *elem = ride->riders;
     struct SpiderState *state;

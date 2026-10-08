@@ -1703,7 +1703,7 @@ extern unsigned int DAT_004dd5d8;
 // 0x004dd5e0
 extern void *DAT_004dd5e0[24];
 // 0x004dd758
-/* A text file read whole: its bytes and their count (FUN_004223c0 and FindLineStart read both through the
+/* A text file read whole: its bytes and their count (CountTextLines and FindLineStart read both through the
  * address). */
 struct CoasterTextFile {
     unsigned int data;

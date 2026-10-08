@@ -171,7 +171,7 @@ void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3
 }
 
 // FUNCTION: LEGOLAND 0x004378e0
-void FUN_004378e0(struct MapObject *param_1) {
+void GeneralStoreUpdate(struct MapObject *param_1) {
     struct Building *ride = param_1->building;
     struct RideListElem *node = ride->list;
     struct RideListElem *next;
@@ -354,7 +354,7 @@ void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int
 }
 
 // FUNCTION: LEGOLAND 0x00437c90
-void FUN_00437c90(struct MapObject *param_1) {
+void SheriffUpdate(struct MapObject *param_1) {
     struct Building *ride = param_1->building;
     struct RideListElem *node = ride->list;
     struct RideListElem *next;
@@ -536,7 +536,7 @@ void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Curso
 }
 
 // FUNCTION: LEGOLAND 0x00438070
-void FUN_00438070(struct MapObject *obj) {
+void JailCellLoad(struct MapObject *obj) {
     struct Building *building = obj->building;
     DAT_0081cb10 = building;
     building->flags |= 0x420;
@@ -550,7 +550,7 @@ void FUN_00438070(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004380f0
-void FUN_004380f0(void) {
+void JailCellUnload(void) {
     KillSprite(JailCellMaskSprite);
     FUN_00438000();
 }
@@ -642,7 +642,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
 }
 
 // FUNCTION: LEGOLAND 0x00438430
-void FUN_00438430(Element *obj) {
+void JailCellUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -882,7 +882,7 @@ void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int pa
 }
 
 // FUNCTION: LEGOLAND 0x00438960
-void FUN_00438960(Element *obj) {
+void BankUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -1095,7 +1095,7 @@ void RenderSaloon(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x00438f10
-void FUN_00438f10(Element *obj) {
+void SaloonUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;

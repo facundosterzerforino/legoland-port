@@ -417,7 +417,7 @@ void FUN_0042d5f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d610
-void FUN_0042d610(struct EarthRideObj *param_1) {
+void EarthSlideRideUpdate(struct EarthRideObj *param_1) {
     struct Cursor *ride = param_1->ride;
     struct EarthBlokeElem *elem;
     struct EarthBlokeElem *next;

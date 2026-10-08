@@ -757,7 +757,7 @@ void JoustFreeResources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00408c50
-unsigned int *FUN_00408c50(struct JoustRoot *param1, unsigned short param2) {
+unsigned int *GetJoustSpriteInfo(struct JoustRoot *param1, unsigned short param2) {
     struct JoustBlock *block = param1->field_c;
 
     DAT_004c1228.sprite = block->layer;
@@ -867,7 +867,7 @@ LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct CallbackTabl
         iface->cb_b0 = RenderJoust;
         iface->cb_9c = JoustRemoveObject;
         iface->cb_98 = JoustAddObject;
-        iface->cb_a0 = FUN_00408c50;
+        iface->cb_a0 = GetJoustSpriteInfo;
         iface->cb_bc = SaveJoust;
         iface->cb_b8 = LoadJoust;
     }

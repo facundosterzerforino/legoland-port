@@ -209,7 +209,7 @@ void FUN_0043c320(struct BarrelNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c340
-void FUN_0043c340(struct Element *elem) {
+void SpinningBarrelsRideLoad(struct Element *elem) {
     struct LayerResult layer;
 
     SpinningBarrelsRide = elem->ride;
@@ -274,7 +274,7 @@ void SpinningBarrelsAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c570
-unsigned int *FUN_0043c570(struct BarrelRoot *ride, unsigned short param2) {
+unsigned int *GetSpinningBarrelsRideSpriteInfo(struct BarrelRoot *ride, unsigned short param2) {
     struct BarrelCarNode *target = ride->car;
 
     DAT_0062fdb0.sprite = target->next;
@@ -288,7 +288,7 @@ unsigned int *FUN_0043c570(struct BarrelRoot *ride, unsigned short param2) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c5b0
-void FUN_0043c5b0(void) {
+void SpinningBarrelsRideUnload(void) {
     KillSprite(SpinningBarrelsEntranceMatteSprite);
     KillSprite(SpinningBarrelsEntranceMatte2Sprite);
     KillSprite(DAT_0062fe00[1]);
@@ -414,14 +414,14 @@ LEGO_EXPORT int LoadSBarrel(struct BarrelLoadArg *arg) {
 void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct CallbackTable *ride) {
     // STRING: LEGOLAND 0x004b7978
     if (_stricmp("SPINNING BARRELS RIDE", str->name) == 0) {
-        ride->cb_a4 = FUN_0043c340;
+        ride->cb_a4 = SpinningBarrelsRideLoad;
         ride->cb_8c = SpinningBarrelsSetEditMode;
         ride->cb_a8 = SpinningBarrelsUpdate;
         ride->cb_b0 = RenderSpinningBarrels;
         ride->cb_9c = SpinningBarrelsRemoveObject;
         ride->cb_98 = SpinningBarrelsAddObject;
-        ride->cb_ac = FUN_0043c5b0;
-        ride->cb_a0 = FUN_0043c570;
+        ride->cb_ac = SpinningBarrelsRideUnload;
+        ride->cb_a0 = GetSpinningBarrelsRideSpriteInfo;
         ride->cb_bc = SaveSBarrel;
         ride->cb_b8 = LoadSBarrel;
     }

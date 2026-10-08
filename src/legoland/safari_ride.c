@@ -219,7 +219,7 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x00414d90
-void FUN_00414d90(struct SafariObject *a1) {
+void SafariRideLoad(struct SafariObject *a1) {
     SafariRide = a1->field_c;
     SafariRide->flags |= 0x420;
     SafariLayer = SafariRide->layer;
@@ -247,7 +247,7 @@ void FUN_00414d90(struct SafariObject *a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ea0
-void FUN_00414ea0(struct SafariObject *a1) {
+void SafariRideUnload(struct SafariObject *a1) {
     SafariRide = a1->field_c;
     FUN_00414a60();
     Kill_FXList(SAFARI_SFX, 1);
@@ -305,7 +305,7 @@ void SafariAddObject(unsigned int uid, struct SafariBasicObject *a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ff0
-unsigned int *FUN_00414ff0(struct SafariRoot *p1, unsigned short arg2) {
+unsigned int *GetSafariRideSpriteInfo(struct SafariRoot *p1, unsigned short arg2) {
     struct SafariBlock *pB = p1->ride;
     DAT_004cbed0.sprite = pB->layer;
     DAT_004cbed0.x = pB->field_14;
@@ -319,14 +319,14 @@ unsigned int *FUN_00414ff0(struct SafariRoot *p1, unsigned short arg2) {
 void SafariRideGetInterfaces(struct ClassNode *name, struct CallbackTable *interfaces) {
     // STRING: LEGOLAND 0x004b4d74
     if (_stricmp("SAFARI RIDE", name->name) == 0) {
-        interfaces->cb_a4 = FUN_00414d90;
-        interfaces->cb_ac = FUN_00414ea0;
+        interfaces->cb_a4 = SafariRideLoad;
+        interfaces->cb_ac = SafariRideUnload;
         interfaces->cb_8c = SafariSetEditMode;
         interfaces->cb_a8 = SafariRideUpdate;
         interfaces->cb_b0 = RenderSafari;
         interfaces->cb_9c = SafariRemoveObject;
         interfaces->cb_98 = SafariAddObject;
-        interfaces->cb_a0 = FUN_00414ff0;
+        interfaces->cb_a0 = GetSafariRideSpriteInfo;
         interfaces->cb_bc = SaveSafariRide;
         interfaces->cb_b8 = LoadSafariRide;
     }

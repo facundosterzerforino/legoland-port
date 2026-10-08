@@ -670,7 +670,7 @@ void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a2f0
-void FUN_0041a2f0(int param_1, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolCalcCursor(int param_1, unsigned int param_2, unsigned int param_3) {
     struct Cursor *cursor = *(struct Cursor **)(param_1 + 0xc);
 
     BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
@@ -694,7 +694,7 @@ void FUN_0041a2f0(int param_1, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a3d0
-void FUN_0041a3d0(void *param_1, unsigned int param_2) {
+void BoatingSchoolDCalcCursor(void *param_1, unsigned int param_2) {
     struct PathNode *path = BoatPathList;
     struct MermaidNode *node = MermaidList;
 
@@ -810,7 +810,7 @@ void BoatingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *cursor)
 }
 
 // FUNCTION: LEGOLAND 0x0041a720
-void FUN_0041a720(void) {
+void BoatingSchoolUpdate(void) {
     struct RideNode *node = BoatingSchoolRide->riders;
     struct RideNode *next;
     struct BoatRideNode *score;
@@ -1164,23 +1164,23 @@ LEGO_EXPORT void GetInterface(struct ClassNode *head, struct CallbackTable *ifac
     void **cb = (void **)iface;
     // STRING: LEGOLAND 0x004b537c
     if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
-        cb[7] = FUN_0041b830;
+        cb[7] = BoatingSchoolWaterLoad;
         cb[0] = BoatingSchoolSetEditMode;
-        cb[1] = FUN_0041bd40;
-        cb[2] = FUN_0041bfb0;
-        cb[3] = FUN_0041b8e0;
-        cb[4] = FUN_0041c130;
+        cb[1] = BoatingSchoolWaterCalcCursor;
+        cb[2] = BoatingSchoolWaterDCalcCursor;
+        cb[3] = BoatingSchoolWaterAddObject;
+        cb[4] = BoatingSchoolWaterRemoveObject;
         return;
     }
     if (_stricmp("BOATING SCHOOL", head->name) == 0) {
         cb[7] = LoadBoatingSchoolResources;
         cb[8] = UnloadBoatingSchoolResources;
         cb[0] = FUN_0041a000;
-        cb[1] = FUN_0041a2f0;
-        cb[2] = FUN_0041a3d0;
+        cb[1] = BoatingSchoolCalcCursor;
+        cb[2] = BoatingSchoolDCalcCursor;
         cb[3] = BoatingSchoolAddObject;
         cb[4] = BoatingSchoolRemoveObject;
-        cb[6] = FUN_0041a720;
+        cb[6] = BoatingSchoolUpdate;
         cb[9] = RenderBoatingSchool;
         cb[0xc] = BoatingSchool_Save;
         cb[0xb] = BoatingSchool_Load;
@@ -1190,8 +1190,8 @@ LEGO_EXPORT void GetInterface(struct ClassNode *head, struct CallbackTable *ifac
     if (_stricmp("BOATING SCHOOL MERMAID", head->name) == 0) {
         cb[7] = InitBoatingSchoolMermaid;
         cb[0] = BoatingSchoolMermaidSetEditMode;
-        cb[1] = FUN_0041b4c0;
-        cb[2] = FUN_0041b6d0;
+        cb[1] = BoatingSchoolMermaidCalcCursor;
+        cb[2] = BoatingSchoolMermaidDCalcCursor;
         cb[3] = BoatingSchoolMermaidAddObject;
         cb[4] = BoatingSchoolMermaidRemoveObject;
     }
@@ -1260,7 +1260,7 @@ void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b4c0
-void FUN_0041b4c0(Element *obj, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
     struct Ride *ride;
     unsigned int mask;
     unsigned short owner;
@@ -1336,7 +1336,7 @@ void FUN_0041b4c0(Element *obj, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b6d0
-unsigned int FUN_0041b6d0(unsigned int param_1, unsigned int param_2) {
+unsigned int BoatingSchoolMermaidDCalcCursor(unsigned int param_1, unsigned int param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -1383,7 +1383,7 @@ void BoatingSchoolMermaidRemoveObject(void *param_1, TileId tile, struct Cursor 
 }
 
 // FUNCTION: LEGOLAND 0x0041b830
-void FUN_0041b830(Element *arg) {
+void BoatingSchoolWaterLoad(Element *arg) {
     struct Ride *building = arg->ride;
     BoatingSchoolWaterRide = building;
     DAT_004b53c0.v[1] += building->footprint.v[1];
@@ -1404,7 +1404,7 @@ void BoatingSchoolSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b8e0
-void FUN_0041b8e0(Element *obj, int *coords) {
+void BoatingSchoolWaterAddObject(Element *obj, int *coords) {
     struct BoatRideNode *score = BoatRideNodeList;
     unsigned int mask;
     unsigned short owner;
@@ -1501,7 +1501,7 @@ void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0041bd40
-void FUN_0041bd40(Element *obj, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
     unsigned int mask;
     unsigned short owner;
     int n;
@@ -1589,7 +1589,7 @@ void FUN_0041bd40(Element *obj, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0041bfb0
-void FUN_0041bfb0(unsigned int param_1, int *coords) {
+void BoatingSchoolWaterDCalcCursor(unsigned int param_1, int *coords) {
     struct BoatRideNode *score = BoatRideNodeList;
     struct BoatRide *ride;
     struct MapElement *elem;
@@ -1615,7 +1615,7 @@ void FUN_0041bfb0(unsigned int param_1, int *coords) {
             coords[1] = QueryObj.pos.y;
             memcpy(&QueryClass->footprint, &BoatingSchoolFootprint, sizeof(BoatingSchoolFootprint));
             fake.ride = BoatingSchoolRide;
-            FUN_0041a3d0(&fake, (unsigned int)coords);
+            BoatingSchoolDCalcCursor(&fake, (unsigned int)coords);
             return;
         }
     }
@@ -1631,7 +1631,7 @@ void FUN_0041bfb0(unsigned int param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041c130
-void FUN_0041c130(Element *obj, TileId tile, struct Cursor *cursor) {
+void BoatingSchoolWaterRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     struct BoatRideNode *score = BoatRideNodeList;
     struct MapElement *elem;
     int ex;

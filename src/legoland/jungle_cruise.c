@@ -666,7 +666,7 @@ void MonkeyTreeAddObject(unsigned int param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00433d90
-void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
     struct Ride *ride;
     unsigned int mask;
     unsigned short owner;
@@ -742,7 +742,7 @@ void FUN_00433d90(Element *obj, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00433fa0
-unsigned int FUN_00433fa0(unsigned int param_1, unsigned int param_2) {
+unsigned int JungleCruiseMonkeyTreeDCalcCursor(unsigned int param_1, unsigned int param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -851,7 +851,7 @@ void MonkeyFishAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00434330
-void FUN_00434330(Element *obj, unsigned int param_2, int *param_3) {
+void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *param_3) {
     struct Ride *ride;
     TileId owners[2];
     struct Footprint fp;
@@ -930,7 +930,7 @@ void FUN_00434330(Element *obj, unsigned int param_2, int *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00434650
-unsigned int FUN_00434650(unsigned int param_1, unsigned int param_2) {
+unsigned int JungleCruiseMonkeyFishDCalcCursor(unsigned int param_1, unsigned int param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -1183,7 +1183,7 @@ void JungleCruiseAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00435150
-void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
     memcpy(EditCursor.field_1414, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
     EditCursor.field_1830 = 0;
     JungleCruiseFootprint.next = &JungleCruiseStartFootprint;
@@ -1207,7 +1207,7 @@ void FUN_00435150(Element *obj, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00435230
-void FUN_00435230(unsigned int param_1, struct Point *param_2) {
+void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
     struct JunglePath *p1 = JunglePathList;
     struct JungleFish *p3 = JungleFishList;
     struct JungleObj *p4 = DAT_00629c34;
@@ -1376,7 +1376,7 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) 
 }
 
 // FUNCTION: LEGOLAND 0x00435750
-void FUN_00435750(void) {
+void JungleCruiseUpdate(void) {
     struct RideNode *node = JungleCruiseRide->riders;
     struct RideNode *next;
     struct JungleScore *score;
@@ -1755,7 +1755,7 @@ void JungleCruiseWaterSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00436200
-void FUN_00436200(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
     unsigned int mask;
     unsigned short owner;
     int n;
@@ -1843,7 +1843,7 @@ void FUN_00436200(Element *obj, unsigned int param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00436470
-void FUN_00436470(unsigned int param_1, int *coords) {
+void JungleCruiseWaterDCalcCursor(unsigned int param_1, int *coords) {
     struct JungleScore *score = JungleScoreList;
     struct JungleRide *ride;
     struct MapElement *elem;
@@ -1869,7 +1869,7 @@ void FUN_00436470(unsigned int param_1, int *coords) {
             coords[1] = QueryObj.pos.y;
             memcpy(&QueryClass->footprint, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
             fake.ride = JungleCruiseRide;
-            FUN_00435230((unsigned int)&fake, (struct Point *)coords);
+            JungleCruiseDCalcCursor((unsigned int)&fake, (struct Point *)coords);
             return;
         }
     }
@@ -1885,7 +1885,7 @@ void FUN_00436470(unsigned int param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x004365f0
-void FUN_004365f0(Element *obj, int *coords) {
+void JungleCruiseWaterAddObject(Element *obj, int *coords) {
     struct JungleScore *score = JungleScoreList;
     unsigned int mask;
     unsigned short owner;
@@ -1981,7 +1981,7 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00436a40
-void FUN_00436a40(Element *obj, TileId tile, struct Cursor *cursor) {
+void JungleCruiseWaterRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     struct JungleScore *score = JungleScoreList;
     struct MapElement *elem;
     int ex;

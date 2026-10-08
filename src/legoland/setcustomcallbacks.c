@@ -84,14 +84,14 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("DRIVING SCHOOL PUMPS", head->name) == 0) {
         iface->cb_a4 = InitDrivingSchoolPumps;
         iface->cb_8c = DrivingSchoolPumpsSetEditMode;
-        iface->cb_90 = FUN_00411cd0;
+        iface->cb_90 = DrivingSchoolPumpsCalcCursor;
         iface->cb_98 = DrivingSchoolPumpsAddObject;
         iface->cb_9c = DrivingSchoolPumpsRemoveObject;
     } else if (_stricmp("DRIVING SCHOOL", head->name) == 0) {
         iface->cb_a4 = LoadDrivingSchoolResources;
         iface->cb_8c = DrivingSchoolSetEditMode;
-        iface->cb_90 = FUN_00405740;
-        iface->cb_94 = FUN_004058a0;
+        iface->cb_90 = DrivingSchoolCalcCursor;
+        iface->cb_94 = DrivingSchoolDCalcCursor;
         iface->cb_98 = DrivingSchoolAddObject;
         iface->cb_9c = DrivingSchoolRemoveObject;
         iface->cb_a8 = DrivingSchoolUpdate;
@@ -107,23 +107,23 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadDrivingSchoolRoadsResources;
         iface->cb_ac = UnloadDrivingSchoolRoadsResources;
         iface->cb_8c = DrivingSchoolRoadsSetEditMode;
-        iface->cb_90 = FUN_00413b50;
+        iface->cb_90 = DrivingSchoolRoadsCalcCursor;
         iface->cb_94 = FUN_00413fa0;
-        iface->cb_98 = FUN_00414020;
+        iface->cb_98 = DrivingSchoolRoadsAddObject;
         iface->cb_9c = FUN_00414220;
     }
     // STRING: LEGOLAND 0x004b89bc
     else if (_stricmp("ZEBRA CROSSING", head->name) == 0) {
         iface->cb_a4 = InitZebraCrossing;
         iface->cb_8c = ZebraCrossingSetEditMode;
-        iface->cb_90 = FUN_00414880;
+        iface->cb_90 = ZebraCrossingCalcCursor;
         iface->cb_94 = FUN_00413fa0;
-        iface->cb_98 = FUN_00414950;
+        iface->cb_98 = ZebraCrossingAddObject;
         iface->cb_9c = FUN_00414220;
     } else if (_stricmp("ENTRANCE 1", head->name) == 0) {
         iface->cb_a4 = LoadEntranceResources;
         iface->cb_ac = UnloadEntranceResources;
-        iface->cb_a8 = FUN_0042dfa0;
+        iface->cb_a8 = Entrance1Update;
         iface->cb_b0 = RenderEntrance;
         iface->cb_9c = EntranceRemoveObject;
     } else if (_stricmp("POTTING SHED", head->name) == 0) {
@@ -131,16 +131,16 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_8c = PottingShedSetEditMode;
         iface->cb_98 = PottingShedAddObject;
         iface->cb_9c = PottingShedRemoveObject;
-        iface->cb_a8 = FUN_0043cf00;
+        iface->cb_a8 = PottingShedUpdate;
         iface->cb_b0 = RenderPottingShed;
         iface->cb_ac = KillGShedMatteSprite;
-        iface->cb_a0 = FUN_0043d210;
+        iface->cb_a0 = GetPottingShedSpriteInfo;
     } else if (_stricmp("MECHANICS HUT", head->name) == 0) {
         iface->cb_a4 = LoadMechHutMaskSprite;
         iface->cb_8c = MechanicsHutSetEditMode;
         iface->cb_98 = MechanicsHutAddObject;
         iface->cb_9c = MechanicsHutRemoveObject;
-        iface->cb_a8 = FUN_0043d2f0;
+        iface->cb_a8 = MechanicsHutUpdate;
         iface->cb_b0 = RenderMechanicsHut;
         iface->cb_ac = KillMechHutMaskSprite;
         iface->cb_a0 = GetMechanicsHutSpriteInfo;
@@ -150,7 +150,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadCarouselResources;
         iface->cb_ac = UnloadCarouselResources;
         iface->cb_8c = CarouselSetEditMode;
-        iface->cb_a8 = FUN_0042c820;
+        iface->cb_a8 = CarouselUpdate;
         iface->cb_b0 = RenderCarousel;
         iface->cb_9c = CarouselRemoveObject;
         iface->cb_98 = CarouselAddObject;
@@ -164,7 +164,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_8c = BalloonzSetEditMode;
         iface->cb_98 = BalloonzAddObject;
         iface->cb_9c = BalloonzRemoveObject;
-        iface->cb_a8 = FUN_0042aa90;
+        iface->cb_a8 = BalloonzUpdate;
         iface->cb_b0 = RenderBalloonz;
         iface->cb_ac = UnloadBalloonzResources;
         iface->cb_a0 = GetBalloonzSpriteInfo;
@@ -176,7 +176,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadEarthSlideResources;
         iface->cb_ac = UnloadEarthSlideResources;
         iface->cb_8c = EarthSlideSetEditMode;
-        iface->cb_a8 = FUN_0042d610;
+        iface->cb_a8 = EarthSlideRideUpdate;
         iface->cb_b0 = RenderEarthSlide;
         iface->cb_9c = EarthSlideRemoveObject;
         iface->cb_98 = EarthSlideAddObject;
@@ -188,7 +188,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadCastleBBQResources;
         iface->cb_ac = UnloadCastleBBQResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_0042ea60;
+        iface->cb_a8 = CastleBBQUpdate;
         iface->cb_b0 = RenderCastleBBQ;
         iface->cb_98 = CastleBBQAddObject;
         iface->cb_9c = CastleBBQRemoveObject;
@@ -198,7 +198,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartDrinkResources;
         iface->cb_ac = UnloadFoodcartDrinkResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_0042ec10;
+        iface->cb_a8 = FoodcartDrinkUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -207,7 +207,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartFoodResources;
         iface->cb_ac = UnloadFoodcartFoodResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_0042ed70;
+        iface->cb_a8 = FoodcartFoodUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -216,7 +216,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartIcecreamResources;
         iface->cb_ac = UnloadFoodcartIcecreamResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_00431170;
+        iface->cb_a8 = FoodcartIcecreamUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -234,7 +234,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("RESTAURANT 1", head->name) == 0) {
         iface->cb_a4 = LoadRestaurant1Resources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FUN_0042f1a0;
+        iface->cb_a8 = Restaurant1Update;
         iface->cb_98 = Restaurant1AddObject;
         iface->cb_9c = Restaurant1RemoveObject;
         iface->cb_ac = KillRestMaskSpritesAndMoneySFX;
@@ -249,7 +249,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a8 = Restaurant2Update;
         iface->cb_98 = Restaurant2AddObject;
         iface->cb_9c = Restaurant2RemoveObject;
-        iface->cb_a0 = FUN_004304a0;
+        iface->cb_a0 = GetRestaurant2SpriteInfo;
         iface->cb_ac = UnloadRestaurant2Resources;
         iface->cb_bc = Restaurant2_Save;
         iface->cb_b8 = Restaurant2_Load;
@@ -260,7 +260,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadChuckWagonResources;
         iface->cb_8c = EaterySetEditMode;
         iface->cb_9c = EateryRemoveObject;
-        iface->cb_a8 = FUN_0042e2a0;
+        iface->cb_a8 = ChuckWagonUpdate;
         iface->cb_b0 = RenderChuckWagon;
         iface->cb_ac = UnloadChuckWagonResources;
     }
@@ -270,7 +270,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_ac = UnloadSharkCafeResources;
         iface->cb_8c = EaterySetEditMode;
         iface->cb_9c = EateryRemoveObject;
-        iface->cb_a8 = FUN_0042e610;
+        iface->cb_a8 = SharkCafeUpdate;
         iface->cb_b0 = FUN_0042e830;
     }
     // STRING: LEGOLAND 0x004b83dc
@@ -281,21 +281,21 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a0 = GetBrollySpriteInfo;
         iface->cb_ac = UnloadBrollyImages;
     } else if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
-        iface->cb_a4 = FUN_0041b830;
+        iface->cb_a4 = BoatingSchoolWaterLoad;
         iface->cb_8c = BoatingSchoolSetEditMode;
-        iface->cb_90 = FUN_0041bd40;
-        iface->cb_94 = FUN_0041bfb0;
-        iface->cb_98 = FUN_0041b8e0;
-        iface->cb_9c = FUN_0041c130;
+        iface->cb_90 = BoatingSchoolWaterCalcCursor;
+        iface->cb_94 = BoatingSchoolWaterDCalcCursor;
+        iface->cb_98 = BoatingSchoolWaterAddObject;
+        iface->cb_9c = BoatingSchoolWaterRemoveObject;
     } else if (_stricmp("BOATING SCHOOL", head->name) == 0) {
         iface->cb_a4 = LoadBoatingSchoolResources;
         iface->cb_ac = UnloadBoatingSchoolResources;
         iface->cb_8c = FUN_0041a000;
-        iface->cb_90 = FUN_0041a2f0;
-        iface->cb_94 = FUN_0041a3d0;
+        iface->cb_90 = BoatingSchoolCalcCursor;
+        iface->cb_94 = BoatingSchoolDCalcCursor;
         iface->cb_98 = BoatingSchoolAddObject;
         iface->cb_9c = BoatingSchoolRemoveObject;
-        iface->cb_a8 = FUN_0041a720;
+        iface->cb_a8 = BoatingSchoolUpdate;
         iface->cb_b0 = RenderBoatingSchool;
         iface->cb_bc = BoatingSchool_Save;
         iface->cb_b8 = BoatingSchool_Load;
@@ -305,8 +305,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("BOATING SCHOOL MERMAID", head->name) == 0) {
         iface->cb_a4 = InitBoatingSchoolMermaid;
         iface->cb_8c = BoatingSchoolMermaidSetEditMode;
-        iface->cb_90 = FUN_0041b4c0;
-        iface->cb_94 = FUN_0041b6d0;
+        iface->cb_90 = BoatingSchoolMermaidCalcCursor;
+        iface->cb_94 = BoatingSchoolMermaidDCalcCursor;
         iface->cb_98 = BoatingSchoolMermaidAddObject;
         iface->cb_9c = BoatingSchoolMermaidRemoveObject;
     }
@@ -314,19 +314,19 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("JUNGLE CRUISE WATER", head->name) == 0) {
         iface->cb_a4 = InitJungleCruiseWater;
         iface->cb_8c = JungleCruiseWaterSetEditMode;
-        iface->cb_90 = FUN_00436200;
-        iface->cb_94 = FUN_00436470;
-        iface->cb_98 = FUN_004365f0;
-        iface->cb_9c = FUN_00436a40;
+        iface->cb_90 = JungleCruiseWaterCalcCursor;
+        iface->cb_94 = JungleCruiseWaterDCalcCursor;
+        iface->cb_98 = JungleCruiseWaterAddObject;
+        iface->cb_9c = JungleCruiseWaterRemoveObject;
     } else if (_stricmp("JUNGLE CRUISE", head->name) == 0) {
         iface->cb_a4 = LoadJungleCruiseResources;
         iface->cb_ac = UnloadJungleCruiseResources;
         iface->cb_8c = JungleCruiseSetEditMode;
-        iface->cb_90 = FUN_00435150;
-        iface->cb_94 = FUN_00435230;
+        iface->cb_90 = JungleCruiseCalcCursor;
+        iface->cb_94 = JungleCruiseDCalcCursor;
         iface->cb_98 = JungleCruiseAddObject;
         iface->cb_9c = JungleCruiseRemoveObject;
-        iface->cb_a8 = FUN_00435750;
+        iface->cb_a8 = JungleCruiseUpdate;
         iface->cb_b0 = RenderJungleCruise;
         iface->cb_bc = JungleCruise_Save;
         iface->cb_b8 = JungleCruise_Load;
@@ -337,8 +337,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadBrijMaskSprite;
         iface->cb_ac = KillBrijMaskSprite;
         iface->cb_8c = MonkeyTreeSetEditMode;
-        iface->cb_90 = FUN_00433d90;
-        iface->cb_94 = FUN_00433fa0;
+        iface->cb_90 = JungleCruiseMonkeyTreeCalcCursor;
+        iface->cb_94 = JungleCruiseMonkeyTreeDCalcCursor;
         iface->cb_98 = MonkeyTreeAddObject;
         iface->cb_9c = MonkeyTreeRemoveObject;
         iface->cb_a0 = GetMonkeyTreeSpriteInfo;
@@ -348,8 +348,8 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadMFish2Sprite;
         iface->cb_ac = KillMFish2Sprite;
         iface->cb_8c = MonkeyFishSetEditMode;
-        iface->cb_90 = FUN_00434330;
-        iface->cb_94 = FUN_00434650;
+        iface->cb_90 = JungleCruiseMonkeyFishCalcCursor;
+        iface->cb_94 = JungleCruiseMonkeyFishDCalcCursor;
         iface->cb_98 = MonkeyFishAddObject;
         iface->cb_9c = MonkeyFishRemoveObject;
         iface->cb_a0 = GetMonkeyFishSpriteInfo;

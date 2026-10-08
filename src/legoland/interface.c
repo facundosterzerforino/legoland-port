@@ -1748,7 +1748,7 @@ int FUN_004766f0(struct MovieHandle *handle, void *param_2, int param_3) {
             target = (unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000;
         }
         if (audio != 0) {
-            FUN_00476d20(target, prev);
+            UpdateAviAudioBuffer(target, prev);
         }
         prev = target;
     }
@@ -1859,7 +1859,7 @@ int StartMovieAudio(struct MovieHandle *handle) {
         AviAudioSamplePos = start;
         DAT_00668f88 = len_start;
         DAT_00668f9c = 1;
-        FUN_00476d20(0, 0);
+        UpdateAviAudioBuffer(0, 0);
         KLIBAUDIO_SetAVIVolume(AviSoundBuffer, (int)DAT_004bb4dc);
         KLIBAUDIO_PlayAVISoundBuffer(AviSoundBuffer, 0);
         return 1;
@@ -1889,7 +1889,7 @@ int StopMovieAudio(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00476d20
-int FUN_00476d20(unsigned int param_1, int param_2) {
+int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
     char *dst;
     unsigned int rem;
     int produced;

@@ -9,7 +9,7 @@
 typedef struct BalloonNode BalloonNode;
 
 /* Per-balloon-ride state (one 0x20 allocation), list head at BalloonNodeList.
-   The ride has six cars on a 24-step wheel; FUN_0042aa60 maps (pos, lap) to a car. */
+   The ride has six cars on a 24-step wheel; BalloonzCarAtPos maps (pos, lap) to a car. */
 struct BalloonNode {
     /* 0x00 */ BalloonNode *next;
     /* 0x04 */ TileId tile;
@@ -30,12 +30,12 @@ void AddBalloonNode(TileId *tile);
 BalloonNode *FindBalloonNode(TileId *tile);
 void RemoveBalloonNode(BalloonNode *node);
 void RemoveAllBalloonNodes(void);
-int FUN_0042aa60(char pos, char lap);
+int BalloonzCarAtPos(char pos, char lap);
 
 void LoadBalloonzResources(Element *obj);
 void BalloonzAddObject(Element *obj, int *coords);
 void BalloonzRemoveObject(Element *obj, TileId tile, Cursor *cursor);
-void FUN_0042aa90(Element *obj);
+void BalloonzUpdate(Element *obj);
 RideSpriteInfo *GetBalloonzSpriteInfo(Element *obj, unsigned short id);
 void RenderBalloonz(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6);
 void UnloadBalloonzResources(void);

@@ -150,7 +150,7 @@ void BalloonzRemoveObject(Element *obj, TileId tile, Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x0042aa60
-int FUN_0042aa60(char pos, char lap) {
+int BalloonzCarAtPos(char pos, char lap) {
     if (lap == 1 && pos > 23) {
         return 0;
     }
@@ -158,7 +158,7 @@ int FUN_0042aa60(char pos, char lap) {
 }
 
 // FUNCTION: LEGOLAND 0x0042aa90
-void FUN_0042aa90(Element *obj) {
+void BalloonzUpdate(Element *obj) {
     Ride *ride;
     RideNode *elem;
     RideNode *next;
@@ -293,7 +293,7 @@ void FUN_0042aa90(Element *obj) {
                     bloke->low_level_action = 7;
                     bloke->field_73 = dir + 0x10;
                     NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
-                    bloke->field_36 = FUN_0042aa60(pos, lap);
+                    bloke->field_36 = BalloonzCarAtPos(pos, lap);
                     cars[bloke->field_36] = 1;
                     bloke->field_58 = (rand() % 3 + 4) * 50;
                     riders++;
@@ -339,7 +339,7 @@ void FUN_0042aa90(Element *obj) {
                 sprintf(&buf[5], "%02d", bloke->field_36);
                 SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 if (can_unload == 1) {
-                    car = FUN_0042aa60(pos, lap);
+                    car = BalloonzCarAtPos(pos, lap);
                     if (car == bloke->field_36) {
                         bloke->flags &= 0xff7f;
                         y = (y + 3) << 8;
@@ -413,7 +413,7 @@ void FUN_0042aa90(Element *obj) {
         lap = state->lap;
         can_board = 0;
         if (pos % 8 == 0 || pos == 0) {
-            car = FUN_0042aa60(pos, lap);
+            car = BalloonzCarAtPos(pos, lap);
             if (queued != 0 && riders < 6 && cars[car] == 0 && rand() % 3 == 0) {
                 can_board = 1;
                 stop = 1;
@@ -582,7 +582,7 @@ void RenderBalloonz(Element *obj, void *param_2, void *param_3, TileId *tile, un
                     IP_RenderBlokeIn3DNow(blokes[i]);
                 }
             }
-            switch (FUN_0042aa60(frame, lap)) {
+            switch (BalloonzCarAtPos(frame, lap)) {
             case 0:
             case 3:
                 PrintSprite(BZRedCarM1Sprite, screen.x + off.x, screen.y + off.y, param_6, 0);

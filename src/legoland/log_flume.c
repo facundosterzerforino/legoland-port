@@ -1419,7 +1419,7 @@ void FUN_0040a2a0(void *other, struct StateNode **ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x0040a2e0
-void FUN_0040a2e0(Element *elem) {
+void LogFlumeEntranceLoad(Element *elem) {
     struct LLS *lls;
 
     LogFlumeEntranceRide = elem->ride;
@@ -1459,7 +1459,7 @@ void FUN_0040a2e0(Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x0040a410
-void FUN_0040a410(void) {
+void LogFlumeEntranceUnload(void) {
     struct FlumeEntry *current;
 
     if (LogFlumeEnta3MSprite) {
@@ -1670,7 +1670,7 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
 }
 
 // FUNCTION: LEGOLAND 0x0040a930
-void FUN_0040a930(Element *elem, int *param_2, unsigned int param_3) {
+void LogFlumeEntranceCalcCursor(Element *elem, int *param_2, unsigned int param_3) {
     struct Ride *ride;
     int h;
     int x;
@@ -1714,7 +1714,7 @@ void FUN_0040a930(Element *elem, int *param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0040aac0
-void FUN_0040aac0(unsigned int param_1, struct Point *param_2) {
+void LogFlumeEntranceDCalcCursor(unsigned int param_1, struct Point *param_2) {
     struct FlumeEntry *entry;
     struct FlumeEntry *cur;
 
@@ -2638,7 +2638,7 @@ int FUN_0040c2e0(struct FlumeChainOwner *owner) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c350
-void FUN_0040c350(Element *elem) {
+void LogFlumeTrackLoad(Element *elem) {
     int i;
 
     LogFlumeTrackRide = elem->ride;
@@ -2665,7 +2665,7 @@ void FUN_0040c350(Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c430
-void FUN_0040c430(void) {
+void LogFlumeTrackUnload(void) {
     struct Sprite **ptr;
 
     LLIDB_UnLoadData(LogFlumeImageListId);
@@ -2689,7 +2689,7 @@ void FUN_0040c430(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c4a0
-void FUN_0040c4a0(Element *elem, int *param_2, unsigned int param_3) {
+void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) {
     struct Ride *ride = elem->ride;
     struct MapRect rect;
     TileId t;
@@ -2766,7 +2766,7 @@ void FUN_0040c4a0(Element *elem, int *param_2, unsigned int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c6c0
-void FUN_0040c6c0(int unused, struct Point *pt) {
+void LogFlumeTrackDCalcCursor(int unused, struct Point *pt) {
     struct FlumeEntry *entry = FUN_0040d210(pt->x, pt->y);
     unsigned int v;
 
@@ -2843,7 +2843,7 @@ void LogFlumeTrackAddObject(int unused, struct Point *pt) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c8d0
-void FUN_0040c8d0(Element *elem, TileId tile, struct Cursor *cursor) {
+void LogFlumeTrackRemoveObject(Element *elem, TileId tile, struct Cursor *cursor) {
     struct FlumeEntry *entry;
 
     memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
@@ -4076,7 +4076,7 @@ void LogFlumeSpecialCorner4SetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e6f0
-void FUN_0040e6f0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner1CalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c445c;
     unsigned int local[5];
     DAT_004c2af4 = 0;
@@ -4085,7 +4085,7 @@ void FUN_0040e6f0(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040e740
-void FUN_0040e740(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner2CalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c2aa0;
     unsigned int local[5];
     DAT_004c2af4 = 1;
@@ -4094,7 +4094,7 @@ void FUN_0040e740(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040e790
-void FUN_0040e790(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner3CalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c2b0c;
     unsigned int local[5];
     DAT_004c2af4 = 2;
@@ -4103,7 +4103,7 @@ void FUN_0040e790(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040e7e0
-void FUN_0040e7e0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner4CalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c74d4;
     unsigned int local[5];
     DAT_004c2af4 = 3;
@@ -4112,25 +4112,25 @@ void FUN_0040e7e0(unsigned int param_1, unsigned int param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x0040e830
-void FUN_0040e830(unsigned int param_1, struct Point *param_2) {
+void LogFlumeSpecialCorner1DCalcCursor(unsigned int param_1, struct Point *param_2) {
     DAT_004c2af4 = 0;
     FUN_0040d2d0(param_2);
 }
 
 // FUNCTION: LEGOLAND 0x0040e850
-void FUN_0040e850(unsigned int param_1, struct Point *param_2) {
+void LogFlumeSpecialCorner2DCalcCursor(unsigned int param_1, struct Point *param_2) {
     DAT_004c2af4 = 1;
     FUN_0040d2d0(param_2);
 }
 
 // FUNCTION: LEGOLAND 0x0040e870
-void FUN_0040e870(unsigned int dummy, struct Point *param_1) {
+void LogFlumeSpecialCorner3DCalcCursor(unsigned int dummy, struct Point *param_1) {
     DAT_004c2af4 = 2;
     FUN_0040d2d0(param_1);
 }
 
 // FUNCTION: LEGOLAND 0x0040e890
-void FUN_0040e890(unsigned int param_1, struct Point *param_2) {
+void LogFlumeSpecialCorner4DCalcCursor(unsigned int param_1, struct Point *param_2) {
     DAT_004c2af4 = 3;
     FUN_0040d2d0(param_2);
 }
@@ -4623,7 +4623,7 @@ void LogFlumeTunnelSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f510
-void FUN_0040f510(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeTunnelCalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     FUN_0040d6f0(DAT_004cbe18, param_2, param_3, DAT_004cbe18->var_3c, FUN_0040f360, FUN_0040f330);
 }
 
@@ -4641,7 +4641,7 @@ void LogFlumeTunnelRemoveObject(unsigned int param_1, unsigned int param_2, unsi
 }
 
 // FUNCTION: LEGOLAND 0x0040f5a0
-void FUN_0040f5a0(unsigned int param_1, struct Point *param_2) {
+void LogFlumeTunnelDCalcCursor(unsigned int param_1, struct Point *param_2) {
     FUN_0040d2d0(param_2);
 }
 
@@ -4785,13 +4785,13 @@ void LogFlumeCsawSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fa20
-void FUN_0040fa20(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeCsawCalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c2bf0;
     FUN_0040d6f0(src, param_2, param_3, src->var_3c, FUN_0040f830, FUN_0040f800);
 }
 
 // FUNCTION: LEGOLAND 0x0040fa50
-void FUN_0040fa50(unsigned int param_1, struct Point *param_2) {
+void LogFlumeCsawDCalcCursor(unsigned int param_1, struct Point *param_2) {
     FUN_0040d2d0(param_2);
 }
 
@@ -5000,13 +5000,13 @@ void LogFlumeHoldUpSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004100d0
-unsigned int FUN_004100d0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeHoldUpCalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c2b60;
     return FUN_0040d6f0(src, param_2, param_3, src->var_3c, FUN_0040feb0, FUN_0040fe80);
 }
 
 // FUNCTION: LEGOLAND 0x00410100
-void FUN_00410100(unsigned int param_1, struct Point *param_2) {
+void LogFlumeHoldUpDCalcCursor(unsigned int param_1, struct Point *param_2) {
     FUN_0040d2d0(param_2);
 }
 
@@ -5216,13 +5216,13 @@ unsigned int LogFlumeDropSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00410700
-unsigned int FUN_00410700(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int LogFlumeDropCalcCursor(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
     struct CursorSource *src = DAT_004c8d6c;
     return FUN_0040d6f0(src, param_2, param_3, src->var_3c, FUN_00410360, FUN_00410310);
 }
 
 // FUNCTION: LEGOLAND 0x00410730
-void FUN_00410730(unsigned int param_1, struct Point *param_2) {
+void LogFlumeDropDCalcCursor(unsigned int param_1, struct Point *param_2) {
     FUN_0040d2d0(param_2);
 }
 
@@ -5469,15 +5469,15 @@ int LogFlumeEntrance_Load(void) {
 void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl) {
     // STRING: LEGOLAND 0x004b4bb4
     if (_stricmp("LOG FLUME ENTRANCE", flume->name) == 0) {
-        vtbl->cb_a4 = FUN_0040a2e0;
+        vtbl->cb_a4 = LogFlumeEntranceLoad;
         vtbl->cb_8c = LogFlumeEntranceSetEditMode;
-        vtbl->cb_90 = FUN_0040a930;
-        vtbl->cb_94 = FUN_0040aac0;
+        vtbl->cb_90 = LogFlumeEntranceCalcCursor;
+        vtbl->cb_94 = LogFlumeEntranceDCalcCursor;
         vtbl->cb_98 = LogFlumeEntranceAddObject;
         vtbl->cb_9c = LogFlumeEntranceRemoveObject;
         vtbl->cb_a8 = LogFlumeEntranceUpdate;
         vtbl->cb_b0 = RenderLogFlumeEntrance;
-        vtbl->cb_ac = FUN_0040a410;
+        vtbl->cb_ac = LogFlumeEntranceUnload;
         vtbl->cb_bc = LogFlumeEntrance_Save;
         vtbl->cb_b8 = LogFlumeEntrance_Load;
         vtbl->cb_c0 = FUN_004119c0;
@@ -5486,15 +5486,15 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
     // STRING: LEGOLAND 0x004b4ba4
     if (_stricmp("LOG FLUME TRACK", flume->name) == 0) {
         DAT_0082c688 = flume->iface;
-        vtbl->cb_a4 = FUN_0040c350;
+        vtbl->cb_a4 = LogFlumeTrackLoad;
         vtbl->cb_8c = LogFlumeTrackSetEditMode;
         vtbl->cb_a0 = GetLogFlumeTrackSpriteInfo;
         vtbl->cb_b0 = RenderLogFlumeTrack;
-        vtbl->cb_90 = FUN_0040c4a0;
-        vtbl->cb_94 = FUN_0040c6c0;
+        vtbl->cb_90 = LogFlumeTrackCalcCursor;
+        vtbl->cb_94 = LogFlumeTrackDCalcCursor;
         vtbl->cb_98 = LogFlumeTrackAddObject;
-        vtbl->cb_9c = FUN_0040c8d0;
-        vtbl->cb_ac = FUN_0040c430;
+        vtbl->cb_9c = LogFlumeTrackRemoveObject;
+        vtbl->cb_ac = LogFlumeTrackUnload;
         return;
     }
     // STRING: LEGOLAND 0x004b4b88
@@ -5503,8 +5503,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeSpecialCorner1SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner1;
-        vtbl->cb_90 = FUN_0040e6f0;
-        vtbl->cb_94 = FUN_0040e830;
+        vtbl->cb_90 = LogFlumeSpecialCorner1CalcCursor;
+        vtbl->cb_94 = LogFlumeSpecialCorner1DCalcCursor;
         vtbl->cb_98 = LogFlumeSpecialCorner1AddObject;
         vtbl->cb_9c = LogFlumeSpecialCorner1RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner1UnloadSprites;
@@ -5516,8 +5516,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeSpecialCorner2SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner2;
-        vtbl->cb_90 = FUN_0040e740;
-        vtbl->cb_94 = FUN_0040e850;
+        vtbl->cb_90 = LogFlumeSpecialCorner2CalcCursor;
+        vtbl->cb_94 = LogFlumeSpecialCorner2DCalcCursor;
         vtbl->cb_98 = LogFlumeSpecialCorner2AddObject;
         vtbl->cb_9c = LogFlumeSpecialCorner2RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner2UnloadSprites;
@@ -5529,8 +5529,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeSpecialCorner3SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner3;
-        vtbl->cb_90 = FUN_0040e790;
-        vtbl->cb_94 = FUN_0040e870;
+        vtbl->cb_90 = LogFlumeSpecialCorner3CalcCursor;
+        vtbl->cb_94 = LogFlumeSpecialCorner3DCalcCursor;
         vtbl->cb_98 = LogFlumeSpecialCorner3AddObject;
         vtbl->cb_9c = LogFlumeSpecialCorner3RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner3UnloadSprites;
@@ -5542,8 +5542,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeSpecialCorner4SetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner4;
-        vtbl->cb_90 = FUN_0040e7e0;
-        vtbl->cb_94 = FUN_0040e890;
+        vtbl->cb_90 = LogFlumeSpecialCorner4CalcCursor;
+        vtbl->cb_94 = LogFlumeSpecialCorner4DCalcCursor;
         vtbl->cb_98 = LogFlumeSpecialCorner4AddObject;
         vtbl->cb_9c = LogFlumeSpecialCorner4RemoveObject;
         vtbl->cb_ac = LogFlumeSpecialCorner4UnloadSprites;
@@ -5555,8 +5555,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeCsawSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeCsaw;
-        vtbl->cb_90 = FUN_0040fa20;
-        vtbl->cb_94 = FUN_0040fa50;
+        vtbl->cb_90 = LogFlumeCsawCalcCursor;
+        vtbl->cb_94 = LogFlumeCsawDCalcCursor;
         vtbl->cb_98 = LogFlumeCsawAddObject;
         vtbl->cb_9c = LogFlumeCsawRemoveObject;
         vtbl->cb_ac = LogFlumeCsawUnloadSprites;
@@ -5568,8 +5568,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeTunnelSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeTunnel;
-        vtbl->cb_90 = FUN_0040f510;
-        vtbl->cb_94 = FUN_0040f5a0;
+        vtbl->cb_90 = LogFlumeTunnelCalcCursor;
+        vtbl->cb_94 = LogFlumeTunnelDCalcCursor;
         vtbl->cb_98 = LogFlumeTunnelAddObject;
         vtbl->cb_9c = LogFlumeTunnelRemoveObject;
         vtbl->cb_ac = LogFlumeTunnelUnloadSprites;
@@ -5581,8 +5581,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeDropSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeDrop;
-        vtbl->cb_90 = FUN_00410700;
-        vtbl->cb_94 = FUN_00410730;
+        vtbl->cb_90 = LogFlumeDropCalcCursor;
+        vtbl->cb_94 = LogFlumeDropDCalcCursor;
         vtbl->cb_98 = LogFlumeDropAddObject;
         vtbl->cb_9c = LogFlumeDropRemoveObject;
         vtbl->cb_ac = LogFlumeDropUnloadSprites;
@@ -5594,8 +5594,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct CallbackTable *vtbl)
         vtbl->cb_8c = LogFlumeHoldUpSetEditMode;
         vtbl->cb_a0 = FUN_0040ed50;
         vtbl->cb_b0 = RenderLogFlumeHoldUp;
-        vtbl->cb_90 = FUN_004100d0;
-        vtbl->cb_94 = FUN_00410100;
+        vtbl->cb_90 = LogFlumeHoldUpCalcCursor;
+        vtbl->cb_94 = LogFlumeHoldUpDCalcCursor;
         vtbl->cb_98 = LogFlumeHoldUpAddObject;
         vtbl->cb_9c = LogFlumeHoldUpRemoveObject;
         vtbl->cb_ac = LogFlumeHoldUpUnloadSprites;

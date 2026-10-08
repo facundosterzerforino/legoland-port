@@ -62,7 +62,7 @@ void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3,
 }
 
 // FUNCTION: LEGOLAND 0x00402dc0
-void FUN_00402dc0(Element *obj) {
+void CastleLevel1Update(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -189,7 +189,7 @@ void CastleLevel1_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci
         ci->cb_8c = CastleLevelSetEditMode;
         ci->cb_98 = CastleLevelAddObject;
         ci->cb_9c = CastleLevelRemoveObject;
-        ci->cb_a8 = FUN_00402dc0;
+        ci->cb_a8 = CastleLevel1Update;
         ci->cb_b0 = RenderCastleLevel;
     }
 }

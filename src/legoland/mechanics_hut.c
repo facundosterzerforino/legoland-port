@@ -37,7 +37,7 @@ void MechanicsHutRemoveObject(Element *obj, unsigned int tile, struct Cursor *cu
 }
 
 // FUNCTION: LEGOLAND 0x0043d2f0
-void FUN_0043d2f0(Element *obj) {
+void MechanicsHutUpdate(Element *obj) {
     struct Ride *hut = obj->ride;
     struct RideNode *node;
     struct RideNode *next;

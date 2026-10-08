@@ -498,7 +498,7 @@ void CoptersSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00404490
-unsigned int *FUN_00404490(struct CopterEditObject *editobj, unsigned short uid) {
+unsigned int *GetCoptersSpriteInfo(struct CopterEditObject *editobj, unsigned short uid) {
     struct CopterRide *ride = editobj->field_c;
 
     DAT_004c1170.sprite = ride->layer;
@@ -1040,7 +1040,7 @@ void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces) {
         interfaces->cb_98 = CoptersAddObject;
         interfaces->cb_9c = CoptersRemoveObject;
         interfaces->cb_a8 = CoptersUpdate;
-        interfaces->cb_a0 = FUN_00404490;
+        interfaces->cb_a0 = GetCoptersSpriteInfo;
         interfaces->cb_b0 = CoptersRender;
         interfaces->cb_ac = CoptersUnload;
         interfaces->cb_bc = Copters_Save;

@@ -415,7 +415,7 @@ void FUN_004037d0(const unsigned short *key, struct RideNode *entry) {
 }
 
 // FUNCTION: LEGOLAND 0x00403820
-void FUN_00403820(struct Element *elem) {
+void CatapultUpdate(struct Element *elem) {
     struct Ride *ride = elem->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -491,7 +491,7 @@ void CatapultRemoveObject(struct CatapultRemoveEdit *edit, TileId key, void *cur
 }
 
 // FUNCTION: LEGOLAND 0x004039e0
-unsigned int *FUN_004039e0(struct CatapultLayer *arg1, unsigned short arg2) {
+unsigned int *GetCatapultSpriteInfo(struct CatapultLayer *arg1, unsigned short arg2) {
     struct CatapultSprite *sprite = arg1->ride;
 
     DAT_004c1100.sprite = sprite->field_64;
@@ -613,11 +613,11 @@ void Catapult_GetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadCatapultResources;
         ci->cb_ac = CatapultFreeNodesAndKillSfx;
         ci->cb_8c = CatapultSetEditMode;
-        ci->cb_a8 = FUN_00403820;
+        ci->cb_a8 = CatapultUpdate;
         ci->cb_b0 = RenderCatapult;
         ci->cb_9c = CatapultRemoveObject;
         ci->cb_98 = CatapultAddObject;
-        ci->cb_a0 = FUN_004039e0;
+        ci->cb_a0 = GetCatapultSpriteInfo;
         ci->cb_bc = Catapult_Save;
         ci->cb_b8 = Catapult_Load;
     }

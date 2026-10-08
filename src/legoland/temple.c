@@ -67,7 +67,7 @@ void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x00416b50
-void FUN_00416b50(Element *obj) {
+void TempleUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -210,7 +210,7 @@ void Temple_GetInterfaces(struct ClassNode *str, struct CallbackTable *obj) {
         obj->cb_a4 = LoadTempleMatteSprites;
         obj->cb_ac = KillTempleMatteSprites;
         obj->cb_8c = TempleSetEditMode;
-        obj->cb_a8 = FUN_00416b50;
+        obj->cb_a8 = TempleUpdate;
         obj->cb_b0 = RenderTemple;
         obj->cb_9c = TempleRemoveObject;
         obj->cb_98 = TempleAddObject;

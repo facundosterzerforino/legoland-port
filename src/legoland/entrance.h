@@ -10,4 +10,4 @@ void RenderEntrance(struct Element *obj, unsigned int param_2, unsigned int para
 void LoadEntranceResources(struct Element *param);
 void UnloadEntranceResources(struct Element *param);
 void EntranceRemoveObject(struct Element *obj, TileId tile, struct Cursor *cursor);
-void FUN_0042dfa0(struct Element *elem);
+void Entrance1Update(struct Element *elem);

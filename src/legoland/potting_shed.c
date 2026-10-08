@@ -61,7 +61,7 @@ void PottingShedRemoveObject(Element *obj, unsigned int tile, struct Cursor *cur
 }
 
 // FUNCTION: LEGOLAND 0x0043cf00
-void FUN_0043cf00(Element *obj) {
+void PottingShedUpdate(Element *obj) {
     struct Ride *shed = obj->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -165,7 +165,7 @@ void PottingShedSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d210
-struct RideSpriteInfo *FUN_0043d210(struct PSCarLayer *param1, unsigned short param2) {
+struct RideSpriteInfo *GetPottingShedSpriteInfo(struct PSCarLayer *param1, unsigned short param2) {
     struct PSCarSub *s2 = param1->field_c;
     struct PSCarInner *s3;
 

@@ -178,7 +178,7 @@ void EntranceRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x0042dfa0
-void FUN_0042dfa0(Element *elem) {
+void Entrance1Update(Element *elem) {
     Ride *ride = elem->ride;
     RideNode *node;
     RideNode *next;

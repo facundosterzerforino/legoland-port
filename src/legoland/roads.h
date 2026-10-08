@@ -22,7 +22,7 @@ struct RoadLights {
 unsigned int FUN_00413970(unsigned short param_1);
 void FUN_004132a0(TileId tile, int param_2, int param_3, unsigned int param_4, unsigned int param_5);
 void FUN_004133e0(int param_1, int param_2);
-void FUN_00413650(unsigned short param_1, int param_2, int param_3);
+void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3);
 
 int FUN_00413450(int x, int y, struct RideQueueEntry **out);
 struct RoadTile *FUN_004134f0(int arg1, int arg2, struct RoadTile *tile);
@@ -32,13 +32,13 @@ int FUN_004135d0(int x, int y, struct NeighborResult *out);
 void LoadDrivingSchoolRoadsResources(struct LLIDB_Head *head);
 void UnloadDrivingSchoolRoadsResources();
 void DrivingSchoolRoadsSetEditMode();
-void FUN_00413b50(Element *obj, int *param_2, unsigned int param_3);
+void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param_3);
 struct RoadTile *FUN_00413e30(struct Cursor *cur);
 void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param);
-void FUN_00414020(struct RoadEditArg *edit, struct RoadPlaceArg *place);
+void DrivingSchoolRoadsAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *place);
 void FUN_00414220(Element *edit, TileId tile, struct Cursor *cursor);
 void FUN_00414440(void);
 void ZebraCrossingSetEditMode();
-void FUN_00414880(struct RoadEditArg *param_1, unsigned int param_2, unsigned int param_3);
+void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, unsigned int param_2, unsigned int param_3);
 void InitZebraCrossing(struct RoadEditArg *param_1);
-void FUN_00414950(struct RoadEditArg *edit, struct RoadPlaceArg *place);
+void ZebraCrossingAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *place);

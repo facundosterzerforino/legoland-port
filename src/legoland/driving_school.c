@@ -339,7 +339,7 @@ void DrivingSchoolAddObject(unsigned int param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00405740
-void FUN_00405740(struct DSHead *param_1, unsigned int param_2, unsigned int param_3) {
+void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsigned int param_3) {
     struct DSCursorSource *src = param_1->ride;
     struct DSCursorSource *c694;
     unsigned int mapx;
@@ -383,7 +383,7 @@ void FUN_00405740(struct DSHead *param_1, unsigned int param_2, unsigned int par
 }
 
 // FUNCTION: LEGOLAND 0x004058a0
-void FUN_004058a0(unsigned int param_1, unsigned int param_2) {
+void DrivingSchoolDCalcCursor(unsigned int param_1, unsigned int param_2) {
     struct RideQueueEntry *node = DAT_004cbeac;
 
     BasicObjectDCalcCursor(param_1, param_2);
@@ -436,7 +436,7 @@ void DrivingSchoolRemoveObject(Element *obj, TileId tile, unsigned int param_3) 
         if (queue->id == QueryObj.id) {
             if (queue->field_14 & 0x10) {
                 queue->field_14 &= 0xef;
-                FUN_00413650(queue->id, queue->x, queue->y);
+                UpdateQueuePathShape(queue->id, queue->x, queue->y);
                 AddBricks(((struct DSObjClass *)ZebraCrossingRide)->cost);
             }
             DAT_0082f760.tile_x = queue->x;

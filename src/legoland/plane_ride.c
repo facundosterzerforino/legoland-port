@@ -239,7 +239,7 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
 }
 
 // FUNCTION: LEGOLAND 0x0043dda0
-void FUN_0043dda0(Element *input) {
+void PlaneRideLoad(Element *input) {
     struct LayerResult layer;
 
     PlaneRide = input->ride;
@@ -270,7 +270,7 @@ void FUN_0043dda0(Element *input) {
 }
 
 // FUNCTION: LEGOLAND 0x0043dee0
-void FUN_0043dee0(struct PlaneRideObject *input) {
+void PlaneRideUnload(struct PlaneRideObject *input) {
     PlaneRide = (struct Ride *)input->ride;
     if (ZoomerSprite) {
         KillSprite(ZoomerSprite);
@@ -317,7 +317,7 @@ void PlaneRideAddObject(Element *a, int *p) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e010
-unsigned int *FUN_0043e010(struct PlaneRideRoot *param1, unsigned short param2) {
+unsigned int *GetPlaneRideSpriteInfo(struct PlaneRideRoot *param1, unsigned short param2) {
     struct PlaneRideBlock *block = param1->field_c;
 
     DAT_0062fe60.sprite = block->layer;
@@ -471,14 +471,14 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
 void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface) {
     // STRING: LEGOLAND 0x004b7a6c
     if (_stricmp("PLANE RIDE", name->name) == 0) {
-        iface->cb_a4 = FUN_0043dda0;
-        iface->cb_ac = FUN_0043dee0;
+        iface->cb_a4 = PlaneRideLoad;
+        iface->cb_ac = PlaneRideUnload;
         iface->cb_8c = PlaneRideSetEditMode;
         iface->cb_a8 = PlaneRideUpdate;
         iface->cb_b0 = RenderPlaneRide;
         iface->cb_9c = PlaneRideRemoveObject;
         iface->cb_98 = PlaneRideAddObject;
-        iface->cb_a0 = FUN_0043e010;
+        iface->cb_a0 = GetPlaneRideSpriteInfo;
         iface->cb_b8 = LoadZoomer;
         iface->cb_bc = SaveZoomer;
     }

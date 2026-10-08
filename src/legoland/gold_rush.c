@@ -176,7 +176,7 @@ void *FindGoldWashNode(void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00406a10
-void FUN_00406a10(struct GoldObj *obj) {
+void GoldRushLoad(struct GoldObj *obj) {
     struct GoldInner *inner = obj->inner;
     GoldRushRide = inner;
     if (inner != NULL) {
@@ -199,7 +199,7 @@ void FUN_00406a10(struct GoldObj *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00406ab0
-void FUN_00406ab0(void) {
+void GoldRushUnload(void) {
     if (GoldWashMatte1Sprite != NULL) {
         KillSprite(GoldWashMatte1Sprite);
     }
@@ -445,7 +445,7 @@ void FUN_00407250(struct GoldBlokeRef *ref) {
 }
 
 // FUNCTION: LEGOLAND 0x004072b0
-void FUN_004072b0(struct Element *elem) {
+void GoldRushUpdate(struct Element *elem) {
     struct Ride *ride = elem->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -658,10 +658,10 @@ LEGO_EXPORT int LoadGoldWash(void) {
 void GoldRush_GetInterfaces(struct ClassNode *str, struct CallbackTable *module) {
     // STRING: LEGOLAND 0x004b4670
     if (_stricmp("GOLD RUSH", str->name) == 0) {
-        module->cb_a4 = FUN_00406a10;
-        module->cb_ac = FUN_00406ab0;
+        module->cb_a4 = GoldRushLoad;
+        module->cb_ac = GoldRushUnload;
         module->cb_8c = GoldRushSetEditMode;
-        module->cb_a8 = FUN_004072b0;
+        module->cb_a8 = GoldRushUpdate;
         module->cb_b0 = RenderGoldRush;
         module->cb_98 = GoldRushAddObject;
         module->cb_9c = GoldRushRemoveObject;

@@ -144,7 +144,7 @@ void RenderChuckWagon(struct BlokeArg *arg, unsigned int param2, unsigned int pa
 }
 
 // FUNCTION: LEGOLAND 0x0042e2a0
-void FUN_0042e2a0(Element *obj) {
+void ChuckWagonUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -273,7 +273,7 @@ void LoadSharkCafeResources(struct EateryObj *obj) {
 void UnloadSharkCafeResources(void) { KillMoneySFX(); }
 
 // FUNCTION: LEGOLAND 0x0042e610
-void FUN_0042e610(Element *obj) {
+void SharkCafeUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -458,7 +458,7 @@ void CastleBBQRemoveObject(unsigned int param_1, unsigned int param_2, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x0042ea60
-void FUN_0042ea60(Element *obj) {
+void CastleBBQUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -535,7 +535,7 @@ void FUN_0042ea60(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ec10
-void FUN_0042ec10(Element *obj) {
+void FoodcartDrinkUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -596,7 +596,7 @@ void FUN_0042ec10(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ed70
-void FUN_0042ed70(Element *obj) {
+void FoodcartFoodUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -769,7 +769,7 @@ void FUN_0042f0f0(struct Bloke *bloke, int x, int y, int step) {
 }
 
 // FUNCTION: LEGOLAND 0x0042f1a0
-void FUN_0042f1a0(Element *obj) {
+void Restaurant1Update(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
@@ -1531,7 +1531,7 @@ void Restaurant2Update(int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004304a0
-void *FUN_004304a0(struct EateryObj *obj, unsigned short a2) {
+void *GetRestaurant2SpriteInfo(struct EateryObj *obj, unsigned short a2) {
     struct EateryFX *fx = obj->fx_c;
     struct EateryInner *inner = fx->inner_64;
     DAT_00616120.sprite = inner;
@@ -1544,7 +1544,7 @@ void *FUN_004304a0(struct EateryObj *obj, unsigned short a2) {
 }
 
 // FUNCTION: LEGOLAND 0x004304e0
-void FUN_004304e0(unsigned short *param_1, int param_2, unsigned int param_3) {
+void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int param_3) {
     struct SaveBlock *state;
     struct Point coords;
     struct Point off;
@@ -1687,7 +1687,7 @@ void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, 
     f11 = state->field_11;
     f38 = state->field_38;
     f3c = state->field_3c;
-    FUN_004304e0((unsigned short *)param_4, ride, param_6);
+    RenderEateryBaseLayers((unsigned short *)param_4, ride, param_6);
     coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
     if (node == NULL) {
         return;
@@ -1797,7 +1797,7 @@ void UnloadRestaurant2Resources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00431170
-void FUN_00431170(Element *obj) {
+void FoodcartIcecreamUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;

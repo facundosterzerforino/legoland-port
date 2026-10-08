@@ -9,7 +9,7 @@ struct Ride;
 void LoadMechHutMaskSprite(Element *ctx);
 unsigned int MechanicsHutAddObject(unsigned int param1, unsigned int param2);
 void MechanicsHutRemoveObject(Element *obj, unsigned int tile, struct Cursor *cursor);
-void FUN_0043d2f0(Element *obj);
+void MechanicsHutUpdate(Element *obj);
 void RenderMechanicsHut(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile);
 void KillMechHutMaskSprite();
 void MechanicsHutSetEditMode();

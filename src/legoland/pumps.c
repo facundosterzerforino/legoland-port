@@ -159,7 +159,7 @@ void DrivingSchoolPumpsRemoveObject(void *param_1, TileId tile, struct Cursor *c
 }
 
 // FUNCTION: LEGOLAND 0x00411cd0
-void FUN_00411cd0(Element *obj, int *screen, unsigned int param_3) {
+void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_3) {
     struct Ride *ride;
     struct PumpTile *tile;
 

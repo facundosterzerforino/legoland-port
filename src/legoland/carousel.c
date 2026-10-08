@@ -348,7 +348,7 @@ void FUN_0042c800(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042c820
-void FUN_0042c820(struct CarouselRideObj *param_1) {
+void CarouselUpdate(struct CarouselRideObj *param_1) {
     struct CarouselRide *ride = param_1->ride;
     struct CarouselListElem *elem = ride->list;
     struct CarouselListElem *next;

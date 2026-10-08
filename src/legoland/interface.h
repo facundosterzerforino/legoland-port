@@ -65,7 +65,7 @@ int GetPerformanceTime(void);
 int FUN_00476910(struct MovieHandle *handle);
 int StartMovieAudio(struct MovieHandle *handle);
 int StopMovieAudio(void);
-int FUN_00476d20(unsigned int param_1, int param_2);
+int UpdateAviAudioBuffer(unsigned int param_1, int param_2);
 int PlayMovie(char *filename, unsigned int param_2, int param_3);
 LEGO_EXPORT void DisableSidePanelIcons(void);
 LEGO_EXPORT void EnableSidePanelIcons(void);

@@ -195,7 +195,7 @@ void FUN_00417130(struct TempleRide *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417150
-void FUN_00417150(struct SlideContext *arg) {
+void TempleSlideLoad(struct SlideContext *arg) {
     DAT_004cbf80 = arg->var_c;
     DAT_004cbf80->var_1c |= 0x20;
     DAT_004cbf7c = DAT_004cbf80->var_64;
@@ -218,7 +218,7 @@ void FUN_00417150(struct SlideContext *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417200
-void FUN_00417200(struct SlideContext *arg) {
+void TempleSlideUnload(struct SlideContext *arg) {
     DAT_004cbf80 = arg->var_c;
     if (TempSlideMatteSprite != 0) {
         KillSprite(TempSlideMatteSprite);
@@ -255,7 +255,7 @@ void TempleSlideAddObject(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00417300
-unsigned int *FUN_00417300(struct SlideContext *ctx, unsigned short param) {
+unsigned int *GetTempleSlideSpriteInfo(struct SlideContext *ctx, unsigned short param) {
     struct SlideTrack *track = ctx->var_c;
     struct SlideCar *car = track->var_64;
 
@@ -568,14 +568,14 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
 LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct CallbackTable *interfaces) {
     // STRING: LEGOLAND 0x004b4f8c
     if (_stricmp("TEMPLE SLIDE", ctx->name) == 0) {
-        interfaces->cb_a4 = FUN_00417150;
-        interfaces->cb_ac = FUN_00417200;
+        interfaces->cb_a4 = TempleSlideLoad;
+        interfaces->cb_ac = TempleSlideUnload;
         interfaces->cb_8c = TempleSlideSetEditMode;
         interfaces->cb_a8 = TempleSlideUpdate;
         interfaces->cb_b0 = RenderTempleSlide;
         interfaces->cb_9c = RemoveSlideObject;
         interfaces->cb_98 = TempleSlideAddObject;
-        interfaces->cb_a0 = FUN_00417300;
+        interfaces->cb_a0 = GetTempleSlideSpriteInfo;
         interfaces->cb_bc = SaveTempleSlide;
         interfaces->cb_b8 = LoadTempleSlide;
     }

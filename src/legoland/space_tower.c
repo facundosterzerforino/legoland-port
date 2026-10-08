@@ -554,7 +554,7 @@ void RenderSpaceTower(struct SpaceTowerCtx *param_1, unsigned int param_2, unsig
 }
 
 // FUNCTION: LEGOLAND 0x0043b2b0
-void FUN_0043b2b0(struct SpaceTowerCtx *param_1) {
+void SpaceTowerRideLoad(struct SpaceTowerCtx *param_1) {
     SpaceTowerRideObj = param_1->ride;
     ((struct SpaceTowerRide *)SpaceTowerRideObj)->flags |= 0x420;
     SpaceTowerLayers = ((struct SpaceTowerRide *)SpaceTowerRideObj)->layers;
@@ -614,7 +614,7 @@ void SpaceTowerAddObject(struct EditObject *param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0043b4e0
-void *FUN_0043b4e0(int param_1, unsigned short param_2) {
+void *GetSpaceTowerRideSpriteInfo(int param_1, unsigned short param_2) {
     int ride;
 
     ride = *(int *)(param_1 + 0xc);
@@ -632,7 +632,7 @@ void *FUN_0043b4e0(int param_1, unsigned short param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0043b570
-void FUN_0043b570(void) {
+void SpaceTowerRideUnload(void) {
     KillSprite(SpaceTowerMatte1Sprite);
     KillSprite(SpaceTowerMatte2Sprite);
     KillSprite(SpaceTowerSeatMatteSprites[1]);
@@ -742,14 +742,14 @@ LEGO_EXPORT int SpaceTower_Load(void) {
 void SpaceTowerRide(struct ClassNode *name, struct CallbackTable *obj) {
     // STRING: LEGOLAND 0x004b789c
     if (_stricmp("SPACE TOWER RIDE", name->name) == 0) {
-        obj->cb_a4 = FUN_0043b2b0;
+        obj->cb_a4 = SpaceTowerRideLoad;
         obj->cb_8c = SpaceTowerSetEditMode;
         obj->cb_a8 = SpaceTowerUpdate;
-        obj->cb_a0 = FUN_0043b4e0;
+        obj->cb_a0 = GetSpaceTowerRideSpriteInfo;
         obj->cb_b0 = RenderSpaceTower;
         obj->cb_9c = SpaceTowerRemoveObject;
         obj->cb_98 = SpaceTowerAddObject;
-        obj->cb_ac = FUN_0043b570;
+        obj->cb_ac = SpaceTowerRideUnload;
         obj->cb_bc = SpaceTower_Save;
         obj->cb_b8 = SpaceTower_Load;
     }

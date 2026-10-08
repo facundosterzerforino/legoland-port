@@ -66,4 +66,4 @@ void CarouselAddObject(unsigned int param_1, unsigned char *param_2);
 struct RideSpriteInfo *GetCarouselSpriteInfo(struct CarouselRideObj *param1, unsigned short param2);
 int Carousel_Save(void);
 int Carousel_Load(struct CarouselRideObj *param_1);
-void FUN_0042c820(struct CarouselRideObj *param_1);
+void CarouselUpdate(struct CarouselRideObj *param_1);
