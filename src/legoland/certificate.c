@@ -1,4 +1,7 @@
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#endif
 
 #define _WINSPOOL_
 #include <windows.h>
@@ -38,6 +41,29 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
     needed = 0;
     returned = 0;
     pInfo = NULL;
+#ifdef LEGOLAND_PORT
+    {
+        /* [library:print] the original asks EnumPrinters for PRINTER_ENUM_DEFAULT (flags 1), which only Windows
+         * 95/98/Me support: on NT it lists no printer and printing always failed. Ask for the default printer by
+         * name instead (with "Microsoft Print to PDF" as the default, Windows asks where to save a PDF). */
+        char printer_name[256];
+        DWORD name_size = sizeof(printer_name);
+
+        (void)printers;
+        (void)needed;
+        (void)returned;
+        if (!GetDefaultPrinterA(printer_name, &name_size)) {
+            DebugTrace("PrintCertificate: no default printer (%lu)", GetLastError());
+            return 0;
+        }
+        DebugTrace("PrintCertificate: printing to \"%s\"", printer_name);
+        memset(&dm, 0, 0x94);
+        dm.dmSize = 0x94;
+        dm.dmFields = DM_ORIENTATION;
+        dm.dmOrientation = DMORIENT_LANDSCAPE;
+        hDC = CreateDCA(NULL, printer_name, NULL, &dm);
+    }
+#else
     if (EnumPrintersA(1, NULL, 2, printers, 0x540, &needed, &returned) <= 0)
         return 0;
     if (returned <= 0)
@@ -47,6 +73,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
     dm.dmFields = DM_ORIENTATION;
     dm.dmOrientation = DMORIENT_LANDSCAPE;
     hDC = CreateDCA(NULL, ((char **)printers)[1], NULL, &dm);
+#endif
     if (hDC == NULL)
         return 0;
     fd = _open(param_1, _O_RDONLY | _O_BINARY, _S_IREAD);

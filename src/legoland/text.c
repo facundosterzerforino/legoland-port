@@ -4,6 +4,9 @@
 #include <string.h>
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#endif
 
 #include "debug_alloc.h"
 #include "draw.h"
@@ -378,6 +381,14 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         SetBkMode(hdc, 1);
         old_font = SelectFont(hdc, font);
         text_h = DrawTextA(hdc, text, strlen(text), &box, 0x410);
+#ifdef LEGOLAND_PORT
+        /* [port] diagnosing empty speech bubbles: once per new text cell */
+        DebugTrace("BubbleHelp: \"%.60s\" font %d (handle %p) -> %d high, box %ld..%ld, dc %p, err %lu", text, font,
+            (void *)(font == 1 ? LegoFont20Bold : font == 2 ? LegoFont18SemiBold
+                    : font == 3                             ? LegoFont28Normal
+                                                            : LegoFont24Bold),
+            text_h, box.left, box.right, (void *)hdc, GetLastError());
+#endif
         box.top = rect[1];
         box.bottom = box.top + text_h;
         SelectObject(hdc, old_font);
@@ -712,8 +723,17 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
     /* [port] the original indexes (&DAT_008139e0)[mood], relying on the eleven bubble-help sprites being laid out
      * one after another; list them explicitly instead (mood is 1..5 or 10) */
     static struct Sprite **const mood_sprites[11] = {
-        &DAT_008139e0, &MiHungrySprite, &MiHappySprite, &MiSadSprite, &MiHomeSprite, &MiEatSprite, &GreatSprite,
-        &PoorSprite, &FavouriteSprite, &OpinionSprite, &MiBoredSprite,
+        &DAT_008139e0,
+        &MiHungrySprite,
+        &MiHappySprite,
+        &MiSadSprite,
+        &MiHomeSprite,
+        &MiEatSprite,
+        &GreatSprite,
+        &PoorSprite,
+        &FavouriteSprite,
+        &OpinionSprite,
+        &MiBoredSprite,
     };
     RECT box;
     RECT frame;
