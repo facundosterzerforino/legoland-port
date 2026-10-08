@@ -20,6 +20,7 @@
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
 #include "port_display.h"
+#include "port_input.h"
 #endif
 
 struct DInputDeviceVtbl {
@@ -142,7 +143,7 @@ LEGO_EXPORT void ScanMouse(void) {
     if (WinDebugMode != 0) {
         /* [library:input] windowed mode: the exclusive DirectInput mouse reported motion that made the game's
          * cursor drift to the bottom-right. Use the window's own cursor instead (position in
-         * UpdateControllerFromMouseData, buttons here); no wheel. */
+         * UpdateControllerFromMouseData, buttons here, the wheel from WM_MOUSEWHEEL: port_input.h). */
         memset(&MouseState, 0, sizeof(MouseState));
         if (GetForegroundWindow() == WNDENV_Gethwnd()) {
             if ((GetAsyncKeyState(GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON) & 0x8000) != 0) {
@@ -155,9 +156,13 @@ LEGO_EXPORT void ScanMouse(void) {
                 MouseState.rgbButtons[2] = 0x80;
             }
         }
-        return;
-    }
-    if (dintput_mouse != NULL) {
+#ifdef LEGOLAND_PORT
+        MouseState.lZ = PortWheelTake(mouse_granularity > 0 ? mouse_granularity : WHEEL_DELTA);
+#endif
+        if (MouseState.lZ == 0) {
+            return; /* no wheel this frame (and no "lZ <= -0" scroll if the granularity were unknown) */
+        }
+    } else if (dintput_mouse != NULL) {
         hr = IDirectInputDevice_GetDeviceState((IDirectInputDeviceA *)dintput_mouse, 0x10, &MouseState);
         if (hr != DI_OK) {
             if (ms_trace < 5) {

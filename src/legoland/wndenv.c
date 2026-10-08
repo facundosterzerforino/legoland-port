@@ -12,6 +12,7 @@
 #ifdef LEGOLAND_PORT
 #include "ext_console.h"
 #include "extensions.h"
+#include "port_input.h"
 #include "port_watchdog.h"
 #endif
 
@@ -77,6 +78,12 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
             return 0;
         }
         break;
+#ifdef LEGOLAND_PORT
+    case WM_MOUSEWHEEL:
+        /* [library:input] windowed mode reads the wheel from here (port_input.h; DirectInput in full screen) */
+        PortWheelAdd(GET_WHEEL_DELTA_WPARAM(wParam));
+        return 0;
+#endif
     case WM_ACTIVATEAPP:
         /* [library:input] also pause when another program is activated (the game can't read its input then; see
          * ScanKeyboard); WM_SETFOCUS above resumes. Only pause once, or the timer would never resume. */
