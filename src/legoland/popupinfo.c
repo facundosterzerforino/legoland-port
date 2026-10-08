@@ -460,15 +460,22 @@ int FUN_004717a0(const char *param_1, int param_2, int param_3, int param_4, int
     while (1) {
         iVar2 = DrawTextA(hdc, param_1, strlen(param_1), &local_10, 0x411);
         if (iVar2 <= iVar4) {
-            return param_2;
+            break;
         }
         iVar4 = iVar4 + param_3;
         local_10.right = local_10.right + param_5;
         param_2 = param_2 + 1;
         if (iVar2 <= iVar4) {
-            return param_2;
+            break;
         }
     }
+#ifdef LEGOLAND_PORT
+    /* [library:gdi] the original never deletes this DC (DrawPopUpInfo measures with both functions, so every info
+     * popup leaked two). After about 10000 GDI objects CreateCompatibleDC fails for the whole process and every
+     * measured text box comes out empty (BubbleHelp: the advisor's speech bubble shrank to a thin strip). */
+    DeleteDC(hdc);
+#endif
+    return param_2;
 }
 
 // FUNCTION: LEGOLAND 0x00471840
@@ -484,6 +491,12 @@ int FUN_00471840(const char *param_1, int param_2, int param_3, int param_4, int
     local_10.right = param_4;
     SelectFont(hdc, param_6);
     DrawTextA(hdc, param_1, strlen(param_1), &local_10, 0x401);
+#ifdef LEGOLAND_PORT
+    /* [library:gdi] the original never deletes this DC (DrawPopUpInfo measures with both functions, so every info
+     * popup leaked two). After about 10000 GDI objects CreateCompatibleDC fails for the whole process and every
+     * measured text box comes out empty (BubbleHelp: the advisor's speech bubble shrank to a thin strip). */
+    DeleteDC(hdc);
+#endif
     return (((local_10.right - local_10.left) - param_4) + 0x1f) >> 5;
 }
 

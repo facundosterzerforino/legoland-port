@@ -273,6 +273,7 @@ static int SampleMainThread(void) {
 }
 
 static DWORD WINAPI WatchdogThread(LPVOID unused) {
+    DWORD gdi_logged = GetTickCount() - 300000; /* log once at start */
     LONG last = heartbeat;
     DWORD since = GetTickCount();
     int reported = 0;
@@ -287,6 +288,13 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     symbols_ready = SymInitialize(GetCurrentProcess(), exe_dir, TRUE);
     for (;;) {
+        /* every 5 minutes: the game's GDI and USER object counts, to catch handle leaks (Windows refuses new GDI
+         * objects at 10000; the info popup's text measuring leaked two DCs per popup in the original) */
+        if (GetTickCount() - gdi_logged >= 300000) {
+            gdi_logged = GetTickCount();
+            PortTrace("gdi: %lu GDI objects, %lu USER objects", GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS),
+                GetGuiResources(GetCurrentProcess(), GR_USEROBJECTS));
+        }
         if (WaitForSingleObject(crash_event, 250) == WAIT_OBJECT_0) {
             record = crash_pointers->ExceptionRecord;
             report_context = *crash_pointers->ContextRecord;

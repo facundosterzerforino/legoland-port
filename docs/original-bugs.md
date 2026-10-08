@@ -5,6 +5,17 @@ The port plays like the original, so these stay unfixed by default. Each one is 
 player sees belong in `extensions/`, as an option that's off by default (see PORTING.md). Found on 2026-10-05
 with clang's warnings and static analyzer (see "How these were found" at the end).
 
+## Fixed in the port (nothing visible changes)
+
+### The info popup leaks two device contexts each time it measures its text
+`FUN_00471840` and `FUN_004717a0` (`popupinfo.c`, 0x471840 and 0x4717a0) measure the popup's name and info text
+with `CreateCompatibleDC(NULL)` and `DrawTextA`, and never call `DeleteDC` (checked in the machine code: the only
+calls are CreateCompatibleDC, SelectFont and DrawTextA). `DrawPopUpInfo` calls both whenever the popup's size may
+change, so every ride, shop or visitor popup leaks two GDI objects. Windows refuses new GDI objects at 10000 per
+process; after a long session `CreateCompatibleDC` fails everywhere and every measured text box comes out empty:
+the advisor's and the interval screen's speech bubbles shrank to a thin strip (`BubbleHelp`, seen 2026-10-07).
+The port deletes the DC (tagged `[library:gdi]`); the watchdog traces the GDI object count every 5 minutes.
+
 ## Confirmed and visible
 
 ### Castle ride visitors always wear the "chest girly2" texture
