@@ -817,7 +817,7 @@ void BoatingSchoolUpdate(void) {
     struct Bloke *bloke;
     struct LLS *lls;
     TileId tile;
-    int slot;
+    unsigned int slot;
     int i;
     int frame;
     char dir;
@@ -880,17 +880,19 @@ void BoatingSchoolUpdate(void) {
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             break;
         case 1:
-            if (bloke == (struct Bloke *)score->blokes[0] && score->connected != 0 && (int)score->value >= (int)FUN_004192d0((struct BoatRide *)score) * 6 && FUN_00418e60(tile, (unsigned int)bloke) != 0) {
-                BlokeSitAnim(bloke);
-                BlokeSetFrame(bloke, 0);
-                score->blokes[0] = 0;
-                score->bloke_count--;
-                bloke->flags |= 0x80;
-                bloke->param_action++;
-                source.type = 1;
-                source.bloke = bloke;
-                sample = PlayInstanceOfSample(*(void **)(PTR_s_Boat_Noise_wav + 8), 1, 1, &source);
-                AdjustPSampleFreq(sample, 10);
+            if (bloke == (struct Bloke *)score->blokes[0] && score->connected != 0) {
+                if ((int)score->value >= (int)FUN_004192d0((struct BoatRide *)score) * 6 && FUN_00418e60(tile, (unsigned int)bloke) != 0) {
+                    BlokeSitAnim(bloke);
+                    BlokeSetFrame(bloke, 0);
+                    score->blokes[0] = 0;
+                    score->bloke_count--;
+                    bloke->flags |= 0x80;
+                    bloke->param_action++;
+                    source.type = 1;
+                    source.bloke = bloke;
+                    sample = PlayInstanceOfSample(*(void **)(PTR_s_Boat_Noise_wav + 8), 1, 1, &source);
+                    AdjustPSampleFreq(sample, 10);
+                }
             }
             break;
         case 3:

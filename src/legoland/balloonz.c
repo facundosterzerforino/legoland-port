@@ -160,8 +160,8 @@ int BalloonzCarAtPos(char pos, char lap) {
 // FUNCTION: LEGOLAND 0x0042aa90
 void BalloonzUpdate(Element *obj) {
     Ride *ride;
-    RideNode *elem;
     RideNode *next;
+    RideNode *elem;
     Bloke *bloke;
     BalloonNode *state;
     TileId *tile;
@@ -174,37 +174,37 @@ void BalloonzUpdate(Element *obj) {
     char lap;
     char leaving;
     int can_board;
-    int can_unload;
+    unsigned int can_unload;
     char car;
-    unsigned char dir;
+    char dir;
     // STRING: LEGOLAND 0x004b64bc
     char buf[8] = "Bloke??";
 
     ride = obj->ride;
     elem = ride->riders;
     while (elem != NULL) {
-        next = elem->next;
         bloke = elem->rider;
         tile = &elem->tile;
+        next = elem->next;
         state = FindBalloonNode(tile);
-        if (state == NULL) {
+        if (!state) {
             return;
         }
         riders = state->riders;
         queued = state->queued;
         memcpy(cars, state->cars, sizeof(cars));
-        pos = state->pos;
         lap = state->lap;
+        pos = state->pos;
         leaving = state->leaving;
         can_unload = state->can_unload;
         can_board = state->can_board;
         (*ZBalloon2Sprite->lls)->frame = state->frame;
         x = ride->x + tile->pos.x;
         y = tile->pos.y + ride->y;
-        if (bloke->low_level_action == 0) {
+        if (!bloke->low_level_action) {
             switch (bloke->param_action) {
             case 0:
-                bloke->flags |= 8;
+                bloke->flags = bloke->flags | 8;
                 y = (y << 8) + 0xfa;
                 x = (x << 8) - 0x9c;
                 bloke->dest.x = x;
@@ -218,7 +218,7 @@ void BalloonzUpdate(Element *obj) {
                 break;
             case 1:
                 bloke->dest.x = (x << 8) - 0x100;
-                y = (y + 7) << 8;
+                y = (7 + y) << 8;
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
@@ -233,7 +233,7 @@ void BalloonzUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->field_73 = 0x10 + dir;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -280,7 +280,7 @@ void BalloonzUpdate(Element *obj) {
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
-                queued++;
+                queued = queued + 1;
                 break;
             case 7:
                 bloke->dir = 3;
@@ -332,15 +332,15 @@ void BalloonzUpdate(Element *obj) {
                 sprintf(&buf[5], "%02d", bloke->field_36);
                 SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 bloke->param_action++;
-                leaving++;
                 cars[bloke->field_36] = 3;
+                leaving++;
                 break;
             case 12:
                 sprintf(&buf[5], "%02d", bloke->field_36);
                 SetBlokePositionFromBNV(BalloonzBinV, bloke, buf, pos + lap * 24, -1617692.375f, -1617904.25f, 0);
                 if (can_unload == 1) {
                     car = BalloonzCarAtPos(pos, lap);
-                    if (car == bloke->field_36) {
+                    if ((unsigned int)car == bloke->field_36) {
                         bloke->flags &= 0xff7f;
                         y = (y + 3) << 8;
                         x = (x << 8) - 0x564;
@@ -353,8 +353,8 @@ void BalloonzUpdate(Element *obj) {
                         bloke->person->field_30 = 0;
                         NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                         bloke->param_action++;
-                        riders--;
                         cars[car] = 1;
+                        riders--;
                     }
                 }
                 break;
@@ -365,7 +365,7 @@ void BalloonzUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->field_73 = 0x10 + dir;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -376,7 +376,7 @@ void BalloonzUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->field_73 = 0x10 + dir;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
                 cars[bloke->field_36] = 0;
@@ -392,8 +392,8 @@ void BalloonzUpdate(Element *obj) {
         state->lap = lap;
         memcpy(state->cars, cars, sizeof(cars));
         state->riders = riders;
-        state->leaving = leaving;
         state->frame = pos;
+        state->leaving = leaving;
         state->can_board = can_board;
         state->can_unload = can_unload;
         elem = next;
@@ -414,29 +414,31 @@ void BalloonzUpdate(Element *obj) {
         can_board = 0;
         if (pos % 8 == 0 || pos == 0) {
             car = BalloonzCarAtPos(pos, lap);
-            if (queued != 0 && riders < 6 && cars[car] == 0 && rand() % 3 == 0) {
+            if (queued != 0 && 6 > riders && cars[car] == 0 && rand() % 3 == 0) {
                 can_board = 1;
                 stop = 1;
             }
             if (cars[car] == 1) {
                 stop = 1;
             }
-            if (leaving != 0 && cars[car] == 3) {
+            if (leaving != 0 && 3 == cars[car]) {
                 can_unload = 1;
                 stop = 1;
             }
         }
-        if (riders != 0 && !stop) {
-            pos++;
-            if (pos > 23) {
-                pos = 0;
-                lap++;
-                if (lap > 1) {
-                    lap = 0;
+        if (0 != riders) {
+            if (!stop) {
+                pos += 1;
+                if (pos > 23) {
+                    pos = 0;
+                    lap++;
+                    if (1 < lap) {
+                        lap = 0;
+                    }
                 }
+                can_unload = 0;
+                can_board = 0;
             }
-            can_unload = 0;
-            can_board = 0;
         }
         state->riders = riders;
         state->queued = queued;

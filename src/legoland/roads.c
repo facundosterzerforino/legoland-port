@@ -275,7 +275,7 @@ void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3) {
     int bits = 0;
     int mask = 0;
     int flag = 0;
-    unsigned int m;
+    int m;
     unsigned short id;
 
     id = param_1;
@@ -336,14 +336,16 @@ void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3) {
         if (r.field_c != NULL && r.field_c->field_8 == id) {
             bits |= 8;
         }
-        if (r.field_10 != NULL && r.field_10->field_8 == id) {
+        if (r.field_10 && r.field_10->field_8 == id) {
             bits |= 0x10;
         }
         if (r.field_14 != NULL && r.field_14->field_8 == id) {
             bits |= 0x20;
         }
-        if (r.field_18 != NULL && r.field_18->field_8 == id) {
-            bits |= 0x40;
+        if (r.field_18 != NULL) {
+            if (r.field_18->field_8 == id) {
+                bits |= 0x40;
+            }
         }
         if (r.field_1c != NULL && r.field_1c->field_8 == id) {
             bits |= 0x80;

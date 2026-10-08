@@ -1,6 +1,6 @@
-# FUN_0042aa90 (0x0042aa90, `src/legoland/balloonz.c`)
+# BalloonzUpdate (0x0042aa90, `src/legoland/balloonz.c`)
 
-**Best: 94.20%**. Kind: C.
+**Best: 94.65%**. Kind: C.
 
 ## What still differs
 
@@ -16,6 +16,7 @@
 | 2026-10-07 p4 | Haiku agent | Permuted the local declarations (reversed, `dir` first, `buf` first, chars first, `queued` last) | 94.20% (no change) |
 | 2026-10-07 p4 | Haiku agent | `for (elem = ride->riders; ...; elem = next)` instead of `while` | 94.20% (no change) |
 | 2026-10-07 p4 | Haiku agent | Write-back stores reordered to the original's order | 92.98% (worse) |
+| 2026-10-08 | permuter + Opus 5.5 | reordered next/pos/leaving/riders stores, `unsigned int can_unload`, `char dir`, nested `if (riders) { if (!stop)`, constant-first operands | 94.20 -> 94.65 |
 
 ## Ideas not tried yet
 

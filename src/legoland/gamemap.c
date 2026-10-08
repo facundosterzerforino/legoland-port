@@ -590,6 +590,16 @@ LEGO_EXPORT void CalculateMapRenderOrder(void) {
     int sy;
     struct Point pt;
 
+    register struct MapCellObjKind *ride;
+    register int coords2;
+    int fy1;
+    struct MapCellObjKind *ride0;
+    int coords1;
+    unsigned int x8;
+    int src_coords;
+    int byte4;
+    int x;
+    int coords;
     pt.x = 0;
     pt.y = 0;
     DAT_00801408 = 0;
@@ -601,29 +611,39 @@ LEGO_EXPORT void CalculateMapRenderOrder(void) {
         } else {
             cell = NULL;
         }
-        if ((cell->flags.bytes[0] & 0xa0) == 0) {
+        if ((0xa0 & cell->flags.bytes[0]) == 0) {
             pt.y++;
         } else {
-            sx = cell->src.b.byte_4;
+            byte4 = cell->src.b.byte_4;
+            sx = byte4;
             sy = cell->src.b.byte_5;
-            if (sx >= 0 && sx < lpConfig->width && sy >= 0 && sy < lpConfig->height) {
-                src = (struct MapCell *)&GameMap[sy][sx];
-            } else {
+            if (!(0 <= sx && sx < lpConfig->width && sy >= 0 && sy < lpConfig->height)) {
                 src = NULL;
+            } else {
+                src = (struct MapCell *)&GameMap[sy][sx];
             }
-            tile = src->obj->ride;
+            ride0 = src->obj->ride;
+            ride = ride0;
+            tile = ride;
             entry = &MapRenderOrderList[DAT_00801408];
-            DAT_00801408++;
+            DAT_00801408 = DAT_00801408 + 1;
             if (DAT_00801408 == 0x1000) {
                 DAT_00801408 = 0;
             }
-            entry->coords = cell->src.coords;
-            entry->x = (unsigned char)pt.x;
+            coords = cell->src.coords;
+            entry->coords = coords;
+            x = pt.x;
+            x8 = x;
+            entry->x = (unsigned char)x8;
             entry->flag = 1;
-            entry->height = tile->footprint_y1 + sy + 1;
+            fy1 = tile->footprint_y1;
+            entry->height = fy1 + sy + 1;
             if (pt.x == tile->footprint_x1 + sx || pt.x == lpConfig->width - 1) {
-                *out_coords = src->src.coords;
-                FUN_0045a430(cell->src.coords, &pt.x);
+                coords1 = cell->src.coords;
+                src_coords = src->src.coords;
+                *out_coords = src_coords;
+                coords2 = coords1;
+                FUN_0045a430(coords2, &pt.x);
                 out_coords = &src->field_6;
             } else {
                 pt.x++;

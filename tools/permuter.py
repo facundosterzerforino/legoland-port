@@ -236,13 +236,25 @@ class Original:
         s = self.read(addr, 256).split(b"\0")[0]
         if len(s) >= 2 and all(32 <= c < 127 or c in (9, 10, 13) for c in s):
             return '"' + s.decode("latin-1") + '"'
-        i = bisect.bisect_right(self.addrs, addr) - 1
+        i = bisect.bisect_right(self.addrs, addr - 1) - 1  # addr - 1: an end pointer belongs to its array
         if i >= 0:
             base = self.addrs[i]
             name, typ, size = self.syms[base]
-            if addr - base < max(size, 1) and typ not in (FLOAT_TYPE, STRING_TYPE):
+            if addr - base <= max(size, 1) and typ not in (FLOAT_TYPE, STRING_TYPE):
                 return f"{bare(name)}+{addr - base:#x}"
         return "<addr>"
+
+    def in_symbol(self, v):
+        """A plain constant inside a known symbol (or exactly at its end: loop-end pointers) is an address,
+        unless it is a round number like 0x800000 or 0x7fffff, which only lands inside a symbol by chance."""
+        if (v & 0xFFFF) in (0, 0xFFFF):
+            return False
+        i = bisect.bisect_right(self.addrs, v - 1) - 1  # v - 1 so an end pointer finds its array
+        if i < 0:
+            return False
+        base = self.addrs[i]
+        name, typ, size = self.syms[base]
+        return size > 0 and base <= v <= base + size
 
     def function_listing(self, addr, size):
         """Listing of `size` bytes at `addr` (reccmp also reads the original with our function's size),
@@ -270,7 +282,7 @@ class Original:
                 elif op.type == x86.X86_OP_IMM and 0x400000 <= op.imm < 0x900000:
                     # a plain constant can fall inside a symbol's range by chance (the reccmp false positive
                     # tools/reccmp_fixes.py handles): only an exact symbol address counts as an address
-                    if op.imm in self.syms or op.imm in self.imports or (addr <= op.imm < nxt):
+                    if op.imm in self.syms or op.imm in self.imports or (addr <= op.imm < nxt) or self.in_symbol(op.imm):
                         v = op.imm
                 if v is None:
                     continue
@@ -403,6 +415,8 @@ def compile_tu(text: str, workdir: Path) -> bytes | None:
         text=True,
         cwd=ROOT,
     )
+    # lossy conversions (C4244, e.g. a float put in an int temporary) change behaviour: count them
+    compile_tu.lossy = r.stdout.count("C4244")
     if r.returncode != 0 or not obj.exists():
         return None
     return obj.read_bytes()
@@ -414,6 +428,22 @@ def score(orig: list[str], cand: list[str]) -> float:
     return difflib.SequenceMatcher(None, orig, cand, autojunk=False).ratio()
 
 
+_REG = re.compile(r"\b(?:e?[abcd]x|[abcd][lh]|e?[sd]i|e?bp)\b")
+_STACK = re.compile(r"\[esp(?: [+-] 0x[0-9a-f]+)?\]")
+
+
+def guide(orig: list[str], cand: list[str]) -> float:
+    """What the search climbs: exact similarity plus partial credit for lines that differ only in register
+    choice (and, less, in stack offsets). One register swap changes dozens of lines, so the exact score
+    alone has no slope; with this a variant that gets the structure right first still ranks higher."""
+    exact = score(orig, cand)
+    if exact == 1.0:
+        return 1.0
+    o2, c2 = [_REG.sub("R", l) for l in orig], [_REG.sub("R", l) for l in cand]
+    o3, c3 = [_STACK.sub("[S]", l) for l in o2], [_STACK.sub("[S]", l) for l in c2]
+    return 0.5 * exact + 0.3 * score(o2, c2) + 0.2 * score(o3, c3)
+
+
 # ---------------------------------------------------------------- mutations
 
 OPERAND = r"(?:\(\w+\s*\*?\)\s*)?[A-Za-z_][\w]*(?:(?:->|\.)\w+|\[[^\[\]]+\])*|\d+[uUlL]*|0x[0-9a-fA-F]+[uUlL]*"
@@ -421,8 +451,28 @@ COMMUTATIVE = r"\+|\*|&(?!&)|\|(?!\|)|\^|==|!="
 FLIP = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
 
 
-def _sub_random(text, pattern, repl, rng, flags=0):
+_LOOSE_BEFORE = ("(", ",", "[", "?", ":", "{", ";", "&&", "||", "return", "=")
+_LOOSE_AFTER = (")", ",", "]", ";", "?", ":", "&&", "||")
+
+
+def _isolated(text, m, op=""):
+    """True when the matched binary expression isn't an operand of a tighter (or equal) operator next to it,
+    so rewriting it can't change how the surrounding expression parses (a * b + c must not become a * c + b)."""
+    before, after = text[: m.start()].rstrip(), text[m.end() :].lstrip()
+    if before.endswith(("==", "!=", "<=", ">=")) and op in ("==", "!="):
+        return False
+    if not before.endswith(_LOOSE_BEFORE) or before.endswith(("<<=", ">>=")):
+        return False
+    if after.startswith(_LOOSE_AFTER):
+        return True
+    # + and * bind tighter than comparisons, so a following comparison is fine for them
+    return op in ("+", "*") and re.match(r"(==|!=|<=|>=|<(?!<)|>(?!>))", after) is not None
+
+
+def _sub_random(text, pattern, repl, rng, flags=0, op_group=None):
     matches = list(re.finditer(pattern, text, flags))
+    if op_group is not None:
+        matches = [m for m in matches if _isolated(text, m, m.group(op_group))]
     if not matches:
         return None
     m = rng.choice(matches)
@@ -434,12 +484,12 @@ def _sub_random(text, pattern, repl, rng, flags=0):
 
 def m_swap_commutative(body, rng):
     pat = rf"(?<![\w\]\)])({OPERAND})\s*({COMMUTATIVE})\s*({OPERAND})(?![\w\[(])"
-    return _sub_random(body, pat, lambda m: f"{m.group(3)} {m.group(2)} {m.group(1)}", rng)
+    return _sub_random(body, pat, lambda m: f"{m.group(3)} {m.group(2)} {m.group(1)}", rng, op_group=2)
 
 
 def m_flip_compare(body, rng):
     pat = rf"(?<![\w\]\)])({OPERAND})\s*(<=|>=|<(?!<)|>(?!>))\s*({OPERAND})(?![\w\[(])"
-    return _sub_random(body, pat, lambda m: f"{m.group(3)} {FLIP[m.group(2)]} {m.group(1)}", rng)
+    return _sub_random(body, pat, lambda m: f"{m.group(3)} {FLIP[m.group(2)]} {m.group(1)}", rng, op_group=2)
 
 
 def m_incdec(body, rng):
@@ -457,14 +507,28 @@ def m_incdec(body, rng):
 def m_compound(body, rng):
     def repl(m):
         ind, v, rhs_v, op, rest = m.groups()
-        return f"{ind}{v} {op}= {rest};" if v == rhs_v else None
+        # v = v - a / 2 - b is not v -= a / 2 - b: only fold a single operand (or a parenthesised one)
+        single = re.fullmatch(rf"\s*(?:{OPERAND}|\([^()]*\))\s*", rest)
+        return f"{ind}{v} {op}= {rest};" if v == rhs_v and single else None
 
     pat = r"(?m)^(\s*)(\w+(?:->\w+|\.\w+)?) = (\w+(?:->\w+|\.\w+)?) ([-+*&|^]) ([^;]+);"
     out = _sub_random(body, pat, repl, rng)
     if out is not None:
         return out
     pat2 = r"(?m)^(\s*)(\w+(?:->\w+|\.\w+)?) ([-+*&|^])= ([^;]+);"
-    return _sub_random(body, pat2, lambda m: f"{m.group(1)}{m.group(2)} = {m.group(2)} {m.group(3)} {m.group(4)};", rng)
+    # v -= a + b is v = v - (a + b): keep the parentheses unless the right side is a single operand
+    def unfold(m):
+        rest = m.group(4) if re.fullmatch(rf"\s*(?:{OPERAND}|\([^()]*\))\s*", m.group(4)) else f"({m.group(4)})"
+        return f"{m.group(1)}{m.group(2)} = {m.group(2)} {m.group(3)} {rest};"
+    return _sub_random(body, pat2, unfold, rng)
+
+
+def _in_condition(text, m):
+    """True when the match is a whole operand of an if/while condition or of && / || (its value is only tested)."""
+    before, after = text[: m.start()].rstrip(), text[m.end() :].lstrip()
+    if not (after.startswith((")", "&&", "||"))):
+        return False
+    return before.endswith(("&&", "||")) or re.search(r"\b(if|while)\s*\($", before) is not None
 
 
 def m_zero_test(body, rng):
@@ -476,7 +540,11 @@ def m_zero_test(body, rng):
         (r"\b0 != (\w+)", lambda m: f"{m.group(1)} != 0"),
     ]
     pat, repl = rng.choice(choices)
-    return _sub_random(body, pat, repl, rng)
+    matches = [m for m in re.finditer(pat, body) if _in_condition(body, m)]
+    if not matches:
+        return None
+    m = rng.choice(matches)
+    return body[: m.start()] + repl(m) + body[m.end() :]
 
 
 def _statements(lines):
@@ -486,10 +554,33 @@ def _statements(lines):
         s = l.strip()
         if not s.endswith(";") or s.startswith(("return", "break", "continue", "goto", "case", "default", "//")):
             continue
+        # must start a statement: the previous code line ends one (not "y1 =" continued, not a braceless if/else/for/while)
+        prev = next((lines[j].strip() for j in range(k - 1, -1, -1) if lines[j].strip() and not lines[j].strip().startswith("//")), "{")
+        if not prev.endswith((";", "{", "}", ":")) or re.match(r"(\}\s*)?(else|do)\b", prev) and not prev.endswith("{"):
+            continue
+        if re.match(r"(?:\}\s*else\s+)?(?:if|for|while)\b", prev) and not prev.endswith("{"):
+            continue
         if "{" in s or "}" in s or s.startswith(("if", "for", "while", "do", "switch", "else")):
             continue
         out.append(k)
     return out
+
+
+_CALL = re.compile(r"\b(?!sizeof\b|if\b|while\b|for\b|switch\b|return\b)[A-Za-z_]\w*\s*\(")
+
+
+def _idents(s):
+    return set(re.findall(r"[A-Za-z_]\w*", s))
+
+
+def _written(stmt):
+    """Identifiers in the target of an assignment / ++ / -- statement (conservative: every name in it)."""
+    s = stmt.strip()
+    m = re.match(r"(.*?)\s*(?:<<|>>|[-+*/%&|^])?=(?!=)", s)
+    if m:
+        return _idents(m.group(1))
+    m = re.match(r"(?:\+\+|--)?\s*(.*?)\s*(?:\+\+|--)?;$", s)
+    return _idents(m.group(1)) if m and ("++" in s or "--" in s) else set()
 
 
 def m_swap_statements(body, rng):
@@ -501,9 +592,12 @@ def m_swap_statements(body, rng):
         return None
     k = rng.choice(pairs)
     a, b = lines[k], lines[k + 1]
-    # don't swap if the second reads what the first writes (simple check)
-    w = re.match(r"\s*\*?(\w+)", a)
-    if w and re.search(rf"\b{w.group(1)}\b", b.split("=", 1)[-1]):
+    # a call may read or write anything: never move a statement across one
+    if _CALL.search(a) or _CALL.search(b):
+        return None
+    # no dependency either way: neither statement may mention anything the other writes
+    wa, wb = _written(a), _written(b)
+    if wa & _idents(b) or wb & _idents(a):
         return None
     lines[k], lines[k + 1] = b, a
     return "\n".join(lines)
@@ -538,9 +632,14 @@ def _block_end(lines, k):
     """Index of the line that closes the brace opened at the end of lines[k]."""
     depth = 0
     for j in range(k, len(lines)):
-        depth += lines[j].count("{") - lines[j].count("}")
-        if depth == 0 and j > k:
-            return j
+        # on the opening line only the last "{" counts ("} else {" opens a block, its "}" closes another)
+        for ch in (lines[j][lines[j].rfind("{") :] if j == k else lines[j]):
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0 and j > k:
+                    return j  # first brace closing the block, even on a "} else {" line
     return None
 
 
@@ -615,6 +714,9 @@ def m_temp(body, rng):
     for k in st:
         rhs = lines[k].split("=", 1)[1] if "=" in lines[k] else lines[k]
         for m in re.finditer(r"[A-Za-z_]\w*(?:->\w+|\.\w+|\[[^\[\]]+\])+", rhs):
+            # never the target of ++/-- or an address taken with &: the temporary would be modified instead
+            if re.match(r"\s*(\+\+|--)", rhs[m.end() :]) or re.search(r"(\+\+|--|&)\s*(\(\s*[\w\s*]+\)\s*)?$", rhs[: m.start()]):
+                continue
             cands.append((k, m.group(0)))
     if not cands:
         return None
@@ -662,10 +764,102 @@ def m_cast_compare(body, rng):
     pat = rf"(?<![\w\]\)])({OPERAND})(\s*(?:<=|>=|<(?!<)|>(?!>)|==|!=)\s*)({OPERAND})(?![\w\[(])"
     cast = rng.choice(["(int)", "(unsigned int)", "(unsigned)"])
     side = rng.randint(1, 2)
-    return _sub_random(body, pat, lambda m: f"{cast}{m.group(1)}{m.group(2)}{m.group(3)}" if side == 1 else f"{m.group(1)}{m.group(2)}{cast}{m.group(3)}", rng)
+
+    def repl(m):
+        # an unsigned compare against 0 or a negative literal changes the result (x < (unsigned)0 is never true)
+        if cast != "(int)" and any(re.fullmatch(r"-?0[uUlL]*|-\s*\w+", g.strip()) for g in (m.group(1), m.group(3))):
+            return None
+        return f"{cast}{m.group(1)}{m.group(2)}{m.group(3)}" if side == 1 else f"{m.group(1)}{m.group(2)}{cast}{m.group(3)}"
+
+    return _sub_random(body, pat, repl, rng, op_group=2)
+
+
+def _decl_block(lines):
+    """Indices of the function's top-level declaration lines (right after the signature)."""
+    out = []
+    k = 1
+    while k < len(lines):
+        s = lines[k].strip()
+        if not s or s.startswith("//"):
+            k += 1
+            continue
+        if DECL.match(lines[k]) or INIT_DECL.match(lines[k]):
+            out.append(k)
+            k += 1
+            continue
+        break
+    return out
+
+
+INIT_DECL = re.compile(r"^\s+(?:const\s+|volatile\s+|register\s+)?(?:unsigned\s+|signed\s+)?(?:struct\s+\w+|\w+)\s*\**\s*(\w+)\s*=\s*[^;]+;\s*$")
+_DECL_NAME = re.compile(r"(\w+)\s*(?:\[[^\]]*\])*\s*(?:=[^;]*)?;\s*$")
+
+
+def _decl_name(line):
+    m = _DECL_NAME.search(line)
+    return m.group(1) if m else None
+
+
+def m_swap_decls_init(body, rng):
+    """Swap two adjacent declarations, initialised ones included, when neither initialiser reads the other."""
+    lines = body.split("\n")
+    ds = _decl_block(lines)
+    pairs = []
+    for k in ds:
+        if k + 1 not in ds:
+            continue
+        a, b = _decl_name(lines[k]), _decl_name(lines[k + 1])
+        if not a or not b:
+            continue
+        rhs_a = lines[k].split("=", 1)[1] if "=" in lines[k] else ""
+        rhs_b = lines[k + 1].split("=", 1)[1] if "=" in lines[k + 1] else ""
+        # an initialiser that calls something may have side effects: keep their order
+        if re.search(rf"\b{a}\b", rhs_b) or re.search(rf"\b{b}\b", rhs_a) or (_CALL.search(rhs_a) and _CALL.search(rhs_b)):
+            continue
+        pairs.append(k)
+    if not pairs:
+        return None
+    k = rng.choice(pairs)
+    lines[k], lines[k + 1] = lines[k + 1], lines[k]
+    return "\n".join(lines)
+
+
+def m_volatile(body, rng):
+    """Toggle volatile on a local scalar: forces it into a stack slot (or lets it back into a register)."""
+    lines = body.split("\n")
+    ds = [k for k in _decl_block(lines) if "[" not in lines[k] and "struct" not in lines[k] and "*" not in lines[k] and "register " not in lines[k]]
+    if not ds:
+        return None
+    k = rng.choice(ds)
+    l = lines[k]
+    lines[k] = l.replace("volatile ", "", 1) if "volatile " in l else re.sub(r"^(\s+)", r"\1volatile ", l, count=1)
+    return "\n".join(lines)
+
+
+def m_split_init(body, rng):
+    """int x = e;  ->  int x;  ... x = e; as the first statement (moves where the value is first computed)."""
+    lines = body.split("\n")
+    ds = _decl_block(lines)
+    cands = [k for k in ds if INIT_DECL.match(lines[k]) and "const " not in lines[k] and "[" not in lines[k]]
+    if not cands or not ds:
+        return None
+    k = rng.choice(cands)
+    name = _decl_name(lines[k])
+    decl, rhs = lines[k].split("=", 1)
+    ind = lines[k][: len(lines[k]) - len(lines[k].lstrip())]
+    # later initialisers that read it must keep seeing the value: only split when none do
+    if any(re.search(rf"\b{name}\b", lines[j].split("=", 1)[1]) for j in ds if j > k and "=" in lines[j]):
+        return None
+    lines[k] = decl.rstrip() + ";"
+    last = max(ds)
+    lines.insert(last + 1, f"{ind}{name} ={rhs}")
+    return "\n".join(lines)
 
 
 MUTATIONS = [
+    (m_swap_decls_init, 2),
+    (m_volatile, 1),
+    (m_split_init, 2),
     (m_swap_commutative, 5),
     (m_flip_compare, 3),
     (m_incdec, 2),
@@ -695,6 +889,51 @@ def mutate(body, rng):
     return body
 
 
+def decl_orders(body, rng, limit):
+    """Bodies with the top-level declarations in every valid order (a random sample when there are more than
+    limit). An order is valid when no initialiser reads a variable declared after it and initialisers that
+    call something keep their relative order."""
+    import itertools
+    import math
+
+    lines = body.split("\n")
+    ds = _decl_block(lines)
+    if len(ds) < 2 or ds != list(range(ds[0], ds[0] + len(ds))):
+        return []
+    decls = [lines[k] for k in ds]
+    names = [_decl_name(l) for l in decls]
+    rhs = [l.split("=", 1)[1] if "=" in l else "" for l in decls]
+    calls = [i for i, r in enumerate(rhs) if _CALL.search(r)]
+
+    def valid(perm):
+        pos = {i: n for n, i in enumerate(perm)}
+        for i in range(len(decls)):
+            for j in range(len(decls)):
+                if i != j and names[j] and re.search(rf"\b{names[j]}\b", rhs[i]) and pos[j] > pos[i]:
+                    return False
+        return all(pos[a] < pos[b] for a, b in zip(calls, calls[1:]))
+
+    idx = list(range(len(decls)))
+    if math.factorial(len(decls)) <= limit:
+        perms = [p for p in itertools.permutations(idx) if valid(p)]
+    else:
+        perms, tries = set(), 0
+        while len(perms) < limit and tries < limit * 20:
+            tries += 1
+            p = idx[:]
+            rng.shuffle(p)
+            if valid(p):
+                perms.add(tuple(p))
+        perms = list(perms)
+    out = []
+    for p in perms:
+        new = lines[:]
+        new[ds[0] : ds[0] + len(ds)] = [decls[i] for i in p]
+        out.append("\n".join(new))
+    rng.shuffle(out)
+    return out
+
+
 # ---------------------------------------------------------------- main
 
 
@@ -704,6 +943,7 @@ def main():
     ap.add_argument("--minutes", type=float, default=10)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--score-only", action="store_true", help="score the current source and show the diff")
+    ap.add_argument("--decl-orders", action="store_true", help="try every order of the top-level declarations (sampled when there are too many)")
     args = ap.parse_args()
 
     orig = Original()
@@ -720,51 +960,84 @@ def main():
 
     def evaluate(body):
         data = compile_tu(head + body + tail, work)
-        if data is None:
-            return None, None, None
+        if data is None or compile_tu.lossy > base_lossy[0]:
+            return None, None, None, None
         try:
             cand, size = candidate_listing(Obj(data), cname)
         except KeyError:
-            return None, None, None
+            return None, None, None, None
         target = orig.function_listing(args.addr, size)
-        return score(target, cand), cand, target
+        return score(target, cand), cand, target, guide(target, cand)
 
-    best, cand, target = evaluate(base_body)
+    base_lossy = [99999]
+    best, cand, target, best_guide = evaluate(base_body)
+    base_lossy[0] = compile_tu.lossy
     if best is None:
         sys.exit(f"{cname}: the current source does not compile on its own")
-    print(f"{cname} ({src.name}) base score {best * 100:.2f}% ({len(target)} instructions)", flush=True)
+    print(f"{cname} ({src.name}) base score {best * 100:.2f}% (guide {best_guide * 100:.2f}%, {len(target)} instructions)", flush=True)
     if args.score_only:
         for line in difflib.unified_diff(target, cand, "original", "ours", lineterm="", n=1):
             print(line)
         return
 
     rng = random.Random(args.seed)
-    best_body, current = base_body, base_body
-    seen = {hashlib.sha1(base_body.encode()).hexdigest()}
-    deadline = time.time() + args.minutes * 60
-    tries = compiled = failed = 0
+    if args.decl_orders:
+        orders = decl_orders(base_body, rng, limit=int(args.minutes * 60 / 0.35))
+        print(f"{len(orders)} declaration orders to try", flush=True)
+    best_body, current, guide_body = base_body, base_body, base_body
+    # every variant ever compiled for this function (any run): never compile one twice
     outdir.mkdir(parents=True, exist_ok=True)
+    seen_file = outdir / "seen.txt"
+    seen = set(seen_file.read_text().split()) if seen_file.exists() else set()
+    known_before = len(seen)
+    seen.add(hashlib.sha1(base_body.encode()).hexdigest())
+    seen_log = seen_file.open("a")
+    deadline = time.time() + args.minutes * 60
+    tries = compiled = failed = skipped = 0
+    base_score = best
     while time.time() < deadline and best < 1.0:
         tries += 1
-        start = current if rng.random() < 0.5 else best_body
-        body = mutate(start, rng)
+        if args.decl_orders:
+            if not orders:
+                break
+            body = orders.pop()
+        else:
+            r = rng.random()
+            start = current if r < 0.4 else guide_body if r < 0.8 else best_body
+            body = mutate(start, rng)
         h = hashlib.sha1(body.encode()).hexdigest()
         if h in seen:
+            skipped += 1
             continue
         seen.add(h)
-        s, _, _ = evaluate(body)
+        seen_log.write(h + "\n")
+        s, _, _, g = evaluate(body)
         compiled += 1
         if s is None:
             failed += 1
             continue
         if s > best:
-            best, best_body, current = s, body, body
+            best, best_body = s, body
             path = outdir / f"{s * 100:07.3f}.c"
             path.write_text(marker + "\n" + body + "\n", encoding="latin-1")
             print(f"[{compiled}] {s * 100:.2f}%  -> {path.relative_to(ROOT)}", flush=True)
-        elif s == best:
+        # the search follows the graded score: partial register/stack progress counts
+        if g > best_guide:
+            best_guide, guide_body, current = g, body, body
+        elif g == best_guide:
             current = body  # walk along the plateau
-    print(f"done: best {best * 100:.2f}% after {compiled} compiles ({failed} did not compile, {tries} tries)")
+        if compiled % 50 == 0:
+            seen_log.flush()
+            print(f"[{compiled}] still {best * 100:.2f}% ({failed} did not compile, {skipped} already tried)", flush=True)
+    seen_log.close()
+    summary = (
+        f"{time.strftime('%Y-%m-%d %H:%M')} seed={args.seed} minutes={args.minutes:g} "
+        f"base={base_score * 100:.2f}% best={best * 100:.2f}% guide={best_guide * 100:.2f}% compiled={compiled} failed={failed} "
+        f"skipped_already_tried={skipped} variants_known={len(seen)} (was {known_before})"
+    )
+    with (outdir / "runs.log").open("a") as f:
+        f.write(summary + "\n")
+    print("done: " + summary)
 
 
 if __name__ == "__main__":

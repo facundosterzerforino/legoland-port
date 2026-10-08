@@ -1,4 +1,4 @@
-﻿# FUN_00421e90 (0x00421e90, `src/legoland/castle.c`)
+﻿# SubdivideCurveAtMaxError (0x00421e90, `src/legoland/castle.c`)
 
 **Best: 99.09%** (kept). Kind: C.
 
@@ -10,6 +10,8 @@
 | 2026-10-07 | Haiku 5.5 | `FLOAT_004ab43c * o->coef_t3` | 97.27% (same reversed order) |
 | 2026-10-07 | Haiku 5.5 | `a = o->coef_t3; a = a * FLOAT_004ab43c;` (declarations first, C89) | 99.09% (kept) |
 | 2026-10-07 | Haiku 5.5 | On top of the best: `int i;` with `i = 2` after `m = ...` | 99.09% (no change, the constant is still sunk to the loop) |
+| 2026-10-08 | permuter + Opus 5.5 | `register int i`, `unsigned int i`, `register i` assigned right after m, do/while(--i), `for (i = 2; ...)` - mov esi, 2 stays after the sqrt call | 99.09 (no change) x5 |
+| 2026-10-08 | permuter + Opus 5.5 | `r = roots` moved into the for init | 98.18 (worse) |
 
 ## What still differs
 

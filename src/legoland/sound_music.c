@@ -562,6 +562,7 @@ int FUN_004966a0(struct Sample *sample) {
     int coord[2];
     int *obj;
 
+    unsigned int obj8;
     if (SoundAvailable == 0) {
         return 0;
     }
@@ -576,8 +577,9 @@ int FUN_004966a0(struct Sample *sample) {
         return FUN_00496660(sample);
     case 1:
         obj = *(int **)(*(int **)&sample->bloke + 1);
+        obj8 = obj[8];
         coord[0] = obj[7];
-        coord[1] = obj[8];
+        coord[1] = obj8;
         break;
     case 2:
         GetTileCentre((struct Point *)&sample->source_x, coord);

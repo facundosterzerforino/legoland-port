@@ -527,6 +527,9 @@ void *FUN_00492110(void) {
 
 // FUNCTION: LEGOLAND 0x00492130
 int InitDirectSound(void *hwnd) {
+    int ok;
+
+    ok = 0;
     if (DirectSoundCreate(NULL, (LPDIRECTSOUND *)&DSound, NULL) == 0) {
         if (((LPDIRECTSOUND)DSound)->lpVtbl->SetCooperativeLevel((LPDIRECTSOUND)DSound, (HWND)hwnd, 1) ==
             0) {
@@ -534,11 +537,16 @@ int InitDirectSound(void *hwnd) {
             DSoundCaps[0] = sizeof(DSoundCaps);
             if (((LPDIRECTSOUND)DSound)->lpVtbl->GetCaps((LPDIRECTSOUND)DSound, (LPDSCAPS)DSoundCaps) ==
                 0) {
-                SoundAvailable = 1;
-                return 1;
+                ok = 1;
             }
         }
-        ((LPDIRECTSOUND)DSound)->lpVtbl->Release((LPDIRECTSOUND)DSound);
+        if (!ok) {
+            ((LPDIRECTSOUND)DSound)->lpVtbl->Release((LPDIRECTSOUND)DSound);
+        }
+    }
+    if (ok) {
+        SoundAvailable = 1;
+        return 1;
     }
     DSound = NULL;
     SoundAvailable = 0;

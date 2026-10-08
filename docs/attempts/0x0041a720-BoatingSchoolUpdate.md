@@ -1,6 +1,6 @@
-# FUN_0041a720 (0x0041a720, `src/legoland/boating_school.c`)
+# BoatingSchoolUpdate (0x0041a720, `src/legoland/boating_school.c`)
 
-**Best: 94.41%**. Kind: C.
+**Best: 96.58%**. Kind: C.
 
 ## What still differs
 
@@ -16,6 +16,7 @@
 | 2026-10-07 p4 | Haiku agent | Swapped declaration order of `source` and `source2` | 94.41% (no change) |
 | 2026-10-07 p4 | Haiku agent | Moved `source2.type`/`.bloke` stores above `bloke->param_action++` in case 5 | 94.13% (worse) |
 | 2026-10-07 p4 | Haiku agent | Swapped `field_73` and `low_level_action` stores in case 0 | 94.41% (no change) |
+| 2026-10-08 | permuter + Opus 5.5 | `unsigned int slot`; case 1 condition split into two nested ifs | 94.41 -> 96.58 |
 
 ## Ideas not tried yet
 

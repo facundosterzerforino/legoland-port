@@ -153,15 +153,15 @@ void FortUpdate(Element *elem) {
     short *lls;
     RideNode *node;
     RideNode *next;
-    Bloke *bloke;
+    register Bloke *bloke;
     int x, y;
     unsigned char tx;
-    char dir;
+    unsigned char dir;
 
     spr = GetSpriteForLayer(FortLayer, 2);
     if (spr != NULL) {
         lls = (short *)GetLLSForSprite((struct SpriteLLS *)spr);
-        if (lls != NULL) {
+        if (lls) {
             if (++lls[0] >= lls[8]) {
                 lls[0] = 0;
             }
@@ -174,8 +174,8 @@ void FortUpdate(Element *elem) {
             bloke = node->rider;
             x = ride->x;
             tx = node->tile.pos.x;
-            x += tx;
             y = ride->y + node->tile.pos.y;
+            x += tx;
             if (bloke->low_level_action == 0) {
                 switch (bloke->param_action) {
                 case 0:
@@ -184,7 +184,7 @@ void FortUpdate(Element *elem) {
                     bloke->dest.y = y << 8;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
+                    bloke->field_73 = 0x10 + dir;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->field_40 = 2;
                     bloke->param_action++;
@@ -206,8 +206,8 @@ void FortUpdate(Element *elem) {
                     bloke->dest.y = (y << 8) + 0x80;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
-                    NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                    bloke->field_73 = 0x10 + dir;
+                    NewDirForAction(bloke, ((unsigned char)(0x10 + dir) >> 5) + 3);
                     bloke->param_action++;
                     break;
                 case 4:

@@ -16,6 +16,9 @@
 | 2026-10-07 | Haiku agent (barrels) | Seat copy moved to before `bloke = riders->rider` | 92.00% (worse) |
 | 2026-10-07 | Haiku agent (barrels) | Seat copy split into `seat.x = DAT.x; seat.y = DAT.y;` at original spot | 99.20% (no change) |
 | 2026-10-07 | Haiku agent (barrels) | Seat copy moved after both `person->offset` stores | 95.05% (worse) |
+| 2026-10-08 | permuter + Opus 5.5 | seat.y then seat.x at the copy site | 98.93 (worse) |
+| 2026-10-08 | permuter + Opus 5.5 | seat copy between bloke and person; seat.y / person / seat.x split; seat.y early + seat.x after offset.x | 99.20 / 98.93 / 95.85 |
+| 2026-10-08 | permuter + Opus 5.5 | `*&DAT`, memcpy, `*(__int64 *)` copy, `(&DAT)->x` fields - all identical code; person->offset through a struct temp | 99.20 x4 / 67.74 |
 
 ## Ideas not tried yet
 

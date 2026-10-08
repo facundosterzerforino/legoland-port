@@ -163,10 +163,12 @@ void FUN_0043d9f0(struct PlaneRideNode *node) {
 void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
     struct Ride *ride;
     struct RideNode *r;
-    struct Point coords;
+    register struct Point coords;
     char i;
     struct Point off;
     struct PlaneRideNode *node;
+    struct Bloke *rider;
+    int x;
     struct Bloke *riders[4] = {0};
     char n;
     struct Bloke *bloke;
@@ -187,10 +189,13 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
             }
         }
         if (n != 0) {
-            for (i = 0; i < n; i++) {
+            i = 0;
+            while (n > i) {
                 if (riders[i]->param_action == 0xd) {
-                    IP_RenderBlokeIn3DNow(riders[i]);
+                    rider = riders[i];
+                    IP_RenderBlokeIn3DNow(rider);
                 }
+                i++;
             }
             for (i = 0; i < n; i++) {
                 if (riders[i]->param_action == 0xe) {
@@ -201,8 +206,9 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
             off = GetRenderOffsetForLayer(ride->layer, 1);
             AdjustOffsetForViewMode(&off);
             PrintSprite(GetSpriteForLayer(ride->layer, 1), coords.x + off.x, coords.y + off.y, param_6, 0);
+            r = ride->riders;
             *(short *)*ZoomerSprite->lls = node->b4;
-            for (r = ride->riders; r != NULL; r = r->next) {
+            while (r != NULL) {
                 if (tile->id == r->tile.id) {
                     struct Point off2;
                     bloke = r->rider;
@@ -220,11 +226,13 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
                         IP_RenderBlokeIn3DNow(r->rider);
                     }
                 }
+                r = r->next;
             }
             LLSSetFrame(GetLLSForLayer(PlaneRideLayer, 2), node->b5);
             off = GetRenderOffsetForLayer(ride->layer, 2);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(GetSpriteForLayer(ride->layer, 2), coords.x + off.x, coords.y + off.y, param_6, 0);
+            x = coords.x;
+            PrintSprite(GetSpriteForLayer(ride->layer, 2), off.x + x, coords.y + off.y, param_6, 0);
             return;
         }
     }
@@ -555,22 +563,22 @@ void PlaneRideUpdate(struct Element *elem) {
     struct RideNode *next;
     struct PlaneRideNode *node;
     struct Bloke *bloke;
-    TileId *pos;
+    register TileId *pos;
     int iv12, iv13;
     int tw, th;
     int coords[2];
     struct Point tmp;
     int coords2[2];
 
-    while (rn != NULL) {
+    while (NULL != rn) {
         next = rn->next;
         bloke = rn->rider;
         pos = &rn->tile;
         node = (struct PlaneRideNode *)FindPlaneRideNode(pos);
-        if (node == NULL) {
+        if (!node) {
             return;
         }
-        if (bloke->low_level_action == 0) {
+        if (0 == bloke->low_level_action) {
             switch (bloke->param_action) {
             case 0: {
                 struct Point sc;
@@ -635,9 +643,9 @@ void PlaneRideUpdate(struct Element *elem) {
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
                 UnAdjustBlokePosition(&tmp);
-                bloke->flags |= 0x80;
                 coords2[0] = tmp.x;
                 coords2[1] = tmp.y;
+                bloke->flags |= 0x80;
                 bloke->person->sprite = DAT_0062fe98;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617706.75f, -1617948.625f);
@@ -685,7 +693,7 @@ void PlaneRideUpdate(struct Element *elem) {
                 break;
             }
             case 0xe:
-                bloke->flags &= 0xfff7;
+                bloke->flags = bloke->flags & 0xfff7;
                 RemoveBlokeFromRide(ride, rn);
                 if (--node->b3 == 0) {
                     node->b2 = 0;

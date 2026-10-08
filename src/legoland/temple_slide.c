@@ -333,9 +333,9 @@ void TempleSlideUpdate(Element *obj) {
     unsigned int y;
     unsigned char dir;
     int cx;
-    int cy;
+    register unsigned int cy;
     int f;
-    short sx;
+    unsigned short sx;
     short sy;
     int off[4];
     Point coords;
@@ -346,12 +346,13 @@ void TempleSlideUpdate(Element *obj) {
     int tw;
     RideNode *node;
 
+    int field_73;
     ride = obj->ride;
     node = ride->riders;
     while (node != NULL) {
         next = node->next;
-        bloke = node->rider;
         tile = &node->tile;
+        bloke = node->rider;
         x = ride->x + tile->pos.x;
         y = tile->pos.y + ride->y;
         if (bloke->low_level_action == 0) {
@@ -379,7 +380,8 @@ void TempleSlideUpdate(Element *obj) {
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
                     bloke->field_73 = dir + 0x10;
-                    NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                    field_73 = bloke->field_73;
+                    NewDirForAction(bloke, (field_73 >> 5) + 3);
                     bloke->param_action = 3;
                 }
                 break;
@@ -478,7 +480,7 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->field_73 = 0x10 + dir;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
                 break;

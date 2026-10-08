@@ -585,25 +585,33 @@ unsigned int FUN_00488820(unsigned int x, unsigned int y) {
 
 // FUNCTION: LEGOLAND 0x00488840
 LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, struct Sprite *param_2, int param_3, int param_4, int param_5) {
+    register int top;
+    int right;
+    int left;
+    int left2;
     int w = (short)sprite->width;
     int h = (short)sprite->height;
     struct ZBlitDesc local;
-    unsigned int transp;
     int row;
+    unsigned int transp;
     int yy;
 
-    if (DAT_00798590 == 0) {
+    if (!DAT_00798590) {
         FUN_004887a0();
     }
-    DAT_0066b620 = DAT_00668108.left;
-    DAT_0066b628 = DAT_00668108.right;
+    right = DAT_00668108.right;
+    left2 = DAT_00668108.left;
+    left = left2;
     DAT_0066b5b0 = CurrentSurfaceDesc;
+    DAT_0066b620 = left;
     DAT_0066b62c = DAT_00668108.bottom;
-    DAT_0066b624 = DAT_00668108.top;
+    DAT_0066b628 = right;
+    top = DAT_00668108.top;
+    DAT_0066b624 = top;
     CurrentSurfaceDesc.lpSurface = DAT_0066be54;
     CurrentSurfaceDesc.dwWidth = w;
     CurrentSurfaceDesc.dwHeight = h;
-    CurrentSurfaceDesc.lPitch = w * 2;
+    CurrentSurfaceDesc.lPitch = 2 * w;
     DAT_00668108.left = 0;
     DAT_00668108.right = w;
     DAT_00668108.top = 0;
@@ -619,7 +627,8 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     FUN_00464ee0(param_2, &local.rect, local.off);
     FUN_00485fe0(param_2, param_4, param_5);
     transp = GetTransparentColour();
-    for (yy = 0; yy < h; yy++) {
+    yy = 0;
+    while (yy < h) {
         for (row = 0; row < w; row++) {
             unsigned short px;
             if ((int)(FUN_00488820(row, yy) & 0xff) <= param_3) {
@@ -629,14 +638,15 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
             }
             ((unsigned short *)DAT_00701e68)[yy * w + row] = px;
         }
+        yy = 1 + yy;
     }
     DAT_0066be50->width = (short)w;
-    DAT_0066be50->height = (short)h;
     DAT_00701e64->width = (short)w;
+    DAT_0066be50->height = (short)h;
     DAT_00701e64->height = (short)h;
     DAT_00668108.right = DAT_0066b628;
-    DAT_00668108.top = DAT_0066b624;
     CurrentSurfaceDesc = DAT_0066b5b0;
+    DAT_00668108.top = DAT_0066b624;
     DAT_00668108.left = DAT_0066b620;
     DAT_00668108.bottom = DAT_0066b62c;
     return DAT_00701e64;
@@ -741,11 +751,12 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     RECT src;
     RECT dst;
     RECT clip;
-    RECT r2;
     DDSURFACEDESC desc1;
+    RECT r2;
     DDSURFACEDESC desc2;
     HRESULT hr;
 
+    void *bits;
     int x = param_2 + param_6[0];
     int y = param_3 + param_6[1];
     dst.left = x;
@@ -766,12 +777,12 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
             desc1.dwWidth = 0x500;
             desc1.dwHeight = 0x3c0;
             IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc1, &DAT_0079861c, NULL);
-            off[1] = off[0] = GetTransparentColour();
+            off[0] = off[1] = GetTransparentColour();
             IDirectDrawSurface_SetColorKey(DAT_0079861c, 8, (LPDDCOLORKEY)off);
         }
     }
-    DAT_00798608 = DAT_00668108;
     DAT_00798598 = CurrentSurfaceDesc;
+    DAT_00798608 = DAT_00668108;
     memset(&desc2, 0, sizeof(desc2));
     desc2.dwSize = 0x6c;
     if (IDirectDrawSurface_Lock(DAT_0079861c, NULL, &desc2, 0x21, NULL) == 0) {
@@ -797,7 +808,8 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
             printf("break");
         }
         FUN_00464ee0(sprite, &r2, off);
-        IDirectDrawSurface_Unlock(DAT_0079861c, desc2.lpSurface);
+        bits = desc2.lpSurface;
+        IDirectDrawSurface_Unlock(DAT_0079861c, bits);
     }
     IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
     hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);

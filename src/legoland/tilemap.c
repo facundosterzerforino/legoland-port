@@ -1139,10 +1139,11 @@ LEGO_EXPORT void AdjustTileRFFlags(int *param_1) {
 // FUNCTION: LEGOLAND 0x0045c900
 int FUN_0045c900(struct MapRect *param_1) {
     int x;
-    int y;
+    unsigned int y;
     struct MapTile tile;
 
-    for (x = param_1->x0; x <= param_1->x1; x++) {
+    x = param_1->x0;
+    while (x <= param_1->x1) {
         for (y = param_1->y0; y <= param_1->y1; y++) {
             if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
                 tile = *(struct MapTile *)&GameMap[y][x];
@@ -1154,6 +1155,7 @@ int FUN_0045c900(struct MapRect *param_1) {
                 return 0;
             }
         }
+        x++;
     }
     return 1;
 }
@@ -1726,7 +1728,7 @@ void FUN_0045d770(struct Cursor *param_1) {
     if (param_1 != NULL) {
         while ((cur->field_1828 & 0x1000) == 0) {
             cur = (struct Cursor *)cur->field_1830;
-            if (cur == NULL) {
+            if (NULL == cur) {
                 return;
             }
         }
@@ -1775,13 +1777,13 @@ void FUN_0045d770(struct Cursor *param_1) {
                                 } while (local_18.x <= DAT_00801a80[i].x1);
                             }
                             local_18.y = local_18.y + 1;
-                        } while (local_18.y <= DAT_00801a80[i].y1);
+                        } while (local_18.y <= (unsigned int)DAT_00801a80[i].y1);
                     }
                     i = i + 1;
                 } while (i < DAT_00667d3c);
             }
-            PathUpdateNeeded = 1;
             y = chain->field_1414[1] + 1 + chain->tile_y;
+            PathUpdateNeeded = 1;
             if (y <= chain->tile_y + -1 + chain->field_1414[3]) {
                 do {
                     x = chain->field_1414[0] + 1 + chain->tile_x;

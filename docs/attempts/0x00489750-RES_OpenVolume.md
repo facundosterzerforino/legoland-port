@@ -1,6 +1,6 @@
 # RES_OpenVolume (0x00489750, `src/legoland/resource.c`)
 
-**Best: 92.37%**. Kind: C.
+**Best: 96.75%**. Kind: C.
 
 ## What still differs
 
@@ -13,6 +13,7 @@
 | Date | Who | Change | Result |
 |---|---|---|---|
 | 2026-10-07 p7 | Haiku agent | Hoist `file_size - dir_offset` into a `dir_size` local, used for malloc/ReadFile/compare | 88.39% |
+| 2026-10-08 | permuter + Opus 5.5 | `HANDLE handle` temp for ReadFile, `close_handle` read before the DebugTrace; constant-first INVALID_HANDLE_VALUE compares | 92.37 -> 96.75 |
 
 ## Ideas not tried yet
 

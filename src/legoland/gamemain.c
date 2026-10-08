@@ -344,16 +344,20 @@ void FUN_004779d0(struct Point *p) {
 
 // FUNCTION: LEGOLAND 0x00477bd0
 void FindMapPathAStar(int x, int y, int a, int b) {
-    struct GameMainNode *best;
+    register struct GameMainNode *best;
     struct GameMainNode *cur;
-    struct GameMainNode *nb;
+    register struct GameMainNode *nb;
     struct Element *id;
     struct MapElement *tile;
-    struct Point pos;
     int result;
+    struct Point pos;
     struct Point *pp;
     int cost;
 
+    unsigned int cur_x;
+    int cur_y;
+    int pos_x;
+    int cur_x2;
     DAT_004bb598.x = x;
     DAT_004bb598.y = y;
     best = NULL;
@@ -365,7 +369,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
     while ((cur = DAT_00668fc0) != NULL) {
         DAT_00668fc0 = cur->next;
 
-        if ((cur->x == DAT_004bb5a0 && cur->y == DAT_004bb5a4) || cur->field_20 == 1) {
+        if ((DAT_004bb5a0 == cur->x && cur->y == DAT_004bb5a4) || cur->field_20 == 1) {
             best = cur;
         } else {
             pos.x = cur->x;
@@ -373,16 +377,18 @@ void FindMapPathAStar(int x, int y, int a, int b) {
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 if (nb->step_cost != -1) {
-                    if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
+                    if (nb->field_20 && (unsigned)nb->field_20 != 1) {
+                        cur_y = cur->y;
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur_y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
                         cost = cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->path_cost) {
+                        if (NULL != best && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
-                            nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                            cur_x2 = cur->x;
+                            nb->field_24 = FUN_004779a0(cur_x2, cur->y, nb->x, nb->y);
                             nb->parent = cur;
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
@@ -401,15 +407,16 @@ void FindMapPathAStar(int x, int y, int a, int b) {
             pos.y = cur->y;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
-                nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
+                cur_x = cur->x;
+                nb->field_24 = FUN_004779a0(cur_x, cur->y, nb->x, nb->y);
                 if (nb->step_cost != -1) {
-                    if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
-                    } else {
+                    if (!(0 != nb->field_20 && nb->field_20 != 1)) {
                         cost = cur->path_cost + nb->step_cost;
+                    } else {
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->path_cost) {
+                        if (NULL != best && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
@@ -427,19 +434,20 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                 }
             }
-            pos.x = cur->x;
+            pos_x = cur->x;
+            pos.x = pos_x;
             pos.y = cur->y + 1;
             if (IsInMapBounds(pos.x, pos.y)) {
                 nb = FUN_004777f0(&pos, &result);
                 nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                 if (nb->step_cost != -1) {
-                    if (nb->field_20 != 0 && nb->field_20 != 1) {
-                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
-                    } else {
+                    if (!(nb->field_20 != 0 && nb->field_20 != 1)) {
                         cost = cur->path_cost + nb->step_cost;
+                    } else {
+                        cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     }
                     if (result == 0) {
-                        if (best != NULL && cost > best->path_cost) {
+                        if (NULL != best && cost > best->path_cost) {
                             FUN_004776c0((struct QueryNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
@@ -463,7 +471,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                 nb = FUN_004777f0(&pos, &result);
                 nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                 if (nb->step_cost != -1) {
-                    if (nb->field_20 != 0 && nb->field_20 != 1) {
+                    if (0 != nb->field_20 && nb->field_20 != 1) {
                         cost = FUN_00477980(cur->field_24, FUN_004779a0(cur->x, cur->y, nb->x, nb->y)) + cur->path_cost + nb->step_cost;
                     } else {
                         cost = cur->path_cost + nb->step_cost;
@@ -476,7 +484,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                             nb->parent = cur;
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
-                            if (result == 2) {
+                            if (2 == result) {
                                 RemoveQueryNode((struct QueryNode *)nb);
                             }
                             if (result == 1) {
@@ -493,16 +501,18 @@ void FindMapPathAStar(int x, int y, int a, int b) {
     // STRING: LEGOLAND 0x004b8a70
     id = ElemID("PATH CONTROL");
     nb = best;
-    while (nb != NULL) {
+    while (nb) {
         pp = (struct Point *)&nb->x;
-        if (pp->x >= 0 && pp->x < lpConfig->width && pp->y >= 0 && pp->y < lpConfig->height) {
+        if (0 <= pp->x && pp->x < lpConfig->width && pp->y >= 0 && pp->y < lpConfig->height) {
             tile = &GameMap[pp->y][pp->x];
         } else {
             tile = NULL;
         }
-        if (!(tile->flags & 0x10) && (tile->field_10 & 3) != 3) {
-            FUN_004779d0(pp);
-            AddBasicPath((struct EditObject *)id, (int *)pp);
+        if (!(tile->flags & 0x10)) {
+            if ((tile->field_10 & 3) != 3) {
+                FUN_004779d0(pp);
+                AddBasicPath((struct EditObject *)id, (int *)pp);
+            }
         }
         nb = nb->parent;
     }

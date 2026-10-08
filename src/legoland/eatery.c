@@ -1559,9 +1559,9 @@ void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int p
     char c7;
     int sx;
     int sy;
-    cfg.field_8 = *param_1;
-    cfg.field_4 = *(int *)(param_2 + 0xc4);
     cfg.field_0 = 0x103;
+    cfg.field_4 = *(int *)(param_2 + 0xc4);
+    cfg.field_8 = *param_1;
     state = FindSaveBlock(param_1);
     if (state == NULL) {
         return;

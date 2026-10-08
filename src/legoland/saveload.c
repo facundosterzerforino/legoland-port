@@ -1033,17 +1033,19 @@ LEGO_EXPORT int LoadGame(char *path) {
             if ((e->flags & 0x10) != 0) {
                 // STRING: LEGOLAND 0x004bcb94
                 char label[9] = "xxxxxxxx";
-                e->flags |= 4;
                 ride = SavedElementTable[i]->ride;
+                e->flags = e->flags | 4;
                 if (SaveGameRead(label, 8) == 0) {
                     LOAD_FAIL();
                 }
                 // STRING: LEGOLAND 0x004bcb90
                 DBPrintf("%s\n", label);
-                if (ride->type != 2 && ride->type != 0) {
-                    ride->counters = malloc(lpConfig->max_blokes);
-                    if (SaveGameRead(ride->counters, lpConfig->max_blokes) == 0) {
-                        LOAD_FAIL();
+                if (ride->type != 2) {
+                    if (ride->type != 0) {
+                        ride->counters = malloc(lpConfig->max_blokes);
+                        if (SaveGameRead(ride->counters, lpConfig->max_blokes) == 0) {
+                            LOAD_FAIL();
+                        }
                     }
                 }
                 if (SaveGameRead(&ride->field_8, 4) == 0) {

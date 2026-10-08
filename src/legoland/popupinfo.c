@@ -935,7 +935,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     int power;
     int name_lines;
     int info_lines;
-    int entry_index;
+    unsigned int entry_index;
     int icon_x;
     int icon_y;
     int last_x;
@@ -956,7 +956,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         DrawNewObjectPopup();
         return;
     }
-    if (EditMode.unk0 != 0) {
+    if (0 != EditMode.unk0) {
         ResetInfoStruct();
         return;
     }
@@ -1060,7 +1060,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         DAT_007fdf98 = 1;
         break;
     }
-    if (DAT_007fdfa8 != 0) {
+    if (0 != DAT_007fdfa8) {
         if (DAT_007fdf9c == 0x306) {
             PopupInfoLineCount = 2;
         } else {
@@ -1111,10 +1111,10 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         FUN_00455e50(GetString(0x8e), left, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
         FUN_00455e50(GetString(0x8f), (right + left) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
         if (mood == 3) {
-            mid -= 0x20;
+            mid = mid - 0x20;
             PrintSprite(ISadSprite, width / 4 + left - 0x20, mid, 0, 0);
         } else if (mood == 2) {
-            mid -= 0x20;
+            mid = mid - 0x20;
             PrintSprite(IHappySprite, width / 4 + left - 0x20, mid, 0, 0);
         } else {
             mid -= 0x20;
@@ -1157,8 +1157,8 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         RenderBlock(bar_x, bar_y, width, 6, 0);
         RenderBlock(bar_x, bar_y, (int)(width * frac), 6, (frac < 0.25 && repairable != 0) ? GetNearestColour(0xff, 0, 0) : GetNearestColour(0, 0xff, 0));
     }
-    icon_x = size * 32 + x + 0xc8;
     icon_y = y + (size * 5 + 0x1e) * 4;
+    icon_x = size * 32 + x + 0xc8;
     ClosePopUpIcon->flags = ClosePopUpIcon->flags & 0xfffffbff;
     ClosePopUpIcon->x = icon_x - 0x27;
     ClosePopUpIcon->y = icon_y;
@@ -1171,14 +1171,14 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     }
     if (can_delete != 0) {
         if (FUN_004723f0() != 0) {
-            DeleteObjectIcon->flags = DeleteObjectIcon->flags & 0xfffffbff;
+            DeleteObjectIcon->flags = 0xfffffbff & DeleteObjectIcon->flags;
             DeleteObjectIcon->x = icon_x - 0x4e;
             DeleteObjectIcon->y = icon_y;
             last_x = DeleteObjectIcon->x;
         }
     }
     if (add_gardener != 0) {
-        AddGardenerIcon->flags = AddGardenerIcon->flags & 0xfffffbff;
+        AddGardenerIcon->flags = 0xfffffbff & AddGardenerIcon->flags;
         AddGardenerIcon->y = icon_y;
         if (can_delete != 0) {
             AddGardenerIcon->x = icon_x - 0x75;

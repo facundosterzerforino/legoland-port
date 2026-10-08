@@ -19,11 +19,11 @@ int stackdump(void *exc_info, const char *filename) {
     const char *modname = "Unknown";
     EXCEPTION_POINTERS *ep;
     EXCEPTION_RECORD *rec;
-    CONTEXT *ctx;
     const char *sep;
+    CONTEXT *ctx;
     char path[260];
-    HANDLE hFile;
     char *bufend;
+    HANDLE hFile;
     int count = 0;
     char buf[1000] = {DAT_004d8bb0[0]};
     MEMORY_BASIC_INFORMATION mbi;

@@ -62,7 +62,7 @@ ignores the value. A cleanup would add the return.
 | `FUN_0041eaf0`, `FUN_0041d1d0`, `FUN_00426750`, `FUN_0042a640` (`castle.c`) | 100% | `ForEachRingNode` (void visitor) and plain statement calls |
 | `Catapult_AddNode`, `InitGameInterface`, `FUN_00455a50` (`text.c`) | 100% | no caller uses it |
 | `UnloadPopUpSprites` | 100% | `UnLoad_PopUpInfo`, called as a statement |
-| `AcquireWaterWorksSfx` | 100% | `FUN_00417c00`, a `cb_a4` "load resources" callback; that slot is never called with its result used (it isn't the save-load hook, see below) |
+| `AcquireWaterWorksSfx` | 100% | `WaterWorksEntranceLoad`, a `cb_a4` "load resources" callback; that slot is never called with its result used (it isn't the save-load hook, see below) |
 | `RenderLogFlumeCorner`, `RenderLogFlumeTrack` (`log_flume.c`) | 53% / 100% effective | the 0xb0 render callback, called through a void function pointer (`print_sprite.c`) |
 | `FUN_0040d6f0` (`log_flume.c`) | 97.7% (scheduling only) | the 0x90 callback, result unused (`map_object.c`) |
 | `AddBasicObject` | 99.0% (reccmp shows the constant 0x800000 as `EditCursor+5184`) | the 0x98 add-object callbacks, result unused (`gamemap.c`) |
@@ -75,7 +75,7 @@ caller's clip (`arg`) or 0.
 The save-load hook is different: `LoadGame` fails if a ride's `load_hook` (ride +0xb8) returns 0. All 15
 functions the original installs there (`Catapult_Load`, `Copters_Load`, `LoadGoldWash`, `LoadJoust`,
 `LogFlumeEntrance_Load`, `LoadSafariRide`, `LoadSpider`, `LoadTempleSlide`, `Load_WaterBlock`,
-`Load_ElephantF`, `FUN_00426c20`, `LoadJailCells`, `SpaceTower_Load`, `LoadSBarrel`, `LoadZoomer`) return 1 or
+`Load_ElephantF`, `CastleObj_Load`, `LoadJailCells`, `SpaceTower_Load`, `LoadSBarrel`, `LoadZoomer`) return 1 or
 0 explicitly on every path.
 
 The ones whose value *is* used were fixed in the decomp: `AddRepairOrder` / `AddRepairOrderForObject`,
@@ -86,17 +86,17 @@ The ones whose value *is* used were fixed in the decomp: `AddRepairOrder` / `Add
 Functions that match the original 100%, where clang's analyzer reports a value that may be unset. Matching
 100% means the original does exactly the same; these were not traced to see whether the game can reach them.
 
-- `log_flume.c`: `RenderLogFlumeEntrance` (`ok`, when the entrance has no flume entry), `FUN_0040c4a0` and
+- `log_flume.c`: `RenderLogFlumeEntrance` (`ok`, when the entrance has no flume entry), `LogFlumeTrackCalcCursor` and
   `LogFlumeTrackAddObject` (`key`), `FUN_0040cca0` (array index `idx`), `FUN_0040ce20`, `FUN_0040d420`
 - `sound_music.c`: `KillAllSamplesFromSource`, `UnSourceAndFadeAllSamplesFromSource` (`matched`, for a
   sample source type outside the switch)
 - `render3d.c`: `FUN_00442580` (`a`, `b`)
 - `man3d.c`: `Load3DDataFile` (`buffer` returned when the file isn't found)
-- `roads.c`: `FUN_00414020` (`id`)
-- `castle.c`: `FUN_0041f880`, `FUN_00421e90`, `FUN_00429c60`
-- `jungle_cruise.c`: `FUN_004367b0`, `FUN_00436a40`, `FUN_00436dc0`
+- `roads.c`: `DrivingSchoolRoadsAddObject` (`id`)
+- `castle.c`: `FUN_0041f880`, `SubdivideCurveAtMaxError`, `FUN_00429c60`
+- `jungle_cruise.c`: `FUN_004367b0`, `JungleCruiseWaterRemoveObject`, `FUN_00436dc0`
 - `bloke_ai.c`: `FUN_0044e790`, `FUN_0044e890` (return value)
-- `boating_school.c`: `FUN_0041c130` (`owner`)
+- `boating_school.c`: `BoatingSchoolWaterRemoveObject` (`owner`)
 - `image_sprite.c`: `LoadCompSprite`; `string.c`: `LoadStringTable`; `ride_bloke.c`: `RotateOffset` (default case)
 
 Not bugs, but reported: `FUN_0041db90` (`castle.c`, fills its array through function pointers the analyzer

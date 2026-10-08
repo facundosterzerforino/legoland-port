@@ -316,3 +316,6 @@ int FUN_004234e0(void *param1);
 struct PolyArg;
 void FUN_0042a2f0(int n, struct PolyArg *poly);
 void FUN_00428860(int palette, int *shade, int n, struct RecIdx *idx, struct RecSrc *src);
+void BuildBasisFromDir(struct FVec3 *dir, struct FVec3 *basis);
+unsigned int FUN_00428840(unsigned int param_1);
+unsigned int GetLtxFileTableEntry(unsigned int param);

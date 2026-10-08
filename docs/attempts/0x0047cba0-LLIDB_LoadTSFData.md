@@ -1,6 +1,6 @@
 # LLIDB_LoadTSFData (0x0047cba0, `src/legoland/llidb.c`)
 
-**Best: 90.58%** (unchanged C from the start of this round). Kind: C.
+**Best: 93.40%** (unchanged C from the start of this round). Kind: C.
 
 ## What still differs
 
@@ -14,6 +14,7 @@
 |---|---|---|---|
 | 2026-10-07 | Claude Haiku 5.5 | Duplicate `anim = si->sprites[i]->image;` line | no change (90.58%) |
 | 2026-10-07 | Claude Haiku 5.5 | Read the sprite through a `struct Sprite *sp` local | no change (90.58%) |
+| 2026-10-08 | permuter + Opus 5.5 | `char *data_c` temp for the first RES_ReadFile; `if (ret == 4) { if (len != 0)` nested; terminator store before the name read; data_14 before head->data | 90.58 -> 93.40 |
 
 ## Ideas not tried yet
 

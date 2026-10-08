@@ -50,10 +50,10 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     RECT clip;
     RECT bar;
     RECT saved;
-    RECT *items;
+    register RECT *items;
     int sel;
-    int retry;
     int n;
+    int retry;
     int i;
     int j;
     int y;
@@ -74,7 +74,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     clip.bottom = box->top + box->bottom - 9;
     retry = 0;
     DAT_0062fea4 = 0;
-    if (flag == 0) {
+    if (!flag) {
         DialogListScrollY = 0;
     }
     n = 0;
@@ -99,8 +99,8 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
             y += 4;
         }
         if (!retry && y > viewH) {
-            retry = 1;
             clip.right -= 16;
+            retry = 1;
             continue;
         }
         break;
@@ -113,7 +113,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     bar.left = box->right + box->left - 20;
     bar.top = clip.top;
     bar.right = box->right + box->left - 5;
-    bar.bottom = clip.bottom + 0;
+    bar.bottom = 0 + clip.bottom;
     for (;;) {
         if (!ProcessSystemEvents()) {
             break;
@@ -125,12 +125,14 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
         if (MousePos.x >= clip.left && MousePos.x <= clip.right && MousePos.y >= clip.top && MousePos.y <= clip.bottom) {
             my = MousePos.y - clip.top + DialogListScrollY;
             for (i = 0; i < n; i++) {
-                if (my >= items[i].top && my <= items[i].bottom) {
-                    sel = i;
-                    if (!DAT_0062fea4 && (DAT_00813ac4 & 2)) {
-                        return i;
+                if (my >= items[i].top) {
+                    if (my <= items[i].bottom) {
+                        sel = i;
+                        if (!DAT_0062fea4 && (DAT_00813ac4 & 2)) {
+                            return i;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
             if (i == n) {
@@ -153,21 +155,23 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
         }
         GetClipping(&saved);
         SetClipping(&clip);
-        for (j = 0; j < n; j++) {
+        j = 0;
+        while (j < n) {
             if (items[j].bottom >= DialogListScrollY) {
                 break;
             }
+            j++;
         }
-        if (j < n) {
-            np = names + j;
-            for (i = j; i < n; i++) {
+        if (n > (unsigned int)j) {
+            np = j + names;
+            for (i = j; n > i; i++) {
                 ip = &items[i];
                 if (ip->top >= DialogListScrollY + viewH) {
                     break;
                 }
                 t = ip->top;
                 l = ip->left;
-                if (sel == i) {
+                if (i == sel) {
                     RenderBlock(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0x7f, 0x7f, 0xef));
                 } else {
                     RenderBox(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0xcf, 0xcf, 0xcf));

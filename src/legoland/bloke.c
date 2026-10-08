@@ -1212,6 +1212,7 @@ LEGO_EXPORT void ApplyObjectOrientationToPerson(Person *person, float *matrix, v
 LEGO_EXPORT void SetBlokePositionFromBNV(BinVFile *file, Bloke *bloke, char *name, int frame, float near_z, float far_z, float *orient) {
     BinVObject *object;
     Vertex *vertex;
+    float m28;
     float sumZ = 0.0f;
     int sumX = 0;
     int sumY = 0;
@@ -1221,7 +1222,7 @@ LEGO_EXPORT void SetBlokePositionFromBNV(BinVFile *file, Bloke *bloke, char *nam
     float skew;
     float zscale;
     float depth;
-    int z;
+    register int z;
     int i;
 
     binFrame = GetBinVFrame(file, frame);
@@ -1229,14 +1230,15 @@ LEGO_EXPORT void SetBlokePositionFromBNV(BinVFile *file, Bloke *bloke, char *nam
     len = sqrt(object->m18 * object->m18 + object->m14 * object->m14 + object->m10 * object->m10);
     scale = 1.0f / len;
     object->m10 *= scale;
-    object->m14 *= scale;
+    object->m14 = object->m14 * scale;
     object->m18 *= scale;
     len = sqrt(object->m24 * object->m24 + object->m20 * object->m20 + object->m1c * object->m1c);
     scale = 1.0f / len;
     object->m1c *= scale;
     object->m20 *= scale;
     object->m24 *= scale;
-    len = sqrt(object->m2c * object->m2c + object->m28 * object->m28 + object->m30 * object->m30);
+    m28 = object->m28;
+    len = sqrt(object->m2c * object->m2c + m28 * object->m28 + object->m30 * object->m30);
     scale = 1.0f / len;
     object->m28 *= scale;
     object->m2c *= scale;

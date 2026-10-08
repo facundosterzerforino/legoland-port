@@ -14,6 +14,8 @@
 |---|---|---|---|
 | 2026-10-07 | Haiku agent | `tile` set with a single ternary instead of if/else | 99.10% (same) |
 | 2026-10-07 | Haiku agent | `struct MapElement *tile` moved from the function top into the inner x-loop block | 99.10% (same) |
+| 2026-10-08 | permuter + Opus 5.5 | decl order (y before x; rect first), tx/ty swapped, x0/x1 locals per row, outer for(;;) as do/while(1) | 99.10 (no change) x5 |
+| 2026-10-08 | permuter + Opus 5.5 | loop compares flipped (`rect.x1 >= x` / `rect.y1 >= y`); inner loop as guarded do/while | 97.30 / 97.30 / 47.83 (worse) |
 
 ## Ideas not tried yet
 

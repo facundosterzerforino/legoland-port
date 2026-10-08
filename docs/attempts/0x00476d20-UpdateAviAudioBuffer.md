@@ -1,6 +1,6 @@
-# FUN_00476d20 (0x00476d20, `src/legoland/interface.c`)
+# UpdateAviAudioBuffer (0x00476d20, `src/legoland/interface.c`)
 
-**Best: 92.62%** (start version, unchanged). Kind: C.
+**Best: 97.69%** (start version, unchanged). Kind: C.
 
 ## What still differs
 
@@ -13,6 +13,8 @@
 | Date | Who | Change | Result |
 |---|---|---|---|
 | 2026-10-07 p8 | Haiku agent | Reordered locals (`loops`, `play_pos`, `bytes_out`, `count` declared after `play`) | 92.62% (no change) |
+| 2026-10-08 | permuter + Opus 5.5 | REJECTED permuter 97.4%: split `A && B` that had an else into nested ifs, dropping the else when A is false (behaviour change) | not kept |
+| 2026-10-08 | permuter + Opus 5.5 | `int rem`, `register int play_pos`, DAT_00668fa0 computed after `loops = 0xb` | 92.62 -> 97.69 |
 
 ## Ideas not tried yet
 

@@ -84,11 +84,11 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
     char header[0xe];
     char info[0x2c];
     char *path;
-    struct ResFile *file;
+    register struct ResFile *file;
     unsigned int offbits;
     int pixel_offset;
     unsigned int row_size;
-    unsigned int aligned_width;
+    int aligned_width;
     unsigned char *pixels;
     unsigned char *dst;
     unsigned char *src;
@@ -136,18 +136,22 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
     if (*(short *)(info + 0xe) == 8) {
         src = pixels + row_size;
         RES_SetFilePointer(file, pixel_offset);
-        for (x = 0; x < 0x100; x++) {
+        x = 0;
+        while (x < 0x100) {
             DAT_0081c4c0[x] = 0;
+            x++;
         }
         RES_ReadFile(file, DAT_0081c4c0, *(int *)(info + 0x20) * 4);
         RES_SetFilePointer(file, offbits);
         RES_ReadFile(file, pixels, row_size);
-        for (y = 0; y < param_1->height; y++) {
+        for (y = 0; y < (unsigned)param_1->height; y++) {
             src -= aligned_width;
-            for (x = 0; x < param_1->width; x++) {
+            x = 0;
+            while (x < param_1->width) {
                 *dst = *src;
+                x++;
                 src++;
-                dst++;
+                dst = dst + 1;
             }
         }
     }

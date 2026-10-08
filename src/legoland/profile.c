@@ -431,6 +431,9 @@ LEGO_EXPORT void PrintProfileDetails(void) {
     unsigned char sel;
     int show;
 
+    int slot;
+    int last_x;
+    int icon_y;
     y = 0x72;
     DeleteIcon->flags |= 0x400;
     icon = IconListHead;
@@ -444,19 +447,21 @@ LEGO_EXPORT void PrintProfileDetails(void) {
                 Hover.type = 2;
                 Hover.ptr = (struct Bloke *)icon;
             }
-            if (CurrentProfile.profile_slot == icon->slot) {
+            if (CurrentProfile.profile_slot == (int)icon->slot) {
                 if (DeletePopUpShown != 0) {
                     SetIconSprite(icon, DAT_007986b8);
                     last = icon;
                     icon->y = icon->slot * 0x26 + 0x6b;
-                    y = icon->y + 0x22;
+                    icon_y = icon->y;
+                    y = icon_y + 0x22;
                 } else if (NewProfilePopUpShown != 0) {
                     EnterNewProfile(icon);
                     show = 0;
                     last = icon;
                 } else {
                     SetIconSprite(icon, RegDiffPopUpSprite);
-                    icon->y = icon->slot * 0x26 + 0x6b;
+                    slot = icon->slot;
+                    icon->y = slot * 0x26 + 0x6b;
                     y = icon->y + 0x22;
                     LightUpthisDeleteIcon(icon, 1);
                     last = icon;
@@ -484,7 +489,8 @@ LEGO_EXPORT void PrintProfileDetails(void) {
     if (DeletePopUpShown != 0) {
         FUN_00455e50(GetString(0x85), last->x + 0x14, last->y + 7, 0x9b, 0x13, 2, 0x25, 0, 0xffffff);
     } else if (NewProfilePopUpShown != 0) {
-        FUN_00455e50(GetString(0x86), last->x + 0x14, last->y - 0x14, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
+        last_x = last->x;
+        FUN_00455e50(GetString(0x86), last_x + 0x14, last->y - 0x14, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
         UpdateProfileCheckBoxIcons();
     }
     if (CurrentProfile.profile_slot != 0 && DeletePopUpShown == 0) {

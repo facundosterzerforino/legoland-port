@@ -323,6 +323,8 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
     int i;
     struct Point offset;
 
+    int y;
+    int remap;
     coords = GetScreenCoordsForObject(param_4, param_3);
     idx = param_2;
     if (param_2 >= param_1->modulo) {
@@ -336,7 +338,8 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
         if (param_1->data_table == NULL) {
             node = (struct BlokeRideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
         } else {
-            node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[param_1->remap_table[sprite_id]], param_3, (short *)param_4);
+            remap = param_1->remap_table[sprite_id];
+            node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[remap], param_3, (short *)param_4);
         }
         if (node != NULL && (node->inner->flags & 0x80) != 0) {
             IP_RenderBlokeIn3DNow((struct Bloke *)node->inner);
@@ -346,7 +349,8 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
             LLSSetFrame((struct LLS *)GetLLSForSprite((struct SpriteLLS *)frame), param_2);
         }
         offset.x = param_1->x;
-        offset.y = param_1->y;
+        y = param_1->y;
+        offset.y = y;
         AdjustOffsetForViewMode(&offset);
         frame = (int *)param_1->index_array[sprite_id];
         if (frame != NULL) {
@@ -453,13 +457,13 @@ struct CellEntry {
 void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_3, float *param_4, int param_5) {
     struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->entries + param_2 * 6);
     struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->entries + param_3 * 6);
-    unsigned char bVar3 = entry1->field_4;
+    int idx1 = entry1->field_0 + param_1->field_4;
     int iVar22 = entry2->field_0 + param_1->field_4;
+    unsigned char bVar3 = entry1->field_4;
     int lo_x = entry1->x;
     int hi_x = bVar3 + entry1->x + 1;
     int lo_y = entry1->y;
     int hi_y = entry1->field_5 + entry1->y + 1;
-    int idx1 = entry1->field_0 + param_1->field_4;
     float *p;
     int local_18;
 
@@ -765,7 +769,7 @@ unsigned char *Get3DDataListString(char *param_1, int param_2, volatile int para
 // FUNCTION: LEGOLAND 0x00442980
 void FUN_00442980(const char *param_1, const char *param_2, const char *param_3, int param_4, unsigned int param_5) {
     int idx = 0;
-    int count1;
+    unsigned int count1;
     int count2;
     char *list_mid;
     char *list1;
@@ -788,12 +792,12 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
     int r;
 
     data = (char *)Load3DDataFile(param_3, param_1);
-    if (data != NULL) {
+    if (NULL != data) {
         name = data;
         p = data + strlen(data) + 1;
-        count1 = *(int *)p;
         list1 = p + 4;
-        if (count1 != 0) {
+        count1 = *(int *)p;
+        if (0 != count1) {
             q = list1;
             do {
                 q = q + strlen(q) + 1;
@@ -833,8 +837,8 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
         RES_ReadLine(file, line, 512);
         if (RES_ReadLine(file, line, 512) != NULL) {
             do {
-                p = line;
                 dst = path;
+                p = line;
                 do {
                     c = (char)tolower(*p);
                     p++;
@@ -885,26 +889,28 @@ unsigned int FUN_00442c70(void) {
 LEGO_EXPORT struct Point GetScreenCoordsForObject(TileId *tile, struct Ride *ride) {
     int bounds[4];
     struct Point ref;
-    int iVar1;
+    unsigned int iVar1;
     int iVar2;
-    struct Point r;
+    register struct Point r;
 
+    int bounds0;
     ref.x = tile->pos.x;
     ref.y = tile->pos.y;
     GetTileBounds(&ref, bounds);
     iVar2 = ride->field_14;
     iVar1 = ride->field_18;
-    if (iVar2 < 0) {
+    if (0 > iVar2) {
         iVar2 = -(-iVar2 >> 1);
     } else {
         iVar2 = iVar2 >> 1;
     }
-    if (iVar1 < 0) {
-        r.x = iVar2 + bounds[0];
+    if ((int)iVar1 < 0) {
+        bounds0 = bounds[0];
+        r.x = iVar2 + bounds0;
         r.y = bounds[1] - (-iVar1 >> 1);
         return r;
     }
-    r.x = iVar2 + bounds[0];
+    r.x = bounds[0] + iVar2;
     r.y = bounds[1] + (iVar1 >> 1);
     return r;
 }

@@ -18,9 +18,9 @@ LEGO_EXPORT int SetupControllers(void) {
     CONTROLLERBUFFER = malloc(sizeof(struct CtrlBuffer));
     CONTROLLERBUFFER->buttons = 0;
     DAT_00813a5c = 2;
+    DAT_00813a4c = 1;
     DAT_00813ac8 = 2;
     GamePad = 0;
-    DAT_00813a4c = 1;
     DAT_00813a54 = 4;
     DAT_00813ac0 = 1;
     DAT_00813ab8 = 0x100;
@@ -34,7 +34,7 @@ LEGO_EXPORT int SetupControllers(void) {
     MouseTileY = 4;
     FootprintWidth = 1;
     FootprintHeight = 1;
-    if (CONTROLLERBUFFER != NULL) {
+    if ((unsigned int)NULL != CONTROLLERBUFFER) {
         ControllersInitialized = 1;
         return 1;
     }

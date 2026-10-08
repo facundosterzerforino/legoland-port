@@ -201,9 +201,11 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
     unsigned int dir_offset;
     unsigned int bytes_read;
     void *dir_data;
-    int name_len;
     int i;
+    int name_len;
 
+    HANDLE handle;
+    HANDLE close_handle;
     volume = (struct ResVolume *)malloc(0x28);
     cur = MasterVolList;
 
@@ -238,7 +240,7 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
     FUN_0047f850();
 
     volume->handle = CreateFileA(res_path, 0x80000000, 1, 0, 3, 0x8000000, 0);
-    if (volume->handle == INVALID_HANDLE_VALUE) {
+    if (INVALID_HANDLE_VALUE == volume->handle) {
         // STRING: LEGOLAND 0x004bde3c
         sprintf(res_path, "%s%s.res", CdDrivePath, fname);
         DebugTrace("Trying to open from %s", res_path);
@@ -246,7 +248,7 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
         volume->handle = CreateFileA(res_path, 0x80000000, 1, 0, 3, 0x8000000, 0);
     }
 
-    if (volume->handle == INVALID_HANDLE_VALUE) {
+    if (INVALID_HANDLE_VALUE == volume->handle) {
         free(volume);
         return 0;
     }
@@ -256,15 +258,17 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
 
     file_size = GetFileSize(volume->handle, 0);
     SetFilePointer(volume->handle, 0, 0, 0);
-    ReadFile(volume->handle, &dir_offset, 4, &bytes_read, 0);
+    handle = volume->handle;
+    ReadFile(handle, &dir_offset, 4, &bytes_read, 0);
     // STRING: LEGOLAND 0x004bde04
     DebugTrace("FileSize = %x, Directory is at %x", file_size, dir_offset);
 
     dir_data = malloc(file_size - dir_offset);
     if (dir_data == 0) {
         // STRING: LEGOLAND 0x004bdddc
+        close_handle = volume->handle;
         DebugTrace("Failed to allocate space for directory");
-        CloseHandle(volume->handle);
+        CloseHandle(close_handle);
         free(volume);
         return 0;
     }

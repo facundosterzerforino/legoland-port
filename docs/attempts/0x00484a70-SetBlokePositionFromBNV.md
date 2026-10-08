@@ -1,6 +1,6 @@
 # SetBlokePositionFromBNV (0x00484a70, `src/legoland/bloke.c`)
 
-**Best: 94.15%**. Kind: C.
+**Best: 95.12%**. Kind: C.
 
 ## What still differs
 
@@ -15,6 +15,7 @@
 | 2026-10-07 | Haiku agent | Third sqrt sum reordered to `m30*m30 + m2c*m2c + m28*m28` (original load order) | 94.15% (no change) |
 | 2026-10-07 | Haiku agent | Third sqrt sum reordered to `m30*m30 + m28*m28 + m2c*m2c` | 94.15% (no change) |
 | 2026-10-07 | Haiku agent | `int i = 0;` at declaration, loop as `for (; i < 8; i++)` | 94.15%, but the diff moves into the prologue (worse shape) |
+| 2026-10-08 | permuter + Opus 5.5 | `float m28` temp for the third sqrt; `register int z`; `m14 = m14 * scale` | 94.15 -> 95.12 |
 
 ## Ideas not tried yet
 

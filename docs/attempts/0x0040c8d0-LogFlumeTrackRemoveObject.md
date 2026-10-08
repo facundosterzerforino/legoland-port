@@ -1,4 +1,4 @@
-﻿# FUN_0040c8d0 (0x0040c8d0, `src/legoland/log_flume.c`)
+﻿# LogFlumeTrackRemoveObject (0x0040c8d0, `src/legoland/log_flume.c`)
 
 **Best: 92.59%** (unchanged from start). Kind: C.
 

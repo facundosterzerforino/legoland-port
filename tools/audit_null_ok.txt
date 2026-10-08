@@ -9,8 +9,8 @@ bloke_ai.c:FUN_0044f360 baseline
 bloke_ai.c:FUN_0044f4a0 baseline
 bloke_ai.c:FUN_0044f610 baseline
 bloke_ai.c:FUN_0044fe80 baseline
-boating_school.c:FUN_0041bfb0 baseline
-boating_school.c:FUN_0041c130 baseline
+boating_school.c:BoatingSchoolWaterDCalcCursor baseline
+boating_school.c:BoatingSchoolWaterRemoveObject baseline
 boating_school.c:FUN_0041c4c0 baseline
 bricks.c:FUN_00457a70 baseline
 gamemain.c:FUN_004777f0 baseline
@@ -22,8 +22,8 @@ gamemap.c:PutObjOnMap baseline
 gamemap.c:RemObjFromMap baseline
 gamemap.c:RemoveObjectsPowerStats baseline
 jungle_cruise.c:FUN_00434b40 baseline
-jungle_cruise.c:FUN_00436470 baseline
-jungle_cruise.c:FUN_00436a40 baseline
+jungle_cruise.c:JungleCruiseWaterDCalcCursor baseline
+jungle_cruise.c:JungleCruiseWaterRemoveObject baseline
 map_object.c:AddBasicObject baseline
 map_object.c:DoMapAI baseline
 map_object.c:GetCurrentRFFlags baseline

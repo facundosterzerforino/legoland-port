@@ -412,6 +412,7 @@ void FUN_00415200(void) {
 
 // FUNCTION: LEGOLAND 0x00415220
 void SafariRideUpdate(Element *obj) {
+    int half_y;
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct RideNode *next;
@@ -433,10 +434,10 @@ void SafariRideUpdate(Element *obj) {
         next = node->next;
         bloke = node->rider;
         s = (struct SafariNode *)FUN_00414a80((struct SafariKey *)tile);
-        if (s == NULL) {
+        if (!s) {
             return;
         }
-        y = ride->field_25 + tile->pos.y;
+        y = tile->pos.y + ride->field_25;
         x = ride->field_24 + tile->pos.x;
         if (bloke->low_level_action != 0) {
             continue;
@@ -458,7 +459,8 @@ void SafariRideUpdate(Element *obj) {
                 int sx = ((px - py) * w) >> 9;
                 int sy = ((px + py) * h) >> 9;
                 coords[0] = ((unsigned short)lpConfig->view_x - (short)Get_XScroll() + sx - DAT_0082c670.x / 2 - pos.x) * 2;
-                coords[1] = ((unsigned short)lpConfig->view_y - (short)Get_YScroll() + sy - DAT_0082c670.y / 2 - pos.y) * 2;
+                half_y = DAT_0082c670.y;
+                coords[1] = ((unsigned short)lpConfig->view_y - (short)Get_YScroll() + sy - half_y / 2 - pos.y) * 2;
             }
             bloke->person->sprite = DAT_004cbf08;
             bloke->person->field_30 = 1;

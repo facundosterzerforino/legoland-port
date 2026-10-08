@@ -1,0 +1,17 @@
+# PrintProfileDetails (0x0048cf10, `src/legoland/profile.c`)
+
+**Best: 61.11%**
+
+## What still differs
+
+(not analysed yet)
+
+## Tried (don't repeat)
+
+| Date | Who | Change | Result |
+|---|---|---|---|
+| 2026-10-08 | permuter + Opus 5.5 | slot / icon_y / last_x temps, `(int)icon->slot` compare | 60.26 -> 61.11 |
+
+## Ideas not tried yet
+
+- 

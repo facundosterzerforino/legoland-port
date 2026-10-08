@@ -4953,8 +4953,8 @@ void FUN_00423a10(void) {
     FUN_00421ab0((struct Obj421ab0 *)&DAT_006102f8[0], &v1.x, &v2.x, &c);
     n = (q.y - r.y) >> 1;
     t = DAT_006102f8[0].f44;
-    step = (DAT_006102f8[0].f48 - DAT_006102f8[0].f44) / n;
     pt = q;
+    step = (DAT_006102f8[0].f48 - DAT_006102f8[0].f44) / n;
     for (i = 0; i < n; i++) {
         DAT_0060f914[cnt].xy = pt;
         pt.y -= 2;
@@ -8097,15 +8097,16 @@ unsigned int FUN_004283c0(struct AnimPair *pair) {
 
 // FUNCTION: LEGOLAND 0x004284d0
 void FUN_004284d0(void) {
-    struct Obj421ce0 *base;
-    struct Obj421ce0 *cur;
+    register struct Obj421ce0 *base;
+    register struct Obj421ce0 *cur;
     struct Words3 *p;
     struct Words3 *q;
-    unsigned int x;
+    int x;
     unsigned int y;
-    int i;
+    register unsigned int i;
     int j;
-    int k;
+    register unsigned int k;
+    int qi;
     int n = 0;
 
     for (i = 0; i <= 3; i++) {
@@ -8113,39 +8114,48 @@ void FUN_004284d0(void) {
         DAT_006117c0[i].y = DAT_004b5e00[i][1] * 20.0f;
         DAT_006117c0[i].z = DAT_004b5e00[i][2] * 20.0f;
     }
-    for (i = 0; i <= 3; i++) {
+    for (i = 0; 3 >= i; i++) {
         DAT_00611658[i].x = DAT_004b5e30[i][0] * 20.0f;
         DAT_00611658[i].y = DAT_004b5e30[i][1] * 20.0f;
         DAT_00611658[i].z = DAT_004b5e30[i][2] * 20.0f;
     }
-    for (i = 0; i <= 3; i++) {
+    i = 0;
+    while (3 >= i) {
         DAT_00611750[i].x = DAT_004b5e60[i][0] * 20.0f;
         DAT_00611750[i].y = DAT_004b5e60[i][1] * 20.0f;
         DAT_00611750[i].z = DAT_004b5e60[i][2] * 20.0f;
+        i++;
     }
-    for (i = 0; i <= 3; i++) {
+    i = 0;
+    while (i <= 3) {
         DAT_006116e0[i].x = DAT_004b5e90[i][0] * 20.0f;
         DAT_006116e0[i].y = DAT_004b5e90[i][1] * 20.0f;
         DAT_006116e0[i].z = DAT_004b5e90[i][2] * 20.0f;
+        ++i;
     }
-    for (i = 0; i <= 3; i++) {
+    i = 0;
+    while (i <= 3) {
+        qi = DAT_004b5ef4[i][1];
+        q = (struct Words3 *)&DAT_00611750[qi];
         x = DAT_004b5f14[i][0];
         y = DAT_004b5f14[i][1];
-        q = (struct Words3 *)&DAT_00611750[DAT_004b5ef4[i][1]];
         p = (struct Words3 *)&DAT_00611750[DAT_004b5ef4[i][0]];
         FUN_00421ce0(p, q, (struct Words3 *)&DAT_006116e0[i], &((struct Obj421ce0 *)DAT_00828fe0)[n++], x, y);
-        if (n == 5) {
+        if (5 == n) {
             n = 5;
         }
         FUN_00421ce0(q, p, (struct Words3 *)&DAT_006116e0[i], &((struct Obj421ce0 *)DAT_00828fe0)[n++], y, x);
+        i++;
     }
+    j = 0;
     base = &((struct Obj421ce0 *)DAT_00828fe0)[n];
-    for (j = 0; j <= 3; j++) {
+    while (j <= 3) {
         cur = base;
-        base += 5;
+        base = 5 + base;
         for (k = 0; k < 5; k++) {
             FUN_00428350(DAT_004b5ec0[j], (DAT_004b5ec0[j] - 2) & 3, DAT_004b5ee0[k], (struct Obj421ab0 *)cur++, j);
         }
+        j++;
     }
 }
 

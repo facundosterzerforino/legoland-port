@@ -1,6 +1,6 @@
 # ScriptEventClear (0x00469c80, `src/legoland/objectives.c`)
 
-**Best: 93.18%**. Kind: C.
+**Best: 94.32%**. Kind: C.
 
 ## What still differs
 
@@ -14,6 +14,7 @@
 | 2026-10-07 | Haiku agent | `tile_x` and `tile_y` locals as `unsigned char` | 80.86% (frame 0x185c, worse) |
 | 2026-10-07 | Haiku agent | Only `tile_y` as `unsigned char` (`tile_x` stays `short`) | 84.30% (frame 0x1858, worse) |
 | 2026-10-07 | Haiku agent | `tile_x` and `tile_y` locals as `int` | 65.33% (worse) |
+| 2026-10-08 | permuter + Opus 5.5 | `right` temp for footprint.v[2]; tile_x read before tile_y; decl order | 93.18 -> 94.32 |
 
 ## Ideas not tried yet
 

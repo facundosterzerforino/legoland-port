@@ -2102,6 +2102,7 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
 
 // FUNCTION: LEGOLAND 0x00466770
 void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
+    int pitch;
     struct DrawLLSFrame *frame = (struct DrawLLSFrame *)(lls + 1);
     unsigned short *dst;
     unsigned short *pixels;
@@ -2117,7 +2118,7 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     SpriteClipOrigin.top = clip->top;
     DrawClipExtent.height = clip->bottom - clip->top;
     frame_index = (int)OverrideFrame;
-    if (frame_index < 0) {
+    if (0 > frame_index) {
         frame_index = lls->frame;
     }
     if (frame_index >= lls->frame_count) {
@@ -2158,7 +2159,7 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
                 FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
             }
         }
-        i = lls->frame + 1;
+        i = 1 + lls->frame;
         while (i-- != 0) {
             frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
         }
@@ -2195,9 +2196,9 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
         while (i-- != 0) {
             frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
         }
-        pixels = frame->pixels;
         runs = (unsigned char *)frame + frame->pixel_count * 2 + 0x10;
-        mask = (unsigned int *)(runs + frame->run_bytes);
+        pixels = frame->pixels;
+        mask = (unsigned int *)(frame->run_bytes + runs);
         if (hit) {
             if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
                 FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
@@ -2217,7 +2218,8 @@ void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
                 if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
                     FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
+                    pitch = CurrentSurfaceDesc.lPitch;
+                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, pitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);
                 }
             } else {
                 FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, (unsigned short *)DAT_007fe9a8);

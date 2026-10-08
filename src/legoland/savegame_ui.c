@@ -629,10 +629,13 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
     char cursor_str[2];
     unsigned char count;
     char input;
+    int field_e;
+    char *name;
+    int sprite_y;
     char zero = 0;
     int left;
-    int right;
-    int bottom;
+    register int right;
+    unsigned int bottom;
     int center_x;
     int top;
     char *blink;
@@ -644,28 +647,30 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
     count = TempProfile.name_len;
     input = GetInputChar();
     if (input != zero) {
-        if (input == -1 && count != zero) {
-            count--;
+        if (input == -1 && zero != count) {
+            count -= 1;
             TempProfile.name[count] = zero;
         }
-        if (count < 0x1f && DAT_00798738 < 0xcb) {
-            if (input > '\0') {
-                int index = count;
-                count++;
-                TempProfile.name[index] = input;
-                TempProfile.name[count] = zero;
-            } else if (input == ' ') {
-                if (count != zero) {
+        if (count < 0x1f) {
+            if (0xcb > DAT_00798738) {
+                if (input > '\0') {
                     int index = count;
                     count++;
-                    TempProfile.name[index] = ' ';
+                    TempProfile.name[index] = input;
                     TempProfile.name[count] = zero;
+                } else if (input == ' ') {
+                    if (count != zero) {
+                        int index = count;
+                        count++;
+                        TempProfile.name[index] = ' ';
+                        TempProfile.name[count] = zero;
+                    }
                 }
             }
         }
     }
-    top = sprite->field_e + 0x24;
-    left = sprite->field_c + 0x28;
+    top = 0x24 + sprite->field_e;
+    left = 0x28 + sprite->field_c;
     bottom = top + 0x11;
     right = left + 0xd7;
     if (count != zero) {
@@ -674,19 +679,22 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
         rc.top = top;
         rc.right = right;
         rc.bottom = bottom;
-        center_x = FUN_00491e40(TempProfile.name, 2, rc, 1);
+        name = TempProfile.name;
+        center_x = FUN_00491e40(name, 2, rc, 1);
     } else {
         center_x = (right + left) >> 1;
     }
+    sprite_y = sprite->field_e;
+    field_e = sprite_y;
     DAT_00798738 = (center_x - ((right + left) >> 1)) * 2;
-    top = sprite->field_e + 0x20;
+    top = field_e + 0x20;
     blink = "|";
     if (GetBlink() == 0) {
         blink = " ";
     }
     strcpy(cursor_str, blink);
     {
-        RECT rc;
+        register RECT rc;
         rc.left = center_x;
         rc.top = top;
         rc.right = center_x + 100;
@@ -695,8 +703,8 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
     }
     TempProfile.name_len = count;
     focus = (struct EditSprite *)PopUpOkIcon;
-    fx = focus->field_c;
     fy = focus->field_e;
+    fx = focus->field_c;
     if (fx + 0x48 < (int)MousePos.x || (int)MousePos.x < fx) {
         ResetPopUpIconSprites();
     }

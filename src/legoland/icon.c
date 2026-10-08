@@ -392,7 +392,10 @@ void ScrollIconRegion(struct ScrollRegion *r, int param_2, int param_3) {
     int nt;
     int edge;
 
-    if ((r->field_4 & 1) != 0) {
+    int field_0;
+    int content_bottom;
+    int clip_left;
+    if ((1 & r->field_4) != 0) {
         if (r->content_bottom - r->content_top <= r->clip.bottom - r->clip.top) {
             MoveIcons(0xffff, r->field_0, 0, (short)(r->clip.top - r->content_top));
             return;
@@ -405,36 +408,39 @@ void ScrollIconRegion(struct ScrollRegion *r, int param_2, int param_3) {
     }
 
     dy = FUN_0046dd10(0xffff, (short)((r->clip.top - r->content_top) - param_3), (short)(r->content_top + param_3), r->field_0, param_3);
-    dx = param_2;
     l = r->content_left;
+    dx = param_2;
     t = r->content_top;
     nl = l + dx;
     nt = t + dy;
-    if ((r->field_4 & 1) != 0) {
-        if (nt > r->clip.top) {
-            dy = dy + (r->clip.top - nt);
+    if (!((1 & r->field_4) != 0)) {
+        if (!(nl > r->clip.left)) {
+            edge = dx + r->content_right;
+            if (edge < r->clip.right) {
+                dx = dx + (r->clip.right - edge);
+            }
         } else {
+            clip_left = r->clip.left;
+            dx = dx + (clip_left - nl);
+        }
+    } else {
+        if (!(nt > r->clip.top)) {
             edge = r->content_bottom + dy;
             if (edge < r->clip.bottom) {
                 dy = dy + (r->clip.bottom - edge);
             }
-        }
-    } else {
-        if (nl > r->clip.left) {
-            dx = dx + (r->clip.left - nl);
         } else {
-            edge = r->content_right + dx;
-            if (edge < r->clip.right) {
-                dx = dx + (r->clip.right - edge);
-            }
+            dy = dy + (r->clip.top - nt);
         }
     }
-    r->content_left = l + dx;
+    r->content_left = dx + l;
     r->content_top = t + dy;
     r->content_right = r->content_right + dx;
-    r->content_bottom = r->content_bottom + dy;
+    content_bottom = r->content_bottom;
+    r->content_bottom = content_bottom + dy;
     DAT_00668e44[DAT_00668e64] = DAT_00668e44[DAT_00668e64] + dy;
-    MoveIcons(0xffff, r->field_0, (short)dx, (short)dy);
+    field_0 = r->field_0;
+    MoveIcons(0xffff, field_0, (short)dx, (short)dy);
 }
 
 // FUNCTION: LEGOLAND 0x0046d980

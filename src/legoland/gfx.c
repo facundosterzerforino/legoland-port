@@ -268,8 +268,8 @@ LEGO_EXPORT void LoadColourTable(void) {
     RES_ReadFile(file, DAT_00813b20, 0x300);
 
     entry = entries;
-    src = &DAT_00813b20[1];
     lookup = DAT_00813e20;
+    src = &DAT_00813b20[1];
     do {
         unsigned char blue;
         entry->peRed = src[1];

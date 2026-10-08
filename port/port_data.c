@@ -108,6 +108,7 @@
 #include "port_data.h"
 
 /* Symbols no header declares (callbacks only reached through these tables, TU-level globals). */
+void AddRollerCoasterPath2x2();
 void AdjustGardenerCount();
 void Bloke_DoNothing();
 extern char CopterPathTable0[];
@@ -130,8 +131,6 @@ void FUN_00427a40();
 void FUN_00427a80();
 void FUN_00427c30();
 void FUN_00427c70();
-void FUN_00427f70();
-void FUN_00427ff0();
 void FUN_004286e0();
 void FUN_00429e20();
 void FUN_0044ebf0();
@@ -161,6 +160,7 @@ void Mechanic_Idle();
 void Mechanics_Repair();
 void NerpsSetEntranceFee();
 extern char PTR_FUN_004b7e38[];
+void RemoveRollerCoasterPath2x2();
 void ScriptCmdAddBricks();
 void ScriptCmdAddFlag();
 void ScriptCmdAges();
@@ -4381,8 +4381,8 @@ static const struct PortFixup port_fixups[] = {
     {0xade4, 'F', (void *)FUN_00427c30, 0, 0, ~0u},
     {0xade8, 'F', (void *)FUN_00427c70, 0, 0, ~0u},
     {0xadec, 'F', (void *)FUN_004286e0, 0, 0, ~0u},
-    {0xadf0, 'F', (void *)FUN_00427ff0, 0, 0, ~0u},
-    {0xadf4, 'F', (void *)FUN_00427f70, 0, 0, ~0u},
+    {0xadf0, 'F', (void *)AddRollerCoasterPath2x2, 0, 0, ~0u},
+    {0xadf4, 'F', (void *)RemoveRollerCoasterPath2x2, 0, 0, ~0u},
     {0xaf50, 'F', (void *)FUN_00428860, 0, 0, ~0u},
     {0xaf54, 'F', (void *)FUN_00428860, 0, 0, ~0u},
     {0xaf70, 'G', (void *)&DAT_006139c8, sizeof(DAT_006139c8), 0x0, ~0u},

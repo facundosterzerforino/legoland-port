@@ -1097,6 +1097,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
     struct Image *anim;
     int i;
 
+    char *data_c;
     sprintf(filename, "TileData\\%s", head->name);
     file = RES_OpenFile(filename);
     if (file == NULL) {
@@ -1117,7 +1118,8 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
     i = 0;
     if ((int)count > 0) {
         do {
-            RES_ReadFile(file, (char *)si->data_c + i * 4, 4);
+            data_c = (char *)si->data_c;
+            RES_ReadFile(file, data_c + i * 4, 4);
             RES_ReadFile(file, (char *)si->data_10 + i * 4, 4);
             i++;
         } while (i < (int)count);
@@ -1127,36 +1129,38 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
     si->var_0 = tile_base & 0xffff;
 
     i = 0;
-    if ((int)count > 0) {
+    if (0 < (int)count) {
         do {
             RES_ReadFile(file, &len, 4);
             RES_ReadFile(file, filename, len);
             filename[len] = '\0';
             si->sprites[i] = LoadSprite(filename, 1);
             anim = si->sprites[i]->image;
-            if ((anim->field_14 == 2 || anim->field_14 == 3) && ((struct LLS *)anim->data)->frame_count > 1) {
+            if ((anim->field_14 == 2 || (int)anim->field_14 == 3) && ((struct LLS *)anim->data)->frame_count > 1) {
                 LLSPlay((struct LLS *)anim->data, (unsigned int)anim);
             }
-            i++;
+            i += 1;
         } while (i < (int)count);
     }
 
     si->data_14 = 0;
     ret = RES_ReadFile(file, &len, 4);
-    if (ret == 4 && len != 0) {
-        RES_ReadFile(file, name, len);
-        name[len] = '\0';
-        if (LLIDB_FindElement(name, &element, NULL) == 0) {
-            head->data = si;
-            si->data_14 = element;
-            LLIDB_LoadData((void *)element);
-            *(struct SpriteManager **)(*(int *)(element + 0xc) + 0x74) = si;
+    if (ret == 4) {
+        if (len != 0) {
+            name[len] = '\0';
+            RES_ReadFile(file, name, len);
+            if (LLIDB_FindElement(name, &element, NULL) == 0) {
+                si->data_14 = element;
+                head->data = si;
+                LLIDB_LoadData((void *)element);
+                *(struct SpriteManager **)(*(int *)(0xc + element) + 0x74) = si;
+            }
         }
     }
 
     RES_CloseFile(file);
     head->data = si;
-    head->flags |= LLIDB_FLAG_LOADED;
+    head->flags = head->flags | LLIDB_FLAG_LOADED;
     return si;
 }
 

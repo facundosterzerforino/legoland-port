@@ -490,6 +490,8 @@ void FUN_0043c930(void) {
 
 // FUNCTION: LEGOLAND 0x0043c950
 void SpinningBarrelsUpdate(struct Element *elem) {
+    int view_x;
+    int field_73;
     struct Ride *ride = elem->ride;
     struct RideNode *rn = ride->riders;
     struct RideNode *next;
@@ -501,7 +503,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
     int coords[2];
     int coords2[2];
 
-    while (rn != NULL) {
+    while (rn) {
         next = rn->next;
         bloke = rn->rider;
         pos = &rn->tile;
@@ -510,14 +512,14 @@ void SpinningBarrelsUpdate(struct Element *elem) {
             return;
         }
         iv12 = ride->x + pos->pos.x;
-        iv13 = pos->pos.y + ride->y;
+        iv13 = ride->y + pos->pos.y;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
                 node->boarding_count++;
                 iv13 -= 5;
                 node->boarding_timer = 0x190;
-                bloke->flags |= 8;
+                bloke->flags = bloke->flags | 8;
                 iv12 <<= 8;
                 iv13 <<= 8;
                 bloke->dest.x = iv12;
@@ -533,14 +535,15 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 int ix, iy;
 
                 sc = GetScreenCoordsForObject(pos, ride);
-                ix = bloke->pos.x;
                 iy = bloke->pos.y;
+                ix = bloke->pos.x;
                 GetTileDimensions(&tw, &th);
                 iv13 = (ix + iy) * th;
                 iv12 = (ix - iy) * tw;
                 iv12 >>= 9;
                 iv13 >>= 9;
-                coords[0] = ((((unsigned int)lpConfig->view_x - Get_XScroll()) + iv12) - DAT_0062fdd8.x / 2 - sc.x) * 2;
+                view_x = lpConfig->view_x;
+                coords[0] = ((((unsigned int)view_x - Get_XScroll()) + iv12) - DAT_0062fdd8.x / 2 - sc.x) * 2;
                 coords[1] = ((iv13 + ((unsigned int)lpConfig->view_y - Get_YScroll())) - DAT_0062fdd8.y / 2 - sc.y) * 2;
                 bloke->person->sprite = DAT_0062fe00[1];
                 bloke->person->field_30 = 1;
@@ -560,8 +563,9 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 }
                 BlokeSetFrame(bloke, bloke->frame);
                 break;
-            case 6:
+            case 6: {
                 BlokeSitAnim(bloke);
+            }
                 BlokeSetFrame(bloke, 0);
                 bloke->param_action++;
                 if ((short)(signed char)++node->seated_count == SpinningBarrelsRide->seats) {
@@ -604,16 +608,17 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 bloke->param_action++;
                 break;
             case 0x10:
-                bloke->dest.x = ((iv12 + 2) << 8) - (rand() % 2 ? 0x80 : 0);
+                bloke->dest.x = ((2 + iv12) << 8) - (rand() % 2 ? 0x80 : 0);
                 bloke->dest.y = (iv13 << 8) + 0x80;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                field_73 = bloke->field_73;
+                NewDirForAction(bloke, (field_73 >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 0x11:
                 RemoveBlokeFromRide(ride, rn);
-                bloke->flags &= 0xfff7;
+                bloke->flags = bloke->flags & 0xfff7;
                 if (--node->leaving_count == 0) {
                     node->seated_count = 0;
                     Ride_ClearFlagToNotLetAnyoneOn(&node->tile_id);

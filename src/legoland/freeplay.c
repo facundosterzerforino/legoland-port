@@ -449,13 +449,14 @@ LEGO_EXPORT void Add2FreePlayPanelLists(int a, char **name, char *name2, int key
 
 // FUNCTION: LEGOLAND 0x0048b2a0
 LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
-    struct FreePlayGroup *group;
+    register struct FreePlayGroup *group;
     struct IconNode *icon;
     struct PanelNode *list;
     struct Sprite *sprite2;
     struct Sprite *sprite;
-    int y;
+    unsigned int y;
 
+    unsigned int icon_y;
     group = (struct FreePlayGroup *)malloc(sizeof(struct FreePlayGroup));
     if (group == NULL) {
         return 0;
@@ -465,14 +466,14 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         sprite2 = FreePlayUp1Sprite;
         list = DAT_007cb3d0;
     } else if (e == 0x1f4) {
-        sprite = FreePlayDown2Sprite;
         sprite2 = FreePlayUp2Sprite;
+        sprite = FreePlayDown2Sprite;
         list = DAT_007cb3a4;
     } else if (e == 0x190) {
         sprite = FreePlayDown3Sprite;
         sprite2 = FreePlayUp3Sprite;
         list = DAT_007cb3b8;
-    } else if (e == 0x12c) {
+    } else if (0x12c == (unsigned int)e) {
         sprite = FreePlayDown4Sprite;
         sprite2 = FreePlayUp4Sprite;
         list = DAT_007cb39c;
@@ -488,11 +489,12 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     b = icon->x;
     group->clip_left = b;
     group->content_left = b;
-    y = icon->y;
+    icon_y = icon->y;
+    y = icon_y;
     group->clip_top = y;
     group->content_top = y;
     group->clip_right = icon->width + icon->x;
-    group->clip_bottom = icon->height + icon->y;
+    group->clip_bottom = icon->y + icon->height;
     group->field_4 = 1;
     group->group = (short)a;
     SetNewGroup_Callbacks(0, (void *)RenderFreePlayIcons, (void *)FUN_0048b000);
@@ -512,7 +514,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         icon->string = GetString(0x94);
     }
     icon = FindIcon(a + 3);
-    if (icon != NULL) {
+    if (NULL != icon) {
         SetIconSprite(icon, sprite2);
         icon->x -= 9;
         icon->string_id = 0x95;

@@ -1126,17 +1126,18 @@ int FUN_00469c60(unsigned int handle) {
 int ScriptEventClear(struct MapRectArg *arg) {
     struct SweepInstance *next;
     RECT rect;
-    struct SweepInstance *current;
     short tile_x;
+    struct SweepInstance *current;
     struct ObjClass *cls;
     short tile_y;
     struct Cursor saved;
     struct Point point;
     struct Sample *sample;
-    int power;
     void *saved_class;
+    int power;
     int phase;
 
+    int right;
     sample = PlayInstanceOfSample(GameFX[FX_INVENTORY_OUT].sample, 1, 1, 0);
     FUN_00496d10(sample);
     AddSFX_Callback((struct CallbackEntry *)sample, 3000, (unsigned int (*)(struct CallbackEntry *))FUN_00469c60);
@@ -1150,7 +1151,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
                 do {
                     next = (struct SweepInstance *)GetNextRenderObject((MapElement *)next);
                 } while (next != NULL && (cls = next->object->cls, power = FindObjectsPower(cls), cls->field_58 != NULL) &&
-                    (cls->field_58[8] & 0x10) != 0 && power <= 0);
+                    (0x10 & cls->field_58[8]) != 0 && power <= 0);
                 break;
             case 1:
                 next = current;
@@ -1164,12 +1165,13 @@ int ScriptEventClear(struct MapRectArg *arg) {
             }
             if (current->flags_c & 0x80) {
                 cls = current->object->cls;
-                tile_y = current->tile_y;
                 tile_x = current->tile_x;
+                tile_y = current->tile_y;
                 rect.top = cls->footprint.v[1];
                 rect.bottom = cls->footprint.v[3];
                 rect.top += tile_y;
-                rect.right = cls->footprint.v[2];
+                right = cls->footprint.v[2];
+                rect.right = right;
                 rect.right += tile_x;
                 rect.bottom += tile_y;
                 rect.left = cls->footprint.v[0] + tile_x;

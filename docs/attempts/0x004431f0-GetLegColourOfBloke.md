@@ -15,6 +15,8 @@
 | 2026-10-07 | Claude | `unsigned char` r/g/b locals | no change (25%) |
 | 2026-10-07 | Claude | r, g, b declared and loaded in that order | no change (25%) |
 | 2026-10-07 | Claude | One accumulator: `c = r; c = c << 8 | g; c = c << 8 | b` | no change (25%) |
+| 2026-10-08 | permuter + Opus 5.5 | pointer to the 3-byte entry (with/without r/b/g locals), int locals, single |-expression with << 16, rg accumulator, [idx][k] row cast (2 forms) - all 25%; bytes stored into a uint 23.08% | 25 x8 / 23.08 |
+| 2026-10-08 | permuter + Opus 5.5 | (see above) register swap unaffected by any addressing form | - |
 
 ## Ideas not tried yet
 
