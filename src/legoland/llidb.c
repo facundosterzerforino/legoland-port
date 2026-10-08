@@ -1483,13 +1483,14 @@ LEGO_EXPORT int LLSStop(unsigned int handle) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d520
-// The original breaks into the debugger (`__asm int 3`, which also gives it an
-// ebp frame) when frame_count > 1000; that cannot be written in pure C.
 LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
     struct LLSNode *node = LLSPlayList;
 
     if (param_1 == NULL || param_1->frame_count <= 1) {
         return;
+    }
+    if (param_1->frame_count > 1000) {
+        __asm int 3
     }
     while (node != NULL) {
         if (node->lls == param_1) {

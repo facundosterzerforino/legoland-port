@@ -690,16 +690,20 @@ LEGO_EXPORT void PointToIsoPlane(int *param_1, int *out) {
     char cVar7;
     int iVar8;
     int iVar9;
+    int x;
+    int y;
     short size;
 
     size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
     iVar9 = (int)size;
     iVar8 = (short)(size * 2);
     iVar4 = iVar8 + 1 >> 1;
-    iVar1 = (*param_1 + iVar4) / iVar8;
-    iVar5 = (*param_1 + iVar4) % iVar8;
-    iVar2 = param_1[1] / iVar9;
-    iVar6 = param_1[1] % iVar9;
+    x = *param_1;
+    y = param_1[1];
+    iVar1 = (x + iVar4) / iVar8;
+    iVar5 = (x + iVar4) % iVar8;
+    iVar2 = y / iVar9;
+    iVar6 = y % iVar9;
     iVar3 = iVar2 + iVar1;
     *out = iVar3;
     iVar2 = iVar2 - iVar1;
@@ -1195,17 +1199,18 @@ int FUN_0045ca90(int *param_1, int *param_2) {
     int x;
     unsigned int mask;
     unsigned int *tbl;
+    unsigned int v;
     int i;
-    int local_8;
-    int local_4;
+    struct Point pt;
 
-    local_8 = *param_1 + -2;
-    local_4 = param_1[1] + -2;
-    mask = FUN_0045c9c0(&local_8);
+    pt.x = *param_1 + -2;
+    pt.y = param_1[1] + -2;
+    mask = FUN_0045c9c0((int *)&pt);
     i = 0;
     tbl = DAT_004b9558;
+    v = *tbl;
     do {
-        if ((*tbl & mask) == *tbl) {
+        if ((v & mask) == v) {
             dx = DAT_004b957c[i];
             x = *param_1;
             param_2[0] = dx + x;
@@ -1754,25 +1759,23 @@ void FUN_0045d770(struct Cursor *param_1) {
             if (0 < DAT_00667d3c) {
                 i = 0;
                 do {
-                    y = DAT_00801a80[i].y0;
-                    if (y <= DAT_00801a80[i].y1) {
+                    local_18.y = DAT_00801a80[i].y0;
+                    if (local_18.y <= DAT_00801a80[i].y1) {
                         do {
-                            x = DAT_00801a80[i].x0;
-                            if (x <= DAT_00801a80[i].x1) {
+                            local_18.x = DAT_00801a80[i].x0;
+                            if (local_18.x <= DAT_00801a80[i].x1) {
                                 do {
-                                    local_18.x = x;
-                                    local_18.y = y;
                                     FUN_004779d0(&local_18);
-                                    pb = (unsigned char *)((char *)GameMap[y] + 0x10 + x * 0x14);
+                                    pb = (unsigned char *)((char *)GameMap[local_18.y] + 0x10 + local_18.x * 0x14);
                                     *pb = *pb & 0xfc;
                                     AddPathTileGFX(&local_18, *(unsigned short *)PathSprite);
                                     ScriptDirtyCategories = ScriptDirtyCategories | 0x10;
                                     AddPathSquare((struct Point *)&local_18);
-                                    x = x + 1;
-                                } while (x <= DAT_00801a80[i].x1);
+                                    local_18.x = local_18.x + 1;
+                                } while (local_18.x <= DAT_00801a80[i].x1);
                             }
-                            y = y + 1;
-                        } while (y <= DAT_00801a80[i].y1);
+                            local_18.y = local_18.y + 1;
+                        } while (local_18.y <= DAT_00801a80[i].y1);
                     }
                     i = i + 1;
                 } while (i < DAT_00667d3c);

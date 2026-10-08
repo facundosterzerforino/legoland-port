@@ -585,25 +585,28 @@ void FUN_00485fe0(struct Sprite *sprite, int x, int y) {
     RECT rect1;
     RECT rect2;
     int offsets[2];
-    unsigned int *p;
-    int count;
 
-    p = (unsigned int *)DAT_00701e5c;
-    for (count = DAT_0066be40 * DAT_0066be44; count != 0; count = count + -1) {
-        *p = 0;
-        p = p + 1;
+    __asm {
+        push edi
+        mov eax, DAT_0066be40
+        imul DAT_0066be44
+        mov ecx, eax
+        mov eax, 0
+        mov edi, DAT_00701e5c
+        rep stosd
+        pop edi
     }
     if (sprite == NULL) {
         return;
     }
-    rect1.bottom = (short)sprite->height;
     rect1.left = 0;
     rect1.top = 0;
-    rect2.right = DAT_0066be40 + x;
-    rect1.right = (short)sprite->width;
-    rect2.bottom = DAT_0066be44 + y;
+    rect1.right = sprite->width;
+    rect1.bottom = (short)sprite->height;
     rect2.left = x;
     rect2.top = y;
+    rect2.right = x + DAT_0066be40;
+    rect2.bottom = y + DAT_0066be44;
     if (IntersectRect(&rect1, &rect1, &rect2) == 0) {
         return;
     }

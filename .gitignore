@@ -47,3 +47,6 @@ gamedata/
 
 # built by tools/test_display/build.sh
 tools/test_display/*.exe
+
+# tools/permuter.py output
+permuter_out/

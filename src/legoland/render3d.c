@@ -98,7 +98,7 @@ void RidePointToScreen(int *param_1, float *param_2, int *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00441980
-void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
+void Put3DBlokeOnRide(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
     /* Port [library:asm]: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
      * animation param_1: the position from RidePointToScreen, offset by (param_5, param_6), and the 16.16 fixed-point
      * orientation from the frame's 3x3 float matrix, with axes 1 and 2 swapped and some signs flipped. */
@@ -152,7 +152,7 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char 
         do {
             struct BlokeRideNode *node = (struct BlokeRideNode *)FUN_004418c0(i, param_1, (short *)param_2);
             if (node != NULL && (node->inner->flags & 0x80) != 0) {
-                FUN_00441980(param_4, i, param_3, node->field_10, coords.x, coords.y);
+                Put3DBlokeOnRide(param_4, i, param_3, node->field_10, coords.x, coords.y);
             }
             i = i + 1;
         } while (i < param_4[1]);

@@ -168,12 +168,13 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
     struct Point off;
     struct PlaneRideNode *node;
     struct Bloke *riders[4] = {0};
-    char n = 0;
+    char n;
     struct Bloke *bloke;
     struct Person *person;
 
     ride = element->ride;
     r = ride->riders;
+    n = 0;
     node = (struct PlaneRideNode *)FindPlaneRideNode(tile);
     if (node == NULL) {
         return;

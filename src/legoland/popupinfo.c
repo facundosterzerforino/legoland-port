@@ -659,9 +659,9 @@ void AddNewObjectIcon(struct NewObjInfo *param_1) {
 // FUNCTION: LEGOLAND 0x00471ca0
 void RemoveNewObject(void *param) {
     struct Sprite **q;
-    int j;
-    int k;
     int n;
+    int k;
+    int j;
 
     n = (int)NewObjects.count;
     if (0 < n) {
@@ -670,19 +670,18 @@ void RemoveNewObject(void *param) {
                 if (NewObjects.sprites[j] != NULL) {
                     KillSprite(NewObjects.sprites[j]);
                     NewObjects.sprites[j] = NULL;
-                    n = (int)NewObjects.count;
                 }
                 k = j + 1;
-                if (k < n) {
+                if (k < (int)NewObjects.count) {
                     q = &NewObjects.sprites[j];
                     do {
                         k++;
                         q[0] = q[1];
                         ((void **)q)[-0x14] = ((void **)q)[-0x13];
                         q++;
-                        n = (int)NewObjects.count;
-                    } while (k < n);
+                    } while (k < (int)NewObjects.count);
                 }
+                n = (int)NewObjects.count;
                 n--;
                 if (NewObjects.current >= n) {
                     NewObjects.current = n - 1;

@@ -2,7 +2,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["reccmp>=0.1.7"]
 # ///
-"""Show per-TU progress, or details for one TU."""
+"""Show per-TU progress, details for one TU, or `--worst [N]` (the N lowest-scoring functions)."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ os.environ["PATH"] = str(TOOLS_DIR) + os.pathsep + os.environ.get("PATH", "")
 
 import capstone
 from capstone import x86
+import reccmp_fixes  # noqa: F401  (project fix for a reccmp false positive; see the module)
 from reccmp.compare.core import Compare
 from reccmp.parser.marker import MarkerType, match_marker
 from reccmp.project.detect import RecCmpProject
@@ -41,7 +42,7 @@ def parse_annotations(source_dir: Path) -> tuple[dict[int, tuple[str, str]], lis
             if marker.type in (MarkerType.FUNCTION, MarkerType.STUB):
                 starts.append(marker.offset)
             if marker.type == MarkerType.FUNCTION:
-                name = re.search(r"([A-Za-z_]\w*)\s*\(", lines[i + 1]).group(1)
+                name = re.search(r"([A-Za-z_]\w*)\s*\(", re.sub(r"__declspec\(\w+\)", "", lines[i + 1])).group(1)
                 annotations[marker.offset] = (src.stem, name)
     return annotations, sorted(set(starts))
 
@@ -105,6 +106,12 @@ def main():
         s[classify(ratio)] += 1
         first[tu] = min(first.get(tu, address), address)
 
+    if len(sys.argv) > 1 and sys.argv[1] == "--worst":
+        print_worst(
+            functions, inline_asm, int(sys.argv[2]) if len(sys.argv) > 2 else 30
+        )
+        return
+
     if len(sys.argv) > 1:
         tu = sys.argv[1].removesuffix(".c")
         selected = sorted(
@@ -121,9 +128,7 @@ def main():
                 classify(ratio)
             ]
             asm = "  inline asm" if address in inline_asm else ""
-            print(
-                f"{marker} 0x{address:08x} {name:<{width}} {ratio * 100:7.2f}%{asm}"
-            )
+            print(f"{marker} 0x{address:08x} {name:<{width}} {ratio * 100:7.2f}%{asm}")
         s = stats[tu]
         total = sum(s.values())
         print(
@@ -173,6 +178,21 @@ def main():
         f"{'':2s} {'TOTAL':<{w_tu}}  {totals['matched']:>{w_m}}  {totals['partial']:>{w_p}}  {totals['unmatched']:>{w_u}}  {totals['matched'] / total * 100:>{w_pct}.1f}%  {bar}"
     )
     print_split(functions, inline_asm)
+
+
+def print_worst(functions: dict, inline_asm: set[int], count: int):
+    """The lowest-scoring functions that are not yet 100%."""
+    worst = sorted(
+        (
+            (ratio, address, tu, name)
+            for address, (tu, name, ratio) in functions.items()
+            if ratio < 1.0
+        ),
+    )[:count]
+    width = max(len(name) for _, _, _, name in worst)
+    for ratio, address, tu, name in worst:
+        asm = "  inline asm" if address in inline_asm else ""
+        print(f"{ratio * 100:6.2f}%  0x{address:08x}  {tu:<16} {name:<{width}}{asm}")
 
 
 def print_split(functions: dict, inline_asm: set[int]):

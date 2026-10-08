@@ -1503,10 +1503,11 @@ void FUN_00465850(struct AviFrame *frame) {
     int x;
 
     dst = CurrentSurfaceDesc.lpSurface;
-    DAT_006681ec = (DAT_006681ec != dst) ? dst : 0;
     height = frame->height;
     width = frame->width;
-    rest = lpConfig->screen_height - height * 2;
+    DAT_006681ec = (DAT_006681ec != dst) ? dst : 0;
+    rest = lpConfig->screen_height;
+    rest = rest - height * 2;
     half = rest / 2;
     rest = rest - half;
     row = frame->pixels + (height - 1) * width;

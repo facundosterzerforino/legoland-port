@@ -23,10 +23,14 @@ pure C, are done. `find_inline_asm` in `tools/progress.py` detects such function
 - **Transcribed whole as `__declspec(naked)`, 100%:** the other 39 in castle, draw, render, render3d and man3d.
   For SetPersonRotation, FUN_00441980 and FUN_0043fa80 a C + `__asm` version got the structure and every
   instruction right, but MSVC6 kept picking different registers or stack slots around the asm.
-- **Byte-identical, but reccmp reports < 100%:** FUN_00440a30 (and the older naked FUN_00426980, FUN_00426ab0).
-  They load plain constants (0x500000, 0x5a0000, 0x7fffff) that fall inside a data symbol in only one of the two
-  images, so reccmp shows a symbol on that side. Needs a reccmp change, not a source change.
-- **Not matched:** FUN_00404630 (copters) at 54%, C with the `fistp` macro in `__asm`. It has a `switch` jump
+- **Were reported < 100% because of a reccmp false positive, now 100%:** FUN_00440a30 and the older naked
+  FUN_00426980, FUN_00426ab0 load plain constants (0x500000, 0x5a0000, 0x7fffff) that fall inside a data symbol
+  in only one image; `tools/reccmp_fixes.py` now counts such byte-identical lines as equal. FUN_00440a30 also
+  had three raw original addresses (0x641004, 0x643ef0) left in its asm by an early asm2naked; regenerated.
+- **Two more found later, same blitter family:** FUN_00467640 and FUN_00467f00 (draw.c) were C attempts at 10%
+  and 5%; they have the blitters' prologue and `rol` (which `find_inline_asm` doesn't flag, since `_rotl` can
+  emit it). Transcribed with `tools/asm2naked.py`, 100%.
+- **Not matched:** CoptersPlaceRider (FUN_00404630, copters) at 54%, C with the `fistp` macro in `__asm`. It has a `switch` jump
   table, so it cannot be naked; what is left is a register permutation (the original keeps entry/layer/sprite in
   edi/ebx/esi and spills entry to the `node` slot).
 

@@ -201,6 +201,10 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   are called as `call dword ptr [IsBadReadPtr]`; any function or global the asm names needs a prototype or
   `extern` before it (asm will not use an implicit declaration).
 - reccmp treats an immediate as an address when it falls inside any known symbol. A constant like `0x500000`
-  can land inside a big array in one image and not the other, and is then shown as a diff on a byte-identical
-  line.
+  can land inside a big array in one image and not the other. `tools/reccmp_fixes.py` (loaded by `tools/verify`
+  and `progress.py`) counts such a line as equal when its raw text is identical in both images and one side
+  kept the plain number. Lines where both sides resolve to different symbols still count as different.
+- A naked transcription must not contain raw original addresses (`mov edi, 0x641004`): they assemble to the
+  same bytes but point at the original's layout, not ours. `asm2naked.py` names every address it can and
+  reports the rest.
 

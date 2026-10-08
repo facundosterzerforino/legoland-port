@@ -164,17 +164,17 @@ void FUN_00457a70(void) {
                         QueryClass = (struct ObjClass *)elem->ride;
                         QueryObj.id = Hover.data.tile.id;
                     }
-                } else if (Hover.type != 0x103) {
+                } else if (Hover.type == 0x103) {
+                    elem = (struct Element *)Hover.ptr;
+                    QueryClass = (struct ObjClass *)elem->ride;
+                    QueryObj.id = Hover.data.tile.id;
+                } else {
                     struct TileSetView *src;
                     if ((src = (struct TileSetView *)TileSpriteInfo[tile->field_8].src) != 0 && (src->sprite_ids[tile->field_8 - src->first_tile] & 0x10)) {
                         Hover.type = 0x10d;
                     } else {
                         Hover.type = 0x109;
                     }
-                } else {
-                    elem = (struct Element *)Hover.ptr;
-                    QueryClass = (struct ObjClass *)elem->ride;
-                    QueryObj.id = Hover.data.tile.id;
                 }
             } else if (Hover.type == 0x103 && EditMode.unk0 == 2) {
                 elem = (struct Element *)Hover.ptr;

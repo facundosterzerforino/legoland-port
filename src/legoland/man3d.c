@@ -244,7 +244,7 @@ struct MeshFace {
 };
 
 // FUNCTION: LEGOLAND 0x0043fa80
-void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
+void *Load3DMesh(const char *name, const char *dir, unsigned int ctx) {
     /* Port [library:asm]: the original loads this with C plus x87 float-to-int stores. Loads the mesh file
      * .\3ddata\new\<dir>\<name>: per element the vertices and normals are read, Y is flipped, the normals are
      * normalised and both are converted to 16.16 fixed point; then the shared index list and the faces. */
@@ -567,7 +567,7 @@ void *Load3DDataFile(const char *param_1, const char *param_2) {
     unsigned int size;
     void *buffer;
 
-    sprintf(path, ".\\3ddata\\new\\%s\\%s", param_1, param_2);
+    sprintf(path, Path3DFormat, param_1, param_2);
     file = RES_OpenFile(path);
     if (file != 0) {
         size = RES_GetFileSize(file);
@@ -594,29 +594,29 @@ LEGO_EXPORT void InitMan(void) {
     // STRING: LEGOLAND 0x004b7cec
     LoadTextureBitmaps(VisitorLocData, "visitor");
     // STRING: LEGOLAND 0x004b7cc4
-    WomanMeshes[1] = FUN_0043fa80("WomanWalk.WomanWalk.3d", "visitor", ctx);
+    WomanMeshes[1] = Load3DMesh("WomanWalk.WomanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7cac
-    WomanMeshes[0] = FUN_0043fa80("WomanSit.WomanSit.3d", "visitor", ctx);
+    WomanMeshes[0] = Load3DMesh("WomanSit.WomanSit.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c94
-    WomanMeshes[2] = FUN_0043fa80("WomanWave.WomanWave.3d", "visitor", ctx);
+    WomanMeshes[2] = Load3DMesh("WomanWave.WomanWave.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c78
-    WomanMeshes[3] = FUN_0043fa80("WomanStand.WomanStand.3d", "visitor", ctx);
+    WomanMeshes[3] = Load3DMesh("WomanStand.WomanStand.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c5c
-    WomanMeshes[5] = FUN_0043fa80("WomanPanWalk.WomPanWalk.3d", "visitor", ctx);
+    WomanMeshes[5] = Load3DMesh("WomanPanWalk.WomPanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c44
-    WomanMeshes[4] = FUN_0043fa80("WomanPan.WomanPan.3d", "visitor", ctx);
+    WomanMeshes[4] = Load3DMesh("WomanPan.WomanPan.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c30
-    ManMeshes[1] = FUN_0043fa80("ManWalk.ManWalk.3d", "visitor", ctx);
+    ManMeshes[1] = Load3DMesh("ManWalk.ManWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c1c
-    ManMeshes[0] = FUN_0043fa80("ManSit.ManSit.3d", "visitor", ctx);
+    ManMeshes[0] = Load3DMesh("ManSit.ManSit.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7c08
-    ManMeshes[2] = FUN_0043fa80("ManWave.ManWave.3d", "visitor", ctx);
+    ManMeshes[2] = Load3DMesh("ManWave.ManWave.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bf0
-    ManMeshes[3] = FUN_0043fa80("ManStand.ManStand.3d", "visitor", ctx);
+    ManMeshes[3] = Load3DMesh("ManStand.ManStand.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bd4
-    ManMeshes[5] = FUN_0043fa80("ManPanWalk.ManPanWalk.3d", "visitor", ctx);
+    ManMeshes[5] = Load3DMesh("ManPanWalk.ManPanWalk.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7bc0
-    ManMeshes[4] = FUN_0043fa80("ManPan.ManPan.3d", "visitor", ctx);
+    ManMeshes[4] = Load3DMesh("ManPan.ManPan.3d", "visitor", ctx);
     // STRING: LEGOLAND 0x004b7ba4
     FUN_00442980("altman.txt", proj, "visitor", 0, ctx);
     // STRING: LEGOLAND 0x004b7b94
@@ -630,9 +630,9 @@ LEGO_EXPORT void InitMan(void) {
     // STRING: LEGOLAND 0x004b7b8c
     LoadTextureBitmaps(GeoffLocData, "geoff");
     // STRING: LEGOLAND 0x004b7b68
-    GeoffMeshes[0] = FUN_0043fa80("geofWalk.GeofWalk.3d", "geoff", ctx);
+    GeoffMeshes[0] = Load3DMesh("geofWalk.GeofWalk.3d", "geoff", ctx);
     // STRING: LEGOLAND 0x004b7b50
-    GeoffMeshes[1] = FUN_0043fa80("GeofPour.GeofPour.3d", "geoff", ctx);
+    GeoffMeshes[1] = Load3DMesh("GeofPour.GeofPour.3d", "geoff", ctx);
     ctx = FUN_00443710();
     // STRING: LEGOLAND 0x004b7b3c
     TracyLocData = LoadLocFile("tracy.loc", "tracy");
@@ -640,7 +640,7 @@ LEGO_EXPORT void InitMan(void) {
     // STRING: LEGOLAND 0x004b7b48
     LoadTextureBitmaps(TracyLocData, "tracy");
     // STRING: LEGOLAND 0x004b7b24
-    TracyWalkMesh = FUN_0043fa80("TracyWalk.TraceWalk.3d", "tracy", ctx);
+    TracyWalkMesh = Load3DMesh("TracyWalk.TraceWalk.3d", "tracy", ctx);
 }
 
 // FUNCTION: LEGOLAND 0x004405a0
@@ -983,7 +983,7 @@ static void PortProjectTriangle(const int *tri, int ox, int oy, int mirrored, st
 // FUNCTION: LEGOLAND 0x00440a30
 void FUN_00440a30(struct Person *person) {
     /* Port [library:asm]: the original is inline asm. Draws one 3D person (a Mesh element of the current
-     * animation frame, see FUN_0043fa80) into the 160x120 sprite surface: rotates and scales the vertices,
+     * animation frame, see Load3DMesh) into the 160x120 sprite surface: rotates and scales the vertices,
      * projects them isometrically, shades them from a fixed light and a height / depth term, then fills each
      * front-facing triangle (solid colour or textured) with the triangle fillers in render.c. The first
      * shared->field_4 triangles have a normal per vertex (smooth shading), the rest one per triangle. */

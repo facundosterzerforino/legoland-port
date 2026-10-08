@@ -83,45 +83,36 @@ int FUN_00451f70(void) {
 // FUNCTION: LEGOLAND 0x00452030
 void FUN_00452030(void) {
     int bValidate;
-    struct ObjClass *cls;
-    int v74;
-    int v78;
-    int v7c;
-    int v80;
     int local_14;
     int local_10;
     int local_c;
-    int local_8;
     int iVar5;
+    struct ObjClass *cls;
 
     bValidate = 0;
     if ((GamePad & 0x800) != 0) {
-        if (abs((int)(DAT_00813a78 - DAT_00813a80)) < abs((int)(DAT_00813a74 - DAT_00813a7c))) {
+        if (abs(DAT_00813a74 - DAT_00813a7c) > abs(DAT_00813a78 - DAT_00813a80)) {
             DAT_00813a80 = DAT_00813a78;
         } else {
             DAT_00813a7c = DAT_00813a74;
         }
     }
-    v74 = DAT_00813a74;
-    v7c = DAT_00813a7c;
-    v78 = DAT_00813a78;
-    v80 = DAT_00813a80;
     if (EditMode.unk0 == 2) {
-        local_14 = v7c;
-        if (v74 < v7c) {
-            local_14 = v74;
+        local_14 = DAT_00813a7c;
+        if ((int)DAT_00813a74 < (int)DAT_00813a7c) {
+            local_14 = DAT_00813a74;
         }
-        local_10 = v80;
-        if (v78 < v80) {
-            local_10 = v78;
+        local_10 = DAT_00813a80;
+        if ((int)DAT_00813a78 < (int)DAT_00813a80) {
+            local_10 = DAT_00813a78;
         }
-        DAT_00813a8c = v74;
-        if (v74 <= v7c) {
-            DAT_00813a8c = v7c;
+        DAT_00813a8c = DAT_00813a74;
+        if ((int)DAT_00813a74 <= (int)DAT_00813a7c) {
+            DAT_00813a8c = DAT_00813a7c;
         }
-        DAT_00813a90 = v80;
-        if (v80 < v78) {
-            DAT_00813a90 = v78;
+        DAT_00813a90 = DAT_00813a80;
+        if ((int)DAT_00813a80 < (int)DAT_00813a78) {
+            DAT_00813a90 = DAT_00813a78;
         }
         DAT_00813a84 = local_14;
         DAT_00813a88 = local_10;
@@ -134,42 +125,41 @@ void FUN_00452030(void) {
             FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
         }
     } else {
-        local_14 = v74;
-        if (v7c <= v74) {
-            local_14 = v7c;
+        local_14 = DAT_00813a74;
+        if ((int)DAT_00813a7c <= (int)DAT_00813a74) {
+            local_14 = DAT_00813a7c;
         }
-        local_10 = v78;
-        if (v80 <= v78) {
-            local_10 = v80;
+        local_10 = DAT_00813a78;
+        if ((int)DAT_00813a80 <= (int)DAT_00813a78) {
+            local_10 = DAT_00813a80;
         }
-        iVar5 = v7c;
-        if (v7c < v74) {
-            iVar5 = v74;
+        local_c = DAT_00813a7c;
+        if ((int)DAT_00813a7c < (int)DAT_00813a74) {
+            local_c = DAT_00813a74;
         }
-        local_8 = v78;
-        if (v78 <= v80) {
-            local_8 = v80;
+        iVar5 = DAT_00813a78;
+        if ((int)DAT_00813a78 <= (int)DAT_00813a80) {
+            iVar5 = DAT_00813a80;
         }
         cls = (struct ObjClass *)EditMode.unk8;
-        local_c = cls->footprint.v[2] - cls->footprint.v[0];
-        FootprintWidth = local_c + 1;
+        FootprintWidth = (cls->footprint.v[2] - cls->footprint.v[0]) + 1;
         FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
-        if (v74 == v7c && v78 == v80) {
+        if (memcmp(&DAT_00813a74, &DAT_00813a7c, 8) == 0) {
             bValidate = 1;
-            local_c = ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth + -1 + local_14;
-            iVar5 = ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight + -1 + local_10;
+            local_c = ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth + -1 + local_14;
+            iVar5 = ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight + -1 + local_10;
         } else {
-            if ((int)FootprintWidth < 2 || local_14 != v7c || iVar5 != v74) {
-                local_c = ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth + -1 + local_14;
+            if ((int)FootprintWidth < 2 || local_14 != DAT_00813a7c || local_c != DAT_00813a74) {
+                local_c = ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth + -1 + local_14;
             } else {
-                local_14 = iVar5 - ((FootprintWidth - local_14) + iVar5) / FootprintWidth * FootprintWidth;
-                local_c = local_c + v74;
+                local_14 = local_c - ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth;
+                local_c = FootprintWidth - 1 + DAT_00813a74;
             }
-            if ((int)FootprintHeight < 2 || local_10 != v80 || local_8 != v78) {
-                iVar5 = ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight + -1 + local_10;
+            if ((int)FootprintHeight < 2 || local_10 != DAT_00813a80 || iVar5 != DAT_00813a78) {
+                iVar5 = ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight + -1 + local_10;
             } else {
-                iVar5 = v78 + -1 + FootprintHeight;
-                local_10 = local_8 - ((FootprintHeight - local_10) + local_8) / FootprintHeight * FootprintHeight;
+                iVar5 = DAT_00813a78 + -1 + FootprintHeight;
+                local_10 = iVar5 - ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight;
             }
             if (abs(local_14 - local_c) <= (int)FootprintWidth && abs(local_10 - iVar5) <= (int)FootprintHeight) {
                 bValidate = 1;

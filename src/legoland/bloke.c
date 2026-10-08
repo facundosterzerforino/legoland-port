@@ -1133,6 +1133,7 @@ LEGO_EXPORT void DoLowLevelAI(Bloke *bloke) {
 // FUNCTION: LEGOLAND 0x00484950
 LEGO_EXPORT void ApplyObjectOrientationToPerson(Person *person, float *matrix, void *param_3) {
     float scale = 65536.0f;
+    int tmp;
     person->fm[0] = matrix[0];
     person->fm[1] = matrix[6];
     person->fm[2] = -matrix[3];
@@ -1142,15 +1143,69 @@ LEGO_EXPORT void ApplyObjectOrientationToPerson(Person *person, float *matrix, v
     person->fm[6] = -matrix[1];
     person->fm[7] = -matrix[7];
     person->fm[8] = matrix[4];
-    person->m[0] = person->fm[0] * scale;
-    person->m[3] = person->fm[3] * scale;
-    person->m[6] = person->fm[6] * scale;
-    person->m[1] = person->fm[1] * scale;
-    person->m[4] = person->fm[4] * scale;
-    person->m[7] = person->fm[7] * scale;
-    person->m[2] = person->fm[2] * scale;
-    person->m[5] = person->fm[5] * scale;
-    person->m[8] = person->fm[8] * scale;
+    tmp = person->m[0];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[0] = tmp;
+    tmp = person->m[3];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[3] = tmp;
+    tmp = person->m[6];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[6] = tmp;
+    tmp = person->m[1];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[1] = tmp;
+    tmp = person->m[4];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[4] = tmp;
+    tmp = person->m[7];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[7] = tmp;
+    tmp = person->m[2];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[2] = tmp;
+    tmp = person->m[5];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[5] = tmp;
+    tmp = person->m[8];
+    __asm {
+        fld dword ptr [tmp]
+        fmul dword ptr [scale]
+        fistp dword ptr [tmp]
+    }
+    person->m[8] = tmp;
 }
 
 // FUNCTION: LEGOLAND 0x00484a70

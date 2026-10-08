@@ -511,7 +511,7 @@ void RenderCarousel(struct CarouselRideObj *param_1, unsigned int param_2, unsig
     unsigned int local_4c;
     int local_48;
     short local_44;
-    int local_28[11];
+    int local_28[10];
 
     iVar6 = (int)ride;
     elem = ride->list;

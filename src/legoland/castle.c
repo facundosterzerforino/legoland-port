@@ -3982,10 +3982,14 @@ void FUN_00421e90(float x0, float y0, float x1, float y1) {
     m = (y1 - y0) / (x1 - x0);
     b = y0 - m * x0;
     {
-        float a = o->coef_t3 * 3.0f;
-        volatile float b2 = o->coef_t2 + o->coef_t2;
+        float a;
+        volatile float b2;
         volatile float sq;
-        float c = o->coef_t1 - m;
+        float c;
+        a = o->coef_t3;
+        a = a * FLOAT_004ab43c;
+        b2 = o->coef_t2 + o->coef_t2;
+        c = o->coef_t1 - m;
         sq = (float)sqrt(b2 * b2 - c * a * 4.0f);
         roots[0] = (sq - b2) / (a + a);
         roots[1] = (-b2 - sq) / (a + a);
