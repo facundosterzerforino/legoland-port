@@ -11,12 +11,18 @@
 #include "render.h"
 #include "render3d.h"
 #include "tilemap.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x00450b90
 LEGO_EXPORT int AddObjectToBuildList(struct ObjClass *obj, TileId coords) {
     int i;
 
     if (BuildObjCount >= 256) {
+#ifdef LEGOLAND_PORT
+        DebugTrace("build: the build list is full (256 objects waiting to be built), not placed"); /* [port] */
+#endif
         return 0;
     }
     for (i = 0; i < 256; i++) {
