@@ -119,7 +119,7 @@ struct Bloke;
 
 struct IntVec3;
 struct Vec3;
-void FUN_00440980(struct MeshElem *elem, struct IntVec3 *out);
+void ComputeMeshElemBounds(struct MeshElem *elem, struct IntVec3 *out);
 void RemovePersonFromList(struct Person *person);
 void FreePerson(struct Person *person);
 

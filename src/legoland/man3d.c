@@ -211,7 +211,7 @@ void *LoadLocFile(const char *param_1, const char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0043fa10
-void FUN_0043fa10(float *param_1, int param_2) {
+void ClampMeshUVs(float *param_1, int param_2) {
     int n;
     if (param_2 > 0) {
         n = param_2;
@@ -306,7 +306,7 @@ void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
                 iv[i] = PortRound(v[i] * 65536.0f);
             }
             elem->shared = shared;
-            FUN_00440980(elem, (struct IntVec3 *)elem);
+            ComputeMeshElemBounds(elem, (struct IntVec3 *)elem);
         }
         RES_ReadFile(file, &count, 4);
         RES_ReadFile(file, &shared->field_4, 4);
@@ -326,7 +326,7 @@ void *FUN_0043fa80(const char *name, const char *dir, unsigned int ctx) {
             } else {
                 faces[i].texture += ctx;
             }
-            FUN_0043fa10(faces[i].uv, 3);
+            ClampMeshUVs(faces[i].uv, 3);
         }
     }
     return mesh;
@@ -895,7 +895,7 @@ struct IntVec3 {
 };
 
 // FUNCTION: LEGOLAND 0x00440980
-void FUN_00440980(struct MeshElem *elem, struct IntVec3 *out) {
+void ComputeMeshElemBounds(struct MeshElem *elem, struct IntVec3 *out) {
     int n;
     int *verts;
     struct IntVec3 mn;

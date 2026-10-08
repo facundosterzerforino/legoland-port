@@ -85,7 +85,7 @@ struct RenderListNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, 
 }
 
 // FUNCTION: LEGOLAND 0x00441910
-void FUN_00441910(int *param_1, float *param_2, int *param_3) {
+void RidePointToScreen(int *param_1, float *param_2, int *param_3) {
     float v[3];
     v[0] = param_2[0];
     v[1] = param_2[1];
@@ -100,7 +100,7 @@ void FUN_00441910(int *param_1, float *param_2, int *param_3) {
 // FUNCTION: LEGOLAND 0x00441980
 void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
     /* Port [library:asm]: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
-     * animation param_1: the position from FUN_00441910, offset by (param_5, param_6), and the 16.16 fixed-point
+     * animation param_1: the position from RidePointToScreen, offset by (param_5, param_6), and the 16.16 fixed-point
      * orientation from the frame's 3x3 float matrix, with axes 1 and 2 swapped and some signs flipped. */
     static const int src_col[3] = {0, 2, 1};
     static const int row_sign[3] = {1, -1, -1};
@@ -120,7 +120,7 @@ void FUN_00441980(int *param_1, int param_2, int param_3, int param_4, int param
     }
     /* each frame is 12 floats: the position, then the 3x3 matrix */
     frame_data = (float *)((char *)((int **)param_1[9])[param_2] + frame * 48);
-    FUN_00441910(param_1, frame_data, pos);
+    RidePointToScreen(param_1, frame_data, pos);
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
             person->m[j * 3 + i] = row_sign[j] * col_sign[i] * PortRound(frame_data[3 + i * 3 + src_col[j]] * 65536.0f);

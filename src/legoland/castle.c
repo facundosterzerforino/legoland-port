@@ -4768,7 +4768,7 @@ int FUN_004234e0(void *param1) {
 }
 
 // FUNCTION: LEGOLAND 0x004236f0
-unsigned int FUN_004236f0(void) {
+unsigned int FPUSetSinglePrecision(void) {
     /* Port [library:asm]: the original reads the x87 control word with fstcw and, unless it already is, sets single
      * precision, round to nearest and all exceptions masked with fldcw. It returns the old word. */
     unsigned int old = _control87(0, 0);
@@ -4778,7 +4778,7 @@ unsigned int FUN_004236f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00423730
-void FUN_00423730(unsigned int control_word) {
+void FPURestoreControlWord(unsigned int control_word) {
     /* Port [library:asm]: the original restores the saved x87 control word with fldcw. */
     _control87(control_word, _MCW_PC | _MCW_RC | _MCW_EM);
 }
@@ -8446,20 +8446,20 @@ struct TexMesh *FUN_00428cb0(struct Struct428e70 *obj, const struct FVec3 *offse
 
 // FUNCTION: LEGOLAND 0x00428e70
 void FUN_00428e70(struct Struct428e70 *p, unsigned int a, unsigned int b) {
-    unsigned int handle = FUN_004236f0();
+    unsigned int handle = FPUSetSinglePrecision();
     unsigned int result = p->vtable[6](p, DAT_00612178);
     DAT_00615f6c = result;
     FUN_00428cb0(p, (const struct FVec3 *)a, b, result, DAT_00612178);
     FUN_004234e0(&DAT_004b5f60);
-    FUN_00423730(handle);
+    FPURestoreControlWord(handle);
 }
 
 // FUNCTION: LEGOLAND 0x00428ec0
 void FUN_00428ec0(struct Struct428e70 *p, unsigned int a, unsigned int b) {
-    unsigned int handle = FUN_004236f0();
+    unsigned int handle = FPUSetSinglePrecision();
     FUN_00428cb0(p, (const struct FVec3 *)a, b, DAT_00615f6c, DAT_00612178);
     FUN_004234e0(&DAT_004b5f60);
-    FUN_00423730(handle);
+    FPURestoreControlWord(handle);
 }
 
 // FUNCTION: LEGOLAND 0x00428f00

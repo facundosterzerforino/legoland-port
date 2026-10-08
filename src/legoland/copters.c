@@ -555,7 +555,7 @@ void CoptersAddObject(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00404630
-void FUN_00404630(struct CopterNode *node, int index) {
+void CoptersPlaceRider(struct CopterNode *node, int index) {
     /* Port [library:asm]: the original is inline asm (x87). Poses the rider of helicopter seat layer `index`: places
      * the rider's person at the seat's screen position plus the recorded animation offset, and sets the person's
      * orientation from the current frame of the copters.pos animation (track `track` of CoptersPos). */
@@ -748,11 +748,11 @@ void CoptersUpdateNode(struct CopterNode *node) {
             return;
         }
     }
-    FUN_00404630(node, 1);
-    FUN_00404630(node, 0);
-    FUN_00404630(node, 2);
-    FUN_00404630(node, 3);
-    FUN_00404630(node, 4);
+    CoptersPlaceRider(node, 1);
+    CoptersPlaceRider(node, 0);
+    CoptersPlaceRider(node, 2);
+    CoptersPlaceRider(node, 3);
+    CoptersPlaceRider(node, 4);
     if (!(node->field_8 & 1)) {
         if (node->field_8 & 0x4000) {
             if (node->field_2 == node->field_10) {
