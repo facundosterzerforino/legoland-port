@@ -105,8 +105,12 @@ original API calls gives a baseline that later phases are compared against.
 4. Debug until the title screen shows, then click through the menus.
 
 **Done when:** the title screen and main menu work on Windows 11, natively, with no emulator.
-**Also set up:** a way to run the original game for comparison, for example a Windows 98 VM with the mounted
-ISO, or the ISO mounted under a DirectDraw wrapper. Every later rewrite or substitution is checked against it.
+**Reference for later phases (decided 2026-10-08):** no Windows 98 VM or DirectDraw wrapper. This port, running
+the original DirectX APIs on Windows 11, is the reference that phases 5+ are compared against (the whole
+campaign has been played on it: levels, movies, music, sound, saves, the certificate).
+
+**Status (2026-10-08):** everything above works, well past the title screen. Phase 4 is marked done after
+the maintainer's full playthrough.
 
 ## Phase 5: miniwin + SDL3 (window, video, input, files)
 

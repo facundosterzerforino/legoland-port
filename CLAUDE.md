@@ -106,10 +106,12 @@ crash (NULL sample). Open:
   confirm in game. The watchpoints in `ArmWatches` can come out once it is confirmed.
 - Copters sounds: fixed 2026-10-07 (gen_data aimed their name pointers past the 8-byte `CopterPathTable4`);
   confirm in game that the helicopter sounds and copter models load ("Loaded SFX Helicopter ..." in the trace).
-- Playtesting still to do: other lessons, the three parks, gallery, save/load, end screens, certificate
-  printing.
-- A reference setup to compare with the original (Windows 98 VM or a DirectDraw wrapper); then mark phase 4
-  done in `ROADMAP.md`.
+- Phase 4 is done once the maintainer's full playthrough (all levels, the three parks, gallery, save/load, end
+  screens, certificate printing) finds nothing new; then mark it done in `ROADMAP.md`. No reference VM: this
+  port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08).
+- Certificate printing: fixed 2026-10-08 (default printer by name, full landscape DEVMODE); confirm in game.
+- Temporary diagnostics to remove after the playthrough: the `build:` and `BubbleHelp:` trace lines
+  (map_object.c, text.c) and the coaster watchpoints (`ArmWatches`).
 
 ---
 
