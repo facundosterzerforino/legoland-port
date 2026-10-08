@@ -57,17 +57,48 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
             return 0;
         }
         DebugTrace("PrintCertificate: printing to \"%s\"", printer_name);
-        memset(&dm, 0, 0x94);
-        dm.dmSize = 0x94;
-        dm.dmFields = DM_ORIENTATION;
-        dm.dmOrientation = DMORIENT_LANDSCAPE;
-        hDC = CreateDCA(NULL, printer_name, NULL, &dm);
+        /* the original's DEVMODE is a 0x94-byte Windows 9x one with only the orientation set; current drivers
+         * refuse it (CreateDC fails with ERROR_ACCESS_DENIED). Ask the driver for its full settings and turn
+         * them to landscape; without them, print with the driver's defaults. */
+        (void)dm;
+        {
+            HANDLE spool = NULL;
+            DEVMODEA *full = NULL;
+            LONG size;
+
+            if (OpenPrinterA(printer_name, &spool, NULL)) {
+                size = DocumentPropertiesA(NULL, spool, printer_name, NULL, NULL, 0);
+                if (size > 0) {
+                    full = (DEVMODEA *)malloc(size);
+                }
+                if (full != NULL && DocumentPropertiesA(NULL, spool, printer_name, full, NULL, DM_OUT_BUFFER) == IDOK) {
+                    full->dmFields |= DM_ORIENTATION;
+                    full->dmOrientation = DMORIENT_LANDSCAPE;
+                    DocumentPropertiesA(NULL, spool, printer_name, full, full, DM_IN_BUFFER | DM_OUT_BUFFER);
+                } else {
+                    free(full);
+                    full = NULL;
+                }
+                ClosePrinter(spool);
+            }
+            hDC = CreateDCA(NULL, printer_name, NULL, full);
+            free(full);
+        }
+        if (hDC == NULL) {
+            DebugTrace("PrintCertificate: CreateDC failed (%lu)", GetLastError());
+        }
     }
 #else
     if (EnumPrintersA(1, NULL, 2, printers, 0x540, &needed, &returned) <= 0)
-        return 0;
+#ifdef LEGOLAND_PORT
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
+    return 0;
     if (returned <= 0)
-        return 0;
+#ifdef LEGOLAND_PORT
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
+    return 0;
     memset(&dm, 0, 0x94);
     dm.dmSize = 0x94;
     dm.dmFields = DM_ORIENTATION;
@@ -75,7 +106,10 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
     hDC = CreateDCA(NULL, ((char **)printers)[1], NULL, &dm);
 #endif
     if (hDC == NULL)
-        return 0;
+#ifdef LEGOLAND_PORT
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
+    return 0;
     fd = _open(param_1, _O_RDONLY | _O_BINARY, _S_IREAD);
     if (fd >= 0) {
         _read(fd, &bmfh, 14);
@@ -109,6 +143,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hInfo);
                     _close(fd);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 pBits = GlobalLock(hBits);
@@ -118,6 +155,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hBits);
                     _close(fd);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 _read(fd, pBits, bmfh.bfSize - bmfh.bfOffBits);
@@ -129,6 +169,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hBits);
                     DeleteObject(NULL);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 GlobalUnlock(hInfo);
@@ -139,6 +182,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hBits);
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 di.cbSize = sizeof(DOCINFOA);
@@ -152,6 +198,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hBits);
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 if (StartPage(hDC) <= 0) {
@@ -160,6 +209,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     EndDoc(hDC);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 hMemDC = CreateCompatibleDC(hDC);
@@ -170,6 +222,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     EndPage(hDC);
                     EndDoc(hDC);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 if (SelectObject(hMemDC, hBitmap) == NULL) {
@@ -179,6 +234,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     EndPage(hDC);
                     EndDoc(hDC);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 hres = GetDeviceCaps(hDC, HORZRES);
@@ -190,6 +248,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     EndPage(hDC);
                     EndDoc(hDC);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 plf = (LOGFONTA *)LocalAlloc(LPTR, sizeof(LOGFONTA));
@@ -204,6 +265,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
                     LocalFree(plf);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 SetBkMode(hDC, TRANSPARENT);
@@ -221,6 +285,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
                     LocalFree(plf);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 SetBkMode(hDC, TRANSPARENT);
@@ -238,6 +305,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     EndDoc(hDC);
                     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
                     return 0;
                 }
                 EndDoc(hDC);
@@ -251,6 +321,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         _close(fd);
     }
     DeleteDC(hDC);
+#ifdef LEGOLAND_PORT
+    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
+#endif
     return 0;
 }
 
