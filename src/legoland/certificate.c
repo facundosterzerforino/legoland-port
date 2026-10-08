@@ -89,27 +89,30 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         }
     }
 #else
-    if (EnumPrintersA(1, NULL, 2, printers, 0x540, &needed, &returned) <= 0)
+    if (EnumPrintersA(1, NULL, 2, printers, 0x540, &needed, &returned) <= 0) {
 #ifdef LEGOLAND_PORT
         DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
-    return 0;
-    if (returned <= 0)
+        return 0;
+    }
+    if (returned <= 0) {
 #ifdef LEGOLAND_PORT
         DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
-    return 0;
+        return 0;
+    }
     memset(&dm, 0, 0x94);
     dm.dmSize = 0x94;
     dm.dmFields = DM_ORIENTATION;
     dm.dmOrientation = DMORIENT_LANDSCAPE;
     hDC = CreateDCA(NULL, ((char **)printers)[1], NULL, &dm);
 #endif
-    if (hDC == NULL)
+    if (hDC == NULL) {
 #ifdef LEGOLAND_PORT
         DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
-    return 0;
+        return 0;
+    }
     fd = _open(param_1, _O_RDONLY | _O_BINARY, _S_IREAD);
     if (fd >= 0) {
         _read(fd, &bmfh, 14);
