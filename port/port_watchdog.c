@@ -40,8 +40,9 @@ extern unsigned int DAT_00667ca4;
 static struct {
     void *address;
     const char *name;
-} watches[2];
+} watches[4]; /* DR0-DR3; 2 and 3 are set at run time with PortWatchRequest */
 static volatile LONG watch_reports;
+static volatile LONG watch_rearm;
 #define MAX_WATCH_REPORTS 40
 
 void PortHeartbeat(void) { InterlockedIncrement(&heartbeat); }
@@ -168,33 +169,48 @@ static void WriteDump(const char *prefix, DWORD thread_id, EXCEPTION_POINTERS *p
     PortTrace("  minidump %s: %s", ok ? "written" : "FAILED", path);
 }
 
-/* Set the debug registers on the main thread (a thread can't reliably set its own): DR0/DR1 = the watched
- * addresses, break on 4-byte writes. */
+/* Set the debug registers on the main thread (a thread can't reliably set its own): DR0-DR3 = the watched
+ * addresses (4-byte aligned), break on 4-byte writes. */
 static void ArmWatches(void) {
     CONTEXT ctx;
+    DWORD dr7;
     int i;
 
-    watches[0].address = &GameMapRawBlock;
-    watches[0].name = "GameMapRawBlock";
-    watches[1].address = &DAT_00667ca4;
-    watches[1].name = "DAT_00667ca4";
     if (SuspendThread(main_thread) == (DWORD)-1) {
         return;
     }
     memset(&ctx, 0, sizeof(ctx));
     ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
     if (GetThreadContext(main_thread, &ctx)) {
+        dr7 = ctx.Dr7 & ~0xffff00ffu;
+        for (i = 0; i < 4; i++) {
+            if (watches[i].address != NULL) {
+                dr7 |= (1u << (i * 2)) /* Li */ | (0x1u << (16 + i * 4)) /* write */ | (0x3u << (18 + i * 4)) /* 4 bytes */;
+            }
+        }
         ctx.Dr0 = (DWORD)watches[0].address;
         ctx.Dr1 = (DWORD)watches[1].address;
-        ctx.Dr7 = (ctx.Dr7 & ~0x00ff000fu) | 0x1 | 0x4 /* L0, L1 */ | (0x1u << 16) | (0x3u << 18) /* DR0: write, 4 bytes */ |
-            (0x1u << 20) | (0x3u << 22) /* DR1: write, 4 bytes */;
+        ctx.Dr2 = (DWORD)watches[2].address;
+        ctx.Dr3 = (DWORD)watches[3].address;
+        ctx.Dr7 = dr7;
         if (SetThreadContext(main_thread, &ctx)) {
-            for (i = 0; i < 2; i++) {
-                PortTrace("watch: armed on %s (%p)", watches[i].name, watches[i].address);
+            for (i = 0; i < 4; i++) {
+                if (watches[i].address != NULL) {
+                    PortTrace("watch: armed on %s (%p)", watches[i].name, watches[i].address);
+                }
             }
         }
     }
     ResumeThread(main_thread);
+}
+
+void PortWatchRequest(int slot, void *address, const char *name) {
+    if (slot < 2 || slot > 3) {
+        return;
+    }
+    watches[slot].address = (void *)((DWORD)address & ~3u);
+    watches[slot].name = name;
+    InterlockedExchange(&watch_rearm, 1);
 }
 
 /* A watched global was written: log the value, the writing code and the stack, then carry on. */
@@ -204,7 +220,7 @@ static LONG WatchHit(EXCEPTION_POINTERS *pointers) {
     int i;
     int shown = 0;
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 4; i++) {
         if ((ctx->Dr6 & (1u << i)) != 0 && InterlockedIncrement(&watch_reports) <= MAX_WATCH_REPORTS) {
             PortTrace("watch: %s = %08lx, written by the instruction before rva %08lx (phase \"%s\")", watches[i].name,
                 *(DWORD *)watches[i].address, ctx->Eip - module_base, current_phase);
@@ -225,7 +241,7 @@ static LONG WatchHit(EXCEPTION_POINTERS *pointers) {
 static LONG CALLBACK FirstChanceHandler(EXCEPTION_POINTERS *pointers) {
     DWORD code = pointers->ExceptionRecord->ExceptionCode;
 
-    if (code == EXCEPTION_SINGLE_STEP && (pointers->ContextRecord->Dr6 & 3) != 0) {
+    if (code == EXCEPTION_SINGLE_STEP && (pointers->ContextRecord->Dr6 & 0xf) != 0) {
         return WatchHit(pointers);
     }
     if (code != EXCEPTION_ACCESS_VIOLATION && code != EXCEPTION_STACK_OVERFLOW) {
@@ -284,6 +300,10 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
     EXCEPTION_RECORD *record;
 
     (void)unused;
+    watches[0].address = &GameMapRawBlock;
+    watches[0].name = "GameMapRawBlock";
+    watches[1].address = &DAT_00667ca4;
+    watches[1].name = "DAT_00667ca4";
     ArmWatches();
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     symbols_ready = SymInitialize(GetCurrentProcess(), exe_dir, TRUE);
@@ -294,6 +314,9 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
             gdi_logged = GetTickCount();
             PortTrace("gdi: %lu GDI objects, %lu USER objects", GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS),
                 GetGuiResources(GetCurrentProcess(), GR_USEROBJECTS));
+        }
+        if (InterlockedExchange(&watch_rearm, 0) != 0) {
+            ArmWatches();
         }
         if (WaitForSingleObject(crash_event, 250) == WAIT_OBJECT_0) {
             record = crash_pointers->ExceptionRecord;

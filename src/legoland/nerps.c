@@ -6,6 +6,7 @@
 #ifdef LEGOLAND_PORT
 #include "debug.h"
 #include "port_trace.h"
+#include "port_watchdog.h"
 #endif
 
 #include "bloke.h"
@@ -1448,6 +1449,23 @@ struct Ctx6b0 {
 // FUNCTION: LEGOLAND 0x0046b6b0
 void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
     struct ObjectiveEvent *node;
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] diagnosing the advisor's empty messages (2026-10-12): the step's PROMPT text came out "" at run
+         * time (game level 3, string 1 of 2). Watch its table slot and its first bytes for writes. */
+        struct TimedNode *cond;
+
+        for (cond = ((struct TimedList *)ctx)->field_c; cond != NULL; cond = cond->next) {
+            if (cond->field_40 != 0 && cond->field_40 < ScriptStringCount && ScriptStringTable[cond->field_40] != 0) {
+                DebugTrace("watch: step PROMPT is string %u \"%.50s\"", cond->field_40,
+                    (const char *)ScriptStringTable[cond->field_40]);
+                PortWatchRequest(2, &ScriptStringTable[cond->field_40], "PROMPT table slot");
+                PortWatchRequest(3, (void *)ScriptStringTable[cond->field_40], "PROMPT text");
+                break;
+            }
+        }
+    }
+#endif
 
     if (ctx->field_8 != 0) {
         node = AllocObjectiveEvent(1, 2);
