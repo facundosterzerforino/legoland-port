@@ -69,7 +69,7 @@ struct JunglePath {
 };
 
 void FUN_00432ac0(void);
-void FUN_00432d00(int param_1);
+void DrawJungleCruiseBoats(int param_1);
 int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct Bloke *bloke2);
 void FUN_00432cb0(struct JungleRide *param_1);
 unsigned int FUN_004332c0(unsigned short *param_1);

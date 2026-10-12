@@ -171,7 +171,7 @@ void FUN_0048ab60(void) {
         DrawWatchSprite();
         if (node->field_18 == 1) {
             if (FUN_00478b20(node->field_1c) != 0) {
-                FUN_00469900((struct NerpsArg *)ElemID((const char *)node->field_1c), 0, 1);
+                GiveRewardObject((struct NerpsArg *)ElemID((const char *)node->field_1c), 0, 1);
             }
         }
         node = node->next;

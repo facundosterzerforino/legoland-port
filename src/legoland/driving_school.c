@@ -379,7 +379,7 @@ void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsig
     EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
     DAT_0082f760.field_1830 = (unsigned int)&DAT_0082c6e0;
     DAT_0082c6e0.field_1830 = (unsigned int)&DAT_0082df20;
-    FUN_0045f4d0(&EditCursor);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x004058a0
@@ -394,7 +394,7 @@ void DrivingSchoolDCalcCursor(unsigned int param_1, unsigned int param_2) {
         if (node->id == QueryObj.id) {
             DAT_0082f760.tile_x = node->x;
             DAT_0082f760.tile_y = node->y;
-            FUN_0045f460(&DAT_0082f760);
+            ResetCursorBuildable(&DAT_0082f760);
             DAT_0082f760.field_1828 = 0x18;
             BuildCursorPtr(&DAT_0082f760, 0, 0);
             RenderCursor(&DAT_0082f760);

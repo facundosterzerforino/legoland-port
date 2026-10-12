@@ -94,7 +94,7 @@ struct DrawLLSIdxFrame {
 
 void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos);
 void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos);
-void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos);
+void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos);
 void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_004673f0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);

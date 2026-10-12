@@ -276,10 +276,10 @@ LEGO_EXPORT void BasicObjectDCalcCursor(unsigned int param_1, struct Point *para
         memcpy(buf, &map[QueryCursor.tile_y][QueryCursor.tile_x], 20);
     }
     if ((buf[3] & 0x40) != 0) {
-        FUN_0045f480(&QueryCursor, 1);
+        SetCursorBlocked(&QueryCursor, 1);
         return;
     }
-    FUN_0045f460(&QueryCursor);
+    ResetCursorBuildable(&QueryCursor);
 }
 
 // FUNCTION: LEGOLAND 0x00480cd0
@@ -682,7 +682,7 @@ LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke,
     int counter;
 
     fatigue = bloke->field_7e;
-    category = FUN_0044eb10(bloke);
+    category = GetBlokeHungerLevel(bloke);
     rating = item->intensity;
     blokenum = GetBlokeNum(bloke);
     counter = GetBlokeCounter(item, blokenum);

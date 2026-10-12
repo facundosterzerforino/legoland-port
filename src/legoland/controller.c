@@ -182,7 +182,7 @@ void FUN_00452030(void) {
     EditCursor.tile_x = local_14;
     EditCursor.tile_y = local_10;
     if (bValidate == 0) {
-        FUN_0045f460(&EditCursor);
+        ResetCursorBuildable(&EditCursor);
         return;
     }
     ValidateCursor(&EditCursor, (unsigned int)EditMode.unk8);

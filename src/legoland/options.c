@@ -638,7 +638,7 @@ unsigned char FUN_0048fbd0(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0048fc00
 void FUN_0048fc00(void) {
     if (DAT_0080ff80.unk0 != 0) {
-        if (FUN_0046d280(DAT_0080ff80.unk0) != 0) {
+        if (PlaySpeech(DAT_0080ff80.unk0) != 0) {
             DAT_0080ff80.unk0 = 0;
         }
     }

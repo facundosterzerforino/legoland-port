@@ -131,27 +131,27 @@ void (*PTR_FUN_004b7e38[25])(unsigned int, unsigned int) = {
     (void (*)(unsigned int, unsigned int))FUN_004443e0,
     (void (*)(unsigned int, unsigned int))FUN_00444410,
     FUN_00444440,
-    FUN_00444470,
-    FUN_004444b0,
-    FUN_004444f0,
-    FUN_00444530,
-    FUN_00444570,
-    FUN_004445b0,
-    FUN_004445f0,
-    FUN_00444630,
-    FUN_00444670,
-    FUN_004446b0,
+    SetReportCastleScoreGoal,
+    SetReportDrivingSchoolScoreGoal,
+    SetReportLogFlumeScoreGoal,
+    SetReportBoatingSchoolScoreGoal,
+    SetReportJungleCruiseScoreGoal,
+    SetReportType1Or3ObjectCountGoal,
+    SetReportType1Or3ClassCountGoal,
+    SetReportLinkedObjectPercentGoal,
+    SetReportType2ObjectCountGoal,
+    SetReportType2ClassCountGoal,
     FUN_004446f0,
-    FUN_00444730,
-    FUN_00444770,
-    FUN_004447b0,
-    FUN_004447f0,
-    FUN_00444830,
-    FUN_00444870,
-    FUN_004448b0,
-    FUN_004448f0,
+    SetReportFoodStallObjectCountGoal,
+    SetReportFoodStallClassCountGoal,
+    SetReportType4ObjectCountGoal,
+    SetReportType4ClassCountGoal,
+    SetReportVisitorCountGoal,
+    SetReportVisitorHappinessGoal,
+    SetReportVisitorFullnessGoal,
+    SetReportPowerSupplyGoal,
     FUN_00444930,
-    FUN_00444970,
+    SetReportMapTileCountGoal,
 };
 
 // FUNCTION: LEGOLAND 0x0046a140
@@ -312,13 +312,13 @@ unsigned int ScriptEventLookAt(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a420
 unsigned int ScriptEventThemeIcon(struct NerpsArg *arg) {
-    FUN_00468860(arg->field_14, arg->field_1c);
+    SetObjectiveCounter(arg->field_14, arg->field_1c);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a440
 unsigned int ScriptEventAddFlag(struct NerpsArg *arg) {
-    FUN_00468890(arg->field_14, arg->field_1c);
+    AddObjectiveCounter(arg->field_14, arg->field_1c);
     return 1;
 }
 
@@ -330,7 +330,7 @@ unsigned int ScriptEventBridges(struct NerpsArg *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a480
 unsigned int ScriptEventBriefingFile(struct NerpsArg *arg) {
-    /* TODO: fold into NerpsArg — field_8 is used both as unsigned int (FUN_00468810) and a string ptr here */
+    /* TODO: fold into NerpsArg — field_8 is used both as unsigned int (SetHintsFileName) and a string ptr here */
     FUN_004687f0((const char *)arg->field_8);
     return 1;
 }
@@ -338,7 +338,7 @@ unsigned int ScriptEventBriefingFile(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046a4a0
 unsigned int ScriptEventHintsFile(struct NerpsArg *arg) {
     /* TODO: fold into NerpsArg — field_8 doubles as the name string pointer here */
-    FUN_00468810((char *)arg->field_8);
+    SetHintsFileName((char *)arg->field_8);
     return 1;
 }
 
@@ -375,7 +375,7 @@ unsigned int ScriptEventNeed(struct NerpsArg *arg) {
     }
 #endif
     if (count < (int)arg->field_1c) {
-        FUN_00468d80(arg, arg->field_4, arg->field_1c - count);
+        QueueBuildMoreObjectsHint(arg, arg->field_4, arg->field_1c - count);
         DAT_0066878c = arg->field_1c - count;
         return 0;
     }
@@ -398,7 +398,7 @@ unsigned int ScriptEventNeedAt(struct NerpsArg *arg) {
     if ((tile->flags & 0x80) != 0 && tile->field_0 == arg->field_4) {
         return 1;
     }
-    FUN_00468d80(arg, arg->field_4, 1);
+    QueueBuildMoreObjectsHint(arg, arg->field_4, 1);
     return 0;
 }
 
@@ -425,7 +425,7 @@ unsigned int ScriptEventNeedIn(struct NerpsArg *arg) {
     if (count >= (int)arg->field_1c) {
         return 1;
     }
-    FUN_00468d80(arg, arg->field_4, arg->field_1c - count);
+    QueueBuildMoreObjectsHint(arg, arg->field_4, arg->field_1c - count);
     return 0;
 }
 
@@ -448,7 +448,7 @@ unsigned int ScriptEventConnect(struct NerpsArg *arg) {
         }
         /* `!tile->flags & 0x10` is always false: operator precedence bug in the original */
         if (tile == NULL || !tile->flags & 0x10) {
-            FUN_00468dc0(arg, arg->field_4);
+            QueueConnectToPathHint(arg, arg->field_4);
             return 0;
         }
     }
@@ -534,11 +534,11 @@ unsigned int ScriptEventLink(struct NerpsArg *arg) {
         } while (robj != NULL);
     }
     if (blocked != 0) {
-        FUN_00468dc0(arg, arg->field_4);
+        QueueConnectToPathHint(arg, arg->field_4);
         return 0;
     }
     if (total != 0) {
-        FUN_00468e00(arg, arg->field_4);
+        QueueLinkToEntranceHint(arg, arg->field_4);
         return 0;
     }
 ok:
@@ -564,7 +564,7 @@ unsigned int ScriptEventRange(struct NerpsArg *arg) {
         } while (node != NULL);
     }
     if (count < (int)arg->field_14 || sum < (int)arg->field_1c) {
-        FUN_00468e40(arg, arg->field_4, arg->field_14 - count, arg->field_1c - sum);
+        QueueBuildRangeAttractionsHint(arg, arg->field_4, arg->field_14 - count, arg->field_1c - sum);
         return 0;
     }
     return 1;
@@ -591,7 +591,7 @@ unsigned int ScriptEventClearArea(struct NerpsArg *arg) {
         }
     }
     if (count > (int)arg->field_14) {
-        FUN_00468f00(arg, count - arg->field_14);
+        QueueClearAreaHint(arg, count - arg->field_14);
         return 0;
     }
     return 1;
@@ -603,7 +603,7 @@ unsigned int ScriptEventRemove(struct NerpsArg *arg) {
 
     count = ObjCount((struct ObjCountWrap *)arg->field_4);
     if (count > (int)arg->field_1c) {
-        FUN_00468f40(arg, arg->field_4, count - arg->field_1c);
+        QueueDeleteObjectsHint(arg, arg->field_4, count - arg->field_1c);
         return 0;
     }
     return 1;
@@ -634,7 +634,7 @@ unsigned int ScriptEventRemoveRange(struct NerpsArg *arg) {
         sum |= arg->field_1c;
     }
     if (count > (int)arg->field_14 || sum > (int)arg->field_1c) {
-        FUN_00468ea0(arg, arg->field_4, count - arg->field_14, sum - arg->field_1c);
+        QueueDeleteRangeAttractionsHint(arg, arg->field_4, count - arg->field_14, sum - arg->field_1c);
         return 0;
     }
     return 1;
@@ -648,7 +648,7 @@ unsigned int ScriptEventComposite(struct NerpsArg *arg) {
 
     node = ObjectClassList;
     if ((int)ObjCount((struct ObjCountWrap *)arg->field_4) < 1) {
-        FUN_00468d80(arg, arg->field_4, 1);
+        QueueBuildMoreObjectsHint(arg, arg->field_4, 1);
         return 0;
     }
     count = 0;
@@ -665,7 +665,7 @@ unsigned int ScriptEventComposite(struct NerpsArg *arg) {
     if (count >= (int)arg->field_14 && sum >= (int)arg->field_1c) {
         return 1;
     }
-    FUN_00469260(arg, arg->field_4, arg->field_1c - sum, arg->field_14 - count);
+    QueueAddRidePartsHint(arg, arg->field_4, arg->field_1c - sum, arg->field_14 - count);
     return 0;
 }
 
@@ -679,7 +679,7 @@ unsigned int ScriptEventLoopComposite(struct LoopArg *arg) {
     if (vtable->eval != NULL) {
         if (vtable->eval(object, 1) < arg->field_1c) {
             /* TODO: fold LoopArg/NerpsArg — same objective object, two struct views */
-            FUN_00469390((struct NerpsArg *)arg);
+            QueueCustomObjectiveHintIfDue((struct NerpsArg *)arg);
             return 0;
         }
     } else {
@@ -698,7 +698,7 @@ int ScriptEventTechLevel(unsigned int param_1) {
 // FUNCTION: LEGOLAND 0x0046abd0
 unsigned int ScriptEventParkVisitors(struct NerpsArg *arg) {
     if (ParkVisitorCount < (int)arg->field_1c) {
-        FUN_00468f80(arg, arg->field_1c - ParkVisitorCount);
+        QueueAttractVisitorsHint(arg, arg->field_1c - ParkVisitorCount);
         return 0;
     }
     return 1;
@@ -732,7 +732,7 @@ unsigned int ScriptEventRiders(struct NerpsArg *arg) {
         }
         node = node->next;
     }
-    FUN_00469220(arg, arg->field_4, arg->field_1c - count);
+    QueueRideVisitorsHint(arg, arg->field_4, arg->field_1c - count);
     return 0;
 }
 
@@ -767,14 +767,14 @@ unsigned int ScriptEventRideVisitors(struct NerpsArg *arg) {
         }
         node = node->next;
     }
-    FUN_00469220(arg, arg->field_4, arg->field_1c - count);
+    QueueRideVisitorsHint(arg, arg->field_4, arg->field_1c - count);
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0046ad00
 unsigned int ScriptEventSceneryCoverage(struct NerpsArg *arg) {
     if (DAT_00667cf8 < (int)arg->field_14) {
-        FUN_00469310(arg, 2, arg->field_14 - DAT_00667cf8);
+        QueueCoverSquaresHint(arg, 2, arg->field_14 - DAT_00667cf8);
         return 0;
     }
     return 1;
@@ -784,7 +784,7 @@ unsigned int ScriptEventSceneryCoverage(struct NerpsArg *arg) {
 unsigned int ScriptEventPathScenery(struct NerpsArg *arg) {
     FUN_00459970();
     if (DAT_00667d08 < (int)arg->field_14) {
-        FUN_00469350(arg, arg->field_14 - DAT_00667d08);
+        QueuePathSceneryHint(arg, arg->field_14 - DAT_00667d08);
         return 0;
     }
     return 1;
@@ -793,7 +793,7 @@ unsigned int ScriptEventPathScenery(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046ad60
 unsigned int ScriptEventRideCoverage(struct NerpsArg *arg) {
     if (DAT_00667ce4 < (int)arg->field_14) {
-        FUN_00469310(arg, 1, arg->field_14 - DAT_00667ce4);
+        QueueCoverSquaresHint(arg, 1, arg->field_14 - DAT_00667ce4);
         return 0;
     }
     return 1;
@@ -802,7 +802,7 @@ unsigned int ScriptEventRideCoverage(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046ad90
 unsigned int ScriptEventShopCoverage(struct NerpsArg *arg) {
     if (DAT_00667ce8 < (int)arg->field_14) {
-        FUN_00469310(arg, 4, arg->field_14 - DAT_00667ce8);
+        QueueCoverSquaresHint(arg, 4, arg->field_14 - DAT_00667ce8);
         return 0;
     }
     return 1;
@@ -811,7 +811,7 @@ unsigned int ScriptEventShopCoverage(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046adc0
 unsigned int ScriptEventFoodCoverage(struct NerpsArg *arg) {
     if (DAT_00667cec < (int)arg->field_14) {
-        FUN_00469310(arg, 5, arg->field_14 - DAT_00667cec);
+        QueueCoverSquaresHint(arg, 5, arg->field_14 - DAT_00667cec);
         return 0;
     }
     return 1;
@@ -820,7 +820,7 @@ unsigned int ScriptEventFoodCoverage(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046adf0
 unsigned int ScriptEventTotalCoverage(struct NerpsArg *arg) {
     if (DAT_00667ce0 < (int)arg->field_14) {
-        FUN_00469310(arg, 0, arg->field_14 - DAT_00667ce0);
+        QueueCoverSquaresHint(arg, 0, arg->field_14 - DAT_00667ce0);
         return 0;
     }
     return 1;
@@ -841,7 +841,7 @@ unsigned int ScriptEventSave(struct NerpsArg *arg) {
     if (GetBrickCount() >= (int)arg->field_1c) {
         return 1;
     }
-    FUN_004690c0(arg, arg->field_1c - GetBrickCount());
+    QueueSaveCoinsHint(arg, arg->field_1c - GetBrickCount());
     return 0;
 }
 
@@ -863,7 +863,7 @@ unsigned int ScriptEventHappiness(struct NerpsArg *arg) {
         }
         bloke = bloke->next;
     }
-    FUN_00469100(arg, arg->field_1c - count, arg->field_14);
+    QueueHappyVisitorsHint(arg, arg->field_1c - count, arg->field_14);
     return 0;
 }
 
@@ -878,13 +878,13 @@ unsigned int AdjustGardenerCount(struct NerpsArg *arg) {
         if (target <= current) {
             return 1;
         }
-        FUN_00468fc0(arg, target - current);
+        QueueMoreGardenersHint(arg, target - current);
         return 0;
     }
     if (-target >= current) {
         return 1;
     }
-    FUN_00469000(arg, target + current);
+    QueueFewerGardenersHint(arg, target + current);
     return 0;
 }
 
@@ -899,13 +899,13 @@ unsigned int ScriptEventNeedMechanics(struct NerpsArg *arg) {
         if (target <= current) {
             return 1;
         }
-        FUN_00469040(arg, target - current);
+        QueueMoreMechanicsHint(arg, target - current);
         return 0;
     }
     if (-target >= current) {
         return 1;
     }
-    FUN_00469080(arg, target + current);
+    QueueFewerMechanicsHint(arg, target + current);
     return 0;
 }
 
@@ -930,11 +930,11 @@ unsigned int ScriptEventHunger(struct NerpsArg *arg) {
     }
     if (arg->field_18 != 0) {
         if (count > (int)arg->field_1c) {
-            FUN_00469140(arg, count - arg->field_1c, arg->field_14);
+            QueueFewerHungryVisitorsHint(arg, count - arg->field_1c, arg->field_14);
             return 0;
         }
     } else if (count < (int)arg->field_1c) {
-        FUN_00469190(arg, arg->field_1c - count, arg->field_14);
+        QueueMoreFedVisitorsHint(arg, arg->field_1c - count, arg->field_14);
         return 0;
     }
     return 1;
@@ -966,7 +966,7 @@ unsigned int ScriptEventFixRides(struct NerpsArg *arg) {
         }
     }
     if (count > (int)arg->field_1c) {
-        FUN_004691e0(arg, count - arg->field_1c, arg->field_14);
+        QueueRepairObjectsHint(arg, count - arg->field_1c, arg->field_14);
         return 0;
     }
     return 1;
@@ -975,7 +975,7 @@ unsigned int ScriptEventFixRides(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046b080
 unsigned int ScriptEventPowerRides(struct NerpsArg *arg) {
     if (MapStats.unpowered_count > (int)arg->field_1c) {
-        FUN_004691e0(arg, MapStats.unpowered_count - arg->field_1c, 0);
+        QueueRepairObjectsHint(arg, MapStats.unpowered_count - arg->field_1c, 0);
         return 0;
     }
     return 1;
@@ -988,11 +988,11 @@ unsigned int ScriptEventZoning(void) {
 
 // FUNCTION: LEGOLAND 0x0046b0c0
 unsigned int ScriptEventCheckFlag(struct NerpsArg *arg) {
-    if (FUN_004688c0(arg->field_14) >= (int)arg->field_1c) {
+    if (GetObjectiveCounter(arg->field_14) >= (int)arg->field_1c) {
         return 1;
     }
-    if (FUN_00468d10() != 0) {
-        FUN_00468d30(arg);
+    if (IsObjectiveHintDue() != 0) {
+        QueueCustomObjectiveHint(arg);
     }
     return 0;
 }
@@ -1002,8 +1002,8 @@ unsigned int ScriptEventSelectTheme(struct NerpsArg *arg) {
     if (arg->field_1c == DAT_004baff8) {
         return 1;
     }
-    if (FUN_00468d10() != 0) {
-        FUN_00468d30(arg);
+    if (IsObjectiveHintDue() != 0) {
+        QueueCustomObjectiveHint(arg);
     }
     return 0;
 }
@@ -1018,8 +1018,8 @@ unsigned int ScriptEventSelectTab(struct NerpsArg *arg) {
             return 1;
         }
     }
-    if (FUN_00468d10() != 0) {
-        FUN_00468d30(arg);
+    if (IsObjectiveHintDue() != 0) {
+        QueueCustomObjectiveHint(arg);
     }
     return 0;
 }
@@ -1033,10 +1033,10 @@ unsigned int ScriptEventSelectMode(struct NerpsArg *arg) {
     } else if (EditMode.unk0 == arg->field_1c) {
         return 1;
     }
-    if (FUN_00468d10() == 0) {
+    if (IsObjectiveHintDue() == 0) {
         return 0;
     }
-    FUN_00468d30(arg);
+    QueueCustomObjectiveHint(arg);
     return 0;
 }
 
@@ -1199,7 +1199,7 @@ void RunLevelScript(void) {
     prev = NULL;
     active = 0;
     changed = 0;
-    FUN_00471bf0();
+    ClearNewObjectsList();
     if (IsScriptStopped() != 0) {
         return;
     }
@@ -1241,7 +1241,7 @@ void RunLevelScript(void) {
         if (DAT_0066871c != 0) {
             UpdateMenu();
             DAT_0066871c = 0;
-            FUN_00471d40();
+            ShowNewObjectsInfo();
         }
         if (ScriptPurgePending != 0) {
             ScriptPurgePending = 0;
@@ -1251,7 +1251,7 @@ void RunLevelScript(void) {
             ScriptSectionStarted = 0;
             if (active != 0) {
                 FUN_0046b6b0((struct Ctx6b0 *)CurrentScriptSection, 1);
-                FUN_00468d00();
+                ResetObjectiveHintTimer();
             }
         }
         if (ScriptSectionList != NULL && active == 0) {
@@ -1282,7 +1282,7 @@ void RunLevelScript(void) {
             if (ScriptSectionList != NULL) {
                 ScriptSectionStarted = 1;
                 AppendObjectiveEventList((struct AppendArgC *)ScriptSectionList);
-                FUN_00468d00();
+                ResetObjectiveHintTimer();
             }
         }
         ScriptDirtyCategories = 0xffffffff;
@@ -1291,7 +1291,7 @@ void RunLevelScript(void) {
             prev = NULL;
             active = 0;
             changed = 0;
-            FUN_00471bf0();
+            ClearNewObjectsList();
             if (IsScriptStopped() == 0) {
                 continue;
             }
@@ -1469,12 +1469,12 @@ void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
 
     if (ctx->field_8 != 0) {
         node = AllocObjectiveEvent(1, 2);
-        FUN_00468b40(node, ctx->field_8, param_2);
+        SetObjectiveEventText(node, ctx->field_8, param_2);
         if (param_2 == 0) {
             ctx->field_8 = 0;
             node->flags_10 = 0x20;
         }
-        FUN_00468b00(node);
+        InsertObjectiveMessageSorted(node);
         DAT_00668614 = 0;
     }
 }
@@ -1500,7 +1500,7 @@ unsigned int FUN_0046b700(void) {
             return 1;
         }
         FUN_0046b6b0((struct Ctx6b0 *)CurrentScriptSection, 1);
-        FUN_00468d00();
+        ResetObjectiveHintTimer();
         return 1;
     }
     return 0;
@@ -1511,7 +1511,7 @@ unsigned int FUN_0046b760(void) {
     if (IsScriptStopped() == 0) {
         if (CurrentScriptSection != 0) {
             FUN_0046b6b0((struct Ctx6b0 *)CurrentScriptSection, 1);
-            FUN_00468d00();
+            ResetObjectiveHintTimer();
             return 1;
         }
     }
@@ -1617,7 +1617,7 @@ void NewScriptFmvEvent(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
     node = AllocObjectiveEvent(0xc, 1);
-    FUN_00468b40(node, param_1, 1);
+    SetObjectiveEventText(node, param_1, 1);
     InsertObjectiveEventAtHead(node, (struct EventList *)CurrentScriptSection);
 }
 
@@ -1626,7 +1626,7 @@ void NewScriptIntervalEvent(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
     node = AllocObjectiveEvent(0xd, 1);
-    FUN_00468b40(node, param_1, 1);
+    SetObjectiveEventText(node, param_1, 1);
     node->field_1c = 0;
     InsertObjectiveEventAtHead(node, (struct EventList *)CurrentScriptSection);
 }
@@ -1636,7 +1636,7 @@ void NewScriptMessageEvent(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
     node = AllocObjectiveEvent(0xe, 1);
-    FUN_00468b40(node, param_1, 1);
+    SetObjectiveEventText(node, param_1, 1);
     InsertObjectiveEventAtHead(node, (struct EventList *)CurrentScriptSection);
 }
 
@@ -1798,7 +1798,7 @@ void NewScriptBriefingFileEvent(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
     node = AllocObjectiveEvent(0x1c, 1);
-    FUN_00468b40(node, param_1, 1);
+    SetObjectiveEventText(node, param_1, 1);
     InsertObjectiveEventAtHead(node, (struct EventList *)CurrentScriptSection);
 }
 
@@ -1807,7 +1807,7 @@ void NewScriptHintsFileEvent(unsigned int param_1) {
     struct ObjectiveEvent *node;
 
     node = AllocObjectiveEvent(0x1d, 1);
-    FUN_00468b40(node, param_1, 1);
+    SetObjectiveEventText(node, param_1, 1);
     InsertObjectiveEventAtHead(node, (struct EventList *)CurrentScriptSection);
 }
 
@@ -2474,7 +2474,7 @@ unsigned int FUN_0046cb20(void) {
     } else {
         UnloadBaseMap();
     }
-    FUN_004689a0();
+    FreeScriptStrings();
     FUN_0046c5c0();
     ClearAdvisorHelp();
     FUN_0046ce00();
@@ -2532,7 +2532,7 @@ unsigned int LoadScripts(void) {
             }
         }
     } else {
-        FUN_00468840();
+        ClearObjectiveCounters();
         FUN_004688e0();
         if (SaveGameRead(ObjectiveCounters, i) == 0) {
             return 0;
@@ -2586,7 +2586,7 @@ unsigned int LoadScripts(void) {
 
 // FUNCTION: LEGOLAND 0x0046ce00
 void FUN_0046ce00(void) {
-    FUN_00468d00();
+    ResetObjectiveHintTimer();
     DAT_007fe050 = 0;
     DAT_007fe054 = 0;
 }

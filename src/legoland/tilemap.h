@@ -4,7 +4,7 @@
 
 struct MapTile;
 struct FXSpriteList;
-int FUN_0045aa50(struct FXSpriteList **out);
+int CollectTileSpriteLists(struct FXSpriteList **out);
 struct Point;
 struct PathFootprint;
 struct Cursor;
@@ -19,13 +19,13 @@ LEGO_EXPORT unsigned int *AllocTileSpace(void *manager, int count, unsigned int 
 LEGO_EXPORT void PointToIsoPlane(int *param_1, int *out);
 LEGO_EXPORT unsigned int ScreenToMapRef(int *param_1, int *out, unsigned int param_3);
 LEGO_EXPORT unsigned int ScreenToMapRef2(struct Point *screen, struct Point *out);
-int FUN_0045ce10(struct MapTile *tile);
-int FUN_0045ce30(int *param_1);
-unsigned char FUN_0045ceb0(int *coords);
-unsigned char FUN_0045d080(unsigned char flags, int *coords);
-void FUN_0045d260(struct Point *param);
+int IsPathTile(struct MapTile *tile);
+int IsPavedPathTile(int *param_1);
+unsigned char GetPathNeighbourMask(int *coords);
+unsigned char GetPathDiagonalGaps(unsigned char flags, int *coords);
+void AdjustPathTileAndNeighbours(struct Point *param);
 LEGO_EXPORT void RemovePathTile(int *param_1, unsigned short param_2);
-void FUN_0045d3d0(struct PathFootprint *param_1, int *param_2);
+void ClearPathUnderFootprint(struct PathFootprint *param_1, int *param_2);
 LEGO_EXPORT unsigned char Bit_To_Dir(unsigned char bit);
 LEGO_EXPORT unsigned char Dir_To_Bit(unsigned char param);
 LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, char *param_3);

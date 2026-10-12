@@ -205,7 +205,7 @@ int FUN_00478b20(unsigned int arg) {
                 return 0;
             }
             obj->flags |= 4;
-            FUN_00469ab0(obj);
+            TakeRewardObject(obj);
         }
         return 1;
     }
@@ -241,7 +241,7 @@ unsigned int ScriptCmdEnable(unsigned int param_1, unsigned int param_2, unsigne
     if (DAT_00669054 == 1) {
         name = FUN_004787a0(param_1, param_2);
         if (FUN_00478b20(name) != 0) {
-            FUN_00469900((struct NerpsArg *)ElemID((const char *)name), 0, 1);
+            GiveRewardObject((struct NerpsArg *)ElemID((const char *)name), 0, 1);
         }
         return 1;
     }
@@ -345,7 +345,7 @@ int ScriptCmdHintsFile(int param_1, int param_2) {
             name = *(char **)(param_1 + 4);
         }
         if (DAT_00669054 == 1) {
-            FUN_00468810(name);
+            SetHintsFileName(name);
             return 1;
         }
         NewScriptHintsFileEvent((unsigned int)name);
@@ -439,10 +439,10 @@ int ScriptCmdPrompt(struct CommandArgs *arg, int argc) {
         }
         if (argc > 0) {
             if (argc > 1) {
-                DAT_007fdca4 = FUN_004689f0((char *)arg->arg1, arg->arg2, 1);
+                DAT_007fdca4 = AddScriptString((char *)arg->arg1, arg->arg2, 1);
                 return 1;
             }
-            DAT_007fdca4 = FUN_004689f0((char *)arg->arg1, NULL, 1);
+            DAT_007fdca4 = AddScriptString((char *)arg->arg1, NULL, 1);
             return 1;
         }
         DAT_007fdca4 = 0;
@@ -888,7 +888,7 @@ int ScriptCmdAppraisal(struct CommandArgs *arg, int argc) {
     if (argc >= 3) {
         strcat(buf, arg->arg3);
     }
-    FUN_0044dc70(v, (unsigned int)buf);
+    ConfigureAppraisal(v, (unsigned int)buf);
     return 1;
 }
 
@@ -1071,7 +1071,7 @@ int ScriptCmdThemeIcon(struct CommandArgs *arg, int argc) {
         v3 = 1;
     }
     if (DAT_00669054 == 1) {
-        FUN_00468860(v2, v3);
+        SetObjectiveCounter(v2, v3);
     } else {
         NewScriptThemeIconEvent(v2, v3);
     }
@@ -1096,7 +1096,7 @@ int ScriptCmdAddFlag(char **argv, int argc) {
         v2 = 1;
     }
     if (DAT_00669054 == 1) {
-        FUN_00468890(v1, v2);
+        AddObjectiveCounter(v1, v2);
     } else {
         NewScriptAddFlagEvent(v1, v2);
     }
@@ -1307,7 +1307,7 @@ int ScriptCmdPlace(struct CommandArgs *arg, int argc) {
     }
     if (id != 0) {
         if (DAT_00669054 == 1) {
-            FUN_00469bd0(id, coords);
+            PlaceObjectAtTile(id, coords);
         } else {
             NewScriptPlaceEvent(id, coords, v);
         }

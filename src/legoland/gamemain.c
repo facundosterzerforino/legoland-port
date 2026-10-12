@@ -324,14 +324,14 @@ void FUN_004779d0(struct Point *p) {
         order = GetGardenerWorkOrderAt(p->x, p->y);
         if (order != NULL) {
             FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
-            FUN_0045d3d0((struct PathFootprint *)order->element->data, &order->pos.x);
+            ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
             EraseGardenerOrder(order);
             return;
         }
         order = GetMechanicWorkOrderAt(p->x, p->y);
         if (order != NULL) {
             FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
-            FUN_0045d3d0((struct PathFootprint *)order->element->data, &order->pos.x);
+            ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
             EraseMechanicOrder(order);
             return;
         }
@@ -667,17 +667,17 @@ void FUN_004784c0(void) {
     MapStats.capacity_max = lpConfig->max_blokes;
     MapStats.capacity_min = 0;
 
-    FUN_004689a0();
-    DAT_007fdca4 = FUN_004689f0(0, 0, 0);
+    FreeScriptStrings();
+    DAT_007fdca4 = AddScriptString(0, 0, 0);
     ScriptConditionActive = 1;
 
-    FUN_004441f0();
-    FUN_0044db20();
+    ResetReportFlags();
+    ResetAppraisalStreak();
     StopAppraisalTimer();
-    FUN_00468840();
+    ClearObjectiveCounters();
     FUN_004688e0();
-    FUN_0044dc70(0, 0);
-    FUN_00468830();
+    ConfigureAppraisal(0, 0);
+    ClearBriefingAndHintsFileNames();
     FUN_00482d70();
     FUN_00462e90();
     FUN_00476000();

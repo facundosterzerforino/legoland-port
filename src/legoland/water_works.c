@@ -289,8 +289,8 @@ void WaterWorksWaterBlockCalcCursor(struct WaterArg *arg, unsigned int a, unsign
     if (FUN_00417c90() != 0) {
         return;
     }
-    FUN_0045f480(&EditCursor, 0xc);
-    FUN_0045f4d0(&EditCursor);
+    SetCursorBlocked(&EditCursor, 0xc);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x00417e40
@@ -663,8 +663,8 @@ void WaterWorksShowerCalcCursor(struct WaterArg *arg, unsigned int a, unsigned i
     if (FUN_00417c90() != 0) {
         return;
     }
-    FUN_0045f480(&EditCursor, 0xc);
-    FUN_0045f4d0(&EditCursor);
+    SetCursorBlocked(&EditCursor, 0xc);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x00418630
@@ -816,8 +816,8 @@ void WaterWorksElephantFountainCalcCursor(struct WaterArg *arg, unsigned int a, 
     if (FUN_00417c90() != 0) {
         return;
     }
-    FUN_0045f480(&EditCursor, 0xc);
-    FUN_0045f4d0(&EditCursor);
+    SetCursorBlocked(&EditCursor, 0xc);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x004189c0
@@ -848,8 +848,8 @@ void WaterWorksCrocodileFountainCalcCursor(struct CursorNode *arg, unsigned int 
     if (FUN_00417c90() != 0) {
         return;
     }
-    FUN_0045f480(&EditCursor, 0xc);
-    FUN_0045f4d0(&EditCursor);
+    SetCursorBlocked(&EditCursor, 0xc);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x00418aa0

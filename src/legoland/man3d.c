@@ -587,7 +587,7 @@ LEGO_EXPORT void InitMan(void) {
     const char *proj = "NewProject.txt";
 
     FUN_00485fc0((DisplayPixelFormat == 2) + 5);
-    ctx = FUN_00443710();
+    ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7cdc
     VisitorLocData = LoadLocFile("NewProject.loc", "visitor");
     ((unsigned int *)VisitorLocData)[1] = ctx;
@@ -623,7 +623,7 @@ LEGO_EXPORT void InitMan(void) {
     FUN_00442980("altwoman.txt", proj, "visitor", 1, ctx);
     AltManFileData = Load3DDataFile("visitor", "altman.txt");
     AltWomanFileData = Load3DDataFile("visitor", "altwoman.txt");
-    ctx = FUN_00443710();
+    ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7b80
     GeoffLocData = LoadLocFile("geoff.loc", "geoff");
     ((unsigned int *)GeoffLocData)[1] = ctx;
@@ -633,7 +633,7 @@ LEGO_EXPORT void InitMan(void) {
     GeoffMeshes[0] = Load3DMesh("geofWalk.GeofWalk.3d", "geoff", ctx);
     // STRING: LEGOLAND 0x004b7b50
     GeoffMeshes[1] = Load3DMesh("GeofPour.GeofPour.3d", "geoff", ctx);
-    ctx = FUN_00443710();
+    ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7b3c
     TracyLocData = LoadLocFile("tracy.loc", "tracy");
     ((unsigned int *)TracyLocData)[1] = ctx;

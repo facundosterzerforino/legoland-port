@@ -1016,13 +1016,13 @@ LEGO_EXPORT void SetEditCursorFootPrint(void *src) {
 }
 
 // FUNCTION: LEGOLAND 0x0045f460
-void FUN_0045f460(struct Cursor *cursor) {
+void ResetCursorBuildable(struct Cursor *cursor) {
     cursor->field_140c = 1;
     cursor->field_1410 = 0;
 }
 
 // FUNCTION: LEGOLAND 0x0045f480
-void FUN_0045f480(struct Cursor *cursor, int param) {
+void SetCursorBlocked(struct Cursor *cursor, int param) {
     int negated;
 
     negated = -param;
@@ -1033,7 +1033,7 @@ void FUN_0045f480(struct Cursor *cursor, int param) {
 }
 
 // FUNCTION: LEGOLAND 0x0045f4b0
-int FUN_0045f4b0(struct Cursor *cursor) {
+int IsCursorBuildable(struct Cursor *cursor) {
     int target;
 
     target = cursor->field_140c;
@@ -1041,7 +1041,7 @@ int FUN_0045f4b0(struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x0045f4d0
-void FUN_0045f4d0(struct Cursor *cursor) {
+void PropagateCursorBlocked(struct Cursor *cursor) {
     struct Cursor *node;
     struct Cursor *best;
 
@@ -1052,9 +1052,9 @@ void FUN_0045f4d0(struct Cursor *cursor) {
             best = node;
         }
     }
-    if (FUN_0045f4b0(best) == 0) {
+    if (IsCursorBuildable(best) == 0) {
         for (; cursor != 0; cursor = (struct Cursor *)cursor->field_1830) {
-            FUN_0045f480(cursor, best->field_1410);
+            SetCursorBlocked(cursor, best->field_1410);
         }
     }
 }
@@ -1073,7 +1073,7 @@ struct Cursor *FUN_0045f540(struct Cursor *cursor) {
             return node;
         }
     }
-    FUN_0045f460(&PathCursor);
+    ResetCursorBuildable(&PathCursor);
     PathCursor.tile_x = cursor->tile_x;
     PathCursor.tile_y = cursor->tile_y;
     PathCursor.field_1414[0] = cursor->field_1414[0] - 1;
@@ -1116,7 +1116,7 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
         size = sprite->size;
         pts = (struct CursorPts *)cursor;
         pts->count = 0;
-        built = FUN_0045f4b0(cursor);
+        built = IsCursorBuildable(cursor);
         flag = (built != 0) + 1;
         fbits = (flag - 1) * 4;
         *(unsigned char *)((char *)cursor + 0x1428) = (unsigned char)fbits;
@@ -1182,7 +1182,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, unsigned int param) {
     if (FUN_0045ead0((struct ObjState *)param) != 0 && (cursor->field_1828 & 0x4000) == 0) {
         FUN_0045f540(cursor);
     }
-    FUN_0045f460(cursor);
+    ResetCursorBuildable(cursor);
     for (; cursor != 0; cursor = (struct Cursor *)cursor->field_1830) {
         if (cursor->field_1828 & 0x2000) {
             continue;
@@ -1206,10 +1206,10 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, unsigned int param) {
                 people = CheckForPeople(&inter);
                 switch (people) {
                 case -1:
-                    FUN_0045f480(cursor, 4);
+                    SetCursorBlocked(cursor, 4);
                     break;
                 case 1:
-                    FUN_0045f480(cursor, 3);
+                    SetCursorBlocked(cursor, 3);
                     break;
                 }
             }
@@ -1223,38 +1223,38 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, unsigned int param) {
                         tile = 0;
                     }
                     if (tile == 0) {
-                        FUN_0045f480(cursor, 7);
+                        SetCursorBlocked(cursor, 7);
                         continue;
                     }
                     if (tile->flags & 0x40) {
-                        FUN_0045f480(cursor, 1);
+                        SetCursorBlocked(cursor, 1);
                     }
                     if ((tile->flags & 0xa8) == 0 ||
                         (obj = ((Element *)tile->field_0)->obj) == (struct MapObject *)PathControlObject) {
                         obj = 0;
                     }
                     if (obj != 0 && (obj->flags & 0x200000) == 0) {
-                        FUN_0045f480(cursor, 10);
+                        SetCursorBlocked(cursor, 10);
                     } else if (FUN_0045eab0((struct ObjFlags *)param) == 0) {
                         if (obj != 0) {
-                            FUN_0045f480(cursor, 6);
+                            SetCursorBlocked(cursor, 6);
                         }
                         if (tile->flags & 0x800) {
-                            FUN_0045f480(cursor, 5);
+                            SetCursorBlocked(cursor, 5);
                         }
                     }
                     if (FUN_0045eaf0((struct ObjData *)param) != 0) {
                         if ((tile->flags & 0x10) && (tile->field_10 & 1) == 0) {
-                            FUN_0045f480(cursor, 9);
+                            SetCursorBlocked(cursor, 9);
                         }
                     } else if ((tile->flags & 0x10) || (tile->field_10 & 1)) {
-                        FUN_0045f480(cursor, 8);
+                        SetCursorBlocked(cursor, 8);
                     }
                 }
             }
         }
     }
-    FUN_0045f4d0(first);
+    PropagateCursorBlocked(first);
 }
 
 // FUNCTION: LEGOLAND 0x0045fa80
@@ -1688,7 +1688,7 @@ void FUN_00460560(int index) {
 }
 
 // FUNCTION: LEGOLAND 0x004608c0
-void FUN_004608c0(struct Point *pos, RECT *clip) {
+void DrawMapTiles(struct Point *pos, RECT *clip) {
     struct Overlay *ov;
     int dx;
     int dy;
@@ -1783,8 +1783,8 @@ void FUN_004608c0(struct Point *pos, RECT *clip) {
                     }
                 } else {
                     PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col, draw_y);
-                    if (FUN_0045ce10((struct MapTile *)tile) != 0) {
-                        FUN_00460e90((int *)&cell, col, draw_y, 0);
+                    if (IsPathTile((struct MapTile *)tile) != 0) {
+                        DrawPathTile((int *)&cell, col, draw_y, 0);
                     }
                 }
             }
@@ -1809,8 +1809,8 @@ void FUN_004608c0(struct Point *pos, RECT *clip) {
                     }
                 } else {
                     PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col + half_x, draw_y2);
-                    if (FUN_0045ce10((struct MapTile *)tile) != 0) {
-                        FUN_00460e90((int *)&cell, col + half_x, draw_y2, 0);
+                    if (IsPathTile((struct MapTile *)tile) != 0) {
+                        DrawPathTile((int *)&cell, col + half_x, draw_y2, 0);
                     }
                 }
             }
@@ -1853,7 +1853,7 @@ void FUN_004608c0(struct Point *pos, RECT *clip) {
 }
 
 // FUNCTION: LEGOLAND 0x00460e00
-void FUN_00460e00(void) {
+void DrawViewMapTiles(void) {
     int sx;
     int sy;
     struct Point pos;
@@ -1867,7 +1867,7 @@ void FUN_00460e00(void) {
     clip.top = lpConfig->view_y;
     clip.right = lpConfig->view_width + clip.left;
     clip.bottom = lpConfig->view_height + clip.top;
-    FUN_004608c0(&pos, &clip);
+    DrawMapTiles(&pos, &clip);
     DAT_004b95ec = sy;
     DAT_004b95e8 = sx;
     DAT_00667cd0 = 0;
@@ -1876,9 +1876,9 @@ void FUN_00460e00(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00460e90
-void FUN_00460e90(int *coords, unsigned int x, unsigned int y, unsigned int param_4) {
-    unsigned char dir = FUN_0045ceb0(coords);
-    unsigned int mode = FUN_0045d080(dir, coords);
+void DrawPathTile(int *coords, unsigned int x, unsigned int y, unsigned int param_4) {
+    unsigned char dir = GetPathNeighbourMask(coords);
+    unsigned int mode = GetPathDiagonalGaps(dir, coords);
 
     PrintSpriteSimple(TileSpriteArray[3 + (unsigned int)dir + *(int *)PathSprite], x, y);
     switch (mode) {
@@ -1895,9 +1895,9 @@ void FUN_00460e90(int *coords, unsigned int x, unsigned int y, unsigned int para
 }
 
 // FUNCTION: LEGOLAND 0x00460f50
-void FUN_00460f50(int *coords, unsigned int x, unsigned int y, unsigned int param_4) {
-    unsigned char dir = FUN_0045ceb0(coords);
-    unsigned int mode = FUN_0045d080(dir, coords);
+void DrawPathTileEx(int *coords, unsigned int x, unsigned int y, unsigned int param_4) {
+    unsigned char dir = GetPathNeighbourMask(coords);
+    unsigned int mode = GetPathDiagonalGaps(dir, coords);
 
     PrintSpriteSimple(TileSpriteArray[3 + (unsigned int)dir + *(int *)PathSprite], x, y);
     switch (mode) {
@@ -1914,7 +1914,7 @@ void FUN_00460f50(int *coords, unsigned int x, unsigned int y, unsigned int para
 }
 
 // FUNCTION: LEGOLAND 0x00461020
-void FUN_00461020(void) {
+void DrawDeferredSprites(void) {
     int i;
 
     i = 0;
@@ -1938,8 +1938,8 @@ void FUN_00461080(int *coord, unsigned int param2, unsigned int param3, unsigned
         coord[1] >= 0 && coord[1] < lpConfig->height) {
         tile = MapTileGrid[coord[1]];
         tile = tile + coord[0];
-        if (tile != 0 && FUN_0045ce10(tile) != 0 && tile->tile != 0) {
-            FUN_00460f50(coord, param2, param3, param4);
+        if (tile != 0 && IsPathTile(tile) != 0 && tile->tile != 0) {
+            DrawPathTileEx(coord, param2, param3, param4);
         }
     }
 }

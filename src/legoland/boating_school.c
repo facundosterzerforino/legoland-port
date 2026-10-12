@@ -688,8 +688,8 @@ void BoatingSchoolCalcCursor(int param_1, unsigned int param_2, unsigned int par
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
     EditCursor.field_1830 = (unsigned int)&PathCursor;
-    FUN_0045f460(&EditCursor);
-    FUN_0045f460(&PathCursor);
+    ResetCursorBuildable(&EditCursor);
+    ResetCursorBuildable(&PathCursor);
     ValidateCursor(&EditCursor, (unsigned int)cursor);
 }
 
@@ -716,7 +716,7 @@ void BoatingSchoolDCalcCursor(void *param_1, unsigned int param_2) {
         if (path->owner.id == QueryObj.id) {
             DAT_0082ae20.tile_x = path->tile.pos.x;
             DAT_0082ae20.tile_y = path->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -726,7 +726,7 @@ void BoatingSchoolDCalcCursor(void *param_1, unsigned int param_2) {
         if (node->owner == QueryObj.id) {
             DAT_0082ae20.tile_x = node->tile.pos.x;
             DAT_0082ae20.tile_y = node->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -1278,11 +1278,11 @@ void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned
     mask = FUN_0041c690(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
-        FUN_0045f480(&EditCursor, 0xe);
+        SetCursorBlocked(&EditCursor, 0xe);
         return;
     }
     ValidateCursor(&EditCursor, (unsigned int)ride);
-    if (FUN_0045f4b0(&EditCursor) == 0) {
+    if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
     DefaultCursor(&DAT_004cc090[0]);
@@ -1293,10 +1293,10 @@ void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned
     memcpy(DAT_004cc090[1].field_1414, EditCursor.field_1414, 20);
     memcpy(DAT_004cc090[2].field_1414, EditCursor.field_1414, 20);
     memcpy(DAT_004cc090[3].field_1414, EditCursor.field_1414, 20);
-    FUN_0045f460(&DAT_004cc090[0]);
-    FUN_0045f460(&DAT_004cc090[1]);
-    FUN_0045f460(&DAT_004cc090[2]);
-    FUN_0045f460(&DAT_004cc090[3]);
+    ResetCursorBuildable(&DAT_004cc090[0]);
+    ResetCursorBuildable(&DAT_004cc090[1]);
+    ResetCursorBuildable(&DAT_004cc090[2]);
+    ResetCursorBuildable(&DAT_004cc090[3]);
     x = EditCursor.tile_x;
     y = EditCursor.tile_y;
     DAT_004cc090[0].field_1828 = 0x2034;
@@ -1519,10 +1519,10 @@ void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned i
     mask = FUN_0041c690(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
-        FUN_0045f480(&EditCursor, 0xe);
+        SetCursorBlocked(&EditCursor, 0xe);
     } else {
         ValidateCursor(&EditCursor, (unsigned int)obj->ride);
-        if (FUN_0045f4b0(&EditCursor) != 0) {
+        if (IsCursorBuildable(&EditCursor) != 0) {
             rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
             rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
             rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
@@ -1538,10 +1538,10 @@ void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned i
                     memcpy(DAT_004d2168[1].field_1414, EditCursor.field_1414, 20);
                     memcpy(DAT_004d2168[2].field_1414, EditCursor.field_1414, 20);
                     memcpy(DAT_004d2168[3].field_1414, EditCursor.field_1414, 20);
-                    FUN_0045f460(&DAT_004d2168[0]);
-                    FUN_0045f460(&DAT_004d2168[1]);
-                    FUN_0045f460(&DAT_004d2168[2]);
-                    FUN_0045f460(&DAT_004d2168[3]);
+                    ResetCursorBuildable(&DAT_004d2168[0]);
+                    ResetCursorBuildable(&DAT_004d2168[1]);
+                    ResetCursorBuildable(&DAT_004d2168[2]);
+                    ResetCursorBuildable(&DAT_004d2168[3]);
                     x = EditCursor.tile_x;
                     y = EditCursor.tile_y;
                     DAT_004d2168[0].field_1828 = 0x2034;
@@ -1581,10 +1581,10 @@ void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned i
                         }
                     }
                 } else {
-                    FUN_0045f480(&EditCursor, 3);
+                    SetCursorBlocked(&EditCursor, 3);
                 }
             } else {
-                FUN_0045f480(&EditCursor, 4);
+                SetCursorBlocked(&EditCursor, 4);
             }
         }
     }
@@ -1626,7 +1626,7 @@ void BoatingSchoolWaterDCalcCursor(unsigned int param_1, int *coords) {
     BasicObjectDCalcCursor(param_1, (unsigned int)coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->tile_x && tile.pos.y == ride->tile_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
-            FUN_0045f480(&QueryCursor, 1);
+            SetCursorBlocked(&QueryCursor, 1);
             return;
         }
     }

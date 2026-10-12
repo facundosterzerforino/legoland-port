@@ -197,7 +197,7 @@ void FUN_0044eae0(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x0044eb10
-char FUN_0044eb10(Bloke *bloke) {
+char GetBlokeHungerLevel(Bloke *bloke) {
     int i;
 
     if (MapStats.field_190 == 0) {
@@ -1306,7 +1306,7 @@ void FUN_00450530(Bloke *bloke) {
     ApplyMoodDelta(bloke, 4, shops);
     ApplyMoodDelta(bloke, 5, food_score);
     ApplyMoodDelta(bloke, 6, toilets);
-    rate = FUN_0044eb10(bloke);
+    rate = GetBlokeHungerLevel(bloke);
     if (rate >= 3) {
         ApplyMoodDelta(bloke, 7, rate - 2);
     }

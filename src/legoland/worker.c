@@ -865,7 +865,7 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         } else {
             FUN_00499e60(worker->order);
             NewLongTermAction(worker, 0x10);
-            FUN_004735e0(1);
+            TryPlayAdviceSpeech(1);
         }
         return;
     }
@@ -989,7 +989,7 @@ LEGO_EXPORT int WorkOrderBuildObject(Element *element, Point *pos) {
         }
     } else {
         if (GetBrickCount() < GetObjCost(ride)) {
-            FUN_004735e0(3);
+            TryPlayAdviceSpeech(3);
             return 0;
         }
         FUN_0045e300(element, pos);
@@ -1751,7 +1751,7 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
                 return;
             }
             worker->order->no_bricks = 1;
-            FUN_004735e0(2);
+            TryPlayAdviceSpeech(2);
             return;
         }
         worker->param_action++;

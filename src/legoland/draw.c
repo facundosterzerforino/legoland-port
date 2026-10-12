@@ -1180,7 +1180,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
         return;
     }
     if (image->field_14 == 3) {
-        FUN_00466770((struct DrawLLS *)image->data, rect, (struct Point *)off);
+        DrawLLSSpriteMousePick((struct DrawLLS *)image->data, rect, (struct Point *)off);
         return;
     }
     width = rect->right - rect->left;
@@ -2101,7 +2101,7 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
 }
 
 // FUNCTION: LEGOLAND 0x00466770
-void FUN_00466770(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
+void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     int pitch;
     struct DrawLLSFrame *frame = (struct DrawLLSFrame *)(lls + 1);
     unsigned short *dst;

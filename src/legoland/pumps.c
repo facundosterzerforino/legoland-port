@@ -170,10 +170,10 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
     tile = FUN_00411dc0(&EditCursor);
     ValidateCursor(&EditCursor, (unsigned int)ride);
     if (GetBrickCount() < GetObjCost(ride)) {
-        FUN_0045f480(&EditCursor, 2);
+        SetCursorBlocked(&EditCursor, 2);
         return;
     }
-    if (tile != NULL && FUN_0045f4b0(&EditCursor)) {
+    if (tile != NULL && IsCursorBuildable(&EditCursor)) {
         EditCursor.next = &DAT_0082f760;
         memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 0x14);
         DAT_0082f760.field_1830 = 0;
@@ -183,7 +183,7 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
         return;
     }
     EditCursor.field_1830 = 0;
-    FUN_0045f480(&EditCursor, 0xe);
+    SetCursorBlocked(&EditCursor, 0xe);
 }
 
 // FUNCTION: LEGOLAND 0x00411dc0

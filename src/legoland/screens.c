@@ -409,7 +409,7 @@ int FUN_00458c00(void) {
             ResumeAllSamples();
             SamplesPaused = 0;
         }
-        FUN_00458ee0();
+        GameProc();
         break;
     case 1:
         FUN_00459360();
@@ -458,7 +458,7 @@ int FUN_00458c00(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00458ee0
-void FUN_00458ee0(void) {
+void GameProc(void) {
     struct {
         int outgoing[3];
         RECT help_rect;

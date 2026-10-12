@@ -108,7 +108,7 @@ void FUN_00432cb0(struct JungleRide *ride) {
 }
 
 // FUNCTION: LEGOLAND 0x00432d00
-void FUN_00432d00(int param_1) {
+void DrawJungleCruiseBoats(int param_1) {
     struct JungleRide *ride = JungleRideList;
     int tw;
     int tw2;
@@ -682,11 +682,11 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsign
     mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
-        FUN_0045f480(&EditCursor, 0xe);
+        SetCursorBlocked(&EditCursor, 0xe);
         return;
     }
     ValidateCursor(&EditCursor, (unsigned int)ride);
-    if (FUN_0045f4b0(&EditCursor) == 0) {
+    if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
     DefaultCursor(&JungleCruiseCursors[0]);
@@ -697,10 +697,10 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsign
     memcpy(JungleCruiseCursors[1].field_1414, EditCursor.field_1414, 20);
     memcpy(JungleCruiseCursors[2].field_1414, EditCursor.field_1414, 20);
     memcpy(JungleCruiseCursors[3].field_1414, EditCursor.field_1414, 20);
-    FUN_0045f460(&JungleCruiseCursors[0]);
-    FUN_0045f460(&JungleCruiseCursors[1]);
-    FUN_0045f460(&JungleCruiseCursors[2]);
-    FUN_0045f460(&JungleCruiseCursors[3]);
+    ResetCursorBuildable(&JungleCruiseCursors[0]);
+    ResetCursorBuildable(&JungleCruiseCursors[1]);
+    ResetCursorBuildable(&JungleCruiseCursors[2]);
+    ResetCursorBuildable(&JungleCruiseCursors[3]);
     x = EditCursor.tile_x;
     y = EditCursor.tile_y;
     JungleCruiseCursors[0].field_1828 = 0x2034;
@@ -876,11 +876,11 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *p
             return;
         }
         if (mask == 0 && row == 1) {
-            FUN_0045f480(&EditCursor, 0xe);
+            SetCursorBlocked(&EditCursor, 0xe);
             return;
         }
         ValidateCursor(&EditCursor, (unsigned int)ride);
-        if (FUN_0045f4b0(&EditCursor) != 0) {
+        if (IsCursorBuildable(&EditCursor) != 0) {
             memcpy(&fp, EditCursor.field_1414, sizeof(fp));
             fp.v[1] += 5;
             DefaultCursor(&DAT_00616180[row * 4]);
@@ -891,10 +891,10 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *p
             memcpy(DAT_00616180[row * 4 + 1].field_1414, &fp, sizeof(fp));
             memcpy(DAT_00616180[row * 4 + 2].field_1414, &fp, sizeof(fp));
             memcpy(DAT_00616180[row * 4 + 3].field_1414, &fp, sizeof(fp));
-            FUN_0045f460(&DAT_00616180[row * 4]);
-            FUN_0045f460(&DAT_00616180[row * 4 + 1]);
-            FUN_0045f460(&DAT_00616180[row * 4 + 2]);
-            FUN_0045f460(&DAT_00616180[row * 4 + 3]);
+            ResetCursorBuildable(&DAT_00616180[row * 4]);
+            ResetCursorBuildable(&DAT_00616180[row * 4 + 1]);
+            ResetCursorBuildable(&DAT_00616180[row * 4 + 2]);
+            ResetCursorBuildable(&DAT_00616180[row * 4 + 3]);
             DAT_00616180[row * 4].field_1828 = 0x2034;
             DAT_00616180[row * 4 + 1].field_1828 = 0x2034;
             DAT_00616180[row * 4 + 2].field_1828 = 0x2034;
@@ -1190,7 +1190,7 @@ void JungleCruiseCalcCursor(Element *obj, unsigned int param_2, unsigned int par
     JungleCruiseStartFootprint.next = &DAT_004b7260;
     DAT_004b7260.v[4] = 0;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
-    FUN_0045f460(&EditCursor);
+    ResetCursorBuildable(&EditCursor);
     PathCursor.tile_x = EditCursor.tile_x;
     PathCursor.tile_y = EditCursor.tile_y;
     PathCursor.field_1414[0] = EditCursor.field_1414[2] + 1;
@@ -1200,7 +1200,7 @@ void JungleCruiseCalcCursor(Element *obj, unsigned int param_2, unsigned int par
     PathCursor.field_1414[4] = 0;
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
-    FUN_0045f460(&PathCursor);
+    ResetCursorBuildable(&PathCursor);
     EditCursor.field_1830 = (unsigned int)&PathCursor;
     PathCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, (unsigned int)obj->ride);
@@ -1220,7 +1220,7 @@ void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
         if (p1->owner.id == QueryObj.id) {
             DAT_0082ae20.tile_x = p1->tile.pos.x;
             DAT_0082ae20.tile_y = p1->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -1230,7 +1230,7 @@ void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
         if (p2->owner == QueryObj.id) {
             DAT_0082ae20.tile_x = p2->tile.pos.x;
             DAT_0082ae20.tile_y = p2->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -1241,7 +1241,7 @@ void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
         if (p3->owner == QueryObj.id) {
             DAT_0082ae20.tile_x = p3->tile.pos.x;
             DAT_0082ae20.tile_y = p3->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -1255,7 +1255,7 @@ void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
             DAT_0082ae20.field_1414[2] = 0;
             DAT_0082ae20.tile_x = p4->tile.pos.x;
             DAT_0082ae20.tile_y = p4->tile.pos.y;
-            FUN_0045f460(&DAT_0082ae20);
+            ResetCursorBuildable(&DAT_0082ae20);
             DAT_0082ae20.field_1828 = 8;
             BuildCursorPtr(&DAT_0082ae20, 0, 0);
             RenderCursor(&DAT_0082ae20);
@@ -1393,7 +1393,7 @@ void JungleCruiseUpdate(void) {
         JungleCruiseStep = 0;
         FUN_004332f0();
     }
-    FUN_00432d00(0);
+    DrawJungleCruiseBoats(0);
     for (score = JungleScoreList; score != NULL; score = score->next) {
         tile.id = score->tile.id;
         if (score->seats[0] != NULL && --score->timer <= 0 && score->connected != 0 &&
@@ -1529,7 +1529,7 @@ void RenderJungleCruise(int param_1, unsigned int param_2, unsigned int param_3,
     unsigned int lls2;
     struct Point coords;
 
-    FUN_00432d00(1);
+    DrawJungleCruiseBoats(1);
     for (; node != NULL; node = (unsigned int *)*node) {
         if (*param_4 == *(short *)(node + 3) && *(char *)(node[2] + 0x60) != '\x02') {
             IP_RenderBlokeIn3DNow((struct Bloke *)node[2]);
@@ -1771,10 +1771,10 @@ void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned in
     mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
-        FUN_0045f480(&EditCursor, 0xe);
+        SetCursorBlocked(&EditCursor, 0xe);
     } else {
         ValidateCursor(&EditCursor, (unsigned int)obj->ride);
-        if (FUN_0045f4b0(&EditCursor) != 0) {
+        if (IsCursorBuildable(&EditCursor) != 0) {
             rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
             rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
             rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
@@ -1790,10 +1790,10 @@ void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned in
                     memcpy(DAT_00629c58[1].field_1414, EditCursor.field_1414, 20);
                     memcpy(DAT_00629c58[2].field_1414, EditCursor.field_1414, 20);
                     memcpy(DAT_00629c58[3].field_1414, EditCursor.field_1414, 20);
-                    FUN_0045f460(&DAT_00629c58[0]);
-                    FUN_0045f460(&DAT_00629c58[1]);
-                    FUN_0045f460(&DAT_00629c58[2]);
-                    FUN_0045f460(&DAT_00629c58[3]);
+                    ResetCursorBuildable(&DAT_00629c58[0]);
+                    ResetCursorBuildable(&DAT_00629c58[1]);
+                    ResetCursorBuildable(&DAT_00629c58[2]);
+                    ResetCursorBuildable(&DAT_00629c58[3]);
                     x = EditCursor.tile_x;
                     y = EditCursor.tile_y;
                     DAT_00629c58[0].field_1828 = 0x2034;
@@ -1833,10 +1833,10 @@ void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned in
                         }
                     }
                 } else {
-                    FUN_0045f480(&EditCursor, 3);
+                    SetCursorBlocked(&EditCursor, 3);
                 }
             } else {
-                FUN_0045f480(&EditCursor, 4);
+                SetCursorBlocked(&EditCursor, 4);
             }
         }
     }
@@ -1878,7 +1878,7 @@ void JungleCruiseWaterDCalcCursor(unsigned int param_1, int *coords) {
     BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->cur_x && tile.pos.y == ride->cur_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
-            FUN_0045f480(&QueryCursor, 1);
+            SetCursorBlocked(&QueryCursor, 1);
             return;
         }
     }

@@ -511,7 +511,7 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
     ScreenToMapRef(param_2, (int *)&EditCursor.tile_x, param_3);
     t = FUN_00413e30(&EditCursor);
     ValidateCursor(&EditCursor, (unsigned int)ride);
-    if (FUN_0045f4b0(&EditCursor) == 0) {
+    if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
     rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
@@ -521,19 +521,19 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
     result = CheckForPeople(&rect);
     switch (result) {
     case -1:
-        FUN_0045f480(&EditCursor, 4);
+        SetCursorBlocked(&EditCursor, 4);
         break;
     case 1:
-        FUN_0045f480(&EditCursor, 3);
+        SetCursorBlocked(&EditCursor, 3);
         break;
     default:
         cost = GetObjCost(ride);
         if (GetBrickCount() < cost) {
-            FUN_0045f480(&EditCursor, 2);
+            SetCursorBlocked(&EditCursor, 2);
         } else {
-            if (FUN_0045f4b0(&EditCursor) != 0) {
+            if (IsCursorBuildable(&EditCursor) != 0) {
                 if (FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &r) == 0) {
-                    FUN_0045f480(&EditCursor, 0xe);
+                    SetCursorBlocked(&EditCursor, 0xe);
                 } else {
                     if (q[0] != NULL) {
                         type = q[0]->field_8;
@@ -557,11 +557,11 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
                     if (q[6] != NULL && q[6]->field_8 == type) bits |= 0x40;
                     if (q[7] != NULL && q[7]->field_8 == type) bits |= 0x80;
                     if ((bits & 7) == 7 || (bits & 0x1c) == 0x1c || (bits & 0x70) == 0x70 || (bits & 0xc1) == 0xc1) {
-                        FUN_0045f480(&EditCursor, 0xe);
+                        SetCursorBlocked(&EditCursor, 0xe);
                     }
                 }
             }
-            if (t != NULL && FUN_0045f4b0(&EditCursor) != 0) {
+            if (t != NULL && IsCursorBuildable(&EditCursor) != 0) {
                 memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
                 EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
                 DAT_0082f760.tile_x = t->x;
@@ -638,10 +638,10 @@ void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param) {
         }
 
         QueryCursor.field_1828 = 8;
-        FUN_0045f480(&QueryCursor, 1);
+        SetCursorBlocked(&QueryCursor, 1);
 
         if ((tile->flags & 0xf) != 6) {
-            FUN_0045f460(&QueryCursor);
+            ResetCursorBuildable(&QueryCursor);
         }
     }
 }
@@ -842,7 +842,7 @@ void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, unsigned int param_2, 
     EditCursor.field_1830 = 0;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     tile = FindQueueEntryAtTile(EditCursor.tile_x, EditCursor.tile_y);
-    FUN_0045f480(&EditCursor, 0xe);
+    SetCursorBlocked(&EditCursor, 0xe);
     cost = GetObjCost(obj);
     if (GetBrickCount() < cost) {
         return;
@@ -862,7 +862,7 @@ void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, unsigned int param_2, 
     if (FUN_00411aa0(tile->x - 1, tile->y + 1) != 0) {
         return;
     }
-    FUN_0045f460(&EditCursor);
+    ResetCursorBuildable(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x00414940

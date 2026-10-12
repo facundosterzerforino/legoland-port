@@ -520,7 +520,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->string = GetString(0x24f);
         icon->event_handler = (void *)FUN_00474fa0;
         icon->flags |= 0x4008;
-        icon->render_func = (void *)FUN_00443e30;
+        icon->render_func = (void *)RenderAdvisorIcon;
         ScriptEndIcon = (unsigned int)icon;
         if (a != 0) {
             SetScriptStopped(0);

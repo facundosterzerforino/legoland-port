@@ -211,7 +211,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 }
             }
         }
-        tab_count = FUN_0045aa50(tab);
+        tab_count = CollectTileSpriteLists(tab);
         if (SaveGameWrite(&tab_count, 4) == 0) {
             // STRING: LEGOLAND 0x004bca08
             LogPrintf("TSF Pointers write failed");

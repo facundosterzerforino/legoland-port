@@ -207,7 +207,7 @@ void FUN_00457a70(void) {
             } else {
                 memset(QueryCursor.field_1414, 0, 20);
                 QueryCursor.field_1828 = 8;
-                FUN_0045f480(&QueryCursor, 1);
+                SetCursorBlocked(&QueryCursor, 1);
                 QueryCursor.tile_x = MouseTileX;
                 QueryCursor.tile_y = MouseTileY;
                 DAT_00667c5c = 0;
@@ -225,7 +225,7 @@ void FUN_00457a70(void) {
         }
         BuildCursorPtr(&QueryCursor, 0, 0);
         RenderCursor(&QueryCursor);
-        if (FUN_0045f4b0(&QueryCursor)) {
+        if (IsCursorBuildable(&QueryCursor)) {
             SetPointer(2);
         } else {
             SetPointer(1);
@@ -261,13 +261,13 @@ void FUN_00457a70(void) {
                     CalculateMapRenderOrder();
                 }
                 DAT_00667cd8 = 0;
-            } else if (FUN_0045f4b0(&QueryCursor)) {
+            } else if (IsCursorBuildable(&QueryCursor)) {
                 if (Hover.type == 0x10c) {
                     FUN_0045e850((struct ObjNode *)((WorkOrder *)Hover.ptr)->element, &((WorkOrder *)Hover.ptr)->pos.x);
-                    FUN_0045d3d0((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
+                    ClearPathUnderFootprint((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
                     EraseMechanicOrder((WorkOrder *)Hover.ptr);
                 } else if (Hover.type == 0x10b) {
-                    FUN_0045d3d0((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
+                    ClearPathUnderFootprint((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
                     EraseGardenerOrder((WorkOrder *)Hover.ptr);
                 } else {
                     pt.x = *(unsigned int *)&QueryObj & 0xff;
@@ -279,7 +279,7 @@ void FUN_00457a70(void) {
                     }
                     QueryClass = (struct ObjClass *)tile->field_0->ride;
                     if (DAT_00810144 == 0) {
-                        FUN_0045d3d0((struct PathFootprint *)QueryClass, &pt.x);
+                        ClearPathUnderFootprint((struct PathFootprint *)QueryClass, &pt.x);
                     }
                     RemObjFromMap(QueryClass, (unsigned int)QueryClass->element, QueryObj, &QueryCursor);
                 }
@@ -300,7 +300,7 @@ void FUN_00457a70(void) {
         }
         break;
     case 1:
-        if (FUN_0045f4b0(&EditCursor)) {
+        if (IsCursorBuildable(&EditCursor)) {
             SetPointer(4);
         } else {
             SetPointer(3);
@@ -315,7 +315,7 @@ void FUN_00457a70(void) {
         }
         BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0((struct ObjState *)EditMode.unk8));
         if (DAT_00813ac4 & 0x11) {
-            if (FUN_0045f4b0(&EditCursor)) {
+            if (IsCursorBuildable(&EditCursor)) {
                 if (EditMode.unk8->flags & 0x2000000) {
                     DAT_00667cd8 = 1;
                     DAT_00667cdc = 0;
@@ -359,7 +359,7 @@ void FUN_00457a70(void) {
                     ScriptDirtyCategories |= 2;
                 }
             } else {
-                FUN_00473640(EditCursor.field_1410);
+                PlayCantBuildAdvice(EditCursor.field_1410);
             }
         } else {
             RenderCursor(&EditCursor);
@@ -382,7 +382,7 @@ void FUN_00457a70(void) {
         } else {
             memset(QueryCursor.field_1414, 0, 20);
             QueryCursor.field_1828 = 8;
-            FUN_0045f480(&QueryCursor, 1);
+            SetCursorBlocked(&QueryCursor, 1);
             QueryCursor.tile_x = MouseTileX;
             QueryCursor.tile_y = MouseTileY;
             DAT_00667c5c = 0;

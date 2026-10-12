@@ -1708,11 +1708,11 @@ void LogFlumeEntranceCalcCursor(Element *elem, int *param_2, unsigned int param_
     PathCursor.footprint.y1 = 1 + EditCursor.footprint.y1;
     PathCursor.footprint.next = NULL;
     PathCursor.field_1828 = 0x1000;
-    FUN_0045f460(&PathCursor);
+    ResetCursorBuildable(&PathCursor);
     memcpy(DAT_004c8d78.footprint.v, &LogFlumeFootprint, 20);
     DAT_004c8d78.footprint.x1 = LogFlumeFootprint.x1 - 1;
     DAT_004c8d78.footprint.y1 = DAT_004c8d78.footprint.y1 - 1;
-    FUN_0045f460(&DAT_004c8d78);
+    ResetCursorBuildable(&DAT_004c8d78);
     y = EditCursor.tile_y;
     x = EditCursor.tile_x;
     fx0 = LogFlumeEntranceRide->footprint.x0;
@@ -1724,9 +1724,9 @@ void LogFlumeEntranceCalcCursor(Element *elem, int *param_2, unsigned int param_
     DAT_004c2c18.tile_y = LogFlumeEntranceRide->footprint.y1 + y - 1 + h;
     DAT_004c2c18.tile_x++;
     memcpy(DAT_004c2c18.footprint.v, DAT_004c8d78.footprint.v, 20);
-    FUN_0045f460(&DAT_004c2c18);
+    ResetCursorBuildable(&DAT_004c2c18);
     ValidateCursor(&EditCursor, (unsigned int)ride);
-    FUN_0045f4d0(&EditCursor);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x0040aac0
@@ -1749,7 +1749,7 @@ void LogFlumeEntranceDCalcCursor(unsigned int param_1, struct Point *param_2) {
                 LogFlumeCursor.tile_y = cur->tile.pos.y;
             }
             LogFlumeCursor.field_1828 = 0x18;
-            FUN_0045f460(&LogFlumeCursor);
+            ResetCursorBuildable(&LogFlumeCursor);
             BuildCursorPtr(&LogFlumeCursor, 0, 0);
             RenderCursor(&LogFlumeCursor);
         }
@@ -1852,7 +1852,7 @@ int FUN_0040adb0(TileId tile, struct FlumeRect *rect, int param_3, int y, float 
 }
 
 // FUNCTION: LEGOLAND 0x0040ae90
-void FUN_0040ae90(unsigned int param_1, int param_2, int param_3) {
+void DrawLogFlumeBarrel(unsigned int param_1, int param_2, int param_3) {
     struct FlumeSlot *slot = (struct FlumeSlot *)param_1;
     struct FlumeEntry *other = (struct FlumeEntry *)param_2;
     struct FlumeEntry *owner = (struct FlumeEntry *)slot->owner;
@@ -2002,7 +2002,7 @@ void FUN_0040b290(struct FlumeEntry *entry, int x, int y, struct FlumeStageList 
         do {
             for (j = 0; j < set->count; j++) {
                 if (FUN_0040b210((struct FlumeWeighted *)&set->slots[j], (struct FlumeWeighted *)node)) {
-                    FUN_0040ae90((unsigned int)&set->slots[j], (int)node, 1);
+                    DrawLogFlumeBarrel((unsigned int)&set->slots[j], (int)node, 1);
                 }
             }
             if (reverse == 0) {
@@ -2037,14 +2037,14 @@ int FUN_0040b390(struct FlumeEntry *entry) {
         if (node != NULL) {
             do {
                 if (FUN_0040b210((struct FlumeWeighted *)&set->slots[i], (struct FlumeWeighted *)node)) {
-                    FUN_0040ae90((unsigned int)&set->slots[i], (int)node, 1);
+                    DrawLogFlumeBarrel((unsigned int)&set->slots[i], (int)node, 1);
                     matched++;
                 }
                 node = node->next;
             } while (node != NULL);
         } else {
             if (FUN_0040b210((struct FlumeWeighted *)&set->slots[i], (struct FlumeWeighted *)entry)) {
-                FUN_0040ae90((unsigned int)&set->slots[i], (int)entry, 1);
+                DrawLogFlumeBarrel((unsigned int)&set->slots[i], (int)entry, 1);
                 matched++;
             }
         }
@@ -2722,10 +2722,10 @@ void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) 
     EditCursor.footprint.x1 = LogFlumeFootprint.x1 - 1;
     EditCursor.footprint.y1--;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
-    FUN_0045f460(&EditCursor);
+    ResetCursorBuildable(&EditCursor);
     EditCursor.next = NULL;
     ValidateCursor(&EditCursor, (unsigned int)ride);
-    if (FUN_0045f4b0(&EditCursor)) {
+    if (IsCursorBuildable(&EditCursor)) {
         rect.x0 = EditCursor.footprint.x0 + EditCursor.tile_x;
         rect.y0 = EditCursor.tile_y + EditCursor.footprint.y0;
         rect.x1 = EditCursor.footprint.x1 + EditCursor.tile_x;
@@ -2733,26 +2733,26 @@ void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) 
         r = CheckForPeople(&rect);
         switch (r) {
         case -1:
-            FUN_0045f480(&EditCursor, 4);
+            SetCursorBlocked(&EditCursor, 4);
             break;
         case 1:
-            FUN_0045f480(&EditCursor, 3);
+            SetCursorBlocked(&EditCursor, 3);
             break;
         }
     }
     cost = GetObjCost(ride);
     if (GetBrickCount() < cost) {
-        FUN_0045f480(&EditCursor, 2);
+        SetCursorBlocked(&EditCursor, 2);
     }
-    if (FUN_0045f4b0(&EditCursor)) {
+    if (IsCursorBuildable(&EditCursor)) {
         t.pos.x = LogFlumeFootprint.x0 + EditCursor.tile_x;
         t.pos.y = LogFlumeFootprint.y0 + EditCursor.tile_y;
         FUN_00409440(t, (void **)&list);
         FUN_00409510((struct StateSlots *)list);
         if (FUN_00409470((unsigned int *)list) == 0) {
-            FUN_0045f480(&EditCursor, 0xe);
+            SetCursorBlocked(&EditCursor, 0xe);
         } else {
-            FUN_0045f480(&EditCursor, 0xe);
+            SetCursorBlocked(&EditCursor, 0xe);
             p = list[0];
             if (p != NULL) {
                 key = p->key;
@@ -2776,11 +2776,11 @@ void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) 
             code = FUN_00409410((unsigned int *)list);
             if (FUN_00409580(code, (struct StateSlots *)list)) {
                 FUN_0040d520((struct FlumeEntry **)list, &EditCursor);
-                FUN_0045f460(&EditCursor);
+                ResetCursorBuildable(&EditCursor);
             }
         }
     }
-    FUN_0045f4d0(&EditCursor);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x0040c6c0
@@ -2789,7 +2789,7 @@ void LogFlumeTrackDCalcCursor(int unused, struct Point *pt) {
     unsigned int v;
 
     if (entry != NULL) {
-        FUN_0045f480(&QueryCursor, 1);
+        SetCursorBlocked(&QueryCursor, 1);
         QueryCursor.tile_x = entry->tile.pos.x;
         QueryCursor.tile_y = entry->tile.pos.y;
         v = LogFlumeFootprint.x1;
@@ -2799,7 +2799,7 @@ void LogFlumeTrackDCalcCursor(int unused, struct Point *pt) {
         QueryCursor.field_1828 = 8;
         if (FUN_00409140((struct Node *)entry)) {
             if ((entry->field_c == NULL || entry->field_8 == NULL || FUN_0040ba80((struct Node *)entry->parent)) && !(entry->flags10d & 1)) {
-                FUN_0045f460(&QueryCursor);
+                ResetCursorBuildable(&QueryCursor);
             }
         }
     }
@@ -2914,7 +2914,7 @@ void FUN_0040ca30(void *a1, int a2) {
     if (node != NULL) {
         do {
             if (node->var_4 != 0) {
-                FUN_0040ae90(node->var_4, a2, 1);
+                DrawLogFlumeBarrel(node->var_4, a2, 1);
             }
             node = node->var_8;
         } while (node != NULL);
@@ -3317,11 +3317,11 @@ void FUN_0040d2d0(struct Point *pt) {
         FUN_0040d090(entry, &fp, &t);
         QueryCursor.footprint = *fp;
         QueryCursor.field_1828 = 8;
-        FUN_0045f480(&QueryCursor, 1);
+        SetCursorBlocked(&QueryCursor, 1);
         if (FUN_00409140((struct Node *)entry->sub2)) {
             if (entry->link30->field_c == NULL || entry->link30->field_8 == NULL || entry->link34->field_c == NULL || entry->link34->field_8 == NULL || FUN_0040ba80((struct Node *)entry->parent)) {
                 if (!(entry->flags10d & 1) && !FUN_0040c2e0((struct FlumeChainOwner *)entry)) {
-                    FUN_0045f460(&QueryCursor);
+                    ResetCursorBuildable(&QueryCursor);
                 }
             }
         }
@@ -3378,7 +3378,7 @@ void FUN_0040d420(unsigned int *res) {
             cur->tile_y = res[8];
             flags &= ~8;
         }
-        FUN_0045f460(cur);
+        ResetCursorBuildable(cur);
     }
 }
 
@@ -3435,7 +3435,7 @@ void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first) {
             flags &= ~0x40;
         }
         cur->field_1828 = 0x2010;
-        FUN_0045f460(cur);
+        ResetCursorBuildable(cur);
     } while (flags != 0 && ++i < 2);
 }
 
@@ -3456,7 +3456,7 @@ unsigned int FUN_0040d6f0(struct CursorSource *param_1, unsigned int param_2, un
     EditCursor.footprint = *(struct Footprint *)param_4;
     ScreenToMapRef((int *)param_2, &EditCursor.tile_x, param_3);
     EditCursor.field_1830 = 0;
-    FUN_0045f460(&EditCursor);
+    ResetCursorBuildable(&EditCursor);
     ValidateCursor(&EditCursor, (unsigned int)param_1);
     u.t.x = (unsigned char)EditCursor.tile_x;
     u.t.y = (unsigned char)EditCursor.tile_y;
@@ -3465,31 +3465,31 @@ unsigned int FUN_0040d6f0(struct CursorSource *param_1, unsigned int param_2, un
     EditCursor.next = &DAT_004c4468;
     cost = GetObjCost((struct Ride *)param_1);
     if (GetBrickCount() < cost) {
-        FUN_0045f480(&EditCursor, 2);
+        SetCursorBlocked(&EditCursor, 2);
     }
-    if (FUN_0045f4b0(&EditCursor)) {
+    if (IsCursorBuildable(&EditCursor)) {
         u.t.x = (unsigned char)EditCursor.tile_x;
         u.t.y = (unsigned char)EditCursor.tile_y;
         param_5(u.t, buf);
         FUN_0040cf10((struct InputBuffer *)buf, &u.list);
         FUN_0040cfa0((struct StateNode * (*)[4]) u.list);
         if (FUN_0040cf30(u.list) == 0) {
-            FUN_0045f480(&EditCursor, 0xe);
+            SetCursorBlocked(&EditCursor, 0xe);
         } else {
-            FUN_0045f460(&EditCursor);
+            ResetCursorBuildable(&EditCursor);
             key = FUN_0040cf80((struct Slot **)u.list);
             FUN_0040cf50(key, (struct Slot **)u.list);
             if (FUN_0040cf30(u.list) == 0) {
-                FUN_0045f480(&EditCursor, 0xe);
+                SetCursorBlocked(&EditCursor, 0xe);
             } else if (param_6(u.list)) {
-                FUN_0045f460(&EditCursor);
+                ResetCursorBuildable(&EditCursor);
                 FUN_0040d520((struct FlumeEntry **)u.list, EditCursor.next->next);
             } else {
-                FUN_0045f480(&EditCursor, 0xd);
+                SetCursorBlocked(&EditCursor, 0xd);
             }
         }
     }
-    if (FUN_0045f4b0(&EditCursor)) {
+    if (IsCursorBuildable(&EditCursor)) {
         int cx = EditCursor.tile_x;
         int cy = EditCursor.tile_y;
         rect.x0 = EditCursor.footprint.x0 + cx;
@@ -3499,14 +3499,14 @@ unsigned int FUN_0040d6f0(struct CursorSource *param_1, unsigned int param_2, un
         r = CheckForPeople(&rect);
         switch (r) {
         case -1:
-            FUN_0045f480(&EditCursor, 4);
+            SetCursorBlocked(&EditCursor, 4);
             break;
         case 1:
-            FUN_0045f480(&EditCursor, 3);
+            SetCursorBlocked(&EditCursor, 3);
             break;
         }
     }
-    FUN_0045f4d0(&EditCursor);
+    PropagateCursorBlocked(&EditCursor);
 }
 
 // FUNCTION: LEGOLAND 0x0040d900

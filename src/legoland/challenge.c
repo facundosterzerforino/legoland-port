@@ -176,7 +176,7 @@ unsigned int LoadBmpImage(const char *param_1, unsigned char param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00443710
-unsigned int FUN_00443710(void) {
+unsigned int GetLoadedTextureCount(void) {
     return DAT_00665e8c;
 }
 
@@ -210,7 +210,7 @@ void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004437d0
-void FUN_004437d0(struct Image *param_1, struct TextureNode *param_2) {
+void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_2) {
     int width;
     int height;
     int x;
@@ -405,7 +405,7 @@ void CloseAviAnim(struct AnimHandle *handle) {
 }
 
 // FUNCTION: LEGOLAND 0x00443d90
-void FUN_00443d90(void) {
+void InitAdvisorFrameFormat(void) {
     DAT_004b7d7e = 0x10;
     DAT_004b7d74 = 0x70;
     DAT_004b7d78 = 0x60;
@@ -413,7 +413,7 @@ void FUN_00443d90(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00443dc0
-void FUN_00443dc0(struct AnimHandle *handle) {
+void SetAdvisorVidAnim(struct AnimHandle *handle) {
     struct AnimHandle *current;
 
     DAT_00665f68 = 0;
@@ -443,7 +443,7 @@ struct AdvisorObject {
 };
 
 // FUNCTION: LEGOLAND 0x00443e30
-unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
+unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1) {
     struct AnimHandle *anim;
     struct AviFrame *frame;
     int state[3];
@@ -464,7 +464,7 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
                 }
                 // STRING: LEGOLAND 0x004b7dc4
                 DAT_00667c40 = "SetVidAnim";
-                FUN_00443dc0((struct AnimHandle *)DAT_00665f60);
+                SetAdvisorVidAnim((struct AnimHandle *)DAT_00665f60);
                 anim = (struct AnimHandle *)DAT_00665f5c;
                 DAT_00665f60 = NULL;
             }
@@ -488,7 +488,7 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
             } else {
                 /* [library:movie] nothing else paints the advisor window, so without a frame it showed whatever
                  * an earlier screen left in the back buffer. Clear it to black (112x96, the size the advisor
-                 * AVIs are decoded to, see FUN_00443d90). */
+                 * AVIs are decoded to, see InitAdvisorFrameFormat). */
                 unsigned short *row;
                 int x;
                 int y;
@@ -522,7 +522,7 @@ unsigned int FUN_00443e30(struct AdvisorObject *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00443f90
-void *FUN_00443f90(unsigned int param_1) {
+void *GetAdvisorAnimForState(unsigned int param_1) {
     switch (param_1) {
     case 1:
         return AdLRAnim;
@@ -540,7 +540,7 @@ void *FUN_00443f90(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00443fe0
-unsigned int FUN_00443fe0(unsigned int param_1) {
+unsigned int GetNextAdvisorAnimState(unsigned int param_1) {
     switch (param_1) {
     case 1:
         return 1;
@@ -557,22 +557,22 @@ unsigned int FUN_00443fe0(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00444020
-void *FUN_00444020(void) {
+void *OnAdvisorAnimEnd(void) {
     unsigned int handle;
 
     if (DAT_00665fec == DAT_00665fe8) {
-        DAT_00665fec = FUN_00443fe0(DAT_00665fe8);
+        DAT_00665fec = GetNextAdvisorAnimState(DAT_00665fe8);
     }
     handle = DAT_00665fec;
     DAT_00665fe8 = handle;
     DAT_0081c088 = DAT_0081c09c;
     DAT_0081c09c = 0;
-    DAT_00665f60 = FUN_00443f90(handle);
+    DAT_00665f60 = GetAdvisorAnimForState(handle);
     return DAT_00665f60;
 }
 
 // FUNCTION: LEGOLAND 0x00444070
-void FUN_00444070(unsigned int param_1, unsigned int param_2) {
+void SetNextAdvisorAnimState(unsigned int param_1, unsigned int param_2) {
     DAT_00665fec = param_1;
     DAT_0081c09c = param_2;
     DAT_0081c088 = 0;
@@ -580,39 +580,39 @@ void FUN_00444070(unsigned int param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00444090
 void LoadAdvisorAnims(void) {
-    FUN_00443d90();
+    InitAdvisorFrameFormat();
 
     // STRING: LEGOLAND 0x004b7e24
     AdBlinkAnim = OpenAviAnim("AD_Blink.avi");
     if (AdBlinkAnim != 0) {
-        ((struct AnimHandle *)AdBlinkAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdBlinkAnim)->callback = OnAdvisorAnimEnd;
     }
     // STRING: LEGOLAND 0x004b7e18
     AdLRAnim = OpenAviAnim("AD_LR.avi");
     if (AdLRAnim != 0) {
-        ((struct AnimHandle *)AdLRAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdLRAnim)->callback = OnAdvisorAnimEnd;
     }
     // STRING: LEGOLAND 0x004b7e08
     AdPhoneAnim = OpenAviAnim("AD_Phone.avi");
     if (AdPhoneAnim != 0) {
-        ((struct AnimHandle *)AdPhoneAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdPhoneAnim)->callback = OnAdvisorAnimEnd;
     }
     // STRING: LEGOLAND 0x004b7df4
     AdPhoneGestureAnim = OpenAviAnim("AD_PhoneGesture.avi");
     if (AdPhoneGestureAnim != 0) {
-        ((struct AnimHandle *)AdPhoneGestureAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdPhoneGestureAnim)->callback = OnAdvisorAnimEnd;
     }
     // STRING: LEGOLAND 0x004b7de0
     AdPhoneDownAnim = OpenAviAnim("AD_PhoneDown.avi");
     if (AdPhoneDownAnim != 0) {
-        ((struct AnimHandle *)AdPhoneDownAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdPhoneDownAnim)->callback = OnAdvisorAnimEnd;
     }
     // STRING: LEGOLAND 0x004b7dd0
     AdWobbleAnim = OpenAviAnim("AD_Wobble.avi");
     if (AdWobbleAnim != 0) {
-        ((struct AnimHandle *)AdWobbleAnim)->callback = FUN_00444020;
+        ((struct AnimHandle *)AdWobbleAnim)->callback = OnAdvisorAnimEnd;
     }
-    FUN_00443dc0(AdBlinkAnim);
+    SetAdvisorVidAnim(AdBlinkAnim);
 }
 
 // FUNCTION: LEGOLAND 0x00444150
@@ -644,7 +644,7 @@ void FreeAdvisorAnims(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004441f0
-void FUN_004441f0(void) {
+void ResetReportFlags(void) {
     ReportFlags = 0;
 }
 
@@ -682,7 +682,7 @@ unsigned int LoadReport(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004442c0
-unsigned int FUN_004442c0(void) {
+unsigned int GetDrivingSchoolScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("DRIVING SCHOOL"); /* TODO: fold — ElemID handle (uint) viewed as RideElem* */
@@ -693,7 +693,7 @@ unsigned int FUN_004442c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004442f0
-unsigned int FUN_004442f0(void) {
+unsigned int GetBoatingSchoolScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("BOATING SCHOOL");
@@ -704,7 +704,7 @@ unsigned int FUN_004442f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444320
-unsigned int FUN_00444320(void) {
+unsigned int GetCastleScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("CASTLE OBJ");
@@ -715,7 +715,7 @@ unsigned int FUN_00444320(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444350
-unsigned int FUN_00444350(void) {
+unsigned int GetLogFlumeScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("LOG FLUME ENTRANCE");
@@ -726,7 +726,7 @@ unsigned int FUN_00444350(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444380
-unsigned int FUN_00444380(void) {
+unsigned int GetJungleCruiseScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("JUNGLE CRUISE");
@@ -780,7 +780,7 @@ void FUN_00444440(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444470
-void FUN_00444470(unsigned int param_1, unsigned int param_2) {
+void SetReportCastleScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 4;
         DAT_0066600c = param_1;
@@ -790,7 +790,7 @@ void FUN_00444470(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004444b0
-void FUN_004444b0(unsigned int param_1, unsigned int param_2) {
+void SetReportDrivingSchoolScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 6;
         DAT_00666010 = param_1;
@@ -800,7 +800,7 @@ void FUN_004444b0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004444f0
-void FUN_004444f0(unsigned int param_1, unsigned int param_2) {
+void SetReportLogFlumeScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 8;
         DAT_00666014 = param_1;
@@ -810,7 +810,7 @@ void FUN_004444f0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444530
-void FUN_00444530(unsigned int param_1, unsigned int param_2) {
+void SetReportBoatingSchoolScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 10;
         DAT_00666018 = param_1;
@@ -820,7 +820,7 @@ void FUN_00444530(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444570
-void FUN_00444570(unsigned int param_1, unsigned int param_2) {
+void SetReportJungleCruiseScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 12;
         DAT_0066601c = param_1;
@@ -830,7 +830,7 @@ void FUN_00444570(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004445b0
-void FUN_004445b0(unsigned int param_1, unsigned int param_2) {
+void SetReportType1Or3ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x4000;
         DAT_00666020 = param_1;
@@ -841,7 +841,7 @@ void FUN_004445b0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004445f0
-void FUN_004445f0(unsigned int param_1, unsigned int param_2) {
+void SetReportType1Or3ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x8000;
         DAT_00666028 = param_1;
@@ -852,7 +852,7 @@ void FUN_004445f0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444630
-void FUN_00444630(unsigned int param_1, unsigned int param_2) {
+void SetReportLinkedObjectPercentGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x40000;
         DAT_00666030 = param_1;
@@ -863,7 +863,7 @@ void FUN_00444630(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444670
-void FUN_00444670(unsigned int param_1, unsigned int param_2) {
+void SetReportType2ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x8000000;
         DAT_00666070 = param_1;
@@ -874,7 +874,7 @@ void FUN_00444670(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004446b0
-void FUN_004446b0(unsigned int param_1, unsigned int param_2) {
+void SetReportType2ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x10000000;
         DAT_00666078 = param_1;
@@ -896,7 +896,7 @@ void FUN_004446f0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444730
-void FUN_00444730(unsigned int param_1, unsigned int param_2) {
+void SetReportFoodStallObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x10000;
         DAT_00666040 = param_1;
@@ -907,7 +907,7 @@ void FUN_00444730(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444770
-void FUN_00444770(unsigned int param_1, unsigned int param_2) {
+void SetReportFoodStallClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x20000;
         DAT_00666048 = param_1;
@@ -918,7 +918,7 @@ void FUN_00444770(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004447b0
-void FUN_004447b0(unsigned int param_1, unsigned int param_2) {
+void SetReportType4ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x40000000;
         DAT_00666088 = param_1;
@@ -929,7 +929,7 @@ void FUN_004447b0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004447f0
-void FUN_004447f0(unsigned int param_1, unsigned int param_2) {
+void SetReportType4ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x80000000;
         DAT_00666090 = param_1;
@@ -940,7 +940,7 @@ void FUN_004447f0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444830
-void FUN_00444830(unsigned int param_1, unsigned int param_2) {
+void SetReportVisitorCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x80000;
         DAT_00666038 = param_1;
@@ -951,7 +951,7 @@ void FUN_00444830(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444870
-void FUN_00444870(unsigned int param_1, unsigned int param_2) {
+void SetReportVisitorHappinessGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x1000000;
         DAT_00666050 = param_1;
@@ -962,7 +962,7 @@ void FUN_00444870(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004448b0
-void FUN_004448b0(unsigned int param_1, unsigned int param_2) {
+void SetReportVisitorFullnessGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x4000000;
         DAT_00666050 = param_1;
@@ -973,7 +973,7 @@ void FUN_004448b0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004448f0
-void FUN_004448f0(unsigned int param_1, unsigned int param_2) {
+void SetReportPowerSupplyGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x200000;
         DAT_00666058 = param_1;
@@ -995,7 +995,7 @@ void FUN_00444930(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444970
-void FUN_00444970(unsigned int param_1, unsigned int param_2) {
+void SetReportMapTileCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x800000;
         DAT_00666068 = param_1;
@@ -1078,7 +1078,7 @@ void DrawAppraisalMark(unsigned int param_1, unsigned int param_2, int param_3, 
 }
 
 // FUNCTION: LEGOLAND 0x00444bf0
-void FUN_00444bf0(unsigned int *param_1, unsigned int *param_2) {
+void CountClassesOfType1Or3(unsigned int *param_1, unsigned int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1097,12 +1097,12 @@ void FUN_00444bf0(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444c40
-int FUN_00444c40(struct ObjectClass *node) {
+int IsRidePartClass(struct ObjectClass *node) {
     return FindStringNoCase((const char *)**(int **)((char *)node + 0xc4), &DAT_004b7e9c, 0x16) >= 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444c70
-void FUN_00444c70(unsigned int *param_1, unsigned int *param_2) {
+void CountType2ClassesExceptRideParts(unsigned int *param_1, unsigned int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1112,7 +1112,7 @@ void FUN_00444c70(unsigned int *param_1, unsigned int *param_2) {
         return;
     }
     do {
-        if (node->count != 0 && node->type == 2 && FUN_00444c40(node) == 0) {
+        if (node->count != 0 && node->type == 2 && IsRidePartClass(node) == 0) {
             *param_1 += node->count;
             *param_2 += 1;
         }
@@ -1121,7 +1121,7 @@ void FUN_00444c70(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444cd0
-void FUN_00444cd0(unsigned int *param_1, unsigned int *param_2) {
+void CountClassesOfType4(unsigned int *param_1, unsigned int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1140,7 +1140,7 @@ void FUN_00444cd0(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444d20
-void FUN_00444d20(unsigned int *param_1, unsigned int *param_2) {
+void CountFoodStallClasses(unsigned int *param_1, unsigned int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1159,7 +1159,7 @@ void FUN_00444d20(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444d70
-void FUN_00444d70(unsigned int *param_1, unsigned int *param_2, int *param_3) {
+void SurveyBlokes(unsigned int *param_1, unsigned int *param_2, int *param_3) {
     struct Bloke *bloke;
     signed char value;
 
@@ -1178,7 +1178,7 @@ void FUN_00444d70(unsigned int *param_1, unsigned int *param_2, int *param_3) {
         if (bloke->mood > MapStats.mood_threshold4) {
             *param_2 += 1;
         }
-        value = FUN_0044eb10(bloke);
+        value = GetBlokeHungerLevel(bloke);
         *param_3 += 4 - value;
         bloke = bloke->next;
     } while (bloke != 0);
@@ -1208,7 +1208,7 @@ struct RenderObj {
 };
 
 // FUNCTION: LEGOLAND 0x00444df0
-int FUN_00444df0(void) {
+int GetLinkedObjectPercent(void) {
     struct RenderObj *obj;
     struct GslImage *img;
     short type;
@@ -1554,7 +1554,7 @@ LAB_00445422:
         rep[iVar14 * 0x13 + 18] = 0;
         rep[iVar14 * 0x13 + 19] = 0;
         iVar13 = xbase + 0x30;
-        FUN_00444bf0((unsigned int *)&out58, (unsigned int *)&out5c);
+        CountClassesOfType1Or3((unsigned int *)&out58, (unsigned int *)&out5c);
         if ((ReportFlags & 0x4000) == 0) {
         LAB_00445794:
             if ((ReportFlags & 0x8000) != 0) {
@@ -1588,7 +1588,7 @@ LAB_00445422:
                 iVar4 = iVar4 + 0x18;
             }
             if ((ReportFlags & 0x40000) != 0) {
-                iVar6 = FUN_00444df0();
+                iVar6 = GetLinkedObjectPercent();
                 total = total + 1;
                 passflag = (int)DAT_00666030 <= iVar6;
                 if (passflag == 0) {
@@ -1620,7 +1620,7 @@ LAB_00445422:
             }
             if ((ReportFlags & 0x30) != 0) {
                 total = total + 1;
-                iVar6 = FUN_00444320();
+                iVar6 = GetCastleScore();
                 passflag = (int)DAT_0066600c <= iVar6;
                 if (passflag == 0) {
                     flags = flags | 0x80;
@@ -1685,7 +1685,7 @@ LAB_00445422:
             }
             if ((ReportFlags & 0xc0) != 0) {
                 total = total + 1;
-                iVar6 = FUN_004442c0();
+                iVar6 = GetDrivingSchoolScore();
                 passflag = (int)DAT_00666010 <= iVar6;
                 if (passflag == 0) {
                     flags = flags | 0x100;
@@ -1750,7 +1750,7 @@ LAB_00445422:
             }
             if ((ReportFlags & 0x300) != 0) {
                 total = total + 1;
-                iVar6 = FUN_00444350();
+                iVar6 = GetLogFlumeScore();
                 passflag = (int)DAT_00666014 <= iVar6;
                 if (passflag == 0) {
                     flags = flags | 0x200;
@@ -1815,7 +1815,7 @@ LAB_00445422:
             }
             if ((ReportFlags & 0xc00) != 0) {
                 total = total + 1;
-                iVar6 = FUN_004442f0();
+                iVar6 = GetBoatingSchoolScore();
                 passflag = (int)DAT_00666018 <= iVar6;
                 if (passflag == 0) {
                     flags = flags | 0x400;
@@ -1880,7 +1880,7 @@ LAB_00445422:
             }
             if ((ReportFlags & 0x3000) != 0) {
                 total = total + 1;
-                iVar6 = FUN_00444380();
+                iVar6 = GetJungleCruiseScore();
                 passflag = (int)DAT_0066601c <= iVar6;
                 if (passflag == 0) {
                     flags = flags | 0x800;
@@ -2012,7 +2012,7 @@ LAB_00446751:
             rep[iVar12 * 0x13 + 17] = 0;
             rep[iVar12 * 0x13 + 18] = 0;
             rep[iVar12 * 0x13 + 19] = 0;
-            FUN_00444c70((unsigned int *)&out68, (unsigned int *)&out6c);
+            CountType2ClassesExceptRideParts((unsigned int *)&out68, (unsigned int *)&out6c);
             if ((ReportFlags & 0x8000000) == 0) {
             LAB_004469ab:
                 if ((ReportFlags & 0x10000000) != 0) {
@@ -2119,7 +2119,7 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 17] = 0;
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
-                FUN_00444cd0((unsigned int *)&out68, (unsigned int *)&out6c);
+                CountClassesOfType4((unsigned int *)&out68, (unsigned int *)&out6c);
                 if ((ReportFlags & 0x40000000) == 0) {
                 LAB_00446deb:
                     if ((ReportFlags & 0x80000000) != 0) {
@@ -2226,7 +2226,7 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 17] = 0;
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
-                FUN_00444d20((unsigned int *)&out60, (unsigned int *)&out6c);
+                CountFoodStallClasses((unsigned int *)&out60, (unsigned int *)&out6c);
                 if ((ReportFlags & 0x10000) == 0) {
                 LAB_00447222:
                     if ((ReportFlags & 0x20000) != 0) {
@@ -2333,7 +2333,7 @@ LAB_00446b71:
                 rep[iVar12 * 0x13 + 17] = 0;
                 rep[iVar12 * 0x13 + 18] = 0;
                 rep[iVar12 * 0x13 + 19] = 0;
-                FUN_00444d70((unsigned int *)&out58, (unsigned int *)&out5c, &out64);
+                SurveyBlokes((unsigned int *)&out58, (unsigned int *)&out5c, &out64);
                 if ((ReportFlags & 0x80000) != 0) {
                     total = 1;
                     flatp = (int *)((int)DAT_00666038 <= out58);
@@ -5086,7 +5086,7 @@ LAB_0044acbb:
 }
 
 // FUNCTION: LEGOLAND 0x0044db20
-void FUN_0044db20(void) {
+void ResetAppraisalStreak(void) {
     MapStats.appraisal_streak = 0;
 }
 
@@ -5159,8 +5159,8 @@ int CheckAppraisalDue(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0044dc70
-void FUN_0044dc70(unsigned int param_1, unsigned int param_2) {
+void ConfigureAppraisal(unsigned int param_1, unsigned int param_2) {
     MapStats.appraisal_fail_limit = param_1;
-    FUN_0044db20();
+    ResetAppraisalStreak();
     FUN_004597e0(0, (const char *)param_2);
 }

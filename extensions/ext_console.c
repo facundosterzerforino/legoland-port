@@ -295,9 +295,9 @@ static const char *EventKind(unsigned char flags) {
 
 /* ---- what the inspector counts ----
  * The appraisal (challenge.c) sorts the object classes in the park by their type: 1 and 3 attractions
- * (FUN_00444bf0), 2 scenery except the classes in DAT_004b7e9c (FUN_00444c70, FUN_00444c40), 4 shops (FUN_00444cd0),
- * 5 food stores (FUN_00444d20). "Variety" is how many classes of a kind have at least one object placed, "amount" how
- * many objects they have in all. The level script's REPORT lines set the targets (FUN_004445b0 and the setters after
+ * (CountClassesOfType1Or3), 2 scenery except the classes in DAT_004b7e9c (CountType2ClassesExceptRideParts, IsRidePartClass), 4 shops (CountClassesOfType4),
+ * 5 food stores (CountFoodStallClasses). "Variety" is how many classes of a kind have at least one object placed, "amount" how
+ * many objects they have in all. The level script's REPORT lines set the targets (SetReportType1Or3ObjectCountGoal and the setters after
  * it); the inspector passes a check when target <= what the park has. */
 
 enum {
@@ -327,7 +327,7 @@ static const char *ClassName(const struct Ride *cls) {
     return cls->element != NULL && cls->element->name != NULL ? cls->element->name : "?";
 }
 
-/* FUN_00444c40: scenery classes the count leaves out (water and track pieces, the workers' huts...) */
+/* IsRidePartClass: scenery classes the count leaves out (water and track pieces, the workers' huts...) */
 static int SceneryExcluded(const struct Ride *cls) {
     int i;
 
@@ -829,7 +829,7 @@ static void RunCommand(char *line) {
             CurrentProfile.flags[3 + level] = 1;
         }
         /* flags[0..3]: the Legoland, Western, Castle and Adventurers theme tabs of the build menu, which level
-         * scripts unlock (FUN_00468860 -> FUN_00476140); InitGameInterface applies them when a level starts. */
+         * scripts unlock (SetObjectiveCounter -> FUN_00476140); InitGameInterface applies them when a level starts. */
         for (i = 0; i < 4; i++) {
             CurrentProfile.flags[i] = 1;
         }
@@ -864,7 +864,7 @@ static void RunCommand(char *line) {
                     continue;
                 }
                 given += (elem->flags & 0x10002) != 2;
-                FUN_00469900((struct NerpsArg *)elem, 0, 1);
+                GiveRewardObject((struct NerpsArg *)elem, 0, 1);
             }
             if (DAT_007fdd70[0] != NULL) {
                 FUN_00476180();

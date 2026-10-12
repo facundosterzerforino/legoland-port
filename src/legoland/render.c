@@ -523,7 +523,7 @@ void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 void FUN_00488670(struct Image *image, unsigned int index) {
     struct TextureNode *ptr = (struct TextureNode *)malloc(sizeof(struct TextureNode));
     if (ptr != 0) {
-        FUN_004437d0(image, ptr);
+        BuildTextureNodeFromImage(image, ptr);
         DAT_00798190[index] = ptr;
     }
 }

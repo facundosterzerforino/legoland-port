@@ -302,7 +302,7 @@ LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileI
                         cell->byte_10 = 0;
                         cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
                         cell->word_8 = cell->word_a;
-                        FUN_0045d260((struct Point *)&blk);
+                        AdjustPathTileAndNeighbours((struct Point *)&blk);
                         RemovePathSquare((struct Point *)&blk);
                     }
                 }
@@ -544,7 +544,7 @@ LEGO_EXPORT void DefaultCursor(struct Cursor *cursor) {
     cursor->tile_x = saved_1404;
     cursor->field_1828 = 0xc00;
     cursor->tile_y = saved_1408;
-    FUN_0045f460(cursor);
+    ResetCursorBuildable(cursor);
 }
 
 // FUNCTION: LEGOLAND 0x0045a3e0
