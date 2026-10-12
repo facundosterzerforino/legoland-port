@@ -3,6 +3,10 @@
 #include "debug.h"
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#include "port_trace.h"
+#endif
 
 #include "bloke.h"
 #include "bricks.h"
@@ -1461,6 +1465,18 @@ void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2) {
 unsigned int FUN_0046b700(void) {
     if (CurrentScriptSection != 0) {
         if (DAT_00668614 != 0) {
+#ifdef LEGOLAND_PORT
+            {
+                /* [port] diagnosing empty advisor messages: the string the reminder repeats */
+                static int reported;
+                const char *text = (const char *)ScriptStringTable[DAT_00668614];
+                if ((text == NULL || text[0] == 0 || text[0] == '@') && reported < 20) {
+                    reported++;
+                    DebugTrace("objective reminder: string %u of %u is \"%.40s\"", DAT_00668614, ScriptStringCount,
+                        text != NULL ? text : "(null)");
+                }
+            }
+#endif
             PostObjectiveMessage(PercentSFormat, ScriptStringTable[DAT_00668614]);
             DAT_00668618 = 1;
             return 1;
