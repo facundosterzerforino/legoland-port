@@ -4,9 +4,11 @@
 #include "globals.h"
 #include "legoland.h"
 #ifdef LEGOLAND_PORT
+#include <stdio.h>
 #include "debug.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
+#include "resource.h"
 #endif
 
 #include "bloke.h"
@@ -2485,6 +2487,113 @@ unsigned int FUN_0046cb20(void) {
     return 1;
 }
 
+#ifdef LEGOLAND_PORT
+/* [port] Saves made before the PercentSFormat fix (2026-10-12) hold the level's PROMPT texts as "": the 1-byte
+ * PercentSFormat made FUN_004689f0 format every single-string PROMPT to "", and the save keeps the table. Refill the
+ * empty entries from the level script: entry N (N >= 1) is the script's N-th PROMPT (ScriptCmdPrompt ->
+ * FUN_004689f0; entry 0 is the null one gamemain.c reserves), "text" or "text@wav" as the parser builds it. Only
+ * when the script's PROMPT count matches the table. */
+static void PortRepairScriptStrings(void) {
+    static char *prompts[512];
+    char path[64];
+    struct ResFile *file;
+    char *text;
+    char *line;
+    char *next;
+    int size;
+    int empty = 0;
+    int count = 0;
+    int repaired = 0;
+    int i;
+
+    for (i = 1; i < (int)ScriptStringCount; i++) {
+        if (ScriptStringTable[i] != 0 && ((char *)ScriptStringTable[i])[0] == 0) {
+            empty++;
+        }
+    }
+    if (empty == 0) {
+        return;
+    }
+    sprintf(path, "Scripts\\objlist%u.txt", lpConfig->level);
+    file = RES_OpenFile(path);
+    if (file == NULL) {
+        DebugTrace("script strings: %d empty PROMPT texts, but %s didn't open", empty, path);
+        return;
+    }
+    size = (int)RES_GetFileSize(file);
+    text = (char *)malloc(size + 1);
+    if (text == NULL) {
+        RES_CloseFile(file);
+        return;
+    }
+    RES_ReadFile(file, text, size);
+    text[size] = 0;
+    RES_CloseFile(file);
+    for (line = text; line != NULL && *line != 0; line = next) {
+        char *p = line;
+        char *args[2];
+        int n = 0;
+
+        next = strchr(line, '\n');
+        if (next != NULL) {
+            *next++ = 0;
+        }
+        while (*p == ' ' || *p == '\t') {
+            p++;
+        }
+        if (strncmp(p, "PROMPT", 6) != 0 || (p[6] != ' ' && p[6] != '\t')) {
+            continue;
+        }
+        /* the quoted arguments: "text" or "text", "wav" */
+        p += 6;
+        while (n < 2 && (p = strchr(p, '"')) != NULL) {
+            char *end = strchr(p + 1, '"');
+            if (end == NULL) {
+                break;
+            }
+            *end = 0;
+            args[n++] = p + 1;
+            p = end + 1;
+            if (strchr(p, ',') == NULL || (strchr(p, '#') != NULL && strchr(p, '#') < strchr(p, ','))) {
+                break;
+            }
+        }
+        if (n == 0 || count >= (int)(sizeof(prompts) / sizeof(prompts[0]))) {
+            continue;
+        }
+        prompts[count] = (char *)malloc(strlen(args[0]) + (n > 1 ? strlen(args[1]) + 2 : 1));
+        if (prompts[count] != NULL) {
+            if (n > 1) {
+                sprintf(prompts[count], "%s%c%s", args[0], 0x40, args[1]);
+            } else {
+                strcpy(prompts[count], args[0]);
+            }
+            count++;
+        }
+    }
+    free(text);
+    if (count + 1 != (int)ScriptStringCount) {
+        DebugTrace("script strings: %d empty PROMPT texts, but %s has %d PROMPTs for %u table entries: not repaired",
+            empty, path, count, ScriptStringCount);
+    } else {
+        for (i = 1; i < (int)ScriptStringCount; i++) {
+            if (ScriptStringTable[i] != 0 && ((char *)ScriptStringTable[i])[0] == 0) {
+                free((void *)ScriptStringTable[i]);
+                ScriptStringTable[i] = (unsigned int)prompts[i - 1];
+                prompts[i - 1] = NULL;
+                repaired++;
+            }
+        }
+        DebugTrace("script strings: refilled %d empty PROMPT texts from %s (a save from before the reminder fix)",
+            repaired, path);
+    }
+    for (i = 0; i < count; i++) {
+        free(prompts[i]);
+        prompts[i] = NULL;
+    }
+}
+#endif
+
 // FUNCTION: LEGOLAND 0x0046cb60
 unsigned int LoadScripts(void) {
     struct NerpsListNode *node;
@@ -2517,6 +2626,9 @@ unsigned int LoadScripts(void) {
             return 0;
         }
     }
+#ifdef LEGOLAND_PORT
+    PortRepairScriptStrings(); /* [port] saves from before the PercentSFormat fix */
+#endif
     if (SaveGameRead(&base, 4) == 0) {
         return 0;
     }
