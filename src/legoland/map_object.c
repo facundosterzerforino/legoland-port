@@ -760,7 +760,7 @@ struct BuildBuf {
 // FUNCTION: LEGOLAND 0x0045ed30
 LEGO_EXPORT void ObjectIsBuilt(struct ObjClass *obj, TileId coords) {
     struct Point pos;
-    struct SampleParams source;
+    struct Point saved_tile;
     int out[2];
     struct FootprintNode saved_rect;
     int saved_140c;
@@ -777,16 +777,19 @@ LEGO_EXPORT void ObjectIsBuilt(struct ObjClass *obj, TileId coords) {
 
     pos.x = coords.pos.x;
     pos.y = coords.pos.y;
-    source.field_0 = 2;
-    source.x = pos.x;
-    source.y = pos.y;
-    UnSourceAndFadeAllSamplesFromSource(&source, -200);
+    {
+        struct SampleParams source;
+        source.field_0 = 2;
+        source.x = pos.x;
+        source.y = pos.y;
+        UnSourceAndFadeAllSamplesFromSource(&source, -200);
+    }
     GetTileCentre(&pos, out);
     EditCursor.field_1830 = 0;
     if (GamePad & 0x1000) {
         saved_rect = *(struct FootprintNode *)EditCursor.field_1414;
-        source.field_0 = EditCursor.tile_x;
-        source.field_4 = EditCursor.tile_y;
+        saved_tile.x = EditCursor.tile_x;
+        saved_tile.y = EditCursor.tile_y;
         saved_140c = EditCursor.field_140c;
         saved_1410 = EditCursor.field_1410;
     }
@@ -827,8 +830,8 @@ LEGO_EXPORT void ObjectIsBuilt(struct ObjClass *obj, TileId coords) {
     EditCursor.field_1830 = 0;
     if (GamePad & 0x1000) {
         *(struct FootprintNode *)EditCursor.field_1414 = saved_rect;
-        EditCursor.tile_x = source.field_0;
-        EditCursor.tile_y = source.field_4;
+        EditCursor.tile_x = saved_tile.x;
+        EditCursor.tile_y = saved_tile.y;
         EditCursor.field_140c = saved_140c;
         EditCursor.field_1410 = saved_1410;
     } else if (EditMode.unk8 != 0) {
@@ -1147,8 +1150,8 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
                         pts->count++;
                     }
                     if (y == rect.y1 && (cursor->field_1828 & 0x80) == 0) {
-                        pts->xpts[pts->count] = ux;
                         pts->ypts[pts->count] = (unsigned short)(half + uy);
+                        pts->xpts[pts->count] = ux;
                         pts->fpts[pts->count] = 2 | fbits;
                         pts->count++;
                     }
@@ -1704,12 +1707,12 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     int ybot;
     int xright;
     int draw_y;
-    int draw_y2;
     int col;
-    struct Point cell;
-    struct Point saved;
+    int x2;
+    int cell[2];
+    int row_x;
+    int row_y;
     struct MapElement *tile;
-    struct SpriteSet *set;
     struct Sprite *sprite;
     int frame;
     int k;
@@ -1720,16 +1723,16 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     dx = pos->x - clip->left;
     dy = pos->y - clip->top;
     SetClipping(clip);
-    size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
     dbl = (short)(((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size * 2);
-    sx = pos->x / dbl;
     half_x = (dbl + 1) >> 1;
+    size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
+    sx = pos->x / dbl;
     half_y = (size + 1) >> 1;
     mx = pos->x % dbl;
     row = (pos->y - half_y) / size;
     phase = (pos->y - half_y) % size;
-    cell.x = row + sx - 3;
-    cell.y = row - sx;
+    cell[0] = row + sx - 3;
+    cell[1] = row - sx;
     which = (mx >= half_x) + 1;
     if (phase > half_y) {
         which += 2;
@@ -1737,28 +1740,28 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     switch (which) {
     case 1:
         if (mx < half_x - phase * 2) {
+            cell[0]--;
             mx += half_x;
-            cell.x--;
             phase += half_y;
         }
         break;
     case 2:
         if (mx >= half_x + phase * 2) {
-            cell.y--;
+            cell[1]--;
             mx -= half_x;
             phase += half_y;
         }
         break;
     case 3:
         if (mx < half_x + (phase - size) * 2) {
-            cell.y++;
+            cell[1]++;
             mx += half_x;
             phase -= half_y;
         }
         break;
     case 4:
         if (mx >= half_x + (size - phase) * 2) {
-            cell.x++;
+            cell[0]++;
             mx -= half_x;
             phase -= half_y;
         }
@@ -1767,12 +1770,12 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     ybot = clip->bottom + size * 2;
     xright = clip->right + dbl * 2;
     PushRenderingStatusAndLockVideoSurface();
-    for (draw_y = clip->top - size * 2 - phase, draw_y2 = half_y + draw_y; draw_y < ybot;
-        draw_y += size, draw_y2 += size) {
-        saved = cell;
+    for (draw_y = clip->top - size * 2 - phase; draw_y < ybot; draw_y += size) {
+        row_x = cell[0];
+        row_y = cell[1];
         for (col = clip->left - dbl * 2 - mx; col < xright; col += dbl) {
-            if (cell.x >= 0 && cell.x < lpConfig->width && cell.y >= 0 && cell.y < lpConfig->height) {
-                tile = &GameMap[cell.y][cell.x];
+            if (cell[0] >= 0 && cell[0] < lpConfig->width && cell[1] >= 0 && cell[1] < lpConfig->height) {
+                tile = &GameMap[cell[1]][cell[0]];
             } else {
                 tile = 0;
             }
@@ -1784,20 +1787,20 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
                 } else {
                     PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col, draw_y);
                     if (IsPathTile((struct MapTile *)tile) != 0) {
-                        DrawPathTile((int *)&cell, col, draw_y, 0);
+                        DrawPathTile(cell, col, draw_y, 0);
                     }
                 }
             }
-            cell.x++;
+            cell[0]++;
             if (tile != 0) {
-                if (cell.x == lpConfig->width) {
+                if (cell[0] == lpConfig->width) {
                     break;
                 }
                 tile++;
             }
             if (tile == 0) {
-                if (cell.x >= 0 && cell.x < lpConfig->width && cell.y >= 0 && cell.y < lpConfig->height) {
-                    tile = &GameMap[cell.y][cell.x];
+                if (cell[0] >= 0 && cell[0] < lpConfig->width && cell[1] >= 0 && cell[1] < lpConfig->height) {
+                    tile = &GameMap[cell[1]][cell[0]];
                 } else {
                     tile = 0;
                 }
@@ -1808,16 +1811,17 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
                         PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col, draw_y);
                     }
                 } else {
-                    PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col + half_x, draw_y2);
+                    x2 = col + half_x;
+                    PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], x2, draw_y + half_y);
                     if (IsPathTile((struct MapTile *)tile) != 0) {
-                        DrawPathTile((int *)&cell, col + half_x, draw_y2, 0);
+                        DrawPathTile(cell, x2, draw_y + half_y, 0);
                     }
                 }
             }
-            cell.y--;
+            cell[1]--;
         }
-        cell.x = saved.x + 1;
-        cell.y = saved.y + 1;
+        cell[0] = row_x + 1;
+        cell[1] = row_y + 1;
     }
     for (; ov != 0; ov = ov->next) {
         if (ov->sprite == 0) {
@@ -1828,28 +1832,34 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
         if ((frame & 0xff00) == 0 || MapStats.field_3e0[(frame >> 8) - 1] == 0) {
             continue;
         }
-        set = (struct SpriteSet *)BridgesData;
         if ((frame & 0xff) == 0) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(set->sprites[(frame + 2) & 0xff], ox + DAT_004b9218, oy + DAT_004b921c);
+            PrintSpriteSimple(((struct SpriteSet *)BridgesData)->sprites[(frame + 2) & 0xff], ox + DAT_004b9218,
+                oy + DAT_004b921c);
             k = (ov->field_10 + 4) & 0xff;
-            if (k < ((struct SpriteSet *)BridgesData)->count) {
+            if (((struct SpriteSet *)BridgesData)->count > k) {
                 sprite = ((struct SpriteSet *)BridgesData)->sprites[k];
                 SortSprite(sprite, ox + DAT_00805f40, oy + DAT_00805f44, (short)sprite->height + oy + DAT_00805f44, 0, 0);
             }
         } else if ((frame & 0xff) == 1) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(set->sprites[(frame + 2) & 0xff], ox + DAT_004b9210, oy + DAT_004b9214);
+            PrintSpriteSimple(((struct SpriteSet *)BridgesData)->sprites[(frame + 2) & 0xff], ox + DAT_004b9210,
+                oy + DAT_004b9214);
             k = (ov->field_10 + 4) & 0xff;
-            if (k < ((struct SpriteSet *)BridgesData)->count) {
+            if (((struct SpriteSet *)BridgesData)->count > k) {
                 sprite = ((struct SpriteSet *)BridgesData)->sprites[k];
                 SortSprite(sprite, ox + DAT_00801a60, oy + DAT_00801a64, (short)sprite->height + oy + DAT_00801a64, 0, 0);
             }
         }
     }
     PopRenderingStatus();
+    /* The original keeps half_x in memory (address-taken): it is reloaded after stores and is not
+       strength-reduced in the column loop. Taking its address in dead code reproduces that. */
+    if (0) {
+        DrawPathTile(&half_x, 0, 0, 0);
+    }
 }
 
 // FUNCTION: LEGOLAND 0x00460e00
@@ -1996,86 +2006,90 @@ void FUN_00461220(void) {
 
 // FUNCTION: LEGOLAND 0x00461290
 void FUN_00461290(int param_1, int param_2, int param_3, int param_4) {
-    int v10;
-    int v4;
-    int vc;
-    int v8;
-    int v14;
-    int v18;
-    int v20;
-    int iv4;
-    int w;
-    int h;
-    int wfull;
-    int whalf;
-    int hneg;
-    int sum;
-    int ix;
-    int iy;
-    int adj;
+    int marginTopRight; /* DAT_004b95f4 / 2 */
+    int marginBottomLeft; /* DAT_004b95f8 / 2 */
+    int marginTopLeft; /* DAT_004b95fc / 2 */
+    int marginBottomRight; /* DAT_004b9600 / 2 */
+    int marginTop; /* DAT_004b960c / 2 */
+    int marginBottom; /* DAT_004b9610 / 2 */
+    int marginLeft; /* DAT_004b9608 / 2 */
+    int maxX; /* DAT_004b9604 / 2, then the right clamp */
+    int tileW;
+    int tileH;
+    int rightX; /* right corner of the map diamond */
+    int rightY;
+    int leftX; /* left corner */
+    int leftY;
+    int bottomX; /* bottom corner */
+    int bottomY;
+    int x;
+    int y;
+    int over;
 
-    v10 = DAT_004b95f4 >> 1;
-    v4 = DAT_004b95f8 >> 1;
-    vc = DAT_004b95fc >> 1;
-    v8 = DAT_004b9600 >> 1;
-    v14 = DAT_004b960c >> 1;
-    v18 = DAT_004b9610 >> 1;
-    v20 = DAT_004b9608 >> 1;
-    iv4 = DAT_004b9604 >> 1;
-    GetTileDimensions(&w, &h);
-    w *= 0x80;
-    h = w >> 1;
-    wfull = lpConfig->width * w;
-    whalf = lpConfig->width * h;
-    hneg = -(lpConfig->height * w);
-    w = lpConfig->height * h;
-    h = hneg + wfull;
-    sum = w + whalf;
-    ix = param_3 + ScrollX;
-    iy = param_4 + ScrollY;
-    iv4 += wfull - param_1;
-    if (ix > iv4) {
-        ix = iv4;
+    marginTopRight = DAT_004b95f4 >> 1;
+    marginBottomLeft = DAT_004b95f8 >> 1;
+    marginTopLeft = DAT_004b95fc >> 1;
+    marginBottomRight = DAT_004b9600 >> 1;
+    marginTop = DAT_004b960c >> 1;
+    marginBottom = DAT_004b9610 >> 1;
+    marginLeft = DAT_004b9608 >> 1;
+    maxX = DAT_004b9604 >> 1;
+    GetTileDimensions(&tileW, &tileH);
+    tileW *= 0x80;
+    tileH = tileW >> 1;
+    rightX = lpConfig->width * tileW;
+    rightY = lpConfig->width * tileH;
+    leftX = -(lpConfig->height * tileW);
+    leftY = lpConfig->height * tileH;
+    bottomX = leftX + rightX;
+    bottomY = leftY + rightY;
+    x = param_3 + ScrollX;
+    y = param_4 + ScrollY;
+    /* clamp to the bounding box */
+    maxX += rightX - param_1;
+    if (x > maxX) {
+        x = maxX;
     }
-    if (ix < hneg - v20) {
-        ix = hneg - v20;
+    if (x < leftX - marginLeft) {
+        x = leftX - marginLeft;
     }
-    if (iy > sum - param_2 + v18) {
-        iy = sum - param_2 + v18;
+    if (y > bottomY - param_2 + marginBottom) {
+        y = bottomY - param_2 + marginBottom;
     }
-    if (iy < -v14) {
-        iy = -v14;
+    if (y < -marginTop) {
+        y = -marginTop;
     }
-    if (iy < whalf && param_1 + ix > 0) {
-        adj = ix - iy * 2 - v10 + param_1;
-        if (adj > 0) {
-            ix -= adj >> 1;
-            iy += adj >> 2;
+    /* push back inside each diagonal edge */
+    if (y < rightY && param_1 + x > 0) {
+        over = x - y * 2 - marginTopRight + param_1;
+        if (over > 0) {
+            x -= over >> 1;
+            y += over >> 2;
         }
     }
-    if (iy < w && ix < 0) {
-        adj = -ix - iy * 2 - vc;
-        if (adj > 0) {
-            ix += adj >> 1;
-            iy += adj >> 2;
+    if (y < leftY && x < 0) {
+        over = -x - y * 2 - marginTopLeft;
+        if (over > 0) {
+            x += over >> 1;
+            y += over >> 2;
         }
     }
-    if (param_2 + iy > whalf && param_1 + ix > h) {
-        adj = (iy - whalf + param_2) * 2 - wfull - v8 + ix + param_1;
-        if (adj > 0) {
-            ix -= adj >> 1;
-            iy -= adj >> 2;
+    if (param_2 + y > rightY && param_1 + x > bottomX) {
+        over = (y - rightY + param_2) * 2 - rightX - marginBottomRight + x + param_1;
+        if (over > 0) {
+            x -= over >> 1;
+            y -= over >> 2;
         }
     }
-    if (param_2 + iy > w && ix < h) {
-        adj = (iy - w + param_2) * 2 - ix - v4 + hneg;
-        if (adj > 0) {
-            ix += adj >> 1;
-            iy -= adj >> 2;
+    if (param_2 + y > leftY && x < bottomX) {
+        over = (y - leftY + param_2) * 2 - x - marginBottomLeft + leftX;
+        if (over > 0) {
+            x += over >> 1;
+            y -= over >> 2;
         }
     }
-    ScrollX = ix - param_3;
-    ScrollY = iy - param_4;
+    ScrollX = x - param_3;
+    ScrollY = y - param_4;
 }
 
 // FUNCTION: LEGOLAND 0x004614a0
@@ -2298,30 +2312,25 @@ void SetBridgeParamsByName(const char *param_1) {
 LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     struct ResFile *file;
     int elem;
-    struct TileMap *tilemap;
     unsigned int len;
+    struct TileMap *tilemap;
     int i;
-    int row;
     int col;
-    register int off;
-    int count;
-    unsigned int blocklen;
-    int mode;
+    int row;
+    unsigned int blocklen; /* RLE block size; later the overlay-tile repeat count */
     int phase;
-    int obj;
     struct MapElement *tile;
-    unsigned char *stream;
-    int curx;
+    int obj;
     int cury;
-    int sample;
-    unsigned int filepos;
+    int curx;
     char hdr[200];
     char namebuf[512];
     char strbuf[512];
+    int n; /* count of placed objects */
+    int idx; /* object index */
     struct Point pos;
+    unsigned int rf; /* RF flag byte, widened before the call */
 
-    int tile_flags;
-    int rf;
     if (MapDataLoaded != 0) {
         return 0xffffffff;
     }
@@ -2361,9 +2370,11 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         return 1;
     }
     for (row = 0; row < lpConfig->height; row++) {
-        for (col = 0; col < lpConfig->width; col++) {
+        col = 0;
+        while (col < lpConfig->width) {
             GameMap[row][col].flags = 0;
             GameMap[row][col].field_12 = 0;
+            col++;
         }
     }
     DAT_00801a68 = malloc(DAT_00801b28 * 4);
@@ -2382,20 +2393,16 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     LLIDB_FindElement("PATH CONTROL", (unsigned int *)&elem, 0);
     LLIDB_LoadData((void *)elem);
     PathControlObject = *(void **)(elem + 0xc);
-    {
-        int n;
-        int idx;
-        struct Point objpos;
-
-        RES_ReadFile(file, &n, 4);
-        for (i = 0; i < n; i++) {
-            DrawWatchSprite();
-            RES_ReadFile(file, &idx, 4);
-            RES_ReadFile(file, &objpos, 8);
-            *(int *)(*(int *)(*(int *)((int)DAT_00801a68 + idx * 4) + 0xc) + 0x4c) = 0;
-            obj = *(int *)((int)DAT_00801a68 + idx * 4);
-            PutObjOnMap((struct ObjClass *)*(int *)(obj + 0xc), obj, &objpos);
-        }
+    RES_ReadFile(file, &n, 4);
+    i = 0;
+    while (i < n) {
+        DrawWatchSprite();
+        RES_ReadFile(file, &idx, 4);
+        RES_ReadFile(file, &pos, 8);
+        *(int *)(*(int *)(*(int *)((int)DAT_00801a68 + idx * 4) + 0xc) + 0x4c) = 0;
+        obj = *(int *)((int)DAT_00801a68 + idx * 4);
+        PutObjOnMap((struct ObjClass *)*(int *)(obj + 0xc), obj, &pos);
+        i++;
     }
     RES_ReadFile(file, &curx, 4);
     DAT_00801a74 = curx;
@@ -2415,15 +2422,13 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     }
 
     {
-        int prev;
-        int carry;
-        int hibit;
+        int prev; /* last tile-set selector (rle type 0) */
         int runlen;
         int rle;
+        unsigned char *stream;
 
         curx = 0;
         cury = 0;
-        carry = 0;
         prev = 0;
         RES_ReadFile(file, &blocklen, 4);
         stream = malloc(blocklen);
@@ -2439,12 +2444,10 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
             switch (rle & 0xc0) {
             case 0:
                 prev = runlen;
-                carry = prev;
                 break;
             case 0x40:
-                hibit = prev & 0x20;
                 while (runlen--) {
-                    if (hibit) {
+                    if (prev & 0x20) {
                         GameMap[cury][curx].field_a = (unsigned short)DAT_00667ca4;
                         pos.x = curx;
                         pos.y = cury;
@@ -2454,14 +2457,13 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                             tile = 0;
                         }
                         obj = ((int **)DAT_00801a70)[prev & 0x1f][5];
-                        tile->field_0 = obj;
-                        PutObjOnMap(*(struct ObjClass **)(obj + 0xc), obj, &pos);
+                        tile->field_0 = (struct Element *)obj;
+                        PutObjOnMap(*(struct ObjClass **)(0xc + obj), obj, &pos);
                         phase++;
                     } else {
                         GameMap[cury][curx].field_a = TILE_REF(tilemap, prev, stream[phase]);
                         SetMapTile(curx, cury, TILE_REF(tilemap, prev, stream[phase]));
                         phase++;
-                        prev = carry;
                     }
                     curx++;
                     if (curx >= lpConfig->width) {
@@ -2471,9 +2473,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                 }
                 break;
             case 0x80:
-                hibit = prev & 0x20;
                 while (runlen--) {
-                    if (hibit) {
+                    if (prev & 0x20) {
                         GameMap[cury][curx].field_a = (unsigned short)DAT_00667ca4;
                         pos.x = curx;
                         pos.y = cury;
@@ -2483,12 +2484,11 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                             tile = 0;
                         }
                         obj = ((int **)DAT_00801a70)[prev & 0x1f][5];
-                        tile->field_0 = obj;
+                        tile->field_0 = (struct Element *)obj;
                         PutObjOnMap(*(struct ObjClass **)(obj + 0xc), obj, &pos);
                     } else {
                         GameMap[cury][curx].field_a = TILE_REF(tilemap, prev, stream[phase]);
                         SetMapTile(curx, cury, TILE_REF(tilemap, prev, stream[phase]));
-                        prev = carry;
                     }
                     curx++;
                     if (curx >= lpConfig->width) {
@@ -2496,7 +2496,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                         cury++;
                     }
                 }
-                phase += 1;
+                phase = phase + 1;
                 break;
             case 0xc0:
                 while (runlen--) {
@@ -2518,6 +2518,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         int runlen;
         int rle;
         int v;
+        unsigned char *stream;
 
         curx = 0;
         cury = 0;
@@ -2538,7 +2539,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                 while (runlen--) {
                     tile = &GameMap[cury][curx];
                     if (TileSpriteInfo[tile->field_8].sprite & 0x20) {
-                        SetMapFlags(curx, cury, tile->flags | v);
+                        SetMapFlags(curx, cury, v | tile->flags);
                     } else {
                         SetMapFlags(curx, cury, tile->flags | v);
                     }
@@ -2554,8 +2555,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                     v = stream[phase++];
                     tile = &GameMap[cury][curx];
                     if (TileSpriteInfo[tile->field_8].sprite & 0x20) {
-                        tile_flags = tile->flags;
-                        SetMapFlags(curx, cury, tile_flags | v);
+                        SetMapFlags(curx, cury, v | tile->flags);
                     } else {
                         SetMapFlags(curx, cury, tile->flags | v);
                     }
@@ -2572,8 +2572,10 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     }
 
     {
-        register int runlen;
+        int runlen;
         int rle;
+        unsigned char *stream;
+        struct Point gfx1, sq1, gfx2, sq2;
 
         curx = 0;
         cury = 0;
@@ -2595,20 +2597,16 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                     Set_RFFlags(curx << 8, cury << 8, stream[phase]);
                     if ((len & 8) == 0) {
                         if ((len & 0x10) != 0) {
-                            struct Point gfx;
-
-                            gfx.x = curx;
-                            gfx.y = cury;
-                            AddPathTileGFX(&gfx, *(unsigned short *)PathSprite);
+                            gfx1.x = curx;
+                            gfx1.y = cury;
+                            AddPathTileGFX(&gfx1, *(unsigned short *)PathSprite);
                         }
                     }
                     tile = &GameMap[cury][curx];
-                    if ((tile->field_10 & 1) || ((tile->flags & 0x10) && (tile->field_10 & 2) == 0)) {
-                        struct Point sq;
-
-                        sq.x = curx;
-                        sq.y = cury;
-                        AddPathSquare((struct Point *)&sq);
+                    if ((tile->field_10 & 1) || ((tile->flags & 0x10) && (2 & tile->field_10) == 0)) {
+                        sq1.x = curx;
+                        sq1.y = cury;
+                        AddPathSquare(&sq1);
                     }
                     curx++;
                     if (curx >= lpConfig->width) {
@@ -2624,19 +2622,15 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                     rf = stream[phase++];
                     Set_RFFlags(curx << 8, cury << 8, rf);
                     if ((len & 8) == 0 && (len & 0x10) != 0) {
-                        struct Point gfx;
-
-                        gfx.x = curx;
-                        gfx.y = cury;
-                        AddPathTileGFX(&gfx, *(unsigned short *)PathSprite);
+                        gfx2.x = curx;
+                        gfx2.y = cury;
+                        AddPathTileGFX(&gfx2, *(unsigned short *)PathSprite);
                     }
                     tile = &GameMap[cury][curx];
-                    if ((tile->field_10 & 1) || ((tile->flags & 0x10) && (tile->field_10 & 2) == 0)) {
-                        struct Point sq;
-
-                        sq.x = curx;
-                        sq.y = cury;
-                        AddPathSquare((struct Point *)&sq);
+                    if ((tile->field_10 & 1) || ((0x10 & tile->flags) && (2 & tile->field_10) == 0)) {
+                        sq2.x = curx;
+                        sq2.y = cury;
+                        AddPathSquare(&sq2);
                     }
                     curx++;
                     if (curx >= lpConfig->width) {
@@ -2651,15 +2645,16 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     }
 
     {
-        int runlen;
         int rle;
+        int runlen;
+        unsigned char *stream;
 
         curx = 0;
         cury = 0;
+        phase = 0;
         RES_ReadFile(file, &blocklen, 4);
         stream = malloc(blocklen);
         RES_ReadFile(file, stream, blocklen);
-        phase = 0;
         while (cury < lpConfig->height) {
             DrawWatchSprite();
             rle = stream[phase++];
@@ -2695,72 +2690,72 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     }
 
     {
-        int n;
+        int sample; /* 16-bit tile code read into a zeroed int */
+        int mode;
+        unsigned int filepos;
         int ovdata[5];
+        int count;
 
-        RES_ReadFile(file, &n, 4);
-        for (i = 0; i < n; i++) {
+        RES_ReadFile(file, &count, 4);
+        for (i = 0; i < count; i++) {
             RES_ReadFile(file, ovdata, 0x14);
             FUN_00462c00((struct OverlayParam *)ovdata);
         }
-    }
 
-    mode = 0;
-    len = 0;
-    sample = 0;
-    filepos = RES_GetFilePointer(file);
-    hdr[0] = 0;
-    memset(hdr + 1, 0, 199);
-    RES_ReadFile(file, hdr, 8);
-    // STRING: LEGOLAND 0x004b9c24
-    if (memcmp(hdr, "BRIDGES!", 8) == 0) {
-        if (RES_ReadFile(file, &count, 4) == 4) {
-            RES_ReadFile(file, hdr, count);
-            hdr[count] = 0;
-            SetBridgeParamsByName(hdr);
-            BridgesHandle = (void *)ElemID(hdr);
-            BridgesData = LLIDB_LoadData(BridgesHandle);
+        mode = 0;
+        blocklen = 0;
+        sample = 0;
+        filepos = RES_GetFilePointer(file);
+        hdr[0] = 0;
+        memset(hdr + 1, 0, 199);
+        RES_ReadFile(file, hdr, 8);
+        // STRING: LEGOLAND 0x004b9c24
+        if (memcmp(hdr, "BRIDGES!", 8) == 0) {
+            if (RES_ReadFile(file, &count, 4) == 4) {
+                RES_ReadFile(file, hdr, count);
+                hdr[count] = 0;
+                SetBridgeParamsByName(hdr);
+                BridgesHandle = (void *)ElemID(hdr);
+                BridgesData = LLIDB_LoadData(BridgesHandle);
+            }
+        } else {
+            RES_SetFilePointer(file, filepos);
         }
-    } else {
-        RES_SetFilePointer(file, filepos);
-    }
 
-    for (cury = 0; cury < lpConfig->height; cury++) {
-        DrawWatchSprite();
-        for (curx = 0; curx < lpConfig->width; curx++) {
-            for (;;) {
-                switch (mode) {
-                case 2:
-                    if (len == 0) {
-                        mode = 1;
+        /* overlay-tile RLE: mode 0 reads a repeat byte, 1 reads a tile code, 2 skips cells */
+        for (row = 0; row < lpConfig->height; row++) {
+            DrawWatchSprite();
+            for (col = 0; col < lpConfig->width; col++) {
+                for (;;) {
+                    switch (mode) {
+                    case 2:
+                        if (blocklen == 0) {
+                            mode = 1;
+                            continue;
+                        }
+                        blocklen--;
+                        break;
+                    case 0:
+                        if (RES_ReadFile(file, &blocklen, 1) != 1) {
+                            goto fail;
+                        }
+                        mode = (blocklen != 0) + 1;
                         continue;
-                    }
-                    len--;
-                    break;
-                case 0:
-                    if (RES_ReadFile(file, &len, 1) != 1) {
-                        RES_CloseFile(file);
-                        MapDataLoaded = 1;
-                        LoadInProgress = 0;
-                        DAT_00810140 = 0;
-                        FUN_00462c60();
-                        return 1;
-                    }
-                    mode = (len != 0) + 1;
-                    continue;
-                case 1:
-                    RES_ReadFile(file, &sample, 2);
-                    if (sample == 0xffff) {
-                        mode = 0;
-                    } else {
-                        GameMap[cury][curx].field_a = *tilemap[((sample - 0x100) >> 8) & 0xff].tiles + (sample & 0xff);
+                    case 1:
+                        RES_ReadFile(file, &sample, 2);
+                        if (sample == 0xffff) {
+                            mode = 0;
+                        } else {
+                            GameMap[row][col].field_a = *tilemap[((sample - 0x100) >> 8) & 0xff].tiles + (sample & 0xff);
+                        }
+                        break;
                     }
                     break;
                 }
-                break;
             }
         }
     }
+fail: /* shared exit; also taken when the overlay-tile stream ends early */
     RES_CloseFile(file);
     MapDataLoaded = 1;
     LoadInProgress = 0;
@@ -2899,13 +2894,13 @@ void FUN_00462c60(void) {
     for (node = (struct Overlay *)OverlayList; node != 0; node = node->next) {
         if (node->field_10 & 0xff00) {
             if (BridgesData != 0) {
-                sample = *(int *)(*(int *)((int)BridgesData + 8) + (*(short *)&node->field_10 & 0xff) * 4);
+                sample = *(int *)(*(int *)((int)BridgesData + 8) + (*(volatile unsigned int *)&node->field_10 & 0xff) * 4);
             } else {
                 node->sprite = 0;
                 continue;
             }
         } else {
-            sample = *(int *)(*(int *)(OverlayILF + 8) + (*(short *)&node->field_10 & 0xff) * 4);
+            sample = *(int *)(*(int *)(OverlayILF + 8) + (*(volatile unsigned int *)&node->field_10 & 0xff) * 4);
         }
         node->sprite = sample;
         if (sample != 0) {
@@ -3178,14 +3173,16 @@ LEGO_EXPORT void RateBlokeOnLeaving(int param_1) {
 void FUN_00463460(struct MapElement *tile, struct Point *pos) {
     unsigned int flags;
     Ride *ride;
-    int threshold;
     int power;
+    volatile int threshold;
 
+    int ptmp5;
     if (tile->durability_level != 0) {
         ride = tile->field_0->ride;
         flags = tile->flags;
         tile->flags &= 0xfdff;
-        threshold = ride->durability >> 2;
+        ptmp5 = ride->durability;
+        threshold = ptmp5 >> 2;
         if (tile->durability_level < threshold) {
             if (tile->flags & 4) {
                 tile->flags |= 0x200;

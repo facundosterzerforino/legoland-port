@@ -19,6 +19,7 @@
 | 2026-10-08 | permuter + Opus 5.5 | seat.y then seat.x at the copy site | 98.93 (worse) |
 | 2026-10-08 | permuter + Opus 5.5 | seat copy between bloke and person; seat.y / person / seat.x split; seat.y early + seat.x after offset.x | 99.20 / 98.93 / 95.85 |
 | 2026-10-08 | permuter + Opus 5.5 | `*&DAT`, memcpy, `*(__int64 *)` copy, `(&DAT)->x` fields - all identical code; person->offset through a struct temp | 99.20 x4 / 67.74 |
+| 2026-10-09 | Opus 5.5 | seat copy as field stores (y,x / x,y) and at each position in the rider block; permuter 12 min (190 variants) | 99.20 (no gain) |
 
 ## Ideas not tried yet
 

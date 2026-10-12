@@ -1060,6 +1060,15 @@ LEGO_EXPORT Point GetTileInDir(Point pos, unsigned char dir) {
     return pos;
 }
 
+/* The tile set's RF flags at (x, y): its callback's answer, or 2 when it has none. Inlined into
+ * FUN_00484790, where the original keeps the returned byte in a stack slot. */
+static __inline unsigned char TileSetRFFlags(FXSpriteList *set, int x, int y) {
+    if (set->get_rf_flags != NULL) {
+        return set->get_rf_flags(x, y);
+    }
+    return 2;
+}
+
 // FUNCTION: LEGOLAND 0x00484790
 void FUN_00484790(Bloke *bloke) {
     Point tile;
@@ -1084,11 +1093,7 @@ void FUN_00484790(Bloke *bloke) {
         elem = NULL;
     }
     set = TileSpriteInfo[elem->field_8].src;
-    if (set->get_rf_flags != NULL) {
-        result = set->get_rf_flags(tile.x, tile.y);
-    } else {
-        result = 2;
-    }
+    result = TileSetRFFlags(set, tile.x, tile.y);
     if ((result & 3) > 0 && (result & 3) <= 2) {
         ux = tile.x;
         uy = tile.y;

@@ -17,6 +17,7 @@
 | 2026-10-07 p4 | Haiku agent | `for (elem = ride->riders; ...; elem = next)` instead of `while` | 94.20% (no change) |
 | 2026-10-07 p4 | Haiku agent | Write-back stores reordered to the original's order | 92.98% (worse) |
 | 2026-10-08 | permuter + Opus 5.5 | reordered next/pos/leaving/riders stores, `unsigned int can_unload`, `char dir`, nested `if (riders) { if (!stop)`, constant-first operands | 94.20 -> 94.65 |
+| 2026-10-09 | Opus 5.5 | state write-back in the original store order (riders, queued, lap, cars, can_board, frame, leaving, can_unload); riders first only; can_board earlier only | 95.06 / 95.84 / 96.00 harness (all below the current 96.94) |
 
 ## Ideas not tried yet
 

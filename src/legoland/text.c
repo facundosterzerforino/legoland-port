@@ -343,40 +343,32 @@ void FUN_00455220(int x, int y, const char *text, int font, int width) {
 // FUNCTION: LEGOLAND 0x00455370
 LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     RECT box;
+    int sprite_arg[3] = {5};
     struct TextCell *cell;
     HDC hdc;
     HGDIOBJ old_font;
-    int sprite_arg[3];
-    struct Sprite **sprites;
-    unsigned int color;
-    short corner_h;
     int text_h;
+    int tail_w;
     int cx;
+    int lim;
     int box_w;
-    int corner_w;
-    int row_y;
-    int right4;
-    int left4;
-    int width;
-    int top4;
-    int bottom4;
-    int left_corner_w;
+    short corner_w;
+    short corner_h;
+    int below;
+    RECT frame;
+    short side_w;
+    short side_h;
+    int side_left;
     int mid_top;
-    int mid_h;
-    int hit_left;
-    int frame_left;
-    struct Sprite *top_sprite;
-    int fits_above;
+    int mid_bot;
+    int right_edge;
 
-    sprite_arg[1] = 0;
-    sprite_arg[0] = 5;
-    sprite_arg[2] = 0;
     box.left = 0;
     box.top = 0;
     box.bottom = 0;
     box.right = 200;
     cell = FUN_00455d40(text, font, 0x10, 0xd6dede, 0);
-    if (cell == NULL) {
+    if (!cell) {
         hdc = CreateCompatibleDC(NULL);
         SetBkMode(hdc, 1);
         old_font = SelectFont(hdc, font);
@@ -390,7 +382,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
             text_h, box.left, box.right, (void *)hdc, GetLastError());
 #endif
         box.top = rect[1];
-        box.bottom = box.top + text_h;
+        box.bottom = text_h + box.top;
         SelectObject(hdc, old_font);
         DeleteDC(hdc);
         cell = CreateTextCell(text, box.right - box.left, text_h, font, 0x10, 0xd6dede, 0);
@@ -401,79 +393,88 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         box.bottom = cell->height;
         text_h = cell->height;
     }
-    sprites = ((struct BubbleGfx *)SpeechBubbleData)->sprites;
-    cx = (short)sprites[0]->width;
-    box_w = (rect[2] - cx) + rect[0] >> 1;
-    if (box_w < cx || (cx = (unsigned int)lpConfig->screen_width - cx, cx < box_w)) {
-        box_w = cx;
-    }
-    cx = box_w;
-    corner_h = (short)sprites[2]->height;
-    box_w = box.right - box.left;
-    box.left = cx - (box_w >> 1);
-    box.right = ((box_w + 1) >> 1) + cx;
-    corner_w = (short)sprites[2]->width;
-    if (box.left < corner_w) {
-        box.left = corner_w;
-        box.right = box_w + corner_w;
+
+    /* centre the tail between the anchor's left and right edges, kept on screen */
+    tail_w = ((struct BubbleGfx *)SpeechBubbleData)->sprites[0]->width;
+    cx = (rect[2] - tail_w + rect[0]) >> 1;
+    if (cx < tail_w) {
+        cx = tail_w;
     } else {
-        corner_w = (unsigned int)lpConfig->screen_width - corner_w;
-        if (corner_w <= box.right) {
-            box.left = corner_w - box_w;
-            box.right = corner_w;
+        lim = lpConfig->screen_width - tail_w;
+        if (cx > lim) {
+            cx = lim;
         }
     }
-    fits_above = (box.bottom - box.top) + 8 <= rect[1];
-    if (fits_above) {
-        box.bottom = rect[1] + -6;
-        row_y = box.bottom - text_h;
+
+    /* centre the text box on the tail, kept on screen */
+    corner_w = ((struct BubbleGfx *)SpeechBubbleData)->sprites[2]->width;
+    corner_h = ((struct BubbleGfx *)SpeechBubbleData)->sprites[2]->height;
+    box_w = box.right - box.left;
+    box.left = cx - (box_w >> 1);
+    box.right = cx + ((box_w + 1) >> 1);
+    if (box.left < corner_w) {
+        box.left = corner_w;
+        box.right = box_w + box.left;
     } else {
-        row_y = rect[3] + 6;
-        box.bottom = text_h + row_y;
+        if (box.right >= lpConfig->screen_width - corner_w) {
+            box.right = lpConfig->screen_width - corner_w;
+            box.left = box.right - box_w;
+        }
     }
-    right4 = box.right + 4;
-    left4 = box.left + -4;
-    width = right4 - left4;
-    top4 = row_y + -4;
-    bottom4 = box.bottom + 4;
-    box.top = row_y;
-    frame_left = left4;
-    RenderBlock(left4, top4, width, 1, 0);
-    color = GetNearestColour(0xde, 0xde, 0xd6);
-    RenderBlock(left4, row_y + -3, width, (bottom4 - top4) + -1, color);
-    RenderBlock(left4, bottom4, width, 1, 0);
-    if (fits_above) {
-        row_y = bottom4; /* the tail hangs under the bubble, pointing down at the speaker */
-        top_sprite = sprites[1];
+
+    /* above the anchor if it fits, otherwise below it */
+    if (rect[1] < box.bottom - box.top + 8) {
+        below = 1;
+        box.top = rect[3] + 6;
+        box.bottom = text_h + box.top;
     } else {
-        row_y = top4 - corner_h;
-        top_sprite = sprites[0];
+        below = 0;
+        box.bottom = rect[1] - 6;
+        box.top = box.bottom - text_h;
     }
-    PrintSprite(top_sprite, cx, row_y, 0, sprite_arg);
-    corner_h = (short)sprites[2]->height;
-    left_corner_w = (short)sprites[2]->width;
-    left4 = left4 - left_corner_w;
-    PrintSprite(sprites[2], left4, top4, 0, sprite_arg);
-    mid_top = bottom4 - corner_h;
-    width = corner_h + top4;
-    PrintSprite(sprites[4], left4, mid_top + 1, 0, sprite_arg);
-    mid_h = (mid_top - width) + 1;
-    RenderBlock(left4, width, 1, mid_h, 0);
-    color = GetNearestColour(0xde, 0xde, 0xd6);
-    RenderBlock(left4 + 1, width, left_corner_w + -1, mid_h, color);
-    PrintSprite(sprites[3], right4, top4, 0, sprite_arg);
-    PrintSprite(sprites[5], right4, mid_top + 1, 0, sprite_arg);
-    RenderBlock(left_corner_w + right4 + -1, width, 1, mid_h, 0);
-    color = GetNearestColour(0xde, 0xde, 0xd6);
-    RenderBlock(right4, width, left_corner_w + -1, mid_h, color);
+
+    /* the frame: top line, fill, bottom line */
+    frame.right = box.right + 4;
+    frame.left = box.left - 4;
+    frame.top = box.top - 4;
+    frame.bottom = box.bottom + 4;
+    RenderBlock(frame.left, frame.top, frame.right - frame.left, 1, 0);
+    RenderBlock(frame.left, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1,
+        GetNearestColour(0xde, 0xde, 0xd6));
+    RenderBlock(frame.left, frame.bottom, frame.right - frame.left, 1, 0);
+
+    /* the tail points at the anchor */
+    if (below) {
+        PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[0], cx, frame.top - corner_h, 0, sprite_arg);
+    } else {
+        PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[1], cx, frame.bottom, 0, sprite_arg);
+    }
+
+    /* left side: corners, edge line and fill */
+    side_w = ((struct BubbleGfx *)SpeechBubbleData)->sprites[2]->width;
+    side_h = ((struct BubbleGfx *)SpeechBubbleData)->sprites[2]->height;
+    side_left = frame.left - side_w;
+    PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[2], side_left, frame.top, 0, sprite_arg);
+    mid_top = side_h + frame.top;
+    mid_bot = frame.bottom - side_h;
+    PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[4], side_left, mid_bot + 1, 0, sprite_arg);
+    RenderBlock(side_left, mid_top, 1, mid_bot - mid_top + 1, 0);
+    RenderBlock(side_left + 1, mid_top, side_w - 1, mid_bot - mid_top + 1, GetNearestColour(0xde, 0xde, 0xd6));
+
+    /* right side */
+    PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[3], frame.right, frame.top, 0, sprite_arg);
+    PrintSprite(((struct BubbleGfx *)SpeechBubbleData)->sprites[5], frame.right, mid_bot + 1, 0, sprite_arg);
+    right_edge = side_w + frame.right;
+    RenderBlock(right_edge - 1, mid_top, 1, mid_bot - mid_top + 1, 0);
+    RenderBlock(frame.right, mid_top, side_w - 1, mid_bot - mid_top + 1, GetNearestColour(0xde, 0xde, 0xd6));
+
     PrintTextCell(cell, box.left, box.top);
-    hit_left = left4;
-    if (frame_left <= (int)MousePos.x && (int)MousePos.x <= right4 && top4 <= (int)MousePos.y &&
-        (int)MousePos.y <= bottom4) {
+
+    if (MousePos.x >= frame.left && MousePos.x <= frame.right && MousePos.y >= frame.top &&
+        MousePos.y <= frame.bottom) {
         Hover.type = 5;
     }
-    if (hit_left <= (int)MousePos.x && (int)MousePos.x <= left_corner_w + right4 &&
-        width <= (int)MousePos.y && (int)MousePos.y <= mid_top) {
+    if (MousePos.x >= side_left && MousePos.x <= right_edge && MousePos.y >= mid_top && MousePos.y <= mid_bot) {
         Hover.type = 5;
     }
 }
@@ -738,30 +739,35 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
         &MiBoredSprite,
     };
     RECT box;
-    RECT frame;
+    register RECT frame;
     HDC hdc;
     HDC ddhdc;
     HGDIOBJ old_font;
     struct TextCell *cell;
     unsigned int block_color;
-    int mood_pad;
-    int text_h;
     int cx;
+    volatile int mood_pad;
+    int text_h;
     int half_mood;
 
+    volatile int ptmp23;
+    volatile int ptmp24;
+    volatile int ptmp25;
+    volatile int ptmp42;
+    int ptmp74;
     box.right = 0;
     box.bottom = 0;
     box.top = 0;
     box.left = 0;
     block_color = GetNearestColour(0xda, 0xc6, 0x96);
     mood_pad = 0;
-    if (mood != 0) {
+    if (mood) {
         mood_pad = 0x28;
     }
-    if (text != NULL) {
-        box.right = 200;
+    if (NULL != text) {
+        { box.right = 200; }
         cell = FUN_00455d40(text, font, 0x10, 0x96c6da, 0);
-        if (cell == NULL) {
+        if (!cell) {
             hdc = CreateCompatibleDC(NULL);
             SetBkMode(hdc, 1);
             old_font = SelectFont(hdc, font);
@@ -792,10 +798,12 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
             if (box.left < 0) {
                 box.left = 0;
             } else if (right >= (int)(unsigned int)lpConfig->screen_width) {
-                box.left = ((unsigned int)lpConfig->screen_width - width) - mood_pad;
+                ptmp23 = lpConfig->screen_width;
+                box.left = ((unsigned int)ptmp23 - width) - mood_pad;
             }
             half_mood = mood_pad / 2;
-            box.right = half_mood + width + box.left;
+            ptmp42 = box.left;
+            box.right = half_mood + width + ptmp42;
         }
         if (rect->top < (box.bottom - box.top) + 8) {
             box.top = rect->bottom + 6;
@@ -807,11 +815,14 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
         frame.left = box.left - 4;
         frame.top = box.top - 4;
         frame.right = box.right + 4;
-        frame.bottom = box.bottom + 4;
+        frame.bottom = 4 + box.bottom;
         RenderBlock(frame.left + 1, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1, block_color);
         RenderBlock(frame.left, frame.top, frame.right - frame.left, 1, 0);
-        RenderBlock(frame.left, frame.bottom, frame.right - frame.left, 1, 0);
-        RenderBlock(frame.left, frame.top, 1, frame.bottom - frame.top, 0);
+        ptmp74 = frame.left;
+        RenderBlock(ptmp74, frame.bottom, frame.right - frame.left, 1, 0);
+        ptmp24 = frame.left;
+        ptmp25 = frame.top;
+        RenderBlock(ptmp24, ptmp25, 1, frame.bottom - frame.top, 0);
         RenderBlock(frame.right, frame.top, 1, frame.bottom - frame.top, 0);
         if (mood != 0) {
             PrintSprite(*mood_sprites[mood], frame.right - half_mood, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);

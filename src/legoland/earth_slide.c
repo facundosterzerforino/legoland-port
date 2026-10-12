@@ -390,9 +390,8 @@ void FUN_0042d560(unsigned short *param_1) {
     flags = *(unsigned int *)((char *)param_1 + 0x10);
     if ((flags & 1) != 0) {
         if ((v14 = ++*(int *)((char *)param_1 + 0x14)) > 2) {
-            nb = *(char *)((char *)param_1 + 0xb) + 1;
             *(int *)((char *)param_1 + 0x14) = 0;
-            *(char *)((char *)param_1 + 0xb) = nb;
+            nb = ++*(char *)((char *)param_1 + 0xb);
             if ((int)nb >= *(int *)((char *)EarthSlideRin + 0x14)) {
                 flags = flags & 0xfffffffe;
                 *(unsigned char *)((char *)param_1 + 0xb) = 0;
@@ -417,141 +416,129 @@ void FUN_0042d5f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d610
-void EarthSlideRideUpdate(struct EarthRideObj *param_1) {
-    struct Cursor *ride = param_1->ride;
-    struct EarthBlokeElem *elem;
-    struct EarthBlokeElem *next;
+void EarthSlideRideUpdate(Element *obj) {
+    struct Ride *ride = obj->ride;
+    struct RideNode *elem = ride->riders;
+    struct RideNode *next;
     struct EarthNode *node;
-    void *bloke;
-    unsigned int idx;
-    unsigned char by;
-    int bx;
-    int byy;
-    char cx;
-    char cy;
-    char cv;
-    int target[2]; /* FUN_0042cec0 writes x and y */
+    struct Bloke *bloke;
+    TileId *tile;
+    int tx, ty;
+    int x, y; /* map tile of the bloke's slide entrance */
+    Point exit; /* map tile where the bloke leaves the ride */
+    Point target; /* boarding spot, from FUN_0042cec0 */
+    char dir;
 
-    elem = *(struct EarthBlokeElem **)((char *)ride + 0xcc);
     FUN_0042d5f0();
-    while (1) {
-        if (elem == NULL) {
-            return;
-        }
+    while (elem != NULL) {
         next = elem->next;
-        bloke = elem->bloke;
-        node = FUN_0042ce20((unsigned short *)&elem->id_x);
+        tile = &elem->tile;
+        bloke = elem->rider;
+        node = FUN_0042ce20(&tile->id);
         if (node == NULL) {
             return;
         }
-        idx = elem->id_x;
-        by = elem->id_y;
-        bx = *(int *)((char *)ride + 0xc) + idx;
-        cx = *(char *)((char *)ride + 0x24);
-        byy = *(int *)((char *)ride + 0x10) + by;
-        cy = *(char *)((char *)ride + 0x25);
-        if (*(short *)((char *)bloke + 0xe) == 0) {
-            switch (*(unsigned char *)((char *)bloke + 0x60)) {
+        tx = tile->pos.x;
+        x = ride->x + tx;
+        ty = tile->pos.y;
+        y = ride->y + ty;
+        exit.x = ride->field_24 + tx;
+        exit.y = ride->field_25 + ty;
+        if (bloke->low_level_action == 0) {
+            /* param_action is the bloke's step through the ride */
+            switch (bloke->param_action) {
             case 0:
-                *(unsigned char *)((char *)bloke + 0x62) |= 8;
-                FUN_0042cec0(ride, &elem->id_x, target);
-                FUN_0042ce50(node, elem);
-                *(int *)((char *)bloke + 0x24) = target[0];
-                *(int *)((char *)bloke + 0x28) = target[1];
-                cv = CalcMoveLine(*(struct Point *)((char *)bloke + 0x68), *(struct Point *)((char *)bloke + 0x24), (struct Navigator *)((char *)bloke + 0x98));
-                *(short *)((char *)bloke + 0xe) = 7;
-                *(unsigned char *)((char *)bloke + 0x73) = cv + 0x10;
-                NewDirForAction(bloke, ((unsigned char)(cv + 0x10) >> 5) + 3);
-                *(char *)((char *)bloke + 0x60) += 1;
+                /* walk to the boarding spot */
+                bloke->flags |= 8;
+                FUN_0042cec0((struct Cursor *)ride, &tile->pos.x, &target.x);
+                FUN_0042ce50(node, (struct EarthBlokeElem *)elem);
+                bloke->dest.x = target.x;
+                bloke->dest.y = target.y;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                bloke->low_level_action = 7;
+                bloke->field_73 = dir + 0x10;
+                NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                bloke->param_action++;
                 break;
             case 1:
-                if ((*(unsigned int *)((char *)node + 0x10) & 0x8000) == 0 && FUN_0042cf40(node, bloke) != 0) {
+                /* wait for a free slide */
+                if ((node->field_10 & 0x8000) == 0 && FUN_0042cf40(node, bloke) != 0) {
                     FUN_0042cf70(node);
-                    cv = *(char *)((char *)node + 9) + 1;
-                    *(char *)((char *)node + 9) = cv;
-                    if (cv == 1) {
-                        *(unsigned int *)((char *)node + 0x10) |= 0x8000;
+                    if (++node->field_9 == 1) {
+                        node->field_10 |= 0x8000;
                     }
-                    bx = bx * 0x100 + -0x180;
-                    byy = byy * 0x100 + 0x380;
-                    *(int *)((char *)bloke + 0x24) = bx;
-                    *(int *)((char *)bloke + 0x28) = byy;
-                    cv = CalcMoveLine(*(struct Point *)((char *)bloke + 0x68), *(struct Point *)((char *)bloke + 0x24), (struct Navigator *)((char *)bloke + 0x98));
-                    *(short *)((char *)bloke + 0xe) = 7;
-                    *(unsigned char *)((char *)bloke + 0x73) = cv + 0x10;
-                    NewDirForAction(bloke, ((unsigned char)(cv + 0x10) >> 5) + 3);
-                    *(char *)((char *)bloke + 0x60) += 1;
+                    bloke->dest.x = (x << 8) - 0x180;
+                    bloke->dest.y = (y << 8) + 0x380;
+                    dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->low_level_action = 7;
+                    bloke->field_73 = dir + 0x10;
+                    NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                    bloke->param_action++;
                 }
                 break;
             case 2:
-                bx = (bx + -3) * 0x100;
-                byy = (byy + 3) * 0x100;
-                *(int *)((char *)bloke + 0x24) = bx;
-                *(int *)((char *)bloke + 0x28) = byy;
-                cv = CalcMoveLine(*(struct Point *)((char *)bloke + 0x68), *(struct Point *)((char *)bloke + 0x24), (struct Navigator *)((char *)bloke + 0x98));
-                *(short *)((char *)bloke + 0xe) = 7;
-                *(unsigned char *)((char *)bloke + 0x73) = cv + 0x10;
-                NewDirForAction(bloke, ((unsigned char)(cv + 0x10) >> 5) + 3);
-                *(char *)((char *)bloke + 0x60) += 1;
+                bloke->dest.x = (x - 3) << 8;
+                bloke->dest.y = (y + 3) << 8;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                bloke->low_level_action = 7;
+                bloke->field_73 = dir + 0x10;
+                NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                bloke->param_action++;
                 break;
             case 3:
-                bx = (bx + -4) * 0x100;
-                byy = (byy + 3) * 0x100;
-                *(int *)((char *)bloke + 0x24) = bx;
-                *(int *)((char *)bloke + 0x28) = byy;
-                cv = CalcMoveLine(*(struct Point *)((char *)bloke + 0x68), *(struct Point *)((char *)bloke + 0x24), (struct Navigator *)((char *)bloke + 0x98));
-                *(short *)((char *)bloke + 0xe) = 7;
-                *(unsigned char *)((char *)bloke + 0x73) = cv + 0x10;
-                NewDirForAction(bloke, ((unsigned char)(cv + 0x10) >> 5) + 3);
-                *(char *)((char *)bloke + 0x60) += 1;
+                bloke->dest.x = (x - 4) << 8;
+                bloke->dest.y = (y + 3) << 8;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                bloke->low_level_action = 7;
+                bloke->field_73 = dir + 0x10;
+                NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                bloke->param_action++;
                 break;
             case 4:
-                *(int *)((char *)bloke + 0x68) = (bx + -4) * 0x100;
-                *(int *)((char *)bloke + 0x6c) = (byy + 3) * 0x100;
-                idx = rand();
-                *(unsigned int *)((char *)bloke + 0x58) = (idx & 0x1f) + 4;
-                *(char *)((char *)bloke + 0x60) += 1;
+                bloke->pos.x = (x - 4) << 8;
+                bloke->pos.y = (y + 3) << 8;
+                bloke->field_58 = (rand() & 0x1f) + 4;
+                bloke->param_action++;
                 break;
             case 5:
-                if (*(int *)((char *)bloke + 0x58) == 0) {
-                    *(char *)((char *)elem->bloke + 0x60) += 1;
+                if (bloke->field_58 == 0) {
+                    elem->rider->param_action++;
                 }
-                *(int *)((char *)bloke + 0x58) += -1;
+                bloke->field_58--;
                 break;
             case 6:
-                *(unsigned char *)((char *)bloke + 0x62) |= 0x80;
+                /* sit down in the slide */
+                bloke->flags |= 0x80;
                 BlokeSitAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                cv = *(char *)((char *)node + 8) + 1;
-                *(char *)((char *)node + 8) = cv;
-                *(char *)((char *)node + 9) += -1;
-                if (cv == 1) {
-                    *(unsigned char *)((char *)node + 10) = 1;
-                    *(unsigned char *)((char *)node + 0xb) = 0;
-                    *(unsigned int *)((char *)node + 0x10) |= 1;
-                    *(int *)((char *)node + 0x14) = 0;
-                    *(int *)((char *)node + 0x4) = 0;
+                node->field_8++;
+                node->field_9--;
+                if (node->field_8 == 1) {
+                    node->field_a = node->field_8;
+                    node->field_b = 0;
+                    node->field_10 |= 1;
+                    node->field_14 = 0;
+                    node->field_4 = 0;
                 }
-                *(int *)((char *)bloke + 0x58) = 8;
-                *(char *)((char *)bloke + 0x60) += 1;
-                Put3DBlokesOnRide((struct ViewportEntry *)EarthSlideRide, (unsigned char *)node, (int)*(char *)((char *)node + 0xb), (int *)EarthPos);
+                bloke->field_58 = 8;
+                bloke->param_action++;
+                Put3DBlokesOnRide((struct ViewportEntry *)EarthSlideRide, (unsigned char *)node, (char)node->field_b, (int *)EarthPos);
                 break;
             case 8:
-                BlokeWalkAnim((struct Bloke *)bloke);
-                *(unsigned short *)((char *)bloke + 0x62) &= 0xff7f;
-                *(unsigned int *)((char *)bloke + 0x68) = (cx + idx) * 0x100 + 0x80;
-                *(unsigned int *)((char *)bloke + 0x6c) = (cy + by) * 0x100 + 0x80;
+                /* get off at the bottom */
+                BlokeWalkAnim(bloke);
+                bloke->flags &= ~0x80;
+                bloke->pos.x = (exit.x << 8) + 0x80;
+                bloke->pos.y = (exit.y << 8) + 0x80;
                 RemoveBlokeFromRide(ride, elem);
-                *(unsigned short *)((char *)bloke + 0x62) &= 0xfff7;
-                cv = *(char *)((char *)node + 10) + -1;
-                *(char *)((char *)node + 10) = cv;
-                if (cv == 0) {
-                    *(unsigned char *)((char *)node + 8) = 0;
-                    *(int *)((char *)node + 0x4) = 1;
-                    *(unsigned int *)((char *)node + 0x10) &= 0xffff7fff;
+                bloke->flags &= ~8;
+                if (--node->field_a == 0) {
+                    node->field_8 = 0;
+                    node->field_4 = 1;
+                    node->field_10 &= ~0x8000;
                 }
-                if ((short)*(char *)((char *)node + 0x18) != *(short *)((char *)ride + 0x2e)) {
-                    Ride_ClearFlagToNotLetAnyoneOn((unsigned char *)node);
+                if ((short)(char)node->queue_count != ride->seats) {
+                    Ride_ClearFlagToNotLetAnyoneOn(node);
                 }
                 break;
             }

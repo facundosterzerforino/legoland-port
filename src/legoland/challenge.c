@@ -682,7 +682,7 @@ unsigned int LoadReport(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004442c0
-unsigned int GetDrivingSchoolScore(void) {
+int GetDrivingSchoolScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("DRIVING SCHOOL"); /* TODO: fold — ElemID handle (uint) viewed as RideElem* */
@@ -693,7 +693,7 @@ unsigned int GetDrivingSchoolScore(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004442f0
-unsigned int GetBoatingSchoolScore(void) {
+int GetBoatingSchoolScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("BOATING SCHOOL");
@@ -704,7 +704,7 @@ unsigned int GetBoatingSchoolScore(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444320
-unsigned int GetCastleScore(void) {
+int GetCastleScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("CASTLE OBJ");
@@ -715,7 +715,7 @@ unsigned int GetCastleScore(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444350
-unsigned int GetLogFlumeScore(void) {
+int GetLogFlumeScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("LOG FLUME ENTRANCE");
@@ -726,7 +726,7 @@ unsigned int GetLogFlumeScore(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444380
-unsigned int GetJungleCruiseScore(void) {
+int GetJungleCruiseScore(void) {
     struct RideElem *elem;
 
     elem = (struct RideElem *)ElemID("JUNGLE CRUISE");
@@ -1032,36 +1032,36 @@ void LoadAppraisalSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00444a70
-void DrawAppraisalBar(int param_1, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7) {
+void DrawAppraisalBar(RECT rc, int value, int max, int goal) {
     int negative;
     int bar;
     unsigned int colour;
     int mark;
 
-    if (param_6 < 0) {
+    if (max < 0) {
         negative = 1;
-        param_6 = -param_6;
-        param_7 = param_6 - param_7;
+        max = -max;
+        goal = max - goal;
     } else {
         negative = 0;
     }
-    if (param_5 > param_6) {
-        param_5 = param_6;
+    if (value > max) {
+        value = max;
     }
     if (negative != 0) {
-        param_5 = param_6 - param_5;
+        value = max - value;
     }
-    if (param_5 >= param_7) {
+    if (value >= goal) {
         colour = GetNearestColour(0, 0xff, 0);
     } else {
         colour = GetNearestColour(0xff, 0, 0);
     }
-    bar = ((param_3 - param_1) * param_5) / param_6;
-    PrintSprite(AppBarSprite, param_1, param_2, 0, 0);
-    RenderBlock(param_1 + 3, param_2 + 2, bar - 2, 1, colour);
-    RenderBlock(param_1 + 2, param_2 + 3, bar, (param_4 - param_2) - 1, colour);
-    mark = (((param_3 - param_1) - 2) * param_7) / param_6 + 2 + param_1;
-    PrintSprite(AppBarMarkerSprite, mark, param_2 + 2, 0, 0);
+    bar = ((rc.right - rc.left) * value) / max;
+    PrintSprite(AppBarSprite, rc.left, rc.top, 0, 0);
+    RenderBlock(rc.left + 3, rc.top + 2, bar - 2, 1, colour);
+    RenderBlock(rc.left + 2, rc.top + 3, bar, (rc.bottom - rc.top) - 1, colour);
+    mark = (((rc.right - rc.left) - 2) * goal) / max + 2 + rc.left;
+    PrintSprite(AppBarMarkerSprite, mark, rc.top + 2, 0, 0);
 }
 
 // FUNCTION: LEGOLAND 0x00444b70
@@ -1078,7 +1078,7 @@ void DrawAppraisalMark(unsigned int param_1, unsigned int param_2, int param_3, 
 }
 
 // FUNCTION: LEGOLAND 0x00444bf0
-void CountClassesOfType1Or3(unsigned int *param_1, unsigned int *param_2) {
+void CountClassesOfType1Or3(int *param_1, int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1102,7 +1102,7 @@ int IsRidePartClass(struct ObjectClass *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00444c70
-void CountType2ClassesExceptRideParts(unsigned int *param_1, unsigned int *param_2) {
+void CountType2ClassesExceptRideParts(int *param_1, int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1121,7 +1121,7 @@ void CountType2ClassesExceptRideParts(unsigned int *param_1, unsigned int *param
 }
 
 // FUNCTION: LEGOLAND 0x00444cd0
-void CountClassesOfType4(unsigned int *param_1, unsigned int *param_2) {
+void CountClassesOfType4(int *param_1, int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1140,7 +1140,7 @@ void CountClassesOfType4(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444d20
-void CountFoodStallClasses(unsigned int *param_1, unsigned int *param_2) {
+void CountFoodStallClasses(int *param_1, int *param_2) {
     struct ObjectClass *node;
 
     node = ObjectClassList;
@@ -1159,27 +1159,27 @@ void CountFoodStallClasses(unsigned int *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444d70
-void SurveyBlokes(unsigned int *param_1, unsigned int *param_2, int *param_3) {
+void SurveyBlokes(int *count, int *happiness, int *fullness) {
     struct Bloke *bloke;
     signed char value;
 
     bloke = FirstBloke;
-    *param_1 = 0;
-    *param_2 = 0;
-    *param_3 = 0;
+    *count = 0;
+    *happiness = 0;
+    *fullness = 0;
     if (bloke == 0) {
         return;
     }
     do {
-        *param_1 += 1;
+        *count += 1;
         if (bloke->mood > MapStats.mood_threshold3) {
-            *param_2 += 1;
+            *happiness += 1;
         }
         if (bloke->mood > MapStats.mood_threshold4) {
-            *param_2 += 1;
+            *happiness += 1;
         }
         value = GetBlokeHungerLevel(bloke);
-        *param_3 += 4 - value;
+        *fullness += 4 - value;
         bloke = bloke->next;
     } while (bloke != 0);
 }
@@ -1379,7 +1379,7 @@ void UnlightAppraisalPageButtons(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00445190
-void InitAppraisalScreen(void) {
+void InitAppraisalScreen(int pages) {
     struct IconNode *icon;
 
     NextPageSprite = LoadSprite("NextPage.lls", 4);
@@ -1430,56 +1430,171 @@ void UpdateAppraisalPageButtons(void) {
     }
 }
 
+/* RunAppraisal's report layout. Each row of the report is a struct AppraisalRow; a row is 0x16 high and rows are
+ * 0x18 apart. A row whose bottom would pass 0x1b5 goes to the top of a new page. rc.layout is the first row's
+ * rectangle on a page, rc.cur the current row's. The report is built in sections (a header row, then one row per
+ * check); a section that does not fit on the page it started on is written again from its header on a new page:
+ * every page test of the section jumps to one restart block (the original has a single copy of it, at the
+ * section's last page test). These restarts, and the retries of section headers, are gotos: MSVC6 only produces the
+ * original's single shared restart block from explicit jumps (it does not merge separate copies reliably), so this
+ * function is a deliberate exception to the no-goto rule. */
+
+/* back to the top of the page: the original reloads the layout rectangle from memory at every page break */
+#define APPR_TOP_OF_PAGE() \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    bottom = rc.layout.bottom
+/* ... and the row starts a new page */
+#define APPR_NEW_PAGE() \
+    AppraisalPageCount++; \
+    pagestart = i; \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    rc.cur.bottom = rc.layout.bottom
+/* a section header that does not fit: retry it at the top of a new page */
+#define APPR_RETRY(label) \
+    { \
+        AppraisalPageCount++; \
+        pagestart = i; \
+        goto label; \
+    }
+/* the common start of a text row */
+#define APPR_ROW(kind, id) \
+    recs[i].page = AppraisalPageCount; \
+    recs[i].x = x; \
+    recs[i].type = (kind); \
+    recs[i].rnd = rand() % 5; \
+    recs[i].text = GetString(id)
+
+/* RunAppraisal's report layout. Each row of the report is a struct AppraisalRow; a row is 0x16 high and rows are
+ * 0x18 apart. A row whose bottom would pass 0x1b5 goes to the top of a new page. rc.layout is the first row's
+ * rectangle on a page, rc.cur the current row's. The report is built in sections (a header row, then one row per
+ * check); a section that does not fit on the page it started on is written again from its header on a new page.
+ * Every page test carries its own copy of that restart and jumps back to the section's head (the only gotos here);
+ * the compiler merges the copies into one block per section, as in the original, and the copies' references are
+ * what make pagestart and x the heaviest locals, so they come first in the frame, as in the original. */
+
+/* back to the top of the page: the original reloads the layout rectangle from memory at every page break */
+#define APPR_TOP_OF_PAGE() \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    bottom = rc.layout.bottom
+/* ... and the row starts a new page */
+#define APPR_NEW_PAGE() \
+    AppraisalPageCount++; \
+    pagestart = i; \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    rc.cur.bottom = rc.layout.bottom
+/* a section header that does not fit: retry it at the top of a new page */
+#define APPR_RETRY(label) \
+    { \
+        AppraisalPageCount++; \
+        pagestart = i; \
+        goto label; \
+    }
+/* the common start of a text row */
+#define APPR_ROW(kind, id) \
+    recs[i].page = AppraisalPageCount; \
+    recs[i].x = x; \
+    recs[i].type = (kind); \
+    recs[i].rnd = rand() % 5; \
+    recs[i].text = GetString(id)
+
+/* RunAppraisal's report layout. Each row of the report is a struct AppraisalRow; a row is 0x16 high and rows are
+ * 0x18 apart. A row whose bottom would pass 0x1b5 goes to the top of a new page. rc.layout is the first row's
+ * rectangle on a page, rc.cur the current row's. The report is built in sections (a header row, then one row per
+ * check); a section that does not fit on the page it started on is written again from its header on a new page.
+ * Every page test carries its own copy of that restart and jumps back to the section's head (the only gotos here);
+ * the compiler merges the copies into one block per section, as in the original, and the copies' references are
+ * what make pagestart and x the heaviest locals, so they come first in the frame, as in the original. */
+
+/* back to the top of the page: the original reloads the layout rectangle from memory at every page break */
+#define APPR_TOP_OF_PAGE() \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    bottom = rc.layout.bottom
+/* ... and the row starts a new page */
+#define APPR_NEW_PAGE() \
+    AppraisalPageCount++; \
+    pagestart = i; \
+    rc.cur.left = rc.layout.left; \
+    y = rc.layout.top; \
+    rc.cur.right = rc.layout.right; \
+    rc.cur.bottom = rc.layout.bottom
+/* a section header that does not fit: retry it at the top of a new page */
+#define APPR_RETRY(label) \
+    { \
+        AppraisalPageCount++; \
+        pagestart = i; \
+        goto label; \
+    }
+/* the common start of a text row */
+#define APPR_ROW(kind, id) \
+    recs[i].page = AppraisalPageCount; \
+    recs[i].x = x; \
+    recs[i].type = (kind); \
+    recs[i].rnd = rand() % 5; \
+    recs[i].text = GetString(id)
+
 // FUNCTION: LEGOLAND 0x004453a0
 unsigned int RunAppraisal(void) {
-    short coord;
-    int *piVar2;
-    int iVar3;
-    int iVar4;
-    char *uVar5;
-    int iVar6;
-    int iVar7;
-    int iVar8;
-    unsigned int uVar9;
-    int *piVar10;
-    int *piVar11;
-    char *text;
-    int iVar12;
-    int iVar13;
-    int iVar14;
-    int iVar15;
-    int xbase;
-    int tmp8;
-    int colstep;
-    int ystart;
-    int rectr;
-    unsigned int wstart;
-    int ysave;
-    int rowy;
-    int closing_text;
-    int *flatp;
-    unsigned int subpass;
-    unsigned int flags;
-    unsigned int passtotal;
-    unsigned int total;
-    int *rowp;
-    unsigned int passtotacc;
-    unsigned int tottotacc;
-    unsigned int passflag;
-    int out58;
-    int out5c;
-    int out60;
-    int out64;
-    int out68;
-    int out6c;
-    int rep[0x777];
+    int i; /* the row being written (= rows written so far) */
+    int y; /* top of the row being written */
+    int bottom; /* its bottom (y + 0x16), tested against the page bottom 0x1b5 */
+    int pagestart; /* first row of the current page */
+    int x; /* indent of the row; +0x30 inside a section */
+    int first; /* the current section's header row */
+    int total; /* checks in the current section */
+    int pass; /* checks passed in the current section */
+    int ok; /* the current check passed */
+    int flags; /* failed checks, one bit each */
+    int totacc; /* checks in all sections */
+    int passacc; /* checks passed in all sections */
+    int val; /* a check's measured value, when it is kept for the row */
+    int *xp; /* &recs[first].x: x of the current section's header row, restored on a restart */
+    int bf0_total;
+    int bf0_count;
+    int c70_total;
+    int c70_count;
+    int cd0_total;
+    int cd0_count;
+    int d20_total;
+    int d20_count;
+    int d70_count;
+    int d70_p2;
+    int d70_p3;
+    TileId coord;
+    struct MapElement *obj; /* render object being counted (0x400000 check) */
+    struct Ride *ride; /* its class */
+    int objcount; /* render objects that FUN_0044f360 accepts */
+    int tiles; /* GetMapTileCount() (0x800000 check) */
+    int *nidsp; /* &recs[k].nids of a continuation row, zeroed after its text is fetched */
+    int chances; /* appraisals the park may still fail before it is closed */
+    int *nidp; /* &recs[i].nids: the speech-id count of the advice row being written */
+    int shown; /* the row being drawn */
+    int played; /* next queued speech id to play */
+    int nids; /* speech ids of the row being drawn */
+    RECT r; /* a rectangle passed by value */
+    struct {
+        RECT layout;
+        RECT cur;
+    } rc;
+    struct AppraisalRow recs[100];
     char wavbuf[0x80];
-    char fmtbuf[0x1fc];
-    int flat[0xc4];
+    char fmtbuf[0x200];
+    int queue[200]; /* speech ids queued for the page being shown */
 
-    xbase = 0;
-    tottotacc = 0;
-    passtotacc = 0;
+    x = 0;
+    i = 0;
+    pagestart = 0;
+    totacc = 0;
+    passacc = 0;
     flags = 0;
     if (IsScriptStopped() != 0) {
         return 0;
@@ -1489,3601 +1604,3338 @@ unsigned int RunAppraisal(void) {
     AppraisalPageChanged = 1;
     PushRenderingStatusAndUnlockVideoSurface();
     ReadGameButtons();
-    colstep = 0x50;
-    ystart = 0x6d;
-    rectr = 0x1a4;
-    wstart = 0x83;
-    iVar3 = 0;
-LAB_00445422:
-    uVar9 = 0x83;
-    iVar14 = iVar3;
-    iVar4 = 0x6d;
-    if ((ReportFlags & 0xf) != 0) {
-        rep[iVar3 * 0x13 + 10] = xbase;
-        rep[iVar3 * 0x13 + 9] = AppraisalPageCount;
-        rep[iVar3 * 0x13 + 10] = xbase;
-        rep[iVar3 * 0x13 + 11] = 0;
-        rep[iVar3 * 0x13 + 12] = rand() % 5;
-        uVar5 = GetString(0x12c);
-        iVar14 = iVar3 + 1;
-        rep[iVar3 * 0x13 + 13] = (int)uVar5;
-        rep[iVar3 * 0x13 + 14] = 0;
-        rep[iVar3 * 0x13 + 15] = 0;
-        rep[iVar3 * 0x13 + 16] = 0;
-        rep[iVar3 * 0x13 + 17] = 0;
-        rep[iVar3 * 0x13 + 18] = 0;
-        rep[iVar3 * 0x13 + 19] = 0;
-        rep[iVar3 * 0x13 + 11] = 1;
-        uVar9 = 0x9b;
-        iVar4 = 0x85;
+    rc.layout.left = 0x50;
+    rc.layout.top = 0x6d;
+    rc.layout.right = 0x1a4;
+    rc.layout.bottom = 0x83;
+    y = rc.layout.top;
+    bottom = rc.layout.bottom;
+    if (0) {
+        /* Never runs. The original takes the address of the two rectangles in code the optimizer removes,
+         * which keeps them in memory: layout is reloaded at every page break and cur's stores are kept.
+         * Nothing else reproduces that, so this does it the same way. */
+        SetClipping(&rc.layout);
     }
-    do {
-        iVar12 = iVar14;
-        if ((ReportFlags & 0x4fff0) == 0) {
-        LAB_0044672e:
-            if ((ReportFlags & 0x38000000) == 0)
-                goto LAB_00446b71;
-            iVar14 = iVar12 * 0x4c;
-            goto LAB_00446751;
+
+    /* section 0 (0x4453a0-0x445539): the report title row (ReportFlags & 0xf) */
+top:
+    if (ReportFlags & 0xf) {
+        recs[i].x = x;
+        if (bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != i) APPR_RETRY(top);
+            APPR_NEW_PAGE();
         }
+        recs[i].page = AppraisalPageCount;
+        recs[i].x = x;
+        recs[i].type = 0;
+        recs[i].rnd = rand() % 5;
+        recs[i].text = GetString(0x12c);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        recs[i].type = 1;
+        i++;
+        y += 0x18;
+        bottom = y + 0x16;
+    }
+    /* section 1 (0x445539-0x44672e): the 0x4fff0 checks */
+s1:
+    if (ReportFlags & 0x4fff0) {
         total = 0;
-        passtotal = 0;
-        iVar13 = iVar14 * 0x4c;
-        piVar10 = &rep[iVar14 * 0x13 + 10];
-        *piVar10 = xbase;
-        iVar6 = iVar4;
-        if (0x1b5 < uVar9) {
-            if (iVar3 != iVar14)
-                break;
-            AppraisalPageCount = AppraisalPageCount + 1;
-            iVar6 = ystart;
-            iVar3 = iVar14;
+        pass = 0;
+        first = i;
+        xp = &recs[i].x;
+        *xp = x;
+        if (bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != i) APPR_RETRY(top);
+            APPR_NEW_PAGE();
         }
-        rep[iVar14 * 0x13 + 9] = AppraisalPageCount;
-        *piVar10 = xbase;
-        rep[iVar14 * 0x13 + 11] = 0;
-        rep[iVar14 * 0x13 + 12] = rand() % 5;
-        uVar5 = GetString(0x131);
-        iVar12 = iVar14 + 1;
-        iVar4 = iVar6 + 0x18;
-        rep[iVar14 * 0x13 + 13] = (int)uVar5;
-        rep[iVar14 * 0x13 + 14] = 0;
-        rep[iVar14 * 0x13 + 15] = 0;
-        rep[iVar14 * 0x13 + 16] = 0;
-        rep[iVar14 * 0x13 + 17] = 0;
-        rep[iVar14 * 0x13 + 18] = 0;
-        rep[iVar14 * 0x13 + 19] = 0;
-        iVar13 = xbase + 0x30;
-        CountClassesOfType1Or3((unsigned int *)&out58, (unsigned int *)&out5c);
-        if ((ReportFlags & 0x4000) == 0) {
-        LAB_00445794:
-            if ((ReportFlags & 0x8000) != 0) {
-                total = total + 1;
-                passflag = (int)DAT_00666028 <= out5c;
-                if (passflag == 0) {
-                    flags = flags | 0x20;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                    if (iVar3 != iVar14)
-                        goto LAB_004464b7;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar12;
-                }
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                rep[iVar12 * 0x13 + 10] = iVar13;
-                rep[iVar12 * 0x13 + 11] = passflag;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x133);
-                iVar12 = iVar12 + 1;
-                rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                rep[(iVar12 - 1) * 0x13 + 15] = 1;
-                rep[(iVar12 - 1) * 0x13 + 16] = out5c;
-                rep[(iVar12 - 1) * 0x13 + 17] = DAT_00666028;
-                rep[(iVar12 - 1) * 0x13 + 18] = DAT_0066602c;
-                rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0x40000) != 0) {
-                iVar6 = GetLinkedObjectPercent();
-                total = total + 1;
-                passflag = (int)DAT_00666030 <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x40;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                    if (iVar3 != iVar14)
-                        goto LAB_004464b7;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar12;
-                }
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                rep[iVar12 * 0x13 + 10] = iVar13;
-                rep[iVar12 * 0x13 + 11] = passflag;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x134);
-                iVar12 = iVar12 + 1;
-                rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                rep[(iVar12 - 1) * 0x13 + 15] = 1;
-                rep[(iVar12 - 1) * 0x13 + 16] = iVar6;
-                rep[(iVar12 - 1) * 0x13 + 17] = DAT_00666030;
-                rep[(iVar12 - 1) * 0x13 + 18] = DAT_00666034;
-                rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0x30) != 0) {
-                total = total + 1;
-                iVar6 = GetCastleScore();
-                passflag = (int)DAT_0066600c <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x80;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                uVar9 = ReportFlags >> 4 & 3;
-                if (uVar9 == 1) {
-                    if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                        if (iVar3 != iVar14)
-                            goto LAB_004464b7;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar12;
-                    }
-                    rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar12 * 0x13 + 10] = iVar13;
-                    rep[iVar12 * 0x13 + 11] = passflag;
-                    rep[iVar12 * 0x13 + 12] = rand() % 5;
-                LAB_00445c4c:
-                    tmp8 = iVar12 * 0x4c;
-                    uVar5 = GetString(0x135);
-                    iVar12 = iVar12 + 1;
-                    rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 15] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 16] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 17] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 18] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                } else {
-                    if (uVar9 == 2) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_00445c4c;
-                    }
-                    if (uVar9 == 3) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_00445c4c;
-                    }
-                }
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0xc0) != 0) {
-                total = total + 1;
-                iVar6 = GetDrivingSchoolScore();
-                passflag = (int)DAT_00666010 <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x100;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                uVar9 = ReportFlags >> 6 & 3;
-                if (uVar9 == 1) {
-                    if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                        if (iVar3 != iVar14)
-                            goto LAB_004464b7;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar12;
-                    }
-                    rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar12 * 0x13 + 10] = iVar13;
-                    rep[iVar12 * 0x13 + 11] = passflag;
-                    rep[iVar12 * 0x13 + 12] = rand() % 5;
-                LAB_00445ed5:
-                    tmp8 = iVar12 * 0x4c;
-                    uVar5 = GetString(0x138);
-                    iVar12 = iVar12 + 1;
-                    rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 15] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 16] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 17] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 18] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                } else {
-                    if (uVar9 == 2) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_00445ed5;
-                    }
-                    if (uVar9 == 3) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_00445ed5;
-                    }
-                }
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0x300) != 0) {
-                total = total + 1;
-                iVar6 = GetLogFlumeScore();
-                passflag = (int)DAT_00666014 <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x200;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                uVar9 = ReportFlags >> 8 & 3;
-                if (uVar9 == 1) {
-                    if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                        if (iVar3 != iVar14)
-                            goto LAB_004464b7;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar12;
-                    }
-                    rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar12 * 0x13 + 10] = iVar13;
-                    rep[iVar12 * 0x13 + 11] = passflag;
-                    rep[iVar12 * 0x13 + 12] = rand() % 5;
-                LAB_0044615f:
-                    tmp8 = iVar12 * 0x4c;
-                    uVar5 = GetString(0x13b);
-                    iVar12 = iVar12 + 1;
-                    rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 15] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 16] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 17] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 18] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                } else {
-                    if (uVar9 == 2) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_0044615f;
-                    }
-                    if (uVar9 == 3) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_0044615f;
-                    }
-                }
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0xc00) != 0) {
-                total = total + 1;
-                iVar6 = GetBoatingSchoolScore();
-                passflag = (int)DAT_00666018 <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x400;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                uVar9 = ReportFlags >> 10 & 3;
-                if (uVar9 == 1) {
-                    if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                        if (iVar3 != iVar14)
-                            goto LAB_004464b7;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar12;
-                    }
-                    rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar12 * 0x13 + 10] = iVar13;
-                    rep[iVar12 * 0x13 + 11] = passflag;
-                    rep[iVar12 * 0x13 + 12] = rand() % 5;
-                LAB_004463e9:
-                    tmp8 = iVar12 * 0x4c;
-                    uVar5 = GetString(0x13e);
-                    iVar12 = iVar12 + 1;
-                    rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 15] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 16] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 17] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 18] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                } else {
-                    if (uVar9 == 2) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_004463e9;
-                    }
-                    if (uVar9 == 3) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_004463e9;
-                    }
-                }
-                iVar4 = iVar4 + 0x18;
-            }
-            if ((ReportFlags & 0x3000) != 0) {
-                total = total + 1;
-                iVar6 = GetJungleCruiseScore();
-                passflag = (int)DAT_0066601c <= iVar6;
-                if (passflag == 0) {
-                    flags = flags | 0x800;
-                } else {
-                    passtotal = passtotal + 1;
-                }
-                uVar9 = ReportFlags >> 0xc & 3;
-                if (uVar9 == 1) {
-                    if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                        if (iVar3 != iVar14)
-                            goto LAB_004464b7;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar12;
-                    }
-                    rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar12 * 0x13 + 10] = iVar13;
-                    rep[iVar12 * 0x13 + 11] = passflag;
-                    rep[iVar12 * 0x13 + 12] = rand() % 5;
-                LAB_004466af:
-                    tmp8 = iVar12 * 0x4c;
-                    uVar5 = GetString(0x141);
-                    iVar12 = iVar12 + 1;
-                    rep[(iVar12 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 15] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 16] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 17] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 18] = 0;
-                    rep[(iVar12 - 1) * 0x13 + 19] = 0;
-                } else {
-                    if (uVar9 == 2) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_004466af;
-                    }
-                    if (uVar9 == 3) {
-                        if (0x1b5 < (unsigned int)(iVar4 + 0x16)) {
-                            if (iVar3 != iVar14)
-                                goto LAB_004464b7;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar12;
-                        }
-                        rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar12 * 0x13 + 10] = iVar13;
-                        rep[iVar12 * 0x13 + 11] = passflag;
-                        rep[iVar12 * 0x13 + 12] = rand() % 5;
-                        goto LAB_004466af;
-                    }
-                }
-                iVar4 = iVar4 + 0x18;
-            }
-            passtotacc = passtotal;
-            rep[iVar14 * 0x13 + 11] = (passtotal == total);
-            uVar9 = iVar4 + 0x16;
-            tottotacc = total;
-            goto LAB_0044672e;
-        }
-        total = 1;
-        flatp = (int *)((int)DAT_00666020 <= out58);
-        if (flatp == (int *)0x0) {
-            flags = flags | 0x10;
-        }
-        passtotal = (flatp != (int *)0x0);
-        if ((unsigned int)(iVar6 + 0x2e) < 0x1b6) {
-        LAB_004456f0:
-            rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-            rep[iVar12 * 0x13 + 10] = iVar13;
-            rep[iVar12 * 0x13 + 11] = (int)flatp;
-            rep[iVar12 * 0x13 + 12] = rand() % 5;
-            uVar5 = GetString(0x132);
-            iVar7 = iVar12;
-            iVar12 = iVar14 + 2;
-            rep[iVar7 * 0x13 + 13] = (int)uVar5;
-            rep[iVar7 * 0x13 + 14] = 0;
-            rep[iVar7 * 0x13 + 15] = 1;
-            rep[iVar7 * 0x13 + 16] = out58;
-            rep[iVar7 * 0x13 + 17] = DAT_00666020;
-            rep[iVar7 * 0x13 + 18] = DAT_00666024;
-            rep[iVar7 * 0x13 + 19] = 0;
-            iVar4 = iVar4 + 0x18;
-            goto LAB_00445794;
-        }
-        if (iVar3 == iVar14) {
-            AppraisalPageCount = AppraisalPageCount + 1;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-            goto LAB_004456f0;
-        }
-    LAB_004464b7:
-        xbase = *piVar10;
-        AppraisalPageCount = AppraisalPageCount + 1;
-        uVar9 = wstart;
-        iVar4 = ystart;
-        iVar3 = iVar14;
-    } while (1);
-    AppraisalPageCount = AppraisalPageCount + 1;
-    iVar3 = iVar14;
-    goto LAB_00445422;
-LAB_00446751:
-    do {
-        rowp = &rep[iVar12 * 0x13 + 10];
-        total = 0;
-        subpass = 0;
-        *rowp = xbase;
-        if (uVar9 < 0x1b6) {
-        LAB_004467ce:
-            rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-            *rowp = xbase;
-            rep[iVar12 * 0x13 + 11] = (int)flatp;
-            rep[iVar12 * 0x13 + 12] = rand() % 5;
-            uVar5 = GetString(0x144);
-            iVar13 = iVar12 + 1;
-            iVar6 = iVar4 + 0x18;
-            rep[iVar12 * 0x13 + 13] = (int)uVar5;
-            rep[iVar12 * 0x13 + 14] = 0;
-            rep[iVar12 * 0x13 + 15] = 0;
-            rep[iVar12 * 0x13 + 16] = 0;
-            rep[iVar12 * 0x13 + 17] = 0;
-            rep[iVar12 * 0x13 + 18] = 0;
-            rep[iVar12 * 0x13 + 19] = 0;
-            CountType2ClassesExceptRideParts((unsigned int *)&out68, (unsigned int *)&out6c);
-            if ((ReportFlags & 0x8000000) == 0) {
-            LAB_004469ab:
-                if ((ReportFlags & 0x10000000) != 0) {
-                    total = total + 1;
-                    flatp = (int *)((int)DAT_00666078 <= out6c);
-                    if (flatp == (int *)0x0) {
-                        flags = flags | 0x2000;
-                    } else {
-                        subpass = subpass + 1;
-                    }
-                    if (0x1b5 < (unsigned int)(iVar6 + 0x16)) {
-                        if (iVar3 != iVar12)
-                            goto LAB_00446a1c;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    rep[iVar13 * 0x13 + 9] = AppraisalPageCount;
-                    rep[iVar13 * 0x13 + 10] = xbase + 0x30;
-                    rep[iVar13 * 0x13 + 11] = (int)flatp;
-                    rep[iVar13 * 0x13 + 12] = rand() % 5;
-                    uVar5 = GetString(0x133);
-                    iVar13 = iVar13 + 1;
-                    rep[(iVar13 - 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar13 - 1) * 0x13 + 14] = 0;
-                    rep[(iVar13 - 1) * 0x13 + 15] = 1;
-                    rep[(iVar13 - 1) * 0x13 + 16] = out6c;
-                    rep[(iVar13 - 1) * 0x13 + 17] = DAT_00666078;
-                    rep[(iVar13 - 1) * 0x13 + 18] = DAT_0066607c;
-                    rep[(iVar13 - 1) * 0x13 + 19] = 0;
-                    iVar6 = iVar6 + 0x18;
-                }
-                rep[iVar12 * 0x13 + 11] = (subpass == total);
-                tottotacc = tottotacc + total;
-                passtotacc = passtotacc + subpass;
-                uVar9 = iVar6 + 0x16;
-                iVar12 = iVar13;
-                iVar4 = iVar6;
-                break;
-            }
-            total = 1;
-            flatp = (int *)((int)DAT_00666070 <= out68);
-            if (flatp == (int *)0x0) {
-                flags = flags | 0x1000;
-            }
-            subpass = (flatp != (int *)0x0);
-            if ((unsigned int)(iVar4 + 0x2e) < 0x1b6) {
-            LAB_00446910:
-                rep[(iVar12 + 1) * 0x13 + 9] = AppraisalPageCount;
-                rep[(iVar12 + 1) * 0x13 + 10] = xbase + 0x30;
-                rep[(iVar12 + 1) * 0x13 + 11] = (int)flatp;
-                rep[(iVar12 + 1) * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x132);
-                iVar13 = iVar12 + 2;
-                rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
-                rep[(iVar12 + 1) * 0x13 + 14] = 0;
-                rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                rep[(iVar12 + 1) * 0x13 + 16] = out68;
-                rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666070;
-                rep[(iVar12 + 1) * 0x13 + 18] = DAT_00666074;
-                rep[(iVar12 + 1) * 0x13 + 19] = 0;
-                iVar6 = iVar6 + 0x18;
-                goto LAB_004469ab;
-            }
-            if (iVar3 == iVar12) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar6 = ystart;
-                iVar3 = iVar13;
-                goto LAB_00446910;
-            }
-        LAB_00446a1c:
-            xbase = *rowp;
-        } else if (iVar3 == iVar12) {
-            AppraisalPageCount = AppraisalPageCount + 1;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-            goto LAB_004467ce;
-        }
-        AppraisalPageCount = AppraisalPageCount + 1;
-        uVar9 = wstart;
-        iVar4 = ystart;
-        iVar3 = iVar12;
-    } while ((ReportFlags & 0x38000000) != 0);
-LAB_00446b71:
-    if ((ReportFlags & 0xc0000000) != 0) {
-        do {
-            rowp = &rep[iVar12 * 0x13 + 10];
-            total = 0;
-            subpass = 0;
-            *rowp = xbase;
-            if (uVar9 < 0x1b6) {
-            LAB_00446c11:
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                *rowp = xbase;
-                rep[iVar12 * 0x13 + 11] = (int)flatp;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x145);
-                iVar13 = iVar12 + 1;
-                iVar6 = iVar4 + 0x18;
-                rep[iVar12 * 0x13 + 13] = (int)uVar5;
-                rep[iVar12 * 0x13 + 14] = 0;
-                rep[iVar12 * 0x13 + 15] = 0;
-                rep[iVar12 * 0x13 + 16] = 0;
-                rep[iVar12 * 0x13 + 17] = 0;
-                rep[iVar12 * 0x13 + 18] = 0;
-                rep[iVar12 * 0x13 + 19] = 0;
-                CountClassesOfType4((unsigned int *)&out68, (unsigned int *)&out6c);
-                if ((ReportFlags & 0x40000000) == 0) {
-                LAB_00446deb:
-                    if ((ReportFlags & 0x80000000) != 0) {
-                        total = total + 1;
-                        flatp = (int *)((int)DAT_00666090 <= out6c);
-                        if (flatp == (int *)0x0) {
-                            flags = flags | 0x10000;
-                        } else {
-                            subpass = subpass + 1;
-                        }
-                        if (0x1b5 < (unsigned int)(iVar6 + 0x16)) {
-                            if (iVar3 != iVar12)
-                                goto LAB_00446e59;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar13;
-                        }
-                        rep[iVar13 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar13 * 0x13 + 10] = xbase + 0x30;
-                        rep[iVar13 * 0x13 + 11] = (int)flatp;
-                        rep[iVar13 * 0x13 + 12] = rand() % 5;
-                        uVar5 = GetString(0x133);
-                        iVar13 = iVar13 + 1;
-                        rep[(iVar13 - 1) * 0x13 + 13] = (int)uVar5;
-                        rep[(iVar13 - 1) * 0x13 + 14] = 0;
-                        rep[(iVar13 - 1) * 0x13 + 15] = 1;
-                        rep[(iVar13 - 1) * 0x13 + 16] = out6c;
-                        rep[(iVar13 - 1) * 0x13 + 17] = DAT_00666090;
-                        rep[(iVar13 - 1) * 0x13 + 18] = DAT_00666094;
-                        rep[(iVar13 - 1) * 0x13 + 19] = 0;
-                        iVar6 = iVar6 + 0x18;
-                    }
-                    rep[iVar12 * 0x13 + 11] = (subpass == total);
-                    tottotacc = tottotacc + total;
-                    passtotacc = passtotacc + subpass;
-                    uVar9 = iVar6 + 0x16;
-                    iVar12 = iVar13;
-                    iVar4 = iVar6;
-                    break;
-                }
-                total = 1;
-                flatp = (int *)((int)DAT_00666088 <= out68);
-                if (flatp == (int *)0x0) {
-                    flags = flags | 0x8000;
-                }
-                subpass = (flatp != (int *)0x0);
-                if ((unsigned int)(iVar4 + 0x2e) < 0x1b6) {
-                LAB_00446d50:
-                    rep[(iVar12 + 1) * 0x13 + 9] = AppraisalPageCount;
-                    rep[(iVar12 + 1) * 0x13 + 10] = xbase + 0x30;
-                    rep[(iVar12 + 1) * 0x13 + 11] = (int)flatp;
-                    rep[(iVar12 + 1) * 0x13 + 12] = rand() % 5;
-                    uVar5 = GetString(0x132);
-                    iVar13 = iVar12 + 2;
-                    rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 + 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                    rep[(iVar12 + 1) * 0x13 + 16] = out68;
-                    rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666088;
-                    rep[(iVar12 + 1) * 0x13 + 18] = DAT_0066608c;
-                    rep[(iVar12 + 1) * 0x13 + 19] = 0;
-                    iVar6 = iVar6 + 0x18;
-                    goto LAB_00446deb;
-                }
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar13;
-                    goto LAB_00446d50;
-                }
-            LAB_00446e59:
-                xbase = *rowp;
-            } else if (iVar3 == iVar12) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar12;
-                goto LAB_00446c11;
-            }
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = wstart;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-        } while ((ReportFlags & 0xc0000000) != 0);
-    }
-    if ((ReportFlags & 0x30000) != 0) {
-        do {
-            rowp = &rep[iVar12 * 0x13 + 10];
-            total = 0;
-            subpass = 0;
-            *rowp = xbase;
-            if (uVar9 < 0x1b6) {
-            LAB_0044704b:
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                *rowp = xbase;
-                rep[iVar12 * 0x13 + 11] = (int)flatp;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x146);
-                iVar13 = iVar12 + 1;
-                iVar6 = iVar4 + 0x18;
-                rep[iVar12 * 0x13 + 13] = (int)uVar5;
-                rep[iVar12 * 0x13 + 14] = 0;
-                rep[iVar12 * 0x13 + 15] = 0;
-                rep[iVar12 * 0x13 + 16] = 0;
-                rep[iVar12 * 0x13 + 17] = 0;
-                rep[iVar12 * 0x13 + 18] = 0;
-                rep[iVar12 * 0x13 + 19] = 0;
-                CountFoodStallClasses((unsigned int *)&out60, (unsigned int *)&out6c);
-                if ((ReportFlags & 0x10000) == 0) {
-                LAB_00447222:
-                    if ((ReportFlags & 0x20000) != 0) {
-                        total = total + 1;
-                        flatp = (int *)((int)DAT_00666048 <= out6c);
-                        if (flatp == (int *)0x0) {
-                            flags = flags | 0x40000;
-                        } else {
-                            subpass = subpass + 1;
-                        }
-                        if (0x1b5 < (unsigned int)(iVar6 + 0x16)) {
-                            if (iVar3 != iVar12)
-                                goto LAB_00447290;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar13;
-                        }
-                        rep[iVar13 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar13 * 0x13 + 10] = xbase + 0x30;
-                        rep[iVar13 * 0x13 + 11] = (int)flatp;
-                        rep[iVar13 * 0x13 + 12] = rand() % 5;
-                        uVar5 = GetString(0x133);
-                        iVar13 = iVar13 + 1;
-                        rep[(iVar13 - 1) * 0x13 + 13] = (int)uVar5;
-                        rep[(iVar13 - 1) * 0x13 + 14] = 0;
-                        rep[(iVar13 - 1) * 0x13 + 15] = 1;
-                        rep[(iVar13 - 1) * 0x13 + 16] = out6c;
-                        rep[(iVar13 - 1) * 0x13 + 17] = DAT_00666048;
-                        rep[(iVar13 - 1) * 0x13 + 18] = DAT_0066604c;
-                        rep[(iVar13 - 1) * 0x13 + 19] = 0;
-                        iVar6 = iVar6 + 0x18;
-                    }
-                    rep[iVar12 * 0x13 + 11] = (subpass == total);
-                    tottotacc = tottotacc + total;
-                    passtotacc = passtotacc + subpass;
-                    uVar9 = iVar6 + 0x16;
-                    iVar12 = iVar13;
-                    iVar4 = iVar6;
-                    break;
-                }
-                total = 1;
-                flatp = (int *)((int)DAT_00666040 <= out60);
-                if (flatp == (int *)0x0) {
-                    flags = flags | 0x20000;
-                }
-                subpass = (flatp != (int *)0x0);
-                if ((unsigned int)(iVar4 + 0x2e) < 0x1b6) {
-                LAB_00447187:
-                    rep[(iVar12 + 1) * 0x13 + 9] = AppraisalPageCount;
-                    rep[(iVar12 + 1) * 0x13 + 10] = xbase + 0x30;
-                    rep[(iVar12 + 1) * 0x13 + 11] = (int)flatp;
-                    rep[(iVar12 + 1) * 0x13 + 12] = rand() % 5;
-                    uVar5 = GetString(0x132);
-                    iVar13 = iVar12 + 2;
-                    rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 + 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                    rep[(iVar12 + 1) * 0x13 + 16] = out60;
-                    rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666040;
-                    rep[(iVar12 + 1) * 0x13 + 18] = DAT_00666044;
-                    rep[(iVar12 + 1) * 0x13 + 19] = 0;
-                    iVar6 = iVar6 + 0x18;
-                    goto LAB_00447222;
-                }
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar13;
-                    goto LAB_00447187;
-                }
-            LAB_00447290:
-                xbase = *rowp;
-            } else if (iVar3 == iVar12) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar12;
-                goto LAB_0044704b;
-            }
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = wstart;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-        } while ((ReportFlags & 0x30000) != 0);
-    }
-    if ((ReportFlags & 0x5080000) != 0) {
-        do {
-            rowp = &rep[iVar12 * 0x13 + 10];
-            total = 0;
-            subpass = 0;
-            *rowp = xbase;
-            if (uVar9 < 0x1b6) {
-            LAB_00447482:
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                *rowp = xbase;
-                rep[iVar12 * 0x13 + 11] = (int)flatp;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x147);
-                iVar13 = iVar12 + 1;
-                iVar6 = iVar4 + 0x18;
-                rep[iVar12 * 0x13 + 13] = (int)uVar5;
-                rep[iVar12 * 0x13 + 14] = 0;
-                rep[iVar12 * 0x13 + 15] = 0;
-                rep[iVar12 * 0x13 + 16] = 0;
-                rep[iVar12 * 0x13 + 17] = 0;
-                rep[iVar12 * 0x13 + 18] = 0;
-                rep[iVar12 * 0x13 + 19] = 0;
-                SurveyBlokes((unsigned int *)&out58, (unsigned int *)&out5c, &out64);
-                if ((ReportFlags & 0x80000) != 0) {
-                    total = 1;
-                    flatp = (int *)((int)DAT_00666038 <= out58);
-                    if (flatp == (int *)0x0) {
-                        flags = flags | 0x80000;
-                    }
-                    subpass = (flatp != (int *)0x0);
-                    iVar6 = iVar4 + 0x30;
-                }
-                if ((ReportFlags & 0x1000000) == 0) {
-                LAB_004476a1:
-                    if ((ReportFlags & 0x4000000) != 0) {
-                        total = total + 1;
-                        flatp = (int *)((int)DAT_00666050 <= out64);
-                        if (flatp == (int *)0x0) {
-                            flags = flags | 0x200000;
-                        } else {
-                            subpass = subpass + 1;
-                        }
-                        if (0x1b5 < (unsigned int)(iVar6 + 0x16)) {
-                            if (iVar3 != iVar12)
-                                goto LAB_0044770b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar13;
-                        }
-                        rep[iVar13 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar13 * 0x13 + 10] = xbase + 0x30;
-                        rep[iVar13 * 0x13 + 11] = (int)flatp;
-                        rep[iVar13 * 0x13 + 12] = rand() % 5;
-                        uVar5 = GetString(0x149);
-                        iVar13 = iVar13 + 1;
-                        rep[(iVar13 - 1) * 0x13 + 13] = (int)uVar5;
-                        rep[(iVar13 - 1) * 0x13 + 14] = 0;
-                        rep[(iVar13 - 1) * 0x13 + 15] = 1;
-                        rep[(iVar13 - 1) * 0x13 + 16] = out64;
-                        rep[(iVar13 - 1) * 0x13 + 17] = DAT_00666050;
-                        rep[(iVar13 - 1) * 0x13 + 18] = DAT_00666054;
-                        rep[(iVar13 - 1) * 0x13 + 19] = 0;
-                        iVar6 = iVar6 + 0x18;
-                    }
-                    rep[iVar12 * 0x13 + 11] = (subpass == total);
-                    tottotacc = tottotacc + total;
-                    passtotacc = passtotacc + subpass;
-                    uVar9 = iVar6 + 0x16;
-                    iVar12 = iVar13;
-                    iVar4 = iVar6;
-                    break;
-                }
-                total = total + 1;
-                flatp = (int *)((int)DAT_00666050 <= out5c);
-                if (flatp == (int *)0x0) {
-                    flags = flags | 0x100000;
-                } else {
-                    subpass = subpass + 1;
-                }
-                if ((unsigned int)(iVar6 + 0x16) < 0x1b6) {
-                LAB_00447603:
-                    rep[(iVar12 + 1) * 0x13 + 9] = AppraisalPageCount;
-                    rep[(iVar12 + 1) * 0x13 + 10] = xbase + 0x30;
-                    rep[(iVar12 + 1) * 0x13 + 11] = (int)flatp;
-                    rep[(iVar12 + 1) * 0x13 + 12] = rand() % 5;
-                    uVar5 = GetString(0x148);
-                    iVar13 = iVar12 + 2;
-                    rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 + 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                    rep[(iVar12 + 1) * 0x13 + 16] = out5c;
-                    rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666050;
-                    rep[(iVar12 + 1) * 0x13 + 18] = DAT_00666054;
-                    rep[(iVar12 + 1) * 0x13 + 19] = 0;
-                    iVar6 = iVar6 + 0x18;
-                    goto LAB_004476a1;
-                }
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar13;
-                    goto LAB_00447603;
-                }
-            LAB_0044770b:
-                xbase = *rowp;
-            } else if (iVar3 == iVar12) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar12;
-                goto LAB_00447482;
-            }
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = wstart;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-        } while ((ReportFlags & 0x5080000) != 0);
-    }
-    if ((ReportFlags & 0xe00000) != 0) {
-        do {
-            rowp = &rep[iVar12 * 0x13 + 10];
-            total = 0;
-            subpass = 0;
-            *rowp = xbase;
-            if (uVar9 < 0x1b6) {
-            LAB_004478fd:
-                rep[iVar12 * 0x13 + 9] = AppraisalPageCount;
-                *rowp = xbase;
-                rep[iVar12 * 0x13 + 11] = (int)flatp;
-                rep[iVar12 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x14a);
-                iVar7 = iVar12 + 1;
-                iVar6 = iVar4 + 0x18;
-                rep[iVar12 * 0x13 + 13] = (int)uVar5;
-                rep[iVar12 * 0x13 + 14] = 0;
-                rep[iVar12 * 0x13 + 15] = 0;
-                rep[iVar12 * 0x13 + 16] = 0;
-                rep[iVar12 * 0x13 + 17] = 0;
-                rep[iVar12 * 0x13 + 18] = 0;
-                passtotal = (iVar12 + 1) * 0x13;
-                rep[iVar12 * 0x13 + 19] = 0;
-                iVar13 = xbase + 0x30;
-                if ((ReportFlags & 0x200000) == 0) {
-                LAB_00447b1b:
-                    if ((ReportFlags & 0x400000) != 0) {
-                        tmp8 = 0;
-                        piVar10 = (int *)GetFirstRenderObject();
-                        while (piVar10 != (int *)0x0) {
-                            /* the object's map position (+4) is what FUN_0044f360 checks; the class type
-                             * (+0x20) only filters (0x447b42) */
-                            coord = *(short *)((char *)piVar10 + 4);
-                            if (((*(short *)(*(int *)(*piVar10 + 0xc) + 0x20) != 0) &&
-                                    (*(short *)(*(int *)(*piVar10 + 0xc) + 0x20) != 2)) &&
-                                (iVar4 = FUN_0044f360(*(int *)(*piVar10 + 0xc), &coord), iVar4 != 0)) {
-                                tmp8 = tmp8 + 1;
-                            }
-                            piVar10 = (int *)GetNextRenderObject((MapElement *)piVar10);
-                        }
-                        total = total + 1;
-                        flatp = (int *)((int)DAT_00666060 <= tmp8);
-                        if (flatp == (int *)0x0) {
-                            flags = flags | 0x800000;
-                        } else {
-                            subpass = subpass + 1;
-                        }
-                        if (0x1b5 < iVar6 + 0x16) {
-                            if (iVar3 != iVar12)
-                                goto LAB_00447d21;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar7;
-                        }
-                        rep[passtotal + 9] = AppraisalPageCount;
-                        rep[passtotal + 10] = iVar13;
-                        rep[passtotal + 11] = (int)flatp;
-                        rep[passtotal + 12] = rand() % 5;
-                        uVar5 = GetString(0x14c);
-                        iVar7 = iVar7 + 1;
-                        rep[passtotal + 13] = (int)uVar5;
-                        rep[passtotal + 14] = 0;
-                        rep[passtotal + 15] = 1;
-                        rep[passtotal + 16] = tmp8;
-                        rep[passtotal + 17] = DAT_00666060;
-                        rep[passtotal + 18] = DAT_00666064;
-                        rep[passtotal + 19] = 0;
-                        iVar6 = iVar6 + 0x18;
-                    }
-                    if ((ReportFlags & 0x800000) != 0) {
-                        iVar4 = GetMapTileCount();
-                        total = total + 1;
-                        flatp = (int *)((int)DAT_00666068 <= iVar4);
-                        if (flatp == (int *)0x0) {
-                            flags = flags | 0x1000000;
-                        } else {
-                            subpass = subpass + 1;
-                        }
-                        if (0x1b5 < iVar6 + 0x16) {
-                            if (iVar3 != iVar12)
-                                goto LAB_00447d21;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar7;
-                        }
-                        rep[iVar7 * 0x13 + 9] = AppraisalPageCount;
-                        rep[iVar7 * 0x13 + 10] = iVar13;
-                        rep[iVar7 * 0x13 + 11] = (int)flatp;
-                        rep[iVar7 * 0x13 + 12] = rand() % 5;
-                        uVar5 = GetString(0x14d);
-                        iVar7 = iVar7 + 1;
-                        rep[(iVar7 - 1) * 0x13 + 13] = (int)uVar5;
-                        rep[(iVar7 - 1) * 0x13 + 14] = 0;
-                        rep[(iVar7 - 1) * 0x13 + 15] = 1;
-                        rep[(iVar7 - 1) * 0x13 + 16] = iVar4;
-                        rep[(iVar7 - 1) * 0x13 + 17] = DAT_00666068;
-                        rep[(iVar7 - 1) * 0x13 + 18] = DAT_0066606c;
-                        rep[(iVar7 - 1) * 0x13 + 19] = 0;
-                        iVar6 = iVar6 + 0x18;
-                    }
-                    rep[iVar12 * 0x13 + 11] = (subpass == total);
-                    tottotacc = tottotacc + total;
-                    passtotacc = passtotacc + subpass;
-                    uVar9 = iVar6 + 0x16;
-                    iVar12 = iVar7;
-                    iVar4 = iVar6;
-                    break;
-                }
-                total = 1;
-                flatp = (int *)((int)DAT_00666058 <= (int)MapStats.power_supply);
-                if (flatp == (int *)0x0) {
-                    flags = flags | 0x400000;
-                }
-                subpass = (flatp != (int *)0x0);
-                if ((unsigned int)(iVar4 + 0x2e) < 0x1b6) {
-                LAB_00447a7a:
-                    rep[(iVar12 + 1) * 0x13 + 9] = AppraisalPageCount;
-                    rep[(iVar12 + 1) * 0x13 + 10] = iVar13;
-                    rep[(iVar12 + 1) * 0x13 + 11] = (int)flatp;
-                    rep[(iVar12 + 1) * 0x13 + 12] = rand() % 5;
-                    uVar5 = GetString(0x14b);
-                    iVar7 = iVar12 + 2;
-                    rep[(iVar12 + 1) * 0x13 + 13] = (int)uVar5;
-                    rep[(iVar12 + 1) * 0x13 + 14] = 0;
-                    rep[(iVar12 + 1) * 0x13 + 15] = 1;
-                    rep[(iVar12 + 1) * 0x13 + 16] = MapStats.power_supply;
-                    rep[(iVar12 + 1) * 0x13 + 17] = DAT_00666058;
-                    rep[(iVar12 + 1) * 0x13 + 18] = DAT_0066605c;
-                    rep[(iVar12 + 1) * 0x13 + 19] = 0;
-                    passtotal = (iVar12 + 2) * 0x13;
-                    iVar6 = iVar6 + 0x18;
-                    goto LAB_00447b1b;
-                }
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar7;
-                    goto LAB_00447a7a;
-                }
-            LAB_00447d21:
-                xbase = *rowp;
-            } else if (iVar3 == iVar12) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar12;
-                goto LAB_004478fd;
-            }
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = wstart;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-        } while ((ReportFlags & 0xe00000) != 0);
-    }
-LAB_00447e73:
-    do {
-        iVar14 = iVar12 * 0x4c;
-        piVar10 = (int *)(((char *)rep + 0x28) + iVar14);
-        *piVar10 = xbase;
-        if ((int)uVar9 < 0x1b6) {
-        LAB_00447ef2:
-            *(int *)((char *)rep + 0x24 + iVar14) = AppraisalPageCount;
-            *piVar10 = xbase;
-            *(int *)((char *)rep + 0x2c + iVar14) = 0xfffffffe;
-            iVar6 = rand();
-            *(int *)((char *)rep + 0x30 + iVar14) = iVar6 % 5;
-            uVar5 = GetString(0x230);
-            iVar6 = iVar4 + 0x18;
-            iVar7 = iVar12 + 1;
-            *(int *)((char *)rep + 0x34 + iVar14) = (int)uVar5;
-            iVar13 = xbase + 0x30;
-            *(int *)((char *)rep + 0x38 + iVar14) = 0;
-            *(int *)((char *)rep + 0x3c + iVar14) = 0;
-            *(int *)((char *)rep + 0x40 + iVar14) = 0;
-            *(int *)((char *)rep + 0x44 + iVar14) = 0;
-            *(int *)((char *)rep + 0x48 + iVar14) = 0;
-            *(int *)((char *)rep + 0x4c + iVar14) = 0;
-            iVar4 = iVar4 + 0x2e;
-            if (passtotacc < tottotacc / 2) {
-                if (0x1b5 < iVar4) {
-                    if (iVar3 != iVar12) goto LAB_0044a60b;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar7;
-                }
-                iVar7 = iVar7 * 0x4c;
-                *(int *)((char *)rep + 0x24 + iVar7) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar7) = iVar13;
-                *(int *)((char *)rep + 0x2c + iVar7) = 0xfffffffe;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar7) = iVar4 % 5;
-                uVar5 = GetString(0x14f);
-                iVar8 = iVar12 + 2;
-                *(int *)((char *)rep + 0x34 + iVar7) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar7) = 0;
-                *(int *)((char *)rep + 0x3c + iVar7) = 0;
-                *(int *)((char *)rep + 0x40 + iVar7) = 0;
-                *(int *)((char *)rep + 0x44 + iVar7) = 0;
-                *(int *)((char *)rep + 0x48 + iVar7) = 0;
-                *(int *)((char *)rep + 0x4c + iVar7) = 0;
-                iVar14 = iVar8 * 0x4c;
-                (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x14f;
-                rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                iVar4 = iVar6 + 0x18;
-                if (0x1b5 < iVar6 + 0x2e) {
-                    if (iVar3 != iVar12) goto LAB_0044a60b;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar8;
-                }
-                *(int *)((char *)rep + 0x24 + iVar14) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar14) = iVar13;
-                *(int *)((char *)rep + 0x2c + iVar14) = 0xfffffffe;
-                iVar6 = rand();
-                *(int *)((char *)rep + 0x30 + iVar14) = iVar6 % 5;
-                uVar5 = GetString(0x150);
-                *(int *)((char *)rep + 0x34 + iVar14) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar14) = 0;
-                *(int *)((char *)rep + 0x3c + iVar14) = 0;
-                *(int *)((char *)rep + 0x40 + iVar14) = 0;
-                *(int *)((char *)rep + 0x44 + iVar14) = 0;
-                *(int *)((char *)rep + 0x48 + iVar14) = 0;
-                *(int *)((char *)rep + 0x4c + iVar14) = 0;
-                piVar11 = rep + (iVar12 + 3) * 0x13;
-                (rep + 1)[(iVar12 + 3) * 0x13 + *piVar11] = 0x150;
-                *piVar11 = *piVar11 + 1;
-                iVar14 = iVar12 + 3;
-                iVar6 = iVar14 * 0x4c;
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffe;
-                iVar7 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar7 % 5;
-                uVar5 = GetString(0x151);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-            LAB_0044855b:
-                ysave = iVar4 + 0x2e;
-                iVar4 = iVar4 + 0x18;
-                iVar14 = iVar12 + 3;
-                iVar6 = iVar4;
-                if ((flags & 1) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x155);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x155;
-                    *piVar11 = *piVar11 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    ysave = iVar6 + 0x2e;
-                }
-                iVar6 = iVar4;
-                if ((flags & 2) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x156);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x156;
-                    *piVar11 = *piVar11 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    ysave = iVar6 + 0x2e;
-                }
-                iVar6 = iVar4;
-                if ((flags & 4) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x157);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x157;
-                    *piVar11 = *piVar11 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    ysave = iVar6 + 0x2e;
-                }
-                iVar6 = iVar4;
-                if ((flags & 8) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x158);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x158;
-                    *piVar11 = *piVar11 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    ysave = iVar6 + 0x2e;
-                }
-                uVar9 = flags & 0x30;
-                iVar6 = iVar4;
-                if (uVar9 == 0x10) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar14 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar14 % 5;
-                    uVar5 = GetString(0x159);
-                    iVar14 = iVar12 + 4;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x159;
-                LAB_00448d96:
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                } else {
-                    if (uVar9 == 0x20) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar14 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar14 % 5;
-                        uVar5 = GetString(0x15a);
-                        iVar14 = iVar12 + 4;
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + iVar14 * 0x13;
-                        (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x15a;
-                        goto LAB_00448d96;
-                    }
-                    if (uVar9 == 0x30) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            ysave = 0x83;
-                            iVar4 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar14 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar14) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar14) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar14) = 0xffffffff;
-                        iVar6 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar14) = iVar6 % 5;
-                        uVar5 = GetString(0x15b);
-                        *(int *)((char *)rep + 0x34 + iVar14) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar14) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar14) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar14) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar14) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar14) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar14) = 0;
-                        iVar6 = iVar4;
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar12 + 4;
-                        }
-                        iVar4 = (iVar12 + 4) * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                        iVar14 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar14 % 5;
-                        uVar5 = GetString(0x133);
-                        iVar14 = iVar12 + 5;
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + iVar14 * 0x13;
-                        (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x15b;
-                        goto LAB_00448d96;
-                    }
-                }
-                if ((flags & 0x40) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar6 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar7 % 5;
-                    uVar5 = GetString(0x15c);
-                    iVar7 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    iVar6 = iVar7 * 0x4c;
-                    (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x15c;
-                    rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                    ysave = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        ysave = ystart;
-                        iVar3 = iVar7;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x15d);
-                    iVar14 = iVar14 + 2;
-                    iVar4 = ysave + 0x18;
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    ysave = ysave + 0x2e;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                }
-                if ((flags & 0x80) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x15e);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x15e;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x100) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x15f);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x15f;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x200) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x160);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x160;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x400) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x161);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x161;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x800) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x162);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x162;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                uVar9 = flags & 0x3000;
-                iVar6 = iVar4;
-                if (uVar9 == 0x1000) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x163);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + (iVar14 + 1) * 0x13;
-                    (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x163;
-                LAB_00449820:
-                    iVar14 = iVar14 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                } else {
-                    if (uVar9 == 0x2000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                        uVar5 = GetString(0x164);
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + (iVar14 + 1) * 0x13;
-                        (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x164;
-                        goto LAB_00449820;
-                    }
-                    if (uVar9 == 0x3000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                        uVar5 = GetString(0x165);
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + (iVar14 + 1) * 0x13;
-                        (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x165;
-                        goto LAB_00449820;
-                    }
-                }
-                uVar9 = flags & 0x18000;
-                iVar6 = iVar4;
-                if (uVar9 == 0x8000) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x166);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + (iVar14 + 1) * 0x13;
-                    (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x166;
-                LAB_00449b4b:
-                    iVar14 = iVar14 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                } else {
-                    if (uVar9 == 0x10000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                        uVar5 = GetString(0x167);
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + (iVar14 + 1) * 0x13;
-                        (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x167;
-                        goto LAB_00449b4b;
-                    }
-                    if (uVar9 == 0x18000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                        uVar5 = GetString(0x168);
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + (iVar14 + 1) * 0x13;
-                        (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x168;
-                        goto LAB_00449b4b;
-                    }
-                }
-                uVar9 = flags & 0x60000;
-                iVar6 = iVar4;
-                if (uVar9 == 0x20000) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x169);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + (iVar14 + 1) * 0x13;
-                    (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x169;
-                LAB_00449f70:
-                    iVar14 = iVar14 + 1;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                } else {
-                    if (uVar9 == 0x40000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar6 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar4 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                        uVar5 = GetString(0x16a);
-                        *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                        piVar11 = rep + (iVar14 + 1) * 0x13;
-                        (rep + 1)[(iVar14 + 1) * 0x13 + *piVar11] = 0x16a;
-                        goto LAB_00449f70;
-                    }
-                    if (uVar9 == 0x60000) {
-                        if (0x1b5 < ysave) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            iVar4 = ystart;
-                            iVar3 = iVar14;
-                        }
-                        iVar6 = iVar14 * 0x4c;
-                        *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                        iVar7 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar6) = iVar7 % 5;
-                        uVar5 = GetString(0x16b);
-                        iVar7 = iVar14 + 1;
-                        *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                        iVar6 = iVar7 * 0x4c;
-                        (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x16b;
-                        rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                        ysave = iVar4 + 0x18;
-                        if (0x1b5 < iVar4 + 0x2e) {
-                            if (iVar3 != iVar12) goto LAB_0044a60b;
-                            AppraisalPageCount = AppraisalPageCount + 1;
-                            ysave = ystart;
-                            iVar3 = iVar7;
-                        }
-                        *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                        *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                        *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                        iVar4 = rand();
-                        *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                        uVar5 = GetString(0x231);
-                        iVar14 = iVar14 + 2;
-                        iVar4 = ysave + 0x18;
-                        *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                        *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                        *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                        *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                        ysave = ysave + 0x2e;
-                        *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    }
-                }
-                if ((flags & 0x80000) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x16c);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x16c;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x100000) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x16d);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x16d;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x200000) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x16f);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x16f;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x400000) != 0) {
-                    iVar6 = iVar4;
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar4 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar7 % 5;
-                    uVar5 = GetString(0x170);
-                    iVar14 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    piVar11 = rep + iVar14 * 0x13;
-                    (rep + 1)[iVar14 * 0x13 + *piVar11] = 0x170;
-                    iVar4 = iVar6 + 0x18;
-                    *piVar11 = *piVar11 + 1;
-                    ysave = iVar6 + 0x2e;
-                }
-                if ((flags & 0x800000) != 0) {
-                    if (0x1b5 < ysave) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    iVar6 = iVar14 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar7 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar7 % 5;
-                    uVar5 = GetString(0x171);
-                    iVar7 = iVar14 + 1;
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    iVar6 = iVar7 * 0x4c;
-                    (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x171;
-                    rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                    ysave = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        ysave = ystart;
-                        iVar3 = iVar7;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x172);
-                    iVar14 = iVar14 + 2;
-                    iVar4 = ysave + 0x18;
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    ysave = ysave + 0x2e;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                }
-                if ((flags & 0x1000000) == 0) goto LAB_0044a70c;
-                iVar6 = iVar4;
-                if (ysave < 0x1b6) goto LAB_0044a658;
-                if (iVar3 == iVar12) break;
+        APPR_ROW(0, 0x131);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        x += 0x30;
+        CountClassesOfType1Or3(&bf0_total, &bf0_count);
+        if (ReportFlags & 0x4000) {
+            total++;
+            ok = bf0_total >= DAT_00666020;
+            if (ok) {
+                pass++;
             } else {
-                if (tottotacc <= passtotacc) {
-                    if (0x1b5 < iVar4) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar6 = ystart;
-                        iVar3 = iVar7;
-                    }
-                    iVar7 = iVar7 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar7) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar7) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar7) = 0xfffffffe;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar7) = iVar4 % 5;
-                    uVar5 = GetString(0x153);
-                    iVar14 = iVar12 + 2;
-                    *(int *)((char *)rep + 0x34 + iVar7) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar7) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar7) = 0;
-                    tmp8 = iVar14 * 0x4c;
-                    flatp = (int *)(((char *)rep + 0x4c) + tmp8);
-                    (rep + 1)[iVar14 * 0x13 + rep[iVar14 * 0x13]] = 0x153;
-                    rep[iVar14 * 0x13] = rep[iVar14 * 0x13] + 1;
-                    iVar4 = iVar6 + 0x18;
-                    if (0x1b5 < iVar6 + 0x2e) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    *(int *)((char *)rep + 0x24 + tmp8) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + tmp8) = iVar13;
-                    *(int *)((char *)rep + 0x2c + tmp8) = 0xfffffffe;
-                    iVar14 = rand();
-                    *(int *)((char *)rep + 0x30 + tmp8) = iVar14 % 5;
-                LAB_00448514:
-                    uVar5 = GetString(0x154);
-                    *(int *)((char *)rep + 0x34 + tmp8) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + tmp8) = 0;
-                    *(int *)((char *)rep + 0x3c + tmp8) = 0;
-                    *(int *)((char *)rep + 0x40 + tmp8) = 0;
-                    *(int *)((char *)rep + 0x44 + tmp8) = 0;
-                    *(int *)((char *)rep + 0x48 + tmp8) = 0;
-                    *flatp = 0;
-                    goto LAB_0044855b;
-                }
-                if (iVar4 < 0x1b6) {
-                LAB_0044820e:
-                    iVar7 = iVar7 * 0x4c;
-                    *(int *)((char *)rep + 0x24 + iVar7) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar7) = iVar13;
-                    *(int *)((char *)rep + 0x2c + iVar7) = 0xfffffffe;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar7) = iVar4 % 5;
-                    uVar5 = GetString(0x150);
-                    iVar14 = iVar12 + 2;
-                    *(int *)((char *)rep + 0x34 + iVar7) = (int)uVar5;
-                    *(int *)((char *)rep + 0x38 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar7) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x4c + iVar7) = 0;
-                    tmp8 = iVar14 * 0x4c;
-                    flatp = (int *)(((char *)rep + 0x4c) + tmp8);
-                    (rep + 1)[iVar14 * 0x13 + rep[iVar14 * 0x13]] = 0x151;
-                    rep[iVar14 * 0x13] = rep[iVar14 * 0x13] + 1;
-                    iVar4 = iVar6 + 0x18;
-                    if (0x1b5 < iVar6 + 0x2e) {
-                        if (iVar3 != iVar12) goto LAB_0044a60b;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar14;
-                    }
-                    *(int *)((char *)rep + 0x24 + tmp8) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + tmp8) = iVar13;
-                    *(int *)((char *)rep + 0x2c + tmp8) = 0xfffffffe;
-                    iVar14 = rand();
-                    *(int *)((char *)rep + 0x30 + tmp8) = iVar14 % 5;
-                    goto LAB_00448514;
-                }
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar6 = ystart;
-                    iVar3 = iVar7;
-                    goto LAB_0044820e;
-                }
+                flags |= 0x10;
             }
-        LAB_0044a60b:
-            xbase = *piVar10;
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = 0x83;
-            iVar4 = 0x6d;
-            iVar3 = iVar12;
-            goto LAB_00447e73;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto s1;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x132);
+            recs[i].arg = 0;
+            recs[i].bar = 1;
+            recs[i].value = bf0_total;
+            recs[i].goal = DAT_00666020;
+            recs[i].max = DAT_00666024;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
         }
-        if (iVar3 == iVar12) {
-            AppraisalPageCount = AppraisalPageCount + 1;
-            iVar4 = ystart;
-            iVar3 = iVar12;
-            goto LAB_00447ef2;
+        if (ReportFlags & 0x8000) {
+            total++;
+            ok = bf0_count >= DAT_00666028;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x20;
+            }
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto s1;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x133);
+            recs[i].arg = 0;
+            recs[i].bar = 1;
+            recs[i].value = bf0_count;
+            recs[i].goal = DAT_00666028;
+            recs[i].max = DAT_0066602c;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
         }
-        AppraisalPageCount = AppraisalPageCount + 1;
-        uVar9 = wstart;
-        iVar4 = ystart;
-        iVar3 = iVar12;
-    } while (1);
-    AppraisalPageCount = AppraisalPageCount + 1;
-    iVar6 = ystart;
-    iVar3 = iVar14;
-LAB_0044a658:
-    rep[iVar14 * 0x13 + 9] = AppraisalPageCount;
-    rep[iVar14 * 0x13 + 10] = iVar13;
-    rep[iVar14 * 0x13 + 11] = 0xffffffff;
-    rep[iVar14 * 0x13 + 12] = rand() % 5;
-    uVar5 = GetString(0x173);
-    iVar14 = iVar14 + 1;
-    rep[(iVar14 - 1) * 0x13 + 13] = (int)uVar5;
-    rep[(iVar14 - 1) * 0x13 + 14] = 0;
-    rep[(iVar14 - 1) * 0x13 + 15] = 0;
-    rep[(iVar14 - 1) * 0x13 + 16] = 0;
-    rep[(iVar14 - 1) * 0x13 + 17] = 0;
-    rep[(iVar14 - 1) * 0x13 + 18] = 0;
-    rep[(iVar14 - 1) * 0x13 + 19] = 0;
-    piVar10 = &rep[iVar14 * 0x13];
-    piVar10[1 + *piVar10] = 0x173;
-    iVar4 = iVar6 + 0x18;
-    *piVar10 = *piVar10 + 1;
-    ysave = iVar6 + 0x2e;
-LAB_0044a70c:
-    if ((flags != 0) && (MapStats.appraisal_fail_limit != 0)) {
+        if (ReportFlags & 0x40000) {
+            val = GetLinkedObjectPercent();
+            total++;
+            ok = val >= DAT_00666030;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x40;
+            }
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto s1;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x134);
+            recs[i].arg = 0;
+            recs[i].bar = 1;
+            recs[i].value = val;
+            recs[i].goal = DAT_00666030;
+            recs[i].max = DAT_00666034;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+        }
+        if (ReportFlags & 0x30) {
+            total++;
+            ok = GetCastleScore() >= DAT_0066600c;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x80;
+            }
+            switch ((ReportFlags >> 4) & 3) {
+            case 1:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x135);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 2:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x136);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 3:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x137);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            }
+            y += 0x18;
+        }
+        if (ReportFlags & 0xc0) {
+            total++;
+            ok = GetDrivingSchoolScore() >= DAT_00666010;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x100;
+            }
+            switch ((ReportFlags >> 6) & 3) {
+            case 1:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x138);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 2:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x139);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 3:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13a);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            }
+            y += 0x18;
+        }
+        if (ReportFlags & 0x300) {
+            total++;
+            ok = GetLogFlumeScore() >= DAT_00666014;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x200;
+            }
+            switch ((ReportFlags >> 8) & 3) {
+            case 1:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13b);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 2:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13c);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 3:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13d);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            }
+            y += 0x18;
+        }
+        if (ReportFlags & 0xc00) {
+            total++;
+            ok = GetBoatingSchoolScore() >= DAT_00666018;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x400;
+            }
+            switch ((ReportFlags >> 10) & 3) {
+            case 1:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13e);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 2:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x13f);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 3:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x140);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            }
+            y += 0x18;
+        }
+        if (ReportFlags & 0x3000) {
+            total++;
+            ok = GetJungleCruiseScore() >= DAT_0066601c;
+            if (ok) {
+                pass++;
+            } else {
+                flags |= 0x800;
+            }
+            switch ((ReportFlags >> 12) & 3) {
+            case 1:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x141);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 2:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x142);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            case 3:
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts the section here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto s1;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x143);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0;
+                i++;
+                break;
+            }
+            y += 0x18;
+        }
+        recs[first].type = pass == total;
+        x -= 0x30;
+        bottom = y + 0x16;
+        totacc += total;
+        passacc += pass;
+    }
+    /* section 2 (0x44672e-0x4473e2): the loop sections 0x38000000, 0xc0000000 and 0x30000 */
+    if (ReportFlags & 0x38000000) {
+        int lpass; /* checks passed in it */
+
+        do {
+            total = 0;
+            lpass = 0;
+            first = i;
+            xp = &recs[i].x;
+            *xp = x;
+            if (bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != i) {
+                    /* the header does not fit: retry it at the top of a new page */
+                    AppraisalPageCount++;
+                    pagestart = i;
+                    continue;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x144);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+            x += 0x30;
+            CountType2ClassesExceptRideParts(&c70_total, &c70_count);
+            if (ReportFlags & 0x8000000) {
+                total++;
+                ok = c70_total >= DAT_00666070;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x1000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x132);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = c70_total;
+                recs[i].goal = DAT_00666070;
+                recs[i].max = DAT_00666074;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x10000000) {
+                total++;
+                ok = c70_count >= DAT_00666078;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x2000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts the section here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x133);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = c70_count;
+                recs[i].goal = DAT_00666078;
+                recs[i].max = DAT_0066607c;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            recs[first].type = lpass == total;
+            totacc += total;
+            passacc += lpass;
+            x -= 0x30;
+            bottom = y + 0x16;
+            break;
+        } while (ReportFlags & 0x38000000);
+    }
+    if (ReportFlags & 0xc0000000) {
+        int lpass; /* checks passed in it */
+
+        do {
+            total = 0;
+            lpass = 0;
+            first = i;
+            xp = &recs[i].x;
+            *xp = x;
+            if (bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != i) {
+                    /* the header does not fit: retry it at the top of a new page */
+                    AppraisalPageCount++;
+                    pagestart = i;
+                    continue;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x145);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+            x += 0x30;
+            CountClassesOfType4(&cd0_total, &cd0_count);
+            if (ReportFlags & 0x40000000) {
+                total++;
+                ok = cd0_total >= DAT_00666088;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x8000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x132);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = cd0_total;
+                recs[i].goal = DAT_00666088;
+                recs[i].max = DAT_0066608c;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x80000000) {
+                total++;
+                ok = cd0_count >= DAT_00666090;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x10000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts the section here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x133);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = cd0_count;
+                recs[i].goal = DAT_00666090;
+                recs[i].max = DAT_00666094;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            recs[first].type = lpass == total;
+            totacc += total;
+            passacc += lpass;
+            x -= 0x30;
+            bottom = y + 0x16;
+            break;
+        } while (ReportFlags & 0xc0000000);
+    }
+    if (ReportFlags & 0x30000) {
+        int lpass; /* checks passed in it */
+
+        do {
+            total = 0;
+            lpass = 0;
+            first = i;
+            xp = &recs[i].x;
+            *xp = x;
+            if (bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != i) {
+                    /* the header does not fit: retry it at the top of a new page */
+                    AppraisalPageCount++;
+                    pagestart = i;
+                    continue;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x146);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+            x += 0x30;
+            CountFoodStallClasses(&d20_total, &d20_count);
+            if (ReportFlags & 0x10000) {
+                total++;
+                ok = d20_total >= DAT_00666040;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x20000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x132);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = d20_total;
+                recs[i].goal = DAT_00666040;
+                recs[i].max = DAT_00666044;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x20000) {
+                total++;
+                ok = d20_count >= DAT_00666048;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x40000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts the section here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x133);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = d20_count;
+                recs[i].goal = DAT_00666048;
+                recs[i].max = DAT_0066604c;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            recs[first].type = lpass == total;
+            totacc += total;
+            passacc += lpass;
+            x -= 0x30;
+            bottom = y + 0x16;
+            break;
+        } while (ReportFlags & 0x30000);
+    }
+    /* section 3 (0x4473e2-0x447e73): loop sections 0x5080000 (paths) and 0xe00000 (power, objects, map size) */
+    if (ReportFlags & 0x5080000) {
+        int lpass; /* checks passed in it */
+
+        do {
+            total = 0;
+            lpass = 0;
+            first = i;
+            xp = &recs[i].x;
+            *xp = x;
+            if (bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != i) {
+                    /* the header does not fit: retry it on a new page */
+                    AppraisalPageCount++;
+                    pagestart = i;
+                    continue;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x147);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+            x += 0x30;
+            SurveyBlokes(&d70_count, &d70_p2, &d70_p3);
+            if (ReportFlags & 0x80000) {
+                total++;
+                ok = d70_count >= DAT_00666038;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x80000;
+                }
+                y += 0x18;
+            }
+            if (ReportFlags & 0x1000000) {
+                total++;
+                ok = d70_p2 >= DAT_00666050;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x100000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x148);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = d70_p2;
+                recs[i].goal = DAT_00666050;
+                recs[i].max = DAT_00666054;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x4000000) {
+                total++;
+                ok = d70_p3 >= DAT_00666050;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x200000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts it here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x149);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = d70_p3;
+                recs[i].goal = DAT_00666050;
+                recs[i].max = DAT_00666054;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            recs[first].type = lpass == total;
+            totacc += total;
+            passacc += lpass;
+            x -= 0x30;
+            bottom = y + 0x16;
+            break;
+        } while (ReportFlags & 0x5080000);
+    }
+    if (ReportFlags & 0xe00000) {
+        int lpass; /* checks passed in it */
+
+        do {
+            total = 0;
+            lpass = 0;
+            first = i;
+            xp = &recs[i].x;
+            *xp = x;
+            if (bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != i) {
+                    /* the header does not fit: retry it on a new page */
+                    AppraisalPageCount++;
+                    pagestart = i;
+                    continue;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(ok, 0x14a);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            y += 0x18;
+            x += 0x30;
+            if (ReportFlags & 0x200000) {
+                total++;
+                ok = MapStats.power_supply >= DAT_00666058;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x400000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x14b);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = MapStats.power_supply;
+                recs[i].goal = DAT_00666058;
+                recs[i].max = DAT_0066605c;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x400000) {
+                objcount = 0;
+                for (obj = GetFirstRenderObject(); obj != NULL; obj = GetNextRenderObject(obj)) {
+                    ride = obj->field_0->ride;
+                    coord = obj->anchor;
+                    if (ride->type != 0 && ride->type != 2 && FUN_0044f360(obj->field_0->ride, &coord)) {
+                        objcount++;
+                    }
+                }
+                total++;
+                ok = objcount >= DAT_00666060;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x800000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x14c);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = objcount;
+                recs[i].goal = DAT_00666060;
+                recs[i].max = DAT_00666064;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            if (ReportFlags & 0x800000) {
+                tiles = GetMapTileCount();
+                total++;
+                ok = tiles >= DAT_00666068;
+                if (ok) {
+                    lpass++;
+                } else {
+                    flags |= 0x1000000;
+                }
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in this section that cannot start a new page restarts it here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        continue;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(ok, 0x14d);
+                recs[i].arg = 0;
+                recs[i].bar = 1;
+                recs[i].value = tiles;
+                recs[i].goal = DAT_00666068;
+                recs[i].max = DAT_0066606c;
+                recs[i].nids = 0;
+                i++;
+                y += 0x18;
+            }
+            recs[first].type = lpass == total;
+            totacc += total;
+            passacc += lpass;
+            x -= 0x30;
+            bottom = y + 0x16;
+            break;
+        } while (ReportFlags & 0xe00000);
+    }
+    /* section 4 (0x447e73-0x44855b): the summary header (0x230) and the verdict rows 0x14f..0x154 */
+    /* the summary part (S4-S7); every page break in it restarts here through summary_restart */
+summary:
+    first = i;
+    xp = &recs[i].x;
+    *xp = x;
+    if (bottom > 0x1b5) {
+        APPR_TOP_OF_PAGE();
+        if (pagestart != i) APPR_RETRY(summary);
+        APPR_NEW_PAGE();
+    }
+    APPR_ROW(-2, 0x230);
+    recs[i].arg = 0;
+    recs[i].bar = 0;
+    recs[i].value = 0;
+    recs[i].goal = 0;
+    recs[i].max = 0;
+    recs[i].nids = 0;
+    i++;
+    y += 0x18;
+    x += 0x30;
+    bottom = y + 0x16;
+    if (passacc < totacc / 2) {
+        if (bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x14f);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        recs[i - 1].ids[recs[i - 1].nids] = 0x14f;
+        recs[i - 1].nids++;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x150);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids] = 0x150;
+        recs[i - 1].nids++;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    } else if (passacc < totacc) {
+        if (bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x151);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        recs[i - 1].ids[recs[i - 1].nids] = 0x151;
+        recs[i - 1].nids++;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x150);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        recs[i].nids = 0;
+        i++;
+    } else {
+        if (bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x153);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        recs[i - 1].ids[recs[i - 1].nids] = 0x153;
+        recs[i - 1].nids++;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-2, 0x154);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        recs[i].nids = 0;
+        i++;
+    }
+    /* section 5 (0x44855b-0x449504): the failure-flag rows: flags&1,2,4,8, switch(flags&0x30), the &0x40 pair, &0x80..&0x800 */
+    if (flags & 1) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x155);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x155;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 2) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x156);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x156;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 4) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x157);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x157;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 8) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x158);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x158;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    switch (flags & 0x30) {
+    case 0x10:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x159);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x159;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x20:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x15a);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x15a;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x30:
+        /* the original does not advance y between these two rows, so the 0x133 row tests the same bottom */
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x15b);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-3, 0x133);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x15b;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    }
+    if (flags & 0x40) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x15c);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        nidsp = &recs[i].nids;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x15c;
+        y += 0x18;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-3, 0x15d);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        i++;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        *nidsp = 0;
+    }
+    if (flags & 0x80) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x15e);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x15e;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x100) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x15f);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x15f;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x200) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x160);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x160;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x400) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x161);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x161;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x800) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x162);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x162;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    /* section 6 (0x449504-0x44a3d3): failure-flag rows for switch (flags & 0x3000), (flags & 0x18000), (flags & 0x60000) and flags & 0x80000..0x400000 */
+    switch (flags & 0x3000) {
+    case 0x1000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x163);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x163;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x2000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x164);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x164;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x3000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x165);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x165;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    }
+    switch (flags & 0x18000) {
+    case 0x8000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x166);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x166;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x10000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x167);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x167;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x18000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x168);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x168;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    }
+    switch (flags & 0x60000) {
+    case 0x20000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x169);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x169;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x40000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x16a);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x16a;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        break;
+    case 0x60000:
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x16b);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        nidsp = &recs[i].nids;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x16b;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-3, 0x231);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        i++;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+        *nidsp = 0;
+        break;
+    }
+    if (flags & 0x80000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x16c);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x16c;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x100000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x16d);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x16d;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x200000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x16f);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x16f;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x400000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x170);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x170;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    /* section 7 (0x44a3d3-0x44acbb): the 0x800000 pair, the 0x1000000 row (+ summary_restart), the fail-limit rows (+ limit_restart) */
+    if (flags & 0x800000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x171);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x171;
+        if (y + 0x16 > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-3, 0x172);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags & 0x1000000) {
+        if (rc.cur.bottom > 0x1b5) {
+            APPR_TOP_OF_PAGE();
+            if (pagestart != first) {
+                /* every page break of the summary and the failure rows restarts the summary here */
+                i = first;
+                x = *xp;
+                AppraisalPageCount++;
+                pagestart = first;
+                goto summary;
+            }
+            APPR_NEW_PAGE();
+        }
+        APPR_ROW(-1, 0x173);
+        recs[i].arg = 0;
+        recs[i].bar = 0;
+        recs[i].value = 0;
+        recs[i].goal = 0;
+        recs[i].max = 0;
+        recs[i].nids = 0;
+        i++;
+        recs[i - 1].ids[recs[i - 1].nids++] = 0x173;
+        y += 0x18;
+        rc.cur.bottom = y + 0x16;
+    }
+    if (flags != 0 && MapStats.appraisal_fail_limit != 0) {
         if (MapStats.appraisal_streak < 0) {
-            iVar6 = MapStats.appraisal_streak + -1 + MapStats.appraisal_fail_limit;
+            chances = MapStats.appraisal_streak + MapStats.appraisal_fail_limit - 1;
         } else {
-            iVar6 = MapStats.appraisal_fail_limit + -1;
+            chances = MapStats.appraisal_fail_limit - 1;
         }
-        if (iVar6 < 2) {
-            if (0 < iVar6) {
-                if (0x1b5 < ysave) {
-                    if (iVar3 != iVar12)
-                        goto LAB_0044abd8;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    ysave = 0x83;
-                    iVar4 = ystart;
-                    iVar3 = iVar14;
+        if (chances > 1) {
+            sprintf(fmtbuf, GetString(0x235), GetString(chances + 0x514));
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
                 }
-                rep[iVar14 * 0x13 + 9] = AppraisalPageCount;
-                rep[iVar14 * 0x13 + 10] = iVar13;
-                rep[iVar14 * 0x13 + 11] = 0xfffffffe;
-                rep[iVar14 * 0x13 + 12] = rand() % 5;
-                uVar5 = GetString(0x514);
-                iVar7 = iVar14 + 1;
-                rep[iVar14 * 0x13 + 13] = (int)uVar5;
-                rep[iVar14 * 0x13 + 14] = 0;
-                rep[iVar14 * 0x13 + 15] = 0;
-                rep[iVar14 * 0x13 + 16] = 0;
-                rep[iVar14 * 0x13 + 17] = 0;
-                rep[iVar14 * 0x13 + 18] = 0;
-                rep[iVar14 * 0x13 + 19] = 0;
-                tmp8 = iVar7 * 0x4c;
-                flatp = &rep[iVar7 * 0x13 + 19];
-                (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x514;
-                rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                goto joined_r0x0044aa07;
+                APPR_NEW_PAGE();
             }
-            if (0x1b5 < ysave) {
-                if (iVar3 == iVar12) {
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    ysave = 0x83;
-                    iVar4 = ystart;
-                    iVar3 = iVar14;
-                    goto LAB_0044aaef;
+            recs[i].page = AppraisalPageCount;
+            recs[i].x = x;
+            recs[i].type = -2;
+            recs[i].rnd = rand() % 5;
+            recs[i].text = fmtbuf;
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            recs[i - 1].ids[recs[i - 1].nids++] = 0x235;
+            recs[i - 1].ids[recs[i - 1].nids++] = chances + 0x514;
+            recs[i - 1].ids[recs[i - 1].nids++] = 0x236;
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
                 }
-                goto LAB_0044abd8;
+                APPR_NEW_PAGE();
             }
-        LAB_0044aaef:
-            rep[iVar14 * 0x13 + 9] = AppraisalPageCount;
-            rep[iVar14 * 0x13 + 10] = iVar13;
-            rep[iVar14 * 0x13 + 11] = 0xfffffffe;
-            rep[iVar14 * 0x13 + 12] = rand() % 5;
-            uVar5 = GetString(0x237);
-            iVar7 = iVar14 + 1;
-            rep[iVar14 * 0x13 + 13] = (int)uVar5;
-            rep[iVar14 * 0x13 + 14] = 0;
-            rep[iVar14 * 0x13 + 15] = 0;
-            rep[iVar14 * 0x13 + 16] = 0;
-            rep[iVar14 * 0x13 + 17] = 0;
-            rep[iVar14 * 0x13 + 18] = 0;
-            rep[iVar14 * 0x13 + 19] = 0;
-            tmp8 = iVar7 * 0x4c;
-            flatp = &rep[iVar7 * 0x13 + 19];
-            (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x237;
-            rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-            if (0x1b5 < ysave) {
-                if (iVar3 != iVar12)
-                    goto LAB_0044abd8;
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar7;
+            APPR_ROW(-2, 0x236);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+        } else if (chances > 0) {
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
             }
-            rep[iVar7 * 0x13 + 9] = AppraisalPageCount;
-            rep[iVar7 * 0x13 + 10] = iVar13;
-            rep[iVar7 * 0x13 + 11] = 0xfffffffe;
-            iVar12 = rand();
-            rep[iVar7 * 0x13 + 12] = iVar12 % 5;
-            /* last chance gone: "appraisal. The park will now be closed" (0x44ac5e) */
-            closing_text = 0x238;
+            APPR_ROW(-2, 0x514);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            recs[i - 1].ids[recs[i - 1].nids++] = 0x514;
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-2, 0x236);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
         } else {
-            sprintf(fmtbuf, GetString(0x235), GetString(iVar6 + 0x514));
-            if (0x1b5 < ysave) {
-                if (iVar3 != iVar12)
-                    goto LAB_0044abd8;
-                AppraisalPageCount = AppraisalPageCount + 1;
-                ysave = 0x83;
-                iVar4 = ystart;
-                iVar3 = iVar14;
-            }
-            rep[iVar14 * 0x13 + 9] = AppraisalPageCount;
-            rep[iVar14 * 0x13 + 10] = iVar13;
-            rep[iVar14 * 0x13 + 11] = 0xfffffffe;
-            iVar8 = rand();
-            iVar15 = iVar14 + 1;
-            rep[iVar14 * 0x13 + 12] = iVar8 % 5;
-            rep[iVar14 * 0x13 + 13] = (int)fmtbuf;
-            rep[iVar14 * 0x13 + 14] = 0;
-            rep[iVar14 * 0x13 + 15] = 0;
-            rep[iVar14 * 0x13 + 16] = 0;
-            rep[iVar14 * 0x13 + 17] = 0;
-            rep[iVar14 * 0x13 + 18] = 0;
-            rep[iVar14 * 0x13 + 19] = 0;
-            rowp = (int *)(iVar14 + -0x12 + iVar15 * 0x12);
-            tmp8 = iVar15 * 0x4c;
-            flatp = &rep[iVar15 * 0x13 + 19];
-            (rep + 1)[(int)rowp + rep[iVar15 * 0x13]] = 0x235;
-            iVar7 = rep[iVar15 * 0x13];
-            rep[iVar15 * 0x13] = iVar7 + 1;
-            (rep + 1)[iVar7 + 1 + (int)rowp] = iVar6 + 0x514;
-            iVar6 = rep[iVar15 * 0x13];
-            rep[iVar15 * 0x13] = iVar6 + 1;
-            (rep + 1)[iVar6 + 1 + (int)rowp] = 0x236;
-            rep[iVar15 * 0x13] = rep[iVar15 * 0x13] + 1;
-            /* the second row is the next one (the original keeps its offset in [esp+0x18]); iVar7 was stale
-             * here and the closing text overwrote the first row */
-            iVar7 = iVar15;
-        joined_r0x0044aa07:
-            if (0x1b5 < ysave) {
-                if (iVar3 != iVar12) {
-                LAB_0044abd8:
-                    xbase = rep[iVar12 * 0x13 + 10];
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    uVar9 = wstart;
-                    iVar14 = iVar12;
-                    iVar4 = ystart;
-                    iVar3 = iVar12;
-                    goto LAB_0044acbb;
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
                 }
-                iVar3 = iVar14 + 1;
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
+                APPR_NEW_PAGE();
             }
-            rep[iVar7 * 0x13 + 9] = AppraisalPageCount;
-            rep[iVar7 * 0x13 + 10] = iVar13;
-            rep[iVar7 * 0x13 + 11] = 0xfffffffe;
-            iVar12 = rand();
-            rep[iVar7 * 0x13 + 12] = iVar12 % 5;
-            /* chances left: "...an appraisal before the park is closed" (0x44aa88) */
-            closing_text = 0x236;
+            APPR_ROW(-2, 0x237);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
+            recs[i - 1].ids[recs[i - 1].nids++] = 0x237;
+            if (rc.cur.bottom > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    /* every page break of the fail-limit rows restarts the advice here */
+                    i = first;
+                    x = recs[first].x;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-2, 0x238);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            recs[i].nids = 0;
+            i++;
         }
-        uVar5 = GetString(closing_text);
-        iVar14 = iVar14 + 2;
-        rep[iVar7 * 0x13 + 13] = (int)uVar5;
-        rep[iVar7 * 0x13 + 14] = 0;
-        rep[iVar7 * 0x13 + 15] = 0;
-        rep[iVar7 * 0x13 + 16] = 0;
-        rep[iVar7 * 0x13 + 17] = 0;
-        rep[iVar7 * 0x13 + 18] = 0;
-        *flatp = 0;
     }
-    uVar9 = iVar4 + 0x16;
-LAB_0044acbb:
-    do {
-        while (1) {
-            iVar12 = iVar14 * 0x4c;
-            piVar10 = (int *)(((char *)rep + 0x28) + iVar12);
-            *piVar10 = xbase;
-            if ((int)uVar9 < 0x1b6) break;
-            if (iVar3 == iVar14) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar4 = ystart;
-                iVar3 = iVar14;
+    x -= 0x30;
+    bottom = y + 0x16;
+    /* section 8 (0x44acbb-0x44bed0): advice head (0x174) and the advice for flags & 0xf and flags & 0x70 */
+    /* the advice part: rewritten from here when it does not fit on its page (advice_restart) */
+advice:
+    first = i;
+    xp = &recs[i].x;
+    *xp = x;
+    if (bottom > 0x1b5) {
+        APPR_TOP_OF_PAGE();
+        if (pagestart != i) APPR_RETRY(advice);
+        APPR_NEW_PAGE();
+    }
+    APPR_ROW(-2, 0x174);
+    recs[i].arg = 0;
+    recs[i].bar = 0;
+    recs[i].value = 0;
+    recs[i].goal = 0;
+    recs[i].max = 0;
+    recs[i].nids = 0;
+    i++;
+    nidp = &recs[i].nids;
+    recs[i - 1].ids[recs[i - 1].nids] = 0x174;
+    recs[i - 1].nids++;
+    y += 0x18;
+    total = 0; /* from here on, total counts the advice rows (the checks' total is no longer needed) */
+    x += 0x30;
+    /* one of four pieces of advice for the failed checks 0x10..0x80 (flags & 0xf) */
+    if (flags & 0xf) {
+        switch (rand() & 3) {
+        case 0:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x17c);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x17c;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x17d);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x17d;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 1:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x187);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x187;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x188);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x188;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 2:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x190);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x190;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x191);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x191;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x192);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x192;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 3:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x19a);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x19a;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x19b);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x19b;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        }
+    }
+    /* flags & 0x70: one of three, or none */
+    if (flags & 0x70) {
+        switch (rand() & 3) {
+        case 0:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1a4);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1a4;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1a5);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1a5;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1a6);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1a6;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 1:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1ae);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1ae;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1af);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1af;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1b0);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1b0;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 2:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1b8);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1b8;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1b9);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1b9;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        }
+    }
+    /* section 9 (0x44bed0-0x44d744): advice rows for the failed checks 0x7000, 0x18000, 0x260000,
+     * 0x1080000 and 0xc00000; holds advice_restart, the restart of the advice part */
+    if (flags & 0x7000) {
+        switch (rand() % 3) {
+        case 0:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1c2);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1c2;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1c3);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1c3;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1c4);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1c4;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 1:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1cc);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1cc;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1cd);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1cd;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        }
+    }
+    if (flags & 0x18000) {
+        switch (rand() % 3) {
+        case 0:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1d6);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1d6;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1d7);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1d7;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1d8);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1d8;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 1:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1e0);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1e0;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1e1);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1e1;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        }
+    }
+    if (flags & 0x260000) {
+        switch (rand() % 3) {
+        case 0:
+            if (flags & 0x200000) {
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-1, 0x1ea);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                nidp = &recs[i].nids;
+                recs[i - 1].ids[recs[i - 1].nids] = 0x1ea;
+                recs[i - 1].nids++;
+                y += 0x18;
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-3, 0x1eb);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                nidp = &recs[i].nids;
+                recs[i - 1].ids[recs[i - 1].nids] = 0x1eb;
+                recs[i - 1].nids++;
+                y += 0x18;
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-3, 0x1ec);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                nidp = &recs[i].nids;
+                recs[i - 1].ids[recs[i - 1].nids] = 0x1ec;
+                recs[i - 1].nids++;
+                y += 0x18;
+                total++;
+            }
+            break;
+        case 1:
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x1f4);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1f4;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x1f5);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x1f5;
+            recs[i - 1].nids++;
+            y += 0x18;
+            total++;
+            break;
+        case 2:
+            if (ReportFlags & 0xf) {
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-1, 0x1fe);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                nidp = &recs[i].nids;
+                recs[i - 1].ids[recs[i - 1].nids] = 0x1fe;
+                recs[i - 1].nids++;
+                y += 0x18;
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-3, 0x1ff);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                nidp = &recs[i].nids;
+                recs[i - 1].ids[recs[i - 1].nids] = 0x1ff;
+                recs[i - 1].nids++;
+                y += 0x18;
+                total++;
+            }
+            break;
+        }
+    }
+    if (flags & 0x1080000) {
+        if (rand() & 1) {
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x208);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x208;
+            recs[i - 1].nids++;
+            y += 0x18;
+        } else {
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-1, 0x212);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x212;
+            recs[i - 1].nids++;
+            y += 0x18;
+            if (y + 0x16 > 0x1b5) {
+                APPR_TOP_OF_PAGE();
+                if (pagestart != first) {
+                    i = first;
+                    x = *xp;
+                    AppraisalPageCount++;
+                    pagestart = first;
+                    goto advice;
+                }
+                APPR_NEW_PAGE();
+            }
+            APPR_ROW(-3, 0x213);
+            recs[i].arg = 0;
+            recs[i].bar = 0;
+            recs[i].value = 0;
+            recs[i].goal = 0;
+            recs[i].max = 0;
+            *nidp = 0;
+            i++;
+            nidp = &recs[i].nids;
+            recs[i - 1].ids[recs[i - 1].nids] = 0x213;
+            recs[i - 1].nids++;
+            y += 0x18;
+        }
+        total++;
+    }
+    if (flags & 0xc00000) {
+        if (rand() & 1) {
+            if (flags & 0x800000) {
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-1, 0x21c);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                /* nidp is not moved on here */
+                recs[i - 1].ids[recs[i - 1].nids] = 0x21c;
+                recs[i - 1].nids++;
+                y += 0x18;
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    /* the new page does not move pagestart */
+                    AppraisalPageCount++;
+                    rc.cur.left = rc.layout.left;
+                    y = rc.layout.top;
+                    rc.cur.right = rc.layout.right;
+                    rc.cur.bottom = rc.layout.bottom;
+                }
+                APPR_ROW(-3, 0x21d);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0; /* nidp still points at the previous row's count */
+                i++;
+                /* nidp is not moved on here */
+                recs[i - 1].ids[recs[i - 1].nids] = 0x21d;
+                recs[i - 1].nids++;
+                y += 0x18;
+                total++;
+            }
+        } else {
+            if (flags & 0x400000) {
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    APPR_NEW_PAGE();
+                }
+                APPR_ROW(-1, 0x226);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                *nidp = 0;
+                i++;
+                /* nidp is not moved on here */
+                recs[i - 1].ids[recs[i - 1].nids] = 0x226;
+                recs[i - 1].nids++;
+                y += 0x18;
+                if (y + 0x16 > 0x1b5) {
+                    APPR_TOP_OF_PAGE();
+                    if (pagestart != first) {
+                        /* every page break in the advice rows that cannot start a new page restarts the advice here */
+                        i = first;
+                        x = *xp;
+                        AppraisalPageCount++;
+                        pagestart = first;
+                        goto advice;
+                    }
+                    /* the new page does not move pagestart */
+                    AppraisalPageCount++;
+                    rc.cur.left = rc.layout.left;
+                    y = rc.layout.top;
+                    rc.cur.right = rc.layout.right;
+                    rc.cur.bottom = rc.layout.bottom;
+                }
+                APPR_ROW(-3, 0x227);
+                recs[i].arg = 0;
+                recs[i].bar = 0;
+                recs[i].value = 0;
+                recs[i].goal = 0;
+                recs[i].max = 0;
+                recs[i].nids = 0; /* nidp still points at the previous row's count */
+                i++;
+                /* nidp is not moved on here */
+                recs[i - 1].ids[recs[i - 1].nids] = 0x227;
+                recs[i - 1].nids++;
+                y += 0x18;
+                total++;
+            }
+        }
+    }
+    /* section 10 (0x44d744-0x44db06): end of the layout, the display/speech loop, the result */
+    if (total == 0) {
+        /* no advice rows: drop the advice header */
+        i--;
+    }
+    /* the original sets up a further row rectangle here that nothing uses */
+    rc.cur.bottom = y + 0x16;
+    rc.cur.left = x + 0x20;
+    rc.cur.right = 0x1a4;
+    InitAppraisalScreen(++AppraisalPageCount);
+    LoadAppraisalSprites();
+    while (AppraisalScreenActive) {
+        SpeechStreamUpdate();
+        SetPointer(5);
+        ReadGameButtons();
+        ResetHitInfo();
+        PushRenderingStatusAndLockVideoSurface();
+        PrintSprite(SPRITE_TitleScreenBk, 0, 0, 0, 0);
+        UnlightAppraisalPageButtons();
+        RenderIcons2(1, 0, 0);
+        r.top = 0x45;
+        r.bottom = 0x6d;
+        r.left = 0x28;
+        r.right = 0x1a4;
+        NewPrintCent(GetString(0x228), 3, r, 0);
+        /* the rows of the page being shown start at the top */
+        rc.cur = rc.layout;
+        for (shown = 0; shown < i; shown++) {
+            if (recs[shown].page == AppraisalPage) {
                 break;
             }
-            AppraisalPageCount = AppraisalPageCount + 1;
-            uVar9 = wstart;
-            iVar4 = ystart;
-            iVar3 = iVar14;
         }
-        *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-        *piVar10 = xbase;
-        *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffe;
-        iVar6 = rand();
-        *(int *)((char *)rep + 0x30 + iVar12) = iVar6 % 5;
-        uVar5 = GetString(0x174);
-        *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-        *(int *)((char *)rep + 0x38 + iVar12) = 0;
-        iVar13 = iVar14 + 1;
-        *(int *)((char *)rep + 0x3c + iVar12) = 0;
-        *(int *)((char *)rep + 0x40 + iVar12) = 0;
-        *(int *)((char *)rep + 0x44 + iVar12) = 0;
-        *(int *)((char *)rep + 0x48 + iVar12) = 0;
-        *(int *)((char *)rep + 0x4c + iVar12) = 0;
-        iVar6 = iVar13 * 0x4c;
-        iVar12 = iVar4 + 0x18;
-        flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-        (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x174;
-        rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-        xbase = xbase + 0x30;
-        tmp8 = 0;
-        if ((flags & 0xf) != 0) {
-            uVar9 = rand();
-            uVar9 = uVar9 & 3;
-            if (uVar9 == 0) {
-                if (0x1b5 < iVar12 + 0x16) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar12 = ystart;
-                    iVar3 = iVar13;
+        if (AppraisalPageChanged) {
+            played = 0;
+            flags = 0; /* flags is free now: it counts the speech ids queued for the page */
+        }
+        for (; shown < i; shown++) {
+            if (recs[shown].page != AppraisalPage) {
+                break;
+            }
+            if (AppraisalPageChanged) {
+                nids = recs[shown].nids;
+                if (nids != 0) {
+                    queue[flags++] = recs[shown].ids[0];
+                    if (nids > 1) {
+                        queue[flags++] = recs[shown].ids[1];
+                    }
+                    if (nids > 2) {
+                        queue[flags++] = recs[shown].ids[2];
+                    }
+                    if (nids > 3) {
+                        queue[flags++] = recs[shown].ids[3];
+                    }
+                    if (nids > 4) {
+                        queue[flags++] = recs[shown].ids[4];
+                    }
+                    if (nids > 5) {
+                        queue[flags++] = recs[shown].ids[5];
+                    }
+                    if (nids > 6) {
+                        queue[flags++] = recs[shown].ids[6];
+                    }
+                    if (nids > 7) {
+                        queue[flags++] = recs[shown].ids[7];
+                    }
                 }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x17c);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 2;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *flatp = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x17c;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar12 + 0x18;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x17d);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 3;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x17d;
-                iVar12 = iVar4;
-            } else if (uVar9 == 1) {
-                if (0x1b5 < iVar12 + 0x16) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar12 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x187);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 2;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *flatp = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x187;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar12 + 0x18;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x188);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 3;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x188;
-                iVar12 = iVar4;
-            } else if (uVar9 == 2) {
-                if (0x1b5 < iVar12 + 0x16) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar12 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x190);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 2;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *flatp = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x190;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar12 + 0x18;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x191);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 3;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x191;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar4 + 0x18;
-                if (0x1b5 < iVar4 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x192);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 4;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x192;
-                iVar12 = iVar4;
+            }
+            if (recs[shown].type == -2) {
+                rc.cur.left = recs[shown].x + 0x28;
             } else {
-                if (0x1b5 < iVar12 + 0x16) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar12 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x19a);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 2;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *flatp = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x19a;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar12 + 0x18;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x19b);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 3;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x19b;
-                iVar12 = iVar4;
+                rc.cur.left = recs[shown].x + 0x50;
             }
-            rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
+            DrawAppraisalMark(rc.cur.left - 0x28, rc.cur.top, recs[shown].type, recs[shown].rnd);
+            r.left = rc.cur.left;
+            r.top = rc.cur.top;
+            r.right = 0x1a4;
+            rc.cur.bottom = r.top + 0x16;
+            r.bottom = rc.cur.bottom;
+            DrawTextOnRenderSurface(recs[shown].text, 2, r, recs[shown].arg);
+            if (recs[shown].bar) {
+                r.left = 0x126;
+                r.right = 0x1a4;
+                r.top = rc.cur.top;
+                rc.cur.bottom = r.top + 8;
+                r.bottom = rc.cur.bottom;
+                DrawAppraisalBar(r, recs[shown].value, recs[shown].max, recs[shown].goal);
+            }
+            rc.cur.top += 0x18;
         }
-        if ((flags & 0x70) == 0) {
-        LAB_0044bed0:
-            if ((flags & 0x7000) != 0) {
-                iVar4 = rand();
-                if (iVar4 % 3 == 0) {
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1c2);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar7 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar6 = iVar7 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x1c2;
-                    rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                    iVar4 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar7;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                    uVar5 = GetString(0x1c3);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar12 = iVar8 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1c3;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar12) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar12) = iVar4 % 5;
-                    uVar5 = GetString(0x1c4);
-                    *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-                    iVar13 = iVar13 + 3;
-                    *(int *)((char *)rep + 0x38 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar12) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar12) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar12) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1c4;
-                } else {
-                    if (iVar4 % 3 != 1) goto LAB_0044c3df;
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1cc);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar4 = iVar8 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1cc;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar12 % 5;
-                    uVar5 = GetString(0x1cd);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    iVar13 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1cd;
-                }
-                iVar12 = iVar7 + 0x18;
-                flatp[-0x13] = flatp[-0x13] + 1;
-                tmp8 = tmp8 + 1;
+        if (AppraisalPageChanged) {
+            AppraisalPageChanged = 0;
+        }
+        if (played >= flags) {
+            if (SpeechIsPlaying() == 0) {
+                UpdateSpeechPlayback();
             }
-        LAB_0044c3df:
-            if ((flags & 0x18000) != 0) {
-                iVar4 = rand();
-                if (iVar4 % 3 == 0) {
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1d6);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar7 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar6 = iVar7 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x1d6;
-                    rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                    iVar4 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar7;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                    uVar5 = GetString(0x1d7);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar12 = iVar8 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1d7;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar12) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar12) = iVar4 % 5;
-                    uVar5 = GetString(0x1d8);
-                    *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-                    iVar13 = iVar13 + 3;
-                    *(int *)((char *)rep + 0x38 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar12) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar12) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar12) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1d8;
-                } else {
-                    if (iVar4 % 3 != 1) goto LAB_0044c8ef;
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1e0);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar4 = iVar8 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1e0;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar12 % 5;
-                    uVar5 = GetString(0x1e1);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    iVar13 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1e1;
-                }
-                iVar12 = iVar7 + 0x18;
-                flatp[-0x13] = flatp[-0x13] + 1;
-                tmp8 = tmp8 + 1;
-            }
-        LAB_0044c8ef:
-            if ((flags & 0x260000) != 0) {
-                iVar4 = rand();
-                iVar4 = iVar4 % 3;
-                if (iVar4 == 0) {
-                    if ((flags & 0x200000) == 0) goto LAB_0044d010;
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1ea);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar7 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar6 = iVar7 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar7 * 0x13 + rep[iVar7 * 0x13]] = 0x1ea;
-                    rep[iVar7 * 0x13] = rep[iVar7 * 0x13] + 1;
-                    iVar4 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar7;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                    uVar5 = GetString(0x1eb);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar12 = iVar8 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1eb;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar12) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar12) = iVar4 % 5;
-                    uVar5 = GetString(0x1ec);
-                    *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-                    iVar13 = iVar13 + 3;
-                    *(int *)((char *)rep + 0x38 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar12) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar12) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar12) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1ec;
-                } else if (iVar4 == 1) {
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1f4);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar4 = iVar8 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 500;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar12 % 5;
-                    uVar5 = GetString(0x1f5);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    iVar13 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1f5;
-                } else {
-                    if ((iVar4 != 2) || ((ReportFlags & 0xf) == 0)) goto LAB_0044d010;
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1fe);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar4 = iVar8 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x1fe;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar7 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar12 % 5;
-                    uVar5 = GetString(0x1ff);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    iVar13 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1ff;
-                }
-                iVar12 = iVar7 + 0x18;
-                flatp[-0x13] = flatp[-0x13] + 1;
-                tmp8 = tmp8 + 1;
-            }
-        LAB_0044d010:
-            if ((flags & 0x1080000) != 0) {
-                uVar9 = rand();
-                if ((uVar9 & 1) == 0) {
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x212);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar8 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar7 = iVar8 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar8 * 0x13 + rep[iVar8 * 0x13]] = 0x212;
-                    rep[iVar8 * 0x13] = rep[iVar8 * 0x13] + 1;
-                    iVar4 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar8;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar7) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar7) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar7) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar7) = iVar12 % 5;
-                    uVar5 = GetString(0x213);
-                    *(int *)((char *)rep + 0x34 + iVar7) = (int)uVar5;
-                    iVar13 = iVar13 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar7) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar7) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar7) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar7) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x213;
-                } else {
-                    iVar4 = iVar12;
-                    if (0x1b5 < iVar12 + 0x16) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                    uVar5 = GetString(0x208);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar13 = iVar13 + 1;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *flatp = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x208;
-                }
-                iVar12 = iVar4 + 0x18;
-                flatp[-0x13] = flatp[-0x13] + 1;
-                tmp8 = tmp8 + 1;
-            }
-            if ((flags & 0xc00000) == 0) goto LAB_0044d744;
-            uVar9 = rand();
-            if ((uVar9 & 1) != 0) {
-                if ((flags & 0x800000) == 0) goto LAB_0044d744;
-                if (0x1b5 < iVar12 + 0x16) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar12 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x21c);
-                iVar4 = iVar13 + 1;
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                *flatp = 0;
-                piVar11 = rep + iVar4 * 0x13;
-                (rep + 1)[iVar4 * 0x13 + *piVar11] = 0x21c;
-                *piVar11 = *piVar11 + 1;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                }
-                iVar4 = iVar4 * 0x4c;
-                *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                iVar3 = rand();
-                *(int *)((char *)rep + 0x30 + iVar4) = iVar3 % 5;
-                uVar5 = GetString(0x21d);
-                iVar3 = iVar13 + 2;
-                *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                piVar10 = rep + iVar3 * 0x13;
-                (rep + 1)[iVar3 * 0x13 + rep[iVar3 * 0x13]] = 0x21d;
-                goto LAB_0044d733;
-            }
-            if ((flags & 0x400000) == 0) goto LAB_0044d744;
-            if (0x1b5 < iVar12 + 0x16) {
-                if (iVar3 != iVar14) goto LAB_0044d594;
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar12 = ystart;
-                iVar3 = iVar13;
-            }
-            *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-            *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-            *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-            iVar4 = rand();
-            *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-            uVar5 = GetString(0x226);
-            iVar4 = iVar13 + 1;
-            *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-            *(int *)((char *)rep + 0x38 + iVar6) = 0;
-            *(int *)((char *)rep + 0x3c + iVar6) = 0;
-            *(int *)((char *)rep + 0x40 + iVar6) = 0;
-            *(int *)((char *)rep + 0x44 + iVar6) = 0;
-            *(int *)((char *)rep + 0x48 + iVar6) = 0;
-            *flatp = 0;
-            piVar11 = rep + iVar4 * 0x13;
-            (rep + 1)[iVar4 * 0x13 + *piVar11] = 0x226;
-            *piVar11 = *piVar11 + 1;
-            if (iVar12 + 0x2e < 0x1b6) goto LAB_0044d697;
-            if (iVar3 == iVar14) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-            LAB_0044d697:
-                iVar4 = iVar4 * 0x4c;
-                *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                iVar3 = rand();
-                *(int *)((char *)rep + 0x30 + iVar4) = iVar3 % 5;
-                uVar5 = GetString(0x227);
-                iVar3 = iVar13 + 2;
-                *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                piVar10 = rep + iVar3 * 0x13;
-                (rep + 1)[iVar3 * 0x13 + rep[iVar3 * 0x13]] = 0x227;
-            LAB_0044d733:
-                iVar13 = iVar13 + 2;
-                *piVar10 = *piVar10 + 1;
-                tmp8 = tmp8 + 1;
-            LAB_0044d744:
-                if (tmp8 == 0) {
-                    iVar13 = iVar13 + -1;
-                }
-                AppraisalPageCount = AppraisalPageCount + 1;
-#ifdef LEGOLAND_PORT
-                {
-                    /* [port] log the report's rows (page, x, kind, text) to debug its layout */
-                    int row;
-                    DebugTrace("appraisal report: %d row(s) on %d page(s)", iVar13, AppraisalPageCount);
-                    for (row = 0; row < iVar13; row++) {
-                        /* kind: 1 tick, 0 cross (fails the appraisal), -1 bullet, -2 text; bar: value, maximum, pass
-                         * mark (as DrawAppraisalBar gets them) */
-                        DebugTrace("  row %d: page %d kind %d bar %d (value %d max %d pass %d) \"%s\"", row,
-                            rep[row * 0x13 + 9], rep[row * 0x13 + 11], rep[row * 0x13 + 15], rep[row * 0x13 + 16],
-                            rep[row * 0x13 + 18], rep[row * 0x13 + 17],
-                            rep[row * 0x13 + 13] != 0 ? (const char *)rep[row * 0x13 + 13] : "");
-                    }
-                }
-#endif
-                InitAppraisalScreen();
-                LoadAppraisalSprites();
-                do {
-                    if (AppraisalScreenActive == 0) {
-                        KillAppraisalSprites();
-                        PopRenderingStatus();
-                        SpeechCloseFile();
-                        FUN_00474880();
-                        iVar3 = 0;
-                        if (0 < iVar13) {
-                            piVar10 = (int *)&rep[11];
-                            do {
-                                if (*piVar10 == 0) {
-                                    return 0;
-                                }
-                                iVar3 = iVar3 + 1;
-                                piVar10 = piVar10 + 0x13;
-                            } while (iVar3 < iVar13);
-                        }
-                        return 1;
-                    }
-                    SpeechStreamUpdate();
-                    SetPointer(5);
-                    ReadGameButtons();
-                    ResetHitInfo();
-                    PushRenderingStatusAndLockVideoSurface();
-                    PrintSprite(SPRITE_TitleScreenBk, 0, 0, 0, 0);
-                    UnlightAppraisalPageButtons();
-                    RenderIcons2(1, 0, 0);
-                    {
-                        RECT rcTitle;
-                        rcTitle.left = 0x28;
-                        rcTitle.top = 0x45;
-                        rcTitle.right = 0x1a4;
-                        rcTitle.bottom = 0x6d;
-                        text = GetString(0x228);
-                        NewPrintCent(text, 3, rcTitle, 0);
-                    }
-                    iVar3 = 0;
-                    passtotacc = 0;
-                    if (0 < iVar13) {
-                        piVar10 = (int *)&rep[9];
-                        do {
-                            passtotacc = iVar3;
-                            if (*piVar10 == AppraisalPage) break;
-                            iVar3 = iVar3 + 1;
-                            piVar10 = piVar10 + 0x13;
-                            passtotacc = iVar3;
-                        } while (iVar3 < iVar13);
-                    }
-                    if (AppraisalPageChanged != 0) {
-                        rowp = (int *)0x0;
-                        flags = 0;
-                    }
-                    /* each frame the rows start at the top of the page (0x50,0x6d)-(0x1a4,0x83) and go down 0x18 */
-                    rowy = 0x6d;
-                    if ((int)passtotacc < iVar13) {
-                        piVar10 = (int *)((char *)flat + flags * 4);
-                        piVar11 = (int *)(((char *)rep + 0x4c) + passtotacc * 0x4c);
-                        do {
-                            if (piVar11[-10] != AppraisalPage) break;
-                            if ((AppraisalPageChanged != 0) && (iVar3 = *piVar11, iVar3 != 0)) {
-                                *piVar10 = piVar11[1];
-                                piVar2 = piVar10 + 1;
-                                uVar9 = flags + 1;
-                                if (1 < iVar3) {
-                                    piVar10[1] = piVar11[2];
-                                    piVar2 = piVar10 + 2;
-                                    uVar9 = flags + 2;
-                                }
-                                flags = uVar9;
-                                piVar10 = piVar2;
-                                if (2 < iVar3) {
-                                    flags = flags + 1;
-                                    *piVar10 = piVar11[3];
-                                    piVar10 = piVar10 + 1;
-                                }
-                                if (3 < iVar3) {
-                                    *piVar10 = piVar11[4];
-                                    flags = flags + 1;
-                                    piVar10 = piVar10 + 1;
-                                }
-                                if (4 < iVar3) {
-                                    flags = flags + 1;
-                                    *piVar10 = piVar11[5];
-                                    piVar10 = piVar10 + 1;
-                                }
-                                if (5 < iVar3) {
-                                    *piVar10 = piVar11[6];
-                                    flags = flags + 1;
-                                    piVar10 = piVar10 + 1;
-                                }
-                                if (6 < iVar3) {
-                                    flags = flags + 1;
-                                    *piVar10 = piVar11[7];
-                                    piVar10 = piVar10 + 1;
-                                }
-                                if (7 < iVar3) {
-                                    flags = flags + 1;
-                                    *piVar10 = piVar11[8];
-                                    piVar10 = piVar10 + 1;
-                                }
-                            }
-                            if (piVar11[-8] == -2) {
-                                iVar4 = piVar11[-9] + 0x28;
-                            } else {
-                                iVar4 = piVar11[-9] + 0x50;
-                            }
-                            DrawAppraisalMark(iVar4 - 0x28, rowy, piVar11[-8], piVar11[-7]);
-                            {
-                                RECT rcRow;
-                                rcRow.left = iVar4;
-                                rcRow.top = rowy;
-                                rcRow.right = 0x1a4;
-                                rcRow.bottom = rowy + 0x16;
-                                DrawTextOnRenderSurface((char *)piVar11[-6], 2, rcRow, piVar11[-5]);
-                            }
-                            if (piVar11[-4] != 0) {
-                                DrawAppraisalBar(0x126, rowy, 0x1a4, rowy + 8, piVar11[-3], piVar11[-1], piVar11[-2]);
-                            }
-                            rowy = rowy + 0x18;
-                            passtotacc = passtotacc + 1;
-                            piVar11 = piVar11 + 0x13;
-                        } while ((int)passtotacc < iVar13);
-                    }
-                    if (AppraisalPageChanged != 0) {
-                        AppraisalPageChanged = 0;
-                    }
-                    if ((int)rowp < (int)flags) {
-                        iVar3 = SpeechIsPlaying();
-                        iVar4 = flat[(int)rowp];
-                        if ((iVar3 == 0) && (iVar4 != -1)) {
-                            rowp = (int *)((int)rowp + 1);
-                            // STRING: LEGOLAND 0x004b81a8
-                            sprintf(wavbuf, "TEXT%04d.WAV", iVar4);
-                            SpeechCloseFile();
-                            SpeechLoadWavFile(wavbuf + 8);
-                            SpeechPlay();
-                        }
-                    } else {
-                        iVar3 = SpeechIsPlaying();
-                        if (iVar3 == 0) {
-                            UpdateSpeechPlayback();
-                        }
-                    }
-                    ProcessFrontEndHelp();
-                    UpdateFocussedIconPtr();
-                    PopRenderingStatus();
-                    if (FocussedIconPtr != 0) {
-                        SetPointer(6);
-                    }
-                    CheckFocussedIcon();
-                    RenderingComplete();
-                } while (1);
-            }
-        } else {
-            uVar9 = rand();
-            uVar9 = uVar9 & 3;
-            if (uVar9 != 0) {
-                if (uVar9 == 1) {
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1ae);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar13 = iVar14 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1ae;
-                    rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                    iVar4 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar4 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                    uVar5 = GetString(0x1af);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar13 = iVar14 + 3;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar12 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1af;
-                    rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                    iVar7 = iVar4 + 0x18;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar12) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffd;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar12) = iVar4 % 5;
-                    uVar5 = GetString(0x1b0);
-                    *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-                    iVar13 = iVar14 + 4;
-                    *(int *)((char *)rep + 0x38 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar12) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar12) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar12) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar12) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1b0;
-                } else {
-                    if (uVar9 != 2) goto LAB_0044bed0;
-                    if (0x1b5 < iVar4 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar12 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                    iVar4 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                    uVar5 = GetString(0x1b8);
-                    *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                    iVar13 = iVar14 + 2;
-                    *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                    iVar4 = iVar13 * 0x4c;
-                    *flatp = 0;
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1b8;
-                    rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                    iVar7 = iVar12 + 0x18;
-                    if (0x1b5 < iVar12 + 0x2e) {
-                        if (iVar3 != iVar14) goto LAB_0044d594;
-                        AppraisalPageCount = AppraisalPageCount + 1;
-                        iVar7 = ystart;
-                        iVar3 = iVar13;
-                    }
-                    *(int *)((char *)rep + 0x24 + iVar4) = AppraisalPageCount;
-                    *(int *)((char *)rep + 0x28 + iVar4) = xbase;
-                    *(int *)((char *)rep + 0x2c + iVar4) = 0xfffffffd;
-                    iVar12 = rand();
-                    *(int *)((char *)rep + 0x30 + iVar4) = iVar12 % 5;
-                    uVar5 = GetString(0x1b9);
-                    *(int *)((char *)rep + 0x34 + iVar4) = (int)uVar5;
-                    iVar13 = iVar14 + 3;
-                    *(int *)((char *)rep + 0x38 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x3c + iVar4) = 0;
-                    *(int *)((char *)rep + 0x40 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x44 + iVar4) = 0;
-                    *(int *)((char *)rep + 0x48 + iVar4) = 0;
-                    iVar6 = iVar13 * 0x4c;
-                    *(int *)((char *)rep + 0x4c + iVar4) = 0;
-                    flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                    (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1b9;
-                }
-            LAB_0044bebd:
-                iVar12 = iVar7 + 0x18;
-                flatp[-0x13] = flatp[-0x13] + 1;
-                tmp8 = 1;
-                goto LAB_0044bed0;
-            }
-            if (iVar4 + 0x2e < 0x1b6) {
-            LAB_0044bc2c:
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xffffffff;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar4 % 5;
-                uVar5 = GetString(0x1a4);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 2;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *flatp = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1a4;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar4 = iVar12 + 0x18;
-                if (0x1b5 < iVar12 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar4 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar6) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar6) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar6) = 0xfffffffd;
-                iVar12 = rand();
-                *(int *)((char *)rep + 0x30 + iVar6) = iVar12 % 5;
-                uVar5 = GetString(0x1a5);
-                *(int *)((char *)rep + 0x34 + iVar6) = (int)uVar5;
-                iVar13 = iVar14 + 3;
-                *(int *)((char *)rep + 0x38 + iVar6) = 0;
-                *(int *)((char *)rep + 0x3c + iVar6) = 0;
-                *(int *)((char *)rep + 0x40 + iVar6) = 0;
-                *(int *)((char *)rep + 0x44 + iVar6) = 0;
-                *(int *)((char *)rep + 0x48 + iVar6) = 0;
-                iVar12 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar6) = 0;
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1a5;
-                rep[iVar13 * 0x13] = rep[iVar13 * 0x13] + 1;
-                iVar7 = iVar4 + 0x18;
-                if (0x1b5 < iVar4 + 0x2e) {
-                    if (iVar3 != iVar14) goto LAB_0044d594;
-                    AppraisalPageCount = AppraisalPageCount + 1;
-                    iVar7 = ystart;
-                    iVar3 = iVar13;
-                }
-                *(int *)((char *)rep + 0x24 + iVar12) = AppraisalPageCount;
-                *(int *)((char *)rep + 0x28 + iVar12) = xbase;
-                *(int *)((char *)rep + 0x2c + iVar12) = 0xfffffffd;
-                iVar4 = rand();
-                *(int *)((char *)rep + 0x30 + iVar12) = iVar4 % 5;
-                uVar5 = GetString(0x1a6);
-                *(int *)((char *)rep + 0x34 + iVar12) = (int)uVar5;
-                iVar13 = iVar14 + 4;
-                *(int *)((char *)rep + 0x38 + iVar12) = 0;
-                *(int *)((char *)rep + 0x3c + iVar12) = 0;
-                *(int *)((char *)rep + 0x40 + iVar12) = 0;
-                *(int *)((char *)rep + 0x44 + iVar12) = 0;
-                *(int *)((char *)rep + 0x48 + iVar12) = 0;
-                iVar6 = iVar13 * 0x4c;
-                *(int *)((char *)rep + 0x4c + iVar12) = 0;
-                flatp = (int *)(((char *)rep + 0x4c) + iVar6);
-                (rep + 1)[iVar13 * 0x13 + rep[iVar13 * 0x13]] = 0x1a6;
-                goto LAB_0044bebd;
-            }
-            if (iVar3 == iVar14) {
-                AppraisalPageCount = AppraisalPageCount + 1;
-                iVar12 = ystart;
-                iVar3 = iVar13;
-                goto LAB_0044bc2c;
+        } else if (SpeechIsPlaying() == 0) {
+            if (queue[played] != -1) {
+                // STRING: LEGOLAND 0x004b81a8
+                sprintf(wavbuf, "TEXT%04d.WAV", queue[played++]);
+                SpeechCloseFile();
+                SpeechLoadWavFile(wavbuf);
+                SpeechPlay();
             }
         }
-    LAB_0044d594:
-        iVar4 = 0x6d;
-        uVar9 = 0x83;
-        xbase = *piVar10;
-        AppraisalPageCount = AppraisalPageCount + 1;
-        iVar3 = iVar14;
-    } while (1);
+        ProcessFrontEndHelp();
+        UpdateFocussedIconPtr();
+        PopRenderingStatus();
+        if (FocussedIconPtr != 0) {
+            SetPointer(6);
+        }
+        CheckFocussedIcon();
+        RenderingComplete();
+    }
+    KillAppraisalSprites();
+    PopRenderingStatus();
+    SpeechCloseFile();
+    FUN_00474880();
+    /* passed if no check failed */
+    for (shown = 0; shown < i; shown++) {
+        if (recs[shown].type == 0) {
+            return 0;
+        }
+    }
+    return 1;
+    return 0;
 }
+#undef APPR_TOP_OF_PAGE
+#undef APPR_NEW_PAGE
+#undef APPR_RETRY
+#undef APPR_ROW
+#undef APPR_TOP_OF_PAGE
+#undef APPR_NEW_PAGE
+#undef APPR_RETRY
+#undef APPR_ROW
+#undef APPR_TOP_OF_PAGE
+#undef APPR_NEW_PAGE
+#undef APPR_RETRY
+#undef APPR_ROW
 
 // FUNCTION: LEGOLAND 0x0044db20
 void ResetAppraisalStreak(void) {

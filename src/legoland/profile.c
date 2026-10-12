@@ -363,8 +363,7 @@ unsigned char FUN_0048cc30(void *param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x0048cd50
 LEGO_EXPORT void LightUpthisDeleteIcon(struct IconNode *icon, int param_2) {
-    int bx;
-    int by;
+    RECT rc;
 
     DeleteIcon->flags &= ~0x400;
     if (param_2 != 0) {
@@ -379,19 +378,18 @@ LEGO_EXPORT void LightUpthisDeleteIcon(struct IconNode *icon, int param_2) {
         DeleteIcon->x = icon->x + 0xff;
     }
     SetIconSprite(DeleteIcon, RegDeleteSprite);
-    bx = DeleteIcon->x;
-    by = DeleteIcon->y;
-    if (MousePos.x < bx + 0x24 && bx < MousePos.x && MousePos.y < by + 0x1b && by < MousePos.y) {
+    rc.left = DeleteIcon->x;
+    rc.top = DeleteIcon->y;
+    rc.right = rc.left + 0x24;
+    rc.bottom = rc.top + 0x1b;
+    if (MousePos.x < rc.right && rc.left < MousePos.x && MousePos.y < rc.bottom && rc.top < MousePos.y) {
         SetIconSprite(DeleteIcon, RegDeleteOnSprite);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0048ce20
 LEGO_EXPORT void UpdateProfileCheckBoxIcons(void) {
-    struct IconNode *a;
-    struct IconNode *b;
-    int x;
-    int y;
+    RECT rc;
 
     if (PopUpOkIcon) {
         SetIconSprite(PopUpOkIcon, PuOkSprite);
@@ -401,23 +399,25 @@ LEGO_EXPORT void UpdateProfileCheckBoxIcons(void) {
     } else {
         SetIconSprite(PopUpCloseIcon, PopUpCloseSprite);
     }
-    a = PopUpOkIcon;
-    if (a) {
-        x = a->x;
-        y = a->y;
-        if (MousePos.x < x + 0x24 && x < MousePos.x && MousePos.y < y + 0x1b && y < MousePos.y) {
-            SetIconSprite(a, PuOkOnSprite);
+    if (PopUpOkIcon) {
+        rc.left = PopUpOkIcon->x;
+        rc.top = PopUpOkIcon->y;
+        rc.right = rc.left + 0x24;
+        rc.bottom = rc.top + 0x1b;
+        if (MousePos.x < rc.right && rc.left < MousePos.x && MousePos.y < rc.bottom && rc.top < MousePos.y) {
+            SetIconSprite(PopUpOkIcon, PuOkOnSprite);
         }
     }
-    b = PopUpCloseIcon;
-    x = b->x;
-    y = b->y;
-    if (MousePos.x < x + 0x24 && x < MousePos.x && MousePos.y < y + 0x1b && y < MousePos.y) {
+    rc.left = PopUpCloseIcon->x;
+    rc.top = PopUpCloseIcon->y;
+    rc.right = rc.left + 0x24;
+    rc.bottom = rc.top + 0x1b;
+    if (MousePos.x < rc.right && rc.left < MousePos.x && MousePos.y < rc.bottom && rc.top < MousePos.y) {
         if (NewProfilePopUpShown) {
-            SetIconSprite(b, ClosePopUpOnSprite);
+            SetIconSprite(PopUpCloseIcon, ClosePopUpOnSprite);
             return;
         }
-        SetIconSprite(b, PuCloseOnSprite);
+        SetIconSprite(PopUpCloseIcon, PuCloseOnSprite);
     }
 }
 
@@ -426,21 +426,17 @@ LEGO_EXPORT void PrintProfileDetails(void) {
     struct IconNode *icon;
     struct IconNode *last;
     char *name;
-    int y;
-    int x;
+    RECT rc; /* text box: left/top/right/bottom, passed as x, y, width, height */
     unsigned char sel;
     int show;
 
-    int slot;
-    int last_x;
-    int icon_y;
-    y = 0x72;
-    DeleteIcon->flags |= 0x400;
     icon = IconListHead;
-    FUN_00455e50(DAT_007cb340, 0x8d, y, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
-    while (icon != NULL) {
-        sel = 1;
+    DeleteIcon->flags |= 0x400;
+    rc.top = 0x72;
+    FUN_00455e50(DAT_007cb340, 0x8d, rc.top, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
+    for (; icon != NULL; icon = icon->next) {
         show = 1;
+        sel = 1;
         if ((icon->flags & 0x400) == 0 && (icon->field_20b & 1)) {
             if (MousePos.x >= icon->x - 0x18 && MousePos.x < icon->x && MousePos.y >= icon->slot * 0x26 + 0x86 &&
                 MousePos.y < icon->width + icon->y) {
@@ -452,17 +448,15 @@ LEGO_EXPORT void PrintProfileDetails(void) {
                     SetIconSprite(icon, DAT_007986b8);
                     last = icon;
                     icon->y = icon->slot * 0x26 + 0x6b;
-                    icon_y = icon->y;
-                    y = icon_y + 0x22;
+                    rc.top = icon->y + 0x22;
                 } else if (NewProfilePopUpShown != 0) {
                     EnterNewProfile(icon);
                     show = 0;
                     last = icon;
                 } else {
                     SetIconSprite(icon, RegDiffPopUpSprite);
-                    slot = icon->slot;
-                    icon->y = slot * 0x26 + 0x6b;
-                    y = icon->y + 0x22;
+                    icon->y = icon->slot * 0x26 + 0x6b;
+                    rc.top = icon->y + 0x22;
                     LightUpthisDeleteIcon(icon, 1);
                     last = icon;
                 }
@@ -470,41 +464,51 @@ LEGO_EXPORT void PrintProfileDetails(void) {
                 SetIconSprite(icon, GetProfileOffSprite(icon->slot));
                 sel = 0;
                 icon->y = icon->slot * 0x26 + 0x86;
-                y = icon->y + 7;
+                rc.top = icon->y + 7;
             }
-            x = icon->x + 0x14;
+            rc.bottom = rc.top + 0x13;
+            rc.left = icon->x + 0x14;
+            rc.right = rc.left + 0xe0;
             name = (char *)icon->field_18p;
             if (name != NULL && show) {
                 if (CurrentProfile.profile_slot - 1 != icon->slot || (DeletePopUpShown == 0 && NewProfilePopUpShown == 0)) {
                     if (sel) {
-                        FUN_00455e50(name, x, y, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
+                        FUN_00455e50(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
                     } else {
-                        FUN_00455e50(name, x, y, 0xe0, 0x13, 2, 0x25, 0xffffff, 0);
+                        FUN_00455e50(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0xffffff, 0);
                     }
                 }
             }
         }
-        icon = icon->next;
     }
     if (DeletePopUpShown != 0) {
-        FUN_00455e50(GetString(0x85), last->x + 0x14, last->y + 7, 0x9b, 0x13, 2, 0x25, 0, 0xffffff);
+        rc.left = last->x + 0x14;
+        rc.top = last->y + 7;
+        rc.right = rc.left + 0x9b;
+        rc.bottom = rc.top + 0x13;
+        FUN_00455e50(GetString(0x85), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
+        UpdateProfileCheckBoxIcons();
     } else if (NewProfilePopUpShown != 0) {
-        last_x = last->x;
-        FUN_00455e50(GetString(0x86), last_x + 0x14, last->y - 0x14, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
+        rc.left = last->x + 0x14;
+        rc.top = last->y - 0x14;
+        rc.right = rc.left + 0xe0;
+        rc.bottom = rc.top + 0x13;
+        FUN_00455e50(GetString(0x86), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
         UpdateProfileCheckBoxIcons();
     }
     if (CurrentProfile.profile_slot != 0 && DeletePopUpShown == 0) {
         if (NewProfilePopUpShown != 0) {
             if (TempProfileHasName()) {
                 ((struct IconNode *)AcceptIcon)->flags &= ~0x400;
-                return;
+            } else {
+                ((struct IconNode *)AcceptIcon)->flags |= 0x400;
             }
         } else {
             ((struct IconNode *)AcceptIcon)->flags &= ~0x400;
-            return;
         }
+    } else {
+        ((struct IconNode *)AcceptIcon)->flags |= 0x400;
     }
-    ((struct IconNode *)AcceptIcon)->flags |= 0x400;
 }
 
 // FUNCTION: LEGOLAND 0x0048d230

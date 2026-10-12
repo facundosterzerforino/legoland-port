@@ -265,8 +265,8 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
 
     dir_data = malloc(file_size - dir_offset);
     if (dir_data == 0) {
-        // STRING: LEGOLAND 0x004bdddc
         close_handle = volume->handle;
+        // STRING: LEGOLAND 0x004bdddc
         DebugTrace("Failed to allocate space for directory");
         CloseHandle(close_handle);
         free(volume);

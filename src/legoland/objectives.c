@@ -1193,9 +1193,9 @@ int ScriptEventClear(struct MapRectArg *arg) {
             }
             if (current->flags_c & 0x80) {
                 cls = current->object->cls;
-                tile_x = current->tile_x;
                 tile_y = current->tile_y;
                 rect.top = cls->footprint.v[1];
+                tile_x = current->tile_x;
                 rect.bottom = cls->footprint.v[3];
                 rect.top += tile_y;
                 right = cls->footprint.v[2];

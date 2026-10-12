@@ -1037,7 +1037,7 @@ extern struct FXItem DINO_SFX[5];
 // 0x004b87a8
 extern struct FXItem MONEY_SFX[2];
 // 0x004b8bbc
-extern unsigned char PercentSFormat[1];
+extern unsigned char PercentSFormat[4]; /* "%s" */
 // 0x004b90f8
 extern unsigned int BrickCount;
 // 0x004b90fc
@@ -1496,7 +1496,11 @@ extern void *SafariRunBNV;
 // 0x007988d0
 extern void *DAT_007988d0[600];
 // 0x00799230
-extern struct DirectMusicSegment *MusicSegments[35];
+extern struct DirectMusicSegment *MusicIntroSegments[5];
+// 0x00799244
+extern struct DirectMusicSegment *MusicLoopSegments[5];
+// 0x00799258
+extern struct DirectMusicSegment *MusicTransitionSegments[5][5];
 // 0x00799c1c
 extern unsigned char *DAT_00799c1c[35];
 // 0x0079a608
@@ -2090,81 +2094,81 @@ extern unsigned int ReportFlags;
 // 0x00665ffc
 extern unsigned int DAT_00665ffc;
 // 0x00666000
-extern unsigned int DAT_00666000;
+extern int DAT_00666000;
 // 0x00666004
-extern unsigned int DAT_00666004;
+extern int DAT_00666004;
 // 0x00666008
-extern unsigned int DAT_00666008;
+extern int DAT_00666008;
 // 0x0066600c
-extern unsigned int DAT_0066600c;
+extern int DAT_0066600c;
 // 0x00666010
-extern unsigned int DAT_00666010;
+extern int DAT_00666010;
 // 0x00666014
-extern unsigned int DAT_00666014;
+extern int DAT_00666014;
 // 0x00666018
-extern unsigned int DAT_00666018;
+extern int DAT_00666018;
 // 0x0066601c
-extern unsigned int DAT_0066601c;
+extern int DAT_0066601c;
 // 0x00666020
-extern unsigned int DAT_00666020;
+extern int DAT_00666020;
 // 0x00666024
-extern unsigned int DAT_00666024;
+extern int DAT_00666024;
 // 0x00666028
-extern unsigned int DAT_00666028;
+extern int DAT_00666028;
 // 0x0066602c
-extern unsigned int DAT_0066602c;
+extern int DAT_0066602c;
 // 0x00666030
-extern unsigned int DAT_00666030;
+extern int DAT_00666030;
 // 0x00666034
-extern unsigned int DAT_00666034;
+extern int DAT_00666034;
 // 0x00666038
-extern unsigned int DAT_00666038;
+extern int DAT_00666038;
 // 0x0066603c
-extern unsigned int DAT_0066603c;
+extern int DAT_0066603c;
 // 0x00666040
-extern unsigned int DAT_00666040;
+extern int DAT_00666040;
 // 0x00666044
-extern unsigned int DAT_00666044;
+extern int DAT_00666044;
 // 0x00666048
-extern unsigned int DAT_00666048;
+extern int DAT_00666048;
 // 0x0066604c
-extern unsigned int DAT_0066604c;
+extern int DAT_0066604c;
 // 0x00666050
-extern unsigned int DAT_00666050;
+extern int DAT_00666050;
 // 0x00666054
-extern unsigned int DAT_00666054;
+extern int DAT_00666054;
 // 0x00666058
-extern unsigned int DAT_00666058;
+extern int DAT_00666058;
 // 0x0066605c
-extern unsigned int DAT_0066605c;
+extern int DAT_0066605c;
 // 0x00666060
-extern unsigned int DAT_00666060;
+extern int DAT_00666060;
 // 0x00666064
-extern unsigned int DAT_00666064;
+extern int DAT_00666064;
 // 0x00666068
-extern unsigned int DAT_00666068;
+extern int DAT_00666068;
 // 0x0066606c
-extern unsigned int DAT_0066606c;
+extern int DAT_0066606c;
 // 0x00666070
-extern unsigned int DAT_00666070;
+extern int DAT_00666070;
 // 0x00666074
-extern unsigned int DAT_00666074;
+extern int DAT_00666074;
 // 0x00666078
-extern unsigned int DAT_00666078;
+extern int DAT_00666078;
 // 0x0066607c
-extern unsigned int DAT_0066607c;
+extern int DAT_0066607c;
 // 0x00666080
-extern unsigned int DAT_00666080;
+extern int DAT_00666080;
 // 0x00666084
-extern unsigned int DAT_00666084;
+extern int DAT_00666084;
 // 0x00666088
-extern unsigned int DAT_00666088;
+extern int DAT_00666088;
 // 0x0066608c
-extern unsigned int DAT_0066608c;
+extern int DAT_0066608c;
 // 0x00666090
-extern unsigned int DAT_00666090;
+extern int DAT_00666090;
 // 0x00666094
-extern unsigned int DAT_00666094;
+extern int DAT_00666094;
 // 0x00666098
 extern unsigned int AppraisalDeadline;
 // 0x0066609c
@@ -2825,13 +2829,7 @@ extern DDSURFACEDESC DAT_0066b5b0;
 // 0x0066b61c
 extern unsigned int DAT_0066b61c;
 // 0x0066b620
-extern int DAT_0066b620;
-// 0x0066b624
-extern int DAT_0066b624;
-// 0x0066b628
-extern int DAT_0066b628;
-// 0x0066b62c
-extern int DAT_0066b62c;
+extern RECT DAT_0066b620;
 // 0x0066b630
 extern void *DAT_0066b630;
 // 0x0066be40
@@ -3050,7 +3048,7 @@ extern void *AviLockPtr2;
 // 0x007988b0
 extern void *SoundHwnd;
 // 0x007988bc
-extern unsigned int DAT_007988bc;
+extern volatile unsigned int DAT_007988bc; /* the music thread has finished starting (polled) */
 // 0x007988c0
 extern unsigned int SoundAvailable;
 // 0x007988c4
@@ -3676,25 +3674,25 @@ extern unsigned int MouseTileX;
 // 0x00813a68
 extern unsigned int MouseTileY;
 // 0x00813a6c
-extern unsigned int FootprintWidth;
+extern int FootprintWidth;
 // 0x00813a70
-extern unsigned int FootprintHeight;
+extern int FootprintHeight;
 // 0x00813a74
-extern unsigned int DAT_00813a74;
+extern int DAT_00813a74;
 // 0x00813a78
-extern unsigned int DAT_00813a78;
+extern int DAT_00813a78;
 // 0x00813a7c
-extern unsigned int DAT_00813a7c;
+extern int DAT_00813a7c;
 // 0x00813a80
-extern unsigned int DAT_00813a80;
+extern int DAT_00813a80;
 // 0x00813a84
-extern unsigned int DAT_00813a84;
+extern int DAT_00813a84;
 // 0x00813a88
-extern unsigned int DAT_00813a88;
+extern int DAT_00813a88;
 // 0x00813a8c
-extern unsigned int DAT_00813a8c;
+extern int DAT_00813a8c;
 // 0x00813a90
-extern unsigned int DAT_00813a90;
+extern int DAT_00813a90;
 // 0x00813a94
 extern unsigned int DAT_00813a94;
 // 0x00813a98

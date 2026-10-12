@@ -4,6 +4,14 @@
 #include "llidb.h"
 #include "math.h"
 
+/* One textured face for RemapTexCoordsToCell: 0x24 bytes. */
+struct TexFace {
+    unsigned int flags; /* 0x2000: skip */
+    int field_4;
+    int cell; /* texture cell index */
+    float uv[6]; /* u0 v0 u1 v1 u2 v2 */
+};
+
 struct Sprite;
 struct LLS;
 struct Ride;

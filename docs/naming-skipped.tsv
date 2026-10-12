@@ -498,13 +498,13 @@ FUN_00458b20	named	UnloadMap
 FUN_00459820	named	EndLevel	MapStats.level_end = 1 win / 2 lose and shows the ENDSCREENS text
 FUN_0045a060	skipped-no-evidence		
 FUN_0045a3e0	skipped-no-evidence		
-FUN_0045ce10	skipped-no-evidence		
-FUN_0045d260	skipped-no-evidence		
-FUN_0045d3d0	skipped-no-evidence		
-FUN_0045f460	skipped-no-evidence		
-FUN_0045f480	skipped-no-evidence		
-FUN_0045f4b0	skipped-no-evidence		
-FUN_0045f4d0	skipped-no-evidence		
+FUN_0045ce10	named	IsPathTile	
+FUN_0045d260	named	AdjustPathTileAndNeighbours	
+FUN_0045d3d0	named	ClearPathUnderFootprint	
+FUN_0045f460	named	ResetCursorBuildable	
+FUN_0045f480	named	SetCursorBlocked	
+FUN_0045f4b0	named	IsCursorBuildable	
+FUN_0045f4d0	named	PropagateCursorBlocked	
 FUN_00460560	skipped-no-evidence		
 FUN_00468810	skipped-no-evidence		
 FUN_004689f0	skipped-no-evidence		
@@ -532,7 +532,7 @@ FUN_0046d850	named	ScrollIconRegion	scrolls a ScrollRegion's icons by (dx,dy), c
 FUN_0046fb40	named	DestroyIconGroup	
 FUN_00471610	named	SetPopUpIconSprites	
 FUN_00471d60	named	SetPopUpOkCloseIconSprites	
-FUN_004735e0	skipped-no-evidence		
+FUN_004735e0	named	TryPlayAdviceSpeech	
 FUN_00474750	skipped-no-evidence		
 FUN_00474880	skipped-no-evidence		
 FUN_004748a0	skipped-no-evidence		

@@ -459,20 +459,13 @@ int FUN_00458c00(void) {
 
 // FUNCTION: LEGOLAND 0x00458ee0
 void GameProc(void) {
-    struct {
-        int outgoing[3];
-        RECT help_rect;
-    } frame;
-    unsigned int input;
-    char *value;
-    unsigned int saved_value;
-    unsigned int saved_action;
-    unsigned int *class_data;
-    struct ObjClass *query_class;
+    struct HitInfo hit = {1};
+    RECT help_rect;
+    struct HoverInfo saved;
 
     // STRING: LEGOLAND 0x004b91e4
     DAT_00667c40 = "AI";
-    HandleRideAI(1, 0, 0);
+    HandleRideAI();
     DoMapAI();
     ControlPeople();
     ControlWorkers();
@@ -483,7 +476,7 @@ void GameProc(void) {
     DAT_00667c40 = "ProcessStuff";
     ProcessBuildingTimes();
     ProcessDamage();
-    input = Hover.type;
+    saved.type = Hover.type;
     SetPointer(5);
     // STRING: LEGOLAND 0x004b91cc
     DAT_00667c40 = "Zoning";
@@ -492,12 +485,11 @@ void GameProc(void) {
     DAT_00667c40 = "Rendering";
     PushRenderingStatusAndLockVideoSurface();
     RenderView();
-    if ((input & 0x100) != 0 || (GamePad & 0x1000) != 0) {
+    if ((saved.type & 0x100) != 0 || (GamePad & 0x1000) != 0) {
         FUN_00457a70();
     }
-    saved_value = Hover.ptr;
-    saved_action = Hover.data.value;
-    PrintSprite(InterfaceBgSprite, 0, 0, 0, frame.outgoing);
+    saved = Hover;
+    PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit.type);
     FUN_0046f100(0x2c3);
     FUN_0046ee00();
     // STRING: LEGOLAND 0x004b91b0
@@ -507,87 +499,67 @@ void GameProc(void) {
     RenderIcons2(0x2c3, 0, 0);
     FUN_0046cff0();
     if ((GamePad & 0x1000) != 0) {
-        Hover.type = input;
-        Hover.ptr = saved_value;
-        Hover.data.value = saved_action;
+        Hover = saved;
     }
-    input = Hover.type;
-    if ((input & 0x100) != 0 && (EditMode.unk0 == 0 || EditMode.unk0 == 2)) {
-        frame.help_rect.left = MousePos.x;
-        frame.help_rect.top = MousePos.y - 0xa;
-        frame.help_rect.right = MousePos.x;
-        frame.help_rect.bottom = MousePos.y;
+    if ((Hover.type & 0x100) != 0 && (EditMode.unk0 == 0 || EditMode.unk0 == 2)) {
+        help_rect.left = MousePos.x;
+        help_rect.top = MousePos.y - 0xa;
+        help_rect.right = MousePos.x;
+        help_rect.bottom = MousePos.y;
         if (EditMode.unk0 == 0) {
-            if (input == 0x7e4) {
-                value = GetString(0x7e4);
-                HTBubbleHelp(&frame.help_rect, value, 2);
+            switch (Hover.type) {
+            case 0x103:
+                SetPointer(8);
+                if (QueryClass != NULL) {
+                    HTBubbleHelp(&help_rect, QueryClass->name, 2);
+                    FUN_0046d340(*QueryClass->element);
+                }
+                break;
+            case 0x10a:
+                HTBubbleHelp(&help_rect, GetString(0xd4), 2);
+                FUN_0046d230(0xd4);
+                SetPointer(8);
+                break;
+            case 0x10b:
+                HTBubbleHelp(&help_rect, GetString(0xd2), 2);
+                FUN_0046d230(0xd2);
+                SetPointer(7);
+                break;
+            case 0x10c:
+                HTBubbleHelp(&help_rect, GetString(0xd3), 2);
+                FUN_0046d230(0xd3);
+                SetPointer(7);
+                break;
+            case 0x10d:
+                HTBubbleHelp(&help_rect, GetString(0x7e4), 2);
                 FUN_0046d230(0x7e4);
                 SetPointer(8);
-            } else {
-                switch (input) {
-                case 0x103:
-                    SetPointer(8);
-                    query_class = QueryClass;
-                    if (query_class != NULL) {
-                        HTBubbleHelp(&frame.help_rect, query_class->name, 2);
-                        class_data = query_class->element;
-                        FUN_0046d340(*class_data);
-                    }
-                    break;
-                case 0x10a:
-                    value = GetString(0xd4);
-                    HTBubbleHelp(&frame.help_rect, value, 2);
-                    FUN_0046d230(0xd4);
-                    SetPointer(8);
-                    break;
-                case 0x10b:
-                    value = GetString(0xd2);
-                    HTBubbleHelp(&frame.help_rect, value, 2);
-                    FUN_0046d230(0xd2);
-                    SetPointer(7);
-                    break;
-                case 0x10c:
-                    value = GetString(0xd3);
-                    HTBubbleHelp(&frame.help_rect, value, 2);
-                    FUN_0046d230(0xd3);
-                    SetPointer(7);
-                    break;
-                case 0x306:
-                    FUN_00455fc0(&frame.help_rect, GetVisitorName(Hover.ptr), 2, FUN_00482cb0(Hover.ptr));
-                    FUN_00450a40(Hover.ptr);
-                    SetPointer(8);
-                    break;
-                case 0x307:
-                    value = GetString(0x90);
-                    HTBubbleHelp(&frame.help_rect, value, 2);
-                    FUN_0046d230(0x90);
-                    SetPointer(8);
-                    FUN_00450a40(Hover.ptr);
-                    break;
-                case 0x308:
-                    value = GetString(0x92);
-                    HTBubbleHelp(&frame.help_rect, value, 2);
-                    FUN_0046d230(0x92);
-                    SetPointer(8);
-                    FUN_00450a40(Hover.ptr);
-                    break;
-                case 0x104:
-                case 0x105:
-                case 0x106:
-                case 0x107:
-                case 0x108:
-                case 0x109:
-                default:
-                    SetPointer(7);
-                    break;
-                }
+                break;
+            case 0x306:
+                FUN_00455fc0(&help_rect, GetVisitorName(Hover.ptr), 2, FUN_00482cb0(Hover.ptr));
+                SetPointer(8);
+                FUN_00450a40(Hover.ptr);
+                break;
+            case 0x307:
+                HTBubbleHelp(&help_rect, GetString(0x90), 2);
+                FUN_0046d230(0x90);
+                SetPointer(8);
+                FUN_00450a40(Hover.ptr);
+                break;
+            case 0x308:
+                HTBubbleHelp(&help_rect, GetString(0x92), 2);
+                FUN_0046d230(0x92);
+                SetPointer(8);
+                FUN_00450a40(Hover.ptr);
+                break;
+            default:
+                SetPointer(7);
+                break;
             }
         } else {
-            query_class = QueryClass;
-            if (query_class != NULL) {
-                HTBubbleHelp(&frame.help_rect, query_class->name, 2);
-                class_data = query_class->element;
-                FUN_0046d340(*class_data);
+            if (QueryClass != NULL) {
+                HTBubbleHelp(&help_rect, QueryClass->name, 2);
+                FUN_0046d340(*QueryClass->element);
             }
         }
     }
@@ -601,16 +573,18 @@ void GameProc(void) {
     // STRING: LEGOLAND 0x004b9194
     DAT_00667c40 = "Appraisals Over";
     UpdateFocussedIconPtr();
-    if ((GamePad & 0x1000) == 0 && DAT_00667c48 == 0 && FocussedIconPtr != NULL && DAT_00668954 == 0) {
-        SetPointer(6);
+    if ((GamePad & 0x1000) == 0 && DAT_00667c48 == 0) {
+        if (FocussedIconPtr != NULL && DAT_00668954 == 0) {
+            SetPointer(6);
+        }
+        CheckFocussedIcon();
     }
-    CheckFocussedIcon();
     if (DAT_00668954 != 0) {
         RenderWorkerOnMouse();
     }
     PopRenderingStatus();
     if (MapStats.show_capacity != 0) {
-        if (IsLeftShiftDown() != 0 && IsRightShiftDown() != 0) {
+        if (IsLeftShiftDown() != 0 || IsRightShiftDown() != 0) {
             PrintCapacityStats();
         }
     }

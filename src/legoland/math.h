@@ -42,6 +42,9 @@ struct RectNode {
 
 LEGO_EXPORT int ArcTan256(int dx, int dy);
 LEGO_EXPORT char CalcMoveLine(struct Point from, struct Point to, struct Navigator *nav);
+/* CastleObjUpdate's view of CalcMoveLine: it uses the result with no sign extension (add eax,0x10;
+ * mov [..],al at 0x425304 / 0x4253da), i.e. as an int. */
+typedef int (*CalcMoveLineIntFn)(struct Point from, struct Point to, struct Navigator *nav);
 void MovePointInDirection(struct Point *src, struct Point *dst, int dir);
 void StepPointByDirection(int *src, int *dst, int dir);
 LEGO_EXPORT int GetRectArea(struct RectNode *list);

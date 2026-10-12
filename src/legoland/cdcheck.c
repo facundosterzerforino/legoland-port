@@ -156,11 +156,11 @@ int FUN_00451280(HANDLE h, int drive) {
     regs.reg_ECX = 0x848;
     result = DeviceIoControl(h, 1, &regs, sizeof(regs), &regs, sizeof(regs), (LPDWORD)&drive, NULL);
     if (!result) {
-        return 0;
+        goto fail;
     }
     if (regs.reg_Flags & 1) {
         if (regs.reg_EAX != 0xb0 && regs.reg_EAX != 1) {
-            return 0;
+            goto fail;
         }
         result = 1;
     }
@@ -182,6 +182,8 @@ int FUN_00451280(HANDLE h, int drive) {
         }
     }
     return result;
+fail:
+    return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00451390

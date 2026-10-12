@@ -433,13 +433,16 @@ int FUN_0043ad00(unsigned char *param_1, int param_2) {
 void FUN_0043ad90(struct SpaceTowerCar *param_1, int param_2, unsigned int param_3) {
     struct Point coords;
     struct Point off;
+    struct Point pos;
 
     coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
     if (SpaceTowerSeatMatteSprites[param_2] != NULL) {
         off = DAT_0062fd88[param_2];
         off.y -= param_1->seats[param_2].pos;
         AdjustOffsetForViewMode(&off);
-        PrintSprite(SpaceTowerSeatMatteSprites[param_2], coords.x + off.x, coords.y + off.y, param_3, 0);
+        pos.x = coords.x + off.x;
+        pos.y = coords.y + off.y;
+        PrintSprite(SpaceTowerSeatMatteSprites[param_2], pos.x, pos.y, param_3, 0);
     }
 }
 
@@ -909,8 +912,8 @@ void SpaceTowerUpdate(struct SpaceTowerCtx *param_1) {
                 bloke->flags |= 8;
                 ride_x <<= 8;
                 ride_y = (ride_y + 1) << 8;
-                bloke->dest.y = ride_y;
                 bloke->dest.x = ride_x;
+                bloke->dest.y = ride_y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;

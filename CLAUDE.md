@@ -184,8 +184,15 @@ struct assignment, etc.).
   `__declspec(naked)` (`tools/asm2naked.py` does it) and say so in the comment above `// FUNCTION:`. The port
   replaces these functions with plain-C equivalents tagged `// [library:asm]`.
 - **`goto` only with named labels** — cleanup/error paths like `goto fail;` are fine (the original code
-  used them, and they often match better than duplicated cleanup). No Ghidra-style `goto LAB_00446b71;`:
-  give the label a meaningful name or restructure with `if`/loops.
+  used them, and they often match better than duplicated cleanup). That includes multi-label cleanup
+  ladders (`fail_release:` / `fail_free:` / `fail_close:`) when the original's failure paths enter one
+  shared cleanup tail at different steps. No Ghidra-style `goto LAB_00446b71;`: give the label a
+  meaningful name or restructure with `if`/loops.
+- **`volatile` is allowed when it is the only way** to get a load or store the original does (a field
+  re-read from memory at each use, a store that must stay in place). Try the natural forms first (reading
+  the field at each use, statement order, struct copies), and put a short comment on it, e.g.
+  `/* volatile: the original re-reads this */`. It is a matching device, not a claim about the original
+  source. Permuter temporaries (`ptmp45`) get a meaningful name when you touch them.
 - **Run `clang-format -i`** on all modified `.c`/`.h` files before committing.
 - **Retype globals** when casts can be removed. If a global is always cast to `struct Foo *`,
   change its type in `globals.h`/`globals.c`. Consecutive globals that form a struct

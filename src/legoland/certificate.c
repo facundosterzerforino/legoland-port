@@ -16,30 +16,35 @@
 
 // FUNCTION: LEGOLAND 0x00451740
 int PrintCertificate(char *param_1, char *param_2, char *param_3) {
-    BYTE printers[0xa80];
     DEVMODEA dm;
+    BYTE printers[0xa80];
     DOCINFOA di;
     BITMAPFILEHEADER bmfh;
-    BITMAPINFOHEADER bmih;
     HDC hMemDC;
+    BITMAPINFOHEADER bmih;
     DWORD needed;
     void *pBits;
     DWORD returned;
     BITMAPINFO *pInfo;
-    HGLOBAL hInfo;
+    register HGLOBAL hInfo;
     HGLOBAL hBits;
-    HBITMAP hBitmap;
+    register HBITMAP hBitmap;
     HFONT hFont;
     HFONT hOldFont;
     LOGFONTA *plf;
-    HDC hDC;
     int hres;
+    HDC hDC;
     int vres;
-    int ncolors;
     int fd;
+    volatile int ncolors;
 
+    volatile int ptmp10;
+    returned;
     needed = 0;
-    returned = 0;
+    pInfo;
+    pInfo;
+    pInfo;
+    returned;
     pInfo = NULL;
 #ifdef LEGOLAND_PORT
     {
@@ -114,19 +119,20 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         return 0;
     }
     fd = _open(param_1, _O_RDONLY | _O_BINARY, _S_IREAD);
-    if (fd >= 0) {
+    if ((int)fd >= 0) {
         _read(fd, &bmfh, 14);
         _read(fd, &bmih, 40);
-        if (bmih.biBitCount > 8)
+        if (8 < bmih.biBitCount)
             ncolors = 0;
         else
             ncolors = 1 << bmih.biBitCount;
         hInfo = GlobalAlloc(GHND, ncolors * 4 + 40);
-        if (hInfo != NULL) {
+        if ((unsigned int)hInfo != NULL) {
             pInfo = (BITMAPINFO *)GlobalLock(hInfo);
-            if (pInfo == NULL) {
+            if ((unsigned int)NULL == pInfo) {
                 GlobalFree(hInfo);
             } else {
+                ptmp10 = bmih.biXPelsPerMeter;
                 pInfo->bmiHeader.biSize = bmih.biSize;
                 pInfo->bmiHeader.biWidth = bmih.biWidth;
                 pInfo->bmiHeader.biHeight = bmih.biHeight;
@@ -134,11 +140,11 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 pInfo->bmiHeader.biBitCount = bmih.biBitCount;
                 pInfo->bmiHeader.biCompression = bmih.biCompression;
                 pInfo->bmiHeader.biSizeImage = bmih.biSizeImage;
-                pInfo->bmiHeader.biXPelsPerMeter = bmih.biXPelsPerMeter;
+                pInfo->bmiHeader.biXPelsPerMeter = ptmp10;
                 pInfo->bmiHeader.biYPelsPerMeter = bmih.biYPelsPerMeter;
                 pInfo->bmiHeader.biClrUsed = bmih.biClrUsed;
                 pInfo->bmiHeader.biClrImportant = bmih.biClrImportant;
-                if (pInfo->bmiHeader.biBitCount < 9)
+                if (9 > pInfo->bmiHeader.biBitCount)
                     _read(fd, pInfo->bmiColors, (1 << bmih.biBitCount) * 4);
                 hBits = GlobalAlloc(GHND, bmfh.bfSize - bmfh.bfOffBits);
                 if (hBits == NULL) {
@@ -152,7 +158,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     return 0;
                 }
                 pBits = GlobalLock(hBits);
-                if (pBits == NULL) {
+                if ((unsigned int)pBits == (int)NULL) {
                     GlobalUnlock(hInfo);
                     GlobalFree(hInfo);
                     GlobalFree(hBits);
@@ -194,7 +200,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 // STRING: LEGOLAND 0x004b86e8
                 di.lpszDocName = "Lego certificate";
                 di.lpszOutput = NULL;
-                di.lpszDatatype = NULL;
+                { di.lpszDatatype = NULL; }
                 di.fwType = 0;
                 if (StartDocA(hDC, &di) == -1) {
                     GlobalFree(hInfo);
@@ -262,7 +268,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 // STRING: LEGOLAND 0x004b86e0
                 lstrcpyA(plf->lfFaceName, "Lego");
                 hFont = CreateFontIndirectA(plf);
-                if (hFont == NULL) {
+                if (!hFont) {
                     GlobalFree(hInfo);
                     GlobalFree(hBits);
                     DeleteObject(hBitmap);
@@ -282,7 +288,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 plf->lfWeight = 300;
                 lstrcpyA(plf->lfFaceName, "Lego");
                 hFont = CreateFontIndirectA(plf);
-                if (hFont == NULL) {
+                if (NULL == hFont) {
                     GlobalFree(hInfo);
                     GlobalFree(hBits);
                     DeleteObject(hBitmap);
@@ -306,7 +312,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     GlobalFree(hInfo);
                     GlobalFree(hBits);
                     DeleteObject(hBitmap);
-                    EndDoc(hDC);
+                    { EndDoc(hDC); }
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
                     DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());

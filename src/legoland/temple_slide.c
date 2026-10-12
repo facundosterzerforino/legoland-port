@@ -176,8 +176,8 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
             person = bloke->person;
             person->offset.x = bloke->screen_x;
             person->offset.y = bloke->screen_y;
-            person->offset.x += off1.x;
-            person->offset.y += off1.y;
+            person->offset.x += off2.x;
+            person->offset.y += off2.y;
             AdjustBlokePosition(&person->offset);
             person->screen.x = bloke->screen_x + off1.x + off2.x + pos.x;
             person->screen.y = bloke->screen_y + off1.y + off2.y + pos.y;
@@ -332,10 +332,10 @@ void TempleSlideUpdate(Element *obj) {
     unsigned int x;
     unsigned int y;
     unsigned char dir;
+    register int cy;
     int cx;
-    register unsigned int cy;
-    int f;
-    unsigned short sx;
+    register int f;
+    short sx;
     short sy;
     int off[4];
     Point coords;
@@ -347,13 +347,16 @@ void TempleSlideUpdate(Element *obj) {
     RideNode *node;
 
     int field_73;
+    int ptmp227;
+    node;
     ride = obj->ride;
     node = ride->riders;
     while (node != NULL) {
         next = node->next;
         tile = &node->tile;
         bloke = node->rider;
-        x = ride->x + tile->pos.x;
+        ptmp227 = ride->x;
+        x = ptmp227 + tile->pos.x;
         y = tile->pos.y + ride->y;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
@@ -402,8 +405,8 @@ void TempleSlideUpdate(Element *obj) {
                     GetTileDimensions(&tw, &th);
                     cy = (px + py) * th;
                     tw = (px - py) * tw;
-                    tw >>= 9;
                     cy >>= 9;
+                    tw >>= 9;
                 }
                 sx = Get_XScroll();
                 cx = (lpConfig->view_x - sx) + tw;
@@ -442,7 +445,7 @@ void TempleSlideUpdate(Element *obj) {
                         bloke->param_action = 5;
                         free(bloke->path);
                         bloke->path = NULL;
-                    } else if (f >= DAT_004b4f18[bloke->field_36] && f <= DAT_004b4f1c[bloke->field_36]) {
+                    } else if (f >= DAT_004b4f18[bloke->field_36] && f <= (int)DAT_004b4f1c[bloke->field_36]) {
                         BlokeSetFrame(bloke, 0);
                     }
                 }

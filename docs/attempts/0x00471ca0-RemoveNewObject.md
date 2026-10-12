@@ -1,6 +1,6 @@
 # RemoveNewObject (0x00471ca0, `src/legoland/popupinfo.c`)
 
-**Best: 63.16%** (round 2 version). Kind: C.
+**Best: 92.45%** (round 2 version). Kind: C.
 
 ## What still differs
 
@@ -15,6 +15,9 @@
 | 2026-10-07 r2 | Haiku agent | `#pragma optimize("y", off)` | 46.02% (worse: the original has no ebp frame) |
 | 2026-10-07 r2 | Haiku agent | `while` outer loop; `n > 0` instead of `0 < n` | no change |
 | 2026-10-07 r2 | Haiku agent | `count` store before the `current` check; `--n` | no change |
+| 2026-10-09 | Opus 5.5 | no `n` local: read `NewObjects.count` everywhere (the original keeps it in edx and reloads it after the call and the array stores), `NewObjects.count--` | 83.02 |
+| 2026-10-09 | Opus 5.5 | + shift loop `for (k = j; k + 1 < count; k++) sprites[k] = sprites[k + 1]` | **92.45** (kept; `mov eax,esi` vs `lea eax,[esi]`, inc placement) |
+| 2026-10-09 | Opus 5.5 | + Ghidra's pointer do-while (`k++` first) | 49.06 (right order, k/count registers swapped; reversed compares no help) |
 
 ## Ideas not tried yet
 

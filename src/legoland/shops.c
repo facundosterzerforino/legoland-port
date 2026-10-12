@@ -392,11 +392,11 @@ void LegoShop2Update(Element *obj) {
     int r;
 
     while (node != NULL) {
-        next = node->next;
         bloke = node->rider;
         tile = &node->tile;
         y = tile->pos.y + ride->y;
         x = tile->pos.x + ride->x;
+        next = node->next;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
@@ -773,22 +773,25 @@ void RenderExplorersInstitute(struct ShopObject *obj, unsigned int param2, unsig
 
 // FUNCTION: LEGOLAND 0x0043a1e0
 void ExplorersInstituteUpdate(struct Element *obj) {
+    unsigned int ptmp54;
+    int ptmp55;
+    volatile int ptmp911;
     struct Ride *ride = obj->ride;
     struct RideNode *elem = ride->riders;
     struct RideNode *next;
-    struct Bloke *bloke;
     int x;
-    int y;
+    struct Bloke *bloke;
+    unsigned int y;
 
     while (elem != NULL) {
         next = elem->next;
         bloke = elem->rider;
-        if (bloke->low_level_action == 0) {
+        if ((int)0 == bloke->low_level_action) {
             switch (bloke->param_action) {
             case 0:
                 bloke->flags |= 8;
                 bloke->dest.x = elem->tile.pos.x << 8;
-                bloke->dest.y = (elem->tile.pos.y + 1) << 8;
+                bloke->dest.y = (1 + elem->tile.pos.y) << 8;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
@@ -811,15 +814,18 @@ void ExplorersInstituteUpdate(struct Element *obj) {
                 break;
             case 3:
                 bloke->dest.x = elem->tile.pos.x << 8;
-                bloke->dest.y = (elem->tile.pos.y + 1) << 8;
+                bloke->dest.y = (1 + elem->tile.pos.y) << 8;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                ptmp55 = bloke->field_73;
+                NewDirForAction(bloke, (ptmp55 >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 4:
-                bloke->dest.y = ((elem->tile.pos.y + ride->y) << 8) + 0x80;
-                bloke->dest.x = ((ride->x + elem->tile.pos.x) << 8) + 0x80;
+                ptmp911 = elem->tile.pos.y;
+                bloke->dest.y = ((ride->y + ptmp911) << 8) + 0x80;
+                ptmp54 = elem->tile.pos.x;
+                bloke->dest.x = ((ride->x + ptmp54) << 8) + 0x80;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);

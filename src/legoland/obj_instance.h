@@ -105,4 +105,4 @@ LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node);
 LEGO_EXPORT void RemoveAllBlokesFromRide(struct Ride *ride, TileId tile);
 LEGO_EXPORT int GetAllBlokesOffRide(struct Ride *ride, unsigned short uid);
 
-LEGO_EXPORT void HandleRideAI(int arg_1, int arg_2, int arg_3);
+LEGO_EXPORT void HandleRideAI(void);

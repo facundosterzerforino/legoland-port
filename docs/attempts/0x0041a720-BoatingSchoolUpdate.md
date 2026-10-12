@@ -17,6 +17,7 @@
 | 2026-10-07 p4 | Haiku agent | Moved `source2.type`/`.bloke` stores above `bloke->param_action++` in case 5 | 94.13% (worse) |
 | 2026-10-07 p4 | Haiku agent | Swapped `field_73` and `low_level_action` stores in case 0 | 94.41% (no change) |
 | 2026-10-08 | permuter + Opus 5.5 | `unsigned int slot`; case 1 condition split into two nested ifs | 94.41 -> 96.58 |
+| 2026-10-09 | Opus 5.5 | all 6 orders of `param_action++` / `source2.type = 1` / `source2.bloke = bloke` | 95.53-96.09 (current order best; type-first puts the store before NewDirForAction's cleanup) |
 
 ## Ideas not tried yet
 

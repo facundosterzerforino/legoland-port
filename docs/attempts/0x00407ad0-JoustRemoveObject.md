@@ -1,6 +1,6 @@
 # JoustRemoveObject (0x00407ad0, `src/legoland/joust.c`)
 
-**Best: 95.00%**. Kind: C.
+**Best: 100% (matched 2026-10-09)**. Kind: C.
 
 ## What still differs
 
@@ -17,6 +17,7 @@
 | 2026-10-07 | Haiku agent | Load x and y into `unsigned int` locals first, then assign kind, x, y | 62.50% (worse, extra eax use) |
 | 2026-10-07 | Haiku agent | Assign x, y, then kind | 92.50% (worse) |
 | 2026-10-07 | Haiku agent | `struct {...} source = {2, 0, node->id.pos.x, node->id.pos.y};` inside the `if` | 88.64% (loads and pushes match, but the pad field gets a `mov [esp+0x10], 0` the original lacks) |
+| 2026-10-09 | Opus 5.5 | block-scope initialiser `{2, x, y}` with the pad as an unnamed `unsigned int : 32;` bit-field (C leaves unnamed members uninitialised, so no store) | **100** |
 
 ## Ideas not tried yet
 

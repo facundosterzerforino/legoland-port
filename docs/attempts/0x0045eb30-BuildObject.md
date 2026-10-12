@@ -16,6 +16,7 @@
 | 2026-10-07 | Haiku agent | `out` and `effect` moved into each branch's block scope | 95.21% (worse) |
 | 2026-10-07 | Haiku agent | `cost` local removed, `GetObjCost(obj)` called inline in the first `if` | 96.81% (same) |
 | 2026-10-07 | Haiku agent | `obj = editObj->obj;` moved before the `packed` byte stores | 82.98% (worse) |
+| 2026-10-09 | Opus 5.5 | analysis | packed (TileId) lives in a dead parameter slot in both builds: the original reuses editObj's slot (entry+4), ours coords' (entry+8) |
 
 ## Ideas not tried yet
 

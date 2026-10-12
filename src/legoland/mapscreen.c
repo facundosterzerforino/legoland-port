@@ -187,7 +187,7 @@ void FUN_00456770(struct MapPoint *arg) {
 // FUNCTION: LEGOLAND 0x004567a0
 LEGO_EXPORT void RenderFullMap(void) {
     struct Element *square_track;
-    register struct Element *square_track_height;
+    struct Element *square_track_height;
     struct Element *square_track_height_0;
     struct Element *square_track_height_path;
     struct Element *castle_dummy;
@@ -195,16 +195,8 @@ LEGO_EXPORT void RenderFullMap(void) {
     struct Sprite *blob;
     struct Sprite *stick;
     struct Sprite *lights;
-    register HPEN pen;
+    HPEN pen;
 
-    struct Sprite *info_sprite;
-    int dest_x;
-    int ride_x;
-    int uid_x;
-    struct FXSpriteList *tile_src;
-    int bounds_y1;
-    int cfg_height;
-    int bounds_y2;
     // STRING: LEGOLAND 0x004b5bfc
     square_track = ElemID("SQUARE_TRACK");
     // STRING: LEGOLAND 0x004b5be8
@@ -226,106 +218,90 @@ LEGO_EXPORT void RenderFullMap(void) {
     pen = CreatePen(PS_SOLID, 2, 0xff4000);
 
     if (DAT_00667c30 == 0) {
-        struct Point tile_size;
-        int half;
-        struct Point map_scale;
-        struct {
-            unsigned int y;
-            int x;
-        } saved_scroll;
-        struct Point tile_pos;
-        register int base_x;
-        int base_y;
+        int tile_w;
+        int tile_h;
+        int half_h;
+        int scale_x; /* 16.16 world -> map scale */
+        int scale_y;
+        int saved_view_x;
+        int saved_view_y;
+        struct Point pos; /* map tile of the terrain passes */
         int bounds[4];
-        /* These height values belong to separate rendering passes. */
-        union {
-            float syf;
-            float f1;
-        } height_value;
-        /* Clipping and terrain rendering use this storage at different times. */
-        union {
-            RECT clip;
-            struct MapElement tile;
-        } tile_scratch;
+        struct MapElement tile;
         struct MapElement *obj;
         struct OverlayNode *node;
 
         FUN_0045a660();
-        memset(DAT_008119c0, 0, 0x2000);
+        memset(DAT_008119c0, 0, 0x2000); /* all 32 rows, DAT_008138c0 included */
         MapViewX = 0;
         MapViewY = 0x20;
         MapViewWidth = 0x280;
         MapViewHeight = 0x154;
         StoreClipping();
         {
-            tile_scratch.clip.left = 0;
-            tile_scratch.clip.right = MapViewWidth;
-            tile_scratch.clip.top = 0;
-            tile_scratch.clip.bottom = MapViewHeight;
-            SetClipping(&tile_scratch.clip);
+            RECT clip;
+
+            clip.left = 0;
+            clip.right = MapViewWidth;
+            clip.top = 0;
+            clip.bottom = MapViewHeight;
+            SetClipping(&clip);
         }
-        GetTileDimensions(&tile_size.x, &tile_size.y);
+        GetTileDimensions(&tile_w, &tile_h);
         DAT_00667c04 = 0;
-        cfg_height = lpConfig->height;
-        MapWorldMinX = -(cfg_height * tile_size.x / 2);
-        DAT_00667c08 = lpConfig->width * tile_size.x / 2;
-        DAT_00667c0c = (lpConfig->width + lpConfig->height) * tile_size.y / 2;
+        MapWorldMinX = -(lpConfig->height * tile_w / 2);
+        DAT_00667c08 = lpConfig->width * tile_w / 2;
+        DAT_00667c0c = (lpConfig->width + lpConfig->height) * tile_h / 2;
         MapWorldWidth = DAT_00667c08 - MapWorldMinX + 1;
-        MapWorldHeight = 1 + DAT_00667c0c;
-        map_scale.x = (MapViewWidth << 16) / MapWorldWidth;
-        map_scale.y = (MapViewHeight << 16) / MapWorldHeight;
-        DAT_00667c16 =
-            (short)((float)MapViewWidth * tile_size.x / MapWorldWidth + 1.0f);
-        DAT_00667c14 =
-            (short)((float)MapViewHeight * tile_size.y / MapWorldHeight + 1.0f);
-        half = (tile_size.y + 1) >> 1;
+        MapWorldHeight = DAT_00667c0c + 1;
+        scale_x = (MapViewWidth << 16) / MapWorldWidth;
+        scale_y = (MapViewHeight << 16) / MapWorldHeight;
+        DAT_00667c16 = (short)((float)MapViewWidth * tile_w / MapWorldWidth + 1.0f);
+        DAT_00667c14 = (short)((float)MapViewHeight * tile_h / MapWorldHeight + 1.0f);
+        half_h = (tile_h + 1) >> 1;
         RenderBlock(0, 0, MapViewWidth, MapViewHeight, GetNearestColour(0, 0, 0));
-        saved_scroll.x = lpConfig->view_x;
-        saved_scroll.y = lpConfig->view_y;
+        saved_view_x = lpConfig->view_x;
+        saved_view_y = lpConfig->view_y;
         lpConfig->view_x = 0;
         lpConfig->view_y = 0;
         DAT_00667c30 = 1;
         MapCenterOffsetY =
-            (MapViewHeight -
-                ((lpConfig->width + lpConfig->height - 2) * half - DAT_00667c04) *
-                    MapViewWidth / MapWorldHeight / 2) >>
+            (MapViewHeight - ((lpConfig->width + lpConfig->height - 2) * half_h - DAT_00667c04) * MapViewWidth / MapWorldHeight / 2) >>
             1;
 
-        for (tile_pos.y = 0; tile_pos.y < (int)lpConfig->height; tile_pos.y++) {
-            for (tile_pos.x = 0; tile_pos.x < (int)lpConfig->width; tile_pos.x++) {
-                if (tile_pos.x >= 0 && tile_pos.x < (int)lpConfig->width &&
-                    0 <= tile_pos.y && tile_pos.y < (int)lpConfig->height) {
-                    tile_scratch.tile = GameMap[tile_pos.y][tile_pos.x];
+        /* Pass 1: terrain colour blocks. */
+        for (pos.y = 0; pos.y < (int)lpConfig->height; pos.y++) {
+            for (pos.x = 0; pos.x < (int)lpConfig->width; pos.x++) {
+                if (pos.x >= 0 && pos.x < (int)lpConfig->width && pos.y >= 0 &&
+                    pos.y < (int)lpConfig->height) {
+                    tile = GameMap[pos.y][pos.x];
                 } else {
-                    tile_scratch.tile.flags = 0x40;
+                    tile.flags = 0x40;
                 }
-                if ((tile_scratch.tile.flags & 8) == 0) {
-                    struct FXSpriteList *src;
+                if ((tile.flags & 8) == 0) {
                     unsigned int id;
-                    int px;
-                    unsigned int py;
+                    struct FXSpriteList *src;
                     struct Point pt;
+                    int px;
+                    int py;
 
-                    id = GameMap[tile_pos.y][tile_pos.x].field_8;
-                    pt.x = tile_pos.x;
-                    tile_src = TileSpriteInfo[id].src;
-                    src = tile_src;
-                    pt.y = tile_pos.y;
+                    id = GameMap[pos.y][pos.x].field_8;
+                    src = TileSpriteInfo[id].src;
+                    pt.x = pos.x;
+                    pt.y = pos.y;
                     GetTileBounds(&pt, bounds);
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
-                    px = ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16;
-                    py =
-                        (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY;
-                    if ((tile_scratch.tile.flags & 0x10) &&
-                        (tile_scratch.tile.flags & 0x80)) {
-                        RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, 4 + DAT_00667c14,
+                    px = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
+                    py = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    if ((tile.flags & 0x10) && (tile.flags & 0x80)) {
+                        RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
                             GetNearestColour(0x80, 0x80, 0x80));
                     } else {
                         switch (src->sprite_ids[id - src->base] & 0x3f) {
                         case 0:
                         case 0x20:
-                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, 4 + DAT_00667c14,
+                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
                                 GetNearestColour(0, 0x8f, 0x4f));
                             break;
                         case 1:
@@ -334,7 +310,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                                 GetNearestColour(0xff, 0xe0, 0x8f));
                             break;
                         case 0x30:
-                            RenderBlock(px - 7, py - 2, 5 + DAT_00667c16, 4 + DAT_00667c14,
+                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
                                 GetNearestColour(0x5b, 0xbe, 2));
                             break;
                         }
@@ -343,57 +319,59 @@ LEGO_EXPORT void RenderFullMap(void) {
             }
         }
 
+        /* Pass 2: the sprites of the ride tiles. */
         PushRenderingStatusAndUnlockVideoSurface();
-        for (tile_pos.y = 0; tile_pos.y < (int)lpConfig->height; tile_pos.y++) {
-            tile_pos.x = 0;
-            while (tile_pos.x < (int)lpConfig->width) {
-                if (tile_pos.x >= 0 && tile_pos.x < (int)lpConfig->width &&
-                    0 <= tile_pos.y && tile_pos.y < (int)lpConfig->height) {
-                    tile_scratch.tile = GameMap[tile_pos.y][tile_pos.x];
+        for (pos.y = 0; pos.y < (int)lpConfig->height; pos.y++) {
+            for (pos.x = 0; pos.x < (int)lpConfig->width; pos.x++) {
+                if (pos.x >= 0 && pos.x < (int)lpConfig->width && pos.y >= 0 &&
+                    pos.y < (int)lpConfig->height) {
+                    tile = GameMap[pos.y][pos.x];
                 } else {
-                    tile_scratch.tile.field_8 = 0;
-                    tile_scratch.tile.flags = 0x40;
+                    tile.field_8 = 0;
+                    tile.flags = 0x40;
                 }
-                if (tile_scratch.tile.flags & 8) {
+                if (tile.flags & 8) {
+                    float sx;
+                    float sy;
                     struct Ride *ride;
-                    struct MapPoint off;
                     struct Point pt;
-                    float sxf;
+                    struct MapPoint off;
 
-                    sxf = (float)MapViewWidth / MapWorldWidth;
-                    ride = tile_scratch.tile.field_0->ride;
-                    height_value.syf = (float)MapViewHeight / MapWorldHeight;
-                    pt.x = tile_pos.x;
-                    pt.y = tile_pos.y;
+                    sx = (float)MapViewWidth / MapWorldWidth;
+                    sy = (float)MapViewHeight / MapWorldHeight;
+                    ride = tile.field_0->ride;
+                    pt.x = pos.x;
+                    pt.y = pos.y;
                     GetTileBounds(&pt, bounds);
                     off.field0 = ride->field_14;
                     off.field1 = ride->field_18;
                     FUN_00456770(&off);
-                    bounds[1] += off.field1;
                     bounds[0] += off.field0;
+                    bounds[1] += off.field1;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
-                    PrintScaledSprite(
-                        TileSpriteArray[tile_scratch.tile.field_8],
-                        (int)((bounds[0] - MapWorldMinX) * sxf),
-                        (int)((bounds[1] - DAT_00667c04) * height_value.syf) +
-                            MapCenterOffsetY,
+                    PrintScaledSprite(TileSpriteArray[tile.field_8],
+                        (int)((bounds[0] - MapWorldMinX) * sx),
+                        (int)((bounds[1] - DAT_00667c04) * sy) + MapCenterOffsetY,
                         DAT_00667c16 + 1, DAT_00667c14 + 1);
                 }
-                tile_pos.x++;
             }
         }
 
+        /* Pass 3: the overlay sprites. */
         {
-            tile_scratch.clip.left = 0;
-            tile_scratch.clip.right = MapViewWidth;
-            tile_scratch.clip.top = 0;
-            tile_scratch.clip.bottom = MapViewHeight;
-            SetClipping(&tile_scratch.clip);
+            RECT clip;
+
+            clip.left = 0;
+            clip.right = MapViewWidth;
+            clip.top = 0;
+            clip.bottom = MapViewHeight;
+            SetClipping(&clip);
         }
         {
             int origin[4];
             struct Point pt;
+            struct Point base; /* map position of tile (0,0) */
 
             node = OverlayList;
             pt.x = 0;
@@ -401,48 +379,46 @@ LEGO_EXPORT void RenderFullMap(void) {
             GetTileBounds(&pt, origin);
             origin[0] += ScrollX >> 8;
             origin[1] += ScrollY >> 8;
-            base_x = ((origin[0] - MapWorldMinX) * map_scale.x) >> 16;
-            base_y =
-                (((origin[1] - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY;
+            base.x = ((origin[0] - MapWorldMinX) * scale_x) >> 16;
+            base.y = (((origin[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
             while (node != NULL) {
-                PrintScaledSprite(
-                    node->sprite,
-                    (((tile_size.x * 2 / 3 + node->x) * map_scale.x) >> 16) + base_x,
-                    ((node->y * map_scale.y) >> 16) + base_y,
-                    ((short)node->sprite->width * map_scale.x) >> 16,
-                    ((short)node->sprite->height * map_scale.y) >> 16);
+                PrintScaledSprite(node->sprite,
+                    (((tile_w * 2 / 3 + node->x) * scale_x) >> 16) + base.x,
+                    ((node->y * scale_y) >> 16) + base.y,
+                    (node->sprite->width * scale_x) >> 16,
+                    ((short)node->sprite->height * scale_y) >> 16);
                 node = node->next;
             }
         }
 
-        for (obj = GetFirstRenderObject(); obj != NULL;
-            obj = GetNextRenderObject(obj)) {
-            struct MapElement tile;
-            struct Ride *ride;
+        /* Pass 4: the placed objects. */
+        for (obj = GetFirstRenderObject(); obj != NULL; obj = GetNextRenderObject(obj)) {
             TileId uid;
+            struct MapElement elem;
+            struct Ride *ride;
             RideSpriteInfo *info;
             RideSpriteInfo loc;
 
             uid.id = obj->anchor.id;
-            tile = *obj;
-            if ((tile.flags & 0x200)) {
-                if ((tile.flags & 4) == 0) {
-                    struct Point pt;
+            elem = *obj;
+            if ((elem.flags & 0x200) && (elem.flags & 4) == 0) {
+                /* Remember the map position of each 8x8 block's centre. */
+                struct Point pt;
 
-                    pt.x = (tile.field_4 & ~7) + 4;
-                    pt.y = (tile.field_5 & ~7) + 4;
-                    GetTileBounds(&pt, bounds);
-                    bounds[0] += ScrollX >> 8;
-                    bounds[1] += ScrollY >> 8;
-                    DAT_008119c0[tile.field_5 >> 3][tile.field_4 >> 3].x =
-                        ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16;
-                    DAT_008119c0[tile.field_5 >> 3][tile.field_4 >> 3].y =
-                        (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY;
-                }
+                pt.x = (elem.field_4 & ~7) + 4;
+                pt.y = (elem.field_5 & ~7) + 4;
+                GetTileBounds(&pt, bounds);
+                bounds[0] += ScrollX >> 8;
+                bounds[1] += ScrollY >> 8;
+                DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].x =
+                    ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
+                DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].y =
+                    (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
             }
-            ride = tile.field_0->ride;
+            ride = elem.field_0->ride;
             info = NULL;
             if ((ride->flags & 4) == 0 && (ride->flags & 0x400) == 0) {
+                /* Plain scenery: only the driving school's traffic lights are drawn. */
                 if (ride == driving_school_roads->ride) {
                     struct RideQueueEntry *entry;
                     struct Point pt;
@@ -453,82 +429,73 @@ LEGO_EXPORT void RenderFullMap(void) {
                     pt.x = uid.pos.x;
                     pt.y = uid.pos.y;
                     entry = FindQueueEntryAtTile(pt.x, pt.y);
-                    if (entry != NULL) {
-                        if ((entry->field_14 & 0xf) == 5) {
-                            GetTileBounds(&pt, bounds);
-                            bounds[0] += HALF(loc.x);
-                            bounds[1] += HALF(loc.y);
-                            bounds[0] += ScrollX >> 8;
-                            bounds[1] += ScrollY >> 8;
-                            DAT_00667c16 = ((struct Sprite *)loc.sprite)->width;
-                            DAT_00667c14 = ((struct Sprite *)loc.sprite)->height;
-                            PrintScaledSprite(
-                                loc.sprite, ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16,
-                                (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) +
-                                    MapCenterOffsetY,
-                                (map_scale.x * DAT_00667c16) >> 16,
-                                (DAT_00667c14 * map_scale.y) >> 16);
-                        }
+                    if (entry != NULL && (entry->field_14 & 0xf) == 5) {
+                        GetTileBounds(&pt, bounds);
+                        bounds[0] += HALF(loc.x);
+                        bounds[1] += HALF(loc.y);
+                        bounds[0] += ScrollX >> 8;
+                        bounds[1] += ScrollY >> 8;
+                        DAT_00667c16 = ((struct Sprite *)loc.sprite)->width;
+                        DAT_00667c14 = ((struct Sprite *)loc.sprite)->height;
+                        PrintScaledSprite(loc.sprite, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
+                            (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
+                            (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
                     }
                 }
-            } else if (ride->element == square_track ||
-                ride->element == square_track_height ||
+            } else if (ride->element == square_track || ride->element == square_track_height ||
                 ride->element == square_track_height_0 ||
-                ride->element == square_track_height_path ||
-                castle_dummy == ride->element) {
-                struct Point pos;
-                struct Point dest;
-
-                float f2;
+                ride->element == square_track_height_path || ride->element == castle_dummy) {
+                /* Square track pieces: a line to the next piece, with a stick for the height. */
+                struct Point piece; /* this track piece */
+                struct Point dest; /* the piece it connects to */
+                float height;
+                float dest_height;
                 int flag;
 
-                pos.x = tile.anchor.pos.x;
-                pos.y = tile.field_5;
-                if (FUN_00424050(&pos, &height_value.f1, &dest, &f2, &flag)) {
+                piece.x = elem.field_4;
+                piece.y = elem.field_5;
+                if (FUN_00424050(&piece, &height, &dest, &dest_height, &flag)) {
                     struct Point pt;
-                    register int x1;
+                    int x1;
                     int y1;
-                    unsigned int x2;
+                    int x2;
                     int y2;
-                    HDC hdc;
                     int rise;
+                    HDC hdc;
                     HGDIOBJ old;
 
-                    if (height_value.f1 < 0.0f) {
-                        height_value.f1 = 0.0f;
+                    if (height < FLOAT_004ab390) {
+                        height = 0.0f;
                     }
-                    if (f2 < 0.0f) {
-                        f2 = 0.0f;
+                    if (dest_height < FLOAT_004ab390) {
+                        dest_height = 0.0f;
                     }
-                    pt.x = pos.x;
-                    pt.y = pos.y;
+                    pt.x = piece.x;
+                    pt.y = piece.y;
                     GetTileBounds(&pt, bounds);
-                    rise = -(int)height_value.f1;
-                    bounds[1] += HALF(rise);
+                    rise = -(int)height;
+                    rise = HALF(rise);
+                    bounds[1] += rise;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
-                    x1 = ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16;
-                    bounds_y1 = bounds[1];
-                    y1 = (((bounds_y1 - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY;
-                    dest_x = dest.x;
-                    pt.x = dest_x;
+                    x1 = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
+                    y1 = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    pt.x = dest.x;
                     pt.y = dest.y;
                     GetTileBounds(&pt, bounds);
-                    rise = -(int)f2;
-                    bounds[1] += HALF(rise);
+                    rise = -(int)dest_height;
+                    rise = HALF(rise);
+                    bounds[1] += rise;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
-                    x2 = ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16;
-                    bounds_y2 = bounds[1];
-                    y2 = (((bounds_y2 - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY;
+                    x2 = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
+                    y2 = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
                     if (ride->element != square_track_height_path) {
                         DAT_00667c16 = stick->width;
-                        DAT_00667c14 = (short)((float)map_scale.y * height_value.f1 *
-                            7.62939453125e-06f);
+                        DAT_00667c14 = (short)((float)scale_y * height * 7.62939453125e-06f);
                         if (DAT_00667c14 > 0) {
-                            PrintScaledSprite(
-                                stick, x1 - ((map_scale.x * DAT_00667c16) >> 17), y1,
-                                (DAT_00667c16 * map_scale.x) >> 16, DAT_00667c14);
+                            PrintScaledSprite(stick, x1 - ((DAT_00667c16 * scale_x) >> 17), y1,
+                                (DAT_00667c16 * scale_x) >> 16, DAT_00667c14);
                         }
                     }
                     PushRenderingStatusAndUnlockVideoSurface();
@@ -537,16 +504,16 @@ LEGO_EXPORT void RenderFullMap(void) {
                     MoveToEx(hdc, x2, y2, NULL);
                     LineTo(hdc, x1, y1);
                     if (flag) {
-                        pt.x = pos.x - 10;
-                        pt.y = pos.y;
+                        pt.x = piece.x - 10;
+                        pt.y = piece.y;
                         GetTileBounds(&pt, bounds);
-                        rise = -(int)height_value.f1;
-                        bounds[1] += HALF(rise);
-                        bounds[1] += ScrollY >> 8;
+                        rise = -(int)height;
+                        rise = HALF(rise);
+                        bounds[1] += rise;
                         bounds[0] += ScrollX >> 8;
-                        LineTo(hdc, ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16,
-                            (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) +
-                                MapCenterOffsetY);
+                        bounds[1] += ScrollY >> 8;
+                        LineTo(hdc, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
+                            (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY);
                     }
                     SelectObject(hdc, old);
                     renderEngine->lpVtbl->ReleaseDC(renderEngine, hdc);
@@ -554,7 +521,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                 }
                 loc.sprite = blob;
                 loc.x = 0;
-                loc.y = (int)-height_value.f1;
+                loc.y = (int)-height;
             } else if (ride->flags & 0x400) {
                 if (ride->cb_sprite == NULL) {
                     continue;
@@ -562,12 +529,11 @@ LEGO_EXPORT void RenderFullMap(void) {
                 info = ride->cb_sprite(ride->element, uid);
             } else {
                 loc.sprite = ride->layer;
-                ride_x = ride->field_14;
-                loc.x = ride_x;
+                loc.x = ride->field_14;
                 loc.y = ride->field_18;
                 info = &loc;
             }
-            if (info == NULL || NULL == info->sprite) {
+            if (info == NULL || info->sprite == NULL) {
                 continue;
             }
             if ((((struct Sprite *)info->sprite)->flags & 0x8000) == 0) {
@@ -576,8 +542,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                 int hy;
                 struct Sprite *sprite;
 
-                uid_x = uid.pos.x;
-                pt.x = uid_x;
+                pt.x = uid.pos.x;
                 pt.y = uid.pos.y;
                 GetTileBounds(&pt, bounds);
                 hx = info->x;
@@ -591,19 +556,18 @@ LEGO_EXPORT void RenderFullMap(void) {
                 sprite = info->sprite;
                 DAT_00667c16 = sprite->width;
                 DAT_00667c14 = sprite->height;
-                PrintScaledSprite(
-                    info->sprite, ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16,
-                    (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY,
-                    (DAT_00667c16 * map_scale.x) >> 16,
-                    (DAT_00667c14 * map_scale.y) >> 16);
+                PrintScaledSprite(info->sprite, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
+                    (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
+                    (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
             } else {
+                /* A layered sprite: draw each part at its own offset. */
                 int i;
 
                 for (i = 0; i < ((struct Sprite *)info->sprite)->group->count; i++) {
                     struct Sprite *sub;
                     int sub_x;
                     int sub_y;
-                    int hx;
+                    volatile int hx; /* volatile: last resort, the natural forms tried are in docs/attempts */
                     int hy;
                     int ox;
                     int oy;
@@ -611,8 +575,7 @@ LEGO_EXPORT void RenderFullMap(void) {
 
                     sub = ((struct Sprite *)info->sprite)->group->subs[i];
                     sub_x = ((struct Sprite *)info->sprite)->group->xoffs[i];
-                    info_sprite = (struct Sprite *)info->sprite;
-                    sub_y = info_sprite->group->yoffs[i];
+                    sub_y = ((struct Sprite *)info->sprite)->group->yoffs[i];
                     pt.x = uid.pos.x;
                     pt.y = uid.pos.y;
                     GetTileBounds(&pt, bounds);
@@ -630,17 +593,15 @@ LEGO_EXPORT void RenderFullMap(void) {
                     bounds[1] += ScrollY >> 8;
                     DAT_00667c16 = sub->width;
                     DAT_00667c14 = sub->height;
-                    PrintScaledSprite(
-                        sub, ((bounds[0] - MapWorldMinX) * map_scale.x) >> 16,
-                        (((bounds[1] - DAT_00667c04) * map_scale.y) >> 16) + MapCenterOffsetY,
-                        (DAT_00667c16 * map_scale.x) >> 16,
-                        (map_scale.y * DAT_00667c14) >> 16);
+                    PrintScaledSprite(sub, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
+                        (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
+                        (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
                 }
             }
         }
         PopRenderingStatus();
-        lpConfig->view_x = saved_scroll.x;
-        lpConfig->view_y = saved_scroll.y;
+        lpConfig->view_x = saved_view_x;
+        lpConfig->view_y = saved_view_y;
         RestoreClipping();
         CommitCliprectToHardware();
         if (blob != NULL) {
@@ -649,7 +610,7 @@ LEGO_EXPORT void RenderFullMap(void) {
         if (stick != NULL) {
             KillSprite(stick);
         }
-        if (lights) {
+        if (lights != NULL) {
             KillSprite(lights);
         }
         DeleteObject(pen);

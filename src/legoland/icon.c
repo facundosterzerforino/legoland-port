@@ -1602,69 +1602,65 @@ void UnloadGBarSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046f9a0
-int FUN_0046f9a0(int param_1, int param_2, int param_3, int param_4, unsigned int param_5, int param_6) {
-    int saved = param_1;
-    int i = 0;
-    int found = 0;
+int FUN_0046f9a0(int id, int kind, int param_3, int param_4, unsigned int flags, int param_6) {
+    int found;
+    int i;
     int total;
+    int x;
+    int y;
     struct MenuGroup *group;
     struct IconNode *icon;
-    struct ListElement *elem;
+    struct Element *elem;
 
+    found = 0;
     group = (struct MenuGroup *)malloc(sizeof(struct MenuGroup));
     if (group == NULL) {
         return 0;
     }
-    icon = AddGBarIcons((unsigned int)group, param_3, param_4, param_5, param_6, param_1);
+    icon = AddGBarIcons((unsigned int)group, param_3, param_4, flags, param_6, id);
     group->icon = icon;
-    param_1 = icon->x;
-    group->field_1c = param_1;
-    group->field_c = param_1;
-    param_6 = icon->y;
-    group->field_20 = param_6;
-    group->field_10 = param_6;
-    group->field_24 = icon->width + icon->x;
-    group->field_28 = icon->height + icon->y;
-    group->field_4 = param_5;
-    group->field_0 = (short)saved;
+    x = group->field_c = group->field_1c = icon->x;
+    y = group->field_10 = group->field_20 = icon->y;
+    group->field_24 = icon->x + icon->width;
+    group->field_28 = icon->y + icon->height;
+    group->field_4 = flags;
+    group->field_0 = (short)id;
     SetNewGroup_Callbacks(0, 0, (void *)FUN_00470000);
     total = LLIDB_GetCount();
-    if (total > 0) {
-        do {
-            LLIDB_GetElement(i, (int *)&elem);
-            if ((elem->field_8 & 0x10) != 0 && elem->field_c[0x16] == param_2) {
-                found = found + 1;
-                AddGBarClassIcon((unsigned int)group, (struct InfoSource *)elem->field_c, param_1, param_6, saved, (short)i);
-                if ((param_5 & 1) == 0) {
-                    param_1 = param_1 + 0x79;
-                } else {
-                    param_6 = param_6 + 0x38;
-                }
-            }
-            i = i + 1;
-        } while (i < total);
-    }
-    AddFullScreenIcon((void *)(saved + 6));
-    icon = group->icon;
-    group->field_14 = param_1;
-    group->field_18 = param_6;
-    if ((param_5 & 1) == 0) {
-        if (param_1 < icon->x + icon->width) {
-            icon->width = (short)(group->field_14 - group->field_c);
-            icon = FindIcon((unsigned short)(saved + 4));
-            if (icon != NULL) {
-                icon->x = (short)group->field_14;
+    for (i = 0; i < total; i++) {
+        LLIDB_GetElement(i, &elem);
+        if ((elem->flags & 0x10) && ((int *)elem->data)[0x16] == kind) {
+            found++;
+            AddGBarClassIcon((unsigned int)group, elem->data, x, y, id, (short)i);
+            /* bit 0: vertical bar */
+            if (flags & 1) {
+                y += 0x38;
+            } else {
+                x += 0x79;
             }
         }
-    } else if (param_6 < icon->y + icon->height) {
-        icon->height = (short)param_6 - (short)group->field_10;
-        icon = FindIcon((unsigned short)(saved + 4));
+    }
+    AddFullScreenIcon((void *)(id + 6));
+    group->field_14 = x;
+    group->field_18 = y;
+    icon = group->icon;
+    if (flags & 1) {
+        if (group->field_18 < icon->y + icon->height) {
+            icon->height = (short)group->field_18 - (short)group->field_10;
+            icon = FindIcon((unsigned short)(id + 4));
+            if (icon != NULL) {
+                icon->y = (short)group->field_18;
+            }
+        }
+    } else if (group->field_14 < icon->x + icon->width) {
+        icon->width = (short)group->field_14 - (short)group->field_c;
+        icon = FindIcon((unsigned short)(id + 4));
         if (icon != NULL) {
-            icon->y = (short)group->field_18;
+            icon->x = (short)group->field_14;
         }
     }
     if (found == 0) {
-        DestroyIconGroup(saved);
+        DestroyIconGroup(id);
     }
     return found;
 }

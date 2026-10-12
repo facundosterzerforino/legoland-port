@@ -956,18 +956,18 @@ void FUN_0041db90(unsigned char *obj, float *a, float *b) {
     float out[21];
     float *p;
     float sum;
-    float x;
+    volatile float x; /* volatile: the original re-reads this from its stack slot */
     int k;
 
     saved = ((struct RingHost *)obj)->elem_c;
-    savedval = ((struct RingHost *)obj)->field_24;
     DAT_004d83b4 = (struct RingHost *)obj;
+    savedval = ((struct RingHost *)obj)->field_24;
     *(struct Elem20 *)DAT_004d83a0 = ((struct RingHost *)obj)->elem_c;
     FUN_0041f4e0(FUN_0041db20, &DAT_004d8270, savedval, 0.1f, out);
     *b = out[1];
     *a = 0.0f;
-    node = &((struct RingHost *)obj)->head;
     p = out + 2;
+    node = &((struct RingHost *)obj)->head;
     do {
         sum = FLOAT_004ab390;
         for (k = 0; k < 3; k++) {
@@ -1121,43 +1121,38 @@ struct BisectOut {
 // FUNCTION: LEGOLAND 0x0041df00
 float FUN_0041df00(unsigned char *obj, float t) {
     struct BisectPair s;
-    struct AnimOut *state = (struct AnimOut *)(obj + 0x20);
-    float f4;
-    float f8;
+    struct AnimOut anim;
     float lo;
     float hi;
-    float mid;
 
-    lo = 0.0f;
+    /* bisection on t in [0, t]: t itself holds the midpoint being tried */
+    anim = *(struct AnimOut *)(obj + 0x20);
     hi = t;
+    lo = 0.0f;
     s.p = 0.0f;
-    s.q = state->kind;
-    f4 = state->f4;
-    f8 = state->f8;
+    s.q = anim.kind;
     while (hi - lo > DAT_004ab418) {
-        mid = (hi + lo) * 0.5f;
-        FUN_0041da10(obj, f4, obj + 0xc);
-        FUN_0041dad0((struct FloatHolder *)obj, f8);
-        FUN_00420310((struct VecOps *)(obj + 0x2c), &s, mid);
+        t = (hi + lo) * 0.5f;
+        FUN_0041da10(obj, anim.f4, obj + 0xc);
+        FUN_0041dad0((struct FloatHolder *)obj, anim.f8);
+        FUN_00420310((struct VecOps *)(obj + 0x2c), &s, t);
         if (*(float *)(obj + 0x24) > *(float *)(*(unsigned char **)(obj + 0x10) + 0x48)) {
-            hi = mid;
+            hi = t;
         } else {
-            lo = mid;
+            lo = t;
         }
     }
-    FUN_0041da10(obj, f4, obj + 0xc);
-    FUN_0041dad0((struct FloatHolder *)obj, f8);
-    mid = (hi + lo) * 0.5f;
-    FUN_00420310((struct VecOps *)(obj + 0x2c), &s, mid);
-    return mid;
+    FUN_0041da10(obj, anim.f4, obj + 0xc);
+    FUN_0041dad0((struct FloatHolder *)obj, anim.f8);
+    t = (hi + lo) * 0.5f;
+    FUN_00420310((struct VecOps *)(obj + 0x2c), &s, t);
+    return t;
 }
 
 // FUNCTION: LEGOLAND 0x0041e000
 float FUN_0041e000(unsigned char *obj, float total) {
     struct BisectOut s;
-    float f8;
-    struct AnimOut *state;
-    float f4;
+    struct AnimOut anim;
     int i = 0;
     int n = (int)ceil(total * 70.0f);
     float acc = 0.0f;
@@ -1166,14 +1161,12 @@ float FUN_0041e000(unsigned char *obj, float total) {
     s.p = 0.0f;
     dt = total / n;
     for (i = 0; i < n; i++) {
-        state = (struct AnimOut *)(obj + 0x20);
-        s.q = state->kind;
-        f4 = state->f4;
-        f8 = state->f8;
+        anim = *(struct AnimOut *)(obj + 0x20);
+        s.q = anim.kind;
         FUN_00420310((struct VecOps *)(obj + 0x2c), &s, dt);
         if (*(float *)(obj + 0x24) > *(float *)(*(unsigned char **)(obj + 0x10) + 0x48)) {
-            FUN_0041da10(obj, f4, obj + 0xc);
-            FUN_0041dad0((struct FloatHolder *)obj, f8);
+            FUN_0041da10(obj, anim.f4, obj + 0xc);
+            FUN_0041dad0((struct FloatHolder *)obj, anim.f8);
             return FUN_0041df00(obj, dt) + acc;
         }
         acc += dt;
@@ -1408,13 +1401,18 @@ void FUN_0041e460(struct RingNode *node, struct RingHost *host) {
 
 // FUNCTION: LEGOLAND 0x0041e4a0
 unsigned int FUN_0041e4a0(struct FlagWord *obj) {
-    int v = *(signed char *)obj;
-    return (unsigned int)(v & 2) >> 1;
+    if (*(signed char *)obj & 2) {
+        return 1;
+    }
+    return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0041e4b0
 unsigned int FUN_0041e4b0(struct FlagWord *obj) {
-    return (unsigned int)(*(volatile signed char *)obj & 0x40) >> 6;
+    if (*(signed char *)obj & 0x40) {
+        return 1;
+    }
+    return 0;
 }
 
 struct TimerFlags {
@@ -1530,7 +1528,10 @@ void FUN_0041e640(unsigned int *flags, unsigned int set) {
 
 // FUNCTION: LEGOLAND 0x0041e660
 unsigned int FUN_0041e660(unsigned int a) {
-    return *(volatile signed char *)a & 1;
+    if (*(signed char *)a & 1) {
+        return 1;
+    }
+    return 0;
 }
 
 struct DualId {
@@ -4337,6 +4338,7 @@ struct EdgeMesh {
 // FUNCTION: LEGOLAND 0x004227c0
 struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
     int *triFlag;
+    volatile int ptmp45;
     int nV = 0;
     int *edgeFlag;
     int j;
@@ -4385,7 +4387,8 @@ struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
                     if (e & 0x80000000) {
                         v[k] = src->edges[e & 0x7fffffff].v1;
                     } else {
-                        v[k] = src->edges[e & 0x7fffffff].v0;
+                        ptmp45 = src->edges[e & 0x7fffffff].v0;
+                        v[k] = ptmp45;
                     }
                 }
                 p0 = &src->verts[v[0]];
@@ -4420,7 +4423,8 @@ struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
                     }
                 }
             }
-            for (i = 0; i < nEdges; i++) {
+            i = 0;
+            while (i < nEdges) {
                 if (edgeFlag[i] != 0) {
                     int *pv = &src->edges[i].v0;
                     for (k = 0; k < 2; k++) {
@@ -4439,6 +4443,7 @@ struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
                         pv++;
                     }
                 }
+                i++;
             }
             for (i = 0; i < nEdges; i++) {
                 if (edgeFlag[i] != 0) {
@@ -4466,7 +4471,7 @@ struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
                         j++;
                     }
                 }
-                for (i = 0, j = 0; i < nEdges; i++) {
+                for (i = 0, j = 0; nEdges > i; i++) {
                     if (edgeFlag[i] == 0) {
                         out->edges[j].v0 = src->edges[i].v0 - vertFlag[src->edges[i].v0];
                         out->edges[j].v1 = src->edges[i].v1 - vertFlag[src->edges[i].v1];
@@ -4478,7 +4483,7 @@ struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src) {
                 for (i = 0; i < src->nTris; i++) {
                     if (triFlag[i] == 0) {
                         int e = src->tris[i].e[0];
-                        if (e & 0x80000000) {
+                        if (0x80000000 & e) {
                             out->tris[j].e[0] = (e - edgeFlag[e & 0x7fffffff]) | 0x80000000;
                         } else {
                             out->tris[j].e[0] = e - edgeFlag[e];
@@ -4928,7 +4933,7 @@ void FUN_00423a10(void) {
     struct FVec3 v1;
     struct FVec3 v2;
     struct FVec3 v3;
-    struct Words3 c;
+    struct FVec3 c;
     float t;
     float step;
     int n;
@@ -4941,16 +4946,16 @@ void FUN_00423a10(void) {
     FUN_004239b0(&origin, &p);
     r.x = q.x;
     r.y = p.y;
-    pt1.y = p.y + 2;
     pt.x = r.x + 1;
-    pt1.x = q.x + 1;
     pt.y = q.y + 2;
+    pt1.x = r.x + 1;
+    pt1.y = r.y + 2;
     FUN_00425cb0(&pt, 0.0f, &v1);
     FUN_00425cb0(&pt1, 0.0f, &v2);
-    c.field_0 = 0xc1200000;
-    c.field_4 = 0;
-    c.field_8 = 0;
-    FUN_00421ab0((struct Obj421ab0 *)&DAT_006102f8[0], &v1.x, &v2.x, &c);
+    c.x = -10.0f;
+    c.y = 0.0f;
+    c.z = 0.0f;
+    FUN_00421ab0((struct Obj421ab0 *)&DAT_006102f8[0], &v1.x, &v2.x, (struct Words3 *)&c);
     n = (q.y - r.y) >> 1;
     t = DAT_006102f8[0].f44;
     pt = q;
@@ -4970,7 +4975,7 @@ void FUN_00423a10(void) {
     pt.x = 0;
     pt.y = -1;
     FUN_00425cb0(&pt, 0.0f, &v2);
-    pt.x = q.x + 2;
+    pt.x = r.x + 2;
     pt.y = r.y + 2;
     FUN_00425cb0(&pt, 0.0f, &v3);
     FUN_00421ce0((struct Words3 *)&v1, (struct Words3 *)&v2, (struct Words3 *)&v3, (struct Obj421ce0 *)&DAT_006102f8[1], 0x3fc00000, 0x3f000000);
@@ -4979,27 +4984,27 @@ void FUN_00423a10(void) {
     DAT_0060f914[cnt].a = DAT_006102f8[1].f44;
     DAT_0060f914[cnt].b = DAT_006102f8[1].f48;
     cnt++;
-    pt.x = q.x + 2;
-    pt1.x = p.x + 2;
+    pt.x = r.x + 2;
     pt.y = r.y + 1;
-    pt1.y = r.y + 1;
+    pt1.x = p.x + 2;
+    pt1.y = p.y + 1;
     FUN_00425cb0(&pt, 0.0f, &v1);
     FUN_00425cb0(&pt1, 0.0f, &v2);
-    c.field_0 = 0;
-    c.field_4 = 0xc1200000;
-    c.field_8 = 0;
-    FUN_00421ab0((struct Obj421ab0 *)&DAT_006102f8[2], &v1.x, &v2.x, &c);
-    n = (p.x - q.x) >> 1;
+    c.x = 0.0f;
+    c.y = -10.0f;
+    c.z = 0.0f;
+    FUN_00421ab0((struct Obj421ab0 *)&DAT_006102f8[2], &v1.x, &v2.x, (struct Words3 *)&c);
+    DAT_006102f8[0].prev = 0;
+    DAT_006102f8[0].next = &DAT_006102f8[1];
+    DAT_006102f8[1].prev = &DAT_006102f8[0];
+    DAT_006102f8[1].next = &DAT_006102f8[2];
+    DAT_006102f8[2].prev = &DAT_006102f8[1];
+    DAT_006102f8[2].next = 0;
+    n = (p.x - r.x) >> 1;
     t = DAT_006102f8[2].f44;
     step = (DAT_006102f8[2].f48 - DAT_006102f8[2].f44) / n;
     pt = r;
-    DAT_006102f8[0].next = &DAT_006102f8[1];
-    DAT_006102f8[0].prev = 0;
-    DAT_006102f8[1].next = &DAT_006102f8[2];
-    DAT_006102f8[1].prev = &DAT_006102f8[0];
-    DAT_006102f8[2].next = 0;
-    DAT_006102f8[2].prev = &DAT_006102f8[1];
-    pt.x = q.x + 2;
+    pt.x = r.x + 2;
     for (i = 0; i < n; i++) {
         DAT_0060f914[cnt].xy = pt;
         pt.x += 2;
@@ -5870,79 +5875,81 @@ void FUN_00425170(Element *obj) {
 #pragma optimize("", off)
 // FUNCTION: LEGOLAND 0x004251c0
 void CastleObjUpdate(Element *obj) {
-    Ride *ride;
-    RideNode *elem;
-    RideNode *next;
-    Bloke *bloke;
-    TileId *tile;
-    unsigned int x;
-    unsigned int y;
-    struct TimerNode *node;
+    /* /Od build: stack-slot order follows the (hashed) local names; these single-letter
+     * names reproduce the original layout (a at ebp-4 ... i at ebp-0x24). */
+    RideNode *a; /* current rider node */
+    TileId *b; /* &a->tile */
     struct {
         unsigned char pad_0[0xa8];
         struct SprObj *prev;
         unsigned char pts_a[0x14];
         struct SprObj *next;
         unsigned char pts_b[0x14];
-    } *cs;
+    } *c; /* castle sprite state at DAT_00829ae0 */
+    Ride *d; /* the castle ride */
+    unsigned int e; /* tile y */
+    unsigned int f; /* tile x */
+    Bloke *g; /* rider */
+    RideNode *h; /* next rider node */
+    struct TimerNode *i; /* timer node (unused) */
 
-    ride = obj->ride;
-    elem = ride->riders;
-    cs = (void *)&DAT_00829ae0;
-    if (cs->prev != NULL) {
-        FUN_0041d170(cs->prev, (unsigned int)cs->pts_a);
+    d = obj->ride;
+    a = d->riders;
+    c = (void *)&DAT_00829ae0;
+    if (c->prev != NULL) {
+        FUN_0041d170(c->prev, (unsigned int)c->pts_a);
     }
-    if (cs->next != NULL) {
-        FUN_0041d190(cs->next, (unsigned int)cs->pts_b);
+    if (c->next != NULL) {
+        FUN_0041d190(c->next, (unsigned int)c->pts_b);
     }
-    while (elem != NULL) {
-        next = elem->next;
-        tile = &elem->tile;
-        x = tile->pos.x + ride->x;
-        y = tile->pos.y + ride->y;
-        bloke = elem->rider;
-        switch (bloke->param_action) {
+    while (a != NULL) {
+        h = a->next;
+        b = &a->tile;
+        f = b->pos.x + d->x;
+        e = b->pos.y + d->y;
+        g = a->rider;
+        switch (g->param_action) {
         case 0:
-            bloke->flags |= 8;
-            if (bloke->low_level_action == 0) {
-                bloke->dest.x = (x - 8) << 8;
-                bloke->dest.y = (y - 1) << 8;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-                bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
-                bloke->param_action++;
+            g->flags |= 8;
+            if (g->low_level_action == 0) {
+                g->dest.x = (f - 8) << 8;
+                g->dest.y = (e - 1) << 8;
+                g->field_73 = ((CalcMoveLineIntFn)CalcMoveLine)(g->pos, g->dest, &g->nav) + 0x10;
+                g->low_level_action = 7;
+                NewDirForAction(g, (g->field_73 >> 5) + 3);
+                g->param_action++;
             }
             break;
         case 1:
-            if (bloke->low_level_action == 0) {
-                bloke->param_action = 0x10;
+            if (g->low_level_action == 0) {
+                g->param_action = 0x10;
             }
             break;
         case 0x10:
-            node = FUN_00421930((unsigned int)bloke, (struct Timer *)&DAT_00829ae0);
-            bloke->param_action = 0x20;
+            i = FUN_00421930((unsigned int)g, (struct Timer *)&DAT_00829ae0);
+            g->param_action = 0x20;
             break;
         case 0x21:
-            if (bloke->low_level_action == 0) {
-                bloke->dest.x = (x << 8) + 0x80;
-                bloke->dest.y = (y << 8) + 0x80;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
-                bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
-                bloke->param_action++;
+            if (g->low_level_action == 0) {
+                g->dest.x = (f << 8) + 0x80;
+                g->dest.y = (e << 8) + 0x80;
+                g->field_73 = ((CalcMoveLineIntFn)CalcMoveLine)(g->pos, g->dest, &g->nav) + 0x10;
+                g->low_level_action = 7;
+                NewDirForAction(g, (g->field_73 >> 5) + 3);
+                g->param_action++;
             }
             break;
         case 0x22:
-            if (bloke->low_level_action == 0) {
-                bloke->param_action = 0x40;
+            if (g->low_level_action == 0) {
+                g->param_action = 0x40;
             }
             break;
         case 0x40:
-            bloke->flags &= 0xfff7;
-            RemoveBlokeFromRide(ride, elem);
+            g->flags &= 0xfff7;
+            RemoveBlokeFromRide(d, a);
             break;
         }
-        elem = next;
+        a = h;
     }
     FUN_00425170(obj);
 }
@@ -8097,24 +8104,26 @@ unsigned int FUN_004283c0(struct AnimPair *pair) {
 
 // FUNCTION: LEGOLAND 0x004284d0
 void FUN_004284d0(void) {
-    register struct Obj421ce0 *base;
+    struct Obj421ce0 *base;
     register struct Obj421ce0 *cur;
     struct Words3 *p;
     struct Words3 *q;
     int x;
     unsigned int y;
-    register unsigned int i;
     int j;
-    register unsigned int k;
-    int qi;
-    int n = 0;
+    register int qi;
+    register unsigned int i;
+    unsigned int k;
+    int n;
+    int ptmp22;
+    n = 0;
 
     for (i = 0; i <= 3; i++) {
         DAT_006117c0[i].x = DAT_004b5e00[i][0] * 20.0f;
         DAT_006117c0[i].y = DAT_004b5e00[i][1] * 20.0f;
         DAT_006117c0[i].z = DAT_004b5e00[i][2] * 20.0f;
     }
-    for (i = 0; 3 >= i; i++) {
+    for (i = 0; i <= 3; i++) {
         DAT_00611658[i].x = DAT_004b5e30[i][0] * 20.0f;
         DAT_00611658[i].y = DAT_004b5e30[i][1] * 20.0f;
         DAT_00611658[i].z = DAT_004b5e30[i][2] * 20.0f;
@@ -8130,16 +8139,17 @@ void FUN_004284d0(void) {
     while (i <= 3) {
         DAT_006116e0[i].x = DAT_004b5e90[i][0] * 20.0f;
         DAT_006116e0[i].y = DAT_004b5e90[i][1] * 20.0f;
-        DAT_006116e0[i].z = DAT_004b5e90[i][2] * 20.0f;
+        { DAT_006116e0[i].z = DAT_004b5e90[i][2] * 20.0f; }
         ++i;
     }
     i = 0;
-    while (i <= 3) {
-        qi = DAT_004b5ef4[i][1];
+    while (3 >= i) {
+        ptmp22 = DAT_004b5ef4[i][1];
+        qi = ptmp22;
         q = (struct Words3 *)&DAT_00611750[qi];
-        x = DAT_004b5f14[i][0];
         y = DAT_004b5f14[i][1];
         p = (struct Words3 *)&DAT_00611750[DAT_004b5ef4[i][0]];
+        x = DAT_004b5f14[i][0];
         FUN_00421ce0(p, q, (struct Words3 *)&DAT_006116e0[i], &((struct Obj421ce0 *)DAT_00828fe0)[n++], x, y);
         if (5 == n) {
             n = 5;
@@ -8478,16 +8488,18 @@ void FUN_00428ec0(struct Struct428e70 *p, unsigned int a, unsigned int b) {
 
 // FUNCTION: LEGOLAND 0x00428f00
 void FUN_00428f00(void) {
+    volatile unsigned int ptmp7;
+    int ptmp8;
     int i, j, k, m, n, t, e, v;
-    int cnt;
-    float ang;
+    register float ang;
+    register int cnt;
     float s;
     unsigned int *g, *out;
     int (*d)[2];
     int (*sp)[2];
     int k6, k18;
 
-    for (i = 0; i <= 4; i++) {
+    for (i = 0; 4 >= i; i++) {
         DAT_00613908[i][0] = i;
         DAT_00613908[i][1] = i + 1;
     }
@@ -8499,7 +8511,7 @@ void FUN_00428f00(void) {
         DAT_00613908[n][1] = j + 6;
         n++;
         DAT_00613908[n][0] = j;
-        DAT_00613908[n][1] = j + 7;
+        DAT_00613908[n][1] = 7 + j;
         n++;
     }
     DAT_00613908[n][0] = j;
@@ -8510,7 +8522,7 @@ void FUN_00428f00(void) {
     n++;
     for (j = 0; j <= 4; j++) {
         DAT_00613908[n][0] = j + 6;
-        DAT_00613908[n][1] = j + 7;
+        DAT_00613908[n][1] = 7 + j;
         n++;
     }
     DAT_00613908[n][0] = j + 6;
@@ -8518,7 +8530,7 @@ void FUN_00428f00(void) {
 
     t = 0;
     v = 6;
-    for (e = 18; e < 23; e++) {
+    for (e = 18; 23 > e; e++) {
         DAT_00613878[t * 3] = e - 18 + 0x80000000;
         DAT_00613878[t * 3 + 1] = v + 1;
         DAT_00613878[t * 3 + 2] = v + 2 + 0x80000000;
@@ -8537,8 +8549,11 @@ void FUN_00428f00(void) {
     DAT_00613878[t * 3 + 5] = v + 1 + 0x80000000;
 
     n = 0;
-    g = DAT_00612708[0];
-    for (k = 0; k < 30; k++) {
+    ptmp8 = DAT_00612708[0];
+    ptmp7 = ptmp8;
+    g = ptmp7;
+    k = 0;
+    while (k < 30) {
         k6 = k * 6;
         k18 = k * 18;
         cnt = 18;
@@ -8555,17 +8570,18 @@ void FUN_00428f00(void) {
             sp++;
         } while (--cnt);
         out = g;
-        g += 36;
+        g = g + 36;
         for (i = 0; i < 12; i++) {
-            for (j = 0; j < 3; j++) {
+            for (j = 0; 3 > j; j++) {
                 unsigned int x = DAT_00613878[i * 3 + j];
                 *out++ = ((x & 0x7fffffff) + k18) | (x & 0x80000000);
             }
         }
+        k++;
     }
 
     ang = FLOAT_004ab390;
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < (unsigned)6; i++) {
         DAT_006121c8[i][0] = 0.0f;
         DAT_006121c8[i][1] = (float)cos(ang) * 1.8f;
         s = (float)sin(ang);
@@ -9134,6 +9150,7 @@ float FUN_00429cf0(unsigned int x) {
     float v[3];
     float w[3];
     float *c;
+    float d;
 
     DAT_00615fcc++;
     FUN_00429a80(DAT_00615f84, 1, x, (struct Struct429a80B *)v);
@@ -9141,11 +9158,11 @@ float FUN_00429cf0(unsigned int x) {
     v[0] = v[0] - c[0];
     v[1] = v[1] - c[1];
     v[2] = v[2] - c[2];
-    if (v[2] * v[2] + v[1] * v[1] + v[0] * v[0] > DAT_00615fdc) {
+    if ((d = v[2] * v[2] + v[1] * v[1] + v[0] * v[0]) > DAT_00615fdc) {
         DAT_00615fe4++;
         return 1.0f;
     }
-    if (DAT_00615fd0 > DAT_00615fd4 && v[2] * v[2] + v[1] * v[1] + v[0] * v[0] < DAT_00615fe0) {
+    if (DAT_00615fd0 > DAT_00615fd4 && d < DAT_00615fe0) {
         return FLOAT_004ab468;
     }
     FUN_00429b90(DAT_00615f84, 1, x, (unsigned int)w);

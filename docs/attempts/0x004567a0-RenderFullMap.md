@@ -21,3 +21,4 @@ No attempts recorded yet (first session: baseline measured at 81.60%).
 No earlier round notes for this function.
 
 | 2026-10-08 | permuter + Opus 5.5 | many temps (bounds_y1/y2, dest_x, uid_x, ...), `register` pen/base_x/x1, loops as while, nested ifs, unsigned py/x2 (permuter 84.5% included a y1/y2 bug: expression dropped) | 81.60 -> 81.85 |
+| 2026-10-11 | Opus 5.5 | `volatile int hx` in the layered-sprite loop (per-local volatile search): it fixes the stack-slot order of the whole function (hx needs more weight). Natural forms tried first: hx/hy before GetTileBounds (79.59 / 87.67), `hx = sub_x; hx = HALF(hx);` styles (87.99) | 87.99 -> 93.98 with volatile (kept, last resort) |

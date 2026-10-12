@@ -31,6 +31,7 @@ also moves the branch displacements earlier in the function.
 ## Best
 
 98.62% (the original source).
+| 2026-10-09 | Opus 5.5 | `adj` zeroed before the `base` copy (fixes the store order); field_35 compare casts | 97.06 (worse than 98.62: ours then loads field_35 into al, jumps shift by 1) |
 
 ## Ideas not tried yet
 

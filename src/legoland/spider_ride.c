@@ -423,18 +423,18 @@ void FUN_00416310(void) {
 void SpiderRideUpdate(Element *obj) {
     struct Ride *ride = obj->ride;
     struct RideNode *elem = ride->riders;
+    struct RideNode *next;
     struct SpiderState *state;
     struct Bloke *bloke;
     TileId *tile;
-    struct RideNode *next;
-    struct Point sc;
-    int h, w;
-    int ex, ey;
-    int coords[2];
-    int walk[2];
-    int dx, dy;
-    char dir;
+    struct Point sc; /* screen position of the ride */
+    struct Point off; /* bloke's map position as a screen offset */
+    int w, h;
     int ox, oy;
+    int ex, ey;
+    int coords[3]; /* BNV start position (boarding path) */
+    int walk[3]; /* BNV start position (leaving path) */
+    char dir;
 
     FUN_00416310();
     while (elem != NULL) {
@@ -447,7 +447,8 @@ void SpiderRideUpdate(Element *obj) {
         }
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
-            case 0:
+            case 0: {
+                int dx, dy;
                 state->field_14++;
                 state->field_18 = 0xb4;
                 bloke->flags |= 8;
@@ -455,15 +456,15 @@ void SpiderRideUpdate(Element *obj) {
                 dy = bloke->pos.y;
                 dx = bloke->pos.x;
                 GetTileDimensions(&w, &h);
-                ey = (dx + dy) * h >> 9;
-                ex = (dx - dy) * w >> 9;
-                ox = lpConfig->view_x - (short)Get_XScroll() + ex;
-                oy = ey + (lpConfig->view_y - (short)Get_YScroll());
+                off.x = (dx - dy) * w >> 9;
+                off.y = (dx + dy) * h >> 9;
+                ox = lpConfig->view_x - (short)Get_XScroll() + off.x;
+                oy = off.y + (lpConfig->view_y - (short)Get_YScroll());
+                bloke->flags |= 0x80;
+                bloke->person->field_30 = 1;
                 coords[0] = (ox - DAT_0082c660.x / 2 - sc.x) * 2;
                 coords[1] = (oy - DAT_0082c660.y / 2 - sc.y) * 2;
-                bloke->flags |= 0x80;
                 bloke->person->sprite = (struct Sprite *)DAT_004cbf38[1];
-                bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
@@ -473,6 +474,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->field_58 = 0;
                 bloke->param_action++;
                 break;
+            }
             case 1:
                 if (UpdateBlokeFromBNVPath(bloke, bloke->path) == 0) {
                     bloke->field_35 = 1;
@@ -492,8 +494,8 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->flags |= 0x80;
                 BlokeSitAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                bloke->person->sprite = (struct Sprite *)DAT_004cbf38[1];
                 bloke->field_35 = 1;
+                bloke->person->sprite = (struct Sprite *)DAT_004cbf38[1];
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->param_action++;
@@ -503,8 +505,8 @@ void SpiderRideUpdate(Element *obj) {
                 }
                 break;
             case 7:
-                walk[0] = bloke->field_38 << 1;
-                walk[1] = bloke->field_3a << 1;
+                walk[0] = bloke->screen_x << 1;
+                walk[1] = bloke->screen_y << 1;
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
                 bloke->flags |= 0x80;
@@ -543,10 +545,10 @@ void SpiderRideUpdate(Element *obj) {
                 UnAdjustBlokePosition(&bloke->person->screen);
                 ScreenToMapRef((int *)&bloke->person->screen, (int *)&bloke->pos, 0);
                 bloke->person->field_34 = 0;
-                bloke->dest.y = ey << 8;
-                bloke->pos.y <<= 8;
                 bloke->pos.x <<= 8;
+                bloke->pos.y <<= 8;
                 bloke->dest.x = ex << 8;
+                bloke->dest.y = ey << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
@@ -556,8 +558,7 @@ void SpiderRideUpdate(Element *obj) {
             case 0xe:
                 RemoveBlokeFromRide(ride, elem);
                 bloke->flags &= 0xfff7;
-                state->field_3--;
-                if (state->field_3 == 0) {
+                if (--state->field_3 == 0) {
                     state->field_2 = 0;
                     Ride_ClearFlagToNotLetAnyoneOn(state);
                 }

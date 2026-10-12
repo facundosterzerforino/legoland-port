@@ -202,15 +202,18 @@ LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
     int dx;
     register int dy;
     unsigned int mode;
-    unsigned int flags;
+    int flags;
 
-    int cur_x;
-    if (buffer == NULL) {
+    int ptmp175;
+    unsigned int cur_x;
+    volatile int ptmp176;
+    if (buffer == (unsigned)NULL) {
         return;
     }
     buffer->prev_x = buffer->x;
-    buffer->prev_y = buffer->y;
     mode = buffer->mouse_accel;
+    ptmp176 = buffer->y;
+    buffer->prev_y = ptmp176;
     dx = MouseState.lX;
     dy = MouseState.lY;
     if (WinDebugMode != 0) {
@@ -267,7 +270,8 @@ LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
         buffer->buttons = buffer->buttons | 4;
     }
     if ((MouseState.rgbButtons[1] & 0x80) != 0) {
-        buffer->buttons = 2 | buffer->buttons;
+        ptmp175 = buffer->buttons;
+        buffer->buttons = 2 | ptmp175;
     }
 }
 

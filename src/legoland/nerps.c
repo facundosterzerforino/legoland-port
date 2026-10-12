@@ -299,14 +299,17 @@ unsigned int ScriptEventLookAt(struct NerpsArg *arg) {
     int dimY;
     int v24;
     int v20;
+    struct Point pt;
 
     v24 = arg->field_24;
     v20 = arg->field_20;
     GetTileDimensions(&dimX, &dimY);
-    dimX = (v20 - v24) * dimX;
-    dimY = (v20 + v24) * dimY;
-    ScrollX = ((dimX >> 9) - (lpConfig->view_width >> 1)) * 0x100;
-    ScrollY = ((dimY >> 9) - (lpConfig->view_height >> 1)) * 0x100;
+    pt.x = (v20 - v24) * dimX;
+    pt.y = (v20 + v24) * dimY;
+    pt.x >>= 9;
+    pt.y >>= 9;
+    ScrollX = (pt.x - (lpConfig->view_width >> 1)) * 0x100;
+    ScrollY = (pt.y - (lpConfig->view_height >> 1)) * 0x100;
     return 1;
 }
 
@@ -405,10 +408,11 @@ unsigned int ScriptEventNeedAt(struct NerpsArg *arg) {
 // FUNCTION: LEGOLAND 0x0046a5b0
 unsigned int ScriptEventNeedIn(struct NerpsArg *arg) {
     struct MapElement *tile;
-    int count;
     int x;
-    int y;
+    int count;
+    unsigned int y;
 
+    count;
     count = 0;
     for (y = arg->field_2c; y <= arg->field_34; y++) {
         for (x = arg->field_28; x <= arg->field_30; x++) {
@@ -417,8 +421,8 @@ unsigned int ScriptEventNeedIn(struct NerpsArg *arg) {
             } else {
                 tile = NULL;
             }
-            if ((tile->flags & 0x80) != 0 && tile->field_0 == arg->field_4 && tile->field_4 == x && tile->field_5 == y) {
-                count++;
+            if ((0x80 & tile->flags) != 0 && (unsigned int)tile->field_0 == arg->field_4 && tile->field_4 == x && tile->field_5 == y) {
+                ++count;
             }
         }
     }

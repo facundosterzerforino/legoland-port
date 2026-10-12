@@ -3,6 +3,22 @@
 #include "image_sprite.h"
 #include "render.h"
 
+/* One row of the appraisal report (RunAppraisal); 19 ints. */
+struct AppraisalRow {
+    /* 0x00 */ int page; /* report page the row is on */
+    /* 0x04 */ int x; /* indent */
+    /* 0x08 */ int type; /* check result (1 passed, 0 failed); -1 failed-check advice, -2 summary, -3 continuation line */
+    /* 0x0c */ int rnd; /* rand() % 5, chooses the mark's picture */
+    /* 0x10 */ char *text;
+    /* 0x14 */ int arg;
+    /* 0x18 */ int bar; /* draw a value bar */
+    /* 0x1c */ int value;
+    /* 0x20 */ int goal;
+    /* 0x24 */ int max;
+    /* 0x28 */ int nids; /* speech ids queued when the row is shown */
+    /* 0x2c */ int ids[8];
+};
+
 struct LocFile;
 struct AdvisorObject;
 

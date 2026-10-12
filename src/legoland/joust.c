@@ -163,18 +163,10 @@ void FreeJoustNodeList(void) {
 // FUNCTION: LEGOLAND 0x00407ad0
 void JoustRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor) {
     struct JoustNode *node;
-    struct {
-        unsigned int kind;
-        unsigned int pad;
-        unsigned int x;
-        unsigned int y;
-    } source;
 
     node = FindJoustNode(&coords);
     if (node != NULL) {
-        source.x = node->id.pos.x;
-        source.kind = 2;
-        source.y = node->id.pos.y;
+        struct TileSampleSource source = {2, node->id.pos.x, node->id.pos.y};
         UnSourceAndFadeAllSamplesFromSource(&source, -200);
         node->sample = 0;
         RemoveJoustNode(node);
@@ -331,8 +323,8 @@ void JoustUpdate(struct Element *elem) {
                 SetBlokePositionFromBNV(JoustRideBnv, b, name, (char)hb, -1617735.0f, -1617993.5f, 0);
                 if (f20 != 0 && (char)FUN_00407c20(hb) == b->field_44) {
                     b->dest.x = (x + 2) << 8;
-                    b->dest.y = (y << 8) - 0x100;
                     b->flags &= 0xff7f;
+                    b->dest.y = (y << 8) - 0x100;
                     b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
                     b->low_level_action = 7;
                     b->person->field_2c = 0;
@@ -361,17 +353,17 @@ void JoustUpdate(struct Element *elem) {
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
-            case 11:
+            case 12:
                 b->dest.x = (x << 8) - 0x364;
-                b->dest.y = (y - 3) << 8;
+                b->dest.y = (y << 8) + b->field_36 * 200 - 0x638;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
                 b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
                 b->param_action++;
                 break;
-            case 12:
+            case 11:
                 b->dest.x = (x << 8) - 0x364;
-                b->dest.y = (y << 8) + b->field_36 * 200 - 0x638;
+                b->dest.y = (y - 3) << 8;
                 b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
                 b->low_level_action = 7;
                 NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
@@ -475,8 +467,8 @@ void JoustUpdate(struct Element *elem) {
         }
         jn->busy = busy;
         jn->x = count;
-        jn->sub12 = flags;
         jn->y = horses;
+        jn->sub12 = flags;
         jn->pair = h;
         jn->frame = hb;
         jn->field_1c = f1c;

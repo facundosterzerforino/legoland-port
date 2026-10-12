@@ -95,20 +95,20 @@ void FUN_00418f90(struct BoatRide *param_1) {
 
 // FUNCTION: LEGOLAND 0x00418fe0
 void FUN_00418fe0(int param_1) {
-    struct BoatRide *ride = BoatRideList;
+    struct BoatRide *ride;
     int tw;
     int th;
     int tw2;
-    int th2;
     int dx;
+    int th2;
     int dy;
-    int bx;
-    int by;
+    struct Point b;
     int sx;
     int sy;
     int person;
     struct Point off;
     struct Point seat;
+    ride = BoatRideList;
 
     GetTileDimensions(&tw, &th);
     for (; ride != NULL; ride = ride->next) {
@@ -117,22 +117,24 @@ void FUN_00418fe0(int param_1) {
             dy = ride->step_xy[BoatingSchoolAnimTick * 2 + 1];
             dx = ride->step_xy[BoatingSchoolAnimTick * 2];
             GetTileDimensions(&tw2, &th2);
-            bx = (dx - dy) * tw2 >> 9;
-            by = (dx + dy) * th2 >> 9;
+            b.x = (dx - dy) * tw2;
+            b.y = (dx + dy) * th2;
+            b.x >>= 9;
+            b.y >>= 9;
             sx = (ride->tile_x - ride->tile_y) * (tw >> 1) - ((tw + 1) >> 1) - (ScrollX >> 8);
             sy = (ride->tile_x + ride->tile_y) * (th >> 1) - (ScrollY >> 8);
             off.x = BoatingSchoolBoats->offset_x[ride->step_sprite[BoatingSchoolAnimTick] & 0xff] >> 1;
             off.y = BoatingSchoolBoats->offset_y[ride->step_sprite[BoatingSchoolAnimTick] & 0xff] >> 1;
             AdjustOffsetForViewMode(&off);
-            ride->screen_x = lpConfig->view_x + bx + off.x + sx;
-            ride->screen_y = lpConfig->view_y + by + off.y + sy;
+            ride->screen_x = lpConfig->view_x + b.x + off.x + sx;
+            ride->screen_y = lpConfig->view_y + b.y + off.y + sy;
             PrintSprite(BoatingSchoolBoats->sprites[ride->step_sprite[BoatingSchoolAnimTick] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             if (ride->bloke != 0) {
                 person = (int)Find3DPersonFromBloke(ride->bloke);
                 *(float *)(person + 0x44) = ((float)(int)ride->step_sprite[BoatingSchoolAnimTick] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
                 SetPersonRotation((struct Person *)person, (float *)(person + 0x40));
-                off.x = lpConfig->view_x + bx + sx;
-                off.y = lpConfig->view_y + by + sy;
+                off.x = lpConfig->view_x + b.x + sx;
+                off.y = lpConfig->view_y + b.y + sy;
                 AdjustBlokePosition((struct Point *)&off);
                 seat.x = DAT_004b51d8[(ride->step_sprite[BoatingSchoolAnimTick] & 0xf) * 2] + 0x44;
                 seat.y = DAT_004b51d8[(ride->step_sprite[BoatingSchoolAnimTick] & 0xf) * 2 + 1] + 0x34;
@@ -143,9 +145,11 @@ void FUN_00418fe0(int param_1) {
                 PrintSprite(BoatingSchoolBoats->sprites[(ride->step_sprite[BoatingSchoolAnimTick] + 0x30) & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             }
         }
-        if (ride->field_3e4 == 0x10 && ride->field_3e8 == 2 && BoatingSchoolAnimTick == 0x4f && param_1 != 0 && ride->bloke != 0) {
-            ((struct Bloke *)ride->bloke)->param_action++;
-            ride->bloke = 0;
+        if (ride->field_3e4 == 0x10 && ride->field_3e8 == 2 && BoatingSchoolAnimTick == 0x4f && param_1 != 0) {
+            if (ride->bloke != 0) {
+                ((struct Bloke *)ride->bloke)->param_action++;
+                ride->bloke = 0;
+            }
         }
     }
 }
@@ -406,11 +410,11 @@ void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
     int i;
     int bit;
     int idx;
-    int sx;
     int sy;
-    int tx;
+    int sx;
+    volatile int tx;
     int ty;
-    int dx;
+    unsigned int dx;
     int dy;
     float fx;
     float fy;
@@ -461,8 +465,8 @@ void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
         if (to == 1) {
             to = 0x11;
         }
-        if ((to < from ? to & (from >> 2) : to == from || from & (to >> 2)) == 0) {
-            if ((to & (from * 2)) != 0) {
+        if (((unsigned)to < from ? to & (from >> 2) : to == from || from & (to >> 2)) == 0) {
+            if ((to & (2 * from)) != 0) {
                 arc = DAT_004b5158;
             } else if ((from & (to * 2)) != 0) {
                 arc = DAT_004b5198;
@@ -472,7 +476,7 @@ void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
                     break;
                 }
             }
-            arc += bit;
+            arc = arc + bit;
             step = (arc->a1 - arc->a0) * DAT_004ab3f8;
             angle = arc->a0;
             ride->step_xy[0] = (int)((sin(angle * DAT_004ab3f4) + arc->cx) * DAT_004ab3f0);
@@ -513,12 +517,12 @@ void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
         }
     }
     for (i = 0; i < 80; i++) {
-        if (i < 76) {
-            tx = ride->step_xy[(i + 4) * 2];
-            ty = ride->step_xy[(i + 4) * 2 + 1];
-        } else {
-            tx = ride->step_xy[0x9e];
+        if (!(i < 76)) {
             ty = ride->step_xy[0x9f];
+            tx = ride->step_xy[0x9e];
+        } else {
+            ty = ride->step_xy[(i + 4) * 2 + 1];
+            tx = ride->step_xy[(i + 4) * 2];
         }
         if (i > 3) {
             dx = tx - ride->step_xy[(i - 3) * 2];

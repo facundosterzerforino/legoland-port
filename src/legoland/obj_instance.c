@@ -202,7 +202,7 @@ LEGO_EXPORT struct ObjInstance *GetInstanceOfClass(struct Ride *ride, const Tile
 }
 
 // FUNCTION: LEGOLAND 0x0048a0f0
-LEGO_EXPORT void HandleRideAI(int arg_1, int arg_2, int arg_3) {}
+LEGO_EXPORT void HandleRideAI(void) {}
 
 // FUNCTION: LEGOLAND 0x0048a100
 LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node) {
@@ -310,19 +310,40 @@ LEGO_EXPORT int GetAllBlokesOffRide(struct Ride *ride, unsigned short uid) {
 LEGO_EXPORT TileId GetObjectUID(struct Point *pos, struct Ride *ride) {
     struct MapElement *element;
     struct Point tile;
-    int n;
+    struct Point probe;
     struct Point origin;
+    int n;
     TileId none;
 
     tile = *pos;
     tile.x >>= 8;
     tile.y >>= 8;
     n = tile.y - 1;
-    if (tile.x >= 0 && tile.x < lpConfig->width && n >= 0 && n < lpConfig->height) {
-        element = &GameMap[n][tile.x];
-    } else {
-        element = NULL;
+    element = (tile.x >= 0 && tile.x < lpConfig->width && n >= 0 && n < lpConfig->height) ? &GameMap[n][tile.x] : NULL;
+    /* the original only looks below when the tile above exists, and never NULL-checks the tile below */
+    if (element != NULL) {
+        if ((element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
+            origin.x = element->field_4 + ride->x;
+            origin.y = element->field_5 + ride->y;
+            if (origin.x == tile.x && origin.y == tile.y) {
+                return element->anchor;
+            }
+        }
+        /* the struct copy keeps MSVC from folding the repeated x bounds checks, as in the original */
+        probe = tile;
+        probe.y++;
+        element = (probe.x >= 0 && probe.x < lpConfig->width && probe.y >= 0 && probe.y < lpConfig->height) ? &GameMap[probe.y][probe.x] : NULL;
+        if ((element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
+            origin.x = element->field_4 + ride->x;
+            origin.y = element->field_5 + ride->y;
+            if (origin.x == tile.x && origin.y == tile.y) {
+                return element->anchor;
+            }
+        }
     }
+    probe = tile;
+    probe.x--;
+    element = (probe.x >= 0 && probe.x < lpConfig->width && probe.y >= 0 && probe.y < lpConfig->height) ? &GameMap[probe.y][probe.x] : NULL;
     if (element != NULL && (element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
         origin.x = element->field_4 + ride->x;
         origin.y = element->field_5 + ride->y;
@@ -330,38 +351,8 @@ LEGO_EXPORT TileId GetObjectUID(struct Point *pos, struct Ride *ride) {
             return element->anchor;
         }
     }
-    n = tile.y + 1;
-    if (tile.x >= 0 && tile.x < lpConfig->width && n >= 0 && n < lpConfig->height) {
-        element = &GameMap[n][tile.x];
-    } else {
-        element = NULL;
-    }
-    if (element != NULL && (element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
-        origin.x = element->field_4 + ride->x;
-        origin.y = element->field_5 + ride->y;
-        if (origin.x == tile.x && origin.y == tile.y) {
-            return element->anchor;
-        }
-    }
-    n = tile.x - 1;
-    if (n >= 0 && n < lpConfig->width && tile.y >= 0 && tile.y < lpConfig->height) {
-        element = &GameMap[tile.y][n];
-    } else {
-        element = NULL;
-    }
-    if (element != NULL && (element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
-        origin.x = element->field_4 + ride->x;
-        origin.y = element->field_5 + ride->y;
-        if (origin.x == tile.x && origin.y == tile.y) {
-            return element->anchor;
-        }
-    }
-    n = tile.x + 1;
-    if (n >= 0 && n < lpConfig->width && tile.y >= 0 && tile.y < lpConfig->height) {
-        element = &GameMap[tile.y][n];
-    } else {
-        element = NULL;
-    }
+    probe.x = tile.x + 1;
+    element = (probe.x >= 0 && probe.x < lpConfig->width && probe.y >= 0 && probe.y < lpConfig->height) ? &GameMap[probe.y][probe.x] : NULL;
     if (element != NULL && (element->flags & 0x80) != 0 && element->field_0 != NULL && element->field_0->data == ride) {
         origin.x = element->field_4 + ride->x;
         origin.y = element->field_5 + ride->y;

@@ -352,142 +352,142 @@ void CarouselUpdate(struct CarouselRideObj *param_1) {
     struct CarouselRide *ride = param_1->ride;
     struct CarouselListElem *elem = ride->list;
     struct CarouselListElem *next;
-    int bloke;
-    int blokepos;
-    unsigned char *pos;
-    int iVar12, iVar13;
-    char cVar7;
-    int local_30, local_2c;
-    int local_18, local_14;
-    int local_c, local_8;
+    struct CarouselNode *node;
+    struct Bloke *bloke;
+    TileId *tile;
+    int x, y;
+    int tile_w, tile_h;
+    char dir;
     struct Point coords;
+    struct Point screen;
+    int in_path[3];
+    int out_path[3];
 
     while (elem != NULL) {
         next = elem->next;
-        blokepos = (int)elem->bloke;
-        pos = (unsigned char *)&elem->id;
-        bloke = (int)FindCarouselNode((unsigned short *)pos);
-        if (bloke == 0) {
+        bloke = elem->bloke;
+        tile = (TileId *)&elem->id;
+        node = FindCarouselNode(&tile->id);
+        if (node == NULL) {
             break;
         }
-        iVar12 = *(int *)((char *)ride + 0xc) + (unsigned int)*pos;
-        iVar13 = (unsigned int)pos[1] + *(int *)((char *)ride + 0x10);
-        if (*(short *)(blokepos + 0xe) == 0) {
-            switch (*(unsigned char *)(blokepos + 0x60)) {
+        x = ride->x + tile->pos.x;
+        y = tile->pos.y + ride->y;
+        if (bloke->low_level_action == 0) {
+            switch (bloke->param_action) {
             case 0:
-                iVar13 = iVar13 * 0x100 + 0x80;
-                *(char *)(bloke + 0x18) = *(char *)(bloke + 0x18) + '\x01';
-                iVar12 = (iVar12 + -3) * 0x100;
-                *(unsigned int *)(blokepos + 0x1c) = 0xb4;
-                *(unsigned char *)(blokepos + 0x62) |= 8;
-                *(int *)(blokepos + 0x24) = iVar12;
-                *(int *)(blokepos + 0x28) = iVar13;
-                cVar7 = CalcMoveLine(*(struct Point *)(blokepos + 0x68), *(struct Point *)(blokepos + 0x24), (struct Navigator *)(blokepos + 0x98));
-                *(short *)(blokepos + 0xe) = 7;
-                *(unsigned char *)(blokepos + 0x73) = cVar7 + 0x10;
-                NewDirForAction(blokepos, ((unsigned char)(cVar7 + 0x10) >> 5) + 3);
-                *(unsigned int *)(blokepos + 0x58) = 0;
-                *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
+                /* Walk up to the boarding point. */
+                node->boarding_count++;
+                y = (y << 8) + 0x80;
+                x = (x - 3) << 8;
+                node->boarding_timer = 0xb4;
+                bloke->flags |= 8;
+                bloke->dest.x = x;
+                bloke->dest.y = y;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                bloke->low_level_action = 7;
+                bloke->field_73 = dir + 0x10;
+                NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                bloke->field_58 = 0;
+                bloke->param_action++;
                 break;
             case 1:
-                coords = GetScreenCoordsForObject(pos, ride);
-                {
-                    int iVar10 = *(int *)(blokepos + 0x6c);
-                    int iVar10b = *(int *)(blokepos + 0x68);
-                    short sVar8, sVar9;
-                    GetTileDimensions(&local_30, &local_2c);
-                    iVar13 = (iVar10b + iVar10) * local_2c;
-                    iVar12 = (iVar10b - iVar10) * local_30;
-                    sVar8 = Get_XScroll();
-                    sVar9 = Get_YScroll();
-                    local_18 = (((((unsigned int)lpConfig->view_x - (int)sVar8) + (iVar12 >> 9)) - DAT_00616078 / 2) - coords.x) * 2;
-                    local_14 = ((((iVar13 >> 9) + ((unsigned int)lpConfig->view_y - (int)sVar9)) - DAT_0061607c / 2) - coords.y) * 2;
-                }
-                *(struct Sprite **)(*(int *)(blokepos + 4) + 0x2c) = DAT_006160c0;
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x30) = 1;
-                *(float *)(*(int *)(blokepos + 4) + 0x3c) = GetUnitDepth(-1617853.25f, -1618109.0f);
-                *(unsigned char *)(blokepos + 0x35) = 0;
-                sprintf(DAT_004b64d4, "%02d", FUN_0042cd20(elem, (struct CarouselNode *)bloke, *(unsigned char *)((char *)DAT_006160bc + 0x2e)));
-                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616090[0], 0, "BlokeBox??", -1617853.25f, -1618109.0f, &local_18);
-                UpdateBlokeFromBNVPath(blokepos, *(unsigned int *)(blokepos + 0x54));
-                *(unsigned char *)(blokepos + 0x62) |= 0x80;
-                *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
+                /* Climb on: path from the bloke's screen position to the seat. */
+                coords = GetScreenCoordsForObject(tile, (struct Ride *)ride);
+                /* x/y are reused: map position in, then screen x (in y) and screen y (in x). */
+                y = bloke->pos.y;
+                x = bloke->pos.x;
+                GetTileDimensions(&tile_w, &tile_h);
+                screen.x = (x - y) * tile_w >> 9;
+                screen.y = (x + y) * tile_h >> 9;
+                y = lpConfig->view_x - (short)Get_XScroll() + screen.x;
+                x = screen.y + (lpConfig->view_y - (short)Get_YScroll());
+                in_path[0] = (y - DAT_00616078 / 2 - coords.x) * 2;
+                in_path[1] = (x - DAT_0061607c / 2 - coords.y) * 2;
+                bloke->person->sprite = DAT_006160c0;
+                bloke->person->field_30 = 1;
+                bloke->person->depth = GetUnitDepth(-1617853.25f, -1618109.0f);
+                bloke->field_35 = 0;
+                sprintf(DAT_004b64d4, "%02d", FUN_0042cd20(elem, node, (signed char)DAT_006160bc->capacity));
+                bloke->path = NewBNVPath(DAT_00616090[0], 0, "BlokeBox??", -1617853.25f, -1618109.0f, in_path);
+                UpdateBlokeFromBNVPath(bloke, bloke->path);
+                bloke->param_action++;
+                bloke->flags |= 0x80;
                 break;
             case 2:
-                if (UpdateBlokeFromBNVPath(blokepos, *(unsigned int *)(blokepos + 0x54)) == 0) {
-                    *(unsigned char *)(blokepos + 0x35) = 1;
-                    *(unsigned char *)(blokepos + 0x60) = 5;
-                    free(*(void **)(blokepos + 0x54));
-                    *(unsigned int *)(blokepos + 0x54) = 0;
+                if (UpdateBlokeFromBNVPath(bloke, bloke->path) == 0) {
+                    bloke->field_35 = 1;
+                    bloke->param_action = 5;
+                    free(bloke->path);
+                    bloke->path = NULL;
                 }
-                BlokeSetFrame(blokepos, *(unsigned char *)(blokepos + 0x74));
+                BlokeSetFrame(bloke, bloke->frame);
                 break;
             case 5:
-                *(unsigned char *)(blokepos + 0x62) |= 0x80;
-                BlokeSetFrame(blokepos, 0);
-                *(unsigned char *)(blokepos + 0x35) = 1;
-                *(struct Sprite **)(*(int *)(blokepos + 4) + 0x2c) = DAT_006160c0;
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x30) = 1;
-                *(float *)(*(int *)(blokepos + 4) + 0x3c) = GetUnitDepth(-1617853.25f, -1618109.0f);
-                *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
-                cVar7 = *(char *)(bloke + 6) + '\x01';
-                *(char *)(bloke + 6) = cVar7;
-                if ((short)cVar7 == *(short *)((char *)DAT_006160bc + 0x2e)) {
-                    FUN_0042bc90((struct CarouselNode *)bloke);
+                /* Seated. */
+                bloke->flags |= 0x80;
+                BlokeSetFrame(bloke, 0);
+                bloke->field_35 = 1;
+                bloke->person->sprite = DAT_006160c0;
+                bloke->person->field_30 = 1;
+                bloke->person->depth = GetUnitDepth(-1617853.25f, -1618109.0f);
+                bloke->param_action++;
+                if ((short)(char)++node->seated_count == (short)DAT_006160bc->capacity) {
+                    FUN_0042bc90(node);
                 }
                 break;
             case 7:
-                local_c = (int)*(short *)(blokepos + 0x3c) << 1;
-                local_8 = (int)*(short *)(blokepos + 0x3e) << 1;
-                BlokeWalkAnim((struct Bloke *)blokepos);
-                BlokeSetFrame(blokepos, 0);
-                *(unsigned char *)(blokepos + 0x62) |= 0x80;
-                *(struct Sprite **)(*(int *)(blokepos + 4) + 0x2c) = DAT_006160c0;
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x30) = 1;
-                *(float *)(*(int *)(blokepos + 4) + 0x3c) = GetUnitDepth(-1617853.25f, -1618109.0f);
-                *(unsigned char *)(blokepos + 0x35) = 2;
-                sprintf(DAT_004b64d4, "%02d", *(unsigned char *)(blokepos + 0x36));
-                *(unsigned int *)(blokepos + 0x54) = (unsigned int)NewBNVPath(DAT_00616090[2], 2, "BlokeBox??", -1617853.25f, -1618109.0f, &local_c);
-                *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
+                /* Climb off. */
+                out_path[0] = bloke->screen_x * 2;
+                out_path[1] = bloke->screen_y * 2;
+                BlokeWalkAnim(bloke);
+                BlokeSetFrame(bloke, 0);
+                bloke->flags |= 0x80;
+                bloke->person->sprite = DAT_006160c0;
+                bloke->person->field_30 = 1;
+                bloke->person->depth = GetUnitDepth(-1617853.25f, -1618109.0f);
+                bloke->field_35 = 2;
+                sprintf(DAT_004b64d4, "%02d", bloke->field_36);
+                bloke->path = NewBNVPath(DAT_00616090[2], 2, "BlokeBox??", -1617853.25f, -1618109.0f, out_path);
+                bloke->param_action++;
                 break;
             case 8:
-                if (UpdateBlokeFromBNVPath(blokepos, *(unsigned int *)(blokepos + 0x54)) == 0) {
-                    *(unsigned char *)(blokepos + 0x35) = 2;
-                    *(unsigned char *)(blokepos + 0x60) = 0xd;
-                    free(*(void **)(blokepos + 0x54));
-                    *(unsigned int *)(blokepos + 0x54) = 0;
-                    *(unsigned char *)(blokepos + 0x72) = 3;
+                if (UpdateBlokeFromBNVPath(bloke, bloke->path) == 0) {
+                    bloke->field_35 = 2;
+                    bloke->param_action = 0xd;
+                    free(bloke->path);
+                    bloke->path = NULL;
+                    bloke->dir = 3;
                 }
-                BlokeSetFrame(blokepos, *(unsigned char *)(blokepos + 0x74));
+                BlokeSetFrame(bloke, bloke->frame);
                 break;
             case 0xd:
-                *(unsigned char *)(*(unsigned char *)(blokepos + 0x36) + 0x1f + bloke) = 0;
-                *(unsigned short *)(blokepos + 0x62) &= 0xff7f;
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x2c) = 0;
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x30) = 0;
-                UnAdjustBlokePosition(*(int *)(blokepos + 4) + 0x1c);
-                ScreenToMapRef(*(int *)(blokepos + 4) + 0x1c, blokepos + 0x68, 0);
-                *(unsigned int *)(*(int *)(blokepos + 4) + 0x34) = 0;
-                iVar13 = iVar13 * 0x100 + 0x80;
-                *(int *)(blokepos + 0x6c) = *(int *)(blokepos + 0x6c) << 8;
-                *(int *)(blokepos + 0x68) = *(int *)(blokepos + 0x68) << 8;
-                iVar12 = iVar12 * 0x100 + 0x80;
-                *(int *)(blokepos + 0x24) = iVar12;
-                *(int *)(blokepos + 0x28) = iVar13;
-                cVar7 = CalcMoveLine(*(struct Point *)(blokepos + 0x68), *(struct Point *)(blokepos + 0x24), (struct Navigator *)(blokepos + 0x98));
-                *(short *)(blokepos + 0xe) = 7;
-                *(unsigned char *)(blokepos + 0x73) = cVar7 + 0x10;
-                NewDirForAction(blokepos, ((unsigned char)(cVar7 + 0x10) >> 5) + 3);
-                *(char *)(blokepos + 0x60) = *(char *)(blokepos + 0x60) + '\x01';
+                /* Back on the ground: free the seat and walk out. */
+                node->slots[bloke->field_36 - 1] = 0;
+                bloke->flags &= ~0x80;
+                bloke->person->sprite = NULL;
+                bloke->person->field_30 = 0;
+                UnAdjustBlokePosition(&bloke->person->screen);
+                ScreenToMapRef((int *)&bloke->person->screen, (int *)&bloke->pos, 0);
+                bloke->person->field_34 = 0;
+                y = (y << 8) + 0x80;
+                bloke->pos.x <<= 8;
+                bloke->pos.y <<= 8;
+                x = (x << 8) + 0x80;
+                bloke->dest.x = x;
+                bloke->dest.y = y;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                bloke->low_level_action = 7;
+                bloke->field_73 = dir + 0x10;
+                NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                bloke->param_action++;
                 break;
             case 0xe:
-                RemoveBlokeFromRide((void *)((char *)ride), elem);
-                *(unsigned short *)(blokepos + 0x62) &= 0xfff7;
-                cVar7 = *(char *)(bloke + 7) + -1;
-                *(char *)(bloke + 7) = cVar7;
-                if (cVar7 == '\0') {
-                    *(unsigned char *)(bloke + 6) = 0;
-                    Ride_ClearFlagToNotLetAnyoneOn((unsigned char *)(bloke + 4));
+                RemoveBlokeFromRide((struct Ride *)ride, (struct RideNode *)elem);
+                bloke->flags &= ~8;
+                if (--node->leaving_count == 0) {
+                    node->seated_count = 0;
+                    Ride_ClearFlagToNotLetAnyoneOn(&node->id);
                 }
                 break;
             }
@@ -500,157 +500,112 @@ void CarouselUpdate(struct CarouselRideObj *param_1) {
 // FUNCTION: LEGOLAND 0x0042bcf0
 void RenderCarousel(struct CarouselRideObj *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
     struct CarouselRide *ride = param_1->ride;
-    struct CarouselListElem *elem;
-    int bloke;
-    int iVar6, iVar10;
-    char cVar5;
-    unsigned int uVar7;
+    struct CarouselListElem *elem = ride->list;
+    struct CarouselListElem *e;
+    struct CarouselNode *node;
+    struct Bloke *bloke;
+    struct Person *person;
+    char count = 0;
+    struct Bloke *riders[10] = {0};
+    char i;
+    int sx, sy;
+    struct HoverInfo hit;
     struct LayerResult layerres;
-    int local_68;
-    struct Point local_5c, local_54;
-    unsigned int local_4c;
-    int local_48;
-    short local_44;
-    int local_28[10];
+    struct Point screen;
+    struct Point offset;
+    struct Point offset2;
 
-    iVar6 = (int)ride;
-    elem = ride->list;
-    {
-        int *fill = local_28;
-        int n;
-        local_28[0] = 0;
-        for (n = 9; fill = fill + 1, n != 0; n--) {
-            *fill = 0;
+    hit.type = 0x103;
+    hit.ptr = (struct Bloke *)param_1;
+    hit.data.tile.id = *param_4;
+    node = FindCarouselNode(param_4);
+    if (node == NULL) {
+        return;
+    }
+    screen = GetScreenCoordsForObject((TileId *)param_4, (struct Ride *)ride);
+    sx = screen.x;
+    sy = screen.y;
+    GetLayer((struct Sprite *)ride->layer, &layerres, 0);
+    layerres.field_10 = 0;
+
+    /* Collect the blokes riding this carousel. */
+    for (; elem != NULL; elem = elem->next) {
+        if (*param_4 == elem->id) {
+            riders[count++] = elem->bloke;
         }
     }
-    local_44 = *param_4;
-    cVar5 = '\0';
-    local_4c = 0x103;
-    local_48 = (int)param_1;
-    bloke = (int)FindCarouselNode(param_4);
-    if (bloke != 0) {
-        struct Point sc = GetScreenCoordsForObject((unsigned char *)param_4, ride);
-        iVar10 = sc.y;
-        iVar6 = sc.x;
-        GetLayer((struct LayerOwner *)ride->layer, &layerres, 0);
-        if (elem != NULL) {
-            short sVar1 = *param_4;
-            do {
-                if (sVar1 == (short)elem->id) {
-                    int idx = (int)cVar5;
-                    cVar5 = cVar5 + '\x01';
-                    local_28[idx] = (int)elem->bloke;
-                }
-                elem = elem->next;
-            } while (elem != NULL);
-            if (cVar5 != '\0') {
-                uVar7 = GetLLSForLayer((unsigned int)CarouselLayer, 0);
-                LLSSetFrame((struct LLS *)uVar7, (int)*(char *)(bloke + 8));
-                local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 0);
-                AdjustOffsetForViewMode(&local_5c);
-                uVar7 = GetSpriteForLayer((struct LayerContainer *)CarouselLayer, 0);
-                PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
-                local_54 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 1);
-                AdjustOffsetForViewMode(&local_54);
-                PrintSprite(CarouselEntranceMatte2Sprite, local_54.x + iVar6, local_54.y + iVar10, param_6, (int *)&local_4c);
-                uVar7 = GetLLSForLayer((unsigned int)CarouselLayer, 2);
-                LLSSetFrame((struct LLS *)uVar7, (int)*(char *)(bloke + 8));
-                local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 2);
-                AdjustOffsetForViewMode(&local_5c);
-                uVar7 = GetSpriteForLayer((struct LayerContainer *)CarouselLayer, 2);
-                PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
-                if ('\0' < cVar5) {
-                    int *p;
-                    local_68 = (int)cVar5;
-                    p = local_28;
-                    do {
-                        if (*(char *)(*p + 0x60) == '\0') {
-                            IP_RenderBlokeIn3DNow((struct Bloke *)*p);
-                        }
-                        p = p + 1;
-                        local_68 = local_68 + -1;
-                    } while (local_68 != 0);
-                    if ('\0' < cVar5) {
-                        local_68 = (int)cVar5;
-                        p = local_28;
-                        do {
-                            if (*(char *)(*p + 0x60) == '\x01') {
-                                IP_RenderBlokeIn3DNow((struct Bloke *)*p);
-                            }
-                            p = p + 1;
-                            local_68 = local_68 + -1;
-                        } while (local_68 != 0);
-                        if ('\0' < cVar5) {
-                            local_68 = (int)cVar5;
-                            p = local_28;
-                            do {
-                                if (*(char *)(*p + 0x60) == '\r') {
-                                    IP_RenderBlokeIn3DNow((struct Bloke *)*p);
-                                }
-                                p = p + 1;
-                                local_68 = local_68 + -1;
-                            } while (local_68 != 0);
-                            if ('\0' < cVar5) {
-                                int param1c = (int)cVar5;
-                                p = local_28;
-                                do {
-                                    if (*(char *)(*p + 0x60) == '\x0e') {
-                                        IP_RenderBlokeIn3DNow((struct Bloke *)*p);
-                                    }
-                                    p = p + 1;
-                                    param1c = param1c + -1;
-                                } while (param1c != 0);
-                            }
-                        }
-                    }
-                }
-                *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)*(char *)(bloke + 8);
-                {
-                    struct CarouselListElem *e;
-                    int local_64, local_60;
-                    int iVar3 = DAT_00616078;
-                    int iVar4 = DAT_0061607c;
-                    for (e = ride->list; local_60 = iVar4, local_64 = iVar3, DAT_00616078 = local_64,
-                        DAT_0061607c = local_60, e != NULL;
-                        e = e->next) {
-                        int b = (int)e->bloke;
-                        if (*param_4 == (short)e->id && (*(unsigned char *)(b + 0x62) & 0x80) != 0) {
-                            int unit = *(int *)(b + 4);
-                            *(int *)(unit + 0x24) = (int)*(short *)(b + 0x3c);
-                            *(int *)(unit + 0x28) = (int)*(short *)(b + 0x3e);
-                            AdjustBlokePosition((struct Point *)(unit + 0x24));
-                            AdjustOffsetForViewMode((struct Point *)&local_64);
-                            *(int *)(unit + 0x1c) = *(short *)(b + 0x3c) + local_64 + iVar6;
-                            *(int *)(unit + 0x20) = *(short *)(b + 0x3e) + local_60 + iVar10;
-                            AdjustBlokePosition((struct Point *)(unit + 0x1c));
-                            IP_RenderBlokeIn3DNow(e->bloke);
-                        }
-                        iVar3 = DAT_00616078;
-                        iVar4 = DAT_0061607c;
-                    }
-                }
-                local_54 = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 1);
-                AdjustOffsetForViewMode(&local_54);
-                PrintSprite(CarouselEntranceMatteSprite, local_54.x + iVar6, local_54.y + iVar10, param_6, 0);
-                return;
+
+    if (count != 0) {
+        LLSSetFrame(GetLLSForLayer((struct Sprite *)CarouselLayer, 0), (char)node->frame);
+        offset = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 0);
+        AdjustOffsetForViewMode(&offset);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)CarouselLayer, 0), offset.x + sx, offset.y + sy, param_6, (int *)&hit);
+        offset2 = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 1);
+        AdjustOffsetForViewMode(&offset2);
+        PrintSprite(CarouselEntranceMatte2Sprite, offset2.x + sx, offset2.y + sy, param_6, (int *)&hit);
+        LLSSetFrame(GetLLSForLayer((struct Sprite *)CarouselLayer, 2), (char)node->frame);
+        offset = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 2);
+        AdjustOffsetForViewMode(&offset);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)CarouselLayer, 2), offset.x + sx, offset.y + sy, param_6, (int *)&hit);
+
+        /* Draw the riders back to front by their action. */
+        for (i = 0; i < count; i++) {
+            if (riders[i]->param_action == 0) {
+                IP_RenderBlokeIn3DNow(riders[i]);
             }
         }
-        uVar7 = GetLLSForLayer((unsigned int)CarouselLayer, 0);
-        LLSSetFrame((struct LLS *)uVar7, (int)*(char *)(bloke + 8));
-        local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 0);
-        AdjustOffsetForViewMode(&local_5c);
-        uVar7 = GetSpriteForLayer((struct LayerContainer *)CarouselLayer, 0);
-        PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
-        local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 1);
-        AdjustOffsetForViewMode(&local_5c);
-        uVar7 = GetSpriteForLayer((struct LayerContainer *)CarouselLayer, 1);
-        PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
-        uVar7 = GetLLSForLayer((unsigned int)CarouselLayer, 2);
-        LLSSetFrame((struct LLS *)uVar7, (int)*(char *)(bloke + 8));
-        local_5c = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CarouselLayer, 2);
-        AdjustOffsetForViewMode(&local_5c);
-        uVar7 = GetSpriteForLayer((struct LayerContainer *)CarouselLayer, 2);
-        PrintSprite((struct Sprite *)uVar7, local_5c.x + iVar6, local_5c.y + iVar10, param_6, (int *)&local_4c);
+        for (i = 0; i < count; i++) {
+            if (riders[i]->param_action == 1) {
+                IP_RenderBlokeIn3DNow(riders[i]);
+            }
+        }
+        for (i = 0; i < count; i++) {
+            if (riders[i]->param_action == 13) {
+                IP_RenderBlokeIn3DNow(riders[i]);
+            }
+        }
+        for (i = 0; i < count; i++) {
+            if (riders[i]->param_action == 14) {
+                IP_RenderBlokeIn3DNow(riders[i]);
+            }
+        }
+
+        ZCarouselSprite->lls[0]->frame = (char)node->frame;
+        for (e = ride->list; e != NULL; e = e->next) {
+            if (*param_4 == e->id) {
+                bloke = e->bloke;
+                if (bloke->flags & 0x80) {
+                    struct Point view;
+
+                    view.x = DAT_00616078;
+                    view.y = DAT_0061607c;
+                    person = bloke->person;
+                    person->offset.x = bloke->screen_x;
+                    person->offset.y = bloke->screen_y;
+                    AdjustBlokePosition(&person->offset);
+                    AdjustOffsetForViewMode(&view);
+                    person->screen.x = bloke->screen_x + view.x + sx;
+                    person->screen.y = bloke->screen_y + view.y + sy;
+                    AdjustBlokePosition(&person->screen);
+                    IP_RenderBlokeIn3DNow(e->bloke);
+                }
+            }
+        }
+        offset2 = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 1);
+        AdjustOffsetForViewMode(&offset2);
+        PrintSprite(CarouselEntranceMatteSprite, offset2.x + sx, offset2.y + sy, param_6, 0);
+    } else {
+        LLSSetFrame(GetLLSForLayer((struct Sprite *)CarouselLayer, 0), (char)node->frame);
+        offset = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 0);
+        AdjustOffsetForViewMode(&offset);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)CarouselLayer, 0), offset.x + sx, offset.y + sy, param_6, (int *)&hit);
+        offset = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 1);
+        AdjustOffsetForViewMode(&offset);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)CarouselLayer, 1), offset.x + sx, offset.y + sy, param_6, (int *)&hit);
+        LLSSetFrame(GetLLSForLayer((struct Sprite *)CarouselLayer, 2), (char)node->frame);
+        offset = GetRenderOffsetForLayer((struct Sprite *)CarouselLayer, 2);
+        AdjustOffsetForViewMode(&offset);
+        PrintSprite(GetSpriteForLayer((struct Sprite *)CarouselLayer, 2), offset.x + sx, offset.y + sy, param_6, (int *)&hit);
     }
 }
 

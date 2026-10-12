@@ -17,6 +17,7 @@
 |---|---|---|---|
 | 2026-10-07 | Haiku 5.5 (flumeb) | Swapped the order of the two footprint decrements (`y1` before `x1`) | 83.33% (worse; the current order is the better one) |
 | 2026-10-07 | Haiku 5.5 (flumeb) | `FindFlumeSubEntryByTile(&t)` on a local copy of `tile` instead of `&tile` | 62.39% (worse) |
+| 2026-10-09 | Opus 5.5 | decrements as comma expression inside the `tile` argument; `x--`, `-= 1`, `x = x - 1`; struct assignment instead of memcpy | 92.59 (no change; the early `cursor` push never appears) |
 
 ## Ideas not tried yet
 

@@ -19,6 +19,7 @@
 | 2026-10-07 | Claude | `fld dword ptr index` / `fistp index` in the asm (index stays in memory) | 36.7%, frame now 0x28 (kept) |
 | 2026-10-07 | Claude | `volatile int index` (reloaded at every use, as in the original) | 54.39% (kept) |
 | 2026-10-07 | Claude | Reassign `node` to the entry (`node = (struct CopterNode *)&node->layer[index]`) | 44.77% (worse) |
+| 2026-10-11 | Opus 5.5 | `volatile struct Point p1` (found by a per-local volatile search); natural forms tried first: all 24 declaration orders of p2/p3/p1/base, `base.x + p1.x + p2.x` order | 61.45 -> 81.55 with volatile (kept, last resort); natural forms all 61.45 |
 
 ## Ideas not tried yet
 

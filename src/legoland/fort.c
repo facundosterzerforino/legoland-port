@@ -104,6 +104,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
 
 // FUNCTION: LEGOLAND 0x004064d0
 void FortWanderUpdate(RideNode *node, Bloke *bloke) {
+    TileId *tile = &node->tile;
     int h, r;
     float fx, fy;
     char dir;
@@ -119,8 +120,8 @@ void FortWanderUpdate(RideNode *node, Bloke *bloke) {
         h = (DAT_004b4580.bottom - DAT_004b4580.top) << 8;
         fx = (rand() & 0xff) * 0.003921569f;
         fy = (rand() & 0xff) * 0.003921569f;
-        bloke->dest.x = (int)(((node->tile.pos.x + DAT_004b4580.left) << 8) + r * fx);
-        bloke->dest.y = (int)(((node->tile.pos.y + DAT_004b4580.top) << 8) + h * fy);
+        bloke->dest.x = (int)(((tile->pos.x + DAT_004b4580.left) << 8) + r * fx);
+        bloke->dest.y = (int)(((tile->pos.y + DAT_004b4580.top) << 8) + h * fy);
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
         bloke->low_level_action = 7;
         bloke->field_73 = dir + 0x10;
@@ -148,18 +149,19 @@ void FortWanderUpdate(RideNode *node, Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00406660
 void FortUpdate(Element *elem) {
+    volatile int ptmp785;
     struct Ride *ride = elem->ride;
     struct Sprite *spr;
-    short *lls;
     RideNode *node;
+    short *lls;
     RideNode *next;
-    register Bloke *bloke;
     int x, y;
-    unsigned char tx;
+    register Bloke *bloke;
+    char tx;
     unsigned char dir;
 
     spr = GetSpriteForLayer(FortLayer, 2);
-    if (spr != NULL) {
+    if (spr != (int)NULL) {
         lls = (short *)GetLLSForSprite((struct SpriteLLS *)spr);
         if (lls) {
             if (++lls[0] >= lls[8]) {
@@ -167,16 +169,17 @@ void FortUpdate(Element *elem) {
             }
         }
     }
-    node = ride->riders;
+    ptmp785 = ride->riders;
+    node = ptmp785;
     if (node != NULL) {
         do {
-            next = node->next;
             bloke = node->rider;
             x = ride->x;
             tx = node->tile.pos.x;
-            y = ride->y + node->tile.pos.y;
-            x += tx;
-            if (bloke->low_level_action == 0) {
+            x = x + tx;
+            next = node->next;
+            y = node->tile.pos.y + ride->y;
+            if ((int)bloke->low_level_action == 0) {
                 switch (bloke->param_action) {
                 case 0:
                     bloke->flags |= 8;
@@ -197,8 +200,8 @@ void FortUpdate(Element *elem) {
                     bloke->dest.y = (node->tile.pos.y << 8) + 0x80;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
-                    NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
+                    bloke->field_73 = 0x10 + dir;
+                    NewDirForAction(bloke, ((unsigned char)(0x10 + dir) >> 5) + 3);
                     bloke->param_action++;
                     break;
                 case 3:
@@ -212,7 +215,7 @@ void FortUpdate(Element *elem) {
                     break;
                 case 4:
                     RemoveBlokeFromRide(ride, node);
-                    bloke->flags &= ~8;
+                    bloke->flags = bloke->flags & (~8);
                     break;
                 }
             }

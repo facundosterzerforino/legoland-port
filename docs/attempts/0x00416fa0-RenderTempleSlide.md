@@ -1,6 +1,6 @@
 # RenderTempleSlide (0x00416fa0, `src/legoland/temple_slide.c`)
 
-**Best: 95.00%**. Kind: C.
+**Best: 96.67%**. Kind: C.
 
 ## What still differs
 
@@ -16,6 +16,7 @@
 | 2026-10-07 | Haiku agent | Move `off2` to function scope, after `off1` | 95.00% (no change in the slot layout) |
 | 2026-10-07 | Haiku agent | Declare `off2` then `off1` at function scope | 95.00% (no change) |
 | 2026-10-07 | Haiku agent | Move both `off1` and `off2` into the loop block | 95.00% (no change) |
+| 2026-10-09 | Opus 5.5 | semantic fix: `person->offset += off2` (the DAT_004cbf88 offset), not off1 - read off the original once the pending pushes are counted | 95.00 -> **96.67**, struct 100; left: the screen sums add off1/off2 in the other order (all 24 term orders, groupings and declaration placements give the same code) |
 
 ## Ideas not tried yet
 

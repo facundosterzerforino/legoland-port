@@ -657,15 +657,15 @@ void FUN_00492da0(void) {
     _close(fd)
 
 /* Creates segment n from the file IMT_LOAD read into memory, then frees the file. */
-#define IMT_GET(n, name) \
+#define IMT_GET(n, name, seg) \
     DAT_0079a6b0++; \
-    desc.guidClass = CLSID_DirectMusicSegment; \
     desc.dwSize = sizeof(desc); \
     desc.dwValidData = DMUS_OBJ_CLASS | DMUS_OBJ_NAME | DMUS_OBJ_MEMORY; \
+    desc.guidClass = CLSID_DirectMusicSegment; \
     desc.llMemLength = DAT_0079a608[n]; \
     desc.pbMemData = DAT_00799c1c[n]; \
     wcscpy(desc.wszName, name); \
-    hr = DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicSegment, (void **)&MusicSegments[n]); \
+    hr = DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicSegment, (void **)&(seg)); \
     if (hr != S_OK) { \
         DBPrintf(IMT_MSG_GET_FAILED, DAT_0079a6b0, hr, GetLastError()); \
     } \
@@ -713,7 +713,11 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
     }
     music->vtable->CreatePort(music, &NullGuid, &params, &port, NULL);
     port->vtable->GetFormat(port, NULL, &formatSize, &bufferSize);
-    format = malloc(formatSize < sizeof(WAVEFORMATEX) ? sizeof(WAVEFORMATEX) : formatSize);
+    if (formatSize < sizeof(WAVEFORMATEX)) {
+        format = malloc(sizeof(WAVEFORMATEX));
+    } else {
+        format = malloc(formatSize);
+    }
     port->vtable->GetFormat(port, format, &formatSize, &bufferSize);
     bufferDesc.dwSize = sizeof(bufferDesc);
     bufferDesc.dwFlags = DSBCAPS_CTRLVOLUME;
@@ -815,78 +819,78 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
         // STRING: LEGOLAND 0x004bfad0
         IMT_LOAD(33, "imusic\\wmtran2.sgt");
         // STRING: LEGOLAND 0x004bfab8
-        IMT_GET(0, L"themeintro");
+        IMT_GET(0, L"themeintro", MusicIntroSegments[0]);
         // STRING: LEGOLAND 0x004bfa6c
-        IMT_GET(5, L"theme");
+        IMT_GET(5, L"theme", MusicLoopSegments[0]);
         // STRING: LEGOLAND 0x004bfa58
-        IMT_GET(1, L"segegypt1");
+        IMT_GET(1, L"segegypt1", MusicIntroSegments[1]);
         // STRING: LEGOLAND 0x004bfa44
-        IMT_GET(2, L"seginca1");
+        IMT_GET(2, L"seginca1", MusicIntroSegments[2]);
         // STRING: LEGOLAND 0x004bfa34
-        IMT_GET(3, L"segmed1");
+        IMT_GET(3, L"segmed1", MusicIntroSegments[3]);
         // STRING: LEGOLAND 0x004bfa20
-        IMT_GET(4, L"segwest1");
+        IMT_GET(4, L"segwest1", MusicIntroSegments[4]);
         // STRING: LEGOLAND 0x004bfa0c
-        IMT_GET(6, L"segegypt2");
+        IMT_GET(6, L"segegypt2", MusicLoopSegments[1]);
         // STRING: LEGOLAND 0x004bf9f8
-        IMT_GET(7, L"seginca2");
+        IMT_GET(7, L"seginca2", MusicLoopSegments[2]);
         // STRING: LEGOLAND 0x004bf9e8
-        IMT_GET(8, L"segmed2");
+        IMT_GET(8, L"segmed2", MusicLoopSegments[3]);
         // STRING: LEGOLAND 0x004bf9d4
-        IMT_GET(9, L"segwest2");
+        IMT_GET(9, L"segwest2", MusicLoopSegments[4]);
         // STRING: LEGOLAND 0x004bf9c4
-        IMT_GET(11, L"letran2");
+        IMT_GET(11, L"letran2", MusicTransitionSegments[0][1]);
         // STRING: LEGOLAND 0x004bf9b4
-        IMT_GET(12, L"litran2");
+        IMT_GET(12, L"litran2", MusicTransitionSegments[0][2]);
         // STRING: LEGOLAND 0x004bf9a4
-        IMT_GET(13, L"lmtran2");
+        IMT_GET(13, L"lmtran2", MusicTransitionSegments[0][3]);
         // STRING: LEGOLAND 0x004bf994
-        IMT_GET(14, L"lwtran2");
+        IMT_GET(14, L"lwtran2", MusicTransitionSegments[0][4]);
         // STRING: LEGOLAND 0x004bf984
-        IMT_GET(15, L"eltran2");
+        IMT_GET(15, L"eltran2", MusicTransitionSegments[1][0]);
         // STRING: LEGOLAND 0x004bf974
-        IMT_GET(17, L"eitran2");
+        IMT_GET(17, L"eitran2", MusicTransitionSegments[1][2]);
         // STRING: LEGOLAND 0x004bf964
-        IMT_GET(18, L"emtran2");
+        IMT_GET(18, L"emtran2", MusicTransitionSegments[1][3]);
         // STRING: LEGOLAND 0x004bf954
-        IMT_GET(19, L"ewtran2");
+        IMT_GET(19, L"ewtran2", MusicTransitionSegments[1][4]);
         // STRING: LEGOLAND 0x004bf944
-        IMT_GET(20, L"iltran2");
+        IMT_GET(20, L"iltran2", MusicTransitionSegments[2][0]);
         // STRING: LEGOLAND 0x004bf934
-        IMT_GET(21, L"ietran2");
+        IMT_GET(21, L"ietran2", MusicTransitionSegments[2][1]);
         // STRING: LEGOLAND 0x004bf924
-        IMT_GET(23, L"imtran2");
+        IMT_GET(23, L"imtran2", MusicTransitionSegments[2][3]);
         // STRING: LEGOLAND 0x004bf914
-        IMT_GET(24, L"iwtran2");
+        IMT_GET(24, L"iwtran2", MusicTransitionSegments[2][4]);
         // STRING: LEGOLAND 0x004bf904
-        IMT_GET(25, L"mltran2");
+        IMT_GET(25, L"mltran2", MusicTransitionSegments[3][0]);
         // STRING: LEGOLAND 0x004bf8f4
-        IMT_GET(26, L"metran2");
+        IMT_GET(26, L"metran2", MusicTransitionSegments[3][1]);
         // STRING: LEGOLAND 0x004bf8e4
-        IMT_GET(27, L"mitran2");
+        IMT_GET(27, L"mitran2", MusicTransitionSegments[3][2]);
         // STRING: LEGOLAND 0x004bf8d4
-        IMT_GET(29, L"mwtran2");
+        IMT_GET(29, L"mwtran2", MusicTransitionSegments[3][4]);
         // STRING: LEGOLAND 0x004bf8c4
-        IMT_GET(30, L"wltran2");
+        IMT_GET(30, L"wltran2", MusicTransitionSegments[4][0]);
         // STRING: LEGOLAND 0x004bf8b4
-        IMT_GET(31, L"wetran2");
+        IMT_GET(31, L"wetran2", MusicTransitionSegments[4][1]);
         // STRING: LEGOLAND 0x004bf8a4
-        IMT_GET(32, L"witran2");
+        IMT_GET(32, L"witran2", MusicTransitionSegments[4][2]);
         // STRING: LEGOLAND 0x004bf894
-        IMT_GET(33, L"wmtran2");
+        IMT_GET(33, L"wmtran2", MusicTransitionSegments[4][3]);
     }
     DMusicPerformance->vtable->SetNotificationHandle(DMusicPerformance, DMusicNotificationEvent, 0);
     DMusicPerformance->vtable->AddNotificationType(DMusicPerformance, &GUID_NOTIFICATION_MEASUREANDBEAT);
     DMusicPerformance->vtable->AddNotificationType(DMusicPerformance, &GUID_NOTIFICATION_SEGMENT);
     for (theme = 1; theme < 5; theme++) {
-        MusicSegments[theme]->vtable->SetParam(MusicSegments[theme], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
-        MusicSegments[theme]->vtable->SetRepeats(MusicSegments[theme], 0);
-        MusicSegments[theme + 5]->vtable->SetParam(MusicSegments[theme + 5], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
-        MusicSegments[theme + 5]->vtable->SetRepeats(MusicSegments[theme + 5], 0);
+        MusicIntroSegments[theme]->vtable->SetParam(MusicIntroSegments[theme], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
+        MusicIntroSegments[theme]->vtable->SetRepeats(MusicIntroSegments[theme], 0);
+        MusicLoopSegments[theme]->vtable->SetParam(MusicLoopSegments[theme], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
+        MusicLoopSegments[theme]->vtable->SetRepeats(MusicLoopSegments[theme], 0);
         for (k = 0; k < 5; k++) {
             if (k != theme) {
-                MusicSegments[10 + theme * 5 + k]->vtable->SetParam(MusicSegments[10 + theme * 5 + k], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
-                MusicSegments[10 + theme * 5 + k]->vtable->SetRepeats(MusicSegments[10 + theme * 5 + k], 0);
+                MusicTransitionSegments[theme][k]->vtable->SetParam(MusicTransitionSegments[theme][k], &GUID_Download, 0xffffffff, 0, 0, DMusicPerformance);
+                MusicTransitionSegments[theme][k]->vtable->SetRepeats(MusicTransitionSegments[theme][k], 0);
             }
         }
     }
@@ -907,7 +911,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
                         CurrentMusicTheme = NextMusicTheme;
                         groove = 0;
                         DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
-                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicSegments[CurrentMusicTheme + 5], 0x2000, 0, NULL);
+                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicLoopSegments[CurrentMusicTheme], 0x2000, 0, NULL);
                     } else {
                         groove = 1;
                         MusicCommand = 5;
@@ -919,7 +923,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
                     CurrentMusicTheme = NextMusicTheme;
                     groove = 0;
                     DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
-                    DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicSegments[CurrentMusicTheme], 0x2000, 0, NULL);
+                    DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicIntroSegments[CurrentMusicTheme], 0x2000, 0, NULL);
                     break;
                 case 1:
                     DMusicPerformance->vtable->Stop(DMusicPerformance, NULL, NULL, 0, 0);
@@ -966,7 +970,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
                 } else if (MusicState == 7) {
                     if (msg->dwField1 == 3 && msg->dwField2 == 1) {
                         CurrentMusicTheme = NextMusicTheme;
-                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicSegments[CurrentMusicTheme + 5], 0x2000, 0, NULL);
+                        DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicLoopSegments[CurrentMusicTheme], 0x2000, 0, NULL);
                         groove = 0;
                         DMusicPerformance->vtable->SetGlobalParam(DMusicPerformance, &GUID_PerfMasterGrooveLevel, &groove, 1);
                         MusicState = 4;
@@ -980,7 +984,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
                     if (msg->dwField1 == 0 && MusicState == 5) {
                         if (beat != 0) {
                             MusicState = 6;
-                            DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicSegments[10 + CurrentMusicTheme * 5 + NextMusicTheme], 0x2000, 0, NULL);
+                            DMusicPerformance->vtable->PlaySegment(DMusicPerformance, MusicTransitionSegments[CurrentMusicTheme][NextMusicTheme], 0x2000, 0, NULL);
                         } else {
                             beat = 1;
                         }

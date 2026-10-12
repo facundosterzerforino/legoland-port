@@ -658,38 +658,25 @@ void AddNewObjectIcon(struct NewObjInfo *param_1) {
 
 // FUNCTION: LEGOLAND 0x00471ca0
 void RemoveNewObject(void *param) {
-    struct Sprite **q;
-    int n;
-    int k;
     int j;
+    int k;
 
-    n = (int)NewObjects.count;
-    if (0 < n) {
-        for (j = 0; j < n; j++) {
-            if (param == NewObjects.objs[j]) {
-                if (NewObjects.sprites[j] != NULL) {
-                    KillSprite(NewObjects.sprites[j]);
-                    NewObjects.sprites[j] = NULL;
-                }
-                k = j + 1;
-                if (k < (int)NewObjects.count) {
-                    q = &NewObjects.sprites[j];
-                    do {
-                        k++;
-                        q[0] = q[1];
-                        ((void **)q)[-0x14] = ((void **)q)[-0x13];
-                        q++;
-                    } while (k < (int)NewObjects.count);
-                }
-                n = (int)NewObjects.count;
-                n--;
-                if (NewObjects.current >= n) {
-                    NewObjects.current = n - 1;
-                }
-                NewObjects.count = n;
-                if ((n == 0) && (DAT_007fdfa0 == 2)) {
-                    DAT_007fdfa0 = n;
-                }
+    for (j = 0; j < (int)NewObjects.count; j++) {
+        if (param == NewObjects.objs[j]) {
+            if (NewObjects.sprites[j] != NULL) {
+                KillSprite(NewObjects.sprites[j]);
+                NewObjects.sprites[j] = NULL;
+            }
+            for (k = j; k + 1 < (int)NewObjects.count; k++) {
+                NewObjects.sprites[k] = NewObjects.sprites[k + 1];
+                NewObjects.objs[k] = NewObjects.objs[k + 1];
+            }
+            NewObjects.count--;
+            if (NewObjects.current >= (int)NewObjects.count) {
+                NewObjects.current = NewObjects.count - 1;
+            }
+            if (NewObjects.count == 0 && DAT_007fdfa0 == 2) {
+                DAT_007fdfa0 = 0;
             }
         }
     }
@@ -718,15 +705,12 @@ void FUN_00471d90(void) {
     int iVar5;
     int iVar6;
     RECT rc;
-    struct PrintCtx ctx;
+    struct PrintCtx ctx = {1};
     char local_14[20];
 
     iVar6 = PopUpInfoX;
     uVar4 = *(unsigned int *)&PopupInfoLineCount & 0xff;
     iVar5 = uVar4 * 0x14;
-    ctx.node = 0;
-    ctx.field_8 = 0;
-    ctx.flags = 1;
     iVar1 = PopUpInfoY + 0x48 + iVar5;
     PrintSprite(CBBGLeftSprite, PopUpInfoX, iVar1, 0, (int *)&ctx);
     iVar6 = iVar6 + 0x7a;
@@ -765,54 +749,48 @@ void FUN_00471d90(void) {
 
 // FUNCTION: LEGOLAND 0x00471f10
 void DrawPopUpInfoBackground(void) {
-    int iVar1;
-    int iVar2;
-    int uVar3;
-    int uVar4;
-    int iVar5;
-    int iVar6;
-    int iVar7;
-    int local_1c;
-    struct PrintCtx ctx;
+    int x;
+    int y;
+    int count;
+    int innerX;
+    int cx;
+    int cy;
+    int row;
+    int col;
+    struct PrintCtx ctx = {1};
 
-    iVar2 = PopUpInfoY;
-    iVar1 = PopUpInfoX;
-    ctx.node = 0;
-    ctx.flags = 1;
-    ctx.field_8 = 0;
-    uVar4 = *(unsigned int *)&PopupInfoLineCount & 0xff;
-    PrintSprite(PuBgMainSprite, PopUpInfoX, PopUpInfoY, 0, (int *)&ctx);
-    iVar6 = iVar1 + 0xbc;
-    iVar7 = iVar6;
-    for (uVar3 = uVar4; uVar3 > 0; uVar3 = uVar3 - 1) {
-        PrintSprite(PuBgCentreTopSprite, iVar7, iVar2, 0, (int *)&ctx);
-        iVar7 = iVar7 + 0x20;
+    count = *(unsigned int *)&PopupInfoLineCount & 0xff;
+    x = PopUpInfoX;
+    y = PopUpInfoY;
+    PrintSprite(PuBgMainSprite, x, y, 0, (int *)&ctx);
+    innerX = x + 0xbc;
+    cx = innerX;
+    for (col = count; col > 0; col--) {
+        PrintSprite(PuBgCentreTopSprite, cx, y, 0, (int *)&ctx);
+        cx += 0x20;
     }
-    PrintSprite(PuBgRightTopSprite, iVar7, iVar2, 0, (int *)&ctx);
-    if (uVar4 != 0) {
-        iVar7 = iVar2 + 99;
-        local_1c = uVar4;
-        do {
-            PrintSprite(PuBgLeftMidSprite, iVar1, iVar7, 0, (int *)&ctx);
-            uVar3 = uVar4;
-            iVar5 = iVar6;
-            do {
-                PrintSprite(PuBgCentreMidSprite, iVar5, iVar7, 0, (int *)&ctx);
-                iVar5 = iVar5 + 0x20;
-                uVar3 = uVar3 - 1;
-            } while (uVar3 != 0);
-            PrintSprite(PuBgRightMidSprite, iVar5, iVar7, 0, (int *)&ctx);
-            iVar7 = iVar7 + 0x14;
-            local_1c = local_1c - 1;
-        } while (local_1c != 0);
+    PrintSprite(PuBgRightTopSprite, cx, y, 0, (int *)&ctx);
+    if (count != 0) {
+        cy = y + 99;
+        for (row = count; row > 0; row--) {
+            PrintSprite(PuBgLeftMidSprite, x, cy, 0, (int *)&ctx);
+            cx = innerX;
+            for (col = count; col > 0; col--) {
+                PrintSprite(PuBgCentreMidSprite, cx, cy, 0, (int *)&ctx);
+                cx += 0x20;
+            }
+            PrintSprite(PuBgRightMidSprite, cx, cy, 0, (int *)&ctx);
+            cy += 0x14;
+        }
     }
-    iVar7 = iVar2 + 99 + uVar4 * 0x14;
-    PrintSprite(PuBgRightBtmSprite, iVar1, iVar7, 0, (int *)&ctx);
-    for (; uVar4 > 0; uVar4 = uVar4 - 1) {
-        PrintSprite(PuBgCentreBtmSprite, iVar6, iVar7, 0, (int *)&ctx);
-        iVar6 = iVar6 + 0x20;
+    cy = y + 99 + count * 0x14;
+    PrintSprite(PuBgRightBtmSprite, x, cy, 0, (int *)&ctx);
+    cx = innerX;
+    for (col = count; col > 0; col--) {
+        PrintSprite(PuBgCentreBtmSprite, cx, cy, 0, (int *)&ctx);
+        cx += 0x20;
     }
-    PrintSprite(PuBgLeftBtmSprite, iVar6, iVar7, 0, (int *)&ctx);
+    PrintSprite(PuBgLeftBtmSprite, cx, cy, 0, (int *)&ctx);
 }
 
 // FUNCTION: LEGOLAND 0x00472090
@@ -829,53 +807,79 @@ static __inline void ShowPopUpIconAt(struct IconNode **icon, int x, int y) {
 // FUNCTION: LEGOLAND 0x004720a0
 void DrawNewObjectPopup(void) {
     struct NewObjInfo *obj;
-    struct PrintCtx ctx = {1, 0, 0};
-    char local_80[128];
+    struct PrintCtx ctx = {1};
+    char text[128];
+    int close_x;
+    int close_y;
+    RECT rc;
 
     PrintSprite(NewPopMockSprite, 0xbe, 0x28, 0, (int *)&ctx);
+
     ShowPopUpIconAt(&PrevPopUpIcon, 0xc1, 0x46);
     ShowPopUpIconAt(&NextPopUpIcon, NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb, 0x46);
-    ShowPopUpIconAt(&ClosePopUpIcon, NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb, NewPopMockSprite->height - ClosePopUpIcon->height + 0x25);
+    close_x = NewPopMockSprite->width - ClosePopUpIcon->width + 0xbb;
+    close_y = (short)NewPopMockSprite->height - ClosePopUpIcon->height + 0x25;
+    ShowPopUpIconAt(&ClosePopUpIcon, close_x, close_y);
+
     PushRenderingStatusAndUnlockVideoSurface();
     if (NewObjects.count == 1) {
         // STRING: LEGOLAND 0x004bad04
-        sprintf(local_80, "You have a new object");
+        sprintf(text, "You have a new object");
     } else {
         // STRING: LEGOLAND 0x004bacec
-        sprintf(local_80, "You have %d new objects", NewObjects.count);
+        sprintf(text, "You have %d new objects", NewObjects.count);
     }
-    FUN_00455e50(local_80, 0xc1, 0x30, NewPopMockSprite->width + 0xbb - 0xc1, 0x14, 2, 5, 0xff0000, 0xffffff);
+    rc.left = 0xc1;
+    rc.top = 0x30;
+    rc.right = NewPopMockSprite->width + 0xbb;
+    rc.bottom = 0x44;
+    FUN_00455e50(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
-    FUN_00455e50(obj->field_78, 0xc1, 0x4b, NewPopMockSprite->width + 0xbb - 0xc1, 0x14, 2, 5, 0xff0000, 0xffffff);
+    rc.left = 0xc1;
+    rc.top = 0x4b;
+    rc.right = NewPopMockSprite->width + 0xbb;
+    rc.bottom = 0x5f;
+    FUN_00455e50(obj->field_78, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
-    FUN_00455e50(obj->field_80, 0x13e, 0x68, 0xfc, 0x77, 2, 0x10, 0xff0000, 0xffffff);
+    rc.left = 0x13e;
+    rc.top = 0x68;
+    rc.right = 0x23a;
+    rc.bottom = 0xdf;
+    FUN_00455e50(obj->field_80, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x10, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
-    sprintf(local_80, "%d", obj->field_26);
-    FUN_00455e50(local_80, 0xf0, 0xd1, 0x43, 0x12, 2, 1, 0xff0000, 0xffffff);
+    sprintf(text, "%d", obj->field_26);
+    rc.left = 0xf0;
+    rc.top = 0xd1;
+    rc.right = 0x133;
+    rc.bottom = 0xe3;
+    FUN_00455e50(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 1, 0xff0000, 0xffffff);
     PopRenderingStatus();
     PrintSprite(NewObjects.sprites[NewObjects.current], 0xc4, 100, 0, 0);
-    if (((unsigned int)(int)ClosePopUpIcon->width <= (unsigned int)(MousePos.x - ClosePopUpIcon->x)) ||
-        ((unsigned int)(int)ClosePopUpIcon->height <= (unsigned int)(MousePos.y - ClosePopUpIcon->y))) {
-        SetIconSprite((struct IconNode *)ClosePopUpIcon, PuClosePopUpSprite);
+
+    /* restore the normal sprite of each button the mouse is not over */
+    if ((unsigned int)(MousePos.x - ClosePopUpIcon->x) >= (unsigned int)ClosePopUpIcon->width ||
+        (unsigned int)(MousePos.y - ClosePopUpIcon->y) >= (unsigned int)ClosePopUpIcon->height) {
+        SetIconSprite(ClosePopUpIcon, PuClosePopUpSprite);
     }
-    if (((unsigned int)(int)NextPopUpIcon->width <= (unsigned int)(MousePos.x - NextPopUpIcon->x)) ||
-        ((unsigned int)(int)NextPopUpIcon->height <= (unsigned int)(MousePos.y - NextPopUpIcon->y))) {
-        SetIconSprite((struct IconNode *)NextPopUpIcon, NextIconSprite);
+    if ((unsigned int)(MousePos.x - NextPopUpIcon->x) >= (unsigned int)NextPopUpIcon->width ||
+        (unsigned int)(MousePos.y - NextPopUpIcon->y) >= (unsigned int)NextPopUpIcon->height) {
+        SetIconSprite(NextPopUpIcon, NextIconSprite);
     }
-    if (((unsigned int)(int)PrevPopUpIcon->width <= (unsigned int)(MousePos.x - PrevPopUpIcon->x)) ||
-        ((unsigned int)(int)PrevPopUpIcon->height <= (unsigned int)(MousePos.y - PrevPopUpIcon->y))) {
-        SetIconSprite((struct IconNode *)PrevPopUpIcon, PrevIconSprite);
+    if ((unsigned int)(MousePos.x - PrevPopUpIcon->x) >= (unsigned int)PrevPopUpIcon->width ||
+        (unsigned int)(MousePos.y - PrevPopUpIcon->y) >= (unsigned int)PrevPopUpIcon->height) {
+        SetIconSprite(PrevPopUpIcon, PrevIconSprite);
     }
+
     if (NewObjects.current == 0) {
-        PrevPopUpIcon->flags = PrevPopUpIcon->flags | 0x400;
+        PrevPopUpIcon->flags |= 0x400;
     } else {
-        PrevPopUpIcon->flags = PrevPopUpIcon->flags & 0xfffffbff;
+        PrevPopUpIcon->flags &= ~0x400;
     }
-    if (NewObjects.current == (int)(NewObjects.count + -1)) {
-        NextPopUpIcon->flags = NextPopUpIcon->flags | 0x400;
-        return;
+    if (NewObjects.current == (int)(NewObjects.count - 1)) {
+        NextPopUpIcon->flags |= 0x400;
+    } else {
+        NextPopUpIcon->flags &= ~0x400;
     }
-    NextPopUpIcon->flags = NextPopUpIcon->flags & 0xfffffbff;
 }
 
 // FUNCTION: LEGOLAND 0x004723f0
@@ -915,33 +919,35 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     struct Bloke *bloke;
     int repairable = 0;
     int can_delete = 0;
-    int add_mechanic = 0;
     int add_gardener = 0;
+    int add_mechanic = 0;
     int show_close = 0;
     int size;
     int x;
     int y;
-    int left;
-    int right;
+    struct Point tl;
+    struct Point br;
     int width;
     int bar_x;
     int bar_y;
-    volatile int mid; /* kept in memory, as in the original frame */
+    int bar_w;
+    int mid;
+    int sprite_y;
     int ty;
-    int bottom;
-    int top;
     int mood;
     int hunger;
     int power;
     int name_lines;
     int info_lines;
-    unsigned int entry_index;
+    int entry_index;
     int icon_x;
     int icon_y;
+    int icon_bottom;
     int last_x;
     int left_bound;
     float frac;
     struct BuildObj *entry;
+    TileId target;
     struct InfoObjData *info;
 
     buf_a[0] = 0;
@@ -1080,8 +1086,6 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     x = PopUpInfoX;
     y = PopUpInfoY;
     if (buf_a) {
-        struct Point tl;
-        struct Point br;
         tl.x = x + 0xc;
         tl.y = y + 6;
         br.x = size * 32 + x + 0xbc;
@@ -1089,8 +1093,6 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         FUN_00455e50(buf_a, tl.x, tl.y, br.x - tl.x, br.y - tl.y, 1, 1, 0xff0000, 0xffffff);
     }
     if (buf_b) {
-        struct Point tl;
-        struct Point br;
         tl.x = x + 0xc;
         tl.y = y + 0x23;
         br.x = size * 32 + x + 0xbc;
@@ -1101,43 +1103,44 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     if (DAT_007fdf9c == 0x306) {
         mood = GetBlokeMood(bloke);
         hunger = GetBlokeHungerLevel(bloke);
-        left = x + 0xc;
-        right = size * 32 + x + 0xb0;
-        width = right - left;
-        top = y + 0x23;
-        bottom = y + size * 20 + 0x63;
-        mid = (top + bottom) / 2;
+        tl.x = x + 0xc;
+        tl.y = y + 0x23;
+        br.x = size * 32 + x + 0xb0;
+        br.y = y + size * 20 + 0x63;
+        width = br.x - tl.x;
+        mid = (br.y + tl.y) / 2;
         ty = mid + 0x22;
-        FUN_00455e50(GetString(0x8e), left, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
-        FUN_00455e50(GetString(0x8f), (right + left) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
+        FUN_00455e50(GetString(0x8e), tl.x, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
+        FUN_00455e50(GetString(0x8f), (br.x + tl.x) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
         if (mood == 3) {
-            mid = mid - 0x20;
-            PrintSprite(ISadSprite, width / 4 + left - 0x20, mid, 0, 0);
+            sprite_y = mid - 0x20;
+            PrintSprite(ISadSprite, width / 4 + tl.x - 0x20, sprite_y, 0, 0);
         } else if (mood == 2) {
-            mid = mid - 0x20;
-            PrintSprite(IHappySprite, width / 4 + left - 0x20, mid, 0, 0);
+            sprite_y = mid - 0x20;
+            PrintSprite(IHappySprite, width / 4 + tl.x - 0x20, sprite_y, 0, 0);
         } else {
-            mid -= 0x20;
-            PrintSprite(INormSprite, width / 4 + left - 0x20, mid, 0, 0);
+            sprite_y = mid - 0x20;
+            PrintSprite(INormSprite, width / 4 + tl.x - 0x20, sprite_y, 0, 0);
         }
         if (hunger == 0) {
-            PrintSprite(IFullSprite, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IFullSprite, br.x - width / 4 - 0x20, sprite_y, 0, 0);
         } else if (hunger == 1) {
-            PrintSprite(IPeckishSprite, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IPeckishSprite, br.x - width / 4 - 0x20, sprite_y, 0, 0);
         } else {
-            PrintSprite(IHungrySprite, right - width / 4 - 0x20, mid, 0, 0);
+            PrintSprite(IHungrySprite, br.x - width / 4 - 0x20, sprite_y, 0, 0);
         }
     }
     if (repairable != 0 || DAT_0066895c != 0) {
         if (repairable != 0) {
             frac = (float)DAT_007fdf84[0x11] / ride->durability;
         } else {
+            target = DAT_007fdec0.data.tile;
             entry_index = 0;
             for (entry = BuildObjArray;; entry++, entry_index++) {
                 if ((int)&entry->coords >= (int)&ButtonRepeatDelay) {
                     return;
                 }
-                if (entry->coords.id == (unsigned short)DAT_007fdec0.data.value) {
+                if (entry->coords.id == target.id) {
                     break;
                 }
             }
@@ -1153,9 +1156,13 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         }
         bar_x = x + 6;
         bar_y = y + size * 20 + 0x6f;
-        width = size * 32 + 0xbc;
-        RenderBlock(bar_x, bar_y, width, 6, 0);
-        RenderBlock(bar_x, bar_y, (int)(width * frac), 6, (frac < 0.25 && repairable != 0) ? GetNearestColour(0xff, 0, 0) : GetNearestColour(0, 0xff, 0));
+        bar_w = size * 32 + 0xbc;
+        RenderBlock(bar_x, bar_y, bar_w, 6, 0);
+        if (frac < 0.25 && repairable != 0) {
+            RenderBlock(bar_x, bar_y, (int)(bar_w * frac), 6, GetNearestColour(0xff, 0, 0));
+        } else {
+            RenderBlock(bar_x, bar_y, (int)(bar_w * frac), 6, GetNearestColour(0, 0xff, 0));
+        }
     }
     icon_y = y + (size * 5 + 0x1e) * 4;
     icon_x = size * 32 + x + 0xc8;
@@ -1197,18 +1204,15 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         }
         last_x = AddMechanicsIcon->x;
     }
+    icon_bottom = icon_y + 0x1b;
     PuCornerMaskIcon->x = last_x;
     PuCornerMaskIcon->y = icon_y;
     PuCornerMaskIcon->flags = PuCornerMaskIcon->flags & 0xfffffbff;
-    if (DAT_007fdfa4 != 0) {
-        left_bound = ClosePopUpIcon->x;
-    } else {
-        left_bound = PuCornerMaskIcon->x;
-    }
+    left_bound = DAT_007fdfa4 != 0 ? ClosePopUpIcon->x : PuCornerMaskIcon->x;
     if (ClosePopUpIcon->x + 0x24 < MousePos.x || MousePos.x < left_bound) {
         SetPopUpIconSprites();
     }
-    if (icon_y + 0x1b < MousePos.y || MousePos.y < icon_y) {
+    if (icon_bottom < MousePos.y || MousePos.y < icon_y) {
         SetPopUpIconSprites();
     }
     if (DAT_007fdfa4 != 0) {
@@ -1464,44 +1468,46 @@ void FUN_004736e0(void) {
 
 // FUNCTION: LEGOLAND 0x004736f0
 void FUN_004736f0(void) {
-    int iVar1;
-    int iVar2;
-    int iVar3;
-    int iVar4;
-    struct PrintCtx ctx;
+    int x;
+    int y;
+    int i;
+    RECT rc;
+    RECT hit;
 
-    iVar1 = DAT_007fe014;
-    iVar3 = DAT_007fe010;
     if (DAT_00668d68 != 0) {
-        ctx.node = 0;
-        ctx.flags = 1;
-        ctx.field_8 = 0;
-        PrintSprite(CBBGLeftSprite, iVar3, iVar1, 0, (int *)&ctx);
-        iVar3 = iVar3 + 0x7a;
-        iVar2 = 0;
-        if (0 < DAT_00668964) {
-            do {
-                PrintSprite(CBBGCentreSprite, iVar3, iVar1, 0, (int *)&ctx);
-                iVar3 = iVar3 + 0x20;
-                iVar2 = iVar2 + 1;
-            } while (iVar2 < DAT_00668964);
+        struct PrintCtx ctx = {1};
+
+        y = DAT_007fe014;
+        x = DAT_007fe010;
+        /* the bar: left end, DAT_00668964 centre pieces, right end */
+        PrintSprite(CBBGLeftSprite, x, y, 0, (int *)&ctx);
+        x += 0x7a;
+        for (i = 0; i < DAT_00668964; i++) {
+            PrintSprite(CBBGCentreSprite, x, y, 0, (int *)&ctx);
+            x += 0x20;
         }
-        PrintSprite(CBBGRightSprite, iVar3, iVar1, 0, (int *)&ctx);
-        iVar3 = iVar3 + 0x4e;
-        PopUpInfoOkIcon->flags = PopUpInfoOkIcon->flags & 0xfffffbff;
-        PopUpInfoOkIcon->x = (short)(iVar3 - 0x4b);
+        PrintSprite(CBBGRightSprite, x, y, 0, (int *)&ctx);
+        x += 0x4e;
+        PopUpInfoOkIcon->flags &= ~0x400;
+        PopUpInfoOkIcon->x = (short)(x - 0x4b);
         PopUpInfoOkIcon->y = (short)DAT_007fe014 + 3;
-        CBCloseIcon->flags = CBCloseIcon->flags & 0xfffffbff;
-        CBCloseIcon->x = (short)(iVar3 - 0x27);
+        CBCloseIcon->flags &= ~0x400;
+        CBCloseIcon->x = (short)(x - 0x27);
         CBCloseIcon->y = (short)DAT_007fe014 + 3;
-        iVar2 = DAT_007fe010 + 0xc;
-        iVar4 = DAT_007fe014 + 6;
-        FUN_00455e50(DAT_00668968, iVar2, iVar4, (iVar2 + DAT_00668964 * 0x14 + 0x7a) - iVar2,
-            (iVar4 + 0x1b) - iVar4, 1, 5, 0xff0000, 0xffffff);
-        if ((CBCloseIcon->x + 0x24 < (int)MousePos.x) || ((int)MousePos.x < PopUpInfoOkIcon->x)) {
+        rc.left = DAT_007fe010 + 0xc;
+        rc.top = DAT_007fe014 + 6;
+        rc.right = rc.left + DAT_00668964 * 0x14 + 0x7a;
+        rc.bottom = rc.top + 0x1b;
+        FUN_00455e50(DAT_00668968, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
+        /* hit box of the bar: outside it, reset the OK/close icons */
+        hit.left = PopUpInfoOkIcon->x;
+        hit.right = CBCloseIcon->x + 0x24;
+        hit.top = y;
+        hit.bottom = y + 0x1b;
+        if (hit.right < (int)MousePos.x || (int)MousePos.x < hit.left) {
             SetPopUpOkCloseIconSprites();
         }
-        if ((iVar1 + 0x1b < (int)MousePos.y) || ((int)MousePos.y < iVar1)) {
+        if (hit.bottom < (int)MousePos.y || (int)MousePos.y < hit.top) {
             SetPopUpOkCloseIconSprites();
         }
     }

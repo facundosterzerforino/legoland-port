@@ -1104,7 +1104,6 @@ void SaloonUpdate(Element *obj) {
     int x;
     int y;
     char dir;
-    struct Point to;
 
     while (node != NULL) {
         next = node->next;
@@ -1116,10 +1115,11 @@ void SaloonUpdate(Element *obj) {
             switch (bloke->param_action) {
             case 0:
                 bloke->flags |= 8;
-                to.x = (x << 8) - 0x80;
-                to.y = y << 8;
-                bloke->dest = to;
-                dir = CalcMoveLine(bloke->pos, to, &bloke->nav);
+                x = x * 0x100 - 0x80;
+                y = y * 0x100;
+                bloke->dest.x = x;
+                bloke->dest.y = y;
+                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
                 bloke->field_73 = dir + 0x10;
                 NewDirForAction(bloke, (unsigned char)(((unsigned char)(dir + 0x10) >> 5) + 3));
@@ -1147,21 +1147,25 @@ void SaloonUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 3:
-                if ((char)(rand() % 2) == 0) {
-                    x = x * 0x100 - 0x380;
-                    y = (y - 2) * 0x100;
-                    bloke->dest.x = x;
-                    bloke->dest.y = y;
-                } else {
+                if ((char)(rand() % 2) != 0) {
                     x = x * 0x100 - 0x380;
                     y = (y + 1) * 0x100;
                     bloke->dest.x = x;
                     bloke->dest.y = y;
+                    dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->low_level_action = 7;
+                    bloke->field_73 = dir + 0x10;
+                    NewDirForAction(bloke, (unsigned char)(((unsigned char)(dir + 0x10) >> 5) + 3));
+                } else {
+                    x = x * 0x100 - 0x380;
+                    y = (y - 2) * 0x100;
+                    bloke->dest.x = x;
+                    bloke->dest.y = y;
+                    dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->low_level_action = 7;
+                    bloke->field_73 = dir + 0x10;
+                    NewDirForAction(bloke, (unsigned char)(((unsigned char)(dir + 0x10) >> 5) + 3));
                 }
-                dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (unsigned char)(((unsigned char)(dir + 0x10) >> 5) + 3));
                 bloke->dir = 8;
                 bloke->param_action++;
                 break;

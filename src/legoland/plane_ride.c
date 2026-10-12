@@ -379,13 +379,6 @@ LEGO_EXPORT int SaveZoomer(void) {
     return 0;
 }
 
-struct ZoomerSampleParams {
-    int field_0;
-    unsigned char pad_4[4];
-    unsigned int field_8;
-    unsigned int field_c;
-};
-
 struct ZoomerTypeC {
     void *field_0;
     unsigned int field_4;
@@ -428,7 +421,6 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
     struct ZoomerCar *car;
     struct ZoomerData *data;
     struct ZoomerTypeC *tc;
-    struct ZoomerSampleParams params;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -445,10 +437,10 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
         } else {
             PlaneRideNodeList = node;
         }
-        params.field_8 = ((unsigned char *)node)[0];
-        params.field_0 = 2;
-        params.field_c = ((unsigned char *)node)[1];
-        PauseSingleSample(PlayInstanceOfSample(*(void **)(DAT_004b79d0 + 8), 1, 1, &params));
+        {
+            struct TileSampleSource params = {2, ((unsigned char *)node)[0], ((unsigned char *)node)[1]};
+            PauseSingleSample(PlayInstanceOfSample(*(void **)(DAT_004b79d0 + 8), 1, 1, &params));
+        }
         prev = node;
         if (!SaveGameRead(&marker, 4)) {
             return 0;
@@ -563,12 +555,15 @@ void PlaneRideUpdate(struct Element *elem) {
     struct RideNode *next;
     struct PlaneRideNode *node;
     struct Bloke *bloke;
-    register TileId *pos;
-    int iv12, iv13;
+    TileId *pos;
+    struct Point sc; /* screen position of the ride */
     int tw, th;
-    int coords[2];
+    int ox, d; /* screen x of the bloke, and its offset from the map position */
+    int x, y;
+    int tx, ty; /* tile the rider walks back to */
+    int coords[3]; /* BNV start position (boarding path) */
     struct Point tmp;
-    int coords2[2];
+    struct Point coords2; /* BNV start position (leaving path) */
 
     while (NULL != rn) {
         next = rn->next;
@@ -580,24 +575,20 @@ void PlaneRideUpdate(struct Element *elem) {
         }
         if (0 == bloke->low_level_action) {
             switch (bloke->param_action) {
-            case 0: {
-                struct Point sc;
-                int ix, iy;
-                short sXs, sYs;
-
+            case 0:
                 node->b14++;
                 node->f18 = 0xb4;
                 bloke->flags |= 8;
                 sc = GetScreenCoordsForObject(pos, ride);
-                ix = bloke->pos.x;
-                iy = bloke->pos.y;
+                x = bloke->pos.x;
+                y = bloke->pos.y;
                 GetTileDimensions(&tw, &th);
-                iv13 = ((ix + iy) * th) >> 9;
-                iv12 = ((ix - iy) * tw) >> 9;
-                sXs = Get_XScroll();
-                sYs = Get_YScroll();
-                coords[0] = ((((unsigned int)lpConfig->view_x - (int)sXs) + iv12) - DAT_0081cae8 / 2 - sc.x) * 2;
-                coords[1] = ((iv13 + ((unsigned int)lpConfig->view_y - (int)sYs)) - DAT_0081caec / 2 - sc.y) * 2;
+                d = (x - y) * tw >> 9;
+                x = (x + y) * th >> 9;
+                ox = lpConfig->view_x - (short)Get_XScroll() + d;
+                x = x + (lpConfig->view_y - (short)Get_YScroll());
+                coords[0] = (ox - DAT_0081cae8 / 2 - sc.x) * 2;
+                coords[1] = (x - DAT_0081caec / 2 - sc.y) * 2;
                 bloke->flags |= 0x80;
                 bloke->person->sprite = DAT_0062fe98;
                 bloke->person->field_30 = 1;
@@ -610,7 +601,6 @@ void PlaneRideUpdate(struct Element *elem) {
                 bloke->param_action++;
                 bloke->field_58 = 0;
                 break;
-            }
             case 1:
                 if (UpdateBlokeFromBNVPath(bloke, bloke->path) == 0) {
                     bloke->field_35 = 1;
@@ -643,15 +633,14 @@ void PlaneRideUpdate(struct Element *elem) {
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
                 UnAdjustBlokePosition(&tmp);
-                coords2[0] = tmp.x;
-                coords2[1] = tmp.y;
+                coords2 = tmp;
                 bloke->flags |= 0x80;
                 bloke->person->sprite = DAT_0062fe98;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617706.75f, -1617948.625f);
                 bloke->field_35 = 2;
                 sprintf(DAT_004b79bc + 6, "%02d", bloke->field_36);
-                bloke->path = NewBNVPath(DAT_0062fe84[2], 2, DAT_004b79bc, -1617706.75f, -1617948.625f, coords2);
+                bloke->path = NewBNVPath(DAT_0062fe84[2], 2, DAT_004b79bc, -1617706.75f, -1617948.625f, &coords2.x);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -671,9 +660,9 @@ void PlaneRideUpdate(struct Element *elem) {
                 }
                 BlokeSetFrame(bloke, bloke->frame);
                 break;
-            case 0xd: {
-                iv12 = ride->field_24 + pos->pos.x;
-                iv13 = pos->pos.y + ride->field_25;
+            case 0xd:
+                tx = ride->field_24 + pos->pos.x;
+                ty = pos->pos.y + ride->field_25;
 
                 node->slots[bloke->field_36 - 1] = 0;
                 bloke->flags &= 0xff7f;
@@ -684,14 +673,13 @@ void PlaneRideUpdate(struct Element *elem) {
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;
-                bloke->dest.x = iv12 * 256 + 128;
-                bloke->dest.y = iv13 * 256 + 128;
+                bloke->dest.x = tx * 256 + 128;
+                bloke->dest.y = ty * 256 + 128;
                 bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
                 bloke->param_action++;
                 break;
-            }
             case 0xe:
                 bloke->flags = bloke->flags & 0xfff7;
                 RemoveBlokeFromRide(ride, rn);

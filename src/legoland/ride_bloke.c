@@ -518,7 +518,7 @@ int *FUN_00401970(int *param_1, int param_2, int param_3) {
 // FUNCTION: LEGOLAND 0x004019c0
 void FUN_004019c0(struct RideMover *m) {
     unsigned char oldDir = m->dir;
-    unsigned char moving = m->moving;
+    volatile unsigned char moving = m->moving;
     int dy, dx, dist, diff, vx, vy;
     unsigned char newDir;
 
@@ -538,7 +538,7 @@ void FUN_004019c0(struct RideMover *m) {
                 diff = (newDir - oldDir) & 15;
                 if (diff & 8)
                     diff |= -16;
-                if (diff < -2 || diff > 2) {
+                if (diff < -2 || (unsigned)diff > 2) {
                     if (diff & 8)
                         oldDir--;
                     else
@@ -794,18 +794,24 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
 
 // FUNCTION: LEGOLAND 0x00402150
 int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
-    struct RideQueueEntry *e;
     struct RideQueueEntry *q;
     struct RideQueueEntry *s;
+    struct RideQueueEntry *e;
     struct PathPair pt;
 
+    unsigned int ptmp99;
+    volatile int ptmp102;
+    volatile int ptmp310;
     e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
-    if (e != NULL) {
-        if (e->field_18 == NULL) {
+    if (e) {
+        if (e->field_18 == (int)NULL) {
             return PickQueueTurn(id, p, dir);
         }
         StepPointByDirection(&e->x, &pt.a, dir);
-        q = FUN_004125a0(pt.a, pt.b);
+        ptmp102 = pt.b;
+        { ptmp99 = ptmp102; }
+        ptmp310 = pt.a;
+        q = FUN_004125a0(ptmp310, ptmp99);
         if (q == NULL) {
             return PickQueueTurn(id, p, dir);
         }
@@ -816,13 +822,15 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
             return 5;
         }
         s = FUN_00412650(id);
-        if ((s->y != q->y || s->x + 4 != q->x) && (q->field_14 & 0xf) != 4 && (q->field_14 & 0xf) != 5) {
-            return PickQueueTurn(id, p, dir);
+        if ((s->y != q->y || s->x + 4 != q->x) && (q->field_14 & 0xf) != 4) {
+            if ((q->field_14 & 0xf) != 5) {
+                return PickQueueTurn(id, p, dir);
+            }
         }
         s = q->field_18;
-        StepPointByDirection(&e->x, &pt.a, dir);
+        { StepPointByDirection(&e->x, &pt.a, dir); }
         StepPointByDirection(&pt.a, &pt.a, (dir - 2) & 7);
-        if (s->x == pt.a && s->y == pt.b) {
+        if (s->x == (unsigned)pt.a && s->y == pt.b) {
             return 1;
         }
         StepPointByDirection(&e->x, &pt.a, dir);
@@ -953,64 +961,49 @@ void SetPersonYawFromDir16(struct Person *person, unsigned int direction) {
     switch (direction) {
     case 0:
         person->field_44 = -0.78539794683456421f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 1:
         person->field_44 = -1.1780968904495239f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 2:
         person->field_44 = 4.7123875617980957f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 3:
         person->field_44 = 4.3196887969970703f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 4:
         person->field_44 = 3.9269897937774658f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 5:
         person->field_44 = 3.5342907905578613f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 6:
         person->field_44 = 3.1415917873382568f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 7:
         person->field_44 = 2.7488927841186523f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 8:
         person->field_44 = 2.3561937808990479f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 9:
         person->field_44 = 1.9634948968887329f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 10:
         person->field_44 = 1.5707958936691284f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 11:
         person->field_44 = 1.1780968904495239f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 12:
         person->field_44 = 0.78539794683456421f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 13:
         person->field_44 = 0.3926989734172821f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 14:
         person->field_44 = 0.0f;
-        SetPersonRotation(person, &person->field_40);
-        return;
+        break;
     case 15:
         person->field_44 = -0.3926989734172821f;
     }
@@ -1019,49 +1012,36 @@ void SetPersonYawFromDir16(struct Person *person, unsigned int direction) {
 
 // FUNCTION: LEGOLAND 0x00402780
 void FUN_00402780(struct NewBloke *b) {
-    int id;
-    int car_x;
-    struct Bloke *bloke;
-    int lo;
-    int c6;
-    register int vel_y;
-    int w2, h2;
-    register struct Point of;
-    struct Point off;
-    struct Point op;
+    struct HitInfo hit;
+    struct Point pos;
+    struct Point old_f;
+    struct Point old_p;
     struct Point wp0;
-    struct HitInfo cfg;
-    union {
-        __int64 i;
-        struct {
-            unsigned int lo;
-            unsigned int hi;
-        } p;
-    } r;
-    int sx, sy, key, v;
+    struct Point off;
+    int w, h;
+    int sx, sy, key;
+    int queued;
     struct Person *person;
-    struct Point *scr;
 
-    cfg.type = 0x306;
-    cfg.field_4 = b->owner;
-    cfg.field_8 = 0;
-    r.i = MapToPlayfieldInl(b->fx >> 8, b->fy >> 8);
-    of = b->f;
+    hit.type = 0x306;
+    hit.field_4 = b->owner;
+    hit.field_8 = 0;
+    /* car position on the playfield (x in the low dword, y in the high dword) */
+    *(__int64 *)&pos = MapToPlayfieldInl(b->fx >> 8, b->fy >> 8);
+    old_f = b->f;
+    old_p = b->p;
     wp0 = b->wp[0];
-    op = b->p;
-    v = 0;
+    queued = 0;
     FindQueueEntryAtTile(b->px, b->py);
-    GetTileDimensions(&w2, &h2);
-    lo = r.p.lo;
-    sx = lo - ((w2 + 1) >> 1) - (ScrollX >> 8);
-    sy = r.p.hi - (ScrollY >> 8);
-    car_x = DSchoolBlueCarData->x[b->f_b8];
-    off.x = car_x >> 1;
+    GetTileDimensions(&w, &h);
+    sx = pos.x - ((w + 1) >> 1) - (ScrollX >> 8);
+    sy = pos.y - (ScrollY >> 8);
+    off.x = DSchoolBlueCarData->x[b->f_b8] >> 1;
     off.y = DSchoolBlueCarData->y[b->f_b8] >> 1;
     AdjustOffsetForViewMode(&off);
     b->sx = lpConfig->view_x + off.x + sx;
     b->sy = lpConfig->view_y + off.y + sy;
-    key = h2 + sy;
+    key = h + sy;
     switch (b->f_c3) {
     case 1:
         SetOverridePalette((unsigned int)DSchoolBluePalette);
@@ -1074,71 +1054,62 @@ void FUN_00402780(struct NewBloke *b) {
         break;
     }
     SetOverrideFrame(b->f_b9 = b->f_b8);
-    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (unsigned int)FUN_00402550, (unsigned int)b, &cfg);
+    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (unsigned int)FUN_00402550, (unsigned int)b, &hit);
     ClearOverridePalette();
     ClearOverrideFrame();
+
+    /* place the driver in the car */
     b->bloke->pos.x = sx;
     b->bloke->pos.y = sy;
     b->bloke->dir = (b->f_b8 + 6) & 15;
-    bloke = b->bloke;
-    person = Find3DPersonFromBloke(bloke);
-    person->sort_id = wp0.x;
-    scr = &person->screen;
-    scr->x = lpConfig->view_x + b->bloke->pos.x + 0x10;
-    scr->y = lpConfig->view_y + b->bloke->pos.y + 8;
-    AdjustBlokePosition(scr);
+    person = Find3DPersonFromBloke(b->bloke);
+    person->sort_id = key;
+    person->screen.x = lpConfig->view_x + b->bloke->pos.x + 0x10;
+    person->screen.y = lpConfig->view_y + b->bloke->pos.y + 8;
+    AdjustBlokePosition(&person->screen);
     SetPersonYawFromDir16(person, b->bloke->dir);
-    for (;;) {
-        if (FUN_00402490((struct NearBloke *)b) != NULL) {
-            c6 = b->f_c6;
-            b->f_c8 = c6 >> 1;
-            b->f_bc++;
-            if (0x200 >= b->f_bc) {
-                return;
-            }
-            if (0 != b->f_c4) {
-                return;
-            }
-            break;
+
+    if (FUN_00402490((struct NearBloke *)b) != NULL) {
+        /* blocked by another car: slow down and wait */
+        b->f_c8 = b->f_c6 >> 1;
+        b->f_bc++;
+        if (b->f_bc <= 0x200 || b->f_c4 != 0) {
+            return;
         }
+    } else {
         b->f_bc = 0;
         if (b->f_c8 < b->f_c6) {
             b->f_c8 += 0x40;
         }
         FUN_004019c0((struct RideMover *)b);
-        b->fx = b->fx + b->velX;
-        vel_y = b->velY;
-        b->fy = b->fy + vel_y;
+        b->fx += b->velX;
+        b->fy += b->velY;
         b->px = (b->fx + 0x10000) >> 16;
         b->py = (b->fy + 0x10000) >> 16;
-        if (FUN_00402430((struct PairArg *)&b->p, (struct PairArg *)&op) != 0) {
-            break;
-        }
-        b->p = op;
-        b->f = of;
-        return;
-    }
-    if ((((wp0.x - b->fx) ^ (wp0.x - of.x)) | ((wp0.y - b->fy) ^ (wp0.y - of.y))) & 0x80000000) {
-    } else if (0 != b->f_bb) {
-        if (wp0.x != b->fx || wp0.y != b->fy) {
+        if (FUN_00402430((struct PairArg *)&b->p, (struct PairArg *)&old_p) == 0) {
+            b->p = old_p;
+            b->f = old_f;
             return;
         }
     }
-    if (!b->f_bb) {
-        v = 1;
+
+    /* not yet crossed the waypoint (sign of both deltas unchanged) */
+    if (((((wp0.x - b->fx) ^ (wp0.x - old_f.x)) | ((wp0.y - b->fy) ^ (wp0.y - old_f.y))) & 0x80000000) == 0) {
+        if (b->f_bb != 0 && (wp0.x != b->fx || wp0.y != b->fy)) {
+            return;
+        }
+    }
+    if (b->f_bb == 0) {
+        queued = 1;
         if (b->f_c4 == 0) {
             b->f_c2 = 0;
             if (b->f_c0 != 0) {
-                id = b->id;
-                b->f_c4 = PickQueueTurn(id, &b->tp, b->f_ba);
-                if (b->f_c4 == 0) {
-                    b->f_c8 = 0;
-                }
+                b->f_c4 = PickQueueTurn(b->id, &b->tp, b->f_ba);
             } else {
                 b->f_c4 = GetQueueTurn(b->id, &b->tp, b->f_ba);
-                if (0 == b->f_c4) {
-                    b->f_c8 = 0;
-                }
+            }
+            if (b->f_c4 == 0) {
+                b->f_c8 = 0;
             }
         }
     }
@@ -1171,7 +1142,7 @@ void FUN_00402780(struct NewBloke *b) {
         b->f_c4 = 0;
         break;
     }
-    if (v == 0) {
+    if (queued == 0) {
         FUN_00401cd0((struct TimerStruct *)b);
     }
 }

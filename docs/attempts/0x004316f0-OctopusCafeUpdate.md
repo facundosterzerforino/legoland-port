@@ -11,6 +11,7 @@
 | Date | Who | Change | Result |
 |---|---|---|---|
 | 2026-10-08 | permuter + Opus 5.5 | permuter 61.2% only via `unsigned int f36` (+0.2%) - not kept | rejected |
+| 2026-10-09 | Opus 5.5 | permuter 12 min (about 180-270 variants) | no gain |
 
 ## Ideas not tried yet
 

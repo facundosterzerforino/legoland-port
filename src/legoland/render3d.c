@@ -454,79 +454,75 @@ struct CellEntry {
 };
 
 // FUNCTION: LEGOLAND 0x00442040
-void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_3, float *param_4, int param_5) {
+void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_3, struct TexFace *faces, int count) {
     struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->entries + param_2 * 6);
     struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->entries + param_3 * 6);
     int idx1 = entry1->field_0 + param_1->field_4;
-    int iVar22 = entry2->field_0 + param_1->field_4;
-    unsigned char bVar3 = entry1->field_4;
+    int idx2 = entry2->field_0 + param_1->field_4;
     int lo_x = entry1->x;
-    int hi_x = bVar3 + entry1->x + 1;
+    int hi_x = entry1->field_4 + entry1->x + 1;
     int lo_y = entry1->y;
     int hi_y = entry1->field_5 + entry1->y + 1;
-    float *p;
-    int local_18;
+    struct TexFace *face;
+    int i;
 
-    if (param_5 > 0) {
-        local_18 = param_5;
-        p = param_4 + 3;
+    if (count > 0) {
+        i = count;
+        face = faces;
         do {
-            if ((*(unsigned int *)(p - 3) & 0x2000) == 0 && *(int *)(p - 1) == idx1) {
-                float v0 = p[0];
-                float v1 = p[1];
-                float v2 = p[2];
-                float v3 = p[3];
-                float v4 = p[4];
-                float v5 = p[5];
-                float s0, s1;
+            if ((face->flags & 0x2000) == 0 && face->cell == idx1) {
+                float u0 = face->uv[0];
+                float v0 = face->uv[1];
+                float u1 = face->uv[2];
+                float v1 = face->uv[3];
+                float u2 = face->uv[4];
+                float v2 = face->uv[5];
+                int w, h;
+                float sv2;
+                if (u0 < FLOAT_004ab390) u0 = 0.0f;
+                if (u0 > 1.0) u0 = 1.0f;
                 if (v0 < FLOAT_004ab390) v0 = 0.0f;
-                if (1.0 < v0) v0 = 1.0f;
+                if (v0 > 1.0) v0 = 1.0f;
+                if (u1 < FLOAT_004ab390) u1 = 0.0f;
+                if (u1 > 1.0) u1 = 1.0f;
                 if (v1 < FLOAT_004ab390) v1 = 0.0f;
-                if (1.0 < v1) v1 = 1.0f;
-                if (v2 < FLOAT_004ab390) v2 = 0.0f;
-                if (1.0 < v2) v2 = 1.0f;
-                if (v3 < FLOAT_004ab390) v3 = 0.0f;
-                if (1.0 < v3) v3 = 1.0f;
-                if (v4 < FLOAT_004ab390) v4 = 0.0f;
-                if (1.0 < v4) v4 = 1.0f;
-                if (v5 < FLOAT_004ab390) v5 = FLOAT_004ab390;
-                if (1.0 < v5) v5 = 1.0f;
-                s0 = (float)DAT_0081c0c0[idx1 * 2];
-                v0 = s0 * v0;
-                v2 = s0 * v2;
-                v4 = s0 * v4;
-                s1 = (float)DAT_0081c0c0[idx1 * 2 + 1];
-                v1 = s1 * v1;
-                v3 = s1 * v3;
-                v5 = s1 * v5;
-                if ((float)lo_x <= v0 && v0 <= (float)hi_x &&
-                    (float)lo_x <= v2 && v2 <= (float)hi_x &&
-                    (float)lo_x <= v4 && v4 <= (float)hi_x &&
-                    (float)lo_y <= v1 && v1 <= (float)hi_y &&
-                    (float)lo_y <= v3 && v3 <= (float)hi_y &&
-                    (float)lo_y <= v5 && v5 <= (float)hi_y) {
-                    float e1_2 = (float)entry1->x;
-                    float e1_4 = (float)entry1->field_4;
-                    float e2_4 = (float)entry2->field_4;
-                    float e2_2 = (float)entry2->x;
-                    float t0 = (float)DAT_0081c0c0[iVar22 * 2];
-                    float e1_3 = (float)entry1->y;
-                    float e1_5 = (float)entry1->field_5;
-                    float e2_5 = (float)entry2->field_5;
-                    float e2_3 = (float)entry2->y;
-                    float t1 = (float)DAT_0081c0c0[iVar22 * 2 + 1];
-                    *(int *)(p - 1) = entry2->field_0 + param_1->field_4;
-                    p[1] = (((v1 - e1_3) / e1_5) * e2_5 + e2_3) / t1;
-                    p[2] = (((v2 - e1_2) / e1_4) * e2_4 + e2_2) / t0;
-                    p[3] = (((v3 - e1_3) / e1_5) * e2_5 + e2_3) / t1;
-                    p[4] = (((v4 - e1_2) / e1_4) * e2_4 + e2_2) / t0;
-                    p[0] = (((v0 - e1_2) / e1_4) * e2_4 + e2_2) / t0;
-                    p[5] = (((v5 - e1_3) / e1_5) * e2_5 + e2_3) / t1;
+                if (v1 > 1.0) v1 = 1.0f;
+                if (u2 < FLOAT_004ab390) u2 = 0.0f;
+                if (u2 > 1.0) u2 = 1.0f;
+                if (v2 < FLOAT_004ab390) v2 = FLOAT_004ab390;
+                if (v2 > 1.0) v2 = 1.0f;
+                w = DAT_0081c0c0[idx1 * 2];
+                h = DAT_0081c0c0[idx1 * 2 + 1];
+                u0 = w * u0;
+                u1 = w * u1;
+                u2 = w * u2;
+                v0 = h * v0;
+                v1 = h * v1;
+                sv2 = h * v2;
+                if (u0 >= lo_x && u0 <= hi_x && u1 >= lo_x && u1 <= hi_x && u2 >= lo_x && u2 <= hi_x &&
+                    v0 >= lo_y && v0 <= hi_y && v1 >= lo_y && v1 <= hi_y && sv2 >= lo_y && sv2 <= hi_y) {
+                    /* texture size of the destination cell */
+                    w = DAT_0081c0c0[idx2 * 2];
+                    h = DAT_0081c0c0[idx2 * 2 + 1];
+                    /* map from the source cell's rectangle to the destination cell's, normalized */
+                    u0 = ((u0 - entry1->x) / entry1->field_4 * entry2->field_4 + entry2->x) / w;
+                    v0 = ((v0 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
+                    u1 = ((u1 - entry1->x) / entry1->field_4 * entry2->field_4 + entry2->x) / w;
+                    v1 = ((v1 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
+                    u2 = ((u2 - entry1->x) / entry1->field_4 * entry2->field_4 + entry2->x) / w;
+                    sv2 = ((sv2 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
+                    face->cell = entry2->field_0 + param_1->field_4;
+                    face->uv[0] = u0;
+                    face->uv[1] = v0;
+                    face->uv[2] = u1;
+                    face->uv[3] = v1;
+                    face->uv[4] = u2;
+                    face->uv[5] = sv2;
                 }
             }
-            p = p + 9;
-            local_18 = local_18 - 1;
-        } while (local_18 != 0);
+            face++;
+            i--;
+        } while (i != 0);
     }
 }
 
@@ -668,8 +664,8 @@ void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsig
     if (mem != 0) {
         memcpy(mem, (void *)src, size);
         if ((int)person->character < 2) {
-            RemapTexCoordsToCell(context, valC, arrA[idxI], (float *)mem, count);
-            RemapTexCoordsToCell(context, valE, arrD[idxJ], (float *)mem, count);
+            RemapTexCoordsToCell(context, valC, arrA[idxI], (struct TexFace *)mem, count);
+            RemapTexCoordsToCell(context, valE, arrD[idxJ], (struct TexFace *)mem, count);
         }
         FUN_004424e0(&z0, &z1, &z3, &z2, (int)mem, count);
     }
@@ -766,9 +762,14 @@ unsigned char *Get3DDataListString(char *param_1, int param_2, volatile int para
     return GetNthStringInList((unsigned char *)names, param_3);
 }
 
+// GLOBAL: LEGOLAND 0x004b7d00
+const char ModelLineFormat[] = "%s %i %i %i %i %i";
+
 // FUNCTION: LEGOLAND 0x00442980
 void FUN_00442980(const char *param_1, const char *param_2, const char *param_3, int param_4, unsigned int param_5) {
     int idx = 0;
+    /* As in the original (0x442a13), count1 and count2 are not set when Load3DDataFile fails, and count2 is not set
+     * when count1 is 0: the game reads whatever is in their stack slots there. */
     unsigned int count1;
     int count2;
     char *list_mid;
@@ -795,10 +796,11 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
     if (NULL != data) {
         name = data;
         p = data + strlen(data) + 1;
-        list1 = p + 4;
         count1 = *(int *)p;
+        p += 4;
+        list1 = p;
         if (0 != count1) {
-            q = list1;
+            q = p;
             do {
                 q = q + strlen(q) + 1;
             } while (strlen(q) != 0);
@@ -808,10 +810,8 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
             count2 = *(int *)q;
             list2 = q + 4;
         }
-    } else {
-        count1 = 0;
     }
-    sprintf(path, ".\\3ddata\\new\\%s\\%s", param_3, param_2);
+    sprintf(path, Path3DFormat, param_3, param_2);
     if (param_4 == 0) {
         DAT_0063810c = count1;
         DAT_00655a38 = (int *)malloc(count1 * 4);
@@ -837,19 +837,18 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
         RES_ReadLine(file, line, 512);
         if (RES_ReadLine(file, line, 512) != NULL) {
             do {
+                /* lowercase the model name up to the first '.' */
                 dst = path;
                 p = line;
                 do {
-                    c = (char)tolower(*p);
-                    p++;
+                    c = (char)tolower(*p++);
                     if (c == '.') c = 0;
-                    *dst = c;
-                    dst++;
+                    *dst++ = c;
                 } while (c != 0);
-                sscanf(p, "%s %i %i %i %i %i", word, &v5, &v4, &v3, &v2, &v1);
-                if (strcmp(name, path) == 0) {
+                sscanf(p, ModelLineFormat, word, &v5, &v4, &v3, &v2, &v1);
+                if (_strcmpi(name, path) == 0) {
                     *out_a = idx;
-                } else if (strcmp(list_mid, path) == 0) {
+                } else if (_strcmpi(list_mid, path) == 0) {
                     *out_b = idx;
                 }
                 if (count1 != 0) {
@@ -889,29 +888,27 @@ unsigned int FUN_00442c70(void) {
 LEGO_EXPORT struct Point GetScreenCoordsForObject(TileId *tile, struct Ride *ride) {
     int bounds[4];
     struct Point ref;
-    unsigned int iVar1;
-    int iVar2;
-    register struct Point r;
+    int dx;
+    int dy;
+    struct Point r;
 
-    int bounds0;
     ref.x = tile->pos.x;
     ref.y = tile->pos.y;
     GetTileBounds(&ref, bounds);
-    iVar2 = ride->field_14;
-    iVar1 = ride->field_18;
-    if (0 > iVar2) {
-        iVar2 = -(-iVar2 >> 1);
+    dx = ride->field_14;
+    dy = ride->field_18;
+    if (dx < 0) {
+        dx = -(-dx >> 1);
     } else {
-        iVar2 = iVar2 >> 1;
+        dx = dx >> 1;
     }
-    if ((int)iVar1 < 0) {
-        bounds0 = bounds[0];
-        r.x = iVar2 + bounds0;
-        r.y = bounds[1] - (-iVar1 >> 1);
-        return r;
+    if (dy < 0) {
+        dy = -(-dy >> 1);
+    } else {
+        dy = dy >> 1;
     }
-    r.x = bounds[0] + iVar2;
-    r.y = bounds[1] + (iVar1 >> 1);
+    r.x = bounds[0] + dx;
+    r.y = bounds[1] + dy;
     return r;
 }
 
@@ -1251,19 +1248,20 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
 
 // FUNCTION: LEGOLAND 0x004431f0
 LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1) {
-    unsigned int idx = param_1->field_4->field_8c;
-    unsigned int r = BlokeColours[idx * 3];
-    unsigned int b = BlokeColours[idx * 3 + 2];
+    volatile unsigned int idx = param_1->field_4->field_8c;
     unsigned int g = BlokeColours[idx * 3 + 1];
+    unsigned int b = BlokeColours[idx * 3 + 2];
+    unsigned int r = BlokeColours[idx * 3];
     return (((r << 8) | g) << 8) | b;
 }
 
 // FUNCTION: LEGOLAND 0x00443220
 LEGO_EXPORT unsigned int GetArmColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_90;
-    unsigned int r = BlokeColours[idx * 3];
-    unsigned int b = BlokeColours[idx * 3 + 2];
     unsigned int g = BlokeColours[idx * 3 + 1];
+    unsigned int b = BlokeColours[idx * 3 + 2];
+    volatile int r;
+    r = BlokeColours[3 * idx];
     return (((r << 8) | g) << 8) | b;
 }
 

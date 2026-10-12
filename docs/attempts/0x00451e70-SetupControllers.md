@@ -14,6 +14,7 @@
 | 2026-10-08 | Haiku 5.5 (agent a3) | `struct CtrlBuffer *buf` local for the malloc result, with `CONTROLLERBUFFER = buf` | 80.56% (no change) |
 | 2026-10-08 | Haiku 5.5 (agent a3) | `MouseTileY = DAT_00813a54;` instead of `= 4` | 80.56% (no change) |
 | 2026-10-08 | permuter + Opus 5.5 | DAT_00813a4c stored right after DAT_00813a5c; constant-first / cast compares on ControllersInitialized and CONTROLLERBUFFER | 80.56 -> 91.89 |
+| 2026-10-09 | Opus 5.5 | assignments in the original store order (a5c, ac8, GamePad, a4c, ...) | 83.78 (worse; the original reloads CONTROLLERBUFFER right after the "2" stores, ours schedules the 4 constant first) |
 
 ## Ideas not tried yet
 

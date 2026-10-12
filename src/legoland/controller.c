@@ -82,14 +82,15 @@ int FUN_00451f70(void) {
 
 // FUNCTION: LEGOLAND 0x00452030
 void FUN_00452030(void) {
-    int bValidate;
-    int local_14;
-    int local_10;
-    int local_c;
-    int iVar5;
-    struct ObjClass *cls;
+    int validate;
+    int min_x;
+    int min_y;
+    int max_x;
+    int max_y;
+    struct Ride *cls;
 
-    bValidate = 0;
+    validate = 0;
+    /* constrain the drag to its dominant axis */
     if ((GamePad & 0x800) != 0) {
         if (abs(DAT_00813a74 - DAT_00813a7c) > abs(DAT_00813a78 - DAT_00813a80)) {
             DAT_00813a80 = DAT_00813a78;
@@ -98,94 +99,81 @@ void FUN_00452030(void) {
         }
     }
     if (EditMode.unk0 == 2) {
-        local_14 = DAT_00813a7c;
-        if ((int)DAT_00813a74 < (int)DAT_00813a7c) {
-            local_14 = DAT_00813a74;
+        min_x = DAT_00813a74 < DAT_00813a7c ? DAT_00813a74 : DAT_00813a7c;
+        min_y = DAT_00813a78 < DAT_00813a80 ? DAT_00813a78 : DAT_00813a80;
+        max_x = DAT_00813a74 > DAT_00813a7c ? DAT_00813a74 : DAT_00813a7c;
+        max_y = DAT_00813a80;
+        if (DAT_00813a78 > DAT_00813a80) {
+            max_y = DAT_00813a78;
         }
-        local_10 = DAT_00813a80;
-        if ((int)DAT_00813a78 < (int)DAT_00813a80) {
-            local_10 = DAT_00813a78;
-        }
-        DAT_00813a8c = DAT_00813a74;
-        if ((int)DAT_00813a74 <= (int)DAT_00813a7c) {
-            DAT_00813a8c = DAT_00813a7c;
-        }
-        DAT_00813a90 = DAT_00813a80;
-        if ((int)DAT_00813a80 < (int)DAT_00813a78) {
-            DAT_00813a90 = DAT_00813a78;
-        }
-        DAT_00813a84 = local_14;
-        DAT_00813a88 = local_10;
-        if (DAT_0080ff6c == NULL) {
+        /* both arms end in the same stores; the compiler merges them */
+        if (DAT_0080ff6c != NULL) {
+            cls = DAT_0080ff6c;
+            FootprintWidth = cls->footprint.x1 - cls->footprint.x0 + 1;
+            FootprintHeight = cls->footprint.y1 - cls->footprint.y0 + 1;
+            DAT_00813a90 = max_y;
+            DAT_00813a8c = max_x;
+            DAT_00813a88 = min_y;
+            DAT_00813a84 = min_x;
+        } else {
             FootprintWidth = 1;
             FootprintHeight = 1;
-        } else {
-            cls = (struct ObjClass *)DAT_0080ff6c;
-            FootprintWidth = (cls->footprint.v[2] - cls->footprint.v[0]) + 1;
-            FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
+            DAT_00813a90 = max_y;
+            DAT_00813a8c = max_x;
+            DAT_00813a88 = min_y;
+            DAT_00813a84 = min_x;
         }
     } else {
-        local_14 = DAT_00813a74;
-        if ((int)DAT_00813a7c <= (int)DAT_00813a74) {
-            local_14 = DAT_00813a7c;
-        }
-        local_10 = DAT_00813a78;
-        if ((int)DAT_00813a80 <= (int)DAT_00813a78) {
-            local_10 = DAT_00813a80;
-        }
-        local_c = DAT_00813a7c;
-        if ((int)DAT_00813a7c < (int)DAT_00813a74) {
-            local_c = DAT_00813a74;
-        }
-        iVar5 = DAT_00813a78;
-        if ((int)DAT_00813a78 <= (int)DAT_00813a80) {
-            iVar5 = DAT_00813a80;
-        }
-        cls = (struct ObjClass *)EditMode.unk8;
-        FootprintWidth = (cls->footprint.v[2] - cls->footprint.v[0]) + 1;
-        FootprintHeight = (cls->footprint.v[3] - cls->footprint.v[1]) + 1;
-        if (memcmp(&DAT_00813a74, &DAT_00813a7c, 8) == 0) {
-            bValidate = 1;
-            local_c = ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth + -1 + local_14;
-            iVar5 = ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight + -1 + local_10;
+        min_x = DAT_00813a74 < DAT_00813a7c ? DAT_00813a74 : DAT_00813a7c;
+        min_y = DAT_00813a78 < DAT_00813a80 ? DAT_00813a78 : DAT_00813a80;
+        max_x = DAT_00813a74 > DAT_00813a7c ? DAT_00813a74 : DAT_00813a7c;
+        max_y = DAT_00813a78 > DAT_00813a80 ? DAT_00813a78 : DAT_00813a80;
+        cls = EditMode.unk8;
+        FootprintWidth = cls->footprint.x1 - cls->footprint.x0 + 1;
+        FootprintHeight = cls->footprint.y1 - cls->footprint.y0 + 1;
+        if (memcmp(&DAT_00813a74, &DAT_00813a7c, 8) != 0) {
+            /* snap the drag rectangle to whole footprints, anchored at the drag start */
+            if (FootprintWidth > 1 && min_x == DAT_00813a7c && max_x == DAT_00813a74) {
+                min_x = max_x - (FootprintWidth - min_x + max_x) / FootprintWidth * FootprintWidth;
+                max_x = FootprintWidth + DAT_00813a74 - 1;
+            } else {
+                max_x = (FootprintWidth - min_x + max_x) / FootprintWidth * FootprintWidth + min_x - 1;
+            }
+            if (FootprintHeight > 1 && min_y == DAT_00813a80 && max_y == DAT_00813a78) {
+                min_y = max_y - (FootprintHeight - min_y + max_y) / FootprintHeight * FootprintHeight;
+                max_y = DAT_00813a78 + FootprintHeight - 1;
+            } else {
+                max_y = (FootprintHeight - min_y + max_y) / FootprintHeight * FootprintHeight + min_y - 1;
+            }
+            if (abs(min_x - max_x) <= FootprintWidth && abs(min_y - max_y) <= FootprintHeight) {
+                validate = 1;
+            }
         } else {
-            if ((int)FootprintWidth < 2 || local_14 != DAT_00813a7c || local_c != DAT_00813a74) {
-                local_c = ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth + -1 + local_14;
-            } else {
-                local_14 = local_c - ((FootprintWidth - local_14) + local_c) / FootprintWidth * FootprintWidth;
-                local_c = FootprintWidth - 1 + DAT_00813a74;
-            }
-            if ((int)FootprintHeight < 2 || local_10 != DAT_00813a80 || iVar5 != DAT_00813a78) {
-                iVar5 = ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight + -1 + local_10;
-            } else {
-                iVar5 = DAT_00813a78 + -1 + FootprintHeight;
-                local_10 = iVar5 - ((FootprintHeight - local_10) + iVar5) / FootprintHeight * FootprintHeight;
-            }
-            if (abs(local_14 - local_c) <= (int)FootprintWidth && abs(local_10 - iVar5) <= (int)FootprintHeight) {
-                bValidate = 1;
-            }
+            /* single click: one footprint */
+            validate = 1;
+            max_x = (FootprintWidth - min_x + max_x) / FootprintWidth * FootprintWidth + min_x - 1;
+            max_y = (FootprintHeight - min_y + max_y) / FootprintHeight * FootprintHeight + min_y - 1;
         }
         if (EditMode.unk0 == 1 && EditMode.unk8 != NULL) {
-            cls = (struct ObjClass *)EditMode.unk8;
-            DAT_00813a84 = cls->footprint.v[0] + local_14;
-            DAT_00813a88 = cls->footprint.v[1] + local_10;
-            DAT_00813a8c = cls->footprint.v[0] + local_c;
-            DAT_00813a90 = cls->footprint.v[1] + iVar5;
+            DAT_00813a84 = EditMode.unk8->footprint.x0 + min_x;
+            DAT_00813a88 = EditMode.unk8->footprint.y0 + min_y;
+            DAT_00813a8c = EditMode.unk8->footprint.x0 + max_x;
+            DAT_00813a90 = EditMode.unk8->footprint.y0 + max_y;
         }
     }
-    EditCursor.field_1414[2] = DAT_00813a8c - local_14;
-    EditCursor.field_1414[3] = DAT_00813a90 - local_10;
-    EditCursor.field_1414[0] = DAT_00813a84 - local_14;
-    EditCursor.field_1414[1] = DAT_00813a88 - local_10;
+    EditCursor.field_1414[0] = DAT_00813a84 - min_x;
+    EditCursor.field_1414[1] = DAT_00813a88 - min_y;
+    EditCursor.field_1414[2] = DAT_00813a8c - min_x;
+    EditCursor.field_1414[3] = DAT_00813a90 - min_y;
     EditCursor.field_1414[4] = 0;
+    EditCursor.tile_x = min_x;
+    EditCursor.tile_y = min_y;
     EditCursor.field_1830 = 0;
-    EditCursor.tile_x = local_14;
-    EditCursor.tile_y = local_10;
-    if (bValidate == 0) {
+    if (validate) {
+        ValidateCursor(&EditCursor, (unsigned int)EditMode.unk8);
+    } else {
         ResetCursorBuildable(&EditCursor);
-        return;
     }
-    ValidateCursor(&EditCursor, (unsigned int)EditMode.unk8);
 }
 
 // FUNCTION: LEGOLAND 0x00452390

@@ -180,10 +180,8 @@ struct BlokeSave {
     /* 0x110 */ unsigned int field_8c_p;
     /* 0x114 */ unsigned int field_90_p;
     /* 0x118 */ unsigned int random;
-    /* 0x11c */ unsigned short prev_param;
-    /* 0x11e */ unsigned char pad_11e[2];
-    /* 0x120 */ unsigned char prev_action;
-    /* 0x121 */ unsigned char pad_121[3];
+    /* 0x11c */ unsigned int prev_param; /* Bloke.prev_param, zero-extended (as in WorkerSave) */
+    /* 0x120 */ unsigned int prev_action; /* Bloke.prev_action, zero-extended */
 };
 
 /* A per-state low-level AI handler (indexed by Bloke.field_e). */

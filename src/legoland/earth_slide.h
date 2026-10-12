@@ -64,4 +64,4 @@ void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned 
 void EarthSlideAddObject(unsigned int param_1, unsigned char *param_2);
 int EarthSlideRide_Save(void);
 int EarthSlideRide_Load(void);
-void EarthSlideRideUpdate(struct EarthRideObj *param_1);
+void EarthSlideRideUpdate(struct Element *obj);

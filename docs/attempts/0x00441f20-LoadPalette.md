@@ -15,6 +15,7 @@
 | 2026-10-08 | Haiku agent | `(unsigned char)path & 0xf8` in the 565 branch | 76.33% (branch layout flips, worse) |
 | 2026-10-08 | Haiku agent | Separate `unsigned char r` read buffer for the red channel, both branches | 74.40% (stack layout changes, worse) |
 | 2026-10-08 | Haiku agent | `(unsigned short)` cast on the 565 store expression | 81.00% (no change) |
+| 2026-10-09 | Opus 5.5 | per-channel `(unsigned short)` casts in both branches (LoadColourTable style); 565 red mask as `~7`, `-8`, `0xfff8`, `~7u`, via an `unsigned short`/`int` red local | 76.85 (our 565 branch now equals the original 555 branch exactly; MSVC always narrows the red mask to a byte `and 0xf8`, the original keeps `movzx dx; and edx,-8`) |
 
 ## Ideas not tried yet
 

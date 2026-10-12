@@ -1,6 +1,6 @@
 # ObjectIsBuilt (0x0045ed30, `src/legoland/map_object.c`)
 
-**Best: 93.42%** (start value, no gain found). Kind: C.
+**Best: 100% (matched 2026-10-09)**. Kind: C.
 
 ## What still differs
 
@@ -15,6 +15,7 @@
 | 2026-10-07 | Haiku 5.5 agent | `source` declared before `pos` | 93.42% (same) |
 | 2026-10-07 | Haiku 5.5 agent | loop variables (`cfg`, `next`, `rect`, `x`, `y`, `tx`, `ty`, `tile`) moved into a nested block | 93.42% (same) |
 | 2026-10-07 | Haiku 5.5 agent | `out` declared before `pos` | 93.42% (same) |
+| 2026-10-09 | Opus 5.5 | `source` in its own block around the UnSource call; the saved cursor tile is a separate `struct Point saved_tile` (it used to reuse `source`) | **100** |
 
 ## Ideas not tried yet
 

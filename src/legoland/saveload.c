@@ -31,13 +31,6 @@
 
 /* Abort a load: close the file and report failure. */
 #pragma auto_inline(off)
-static int LoadAbort(void) {
-    _close(SaveFileHandle);
-    LoadInProgress = 0;
-    return 0;
-}
-#pragma auto_inline(on)
-#define LOAD_FAIL() return LoadAbort()
 
 /* A node of OverlayList (the overlays saved at the end of a save game). */
 struct OverlayNode {
@@ -194,8 +187,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                     goto fail;
                 }
                 if (SaveGameWrite(elem->name, len) == 0) {
-                    // STRING: LEGOLAND 0x004bc9e8
                     {
+                        // STRING: LEGOLAND 0x004bc9e8
                         LogPrintf("Element name write failed %s", elem->name);
                         goto fail;
                     }
@@ -203,8 +196,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 SavedElementTable[k++] = elem;
                 flags = elem->flags & 0x3000e;
                 if (SaveGameWrite(&flags, 4) == 0) {
-                    // STRING: LEGOLAND 0x004bc9c4
                     {
+                        // STRING: LEGOLAND 0x004bc9c4
                         LogPrintf("Flags of interest write failed %s", elem->name);
                         goto fail;
                     }
@@ -222,15 +215,15 @@ LEGO_EXPORT int SaveGame(char *filename) {
             LLIDB_FindElementFromDataPtr(tab[i], (unsigned int *)&elem, 0);
             len = strlen(elem->name);
             if (SaveGameWrite(&len, 4) == 0) {
-                // STRING: LEGOLAND 0x004bc980
                 {
+                    // STRING: LEGOLAND 0x004bc980
                     LogPrintf("TSF element length write failed %s, %d", elem->name, len);
                     goto fail;
                 }
             }
             if (SaveGameWrite(elem->name, len) == 0) {
-                // STRING: LEGOLAND 0x004bc95c
                 {
+                    // STRING: LEGOLAND 0x004bc95c
                     LogPrintf("TSF Element name writer failed %s", elem->name);
                     goto fail;
                 }
@@ -261,8 +254,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 DrawWatchSprite();
                 if ((tile.flags & 0x8a8) != 0) {
                     if (FindeIneList((union SavedElement *)&tile) == 0) {
-                        // STRING: LEGOLAND 0x004bc8d8
                         {
+                            // STRING: LEGOLAND 0x004bc8d8
                             LogPrintf("Failed to locate Object instance at (%d,%d)", x, y);
                             goto fail;
                         }
@@ -287,8 +280,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                     tile.field_a = 0;
                 }
                 if (SaveGameWrite(&tile, 0x14) == 0) {
-                    // STRING: LEGOLAND 0x004bc8ac
                     {
+                        // STRING: LEGOLAND 0x004bc8ac
                         LogPrintf("Failed to write mapinfo struct at (%d,%d)", x, y);
                         goto fail;
                     }
@@ -375,8 +368,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
             DrawWatchSprite();
             num = GetBlokeNum(bloke);
             if (SaveGameWrite(&num, 4) == 0) {
-                // STRING: LEGOLAND 0x004bc764
                 {
+                    // STRING: LEGOLAND 0x004bc764
                     LogPrintf("Bloke Num (d) Save Failed", num);
                     goto fail;
                 }
@@ -453,16 +446,16 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.prev_action = bloke->prev_action;
             BlokeSaveBuffer.field_30 = bloke->person->field_30;
             if (SaveGameWrite(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
-                // STRING: LEGOLAND 0x004bc74c
                 {
+                    // STRING: LEGOLAND 0x004bc74c
                     LogPrintf("Bloke data failed (%d)", num);
                     goto fail;
                 }
             }
             if (BlokeSaveBuffer.block_34[8] != 0) {
                 if (SaveGameWrite((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
-                    // STRING: LEGOLAND 0x004bc730
                     {
+                        // STRING: LEGOLAND 0x004bc730
                         LogPrintf("Bloke BNV path data (%d)", num);
                         goto fail;
                     }
@@ -556,16 +549,16 @@ LEGO_EXPORT int SaveGame(char *filename) {
             SaveGameWrite(ride->element->name, 8);
             if (ride->type != 2 && ride->type != 0) {
                 if (SaveGameWrite(ride->counters, lpConfig->max_blokes) == 0) {
-                    // STRING: LEGOLAND 0x004bc5c4
                     {
+                        // STRING: LEGOLAND 0x004bc5c4
                         LogPrintf("BeenOn Flags for %s Save Failed", ride->element->name);
                         goto fail;
                     }
                 }
             }
             if (SaveGameWrite(&ride->field_8, 4) == 0) {
-                // STRING: LEGOLAND 0x004bc5b0
                 {
+                    // STRING: LEGOLAND 0x004bc5b0
                     LogPrintf("Count for Object %s", ride->element->name);
                     goto fail;
                 }
@@ -575,30 +568,30 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 count++;
             }
             if (SaveGameWrite(&count, 4) == 0) {
-                // STRING: LEGOLAND 0x004bc598
                 {
+                    // STRING: LEGOLAND 0x004bc598
                     LogPrintf("Instance Count for %s", ride->element->name);
                     goto fail;
                 }
             }
             for (inst = ride->instances; inst != 0; inst = inst->next) {
                 if (SaveGameWrite(&inst->flags, 4) == 0) {
-                    // STRING: LEGOLAND 0x004bc57c
                     {
+                        // STRING: LEGOLAND 0x004bc57c
                         LogPrintf("Flags for instance of %s", ride->element->name);
                         goto fail;
                     }
                 }
                 if (SaveGameWrite(&inst->uid, 4) == 0) {
-                    // STRING: LEGOLAND 0x004bc560
                     {
+                        // STRING: LEGOLAND 0x004bc560
                         LogPrintf("Objuid for instance of %s", ride->element->name);
                         goto fail;
                     }
                 }
                 if (SaveGameWrite(&inst->field_10, 4) == 0) {
-                    // STRING: LEGOLAND 0x004bc540
                     {
+                        // STRING: LEGOLAND 0x004bc540
                         LogPrintf("TickCount for instance of %s", ride->element->name);
                         goto fail;
                     }
@@ -609,8 +602,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 count++;
             }
             if (SaveGameWrite(&count, 4) == 0) {
-                // STRING: LEGOLAND 0x004bc51c
                 {
+                    // STRING: LEGOLAND 0x004bc51c
                     LogPrintf("Num Blokes On Ride for object %s", ride->element->name);
                     goto fail;
                 }
@@ -619,15 +612,15 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 int num;
                 num = GetBlokeNum(rnode->rider);
                 if (SaveGameWrite(&num, 4) == 0) {
-                    // STRING: LEGOLAND 0x004bc500
                     {
+                        // STRING: LEGOLAND 0x004bc500
                         LogPrintf("Bloke Num for bloke on %s", ride->element->name);
                         goto fail;
                     }
                 }
                 if (SaveGameWrite(&rnode->tile, 2) == 0) {
-                    // STRING: LEGOLAND 0x004bc4e8
                     {
+                        // STRING: LEGOLAND 0x004bc4e8
                         LogPrintf("Ride ID for bloke on %s", ride->element->name);
                         goto fail;
                     }
@@ -635,8 +628,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
             }
             if (ride->save_hook != 0) {
                 if (ride->save_hook(ride->element) == 0) {
-                    // STRING: LEGOLAND 0x004bc4c8
                     {
+                        // STRING: LEGOLAND 0x004bc4c8
                         LogPrintf("Ride specific save data for %s", ride->element->name);
                         goto fail;
                     }
@@ -735,7 +728,6 @@ LEGO_EXPORT int LoadGame(char *path) {
     int x;
     int y;
     struct Ride *ride;
-    struct Element *e;
     struct MapElement *tile;
     struct Bloke *bloke;
     struct Anim3D *anim;
@@ -757,425 +749,426 @@ LEGO_EXPORT int LoadGame(char *path) {
     }
     MeasuredBlockDepth = 0;
     LoadInProgress = 1;
-    for (;;) {
-        if (SaveGameRead(header, 0x20) == 0) {
-            break;
+    if (SaveGameRead(header, 0x20) == 0) {
+        goto fail;
+    }
+    header[5] = 0;
+    if (atoi(header) != 2) {
+        return 0;
+    }
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&SavedElementCount, 4) == 0) {
+        goto fail;
+    }
+    if (SavedElementTable != 0) {
+        free(SavedElementTable);
+        SavedElementTable = 0;
+    }
+    SavedElementTable = malloc(SavedElementCount * 4);
+    for (i = 0; i < SavedElementCount; i++) {
+        DrawWatchSprite();
+        if (SaveGameRead(&len, 4) == 0) {
+            goto fail;
         }
-        header[5] = 0;
-        if (atoi(header) != 2) {
-            return 0;
+        if (SaveGameRead(name, len) == 0) {
+            goto fail;
         }
-        if (SkipSaveGameDword() == 0) {
-            break;
+        name[len] = 0;
+        if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
+            goto fail;
         }
-        if (SkipSaveGameDword() == 0) {
-            break;
+        SavedElementTable[i] = (struct Element *)n;
+        if (SaveGameRead(&m, 4) == 0) {
+            goto fail;
         }
-        if (SaveGameRead(&SavedElementCount, 4) == 0) {
-            break;
+        LLIDB_LoadData((void *)n);
+        ((struct Element *)n)->flags &= 0xfffcfff1;
+        ((struct Element *)n)->flags |= m;
+    }
+    {
+        unsigned short *tab[256];
+        if (SaveGameRead(&DAT_007fdb84, 4) == 0) {
+            goto fail;
         }
-        if (SavedElementTable != 0) {
-            free(SavedElementTable);
-            SavedElementTable = 0;
-        }
-        SavedElementTable = malloc(SavedElementCount * 4);
-        for (i = 0; i < SavedElementCount; i++) {
+        for (i = 0; i < DAT_007fdb84; i++) {
             DrawWatchSprite();
             if (SaveGameRead(&len, 4) == 0) {
-                LOAD_FAIL();
+                goto fail;
             }
             if (SaveGameRead(name, len) == 0) {
-                LOAD_FAIL();
+                goto fail;
             }
             name[len] = 0;
             if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
-                LOAD_FAIL();
+                goto fail;
             }
-            SavedElementTable[i] = (struct Element *)n;
-            if (SaveGameRead(&m, 4) == 0) {
-                LOAD_FAIL();
-            }
+            DAT_007fd660[i] = n;
             LLIDB_LoadData((void *)n);
-            ((struct Element *)n)->flags &= 0xfffcfff1;
-            ((struct Element *)n)->flags |= m;
-        }
-        {
-            unsigned short *tab[256];
-            if (SaveGameRead(&DAT_007fdb84, 4) == 0) {
-                break;
-            }
-            for (i = 0; i < DAT_007fdb84; i++) {
-                DrawWatchSprite();
-                if (SaveGameRead(&len, 4) == 0) {
-                    LOAD_FAIL();
-                }
-                if (SaveGameRead(name, len) == 0) {
-                    LOAD_FAIL();
-                }
-                name[len] = 0;
-                if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
-                    LOAD_FAIL();
-                }
-                DAT_007fd660[i] = n;
-                LLIDB_LoadData((void *)n);
-                tab[i] = ((struct Element *)n)->data;
-            }
-            if (SkipSaveGameDword() == 0) {
-                break;
-            }
-            if (SaveGameRead(lpConfig, 0x44) == 0) {
-                break;
-            }
-            ClearGameMap();
-            for (y = 0; y < lpConfig->height; y++) {
-                DrawWatchSprite();
-                for (x = 0; x < lpConfig->width; x++) {
-                    tile = &GameMap[y][x];
-                    if (SaveGameRead(tile, 0x14) == 0) {
-                        LOAD_FAIL();
-                    }
-                    if ((tile->flags & 0x8a8) != 0) {
-                        tile->field_0 = SavedElementTable[(int)tile->field_0];
-                    } else {
-                        tile->field_0 = 0;
-                    }
-                    if (tile->field_8 != 0) {
-                        tile->field_8 = *tab[(tile->field_8 >> 8) - 1] + (tile->field_8 & 0xff);
-                    }
-                    if (tile->field_a != 0) {
-                        tile->field_a = *tab[(tile->field_a >> 8) - 1] + (tile->field_a & 0xff);
-                    }
-                }
-            }
+            tab[i] = ((struct Element *)n)->data;
         }
         if (SkipSaveGameDword() == 0) {
-            break;
+            goto fail;
         }
-        if (SaveGameRead(&MapStats, 0x3f0) == 0) {
-            break;
+        if (SaveGameRead(lpConfig, 0x44) == 0) {
+            goto fail;
         }
-        if (SaveGameRead(&ScrollX, 4) == 0) {
-            break;
-        }
-        if (SaveGameRead(&ScrollY, 4) == 0) {
-            break;
-        }
-        if (SaveGameRead(&EditMode, 0xc) == 0) {
-            break;
-        }
-        EditMode.unk4 = 3;
-        EditMode.unk8 = 0;
-        FUN_004741c0();
-        FUN_00474880();
-        DrawWatchSprite();
-        if (LoadScripts() == 0) {
-            break;
-        }
-        if (LoadReport() == 0) {
-            break;
-        }
-        if (LoadCurrency() == 0) {
-            break;
-        }
-        if (SaveGameRead(ButtonFlashStates, 0x24) == 0) {
-            break;
-        }
-        DrawWatchSprite();
-        MapDataLoaded = 1;
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        while (FirstBloke != 0) {
-            DestroyBloke(FirstBloke);
-        }
-        n = 0;
-        DrawWatchSprite();
-        if (SaveGameRead(&n, 4) == 0) {
-            break;
-        }
-        while (n-- != 0) {
-            if (SaveGameRead(&m, 4) == 0) {
-                LOAD_FAIL();
-            }
-            bloke = &BlokePool[m];
-            bloke->next = FirstBloke;
-            FirstBloke = bloke;
-            if (SaveGameRead(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
-                LOAD_FAIL();
-            }
-            if (BlokeSaveBuffer.block_34[8] != 0) {
-                BlokeSaveBuffer.block_34[8] = (unsigned int)malloc(0x48);
-                if (SaveGameRead((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
-                    LOAD_FAIL();
-                }
-            }
-            bloke->action = BlokeSaveBuffer.action;
-            bloke->low_level_action = BlokeSaveBuffer.low_level_action;
-            bloke->pending_action = BlokeSaveBuffer.pending_action;
-            if (BlokeSaveBuffer.target != -1) {
-                bloke->target = SavedElementTable[BlokeSaveBuffer.target];
-            } else {
-                bloke->target = 0;
-            }
-            if (BlokeSaveBuffer.last_ride != -1) {
-                bloke->last_ride = SavedElementTable[BlokeSaveBuffer.last_ride];
-            } else {
-                bloke->last_ride = 0;
-            }
-            bloke->field_1c = BlokeSaveBuffer.field_1c;
-            bloke->field_20 = BlokeSaveBuffer.field_20;
-            bloke->dest.x = BlokeSaveBuffer.dest.x;
-            bloke->dest.y = BlokeSaveBuffer.dest.y;
-            bloke->goal.x = BlokeSaveBuffer.goal.x;
-            bloke->goal.y = BlokeSaveBuffer.goal.y;
-            memcpy(&bloke->field_34, BlokeSaveBuffer.block_34, sizeof(BlokeSaveBuffer.block_34));
-            bloke->field_5c = BlokeSaveBuffer.field_5c;
-            bloke->param_action = BlokeSaveBuffer.param_action;
-            bloke->flags = BlokeSaveBuffer.flags;
-            bloke->field_64 = BlokeSaveBuffer.field_64;
-            bloke->field_78 = BlokeSaveBuffer.field_78;
-            bloke->mood = BlokeSaveBuffer.mood;
-            bloke->field_7c = BlokeSaveBuffer.field_7c;
-            bloke->field_7e = BlokeSaveBuffer.field_7e;
-            bloke->speed = BlokeSaveBuffer.speed;
-            bloke->field_80 = BlokeSaveBuffer.field_80;
-            bloke->field_81 = BlokeSaveBuffer.field_81;
-            bloke->field_82 = BlokeSaveBuffer.field_82;
-            if (BlokeSaveBuffer.favourite[0] < SavedElementCount) {
-                bloke->favourite_attraction_0 = SavedElementTable[BlokeSaveBuffer.favourite[0]];
-            } else {
-                bloke->favourite_attraction_0 = 0;
-            }
-            if (BlokeSaveBuffer.favourite[1] < SavedElementCount) {
-                bloke->favourite_attraction_1 = SavedElementTable[BlokeSaveBuffer.favourite[1]];
-            } else {
-                bloke->favourite_attraction_1 = 0;
-            }
-            if (BlokeSaveBuffer.favourite[2] < SavedElementCount) {
-                bloke->favourite_attraction_2 = SavedElementTable[BlokeSaveBuffer.favourite[2]];
-            } else {
-                bloke->favourite_attraction_2 = 0;
-            }
-            if (BlokeSaveBuffer.favourite[3] < SavedElementCount) {
-                bloke->favourite_food = SavedElementTable[BlokeSaveBuffer.favourite[3]];
-            } else {
-                bloke->favourite_food = 0;
-            }
-            bloke->pos.x = BlokeSaveBuffer.pos.x;
-            bloke->pos.y = BlokeSaveBuffer.pos.y;
-            bloke->height = BlokeSaveBuffer.height;
-            bloke->dir = BlokeSaveBuffer.dir;
-            bloke->field_73 = BlokeSaveBuffer.field_73;
-            bloke->frame = BlokeSaveBuffer.frame;
-            bloke->field_75 = BlokeSaveBuffer.field_75;
-            bloke->nav = BlokeSaveBuffer.nav;
-            bloke->person = malloc(sizeof(Person));
-            AddPersonToList(bloke->person);
-            bloke->person->bloke = bloke;
-            bloke->person->character = BlokeSaveBuffer.person_8;
-            bloke->person->scale = BlokeSaveBuffer.scale;
-            bloke->person->screen = BlokeSaveBuffer.screen;
-            bloke->person->offset = BlokeSaveBuffer.offset;
-            bloke->person->field_34 = BlokeSaveBuffer.field_34;
-            bloke->person->field_38 = BlokeSaveBuffer.field_38;
-            bloke->person->depth = BlokeSaveBuffer.depth;
-            bloke->person->rotation = BlokeSaveBuffer.rotation;
-            bloke->person->frame = BlokeSaveBuffer.person_4c;
-            bloke->person->anim = BlokeSaveBuffer.anim;
-            bloke->person->sort_id = BlokeSaveBuffer.sort_id;
-            bloke->person->field_38 = BlokeSaveBuffer.field_38;
-            memcpy(bloke->person->m, BlokeSaveBuffer.m, sizeof(BlokeSaveBuffer.m));
-            bloke->person->field_7c = BlokeSaveBuffer.field_7c_p;
-            bloke->person->field_80 = BlokeSaveBuffer.field_80_p;
-            bloke->person->field_8c = BlokeSaveBuffer.field_8c_p;
-            bloke->person->field_90 = BlokeSaveBuffer.field_90_p;
-            bloke->person->random = BlokeSaveBuffer.random;
-            bloke->prev_param = BlokeSaveBuffer.prev_param;
-            bloke->prev_action = BlokeSaveBuffer.prev_action;
-            bloke->person->field_2c = 0;
-            bloke->person->field_30 = BlokeSaveBuffer.field_30;
-            anim = GetBlokeAnim3DFromPerson(bloke->person);
-            bloke->person->field_50 = FUN_00442580(bloke->person, VisitorLocData, (unsigned int)anim->field_8, anim->elems->shared->count, bloke->person->random);
-        }
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        LoadGardeners();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        LoadMechanics();
-        DrawWatchSprite();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        LoadGardenerOrders();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        FUN_0049ce00();
-        DrawWatchSprite();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        if (SaveGameRead(&CastlePlacedFlag, 4) == 0) {
-            break;
-        }
-        if (SaveGameRead(&BuildObjCount, 4) == 0) {
-            break;
-        }
-        if (SaveGameRead(BuildObjArray, sizeof(BuildObjArray)) == 0) {
-            break;
-        }
-        for (i = 0; i < SavedElementCount; i++) {
+        ClearGameMap();
+        for (y = 0; y < lpConfig->height; y++) {
             DrawWatchSprite();
-            e = SavedElementTable[i];
-            if ((e->flags & 0x10) != 0) {
+            for (x = 0; x < lpConfig->width; x++) {
+                tile = &GameMap[y][x];
+                if (SaveGameRead(tile, 0x14) == 0) {
+                    goto fail;
+                }
+                if ((tile->flags & 0x8a8) != 0) {
+                    tile->field_0 = SavedElementTable[(int)tile->field_0];
+                } else {
+                    tile->field_0 = 0;
+                }
+                if (tile->field_8 != 0) {
+                    tile->field_8 = *tab[(tile->field_8 >> 8) - 1] + (tile->field_8 & 0xff);
+                }
+                if (tile->field_a != 0) {
+                    tile->field_a = *tab[(tile->field_a >> 8) - 1] + (tile->field_a & 0xff);
+                }
+            }
+        }
+    }
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&MapStats, 0x3f0) == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&ScrollX, 4) == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&ScrollY, 4) == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&EditMode, 0xc) == 0) {
+        goto fail;
+    }
+    EditMode.unk4 = 3;
+    EditMode.unk8 = 0;
+    FUN_004741c0();
+    FUN_00474880();
+    DrawWatchSprite();
+    if (LoadScripts() == 0) {
+        goto fail;
+    }
+    if (LoadReport() == 0) {
+        goto fail;
+    }
+    if (LoadCurrency() == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(ButtonFlashStates, 0x24) == 0) {
+        goto fail;
+    }
+    DrawWatchSprite();
+    MapDataLoaded = 1;
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    while (FirstBloke != 0) {
+        DestroyBloke(FirstBloke);
+    }
+    n = 0;
+    DrawWatchSprite();
+    if (SaveGameRead(&n, 4) == 0) {
+        goto fail;
+    }
+    while (n-- != 0) {
+        if (SaveGameRead(&m, 4) == 0) {
+            goto fail;
+        }
+        bloke = &BlokePool[m];
+        bloke->next = FirstBloke;
+        FirstBloke = bloke;
+        if (SaveGameRead(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
+            goto fail;
+        }
+        if (BlokeSaveBuffer.block_34[8] != 0) {
+            BlokeSaveBuffer.block_34[8] = (unsigned int)malloc(0x48);
+            if (SaveGameRead((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
+                goto fail;
+            }
+        }
+        bloke->action = BlokeSaveBuffer.action;
+        bloke->low_level_action = BlokeSaveBuffer.low_level_action;
+        bloke->pending_action = BlokeSaveBuffer.pending_action;
+        if (BlokeSaveBuffer.target != -1) {
+            bloke->target = SavedElementTable[BlokeSaveBuffer.target];
+        } else {
+            bloke->target = 0;
+        }
+        if (BlokeSaveBuffer.last_ride != -1) {
+            bloke->last_ride = SavedElementTable[BlokeSaveBuffer.last_ride];
+        } else {
+            bloke->last_ride = 0;
+        }
+        bloke->field_1c = BlokeSaveBuffer.field_1c;
+        bloke->field_20 = BlokeSaveBuffer.field_20;
+        bloke->dest.x = BlokeSaveBuffer.dest.x;
+        bloke->dest.y = BlokeSaveBuffer.dest.y;
+        bloke->goal.x = BlokeSaveBuffer.goal.x;
+        bloke->goal.y = BlokeSaveBuffer.goal.y;
+        memcpy(&bloke->field_34, BlokeSaveBuffer.block_34, sizeof(BlokeSaveBuffer.block_34));
+        bloke->field_5c = BlokeSaveBuffer.field_5c;
+        bloke->param_action = BlokeSaveBuffer.param_action;
+        bloke->flags = BlokeSaveBuffer.flags;
+        bloke->field_64 = BlokeSaveBuffer.field_64;
+        bloke->field_78 = BlokeSaveBuffer.field_78;
+        bloke->mood = BlokeSaveBuffer.mood;
+        bloke->field_7c = BlokeSaveBuffer.field_7c;
+        bloke->field_7e = BlokeSaveBuffer.field_7e;
+        bloke->speed = BlokeSaveBuffer.speed;
+        bloke->field_80 = BlokeSaveBuffer.field_80;
+        bloke->field_81 = BlokeSaveBuffer.field_81;
+        bloke->field_82 = BlokeSaveBuffer.field_82;
+        if (BlokeSaveBuffer.favourite[0] < SavedElementCount) {
+            bloke->favourite_attraction_0 = SavedElementTable[BlokeSaveBuffer.favourite[0]];
+        } else {
+            bloke->favourite_attraction_0 = 0;
+        }
+        if (BlokeSaveBuffer.favourite[1] < SavedElementCount) {
+            bloke->favourite_attraction_1 = SavedElementTable[BlokeSaveBuffer.favourite[1]];
+        } else {
+            bloke->favourite_attraction_1 = 0;
+        }
+        if (BlokeSaveBuffer.favourite[2] < SavedElementCount) {
+            bloke->favourite_attraction_2 = SavedElementTable[BlokeSaveBuffer.favourite[2]];
+        } else {
+            bloke->favourite_attraction_2 = 0;
+        }
+        if (BlokeSaveBuffer.favourite[3] < SavedElementCount) {
+            bloke->favourite_food = SavedElementTable[BlokeSaveBuffer.favourite[3]];
+        } else {
+            bloke->favourite_food = 0;
+        }
+        bloke->pos.x = BlokeSaveBuffer.pos.x;
+        bloke->pos.y = BlokeSaveBuffer.pos.y;
+        bloke->height = BlokeSaveBuffer.height;
+        bloke->dir = BlokeSaveBuffer.dir;
+        bloke->field_73 = BlokeSaveBuffer.field_73;
+        bloke->frame = BlokeSaveBuffer.frame;
+        bloke->field_75 = BlokeSaveBuffer.field_75;
+        bloke->nav = BlokeSaveBuffer.nav;
+        bloke->person = malloc(sizeof(Person));
+        AddPersonToList(bloke->person);
+        bloke->person->bloke = bloke;
+        bloke->person->character = BlokeSaveBuffer.person_8;
+        bloke->person->scale = BlokeSaveBuffer.scale;
+        bloke->person->screen = BlokeSaveBuffer.screen;
+        bloke->person->offset = BlokeSaveBuffer.offset;
+        bloke->person->field_34 = BlokeSaveBuffer.field_34;
+        bloke->person->field_38 = BlokeSaveBuffer.field_38;
+        bloke->person->depth = BlokeSaveBuffer.depth;
+        bloke->person->rotation = BlokeSaveBuffer.rotation;
+        bloke->person->frame = BlokeSaveBuffer.person_4c;
+        bloke->person->anim = BlokeSaveBuffer.anim;
+        bloke->person->sort_id = BlokeSaveBuffer.sort_id;
+        bloke->person->field_38 = BlokeSaveBuffer.field_38;
+        memcpy(bloke->person->m, BlokeSaveBuffer.m, sizeof(BlokeSaveBuffer.m));
+        bloke->person->field_7c = BlokeSaveBuffer.field_7c_p;
+        bloke->person->field_80 = BlokeSaveBuffer.field_80_p;
+        bloke->person->field_8c = BlokeSaveBuffer.field_8c_p;
+        bloke->person->field_90 = BlokeSaveBuffer.field_90_p;
+        bloke->person->random = BlokeSaveBuffer.random;
+        bloke->prev_param = BlokeSaveBuffer.prev_param;
+        bloke->prev_action = BlokeSaveBuffer.prev_action;
+        bloke->person->field_2c = 0;
+        bloke->person->field_30 = BlokeSaveBuffer.field_30;
+        anim = GetBlokeAnim3DFromPerson(bloke->person);
+        bloke->person->field_50 = FUN_00442580(bloke->person, VisitorLocData, (unsigned int)anim->field_8, anim->elems->shared->count, bloke->person->random);
+    }
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    LoadGardeners();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    LoadMechanics();
+    DrawWatchSprite();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    LoadGardenerOrders();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    FUN_0049ce00();
+    DrawWatchSprite();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&CastlePlacedFlag, 4) == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(&BuildObjCount, 4) == 0) {
+        goto fail;
+    }
+    if (SaveGameRead(BuildObjArray, sizeof(BuildObjArray)) == 0) {
+        goto fail;
+    }
+    /* Per-ride state of every placed ride element. */
+    for (i = 0; i < SavedElementCount; i++) {
+        DrawWatchSprite();
+        if ((SavedElementTable[i]->flags & 0x10) != 0) {
+            SavedElementTable[i]->flags |= 4;
+            ride = SavedElementTable[i]->ride;
+            {
                 // STRING: LEGOLAND 0x004bcb94
                 char label[9] = "xxxxxxxx";
-                ride = SavedElementTable[i]->ride;
-                e->flags = e->flags | 4;
                 if (SaveGameRead(label, 8) == 0) {
-                    LOAD_FAIL();
+                    goto fail;
                 }
                 // STRING: LEGOLAND 0x004bcb90
                 DBPrintf("%s\n", label);
-                if (ride->type != 2) {
-                    if (ride->type != 0) {
-                        ride->counters = malloc(lpConfig->max_blokes);
-                        if (SaveGameRead(ride->counters, lpConfig->max_blokes) == 0) {
-                            LOAD_FAIL();
-                        }
-                    }
+            }
+            if (ride->type != 2 && ride->type != 0) {
+                ride->counters = malloc(lpConfig->max_blokes);
+                if (SaveGameRead(ride->counters, lpConfig->max_blokes) == 0) {
+                    goto fail;
                 }
-                if (SaveGameRead(&ride->field_8, 4) == 0) {
-                    LOAD_FAIL();
+            }
+            if (SaveGameRead(&ride->field_8, 4) == 0) {
+                goto fail;
+            }
+            inst_prev = 0;
+            n = 0;
+            if (SaveGameRead(&n, 4) == 0) {
+                goto fail;
+            }
+            while (n-- != 0) {
+                inst = malloc(sizeof(struct ObjInstance));
+                inst->next = 0;
+                inst->field_8 = (unsigned int)ride;
+                if (inst_prev == 0) {
+                    ride->instances = inst;
+                    inst->field_4 = (unsigned int)inst_prev;
+                } else {
+                    inst_prev->next = inst;
+                    inst->field_4 = (unsigned int)inst_prev;
                 }
-                inst_prev = 0;
-                n = 0;
-                if (SaveGameRead(&n, 4) == 0) {
-                    LOAD_FAIL();
+                inst_prev = inst;
+                if (SaveGameRead(&inst->flags, 4) == 0) {
+                    goto fail;
                 }
-                while (n-- != 0) {
-                    inst = malloc(sizeof(struct ObjInstance));
-                    inst->next = 0;
-                    inst->field_8 = (unsigned int)ride;
-                    if (inst_prev == 0) {
-                        ride->instances = inst;
-                        inst->field_4 = (unsigned int)inst_prev;
-                    } else {
-                        inst_prev->next = inst;
-                        inst->field_4 = (unsigned int)inst_prev;
-                    }
-                    inst_prev = inst;
-                    if (SaveGameRead(&inst->flags, 4) == 0) {
-                        LOAD_FAIL();
-                    }
-                    if (SaveGameRead(&inst->uid, 4) == 0) {
-                        LOAD_FAIL();
-                    }
-                    if (SaveGameRead(&inst->field_10, 4) == 0) {
-                        LOAD_FAIL();
-                    }
+                if (SaveGameRead(&inst->uid, 4) == 0) {
+                    goto fail;
                 }
-                rnode_prev = 0;
-                n = 0;
-                if (SaveGameRead(&n, 4) == 0) {
-                    LOAD_FAIL();
+                if (SaveGameRead(&inst->field_10, 4) == 0) {
+                    goto fail;
                 }
-                while (n-- != 0) {
-                    rnode = malloc(sizeof(struct RideNode));
-                    rnode->next = 0;
-                    if (rnode_prev == 0) {
-                        ride->riders = rnode;
-                        rnode->prev = rnode_prev;
-                    } else {
-                        rnode_prev->next = rnode;
-                        rnode->prev = rnode_prev;
-                    }
-                    rnode_prev = rnode;
-                    if (SaveGameRead(&m, 4) == 0) {
-                        LOAD_FAIL();
-                    }
-                    if (SaveGameRead(&rnode->tile, 2) == 0) {
-                        LOAD_FAIL();
-                    }
-                    rnode->rider = GetBlokePtr(m);
-                    rnode->person = rnode->rider->person;
+            }
+            rnode_prev = 0;
+            n = 0;
+            if (SaveGameRead(&n, 4) == 0) {
+                goto fail;
+            }
+            while (n-- != 0) {
+                rnode = malloc(sizeof(struct RideNode));
+                rnode->next = 0;
+                if (rnode_prev == 0) {
+                    ride->riders = rnode;
+                    rnode->prev = rnode_prev;
+                } else {
+                    rnode_prev->next = rnode;
+                    rnode->prev = rnode_prev;
                 }
-                if (ride->load_hook != 0) {
-                    if (ride->load_hook(ride->element) == 0) {
-                        LOAD_FAIL();
-                    }
+                rnode_prev = rnode;
+                if (SaveGameRead(&m, 4) == 0) {
+                    goto fail;
+                }
+                if (SaveGameRead(&rnode->tile, 2) == 0) {
+                    goto fail;
+                }
+                rnode->rider = GetBlokePtr(m);
+                rnode->person = rnode->rider->person;
+            }
+            if (ride->load_hook != 0) {
+                if (ride->load_hook(ride->element) == 0) {
+                    goto fail;
                 }
             }
         }
-        if (SaveGameRead(ObjInstanceTable, sizeof(ObjInstanceTable)) == 0) {
-            break;
-        }
-        DrawWatchSprite();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        if (FUN_00482920() == 0) {
-            break;
-        }
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        LoadBuildObjArray();
-        DrawWatchSprite();
-        if (SkipSaveGameDword() == 0) {
-            break;
-        }
-        {
-            char name2[0x200];
-            struct OverlayParam ov;
-            SaveGameRead(&n, 4);
+    }
+    if (SaveGameRead(ObjInstanceTable, sizeof(ObjInstanceTable)) == 0) {
+        goto fail;
+    }
+    DrawWatchSprite();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    if (FUN_00482920() == 0) {
+        goto fail;
+    }
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    LoadBuildObjArray();
+    DrawWatchSprite();
+    if (SkipSaveGameDword() == 0) {
+        goto fail;
+    }
+    {
+        char name2[0x200];
+        struct OverlayParam ov;
+        SaveGameRead(&n, 4);
+        SaveGameRead(name2, n);
+        name2[n] = 0;
+        LLIDB_FindElement(name2, (unsigned int *)&OverlayILFHandle, 0);
+        OverlayILF = (unsigned int)LLIDB_LoadData(OverlayILFHandle);
+        SaveGameRead(&n, 4);
+        if (n != 0) {
             SaveGameRead(name2, n);
             name2[n] = 0;
-            LLIDB_FindElement(name2, (unsigned int *)&OverlayILFHandle, 0);
-            OverlayILF = (unsigned int)LLIDB_LoadData(OverlayILFHandle);
-            SaveGameRead(&n, 4);
-            if (n != 0) {
-                SaveGameRead(name2, n);
-                name2[n] = 0;
-                LLIDB_FindElement(name2, (unsigned int *)&BridgesHandle, 0);
-                BridgesData = LLIDB_LoadData(BridgesHandle);
-                SetBridgeParamsByName(name2);
-            } else {
-                BridgesHandle = 0;
-                BridgesData = 0;
-            }
-            SaveGameRead(&n, 4);
-            for (i = 0; i < n; i++) {
-                SaveGameRead(&ov, 0x14);
-                AddOvSav(&ov);
-            }
+            LLIDB_FindElement(name2, (unsigned int *)&BridgesHandle, 0);
+            BridgesData = LLIDB_LoadData(BridgesHandle);
+            SetBridgeParamsByName(name2);
+        } else {
+            BridgesHandle = 0;
+            BridgesData = 0;
         }
-        _close(SaveFileHandle);
-        DrawWatchSprite();
-        LoadInProgress = 0;
-        EditMode.unk0 = 0;
-        GamePad |= 0x20;
-        CalculateMapRenderOrder();
-        // STRING: LEGOLAND 0x004b83d0
-        Entrance1Elem = ElemID("ENTRANCE 1");
-        entrance = Entrance1Elem->ride;
-        first = GetFirstObjectMatching(Entrance1Elem);
-        if (first != 0) {
-            DAT_004b8320.x = (first->field_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
-            DAT_004b8320.y = (((entrance->footprint.v[3] - entrance->footprint.v[1]) << 7) & ~0xff) + ((first->field_5 + entrance->footprint.v[1]) << 8);
+        SaveGameRead(&n, 4);
+        for (i = 0; i < n; i++) {
+            SaveGameRead(&ov, 0x14);
+            AddOvSav(&ov);
         }
-        FUN_00475f10();
-        SetMapLoaded(1);
-        DAT_00810140 = 1;
-        DAT_00667c48 = 1;
-        GamePad &= ~0x1000;
-        FUN_0046b760();
-        return 1;
     }
-    return LoadAbort();
+    _close(SaveFileHandle);
+    DrawWatchSprite();
+    LoadInProgress = 0;
+    GamePad |= 0x20;
+    CalculateMapRenderOrder();
+    // STRING: LEGOLAND 0x004b83d0
+    Entrance1Elem = ElemID("ENTRANCE 1");
+    entrance = Entrance1Elem->ride;
+    first = GetFirstObjectMatching(Entrance1Elem);
+    if (first != 0) {
+        DAT_004b8320.x = (first->field_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
+        DAT_004b8320.y = (((entrance->footprint.v[3] - entrance->footprint.v[1]) << 7) & ~0xff) + ((first->field_5 + entrance->footprint.v[1]) << 8);
+    }
+    FUN_00475f10();
+    SetMapLoaded(1);
+    DAT_00810140 = 1;
+    DAT_00667c48 = 1;
+    EditMode.unk0 = 0;
+    GamePad &= ~0x1000;
+    FUN_0046b760();
+    return 1;
+fail:
+    _close(SaveFileHandle);
+    LoadInProgress = 0;
+    return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0047f760

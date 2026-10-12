@@ -520,10 +520,10 @@ void DrivingSchoolUpdate(Element *obj) {
     int ride_y0;
     struct Bloke *rider;
     struct Bloke *rider2;
-    int ride_y3;
+    unsigned int ride_y3;
     int ride_x0;
     int flags;
-    int tile_y;
+    volatile int tile_y;
     int ride_x3;
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
@@ -533,13 +533,13 @@ void DrivingSchoolUpdate(Element *obj) {
     struct SampleSource source2;
     unsigned char move;
     int res;
-    unsigned int count;
+    volatile unsigned int count;
     struct Sample *sample;
     int r;
 
     FUN_00402c10();
     FUN_00414440();
-    while (node != NULL) {
+    while (node) {
         rider2 = node->rider;
         rider = rider2;
         bloke = rider;
@@ -549,8 +549,8 @@ void DrivingSchoolUpdate(Element *obj) {
             case 0:
                 ride_x0 = ride->x;
                 ride_y0 = ride->y;
-                tile_y = node->tile.pos.y;
                 bloke->dest.x = (node->tile.pos.x + ride_x0) << 8;
+                tile_y = node->tile.pos.y;
                 bloke->dest.y = (tile_y - 3 + ride_y0) << 8;
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
@@ -563,9 +563,9 @@ void DrivingSchoolUpdate(Element *obj) {
                 if (!bloke->field_58) {
                     tile_id = node->tile.id;
                     count = FUN_00401c40(tile_id);
-                    if (count * 5 < (int)FUN_00413970(node->tile.id)) {
+                    if (5 * count < (int)FUN_00413970(node->tile.id)) {
                         res = FUN_00401ae0(node->tile.id, (int)bloke);
-                        if (res == 0) {
+                        if (0 == res) {
                             source.type = 1;
                             source.bloke = bloke;
                             PlayInstanceOfSample(*(void **)(DRIVING_SCHOOL_SFX + 8), 0, 1, &source);
@@ -599,7 +599,7 @@ void DrivingSchoolUpdate(Element *obj) {
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
                 bloke->field_73 = move + 0x10;
-                NewDirForAction(bloke, ((unsigned char)(0x10 + move) >> 5) + 3);
+                NewDirForAction(bloke, ((unsigned char)(move + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 4:

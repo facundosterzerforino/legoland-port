@@ -288,7 +288,12 @@ void FUN_004779d0(struct Point *p) {
     struct Point pos;
     WorkOrder *order;
 
-    if (p->x >= 0 && p->x < lpConfig->width && p->y >= 0 && p->y < lpConfig->height) {
+    int ptmp12;
+    register int ptmp60;
+    int ptmp62;
+    int ptmp63;
+    int ptmp184;
+    if (p->x >= 0 && p->x < (unsigned int)lpConfig->width && p->y >= 0 && (unsigned int)p->y < lpConfig->height) {
         tile = &GameMap[p->y][p->x];
     } else {
         tile = NULL;
@@ -296,13 +301,14 @@ void FUN_004779d0(struct Point *p) {
     if (tile->flags & 0x40) {
         return;
     }
-    if (tile->flags & 0xa0) {
+    if (0xa0 & tile->flags) {
         elem = tile->field_0;
         saved_class = QueryClass;
         memcpy(&saved, &QueryCursor, sizeof(struct Cursor));
         QueryClass = (struct ObjClass *)elem->data;
         t.pos.x = tile->field_4;
-        pos.x = t.pos.x;
+        ptmp60 = t.pos.x;
+        pos.x = ptmp60;
         t.pos.y = tile->field_5;
         pos.y = t.pos.y;
         QueryClass->method_94((unsigned int *)elem, &pos);
@@ -322,20 +328,24 @@ void FUN_004779d0(struct Point *p) {
     }
     if (tile->flags & 0x800) {
         order = GetGardenerWorkOrderAt(p->x, p->y);
-        if (order != NULL) {
+        if (NULL != (unsigned)order) {
             FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
-            ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
+            ptmp63 = order->element->data;
+            ClearPathUnderFootprint((struct PathFootprint *)ptmp63, &order->pos.x);
             EraseGardenerOrder(order);
             return;
         }
-        order = GetMechanicWorkOrderAt(p->x, p->y);
+        ptmp62 = p->x;
+        ptmp184 = p->y;
+        order = GetMechanicWorkOrderAt(ptmp62, ptmp184);
         if (order != NULL) {
-            FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
+            ptmp12 = order->element;
+            FUN_0045e850((struct ObjNode *)ptmp12, &order->pos.x);
             ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
             EraseMechanicOrder(order);
             return;
         }
-    } else if (tile->flags & 8) {
+    } else if (8 & tile->flags) {
         RemovePathSquare(p);
         tile->flags &= 0xfff7;
         tile->field_10 &= 0xfe;
@@ -597,7 +607,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
     char line[1024];
     char *tokens[20];
     char *p;
-    int r = 0;
+    unsigned int r;
     int errors = 0;
     ScriptCommandFn deflt = NULL;
     int ntok;
@@ -607,6 +617,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
 
     DAT_00668fcc = 0;
     cmd = commands;
+    r = 0;
     // STRING: LEGOLAND 0x004bbdcc
     if (strcmp(cmd->name, "none") == 0)
         deflt = cmd->fn;
@@ -625,7 +636,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
                 if (strcmp(tokens[0], cmd->name) == 0) {
                     found = 1;
                     r = commands[i].fn(tokens, ntok - 1, flags);
-                    if (r == 0)
+                    if (0 == r)
                         errors++;
                     break;
                 }

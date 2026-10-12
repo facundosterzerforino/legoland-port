@@ -737,6 +737,10 @@ def m_unsigned(body, rng):
         return None
     k = rng.choice(ds)
     l = lines[k]
+    # making a variable unsigned changes division, modulo and right shifts of negative values: leave those alone
+    name = re.search(r"(\w+)\s*;", l).group(1)
+    if "unsigned " not in l and re.search(rf"\b{name}\b\s*(?:[/%]|>>)|(?:[/%]|>>)\s*\(?\s*\b{name}\b|\b{name}\b\s*[-+]\s*\w+\s*\)\s*[/%]", body):
+        return None
     lines[k] = l.replace("unsigned ", "", 1) if "unsigned " in l else re.sub(r"\b(int|char|short|long)\b", r"unsigned \1", l, count=1)
     return "\n".join(lines)
 
@@ -934,6 +938,24 @@ def decl_orders(body, rng, limit):
     return out
 
 
+def register_combos(body):
+    """body with register added to every subset of its plain local declarations (scalars, pointers, small
+    structs; no arrays, no volatile)."""
+    import itertools
+
+    lines = body.split("\n")
+    ks = [k for k in _decl_block(lines) if "[" not in lines[k] and "volatile " not in lines[k] and "static " not in lines[k]]
+    ks = ks[:8]  # 256 combinations at most
+    plain = [re.sub(r"^(\s+)register ", r"\1", lines[k]) for k in ks]
+    out = []
+    for mask in itertools.product((0, 1), repeat=len(ks)):
+        new = lines[:]
+        for bit, k, l in zip(mask, ks, plain):
+            new[k] = re.sub(r"^(\s+)", r"\1register ", l, count=1) if bit else l
+        out.append("\n".join(new))
+    return out
+
+
 # ---------------------------------------------------------------- main
 
 
@@ -943,7 +965,7 @@ def main():
     ap.add_argument("--minutes", type=float, default=10)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--score-only", action="store_true", help="score the current source and show the diff")
-    ap.add_argument("--decl-orders", action="store_true", help="try every order of the top-level declarations (sampled when there are too many)")
+    ap.add_argument("--decl-orders", action="store_true", help="try every order of the top-level declarations (sampled when there are too many), then every register combination on the 5 best orders")
     args = ap.parse_args()
 
     orig = Original()
@@ -981,9 +1003,11 @@ def main():
         return
 
     rng = random.Random(args.seed)
+    stage, ranked = 1, []
     if args.decl_orders:
-        orders = decl_orders(base_body, rng, limit=int(args.minutes * 60 / 0.35))
+        orders = decl_orders(base_body, rng, limit=int(args.minutes * 60 / 0.35 * 0.85))
         print(f"{len(orders)} declaration orders to try", flush=True)
+        ranked.append((best_guide, base_body))
     best_body, current, guide_body = base_body, base_body, base_body
     # every variant ever compiled for this function (any run): never compile one twice
     outdir.mkdir(parents=True, exist_ok=True)
@@ -998,6 +1022,13 @@ def main():
     while time.time() < deadline and best < 1.0:
         tries += 1
         if args.decl_orders:
+            if not orders and stage == 1:
+                # stage 2: every register combination on the best few orders
+                stage = 2
+                for _, b in sorted(ranked, reverse=True)[:5]:
+                    orders.extend(register_combos(b))
+                rng.shuffle(orders)
+                print(f"[{compiled}] orders done; {len(orders)} register combinations on the 5 best orders", flush=True)
             if not orders:
                 break
             body = orders.pop()
@@ -1016,6 +1047,8 @@ def main():
         if s is None:
             failed += 1
             continue
+        if args.decl_orders and stage == 1:
+            ranked.append((g, body))
         if s > best:
             best, best_body = s, body
             path = outdir / f"{s * 100:07.3f}.c"

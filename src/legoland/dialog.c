@@ -50,22 +50,17 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     RECT clip;
     RECT bar;
     RECT saved;
-    register RECT *items;
+    RECT *items;
     int sel;
     int n;
     int retry;
     int i;
-    int j;
     int y;
     int tw;
     int itemW;
     int viewH;
     int over;
     int my;
-    int l;
-    int t;
-    char **np;
-    RECT *ip;
 
     sel = -1;
     clip.left = box->left + 8;
@@ -83,10 +78,11 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     }
     items = malloc(n * 16);
     viewH = clip.bottom - clip.top + 1;
+    /* lay the items out; if they overflow, narrow the list for a scroll bar and redo it once */
     for (;;) {
         itemW = clip.right - clip.left - 1;
         y = 0;
-        for (i = 0; i < n; i++) {
+        for (i = 0; i < n; i++, y += 4) {
             items[i].top = y;
             tw = MeasureTextHeight(names[i], 2, itemW);
             if (tw < 8) {
@@ -96,7 +92,6 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
             }
             y += tw;
             items[i].bottom = y;
-            y += 4;
         }
         if (!retry && y > viewH) {
             clip.right -= 16;
@@ -113,14 +108,11 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     bar.left = box->right + box->left - 20;
     bar.top = clip.top;
     bar.right = box->right + box->left - 5;
-    bar.bottom = 0 + clip.bottom;
-    for (;;) {
-        if (!ProcessSystemEvents()) {
-            break;
-        }
+    bar.bottom = clip.bottom;
+    while (ProcessSystemEvents()) {
         ReadGameButtons();
         if ((DAT_00813ad4 & 1) || (DAT_00813acc & 1)) {
-            break;
+            return -1;
         }
         if (MousePos.x >= clip.left && MousePos.x <= clip.right && MousePos.y >= clip.top && MousePos.y <= clip.bottom) {
             my = MousePos.y - clip.top + DialogListScrollY;
@@ -155,30 +147,22 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
         }
         GetClipping(&saved);
         SetClipping(&clip);
-        j = 0;
-        while (j < n) {
-            if (items[j].bottom >= DialogListScrollY) {
+        /* skip the items scrolled off the top */
+        for (i = 0; i < n; i++) {
+            if (items[i].bottom >= DialogListScrollY) {
                 break;
             }
-            j++;
         }
-        if (n > (unsigned int)j) {
-            np = j + names;
-            for (i = j; n > i; i++) {
-                ip = &items[i];
-                if (ip->top >= DialogListScrollY + viewH) {
-                    break;
-                }
-                t = ip->top;
-                l = ip->left;
-                if (i == sel) {
-                    RenderBlock(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0x7f, 0x7f, 0xef));
-                } else {
-                    RenderBox(l + clip.left, t - DialogListScrollY + clip.top, ip->right - l + 1, ip->bottom - t + 1, GetNearestColour(0xcf, 0xcf, 0xcf));
-                }
-                FUN_00455220(ip->left + clip.left, ip->top - DialogListScrollY + clip.top, *np, 2, itemW);
-                np++;
+        for (; i < n; i++) {
+            if (items[i].top >= DialogListScrollY + viewH) {
+                break;
             }
+            if (sel == i) {
+                RenderBlock(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, items[i].right - items[i].left + 1, items[i].bottom - items[i].top + 1, GetNearestColour(0x7f, 0x7f, 0xef));
+            } else {
+                RenderBox(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, items[i].right - items[i].left + 1, items[i].bottom - items[i].top + 1, GetNearestColour(0xcf, 0xcf, 0xcf));
+            }
+            FUN_00455220(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, names[i], 2, itemW);
         }
         SetClipping(&saved);
         RenderingComplete();
@@ -282,8 +266,6 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
     struct FileNode *head;
     struct FileNode *tail;
     struct FileNode *node;
-    struct FileNode *a;
-    struct FileNode *b;
     struct FileNode **nodes;
     char **names;
     struct Sprite **icons;
@@ -294,6 +276,7 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
     int i;
     int j;
     int swapped;
+    int dirDiff;
     int r;
 
     tail = 0;
@@ -308,10 +291,11 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
     _chdir(dir);
     // STRING: LEGOLAND 0x004b7a90
     sprintf(spec, "%s%s", fname, ext);
-    count = 0;
     chdirFlag = 0;
+    count = 0;
     h = _findfirst(spec, &fd);
     while (h != -1) {
+        /* build a linked list of the directory entries */
         do {
             if (tail) {
                 tail->next = malloc(12);
@@ -326,58 +310,58 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
             tail->attrib = fd.attrib;
         } while (_findnext(h, &fd) != -1);
         _findclose(h);
-        h = count;
         tail->next = 0;
-        names = malloc(h * 4 + 4);
-        icons = malloc(h * 4);
-        nodes = malloc(h * 4);
-        names[h] = 0;
+        names = malloc(count * 4 + 4);
+        icons = malloc(count * 4);
+        nodes = malloc(count * 4);
+        names[count] = 0;
         node = head;
-        for (i = 0; i < h; i++) {
+        for (i = 0; i < count; i++) {
             nodes[i] = node;
             node = node->next;
         }
-        for (i = 0; i < h - 1; i++) {
+        /* bubble sort: folders first, then by name */
+        for (i = 0; i < count - 1; i++) {
             swapped = 0;
-            for (j = h - 2; j >= i; j--) {
-                a = nodes[j + 1];
-                b = nodes[j];
-                if (((b->attrib ^ a->attrib) >> 4 & 1) != 0) {
-                    if (!(a->attrib & 0x10)) {
-                        continue;
-                    }
-                } else if (_strcmpi(a->name, b->name) >= 0) {
-                    continue;
+            for (j = count - 2; j >= i; j--) {
+                dirDiff = ((nodes[j]->attrib ^ nodes[j + 1]->attrib) >> 4) & 1;
+                if ((dirDiff && (nodes[j + 1]->attrib & 0x10)) ||
+                    (!dirDiff && _strcmpi(nodes[j + 1]->name, nodes[j]->name) < 0)) {
+                    node = nodes[j + 1];
+                    nodes[j + 1] = nodes[j];
+                    nodes[j] = node;
+                    swapped = 1;
                 }
-                nodes[j + 1] = b;
-                nodes[j] = a;
-                swapped = 1;
             }
             if (!swapped) {
                 break;
             }
         }
-        for (i = 0; i < h; i++) {
+        for (i = 0; i < count; i++) {
             names[i] = nodes[i]->name;
-            icons[i] = (nodes[i]->attrib & 0x10) ? folder : file;
+            if (nodes[i]->attrib & 0x10) {
+                icons[i] = folder;
+            } else {
+                icons[i] = file;
+            }
         }
         r = ListBoxDialog(names, title, bg, box, 0, icons, 0x1c, 0x18, 0);
         if (r != -1) {
             if (nodes[r]->attrib & 0x10) {
                 chdirFlag = 1;
             }
-            strcpy(DAT_0081c8e0, names[r]);
             result = DAT_0081c8e0;
+            strcpy(result, names[r]);
         } else {
             result = 0;
         }
         free(names);
         free(icons);
-        for (i = 0; i < h; i++) {
+        for (i = 0; i < count; i++) {
             free(nodes[i]);
         }
         free(nodes);
-        if (chdirFlag == 0) {
+        if (!chdirFlag) {
             KillSprite(drive);
             KillSprite(folder);
             KillSprite(file);
@@ -386,9 +370,8 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
         }
         _chdir(DAT_0081c8e0);
         chdirFlag = 0;
-        result = 0;
-        count = 0;
         tail = 0;
+        count = 0;
         h = _findfirst(spec, &fd);
     }
     return 0;

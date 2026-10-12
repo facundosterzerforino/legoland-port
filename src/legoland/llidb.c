@@ -1150,8 +1150,8 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
             name[len] = '\0';
             RES_ReadFile(file, name, len);
             if (LLIDB_FindElement(name, &element, NULL) == 0) {
-                si->data_14 = element;
                 head->data = si;
+                si->data_14 = element;
                 LLIDB_LoadData((void *)element);
                 *(struct SpriteManager **)(*(int *)(0xc + element) + 0x74) = si;
             }

@@ -585,8 +585,8 @@ int FUN_004966a0(struct Sample *sample) {
         GetTileCentre((struct Point *)&sample->source_x, coord);
         break;
     case 3:
-        coord[0] = sample->source_x - (ScrollX >> 8);
         coord[1] = sample->source_y - (ScrollY >> 8);
+        coord[0] = sample->source_x - (ScrollX >> 8);
     }
     return FUN_004965a0(sample, coord[0], coord[1]);
 }

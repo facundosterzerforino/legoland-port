@@ -880,14 +880,16 @@ LEGO_EXPORT void InsertChildIntoList(struct BuildObject *param_1) {
     struct InterfaceListNode *node;
     struct InterfaceListNode *current;
     struct InterfaceListNode *prev;
+    void *parent;
 
     current = DAT_00668e40;
     node = (struct InterfaceListNode *)malloc(sizeof(struct InterfaceListNode));
     node->data = param_1;
     node->flag = 0;
     node->next = NULL;
+    parent = param_1->parent_element;
     while (current != NULL) {
-        if (((struct BuildObject *)current->data)->element == param_1->parent_element) {
+        if (((struct BuildObject *)current->data)->element == parent) {
             prev = current;
             current = current->next;
             while (current != NULL) {

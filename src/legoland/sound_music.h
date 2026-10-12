@@ -24,6 +24,15 @@ struct SampleSource {
 };
 typedef struct SampleSource SampleSource;
 
+/* SampleSource for a map position (type 2). The bloke slot is an unnamed bit-field: initialisers skip it, so it is
+ * left unwritten as in the original. */
+struct TileSampleSource {
+    /* 0x00 */ unsigned int type;
+    /* 0x04 */ unsigned int : 32;
+    /* 0x08 */ unsigned int x;
+    /* 0x0c */ unsigned int y;
+};
+
 LEGO_EXPORT void KillAllSamplesFromSource(struct SampleSource *source);
 
 LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,

@@ -87,8 +87,8 @@ int FUN_00457970(int dx, int dy) {
 
     dx += ride->footprint.x0;
     dy += ride->footprint.y0;
-    for (y = dy; y < dy + (int)FootprintHeight; y++) {
-        for (x = dx; x < dx + (int)FootprintWidth; x++) {
+    for (y = dy; y < dy + FootprintHeight; y++) {
+        for (x = dx; x < dx + FootprintWidth; x++) {
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
                 elem = &GameMap[y][x];
             } else {
@@ -234,8 +234,8 @@ void FUN_00457a70(void) {
             if (DAT_0080ff6c != NULL && (((struct ObjClass *)DAT_0080ff6c)->flags & 0x2000000)) {
                 DAT_00667cd8 = 1;
                 DAT_00667cdc = 0;
-                for (y = DAT_00813a88; y <= (int)DAT_00813a90; y += DAT_00813a3c) {
-                    for (x = DAT_00813a84; x <= (int)DAT_00813a8c; x += DAT_00813a38) {
+                for (y = DAT_00813a88; y <= DAT_00813a90; y += DAT_00813a3c) {
+                    for (x = DAT_00813a84; x <= DAT_00813a8c; x += DAT_00813a38) {
                         QueryCursor.field_1414[4] = 0;
                         QueryCursor.tile_x = x;
                         QueryCursor.tile_y = y;
@@ -320,8 +320,8 @@ void FUN_00457a70(void) {
                     DAT_00667cd8 = 1;
                     DAT_00667cdc = 0;
                     if (EditMode.unk8 == PathControlObject) {
-                        for (y = DAT_00813a88; y <= (int)DAT_00813a90; y += FootprintHeight) {
-                            for (x = DAT_00813a84; x <= (int)DAT_00813a8c; x += FootprintWidth) {
+                        for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
+                            for (x = DAT_00813a84; x <= DAT_00813a8c; x += FootprintWidth) {
                                 pt.x = x - EditMode.unk8->footprint.x0;
                                 pt.y = y - EditMode.unk8->footprint.y0;
                                 if (pt.x >= 0 && pt.x < lpConfig->width && pt.y >= 0 && pt.y < lpConfig->height) {
@@ -335,8 +335,8 @@ void FUN_00457a70(void) {
                             }
                         }
                     }
-                    for (y = DAT_00813a88; y <= (int)DAT_00813a90; y += FootprintHeight) {
-                        for (x = DAT_00813a84; x <= (int)DAT_00813a8c; x += FootprintWidth) {
+                    for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
+                        for (x = DAT_00813a84; x <= DAT_00813a8c; x += FootprintWidth) {
                             pt.x = x - EditMode.unk8->footprint.x0;
                             pt.y = y - EditMode.unk8->footprint.y0;
                             if (FUN_00457970(pt.x, pt.y)) {

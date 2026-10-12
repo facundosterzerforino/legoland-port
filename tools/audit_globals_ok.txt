@@ -122,3 +122,4 @@ indexed:0x0062fe94 LoadZoomer: port reads DAT_0062fe98 for index 1 (47661c1): re
 indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites explicitly (47661c1): reviewed, harmless
 0x004b7ac0 BlokeColours (0x18 of 0x20): reviewed, harmless (8 RGB triples, then alignment padding before DAT_004b7ae0)
 0x007fe9c0 PointerSprites (0x24 of 0x50): reviewed, harmless (the 9 cursors debug.c loads; SetPointer indexes only those)
+0x00799258 MusicTransitionSegments (0x64 of 0x9c4): reviewed, harmless (the 5x5 theme-to-theme transitions; every index is [theme][theme] with themes 0-4)

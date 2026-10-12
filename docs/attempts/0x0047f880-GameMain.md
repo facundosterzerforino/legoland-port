@@ -19,6 +19,7 @@
 | 2026-10-07 | Claude Opus 5.5 | `i < 3U` (unsigned constant) | 99.62% (still `jl`) |
 | 2026-10-07 | Claude Opus 5.5 | `(unsigned)i < 3U` | 99.62% (still `jl`: MSVC6 picks the signed jump even for an explicitly unsigned compare here) |
 | 2026-10-07 | Claude Opus 5.5 | `i < (int)3U` (control) | 99.62% (`jl`) |
+| 2026-10-09 | Opus 5.5 | volume loop bound as `unsigned int i`, `3u`, `sizeof(ResourceFileNames)/sizeof(...)` (the original uses `jb` for `i < 3` but signed for `0 < i`) | no change (MSVC proves i >= 0 and emits jl for every form); note ResourceVolumes is declared [4] but the loop runs 3 |
 
 ## Ideas not tried yet
 

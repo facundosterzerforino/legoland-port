@@ -173,11 +173,11 @@ int FUN_00411f70(struct Queue *queue, struct QueueItemInner *inner) {
 void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueItemInner *inner) {
     struct QueueTable *table = queue->count;
     struct QueueStep *step = &table->steps[inner->field_38];
-    struct QueueNode *node;
     short cur;
+    struct QueueNode *node;
     char dir;
     int x;
-    int y;
+    volatile int y;
 
     x = (step->dx + param_2) << 8;
     y = (step->dy + param_3) << 8;
@@ -229,21 +229,21 @@ void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_
 
 // FUNCTION: LEGOLAND 0x00412100
 int FUN_00412100(struct PathTable *param_1) {
-    int total = 0;
     int px;
     int py;
     int i;
     struct QueueTable *table;
     int k;
     int j;
-    int sx;
-    int sy;
+    POINT start;
     int dx;
     int dy;
     int len;
     int cx;
     int cy;
+    int total;
 
+    total = 0;
     for (i = 0; i < param_1->count; i++) {
         int x = param_1->pairs[i].a;
         int y = param_1->pairs[i].b;
@@ -255,30 +255,30 @@ int FUN_00412100(struct PathTable *param_1) {
         table->count = total;
         table->steps = (struct QueueStep *)(table + 1);
     }
-    sx = 0;
-    sy = 0;
+    start.x = 0;
+    start.y = 0;
     k = 0;
     for (i = 0; i < param_1->count; i++) {
         struct PathPair *p = &param_1->pairs[i];
         dx = p->a;
         dy = p->b;
         len = (int)sqrt((double)(dy * dy + dx * dx));
-        px = 0;
-        py = 0;
-        cx = sx;
-        cy = sy;
-        for (j = len; j > 0; j--) {
-            table->steps[k].dx = cx;
-            table->steps[k].dy = cy;
-            k++;
-            cx = sx + px / len;
-            cy = sy + py / len;
-            px += dx;
-            py += dy;
+        cx = start.x;
+        cy = start.y;
+        if (len > 0) {
+            px = py = 0;
+            for (j = len; j > 0; j--) {
+                table->steps[k].dx = cx;
+                table->steps[k].dy = cy;
+                k++;
+                cx = start.x + px / len;
+                cy = py / len + start.y;
+                px += dx;
+                py += dy;
+            }
         }
-
-        sx += dx;
-        sy += dy;
+        start.x += dx;
+        start.y += dy;
     }
     return (int)table;
 }

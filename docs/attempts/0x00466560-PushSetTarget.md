@@ -1,6 +1,6 @@
 # PushSetTarget (0x00466560, `src/legoland/draw.c`)
 
-**Best: 85.71%** (start). Kind: C.
+**Best: 100% (matched 2026-10-09)** (start). Kind: C.
 
 ## What still differs
 
@@ -15,6 +15,7 @@
 |---|---|---|---|
 | 2026-10-08 | Haiku 5.5 (a4) | Moved `renderEngine = sprite->surface` before `renderEngineTargetIdx++` | 80.00% (worse) |
 | 2026-10-08 | Haiku 5.5 (a4) | Read `sprite->surface` into a new local `next` at the top | 68.49% (worse, extra callee-saved reg esi) |
+| 2026-10-09 | Opus 5.5 | store through `slot = &renderEngineTargets[idx]; *slot = ...` (a pointer store aliases the index, so it is reloaded like the original), then `idx++`, then `renderEngine = sprite->surface` | **100** |
 
 ## Ideas not tried yet
 

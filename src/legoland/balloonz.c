@@ -408,9 +408,9 @@ void BalloonzUpdate(Element *obj) {
         stop = 0;
         can_unload = state->can_unload;
         memcpy(cars, state->cars, sizeof(cars));
-        leaving = state->leaving;
-        pos = state->pos;
         lap = state->lap;
+        pos = state->pos;
+        leaving = state->leaving;
         can_board = 0;
         if (pos % 8 == 0 || pos == 0) {
             car = BalloonzCarAtPos(pos, lap);

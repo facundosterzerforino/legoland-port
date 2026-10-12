@@ -208,3 +208,29 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   same bytes but point at the original's layout, not ours. `asm2naked.py` names every address it can and
   reports the rest.
 
+## Switch case order changes tail merging
+
+- MSVC6 merges identical `return N` blocks (cross-jumping), and which copies survive depends on the order the
+  `case` labels appear in the source, not on their values. If the original keeps a `return 3` as its own block
+  where ours jumps to a shared one (or the jump table points at a different copy), try every order of the
+  case blocks: FUN_004092b0 went 84.6% -> 100% with `case 1, case 0, case 2, case 3`.
+- Likewise a jump-table-only difference can mean the original split shared labels
+  (`case 1: case 2: ... /* fall through */ case 3: case 4:`), as in OctopusCafeUpdate.
+
+## Frame-size and slot diagnostics (2026-10-11)
+
+- **Compare the frame size first** (`sub esp, N`, or `mov eax, N; call __chkstk`). If the original's is
+  bigger, the source had more distinct variables than ours: look for a variable reused in two places (a
+  `struct Point pt` used for map coordinates in one loop and for corners in another) and give the second use
+  its own block-scoped variable. RenderView went 69.8% -> 72.5% that way (+8 of the missing 12 bytes).
+  If ours is bigger, a variable the original packs into a dead parameter slot is staying live in ours.
+- **Which variable packs into a dead parameter slot** depends on the statement order of the setup code:
+  FUN_0041df00 moved `lo = 0` after the struct copy, and `lo` (not `hi`) went into obj's slot
+  (67.8% -> 71.4%).
+- **A `volatile` that raises the score is a clue, not a fix.** It means the original keeps that value in
+  memory, or that the variable needs more weight in the slot ordering. Look for the source shape behind it
+  (value live across a call, read through its stack slot, more references) before keeping the volatile.
+- **Save/load records:** if the original stores a zero-extended dword where ours stores a word or byte, the
+  record field is wider than we declared (BlokeSave.prev_param/prev_action, as WorkerSave already had).
+- **`// STRING:` annotations must sit directly above the line with the literal**, not above a `{` block; a
+  misplaced one is silently ignored and the string shows as a raw address in the diff.

@@ -284,10 +284,8 @@ void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3) {
         flag = e->field_14 & 0x10;
     }
     FUN_00413520(param_2, param_3, &r);
-    if (r.field_0 != NULL) {
-        if (r.field_0->field_8 == id) {
-            mask = count = 1;
-        }
+    if (r.field_0 != NULL && r.field_0->field_8 == id) {
+        mask = count = 1;
     }
     if (r.field_8 != NULL && r.field_8->field_8 == id) {
         count++;
@@ -494,18 +492,25 @@ void DrivingSchoolRoadsSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00413b50
 void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
-    unsigned int bits;
-    struct Ride *ride = obj->ride;
+    int bits;
     struct RoadTile *t;
+    struct Ride *ride;
 
-    struct NeighborResult r;
     struct MapRect rect;
-    struct RoadQueueEntry **q = (struct RoadQueueEntry **)&r;
+    struct NeighborResult r;
     unsigned short type;
+    int ptmp553;
+    int ptmp236;
+    volatile int ptmp237;
+    register volatile unsigned int ptmp554;
+    struct RoadQueueEntry **q = (struct RoadQueueEntry **)&r;
     int result;
     int cost;
+    ptmp236 = obj->ride;
+    ride = ptmp236;
 
-    memcpy(EditCursor.field_1414, &ride->footprint, 20);
+    ptmp237 = EditCursor.field_1414;
+    memcpy(ptmp237, &ride->footprint, 20);
     bits = 0;
     EditCursor.field_1830 = bits;
     ScreenToMapRef(param_2, (int *)&EditCursor.tile_x, param_3);
@@ -515,7 +520,8 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
         return;
     }
     rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
-    rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
+    ptmp553 = EditCursor.tile_y;
+    rect.y0 = EditCursor.field_1414[1] + ptmp553;
     rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
     rect.y1 = EditCursor.field_1414[3] + EditCursor.tile_y;
     result = CheckForPeople(&rect);
@@ -532,9 +538,7 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
             SetCursorBlocked(&EditCursor, 2);
         } else {
             if (IsCursorBuildable(&EditCursor) != 0) {
-                if (FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &r) == 0) {
-                    SetCursorBlocked(&EditCursor, 0xe);
-                } else {
+                if (!(FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &r) == 0)) {
                     if (q[0] != NULL) {
                         type = q[0]->field_8;
                     } else if (q[2] != NULL) {
@@ -559,13 +563,16 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
                     if ((bits & 7) == 7 || (bits & 0x1c) == 0x1c || (bits & 0x70) == 0x70 || (bits & 0xc1) == 0xc1) {
                         SetCursorBlocked(&EditCursor, 0xe);
                     }
+                } else {
+                    SetCursorBlocked(&EditCursor, 0xe);
                 }
             }
             if (t != NULL && IsCursorBuildable(&EditCursor) != 0) {
                 memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
                 EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
                 DAT_0082f760.tile_x = t->x;
-                DAT_0082f760.tile_y = t->y;
+                { ptmp554 = t->y; }
+                DAT_0082f760.tile_y = ptmp554;
                 DAT_0082f760.field_1830 = 0;
                 DAT_0082f760.field_1828 = 0x2034;
             } else {

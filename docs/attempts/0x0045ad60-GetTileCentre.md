@@ -14,6 +14,7 @@
 | 2026-10-07 p6 | Haiku agent | `out[1] = (...) * (...) + lpConfig->view_y - (ScrollY >> 8);` without the temp `y` | 93.02% (no change) |
 | 2026-10-07 p6 | Haiku agent | `out[1] = lpConfig->view_y + (...) * (...) - (ScrollY >> 8);` | 93.02% (no change) |
 | 2026-10-07 p6 | Haiku agent | `int y`, `y += lpConfig->view_y;`, then `out[1] = y - (ScrollY >> 8);` | 93.02% (no change) |
+| 2026-10-09 | Opus 5.5 | `y +=` / `y -=` statements, `(int)` view_y, `(unsigned int)(ScrollY >> 8)`, `+ (view_y - (ScrollY >> 8))`, `- (ScrollY >> 8) + view_y` | 93.02 (no change, the ScrollY load is always scheduled first) |
 
 ## Ideas not tried yet
 
