@@ -62,7 +62,7 @@ void FUN_00476070(int mask, unsigned int value);
 void FUN_00476140(int index, int value);
 void FUN_00476180(void);
 int GetPerformanceTime(void);
-int FUN_00476910(struct MovieHandle *handle);
+int OpenMovieAudio(struct MovieHandle *handle);
 int StartMovieAudio(struct MovieHandle *handle);
 int StopMovieAudio(void);
 int UpdateAviAudioBuffer(unsigned int param_1, int param_2);
