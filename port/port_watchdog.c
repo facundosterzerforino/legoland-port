@@ -32,15 +32,13 @@ static CONTEXT report_context;
 static DWORD report_stack[STACK_WORDS];
 static int report_stack_words;
 
-/* Hardware write watchpoints (debug registers DR0/DR1) on globals that only level loading should write. A write
- * from anywhere else is logged with the writing code's rva and the stack's exe addresses, to find code that
- * overruns its own buffer into them (the map state was wiped this way while placing rides). */
-extern void *GameMapRawBlock;
-extern unsigned int DAT_00667ca4;
+/* Hardware write watchpoints (debug registers DR0-DR3, set with PortWatchRequest while debugging). A write is
+ * logged with the writing code's rva and the stack's exe addresses, to find code that overruns its own buffer
+ * into a global (the sensory coaster's z-buffer fill wiped the map state this way, 2026-10-07). */
 static struct {
     void *address;
     const char *name;
-} watches[4]; /* DR0-DR3; 2 and 3 are set at run time with PortWatchRequest */
+} watches[4];
 static volatile LONG watch_reports;
 static volatile LONG watch_rearm;
 #define MAX_WATCH_REPORTS 40
@@ -205,7 +203,7 @@ static void ArmWatches(void) {
 }
 
 void PortWatchRequest(int slot, void *address, const char *name) {
-    if (slot < 2 || slot > 3) {
+    if (slot < 0 || slot > 3) {
         return;
     }
     watches[slot].address = (void *)((DWORD)address & ~3u);
@@ -300,11 +298,6 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
     EXCEPTION_RECORD *record;
 
     (void)unused;
-    watches[0].address = &GameMapRawBlock;
-    watches[0].name = "GameMapRawBlock";
-    watches[1].address = &DAT_00667ca4;
-    watches[1].name = "DAT_00667ca4";
-    ArmWatches();
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     symbols_ready = SymInitialize(GetCurrentProcess(), exe_dir, TRUE);
     for (;;) {

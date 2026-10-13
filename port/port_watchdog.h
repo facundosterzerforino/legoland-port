@@ -18,8 +18,9 @@ void PortWatchdogStart(void);
 void PortHeartbeat(void);
 void PortSetPhase(const char *phase); /* a string literal or other static text; also bumps the heartbeat */
 void PortSetPaused(int paused); /* the game waits for its window on purpose: don't report */
-/* Watch 4 bytes for writes with debug register 2 or 3 (armed by the watchdog thread within 250 ms); every write is
- * traced with the writing code and the stack. A diagnostic: name is a string literal. */
+/* Watch 4 bytes for writes with debug register slot 0-3 (armed by the watchdog thread within 250 ms); every write
+ * is traced with the writing code and the stack. A diagnostic, nothing calls it in normal builds: name is a
+ * string literal. */
 void PortWatchRequest(int slot, void *address, const char *name);
 
 #endif

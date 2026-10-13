@@ -373,14 +373,6 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
         SetBkMode(hdc, 1);
         old_font = SelectFont(hdc, font);
         text_h = DrawTextA(hdc, text, strlen(text), &box, 0x410);
-#ifdef LEGOLAND_PORT
-        /* [port] diagnosing empty speech bubbles: once per new text cell */
-        DebugTrace("BubbleHelp: \"%.60s\" font %d (handle %p) -> %d high, box %ld..%ld, dc %p, err %lu", text, font,
-            (void *)(font == 1 ? LegoFont20Bold : font == 2 ? LegoFont18SemiBold
-                    : font == 3                             ? LegoFont28Normal
-                                                            : LegoFont24Bold),
-            text_h, box.left, box.right, (void *)hdc, GetLastError());
-#endif
         box.top = rect[1];
         box.bottom = text_h + box.top;
         SelectObject(hdc, old_font);

@@ -92,7 +92,17 @@ needs them too.
 **Why generate source instead of loading the exe at runtime:** `legoland.exe` may be committed (see
 `PORTING.md`), generated initializers have no load-time patching, and they keep working on 64-bit and Android.
 
-## Phase 4: first boot, with the original APIs
+## Phase 4: first boot, with the original APIs (done)
+
+**Status:** done 2026-10-13, after the maintainer's full playthrough on Windows 11 (all ten game levels, the
+tutorials, movies, music, sound, speech, saves, the appraisals, the end movies and the certificate printout).
+Bugs found on the way, nearly all data the modern compiler lays out differently from MSVC6: globals declared
+smaller than the original (split tables, a name buffer written past its end), locals that MSVC6 happened to
+place next to each other (the sensory coaster's z-buffer fill), and one wrong string index that emptied every
+advisor reminder (`PercentSFormat`). The fixes that also apply to the decomp were made there and merged.
+Port additions made during this phase, all off by default or invisible: the debug console's `variety` and
+appraisal targets, the "music follows the level" launcher option, the mouse wheel in windowed mode, and the
+certificate printing to the default printer.
 
 Windows 11 still ships DirectDraw, DirectSound and DirectInput as compatibility layers. Running once with the
 original API calls gives a baseline that later phases are compared against.
@@ -109,8 +119,6 @@ original API calls gives a baseline that later phases are compared against.
 the original DirectX APIs on Windows 11, is the reference that phases 5+ are compared against (the whole
 campaign has been played on it: levels, movies, music, sound, saves, the certificate).
 
-**Status (2026-10-08):** everything above works, well past the title screen. Phase 4 is marked done after
-the maintainer's full playthrough.
 
 ## Phase 5: miniwin + SDL3 (window, video, input, files)
 

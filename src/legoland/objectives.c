@@ -281,17 +281,6 @@ struct ObjectiveEvent *PostObjectiveMessage(const char *format, ...) {
     if (event != NULL) {
         va_start(args, format);
         vsprintf(DAT_0066820c, format, args);
-#ifdef LEGOLAND_PORT
-        {
-            /* [port] diagnosing the advisor's empty speech bubble (2026-10-12): who posts an empty message */
-            static int reported;
-            if (DAT_0066820c[0] == 0 && reported < 20) {
-                reported++;
-                DebugTrace("objective message: EMPTY (format \"%.40s\"), called from rva %08lx", format,
-                    PortRva(PORT_CALLER()));
-            }
-        }
-#endif
         SetObjectiveEventText(event, (unsigned int)DAT_0066820c, 1);
         InsertObjectiveMessageSorted(event);
     }
@@ -785,19 +774,6 @@ void PostPendingObjectiveHints(void) {
         if (node != NULL) {
             switch (node->type) {
             case 0:
-#ifdef LEGOLAND_PORT
-            {
-                /* [port] diagnosing empty advisor messages: the script string this reminder shows */
-                static int reported;
-                const char *text = (const char *)ScriptStringTable[node->field_40];
-                if ((text == NULL || text[0] == 0 || text[0] == '@') && reported < 20) {
-                    reported++;
-                    DebugTrace("objective message: string %u of %u is \"%.40s\" (event flags %02x, current PROMPT %u)",
-                        node->field_40, ScriptStringCount, text != NULL ? text : "(null)", node->flags_10,
-                        DAT_007fdca4);
-                }
-            }
-#endif
                 PostObjectiveMessage((char *)PercentSFormat, ScriptStringTable[node->field_40]);
                 DAT_00668614 = node->field_40;
                 break;

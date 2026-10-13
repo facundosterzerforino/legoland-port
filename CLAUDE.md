@@ -87,31 +87,19 @@ describe how `main` works.
   `legoland-port-trace-prev.txt`). The watchdog (`port/port_watchdog.c`) writes `CRASH:`/`FREEZE detected` with a
   symbolized stack and saves `run\crash-*.dmp` / `freeze-*.dmp`. For crashes the in-game handler can't catch,
   `tools/dbgrun` is a small debugger (`dbgrun.exe <log> <exe> args`). `tools/minidump.py` reads a dump from WSL by
-  global name (values, neighbours, zeroed runs, value search; pass the .pdb of the exe that crashed). The watchdog
-  arms hardware write watchpoints (`watch:` lines in the trace, `ArmWatches` in `port/port_watchdog.c`) to catch
-  code that overwrites globals it doesn't own. Work from the code; ask the maintainer to reproduce.
+  global name (values, neighbours, zeroed runs, value search; pass the .pdb of the exe that crashed). To catch code
+  that overwrites globals it doesn't own, call `PortWatchRequest(slot, &global, "name")` (`port/port_watchdog.h`,
+  hardware write watchpoints, `watch:` lines in the trace); take the calls out again once the bug is found. Work from the code; ask the maintainer to reproduce.
 - **Windowed mode:** `run\legoland-windowed.exe WINDEBUG`, working directory `installed\`. (Windows keeps
   "16-bit colour, 640x480" compatibility flags on `legoland-port.exe`, which change the desktop resolution.)
 - **Most bugs so far were data, not code:** globals declared smaller than in the original exe, tables with
   missing or wrong entries, unfinished functions, and MSVC6 tricks that are undefined behaviour in modern C (e.g.
   `(&param_4)[1]`). Run the audits in step 5 of the merge steps above after every decomp merge.
 
-Status (phase 4, `ROADMAP.md`): boot, menus, tutorial, building, music, sound, speech, movies (Indeo via FFmpeg),
-windowed mode all work on Windows 11. Fixed on 2026-10-04: lesson-2 tree objective, greenhouse crash, copters
-crash (NULL sample). Open:
-- Sensory coaster crash (GetTileBounds, map globals zeroed): fixed 2026-10-07. The watchpoints caught the
-  z-buffer clear (`FUN_00423140` -> `FUN_004232b0` -> `PortFillPolygon`): `FUN_004232b0` stored the end line
-  through an offset from `idx` that only reaches `src[n - 1]` when the two locals are adjacent (MSVC6), so
-  clang left it uninitialized and the fill ran ~2.4 MB past the buffer. Fixed in the decomp (`08df14b`);
-  confirm in game. The watchpoints in `ArmWatches` can come out once it is confirmed.
-- Copters sounds: fixed 2026-10-07 (gen_data aimed their name pointers past the 8-byte `CopterPathTable4`);
-  confirm in game that the helicopter sounds and copter models load ("Loaded SFX Helicopter ..." in the trace).
-- Phase 4 is done once the maintainer's full playthrough (all levels, the three parks, gallery, save/load, end
-  screens, certificate printing) finds nothing new; then mark it done in `ROADMAP.md`. No reference VM: this
-  port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08).
-- Certificate printing: fixed 2026-10-08 (default printer by name, full landscape DEVMODE); confirm in game.
-- Temporary diagnostics to remove after the playthrough: the `build:` and `BubbleHelp:` trace lines
-  (map_object.c, text.c) and the coaster watchpoints (`ArmWatches`).
+Status: phase 4 is done (2026-10-13, after the maintainer's full playthrough; see `ROADMAP.md`). No reference
+VM: this port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08). Next is
+phase 5 (miniwin + SDL3). The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
+armed (`PortWatchRequest`).
 
 ---
 

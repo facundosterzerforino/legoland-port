@@ -686,15 +686,6 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
     packed.pos.y = (unsigned char)coords[1];
     obj = editObj->obj;
     cost = GetObjCost(obj);
-#ifdef LEGOLAND_PORT
-    /* [port] which class each placement counts towards (scenery variety: the appraisal counts classes) */
-    DebugTrace("build: \"%s\" at %d,%d -> class of \"%s\"%s", editObj->name != NULL ? editObj->name : "?", coords[0],
-        coords[1],
-        obj != NULL && ((struct Ride *)obj)->element != NULL && ((struct Ride *)obj)->element->name != NULL
-            ? ((struct Ride *)obj)->element->name
-            : "?",
-        GetBrickCount() < cost ? " (not enough coins)" : "");
-#endif
     if (GetBrickCount() < cost) {
         return 0;
     }
