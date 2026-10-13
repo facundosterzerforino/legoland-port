@@ -4,9 +4,6 @@
 #include <string.h>
 #include "globals.h"
 #include "legoland.h"
-#ifdef LEGOLAND_PORT
-#include "debug.h"
-#endif
 
 #include "debug_alloc.h"
 #include "draw.h"

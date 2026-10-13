@@ -19,9 +19,6 @@
 #include "map_object.h"
 #include "math.h"
 #include "obj_instance.h"
-#ifdef LEGOLAND_PORT
-#include "debug.h"
-#endif
 #include "objclass.h"
 #include "pathfind.h"
 #include "print_sprite.h"

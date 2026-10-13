@@ -1,13 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include "debug.h"
 #include "globals.h"
 #include "legoland.h"
 #ifdef LEGOLAND_PORT
 #include <stdio.h>
 #include "debug.h"
-#include "port_trace.h"
-#include "port_watchdog.h"
 #include "resource.h"
 #endif
 
