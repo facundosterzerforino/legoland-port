@@ -98,9 +98,10 @@ describe how `main` works.
 
 Status: phase 4 is done (2026-10-13, after the maintainer's full playthrough; see `ROADMAP.md`). No reference
 VM: this port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08). Phase 5
-(miniwin + SDL3) is under way: see its status in `ROADMAP.md`. After changing `miniwin/src/ddraw.c`, run
-`tools/test_miniwin/build.sh && tools/test_miniwin/test_miniwin.exe` (a console program, no window; it compares
-miniwin's DirectDraw with Windows' own and must report 0 failed). The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
+(miniwin + SDL3) is under way: see its status in `ROADMAP.md`. After changing `miniwin/src/ddraw.c` or `files.c`, run
+`tools/test_miniwin/build.sh`, then `tools/test_miniwin/test_miniwin.exe` (compares miniwin's DirectDraw with
+Windows' own) and `test_paths.exe` (path matching on a case-sensitive folder); console programs, no window, both
+must report 0 failed. The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
 armed (`PortWatchRequest`).
 
 ---

@@ -21,10 +21,11 @@ if(LEGOLAND_MODERN_BUILD)
     file(GLOB EXTENSION_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/extensions/*.c")
     list(APPEND PORT_SOURCES ${EXTENSION_SOURCES})
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
-    # [library:timer] the game's clock calls (GetTickCount, QueryPerformanceCounter, Sleep) go to miniwin's versions
-    # on SDL3 under the same names: miniwin/timer.h comes first in every game source
+    # [library:timer] [library:filesystem] the game's clock and file calls (GetTickCount, fopen, _open,
+    # CreateFileA...) go to miniwin's versions under the same names: miniwin/redirect.h comes first in every game
+    # source
     set_source_files_properties(${LEGOLAND_SOURCES} PROPERTIES COMPILE_OPTIONS
-        "/FI${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/miniwin/timer.h")
+        "/FI${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/miniwin/redirect.h")
     # [port] SDL3, the platform layer from phase 5 on (ROADMAP.md): a pinned release, downloaded at configure
     # time and built as a static library with the same toolchain and static C runtime. To build offline, unpack
     # the tarball somewhere and configure with -DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>.

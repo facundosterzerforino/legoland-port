@@ -136,12 +136,21 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
   DirectInput's keyboard and mouse devices on SDL (the keyboard as DirectInput's 256 bytes by DIK code, through a
   table generated from SDL's own Windows scancode table); the windowed mouse code, the focus checks and Caps Lock
   use SDL too. No `dinput.dll` import any more.
-- Step 5, timers, waiting for the maintainer's test: `miniwin/timer.h` is included first into every game source
-  and sends GetTickCount, QueryPerformanceCounter/Frequency and Sleep to SDL3 (`miniwin/src/timer.c`).
+- Step 5 is done (confirmed in game): `miniwin/redirect.h` is included first into every game source and sends
+  GetTickCount, QueryPerformanceCounter/Frequency and Sleep to SDL3 (`miniwin/src/timer.c`).
   GetTickCount keeps Windows' 15.625 ms steps: the frame limiter waits 28 ms on it, so frames last 31.25 ms, and a
   precise clock would make the game run about 10% faster. Threads stay as they are until phase 6: the only game
   threads are the sound and music ones (and the debug console's).
-- Still Windows-only underneath: GDI text on the surfaces (GetDC), DirectSound, the registry.
+- Step 6, files, waiting for the maintainer's test: through `miniwin/redirect.h` too, every file the game opens
+  (fopen, _open, CreateFileA, remove, _mkdir, _findfirst, GetFileAttributesA, SetCurrentDirectoryA) goes through
+  `MiniwinPath` (`miniwin/src/files.c`): backslashes become '/', and a path that isn't on disk as written is matched
+  part by part without regard to case. On Windows nothing changes (its folders ignore case);
+  `tools/test_miniwin/test_paths.exe` checks the matching on a case-sensitive folder. The CD check already passes
+  whenever the data folder is complete (`cdcheck.c`). Movies (AVIFile) come with phase 6.
+- Step 7, settings: nothing to do. The game itself never touches the registry; its settings and profiles are files
+  in the data folder, and the launcher's choices are in `legoland-port.ini`.
+- Still Windows-only underneath: GDI text on the surfaces (GetDC), DirectSound and the movies (phase 6), and the
+  launcher window (a Windows dialog; other platforms will need their own).
 
 Replace the Windows-only layers with SDL3 behind `miniwin/`, one subsystem at a time, checking against phase 4's
 build after each.
