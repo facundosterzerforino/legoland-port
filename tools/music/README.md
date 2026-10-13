@@ -24,16 +24,21 @@ the game's music: keep them out of the repository.
   which patterns can play there and, for each of their parts, every variation's notes; DirectMusic's notes on each
   channel must be one of them exactly. Writes the choices found to `<recording>.choices` (level 3, the statistics).
   `DETAIL=<segment>:<bar>:<channel>` prints what was played there and what each variation would play.
+- `play_engine.exe <data folder> <out folder> <runs> <master groove> <segment.sgt>...` plays segments through
+  miniwin's style engine (`miniwin/src/dmengine.c`, the portable DirectMusic) offline and writes the same format,
+  for the same checks.
 
 ## What the recordings showed (all 30 segments the game plays, 6 runs each at master groove 0 and +1)
 
-Level 1: all 290510 notes have dmusic's pitch. Level 2: all 22868 channel-bars are one of the model's choices.
+Level 1: all 290510 notes have dmusic's pitch. Level 2: all 24608 channel-bars (3456 bars) are one of the model's
+choices.
 The model:
 
 1. Without a chord track, the chord is root 12 (C), chord pattern 0x91 (major triad), scale 0xAB5AB5 (major).
 2. The style track gives each bar's style. A pattern is picked among the style's patterns whose groove range holds
-   the groove level (the command track's plus the master groove), with the groove embellishment; it plays to its
-   end (some are two bars) before the next pick, from the style in force then.
+   the groove level (the command track's plus the master groove), or when none does, comes closest to it (the
+   transitions have level 1 patterns only, and play them at master groove +1), with the groove embellishment; it
+   plays to its end (some are two bars) before the next pick, from the style in force then.
 3. Each part reference picks one of its part's variations. Parts with the same variation lock id play the same
    one: the first part of the group, in the pattern's order, picks among its own enabled variations, and the others
    follow even where they disable it.
@@ -44,3 +49,16 @@ The model:
    loaded.
 7. Random picks are uniform: variations among the candidates (2: 49.5/50.5%, 3: 35.7/29.2/35.1%, 5: about 20%
    each), and patterns when two fit (300/264).
+
+## The engine
+
+`miniwin/src/dmengine.c` follows the model, with dmusic for the files and the synthesizer, and
+`miniwin/src/dmusic.c` gives the game the DirectMusic objects on top (with `-portable-music`). Checked with
+`play_engine.exe` and the same tools, 6 runs of every segment at both master grooves: all 290681 notes have the
+right pitch, all 3456 bars are the model's, and the random picks spread like DirectMusic's (2 candidates
+46.1/53.9%, 4 candidates 19-20% each and 10-12% for the two rarer; patterns 294/270).
+
+The synthesizer is TinySoundFont on Windows' gm.dls, so the sound differs from Microsoft's: that part is judged by
+ear. dmusic's channel volume follows DLS (volume and expression each squared, multiplied), and the engine's overall
+gain makes the main theme as loud as Windows' DirectMusic plays it into the same buffer (`test_dmusic.exe` reports
+both levels).

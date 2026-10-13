@@ -550,11 +550,27 @@ int main(int argc, char **argv) {
                 int nres[16], good[16], ngood = 0, best = -1, best_ok = -1, np = 0;
                 DmPattern *cand[16];
 
+                /* the patterns whose groove range holds the level or, when none does, comes closest to it */
+                int nearest = 1000;
+
+                for (p = 0; p < sty->patterns.length; p++) {
+                    DmPattern *pttn = &sty->patterns.data[p];
+                    int d = groove < pttn->groove_bottom ? pttn->groove_bottom - groove
+                        : groove > pttn->groove_top      ? groove - pttn->groove_top
+                                                         : 0;
+
+                    if (pttn->embellishment == 0 && d < nearest) {
+                        nearest = d;
+                    }
+                }
                 for (p = 0; p < sty->patterns.length && np < 16; p++) {
                     DmPattern *pttn = &sty->patterns.data[p];
                     int ok = 0, c;
+                    int d = groove < pttn->groove_bottom ? pttn->groove_bottom - groove
+                        : groove > pttn->groove_top      ? groove - pttn->groove_top
+                                                         : 0;
 
-                    if (groove < pttn->groove_bottom || groove > pttn->groove_top || pttn->embellishment != 0) {
+                    if (d != nearest || pttn->embellishment != 0) {
                         continue;
                     }
                     cand[np] = pttn;
