@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds the music tools (clang-cl + lld-link with the xwin SDK, like the clang-cl-x86 preset). record_dmusic links
-# miniwin's DirectSound and the SDL3 that the port build fetched: build build-clang-x86 first. The checkers build
-# port/dmusic in.
+# miniwin's DirectSound and the SDL3 that the port build fetched: build build-clang-x86 first. The others build
+# port/dmusic in (and play_engine miniwin's style engine).
 set -e
 cd "$(dirname "$0")"
 X="${XWIN_DIR:-$HOME/xwin}"
@@ -20,4 +20,6 @@ clang-cl $CFLAGS $INCLUDES -I../../miniwin/include -I$SDL/sdl3-src/include -I$SD
 for tool in check_notes check_bars; do
     clang-cl $CFLAGS $INCLUDES $DMFLAGS $tool.c $DMSOURCES /Fe$tool.exe /link /machine:x86 $LIBPATHS
 done
+clang-cl $CFLAGS $INCLUDES $DMFLAGS -I../../miniwin/include play_engine.c ../../miniwin/src/dmengine.c $DMSOURCES \
+    /Feplay_engine.exe /link /machine:x86 $LIBPATHS
 rm -f *.obj

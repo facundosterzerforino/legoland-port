@@ -56,6 +56,8 @@ if(LEGOLAND_MODERN_BUILD)
     set_property(TARGET dmusic PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     set_property(TARGET dmusic PROPERTY C_STANDARD 11)
     target_link_libraries(legoland PRIVATE dmusic)
+    # miniwin's DirectMusic (miniwin/src/dmusic.c, dmengine.c) works with dmusic's internals
+    target_include_directories(legoland PRIVATE "${DMUSIC_DIR}/src" "${DMUSIC_DIR}/vendor/TinySoundFont")
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
     # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
     # below 0x0800 keeps DirectInputCreateA declared.

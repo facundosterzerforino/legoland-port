@@ -193,7 +193,12 @@ build after each.
   DirectSound like the game's other sounds (one mixer, one volume and focus behaviour); `port/port_audio.c`, the
   separate Windows DirectSound, is gone. `tools/test_miniwin/test_dmusic.exe` sets DirectMusic up the way the game
   does on miniwin's DirectSound and checks that the music reaches it. Part 2, the portable replacement: GothicKit
-  dmusic, checked note by note against a recording of what Windows' DirectMusic plays, and synth by synth.
+  dmusic, checked note by note against a recording of what Windows' DirectMusic plays.
+- Step 3, part 2, waiting for the maintainer's listening test: miniwin's DirectMusic (`miniwin/src/dmusic.c`, the
+  objects the game's music thread uses) on a style engine (`miniwin/src/dmengine.c`) built from what the
+  recordings showed (`tools/music/README.md`), with GothicKit dmusic (`port/dmusic`) for the files and the
+  synthesizer. Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
+  of random picks. Off for now: `-portable-music` turns it on, to compare by ear.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.

@@ -82,4 +82,10 @@ void MiniwinSoundHoldWhenInactive(int hold);
  * time by its buffer). */
 void MiniwinSoundKeepPlayingInactive(LPDIRECTSOUNDBUFFER buffer);
 
+/* Gives a buffer a source: as the mixer plays it, source writes the bytes just ahead of the play position (into the
+ * buffer's own memory, in its format), as DirectMusic's synthesizer streams into its buffer. NULL removes it. Called
+ * on the audio thread, under the mixer's lock: it must not call back into DirectSound. */
+void MiniwinSoundBufferSetSource(LPDIRECTSOUNDBUFFER buffer, void (*source)(void *ctx, void *bytes, DWORD size),
+    void *ctx);
+
 #endif

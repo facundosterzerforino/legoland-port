@@ -35,6 +35,11 @@ struct Buffer {
     LONG pan;
     DWORD frequency; /* 0: the format's own rate */
     int keep_playing; /* runs on (muted) in the background even when the others hold */
+    /* a source fills the buffer just ahead of its play position as the mixer reads it (the portable music) */
+    void (*source)(void *ctx, void *bytes, DWORD size);
+    void *source_ctx;
+    DWORD fill; /* the frame the source writes next */
+    DWORD ahead; /* frames filled ahead of the play position */
 };
 
 struct DirectSound {
@@ -79,7 +84,7 @@ static float Gain(LONG hundredths_db) {
 
 /* Adds frames of buffer b to mix (silently when audible is 0: the cursor still moves). Called with the lock held. */
 static void MixBuffer(struct Buffer *b, int frames, int audible) {
-    DWORD total = Frames(b);
+    DWORD total = Frames(b), start = 0;
     double step = (double)(b->frequency != 0 ? b->frequency : b->format.nSamplesPerSec) / MIX_RATE;
     float volume = audible ? Gain(b->volume) : 0.0f;
     float left = volume * (b->pan > 0 ? Gain(-b->pan) : 1.0f);
@@ -89,6 +94,22 @@ static void MixBuffer(struct Buffer *b, int frames, int audible) {
     if (total == 0) {
         b->playing = 0;
         return;
+    }
+    if (b->source != NULL) {
+        /* the frames this round reads (and one more, for the interpolation) */
+        DWORD need = (DWORD)ceil(frames * step) + 2;
+        DWORD align = b->format.nBlockAlign;
+
+        need = need > total ? total : need;
+        while (b->ahead < need) {
+            DWORD n = need - b->ahead;
+
+            n = n > total - b->fill ? total - b->fill : n;
+            b->source(b->source_ctx, b->data->bytes + (size_t)b->fill * align, n * align);
+            b->fill = (b->fill + n) % total;
+            b->ahead += n;
+        }
+        start = (DWORD)b->pos;
     }
     for (i = 0; i < frames; i++) {
         DWORD f0 = (DWORD)b->pos;
@@ -114,6 +135,11 @@ static void MixBuffer(struct Buffer *b, int frames, int audible) {
                 return;
             }
         }
+    }
+    if (b->source != NULL) {
+        DWORD moved = ((DWORD)b->pos + total - start) % total;
+
+        b->ahead = moved < b->ahead ? b->ahead - moved : 0;
     }
 }
 
@@ -590,6 +616,18 @@ static IDirectSoundVtbl SoundVtbl = {
 
 void MiniwinSoundHoldWhenInactive(int hold) {
     hold_when_inactive = hold;
+}
+
+void MiniwinSoundBufferSetSource(LPDIRECTSOUNDBUFFER buffer, void (*source)(void *ctx, void *bytes, DWORD size),
+    void *ctx) {
+    struct Buffer *b = AsBuffer(buffer);
+
+    SDL_LockMutex(lock);
+    b->source = source;
+    b->source_ctx = ctx;
+    b->fill = (DWORD)b->pos;
+    b->ahead = 0;
+    SDL_UnlockMutex(lock);
 }
 
 void MiniwinSoundKeepPlayingInactive(LPDIRECTSOUNDBUFFER buffer) {

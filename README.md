@@ -118,6 +118,9 @@ These are new in the port and off unless you turn them on (`extensions/`):
   ahead and skips what it "played" meanwhile. In the port the movie stops while you are away and goes on where it
   was, picture and sound together. It also fixes the original's catch-up after a longer stall, which
   left the rest of most movies silent or out of step.
+- **Portable music** (`-portable-music`, off for now): the music plays through the port's own DirectMusic
+  (GothicKit dmusic and a style engine checked against Windows') instead of Windows'. The notes are the same; the
+  instruments sound a little different (another synthesizer on the same General MIDI set).
 - **Debug console** (`-console`): see `docs/debug-console.md`.
 - The LEGO Media logo at startup can be skipped with a click (on by default; `-no-skip-logo` turns it off).
 

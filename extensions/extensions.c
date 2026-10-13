@@ -5,6 +5,7 @@
 #include "ext_movie.h"
 #include "ext_music.h"
 #include "extensions.h"
+#include "miniwin/dmusic.h"
 
 int ExtSkipLogo = 1;
 
@@ -24,6 +25,9 @@ void ExtensionsParseCommandLine(const char *cmdline) {
         ExtPauseMovies = 0;
     }
     ExtPauseMoviesApply();
+    if (strstr(cmdline, "-portable-music") != NULL) {
+        MiniwinUsePortableMusic(1);
+    }
     if (strstr(cmdline, "-console") != NULL) {
         ExtConsoleStart();
     }

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include "miniwin/acm.h"
+#include "miniwin/dmusic.h"
 #include "miniwin/files.h"
 #include "miniwin/timer.h"
 
@@ -40,6 +41,10 @@
 #define acmStreamPrepareHeader MiniwinAcmStreamPrepareHeader
 #define acmStreamConvert MiniwinAcmStreamConvert
 #define acmStreamUnprepareHeader MiniwinAcmStreamUnprepareHeader
+
+/* [library:music] the DirectMusic objects: miniwin's with -portable-music, else Windows' */
+#define CoInitialize MiniwinCoInitialize
+#define CoCreateInstance MiniwinCoCreateInstance
 
 /* [library:movie] (miniwin/avifile.h isn't included: src/legoland/imports.h declares these with no result for
  * some, which the calls ignore) */
