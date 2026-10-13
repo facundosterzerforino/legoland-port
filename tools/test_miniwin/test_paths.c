@@ -1,7 +1,7 @@
 /* test_paths: checks miniwin's path translation (miniwin/src/files.c) the way Linux and Android will need it. It
- * makes a case-sensitive folder (Windows can mark one: fsutil file setCaseSensitiveInfo, no admin needed), puts
- * files in it under one spelling, asks for them the way the game does (backslashes, other case), and removes the
- * folder again.
+ * makes a case-sensitive folder in Windows' temp folder (Windows can mark one: fsutil file setCaseSensitiveInfo, no
+ * admin needed; not on WSL's own disk, where the repo is), puts files in it under one spelling, asks for them the way
+ * the game does (backslashes, other case), and removes the folder again.
  *
  *   tools/test_miniwin/build.sh && tools/test_miniwin/test_paths.exe      (prints FAIL lines, exits 1 on any) */
 #include <direct.h>
@@ -11,7 +11,7 @@
 
 #include "miniwin/files.h"
 
-#define ROOT "paths-test"
+#define ROOT "legoland-paths-test"
 
 static int fails;
 
@@ -37,6 +37,11 @@ int main(void) {
     char command[MAX_PATH + 64];
     FILE *f;
 
+    if (GetTempPathA(sizeof(cwd), cwd) == 0 || _chdir(cwd) != 0) {
+        printf("FAIL: no temp folder
+");
+        return 1;
+    }
     system("rmdir /s /q " ROOT " 2>nul");
     if (_mkdir(ROOT) != 0 || _getcwd(cwd, sizeof(cwd)) == NULL) {
         printf("FAIL: can't make %s\n", ROOT);
