@@ -36,6 +36,14 @@ void DmSynth_free(DmSynth* slf) {
 	DmSynthFontArray_free(&slf->fonts);
 }
 
+// [port] DLS level 1: the channel's gain is (volume / 127)^2 * (expression / 127)^2, as DirectMusic's synthesizer
+// plays it (40 log10 attenuation each); TinySoundFont's channel volume is a plain gain.
+static void DmSynth_applyVolume(DmSynthChannel* chan) {
+	tsf_channel_set_volume(chan->font->syn,
+	                       chan->channel,
+	                       chan->volume * chan->volume * chan->expression * chan->expression);
+}
+
 void DmSynth_reset(DmSynth* slf) {
 	if (slf == NULL) {
 		return;
@@ -47,7 +55,9 @@ void DmSynth_reset(DmSynth* slf) {
 			continue;
 		}
 
-		tsf_channel_set_volume(chan->font->syn, chan->channel, chan->reset_volume);
+		chan->volume = chan->reset_volume; // [port]
+		chan->expression = 1.0F;
+		DmSynth_applyVolume(chan);
 		tsf_channel_set_pan(chan->font->syn, chan->channel, chan->reset_pan);
 		tsf_channel_set_pitchwheel(chan->font->syn, chan->channel, chan->reset_pitch);
 	}
@@ -185,11 +195,16 @@ static DmResult DmSynth_assignInstrumentChannels(DmSynth* slf, DmBand* band) {
 			chan->reset_pan = pan;
 		}
 
+		chan->expression = 1.0F;
+		chan->volume = chan->volume == 0.0F ? 100.0F / (float) DmInt_MIDI_MAX : chan->volume; // MIDI's default
 		if (ins->options & DmInstrument_VALID_VOLUME) {
 			float vol = (float) ins->volume / (float) DmInt_MIDI_MAX;
-			tsf_channel_set_volume(fnt->syn, (int) ins->channel, vol);
+			chan->volume = vol;
 			chan->reset_volume = vol;
 		}
+		tsf_channel_set_volume(fnt->syn,
+		                       (int) ins->channel,
+		                       chan->volume * chan->volume * chan->expression * chan->expression);
 
 		if (ins->options & DmInstrument_VALID_TRANSPOSE) {
 			chan->transpose = ins->transpose;
@@ -229,8 +244,12 @@ void DmSynth_sendControl(DmSynth* slf, uint32_t channel, uint8_t control, float 
 		return;
 	}
 
-	if (control == DmInt_MIDI_CC_VOLUME || control == DmInt_MIDI_CC_EXPRESSION) {
-		tsf_channel_set_volume(chan->font->syn, chan->channel, value);
+	if (control == DmInt_MIDI_CC_VOLUME) {
+		chan->volume = value;
+		DmSynth_applyVolume(chan);
+	} else if (control == DmInt_MIDI_CC_EXPRESSION) {
+		chan->expression = value;
+		DmSynth_applyVolume(chan);
 	} else if (control == DmInt_MIDI_CC_PAN) {
 		tsf_channel_set_pan(chan->font->syn, chan->channel, value);
 	} else {

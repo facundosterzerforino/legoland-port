@@ -468,6 +468,8 @@ typedef struct DmSynthChannel {
 
 	float reset_volume;
 	float reset_pan;
+	float volume;     // [port] CC 7, 0-1
+	float expression; // [port] CC 11, 0-1
 	int reset_pitch;
 } DmSynthChannel;
 
