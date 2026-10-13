@@ -120,9 +120,10 @@ the original DirectX APIs on Windows 11, is the reference that phases 5+ are com
 campaign has been played on it: levels, movies, music, sound, saves, the certificate).
 
 
-## Phase 5: miniwin + SDL3 (window, video, input, files)
+## Phase 5: miniwin + SDL3 (window, video, input, files) (done)
 
-**Status (2026-10-13):** started.
+**Status:** done 2026-10-13, every step confirmed in game by the maintainer. The exe no longer imports ddraw.dll or
+dinput.dll.
 - Step 1 is done: SDL3 3.4.18 is fetched at configure time and linked statically into the port build
   (`-port-selftest` reports the version it linked).
 - Steps 2 and 3 are done (confirmed in game by the maintainer, 2026-10-13): the window and the picture are SDL3's,
@@ -132,7 +133,7 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
   codes): identical. DirectDraw's stretch rounding was measured for every pair of sizes up to 640 and is
   reproduced exactly. `miniwin/src/window.c` is the SDL3 window, renderer and events; the game takes its
   windowed code path in all three display modes.
-- Step 4, waiting for the maintainer's test: the keyboard and mouse come from SDL3. `miniwin/src/dinput.c` is
+- Step 4 is done (confirmed in game): the keyboard and mouse come from SDL3. `miniwin/src/dinput.c` is
   DirectInput's keyboard and mouse devices on SDL (the keyboard as DirectInput's 256 bytes by DIK code, through a
   table generated from SDL's own Windows scancode table); the windowed mouse code, the focus checks and Caps Lock
   use SDL too. No `dinput.dll` import any more.
@@ -141,7 +142,7 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
   GetTickCount keeps Windows' 15.625 ms steps: the frame limiter waits 28 ms on it, so frames last 31.25 ms, and a
   precise clock would make the game run about 10% faster. Threads stay as they are until phase 6: the only game
   threads are the sound and music ones (and the debug console's).
-- Step 6, files, waiting for the maintainer's test: through `miniwin/redirect.h` too, every file the game opens
+- Step 6 is done (confirmed in game): through `miniwin/redirect.h` too, every file the game opens
   (fopen, _open, CreateFileA, remove, _mkdir, _findfirst, GetFileAttributesA, SetCurrentDirectoryA) goes through
   `MiniwinPath` (`miniwin/src/files.c`): backslashes become '/', and a path that isn't on disk as written is matched
   part by part without regard to case. On Windows nothing changes (its folders ignore case);
