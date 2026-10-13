@@ -75,11 +75,11 @@ static float Gain(LONG hundredths_db) {
     return hundredths_db <= DSBVOLUME_MIN ? 0.0f : (float)pow(10.0, hundredths_db / 2000.0);
 }
 
-/* Adds frames of buffer b to mix. Called with the lock held. */
-static void MixBuffer(struct Buffer *b, int frames) {
+/* Adds frames of buffer b to mix (silently when audible is 0: the cursor still moves). Called with the lock held. */
+static void MixBuffer(struct Buffer *b, int frames, int audible) {
     DWORD total = Frames(b);
     double step = (double)(b->frequency != 0 ? b->frequency : b->format.nSamplesPerSec) / MIX_RATE;
-    float volume = Gain(b->volume);
+    float volume = audible ? Gain(b->volume) : 0.0f;
     float left = volume * (b->pan > 0 ? Gain(-b->pan) : 1.0f);
     float right = volume * (b->pan < 0 ? Gain(b->pan) : 1.0f);
     int i;
@@ -134,12 +134,11 @@ static void SDLCALL Feed(void *userdata, SDL_AudioStream *s, int additional, int
         memset(mix, 0, sizeof(float) * 2 * frames);
         SDL_LockMutex(lock);
         for (b = buffers; b != NULL; b = b->next) {
-            /* While the game's window doesn't have the focus the game waits (ProcessSystemEvents), and so do its
-             * sounds: a buffer stays "playing" with its cursor held, as DirectSound mutes buffers without
-             * DSBCAPS_GLOBALFOCUS. Otherwise loops kept repeating and the movie's sound ran past what the waiting
-             * movie had written. */
-            if (b->playing && !b->primary && (!inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0)) {
-                MixBuffer(b, frames);
+            /* As DirectSound does with buffers without DSBCAPS_GLOBALFOCUS, a buffer is muted while another window
+             * has the focus, but keeps playing: its cursor moves on, so the movie player (which keeps time by the
+             * clock and resyncs its streaming buffer after a pause) and looping sounds behave as with DirectSound. */
+            if (b->playing && !b->primary) {
+                MixBuffer(b, frames, !inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0);
             }
         }
         SDL_UnlockMutex(lock);

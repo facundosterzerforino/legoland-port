@@ -51,7 +51,7 @@ void MiniwinPresent(const void *pixels, int pitch, int width, int height, const 
 /* 1 while the window has the keyboard focus. */
 int MiniwinHasFocus(void);
 
-/* 1 while the window exists but another one has the focus (the game waits then; so do its sounds). */
+/* 1 while the window exists but another one has the focus (the game waits then, and its sounds are muted). */
 int MiniwinWindowInactive(void);
 
 /* The mouse: its position in the window's picture in pixels (x, y may be NULL), and the buttons that are down
