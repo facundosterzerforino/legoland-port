@@ -1932,6 +1932,9 @@ int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
                 loops = 0xb;
                 DAT_00668fa0 = param_1 % DAT_00668f50;
                 play_pos = DAT_00668f90 * DAT_00668fa0;
+#ifdef LEGOLAND_PORT
+                play_pos = ExtPauseMoviesResync(param_1, play_pos); /* [port] extensions/ext_movie.h */
+#endif
             } else if (loops == 0) {
                 return 1;
             }
