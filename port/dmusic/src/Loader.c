@@ -200,12 +200,9 @@ DmResult DmLoader_getStyle(DmLoader* slf, DmReference const* ref, DmStyle** sty)
 		return DmResult_INVALID_ARGUMENT;
 	}
 
-	// If no file reference is provided, we're unable to load this.
-	if (ref->file == NULL) {
-		return DmResult_NOT_FOUND;
-	}
-
 	// See if we have the requested item in the cache.
+	// [port] before needing a file name: a style loaded already is found by its GUID alone, as DirectMusic's
+	// loader finds the ones its directory scan saw (the game's Inca segments name their styles only by GUID).
 	if (mtx_lock(&slf->lock) != thrd_success) {
 		return DmResult_MUTEX_ERROR;
 	}
@@ -222,6 +219,11 @@ DmResult DmLoader_getStyle(DmLoader* slf, DmReference const* ref, DmStyle** sty)
 	}
 
 	(void) mtx_unlock(&slf->lock);
+
+	// If no file reference is provided, we're unable to load this.
+	if (ref->file == NULL) {
+		return DmResult_NOT_FOUND;
+	}
 
 	// Resolve and parse the DLS
 	size_t length = 0;

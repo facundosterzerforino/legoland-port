@@ -568,6 +568,9 @@ struct DmPerformance {
 /// \return A pointer to the first allocated byte or `NULL` if allocation failed.
 /// \see Dm_free
 /// \see Dm_setHeapAllocator
+// [port] exposed for tools/music/check_notes.c
+DMINT int DmPerformance_musicValueToMidi(struct DmSubChord chord, DmPlayModeFlags mode, uint16_t value);
+
 DMINT void* Dm_alloc(size_t len);
 
 /// \brief Free a heap-allocated pointer previously allocated by #Dm_alloc

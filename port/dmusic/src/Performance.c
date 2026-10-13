@@ -204,7 +204,7 @@ static uint32_t fixup_scale(uint32_t scale, uint8_t scale_root) {
 	return scale;
 }
 
-static int DmPerformance_musicValueToMidi(struct DmSubChord chord, DmPlayModeFlags mode, uint16_t value) {
+int DmPerformance_musicValueToMidi(struct DmSubChord chord, DmPlayModeFlags mode, uint16_t value) {
 	uint32_t offset = 0;
 
 	// Make sure the octave is not negative. If it is, transpose it up, and save the note offset.
