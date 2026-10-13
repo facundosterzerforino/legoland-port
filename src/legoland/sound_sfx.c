@@ -13,8 +13,7 @@
 #include "sound_music.h"
 #include "stream.h"
 #ifdef LEGOLAND_PORT
-#include "port_audio.h"
-#include "wndenv.h"
+#include "miniwin/miniwin.h"
 #endif
 
 struct DirectSoundObj;
@@ -679,13 +678,6 @@ void FUN_00492da0(void) {
  * and the 5x5 transition segments, then serves the commands posted by FUN_00492ca0/SetInteractiveMusicTheme/
  * StopInteractiveMusic (MusicCommand, signalled through MusicCommandEvent) and DirectMusic notifications.
  * Setup failures jump into one release chain, as in the original. */
-#ifdef LEGOLAND_PORT
-/* [library:music] DirectMusic still renders through Windows' DirectSound (port_audio.h); the game's own sounds
- * use miniwin's (DSound) */
-#define MUSIC_DSOUND PortMusicDirectSound(WNDENV_Gethwnd())
-#else
-#define MUSIC_DSOUND DSound
-#endif
 
 // FUNCTION: LEGOLAND 0x00492db0
 DWORD WINAPI MusicThreadProc(LPVOID param) {
@@ -720,7 +712,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
     if (FAILED(CoCreateInstance(&CLSID_DirectMusicPerformance, NULL, CLSCTX_INPROC, &IID_IDirectMusicPerformance, (void **)&DMusicPerformance))) {
         goto release_composer;
     }
-    if (FAILED(DMusicPerformance->vtable->Init(DMusicPerformance, &music, MUSIC_DSOUND, NULL))) {
+    if (FAILED(DMusicPerformance->vtable->Init(DMusicPerformance, &music, DSound, NULL))) {
         goto release_perf;
     }
     music->vtable->CreatePort(music, &NullGuid, &params, &port, NULL);
@@ -736,11 +728,17 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
     bufferDesc.dwBufferBytes = bufferSize;
     bufferDesc.dwReserved = 0;
     bufferDesc.lpwfxFormat = format;
-    if (IDirectSound_CreateSoundBuffer((LPDIRECTSOUND)MUSIC_DSOUND, (LPCDSBUFFERDESC)&bufferDesc, (LPDIRECTSOUNDBUFFER *)&DMusicSoundBuffer, NULL) != DS_OK) {
+    if (IDirectSound_CreateSoundBuffer((LPDIRECTSOUND)DSound, (LPCDSBUFFERDESC)&bufferDesc, (LPDIRECTSOUNDBUFFER *)&DMusicSoundBuffer, NULL) != DS_OK) {
         goto fail;
     }
+#ifdef LEGOLAND_PORT
+    /* [library:music] Windows' DirectMusic renders into miniwin's DirectSound like the game's other sounds. Its
+     * synthesizer keeps time by this buffer's cursor, so the buffer keeps running (muted) in the background as with
+     * DirectSound, even when the pause extension holds the others (extensions/ext_movie.h). */
+    MiniwinSoundKeepPlayingInactive((LPDIRECTSOUNDBUFFER)DMusicSoundBuffer);
+#endif
     free(format);
-    port->vtable->SetDirectSound(port, MUSIC_DSOUND, DMusicSoundBuffer);
+    port->vtable->SetDirectSound(port, DSound, DMusicSoundBuffer);
     port->vtable->Activate(port, TRUE);
     DMusicPerformance->vtable->AddPort(DMusicPerformance, port);
     DMusicPerformance->vtable->AssignPChannelBlock(DMusicPerformance, 0, port, 1);
@@ -1021,8 +1019,6 @@ fail:
     DAT_007988bc = 1;
     return 0;
 }
-
-#undef MUSIC_DSOUND
 
 // FUNCTION: LEGOLAND 0x00495a10
 int StartMusicThread(void *hwnd) {

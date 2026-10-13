@@ -78,4 +78,8 @@ HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKN
  * hold instead, cursors and all (extensions/ext_movie.h). */
 void MiniwinSoundHoldWhenInactive(int hold);
 
+/* Exempts a buffer from that hold: it keeps playing, muted, as with DirectSound (the music, whose synthesizer keeps
+ * time by its buffer). */
+void MiniwinSoundKeepPlayingInactive(LPDIRECTSOUNDBUFFER buffer);
+
 #endif

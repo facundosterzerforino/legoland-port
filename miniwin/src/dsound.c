@@ -34,6 +34,7 @@ struct Buffer {
     LONG volume;
     LONG pan;
     DWORD frequency; /* 0: the format's own rate */
+    int keep_playing; /* runs on (muted) in the background even when the others hold */
 };
 
 struct DirectSound {
@@ -140,7 +141,7 @@ static void SDLCALL Feed(void *userdata, SDL_AudioStream *s, int additional, int
              * clock and resyncs its streaming buffer after a pause) and looping sounds behave as with DirectSound. */
             int focused = !inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0;
 
-            if (b->playing && !b->primary && (focused || !hold_when_inactive)) {
+            if (b->playing && !b->primary && (focused || !hold_when_inactive || b->keep_playing)) {
                 MixBuffer(b, frames, focused);
             }
         }
@@ -589,6 +590,12 @@ static IDirectSoundVtbl SoundVtbl = {
 
 void MiniwinSoundHoldWhenInactive(int hold) {
     hold_when_inactive = hold;
+}
+
+void MiniwinSoundKeepPlayingInactive(LPDIRECTSOUNDBUFFER buffer) {
+    SDL_LockMutex(lock);
+    AsBuffer(buffer)->keep_playing = 1;
+    SDL_UnlockMutex(lock);
 }
 
 HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKNOWN outer) {

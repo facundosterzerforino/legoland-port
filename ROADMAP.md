@@ -188,7 +188,12 @@ build after each.
   and Indeo 5 decoders, `port/port_movie.c`); now the files are read by `miniwin/src/avifile.c` instead of Video for
   Windows' AVIFile. `tools/test_miniwin/test_avifile.exe` compares the two on all 40 AVIs (the 14 movies and the 26
   advisor animations): file and stream info, formats, key frames, every video frame and the sound in the game's own
-  read sizes, about 25 million checks: identical. The port no longer links vfw32.
+  read sizes, about 25 million checks: identical. The port no longer links vfw32. (Confirmed in game.)
+- Step 3, music, part 1, waiting for the maintainer's test: Windows' DirectMusic now renders into miniwin's
+  DirectSound like the game's other sounds (one mixer, one volume and focus behaviour); `port/port_audio.c`, the
+  separate Windows DirectSound, is gone. `tools/test_miniwin/test_dmusic.exe` sets DirectMusic up the way the game
+  does on miniwin's DirectSound and checks that the music reaches it. Part 2, the portable replacement: GothicKit
+  dmusic, checked note by note against a recording of what Windows' DirectMusic plays, and synth by synth.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.
