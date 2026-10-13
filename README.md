@@ -57,6 +57,9 @@ cmake --preset clang-cl-x86
 cmake --build build-clang-x86    # -> build-clang-x86/legoland.exe + .pdb
 ```
 
+The first configure downloads SDL3 (a pinned release, checked by its SHA-256) and builds it with the same
+toolchain; to build offline, unpack that release somewhere and add `-DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>`.
+After the toolchain file changes, reconfigure with `cmake --fresh --preset clang-cl-x86`.
 Set `XWIN_DIR` if the SDK isn't in `~/xwin`. The preset defines `LEGOLAND_PORT`, leaves out the matching-only
 files (`bootstrap.c`, `imports.c`) and links the real C runtime (static) and Windows import libraries.
 Pointer/integer mixing from the decompiled code is reported as warnings, not errors, until phase 8 (64-bit).

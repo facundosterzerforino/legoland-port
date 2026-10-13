@@ -7,6 +7,7 @@ set(CMAKE_SYSTEM_VERSION 10.0)
 set(CMAKE_SYSTEM_PROCESSOR x86)
 
 set(CMAKE_C_COMPILER clang-cl)
+set(CMAKE_CXX_COMPILER clang-cl)
 set(CMAKE_LINKER lld-link)
 set(CMAKE_AR llvm-lib)
 set(CMAKE_RC_COMPILER llvm-rc)
@@ -22,10 +23,12 @@ set(_xwin_includes
     "/imsvc ${XWIN_DIR}/crt/include"
     "/imsvc ${XWIN_DIR}/sdk/include/ucrt"
     "/imsvc ${XWIN_DIR}/sdk/include/um"
-    "/imsvc ${XWIN_DIR}/sdk/include/shared")
+    "/imsvc ${XWIN_DIR}/sdk/include/shared"
+    "/imsvc ${XWIN_DIR}/sdk/include/winrt")
 string(JOIN " " _xwin_includes ${_xwin_includes})
 
 set(CMAKE_C_FLAGS_INIT "--target=i686-pc-windows-msvc -fms-compatibility ${_xwin_includes}")
+set(CMAKE_CXX_FLAGS_INIT "${CMAKE_C_FLAGS_INIT}") # SDL3 (3rdparty) has a few C++ files
 set(CMAKE_EXE_LINKER_FLAGS_INIT
     "/machine:x86 /manifest:no /libpath:${XWIN_DIR}/crt/lib/x86 /libpath:${XWIN_DIR}/sdk/lib/um/x86 /libpath:${XWIN_DIR}/sdk/lib/ucrt/x86")
 

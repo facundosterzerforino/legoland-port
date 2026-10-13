@@ -313,9 +313,9 @@ static const char *const CategoryNames[CAT_COUNT] = {"Attractions", "Scenery", "
 /* REPORT NUM_x / VAR_x for each category: the ReportFlags bit that turns the check on, and its target */
 static const struct {
     unsigned int amount_flag;
-    unsigned int *amount;
+    int *amount;
     unsigned int variety_flag;
-    unsigned int *variety;
+    int *variety;
 } Targets[CAT_COUNT] = {
     {0x4000, &DAT_00666020, 0x8000, &DAT_00666028}, /* NUM_ATTRACTIONS, VAR_ATTRACTIONS */
     {0x8000000, &DAT_00666070, 0x10000000, &DAT_00666078}, /* NUM_SCENERY, VAR_SCENERY */
@@ -374,11 +374,11 @@ static void CountCategory(int cat, int *kinds, int *placed) {
 }
 
 /* "have / target ok" for one check; "" when the script doesn't set it */
-static const char *CheckText(char *buf, size_t size, unsigned int flag, const unsigned int *target, int have) {
+static const char *CheckText(char *buf, size_t size, unsigned int flag, const int *target, int have) {
     if ((ReportFlags & flag) == 0) {
         snprintf(buf, size, "%d (not checked)", have);
     } else {
-        snprintf(buf, size, "%d / %d needed %s", have, (int)*target, (int)*target <= have ? "ok" : "NOT met");
+        snprintf(buf, size, "%d / %d needed %s", have, *target, *target <= have ? "ok" : "NOT met");
     }
     return buf;
 }

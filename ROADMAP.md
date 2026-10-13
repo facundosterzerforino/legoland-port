@@ -122,6 +122,9 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
 
 ## Phase 5: miniwin + SDL3 (window, video, input, files)
 
+**Status (2026-10-13):** started. Step 1 is done: SDL3 3.4.18 is fetched at configure time and linked
+statically into the port build (`-port-selftest` reports the version it linked).
+
 Replace the Windows-only layers with SDL3 behind `miniwin/`, one subsystem at a time, checking against phase 4's
 build after each.
 

@@ -18,10 +18,29 @@ if(LEGOLAND_MODERN_BUILD)
     file(GLOB EXTENSION_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/extensions/*.c")
     list(APPEND PORT_SOURCES ${EXTENSION_SOURCES})
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
+    # [port] SDL3, the platform layer from phase 5 on (ROADMAP.md): a pinned release, downloaded at configure
+    # time and built as a static library with the same toolchain and static C runtime. To build offline, unpack
+    # the tarball somewhere and configure with -DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>.
+    include(FetchContent)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
+    set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+    set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+    set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
+    FetchContent_Declare(SDL3
+        URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.18/SDL3-3.4.18.tar.gz
+        URL_HASH SHA256=9c75cf16330322c217dedd2e0609f1124f1b54b8633e763467b4684d0f4334a3
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+    FetchContent_MakeAvailable(SDL3)
+    target_link_libraries(legoland PRIVATE SDL3::SDL3-static)
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
     # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
     # below 0x0800 keeps DirectInputCreateA declared.
-    target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500)
+    # _CRT_SECURE_NO_WARNINGS: the code uses the standard C functions (fopen, strcpy, sscanf...), which are
+    # portable; the Microsoft-only _s versions the CRT headers suggest aren't.
+    target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500 _CRT_SECURE_NO_WARNINGS)
     target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port" "${CMAKE_CURRENT_SOURCE_DIR}/extensions")
     # Static C runtime, debug info in the objects, a PDB for debuggers.
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")

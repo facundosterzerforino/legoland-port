@@ -6047,15 +6047,16 @@ void PortLoadData(void) {
     }
 }
 
-/* Checks PortLoadData's work and writes a report to path: every filled global holds its original bytes, and
-   every patched pointer inside a filled global points where the table says. Returns the number of problems. */
-int PortDataSelfTest(const char *path) {
-    FILE *f = fopen(path, "w");
+/* Checks PortLoadData's work and appends a report to path: every filled global holds its original bytes, and
+   every patched pointer inside a filled global points where the table says. The last line is the overall result,
+   counting earlier_problems (the checks before this one). Returns the number of problems. */
+int PortDataSelfTest(const char *path, int earlier_problems) {
+    FILE *f = fopen(path, "a");
     unsigned int i;
     unsigned int j;
     unsigned int bytes = 0;
     unsigned int pointers = 0;
-    int bad = 0;
+    int bad = earlier_problems;
 
     if (f == NULL) {
         return -1;

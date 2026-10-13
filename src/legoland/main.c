@@ -13,6 +13,7 @@
 #include "extensions.h"
 #include "port_data.h"
 #include "port_launcher.h"
+#include "port_sdl.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
 #endif
@@ -41,8 +42,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SetProcessDPIAware();
     PortLoadData(); /* [port] the original started with its .data already initialized */
     if (strstr(lpCmdLine, "-port-selftest") != NULL) {
-        /* [port] check the startup data and exit, without starting the game (or touching its trace file) */
-        return PortDataSelfTest("port-selftest.txt");
+        /* [port] check the SDL3 library and the startup data and exit, without starting the game (or touching its
+         * trace file). PortDataSelfTest appends its report, ending with the overall result. */
+        int sdl_problems = PortSdlSelfTest("port-selftest.txt");
+        return PortDataSelfTest("port-selftest.txt", sdl_problems);
     }
     {
         /* [library:window] already running (the game's own check, in wWinMain, comes after the launcher): bring
