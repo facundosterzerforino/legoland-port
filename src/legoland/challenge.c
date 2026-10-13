@@ -91,6 +91,7 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
     int aligned_width;
     unsigned char *pixels;
     unsigned char *dst;
+    unsigned char *row;
     unsigned char *src;
     int x;
     int y;
@@ -134,7 +135,7 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
         return 0;
     }
     if (*(short *)(info + 0xe) == 8) {
-        src = pixels + row_size;
+        row = pixels + row_size; /* the BMP's rows are stored bottom-up: copy them from the last one */
         RES_SetFilePointer(file, pixel_offset);
         x = 0;
         while (x < 0x100) {
@@ -144,8 +145,9 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
         RES_ReadFile(file, DAT_0081c4c0, *(int *)(info + 0x20) * 4);
         RES_SetFilePointer(file, offbits);
         RES_ReadFile(file, pixels, row_size);
-        for (y = 0; y < (unsigned)param_1->height; y++) {
-            src -= aligned_width;
+        for (y = 0; y < param_1->height; y++) {
+            row -= aligned_width;
+            src = row;
             x = 0;
             while (x < param_1->width) {
                 *dst = *src;
