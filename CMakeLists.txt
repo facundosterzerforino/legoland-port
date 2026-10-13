@@ -66,7 +66,7 @@ if(LEGOLAND_MODERN_BUILD)
         -Wno-error=return-mismatch)
     target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
     target_link_libraries(legoland PRIVATE
-        dsound dxguid winmm vfw32 version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
+        dsound dxguid winmm version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
     # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
     # external/legoland.exe at build time rather than committed (tools/extract_resources.py).
     set(LEGOLAND_ORIGINAL_EXE "${CMAKE_CURRENT_SOURCE_DIR}/external/legoland.exe")

@@ -6,6 +6,7 @@
 #include "../src/legoland/imports.h"
 #include "ext_movie.h"
 #include "miniwin/acm.h"
+#include "miniwin/avifile.h"
 #include "miniwin/miniwin.h"
 
 int ExtPauseMovies = 1;
@@ -63,7 +64,7 @@ int ExtPauseMoviesResync(unsigned int frame, int play_pos) {
     if (AviAudioSamplePos >= DAT_00668f88) {
         return play_pos;
     }
-    AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, (void *)AviAcmStreamHeader[3], AviSoundBytesPerFrame >> 2,
+    MiniwinAVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, (void *)AviAcmStreamHeader[3], AviSoundBytesPerFrame >> 2,
         &bytes, &samples);
     AviAcmStreamHeader[7] = (unsigned int)AviAcmDstBase;
     MiniwinAcmStreamPrepareHeader(AviAcmStream, AviAcmStreamHeader, 0);

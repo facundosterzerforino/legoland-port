@@ -41,4 +41,23 @@
 #define acmStreamConvert MiniwinAcmStreamConvert
 #define acmStreamUnprepareHeader MiniwinAcmStreamUnprepareHeader
 
+/* [library:movie] (miniwin/avifile.h isn't included: src/legoland/imports.h declares these with no result for
+ * some, which the calls ignore) */
+#define AVIFileInit MiniwinAVIFileInit
+#define AVIFileExit MiniwinAVIFileExit
+#define AVIFileOpenA MiniwinAVIFileOpenA
+#define AVIFileInfoA MiniwinAVIFileInfoA
+#define AVIFileGetStream MiniwinAVIFileGetStream
+#define AVIFileRelease MiniwinAVIFileRelease
+#define AVIStreamInfoA MiniwinAVIStreamInfoA
+#define AVIStreamAddRef MiniwinAVIStreamAddRef
+#define AVIStreamRelease MiniwinAVIStreamRelease
+#define AVIStreamReadFormat MiniwinAVIStreamReadFormat
+#define AVIStreamStart MiniwinAVIStreamStart
+#define AVIStreamLength MiniwinAVIStreamLength
+#define AVIStreamRead MiniwinAVIStreamRead
+#define AVIStreamGetFrameOpen MiniwinAVIStreamGetFrameOpen
+#define AVIStreamGetFrame MiniwinAVIStreamGetFrame
+#define AVIStreamGetFrameClose MiniwinAVIStreamGetFrameClose
+
 #endif

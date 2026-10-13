@@ -1,11 +1,12 @@
 /* [library:movie] Indeo 3 and Indeo 5 frames for AVI streams, decoded by the port instead of a Video for Windows codec.
- * See port_movie.h. */
+ * See port_movie.h. The streams are miniwin's (miniwin/avifile.h); vfw.h is here for its types and constants. */
 #include <windows.h>
 #include <vfw.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "ffmpeg/port_ffmpeg.h"
+#include "miniwin/avifile.h"
 #include "port_movie.h"
 
 /* One stream is decoded at a time (the game shows one advisor animation or one movie at once). Frames depend
@@ -39,14 +40,14 @@ static int OpenMovie(PAVISTREAM stream) {
 
     ResetMovie();
     /* the stream's format can be longer than a BITMAPINFOHEADER (codec data after it) */
-    if (AVIStreamReadFormat(stream, 0, NULL, &format_size) != 0 || format_size < (LONG)sizeof(format)) {
+    if (MiniwinAVIStreamReadFormat(stream, 0, NULL, (int *)&format_size) != 0 || format_size < (LONG)sizeof(format)) {
         return 0;
     }
     full = (BITMAPINFOHEADER *)calloc(1, format_size);
     if (full == NULL) {
         return 0;
     }
-    if (AVIStreamReadFormat(stream, 0, full, &format_size) != 0) {
+    if (MiniwinAVIStreamReadFormat(stream, 0, full, (int *)&format_size) != 0) {
         free(full);
         return 0;
     }
@@ -107,7 +108,7 @@ static int DecodeSample(long position) {
     LONG bytes = 0;
     int result;
 
-    if (AVIStreamRead(movie.stream, position, 1, NULL, 0, &bytes, NULL) != 0 || bytes < 0) {
+    if (MiniwinAVIStreamRead(movie.stream, position, 1, NULL, 0, (int *)&bytes, NULL) != 0 || bytes < 0) {
         return 0;
     }
     movie.position = position;
@@ -123,7 +124,7 @@ static int DecodeSample(long position) {
         movie.sample = grown;
         movie.sample_size = bytes;
     }
-    if (AVIStreamRead(movie.stream, position, 1, movie.sample, bytes, &bytes, NULL) != 0) {
+    if (MiniwinAVIStreamRead(movie.stream, position, 1, movie.sample, bytes, (int *)&bytes, NULL) != 0) {
         return 0;
     }
     memset(movie.sample + bytes, 0, PORT_FFMPEG_PADDING);
@@ -150,7 +151,7 @@ void *PortMovieGetFrame(void *stream, long position) {
     if (position != movie.position) {
         /* decode from the key frame at or before the wanted one, or carry on from the last decoded frame
          * when that is closer */
-        start = AVIStreamFindSample(movie.stream, position, FIND_KEY | FIND_PREV);
+        start = MiniwinAVIStreamFindSample(movie.stream, position, FIND_KEY | FIND_PREV);
         if (start < 0) {
             start = 0;
         }

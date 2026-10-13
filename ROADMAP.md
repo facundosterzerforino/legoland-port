@@ -183,6 +183,12 @@ build after each.
   files and the movies' sound (MS ADPCM, IMA ADPCM and PCM, to 16- or 8-bit PCM). `tools/test_miniwin/test_acm.exe`
   compares it with Windows' ACM, sizes, header fields and decoded bytes, on made-up blocks and, given the data
   folder, on all 1266 speech files and the 9 ADPCM movie soundtracks: identical. The port no longer links msacm32.
+  (Confirmed in game, with the movies paused in the background: `extensions/ext_movie.h`, on by default.)
+- Step 2, movies, waiting for the maintainer's test: the frames were already decoded by the port (FFmpeg's Indeo 3
+  and Indeo 5 decoders, `port/port_movie.c`); now the files are read by `miniwin/src/avifile.c` instead of Video for
+  Windows' AVIFile. `tools/test_miniwin/test_avifile.exe` compares the two on all 40 AVIs (the 14 movies and the 26
+  advisor animations): file and stream info, formats, key frames, every video frame and the sound in the game's own
+  read sizes, about 25 million checks: identical. The port no longer links vfw32.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.
