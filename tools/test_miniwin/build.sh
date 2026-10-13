@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds the miniwin tests (clang-cl + lld-link with the xwin SDK, like the clang-cl-x86 preset): test_miniwin,
-# test_paths, test_dsound, test_acm, test_avifile and test_dmusic. Most link the SDL3 that the port build fetched, and
-# test_dmusic port/dmusic: build the build-clang-x86 preset first.
+# test_paths, test_dsound, test_acm, test_avifile, test_dmusic and capture_dmusic. Most link the SDL3 that the port
+# build fetched, and the last two port/dmusic: build the build-clang-x86 preset first.
 set -e
 cd "$(dirname "$0")"
 X="${XWIN_DIR:-$HOME/xwin}"
@@ -30,4 +30,8 @@ clang-cl $CFLAGS -std:c11 -DDM_STATIC=1 $INCLUDES -I../../miniwin/include $SDLIN
     -I$DM/vendor/TinySoundFont test_dmusic.c ../../miniwin/src/dsound.c ../../miniwin/src/window.c \
     ../../miniwin/src/dmusic.c ../../miniwin/src/dmengine.c ../../miniwin/src/files.c $DMSOURCES /Fetest_dmusic.exe \
     /link /machine:x86 $LIBPATHS $SDLLIBS dxguid.lib
+clang-cl $CFLAGS -std:c11 -DDM_STATIC=1 $INCLUDES -I../../miniwin/include $SDLINC -I$DM/include -I$DM/src \
+    -I$DM/vendor/TinySoundFont capture_dmusic.c ../../miniwin/src/dsound.c ../../miniwin/src/window.c \
+    ../../miniwin/src/dmusic.c ../../miniwin/src/dmengine.c ../../miniwin/src/files.c $DMSOURCES \
+    /Fecapture_dmusic.exe /link /machine:x86 $LIBPATHS $SDLLIBS dxguid.lib
 rm -f *.obj

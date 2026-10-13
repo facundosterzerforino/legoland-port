@@ -59,6 +59,12 @@ right pitch, all 3456 bars are the model's, and the random picks spread like Dir
 46.1/53.9%, 4 candidates 19-20% each and 10-12% for the two rarer; patterns 294/270).
 
 The synthesizer is TinySoundFont on Windows' gm.dls, so the sound differs from Microsoft's: that part is judged by
-ear. dmusic's channel volume follows DLS (volume and expression each squared, multiplied), and the engine's overall
-gain makes the main theme as loud as Windows' DirectMusic plays it into the same buffer (`test_dmusic.exe` reports
-both levels).
+ear, and by level. `tools/test_miniwin/capture_dmusic.exe <data folder> windows|portable <out.wav> <seconds>
+<segment.sgt>...` sets the music up as the game does, plays the segments one after the other and records what reaches
+miniwin's music buffer; `levels.py <windows.wav> <portable.wav>...` (pairs) compares the levels, overall and per
+octave. The recordings are derived from the game's music: keep them out of the repository.
+
+dmusic follows DLS where TinySoundFont differs: a channel's volume and expression are each squared, and so is the
+velocity (DLS's default 40 log10 curves); drum kits and GS variation banks (MSB 8) select their own presets (dmusic
+used the LSB alone, so the drums played the piano). With the engine's overall gain, the main theme and the four world
+themes (40 s each) are all within 0.6 dB of Windows' DirectMusic, every octave band within 1 dB.

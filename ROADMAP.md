@@ -197,7 +197,10 @@ build after each.
 - Step 3, part 2, waiting for the maintainer's listening test: miniwin's DirectMusic (`miniwin/src/dmusic.c`, the
   objects the game's music thread uses) on a style engine (`miniwin/src/dmengine.c`) built from what the
   recordings showed (`tools/music/README.md`), with GothicKit dmusic (`port/dmusic`) for the files and the
-  synthesizer. Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
+  synthesizer. After the first listening test (the drums played the piano, 16 dB too quiet): the drum kits and
+  variation banks fixed in dmusic, DLS's velocity curve, and the level measured against recordings of Windows'
+  DirectMusic in the game's setup (`tools/test_miniwin/capture_dmusic.exe`), now within 0.6 dB on every theme.
+  Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
   of random picks. Off for now: `-portable-music` turns it on, to compare by ear.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,

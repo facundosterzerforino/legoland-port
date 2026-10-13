@@ -203,6 +203,7 @@ struct DMLoaderVtbl {
     void *CacheObject, *ReleaseObject;
     HRESULT(__stdcall *ClearCache)(struct DMLoader *, const GUID *);
     HRESULT(__stdcall *EnableCache)(struct DMLoader *, const GUID *, BOOL);
+    HRESULT(__stdcall *EnumObject)(struct DMLoader *, const GUID *, DWORD, DMObjectDesc *);
 };
 struct DMLoader {
     struct DMLoaderVtbl *v;

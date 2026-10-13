@@ -16,8 +16,9 @@
 #define CURVE_STEP 12 /* ticks between the steps of a controller curve */
 #define MAX_SEQ 512
 /* The synthesizer's overall level, to play as loud as Windows' DirectMusic does into the same buffer: measured with
- * tools/test_miniwin/test_dmusic.exe on the main theme (about 280 RMS against 1920 at full gain, -16.7 dB). */
-#define SYNTH_GAIN 0.146f
+ * tools/test_miniwin/capture_dmusic.exe and tools/music/levels.py on the main theme and the four world themes (40 s
+ * each, the game's setup): all within 0.6 dB of Windows', and every octave band within 1 dB. */
+#define SYNTH_GAIN 0.95f
 
 enum {
     EV_NOTE_OFF,

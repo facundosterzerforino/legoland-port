@@ -72,6 +72,7 @@ int main(int argc, char **argv) {
     DMNotificationPMsg *msg;
     int i, loud = 0, polls = 0, starts = 0, beats = 0;
     double energy = 0, samples = 0;
+    DWORD last = 0;
 
     if (argc < 2) {
         printf("usage: test_dmusic <data folder> [portable]\n");
@@ -126,11 +127,11 @@ int main(int argc, char **argv) {
     perf->v->AddNotificationType(perf, &GUID_DMNotifySegment);
     Check("PlaySegment", perf->v->PlaySegment(perf, seg, 0x2000, 0, NULL));
     /* five seconds: music in the buffer, and the notifications */
-    for (i = 0; i < 50; i++) {
+    for (i = 0; i < 500; i++) {
         DWORD play, write, n1, n2;
         void *p1, *p2;
 
-        WaitForSingleObject(event, 100);
+        WaitForSingleObject(event, 10);
         ResetEvent(event);
         while (perf->v->GetNotificationPMsg(perf, &msg) == S_OK) {
             if (IsEqualGUID(&msg->guidNotificationType, &GUID_DMNotifySegment)) {
@@ -151,17 +152,23 @@ int main(int argc, char **argv) {
                     break;
                 }
             }
-            for (k = 0; k < n1 / 2; k++) {
-                energy += (double)s[k] * s[k];
+            /* the level of what is final: up to the write cursor for Windows' DirectMusic (it writes ahead of it and
+             * clears what has played), up to the play cursor for miniwin's (it fills just ahead of it) */
+            if (!MiniwinPortableMusic()) {
+                play = write;
             }
-            samples += n1 / 2;
+            for (k = last / 2; i > 0 && k != play / 2; k = (k + 1) % (n1 / 2)) {
+                energy += (double)s[k] * s[k];
+                samples++;
+            }
+            last = play;
             IDirectSoundBuffer_Unlock(buffer, p1, n1, p2, n2);
             polls++;
         }
     }
     printf("music heard in %d of %d looks; %d segment starts, %d beats; level %.0f RMS\n", loud, polls, starts, beats,
         samples > 0 ? sqrt(energy / samples) : 0.0);
-    if (loud < polls / 2) {
+    if (loud < polls / 2 && polls > 0) {
         printf("FAIL: little or no music in miniwin's buffer\n");
         failures++;
     }
