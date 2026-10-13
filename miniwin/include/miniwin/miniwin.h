@@ -12,6 +12,7 @@
 #define DIRECTINPUT_VERSION 0x0500 /* the game's (input.c) */
 #endif
 #include <dinput.h>
+#include <dsound.h>
 
 /* [library:video] DirectDraw on memory surfaces (miniwin/src/ddraw.c), called like DirectDrawCreate. It has what
  * the game uses: 16-bit RGB565 surfaces; Blt copies, stretches and colour fills, with source colour keys and clip
@@ -64,5 +65,10 @@ HRESULT WINAPI MiniwinDirectInputCreate(HINSTANCE instance, DWORD version, LPDIR
 
 /* 1 while the key with this DIK code is down (and the window has the focus). */
 int MiniwinKeyDown(int dik);
+
+/* [library:audio] DirectSound on SDL3 audio (miniwin/src/dsound.c), called like DirectSoundCreate: secondary
+ * buffers of 8- or 16-bit PCM, mixed on SDL's audio thread with DirectSound's volume, pan, frequency, looping and
+ * cursors; duplicates share their data. Fails (DSERR_NODRIVER) when SDL finds no audio device. */
+HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKNOWN outer);
 
 #endif

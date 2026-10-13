@@ -173,6 +173,13 @@ build after each.
 
 ## Phase 6: sound, movies and music
 
+**Status (2026-10-13):** started.
+- Step 1, sound effects, speech and movie sound, waiting for the maintainer's test: `miniwin/src/dsound.c` is
+  DirectSound on SDL3 audio (the game's buffers mixed on SDL's audio thread with DirectSound's volume, pan,
+  frequency, looping and cursors). `tools/test_miniwin/test_dsound.exe` compares it with Windows' DirectSound:
+  identical. DirectMusic still renders through a real Windows DirectSound of its own (`port/port_audio.c`) until
+  the music step; ADPCM decoding still uses Windows' ACM.
+
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.
 2. **Movies** `[library:movie]`: a small AVI reader plus `libavcodec` built with only `indeo5`, `indeo3`,

@@ -14,4 +14,8 @@ clang-cl $CFLAGS $INCLUDES -I../../miniwin/include -I$SDL/sdl3-src/include -I$SD
     test_paths.c ../../miniwin/src/files.c /Fetest_paths.exe \
     /link /machine:x86 $LIBPATHS $SDL/sdl3-build/SDL3-static.lib kernel32.lib user32.lib gdi32.lib winmm.lib \
     imm32.lib ole32.lib oleaut32.lib version.lib uuid.lib advapi32.lib setupapi.lib shell32.lib
+clang-cl $CFLAGS $INCLUDES -I../../miniwin/include -I$SDL/sdl3-src/include -I$SDL/sdl3-build/include-revision \
+    test_dsound.c ../../miniwin/src/dsound.c /Fetest_dsound.exe \
+    /link /machine:x86 $LIBPATHS $SDL/sdl3-build/SDL3-static.lib dsound.lib dxguid.lib kernel32.lib user32.lib \
+    gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib version.lib uuid.lib advapi32.lib setupapi.lib shell32.lib
 rm -f *.obj

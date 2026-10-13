@@ -20,6 +20,9 @@
 #include "text.h"
 #include "timer.h"
 #include "title.h"
+#ifdef LEGOLAND_PORT
+#include "miniwin/miniwin.h"
+#endif
 
 #pragma intrinsic(memset, memcpy, strcpy, strlen)
 
@@ -530,7 +533,12 @@ int InitDirectSound(void *hwnd) {
     int ok;
 
     ok = 0;
+#ifdef LEGOLAND_PORT
+    /* [library:audio] miniwin's DirectSound: the game's sounds are mixed on SDL3 */
+    if (MiniwinDirectSoundCreate(NULL, (LPDIRECTSOUND *)&DSound, NULL) == 0) {
+#else
     if (DirectSoundCreate(NULL, (LPDIRECTSOUND *)&DSound, NULL) == 0) {
+#endif
         if (((LPDIRECTSOUND)DSound)->lpVtbl->SetCooperativeLevel((LPDIRECTSOUND)DSound, (HWND)hwnd, 1) ==
             0) {
             memset(DSoundCaps, 0, sizeof(DSoundCaps));

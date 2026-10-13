@@ -107,7 +107,8 @@ Status: phase 4 is done (2026-10-13, after the maintainer's full playthrough; se
 VM: this port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08). Phase 5
 (miniwin + SDL3) is done too; phase 6 (sound, movies, music) is next, see `ROADMAP.md`. After changing `miniwin/src/ddraw.c` or `files.c`, run
 `tools/test_miniwin/build.sh`, then `tools/test_miniwin/test_miniwin.exe` (compares miniwin's DirectDraw with
-Windows' own) and `test_paths.exe` (path matching on a case-sensitive folder); console programs, no window, both
+Windows' own) , `test_paths.exe` (path matching on a case-sensitive folder) and
+`test_dsound.exe` (miniwin's DirectSound against Windows'); console programs, no window, both
 must report 0 failed. The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
 armed (`PortWatchRequest`).
 
