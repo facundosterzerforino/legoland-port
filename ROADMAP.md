@@ -178,7 +178,11 @@ build after each.
   DirectSound on SDL3 audio (the game's buffers mixed on SDL's audio thread with DirectSound's volume, pan,
   frequency, looping and cursors; muted, still moving, while the window doesn't have the focus, as DirectSound does). `tools/test_miniwin/test_dsound.exe` compares it with Windows' DirectSound:
   identical. DirectMusic still renders through a real Windows DirectSound of its own (`port/port_audio.c`) until
-  the music step; ADPCM decoding still uses Windows' ACM.
+  the music step.
+- ADPCM decoding, waiting for the maintainer's test: `miniwin/src/acm.c` replaces Windows' ACM for the speech
+  files and the movies' sound (MS ADPCM, IMA ADPCM and PCM, to 16- or 8-bit PCM). `tools/test_miniwin/test_acm.exe`
+  compares it with Windows' ACM, sizes, header fields and decoded bytes, on made-up blocks and, given the data
+  folder, on all 1266 speech files and the 9 ADPCM movie soundtracks: identical. The port no longer links msacm32.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.

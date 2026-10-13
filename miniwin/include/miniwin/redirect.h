@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "miniwin/acm.h"
 #include "miniwin/files.h"
 #include "miniwin/timer.h"
 
@@ -31,5 +32,13 @@
 #define CreateFileA MiniwinCreateFileA
 #define GetFileAttributesA MiniwinGetFileAttributesA
 #define SetCurrentDirectoryA MiniwinSetCurrentDirectoryA
+
+/* [library:audio] */
+#define acmStreamOpen MiniwinAcmStreamOpen
+#define acmStreamSize MiniwinAcmStreamSize
+#define acmStreamClose MiniwinAcmStreamClose
+#define acmStreamPrepareHeader MiniwinAcmStreamPrepareHeader
+#define acmStreamConvert MiniwinAcmStreamConvert
+#define acmStreamUnprepareHeader MiniwinAcmStreamUnprepareHeader
 
 #endif
