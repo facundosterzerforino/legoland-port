@@ -50,3 +50,5 @@ tools/test_display/*.exe
 
 # tools/permuter.py output
 permuter_out/
+# built by tools/test_miniwin/build.sh
+tools/test_miniwin/*.exe
