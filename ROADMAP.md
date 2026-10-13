@@ -136,7 +136,12 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
   DirectInput's keyboard and mouse devices on SDL (the keyboard as DirectInput's 256 bytes by DIK code, through a
   table generated from SDL's own Windows scancode table); the windowed mouse code, the focus checks and Caps Lock
   use SDL too. No `dinput.dll` import any more.
-- Still Windows-only underneath: GDI text on the surfaces (GetDC), DirectSound, the registry, timers.
+- Step 5, timers, waiting for the maintainer's test: `miniwin/timer.h` is included first into every game source
+  and sends GetTickCount, QueryPerformanceCounter/Frequency and Sleep to SDL3 (`miniwin/src/timer.c`).
+  GetTickCount keeps Windows' 15.625 ms steps: the frame limiter waits 28 ms on it, so frames last 31.25 ms, and a
+  precise clock would make the game run about 10% faster. Threads stay as they are until phase 6: the only game
+  threads are the sound and music ones (and the debug console's).
+- Still Windows-only underneath: GDI text on the surfaces (GetDC), DirectSound, the registry.
 
 Replace the Windows-only layers with SDL3 behind `miniwin/`, one subsystem at a time, checking against phase 4's
 build after each.
