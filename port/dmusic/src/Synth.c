@@ -182,11 +182,19 @@ static DmResult DmSynth_assignInstrumentChannels(DmSynth* slf, DmBand* band) {
 			continue;
 		}
 
-		uint32_t bank = (ins->patch & 0xFF00U) >> 8;
-		uint32_t patch = ins->patch & 0xFFU;
+		// [port] The presets carry the DLS bank (Dm_createHydra): MSB << 8 | LSB, and 128 for drum kits; the patch has
+		// the MSB in bits 16-23, the LSB in bits 8-15 and the drum flag in bit 31. A variation the collection lacks
+		// plays its bank 0 instrument (as GS synthesizers do), a missing drum kit the standard kit.
+		uint32_t msb = (ins->patch >> 16) & 0x7FU;
+		uint32_t lsb = (ins->patch >> 8) & 0x7FU;
+		uint32_t bank = ins->patch & DmDls_DRUM_KIT ? 128 : msb << 8 | lsb;
+		uint32_t patch = ins->patch & 0x7FU;
 
 		tsf_set_volume(fnt->syn, slf->volume);
-		tsf_channel_set_bank_preset(fnt->syn, (int) ins->channel, (int) bank, (int) patch);
+		if (!tsf_channel_set_bank_preset(fnt->syn, (int) ins->channel, (int) bank, (int) patch) &&
+		    !tsf_channel_set_bank_preset(fnt->syn, (int) ins->channel, bank == 128 ? 128 : 0, bank == 128 ? 0 : (int) patch)) {
+			Dm_report(DmLogLevel_WARN, "DmSynth: no instrument for patch %08x", ins->patch);
+		}
 
 		// Update the instrument's properties
 		if (ins->options & DmInstrument_VALID_PAN) {
@@ -312,8 +320,10 @@ void DmSynth_sendNoteOn(DmSynth* slf, uint32_t channel, uint8_t note, uint8_t ve
 		return;
 	}
 
-	bool res =
-	    tsf_channel_note_on(chan->font->syn, chan->channel, note + chan->transpose, (float) velocity / DmInt_MIDI_MAX);
+	// [port] DLS level 1's velocity curve: an attenuation of 40 log10(velocity / 127) (its default connection, concave
+	// over 96 dB), so the gain is the square; TinySoundFont's velocity is a plain gain.
+	float vel = (float) velocity / DmInt_MIDI_MAX;
+	bool res = tsf_channel_note_on(chan->font->syn, chan->channel, note + chan->transpose, vel * vel);
 	if (!res) {
 		Dm_report(DmLogLevel_ERROR, "DmSynth: DmSynth_sendNoteOn encountered an error.");
 	}
