@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "ext_console.h"
+#include "ext_movie.h"
 #include "ext_music.h"
 #include "extensions.h"
 
@@ -19,6 +20,12 @@ void ExtensionsParseCommandLine(const char *cmdline) {
     } else if (strstr(cmdline, "-level-music") != NULL) {
         ExtLevelMusic = 1;
     }
+    if (strstr(cmdline, "-no-pause-movies") != NULL) {
+        ExtPauseMovies = 0;
+    } else if (strstr(cmdline, "-pause-movies") != NULL) {
+        ExtPauseMovies = 1;
+    }
+    ExtPauseMoviesApply();
     if (strstr(cmdline, "-console") != NULL) {
         ExtConsoleStart();
     }

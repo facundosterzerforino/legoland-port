@@ -1,0 +1,22 @@
+#ifndef EXT_MOVIE_H
+#define EXT_MOVIE_H
+
+/* Pause movies (off by default; the launcher's "Pause movies in the background" box, or -pause-movies /
+ * -no-pause-movies). The original keeps a movie's clock running while the game waits for its window (Alt+Tab, a
+ * click elsewhere): back in the game, the movie jumps to where the clock says, and what it "played" meanwhile is
+ * skipped. With this on, the time the game waited is taken off the movie's clock (PlayMovieFrames), and the game's
+ * sounds hold instead of only going quiet while the window lacks the focus, so the movie goes on where it was,
+ * picture and sound together. */
+
+extern int ExtPauseMovies;
+
+/* Applies the choice (the sound mixer's behaviour). After the launcher and the command line. */
+void ExtPauseMoviesApply(void);
+
+/* ProcessSystemEvents: waiting is 1 while it waits for the game's window, 0 once it goes on. */
+void ExtPauseMoviesWaiting(int waiting);
+
+/* The milliseconds the game waited for its window since the last call (always 0 when the extension is off). */
+int ExtPauseMoviesTake(void);
+
+#endif

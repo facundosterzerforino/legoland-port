@@ -74,4 +74,8 @@ int MiniwinKeyDown(int dik);
  * cursors; duplicates share their data. Fails (DSERR_NODRIVER) when SDL finds no audio device. */
 HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKNOWN outer);
 
+/* While the window lacks the focus, sounds are muted but keep playing (as DirectSound does); with hold set they
+ * hold instead, cursors and all (extensions/ext_movie.h). */
+void MiniwinSoundHoldWhenInactive(int hold);
+
 #endif

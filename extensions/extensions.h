@@ -13,6 +13,9 @@ extern int ExtSkipLogo;
 /* Level music (ext_music.h): each level plays the music theme that fits it. Off by default; the launcher's "Music
  * changes with the level" box saves the choice, and -level-music / -no-level-music override it. */
 
+/* Pause movies (ext_movie.h): a movie stops while the game is in the background instead of running on. Off by
+ * default; the launcher's box saves the choice, and -pause-movies / -no-pause-movies override it. */
+
 /* Reads the switches from the command line (after the launcher, so they override its saved choices). */
 void ExtensionsParseCommandLine(const char *cmdline);
 

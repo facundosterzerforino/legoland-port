@@ -24,6 +24,9 @@
 #include "title.h"
 #include "wndenv.h"
 #include "worker_mouse.h"
+#ifdef LEGOLAND_PORT
+#include "ext_movie.h"
+#endif
 
 struct ProfileObj {
     unsigned char pad_0[0x34];
@@ -1737,9 +1740,17 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
             if (audio != 0) {
                 StartMovieAudio(handle);
             }
+#ifdef LEGOLAND_PORT
+            ExtPauseMoviesTake(); /* [port] extensions/ext_movie.h: waits before the movie started don't count */
+#endif
             started = GetPerformanceTime();
         }
         RenderingComplete();
+#ifdef LEGOLAND_PORT
+        /* [port] extensions/ext_movie.h: the time the game waited for its window (here or in the ProcessSystemEvents
+         * above) is taken off the movie's clock, so the movie goes on where it was */
+        started += ExtPauseMoviesTake();
+#endif
         if ((unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000 == target) {
             frame_index = target + 1;
             if (frame_index < (int)handle->frame_count) {

@@ -42,6 +42,7 @@ struct DirectSound {
 };
 
 static SDL_Mutex *lock;
+static int hold_when_inactive;
 static SDL_AudioStream *stream;
 static struct Buffer *buffers;
 static float mix[MIX_CHUNK * 2];
@@ -137,8 +138,10 @@ static void SDLCALL Feed(void *userdata, SDL_AudioStream *s, int additional, int
             /* As DirectSound does with buffers without DSBCAPS_GLOBALFOCUS, a buffer is muted while another window
              * has the focus, but keeps playing: its cursor moves on, so the movie player (which keeps time by the
              * clock and resyncs its streaming buffer after a pause) and looping sounds behave as with DirectSound. */
-            if (b->playing && !b->primary) {
-                MixBuffer(b, frames, !inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0);
+            int focused = !inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0;
+
+            if (b->playing && !b->primary && (focused || !hold_when_inactive)) {
+                MixBuffer(b, frames, focused);
             }
         }
         SDL_UnlockMutex(lock);
@@ -583,6 +586,10 @@ static IDirectSoundVtbl SoundVtbl = {
     Sound_SetSpeakerConfig,
     Sound_Initialize,
 };
+
+void MiniwinSoundHoldWhenInactive(int hold) {
+    hold_when_inactive = hold;
+}
 
 HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKNOWN outer) {
     struct DirectSound *ds;

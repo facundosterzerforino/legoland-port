@@ -11,6 +11,7 @@
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
 #include "ext_console.h"
+#include "ext_movie.h"
 #include "extensions.h"
 #include "miniwin/miniwin.h"
 #include "port_display.h"
@@ -139,6 +140,7 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
             peeked = 1;
 #ifdef LEGOLAND_PORT
             PortSetPaused(1); /* [port] waiting for the window on purpose: not a freeze */
+            ExtPauseMoviesWaiting(1); /* [port] extensions/ext_movie.h */
             ExtConsolePoll(); /* [port] extensions/: debug console commands also run while the window is inactive */
 #endif
             WaitMessage();
@@ -146,6 +148,7 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
     } while ((lpConfig->field_1c & 1) != 0);
 #ifdef LEGOLAND_PORT
     PortSetPaused(0);
+    ExtPauseMoviesWaiting(0); /* [port] extensions/ext_movie.h */
 #endif
     if (peeked) {
         ResendPalette();
