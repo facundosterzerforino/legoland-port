@@ -89,7 +89,7 @@ A small launcher opens before the game with three choices:
 - **Full screen (keep the desktop's resolution)**, the default: the picture fills the screen, 4:3 and centred, and
   the display mode is never changed (Alt+Tab is instant).
 - **Full screen (change the resolution)**: a 4:3 display mode (640x480 is the original; 800x600, 1024x768,
-  1280x960 and more, as far as the display allows), in 32-bit colour.
+  1280x960 and more, as far as the display allows).
 - **In a window** of a chosen 4:3 size; the window can be resized.
 
 The game still draws its 640x480, 16-bit picture and the port scales it up with sharp pixels (1280x960 and
@@ -101,10 +101,8 @@ Shift while starting the game to see it again. Command line: `-fullscreen` (desk
 (full screen in that mode), `-windowed` (or the original `WINDEBUG`) choose without the launcher, `-launcher`
 always shows it.
 
-**Use SDL3 for the window and picture** (a box in the launcher, or `-sdl` / `-no-sdl`; off by default while it
-is tested): the window and the picture come from SDL3 instead of DirectDraw and a Windows window, the first step
-of the port's platform layer (`miniwin/`, see `ROADMAP.md` phase 5). The game should look and play exactly the
-same; the three ways to show it above work the same way.
+The window and the picture come from SDL3, through the port's platform layer (`miniwin/`, see `ROADMAP.md`
+phase 5); the game no longer uses DirectDraw.
 
 ## Optional features
 

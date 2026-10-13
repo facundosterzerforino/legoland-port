@@ -2,9 +2,9 @@
 #define MINIWIN_MINIWIN_H
 
 /* miniwin: the Windows APIs the game calls, reimplemented so that it can run without DirectX (PORTING.md).
- * For now it is built on Windows only, next to the real SDK headers, and switched on at run time (the launcher's
- * SDL3 box, -sdl): the game creates its DirectDraw object and window here instead of with DirectDrawCreate and
- * CreateWindowEx, and every other call reaches this code through the same COM interfaces as before. */
+ * For now it is built on Windows only, next to the real SDK headers: the game creates its DirectDraw object and
+ * window here instead of with DirectDrawCreate and CreateWindowEx, and every other call reaches this code through
+ * the same COM interfaces as before. */
 
 #include <windows.h>
 #include <ddraw.h>

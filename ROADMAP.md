@@ -125,15 +125,14 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
 **Status (2026-10-13):** started.
 - Step 1 is done: SDL3 3.4.18 is fetched at configure time and linked statically into the port build
   (`-port-selftest` reports the version it linked).
-- Steps 2 and 3, first version, waiting for the maintainer's test: the SDL3 display, a launcher box (`-sdl`), off by
-  default. `miniwin/src/ddraw.c` is DirectDraw on memory surfaces: the game's calls reach it through the same COM
+- Steps 2 and 3 are done (confirmed in game by the maintainer, 2026-10-13): the window and the picture are SDL3's,
+  and DirectDraw is gone (no `ddraw.dll` import). `miniwin/src/ddraw.c` is DirectDraw on memory surfaces: the game's calls reach it through the same COM
   interfaces, so the decompiled drawing code is unchanged. `tools/test_miniwin` compares it with Windows' own
   DirectDraw pixel by pixel (copies, colour keys, stretches with and without clip lists, fills, GDI text, error
   codes): identical. DirectDraw's stretch rounding was measured for every pair of sizes up to 640 and is
   reproduced exactly. `miniwin/src/window.c` is the SDL3 window, renderer and events; the game takes its
   windowed code path in all three display modes. Still Windows-only underneath: GDI text on the surfaces (GetDC),
-  DirectInput, DirectSound, the registry. Once the maintainer confirms it, it becomes the default and the
-  DirectDraw path is removed.
+  DirectInput, DirectSound, the registry.
 
 Replace the Windows-only layers with SDL3 behind `miniwin/`, one subsystem at a time, checking against phase 4's
 build after each.

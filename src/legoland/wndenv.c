@@ -118,11 +118,9 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
             SetCursor(NULL);
         }
 #ifdef LEGOLAND_PORT
-        if (PortDisplaySdl) {
-            /* [library:window] the SDL3 window's messages went to SDL above: its events come back here as the
-             * messages LegoLandWindowProc handles (miniwin/miniwin.h) */
-            MiniwinPumpEvents(LegoLandWindowProc);
-        }
+        /* [library:window] the SDL3 window's messages went to SDL above: its events come back here as the messages
+         * LegoLandWindowProc handles (miniwin/miniwin.h) */
+        MiniwinPumpEvents(LegoLandWindowProc);
 #endif
         /* [library:input] a window that never became the foreground one (launched from the background) gets no
          * WM_KILLFOCUS, and its DirectInput devices can't be acquired: pause until it gets the focus. */

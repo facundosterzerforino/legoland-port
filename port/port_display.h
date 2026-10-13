@@ -4,55 +4,31 @@
 #include <windows.h>
 #include <ddraw.h>
 
-/* [library:video] Output resolution. The game always draws a 640x480 frame (lpConfig->screen_width/height, the
- * interface is laid out for it); the port shows that frame scaled to the chosen size, keeping 4:3 (black bars
- * when the screen or window isn't 4:3). Nearest-neighbour, so pixels stay sharp; 1280x960 and 1920x1440 are
- * exact multiples. Chosen in the launcher (port_launcher.c) or with -res WxH; 640x480 is the original. */
+/* [library:video] How the game's picture is shown. The game always draws a 640x480 RGB565 frame (lpConfig->
+ * screen_width/height; the interface is laid out for it) into miniwin's memory surfaces, and always takes its
+ * windowed code path (WinDebugMode). The port shows the frame in its SDL3 window (miniwin/miniwin.h), scaled to the
+ * window or screen keeping 4:3 (black bars around it), nearest neighbour so pixels stay sharp; 1280x960 and
+ * 1920x1440 are exact multiples. The window and its size are chosen in the launcher (port_launcher.c) or with
+ * -res WxH; 640x480 is the original. */
 
 #define PORT_GAME_WIDTH 640
 #define PORT_GAME_HEIGHT 480
 
-extern int PortDisplayWidth; /* fullscreen display mode, or the window's client size */
+extern int PortDisplayWidth; /* the window's client size, or the full-screen display mode */
 extern int PortDisplayHeight;
-extern int PortDisplayWindowed; /* 1: a window (same as the WINDEBUG switch), also for PortDisplayBorderless */
-extern int PortDisplayBorderless; /* 1: full screen at the desktop's resolution, a borderless window covering it */
-extern int PortDisplayBpp; /* full screen with a mode change: 32 (the game's RGB565 frame is converted when
-                                   * shown) or 16 when the display refused 32 (copied as is) */
-/* 1: the SDL3 window and picture (miniwin, phase 5 of ROADMAP.md) instead of DirectDraw and a Windows window. The
- * game then takes its windowed code path (PortDisplayWindowed is 1), and PortDisplaySdlFullscreen says how the SDL
- * window is shown: MINIWIN_WINDOW, MINIWIN_FULLSCREEN_DESKTOP or MINIWIN_FULLSCREEN_MODE (miniwin/miniwin.h). */
-extern int PortDisplaySdl;
-extern int PortDisplaySdlFullscreen;
-
-/* 1 when the frame is shown at another size than 640x480. */
-int PortDisplayScaled(void);
-
-/* 1 when frames go through PortPresent (window, scaled, or a 32-bit display); 0: the original Blt. */
-int PortDisplayCustomPresent(void);
+extern int PortDisplayFullscreen; /* MINIWIN_WINDOW, MINIWIN_FULLSCREEN_DESKTOP or MINIWIN_FULLSCREEN_MODE */
 
 /* Where the 640x480 frame goes inside an area of the given size (4:3, centred). */
 void PortDisplayDestRect(int area_width, int area_height, RECT *dest);
 
-/* Shows the part src (game coordinates; NULL: the whole frame) of the game's frame surface: scaled into the
- * fullscreen primary surface, with GDI into the window, or (PortDisplaySdl) the whole frame through SDL3. Returns a
- * DirectDraw result. */
-HRESULT PortPresent(HWND hwnd, LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src);
+/* Shows the game's frame surface in the window. Returns a DirectDraw result. */
+HRESULT PortPresent(LPDIRECTDRAWSURFACE frame);
 
-/* Windowed: the last picture copied to the window (32-bit, the client area's size), for tools/test_display. */
-const unsigned int *PortDisplayWindowImage(int *width, int *height);
-
-/* Windowed: turns a point in the window's client area into game coordinates (0..639, 0..479). */
+/* Turns a point in the window's client area into game coordinates (0..639, 0..479). */
 void PortDisplayClientToGame(HWND hwnd, POINT *pt);
 
-/* The window's outer size for a client area of PortDisplayWidth x PortDisplayHeight with this style, shrunk
- * (keeping 4:3) to fit the desktop's work area. */
-void PortDisplayWindowSize(DWORD style, int *width, int *height);
-
-/* Debugging: Ctrl+F12 in the game saves the next 4 presented frames into capture\ next to the exe: frame-N.bmp
- * (the game's 640x480 picture), screen-N.bmp (the window's own image) and desktop-N-after/before.bmp (what the
- * screen shows over the window right after the present and just before the next one). PortDisplayCapture goes
- * after each present, PortDisplayCaptureBefore before it. */
+/* Debugging: Ctrl+F12 in the game saves the next 4 frames (the game's 640x480 picture) as capture\frame-N.bmp next
+ * to the exe. Call it after each present. */
 void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame);
-void PortDisplayCaptureBefore(HWND hwnd);
 
 #endif

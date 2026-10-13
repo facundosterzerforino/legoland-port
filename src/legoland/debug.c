@@ -253,8 +253,7 @@ int __cdecl wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     // STRING: LEGOLAND 0x004bcd70
 #ifdef LEGOLAND_PORT
-    if (StrIStr(lpCmdLine, "WINDEBUG") || PortDisplayWindowed) { /* [library:config] or chosen in the launcher */
-        PortDisplayWindowed = 1;
+    if (TRUE) { /* [library:video] always: the SDL3 window is shown in a window or full screen (port_display.h) */
 #else
     if (StrIStr(lpCmdLine, "WINDEBUG")) {
 #endif
