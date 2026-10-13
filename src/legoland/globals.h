@@ -896,8 +896,8 @@ extern float FLOAT_004ab490;
 extern float FLOAT_004ab494;
 // 0x004ab49c
 extern float FLOAT_004ab49c;
-// 0x004b64d4
-extern char DAT_004b64d4[4];
+// 0x004b64cc
+extern char CarouselBlokeBoxName[12]; /* "BlokeBox??", the seat number goes at +8 */
 // 0x004b64d8
 extern struct FXItem CAROUSSEL_SFX[2];
 // 0x004b65c0

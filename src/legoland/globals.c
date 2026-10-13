@@ -590,8 +590,9 @@ float FLOAT_004ab494;
 // GLOBAL: LEGOLAND 0x004ab49c
 float FLOAT_004ab49c;
 
-// GLOBAL: LEGOLAND 0x004b64d4
-char DAT_004b64d4[4];
+/* the carousel seat path name; the riders' code writes the seat number over "??" (+8) before each lookup */
+// GLOBAL: LEGOLAND 0x004b64cc
+char CarouselBlokeBoxName[12] = "BlokeBox??";
 
 // GLOBAL: LEGOLAND 0x004b64d8
 struct FXItem CAROUSSEL_SFX[2];

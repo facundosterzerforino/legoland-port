@@ -329,9 +329,8 @@ void FUN_0042c6d0(struct CarouselNode *node) {
     for (; elem != NULL; elem = elem->next) {
         if (node->id == elem->id && *(char *)((char *)elem->bloke + 0x35) == '\x01') {
             // STRING: LEGOLAND 0x004b4704
-            sprintf(DAT_004b64d4, "%02d", *(unsigned char *)((char *)elem->bloke + 0x36));
-            // STRING: LEGOLAND 0x004b64cc
-            SetBlokePositionFromBNV(CarouselBinV, elem->bloke, "BlokeBox??", (int)(char)node->frame, -1617853.25f, -1618109.0f, 0);
+            sprintf(CarouselBlokeBoxName + 8, "%02d", *(unsigned char *)((char *)elem->bloke + 0x36));
+            SetBlokePositionFromBNV(CarouselBinV, elem->bloke, CarouselBlokeBoxName, (int)(char)node->frame, -1617853.25f, -1618109.0f, 0);
         }
     }
     *(short *)**(int **)((char *)ZCarouselSprite + 8) = (short)(char)node->frame;
@@ -408,8 +407,8 @@ void CarouselUpdate(struct CarouselRideObj *param_1) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617853.25f, -1618109.0f);
                 bloke->field_35 = 0;
-                sprintf(DAT_004b64d4, "%02d", FUN_0042cd20(elem, node, (signed char)DAT_006160bc->capacity));
-                bloke->path = NewBNVPath(DAT_00616090[0], 0, "BlokeBox??", -1617853.25f, -1618109.0f, in_path);
+                sprintf(CarouselBlokeBoxName + 8, "%02d", FUN_0042cd20(elem, node, (signed char)DAT_006160bc->capacity));
+                bloke->path = NewBNVPath(DAT_00616090[0], 0, CarouselBlokeBoxName, -1617853.25f, -1618109.0f, in_path);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
                 bloke->flags |= 0x80;
@@ -447,8 +446,8 @@ void CarouselUpdate(struct CarouselRideObj *param_1) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617853.25f, -1618109.0f);
                 bloke->field_35 = 2;
-                sprintf(DAT_004b64d4, "%02d", bloke->field_36);
-                bloke->path = NewBNVPath(DAT_00616090[2], 2, "BlokeBox??", -1617853.25f, -1618109.0f, out_path);
+                sprintf(CarouselBlokeBoxName + 8, "%02d", bloke->field_36);
+                bloke->path = NewBNVPath(DAT_00616090[2], 2, CarouselBlokeBoxName, -1617853.25f, -1618109.0f, out_path);
                 bloke->param_action++;
                 break;
             case 8:
