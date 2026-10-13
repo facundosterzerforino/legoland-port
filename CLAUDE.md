@@ -89,7 +89,14 @@ describe how `main` works.
   `tools/dbgrun` is a small debugger (`dbgrun.exe <log> <exe> args`). `tools/minidump.py` reads a dump from WSL by
   global name (values, neighbours, zeroed runs, value search; pass the .pdb of the exe that crashed). To catch code
   that overwrites globals it doesn't own, call `PortWatchRequest(slot, &global, "name")` (`port/port_watchdog.h`,
-  hardware write watchpoints, `watch:` lines in the trace); take the calls out again once the bug is found. Work from the code; ask the maintainer to reproduce.
+  hardware write watchpoints, `watch:` lines in the trace); take the calls out again once the bug is found.
+- **Comparing a port function with the original:** `tools/emu/` runs a function from the original `legoland.exe`
+  and the port's build of it in a CPU emulator (Unicorn, from WSL: `uv pip install unicorn capstone pillow`), with
+  the helpers they call hooked, and compares the results (`drawemu.py` person drawer, `zbemu.py` z-buffer fill,
+  `remapemu.py` texture cells, `loademu.py` mesh loader, `bmpemu.py` texture loader on real game files via
+  `resvol.py`). `genrva.py rvas.json` reads the port's addresses from its PDB first. Never run original machine
+  code natively on Windows (mapping it into a process, suspended child processes, code patching): the
+  maintainer's CrowdStrike blocks it as malware behaviour. Work from the code; ask the maintainer to reproduce.
 - **Windowed mode:** `run\legoland-windowed.exe WINDEBUG`, working directory `installed\`. (Windows keeps
   "16-bit colour, 640x480" compatibility flags on `legoland-port.exe`, which change the desktop resolution.)
 - **Most bugs so far were data, not code:** globals declared smaller than in the original exe, tables with
