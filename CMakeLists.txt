@@ -59,12 +59,8 @@ if(LEGOLAND_MODERN_BUILD)
         -Wno-error=int-conversion
         -Wno-error=incompatible-function-pointer-types
         -Wno-error=return-mismatch)
-    # /SAFESEH:NO: the old dinput.lib (c_dfDI* tables, DirectInputCreateA) predates SafeSEH
-    target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO /SAFESEH:NO)
-    # The modern SDK has no dinput.lib (only dinput8.lib), and the game calls DirectInputCreateA:
-    # use the repo's import library for it.
+    target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
     target_link_libraries(legoland PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/libs/dinput.lib"
         dsound dxguid winmm msacm32 vfw32 version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
     # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
     # external/legoland.exe at build time rather than committed (tools/extract_resources.py).

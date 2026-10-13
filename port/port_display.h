@@ -24,11 +24,11 @@ void PortDisplayDestRect(int area_width, int area_height, RECT *dest);
 /* Shows the game's frame surface in the window. Returns a DirectDraw result. */
 HRESULT PortPresent(LPDIRECTDRAWSURFACE frame);
 
-/* Turns a point in the window's client area into game coordinates (0..639, 0..479). */
-void PortDisplayClientToGame(HWND hwnd, POINT *pt);
+/* Turns a point in the window's picture (pixels) into game coordinates (0..639, 0..479). */
+void PortDisplayClientToGame(POINT *pt);
 
 /* Debugging: Ctrl+F12 in the game saves the next 4 frames (the game's 640x480 picture) as capture\frame-N.bmp next
  * to the exe. Call it after each present. */
-void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame);
+void PortDisplayCapture(LPDIRECTDRAWSURFACE frame);
 
 #endif

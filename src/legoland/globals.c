@@ -203,8 +203,8 @@ double DOUBLE_004ab538;
 double DOUBLE_004ab558;
 
 #ifndef LEGOLAND_PORT
-/* [library:input] In the port these two tables come from dinput.lib (which is where the original got them);
- * the decomp's empty definitions only provide the symbols for the matching link. */
+/* [library:input] In the port these two tables come from miniwin (miniwin/src/dinput.c; the original got them
+ * from dinput.lib); the decomp's empty definitions only provide the symbols for the matching link. */
 // GLOBAL: LEGOLAND 0x004ab560
 const DIDATAFORMAT c_dfDIKeyboard;
 
@@ -242,12 +242,12 @@ GUID CLSID_DirectMusicStyle = {0xd2ac288a, 0xb39b, 0x11d1, {0x87, 0x04, 0x00, 0x
 // GLOBAL: LEGOLAND 0x004ab9f0
 GUID CLSID_DirectMusicSegment = {0xd2ac2882, 0xb39b, 0x11d1, {0x87, 0x04, 0x00, 0x60, 0x08, 0x93, 0xb1, 0xbd}};
 
-#ifndef LEGOLAND_PORT /* [library:input] the port takes this GUID from dinput.lib */
+#ifndef LEGOLAND_PORT /* [library:input] the port takes this GUID from dxguid.lib */
 // GLOBAL: LEGOLAND 0x004ac090
 const GUID GUID_SysKeyboard = {0x6f1d2b61, 0xd5a0, 0x11cf, {0xbf, 0xc7, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}};
 #endif
 
-#ifndef LEGOLAND_PORT /* [library:input] the port takes this GUID from dinput.lib */
+#ifndef LEGOLAND_PORT /* [library:input] the port takes this GUID from dxguid.lib */
 // GLOBAL: LEGOLAND 0x004ac0a0
 const GUID GUID_SysMouse = {0x6f1d2b60, 0xd5a0, 0x11cf, {0xbf, 0xc7, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}};
 #endif

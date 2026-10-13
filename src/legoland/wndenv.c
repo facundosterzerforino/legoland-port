@@ -82,7 +82,7 @@ LEGO_EXPORT LRESULT CALLBACK LegoLandWindowProc(HWND hWnd, UINT msg, WPARAM wPar
         break;
 #ifdef LEGOLAND_PORT
     case WM_MOUSEWHEEL:
-        /* [library:input] windowed mode reads the wheel from here (port_input.h; DirectInput in full screen) */
+        /* [library:input] the port reads the wheel from here (port_input.h; MiniwinPumpEvents sends it) */
         PortWheelAdd(GET_WHEEL_DELTA_WPARAM(wParam));
         return 0;
 #endif
@@ -124,7 +124,11 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
 #endif
         /* [library:input] a window that never became the foreground one (launched from the background) gets no
          * WM_KILLFOCUS, and its DirectInput devices can't be acquired: pause until it gets the focus. */
+#ifdef LEGOLAND_PORT
+        if ((lpConfig->field_1c & 1) == 0 && !MiniwinHasFocus()) { /* [library:input] the focus from SDL3 */
+#else
         if ((lpConfig->field_1c & 1) == 0 && GetForegroundWindow() != WNDENV_Gethwnd()) {
+#endif
             PauseGameTimerResult = PauseGameTimer();
             lpConfig->field_1c |= 1;
         }

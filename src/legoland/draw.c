@@ -1780,7 +1780,7 @@ int BlitFrameToWindow(void) {
 #ifdef LEGOLAND_PORT
     /* [library:video] the frame goes to the SDL3 window, scaled (port_display.c) */
     result = PortPresent(OffscreenSurface);
-    PortDisplayCapture(WNDENV_Gethwnd(), OffscreenSurface); /* [library:video] Ctrl+F12 (port_display.h) */
+    PortDisplayCapture(OffscreenSurface); /* [library:video] Ctrl+F12 (port_display.h) */
 #else
     {
         GetClientRect(WNDENV_Gethwnd(), &client.rect);

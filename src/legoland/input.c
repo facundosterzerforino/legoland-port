@@ -19,6 +19,7 @@
 #include "sound_sfx.h"
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
+#include "miniwin/miniwin.h"
 #include "port_display.h"
 #include "port_input.h"
 #endif
@@ -38,8 +39,14 @@ struct DInputDevice {
 LEGO_EXPORT int InitInputSystem(void) {
     HINSTANCE hinst;
 
+#ifdef LEGOLAND_PORT
+    /* [library:input] miniwin's DirectInput: the keyboard and mouse from SDL3 */
+    hinst = NULL;
+    MiniwinDirectInputCreate(hinst, 0x300, (LPDIRECTINPUTA *)&dinput, NULL);
+#else
     hinst = (HINSTANCE)GetWindowLongA(WNDENV_Gethwnd(), GWL_HINSTANCE);
     DirectInputCreateA(hinst, 0x300, (LPDIRECTINPUTA *)&dinput, NULL);
+#endif
     if (CreateKeyboardDevice() == 0) {
         return 0;
     }
@@ -145,6 +152,16 @@ LEGO_EXPORT void ScanMouse(void) {
          * cursor drift to the bottom-right. Use the window's own cursor instead (position in
          * UpdateControllerFromMouseData, buttons here, the wheel from WM_MOUSEWHEEL: port_input.h). */
         memset(&MouseState, 0, sizeof(MouseState));
+#ifdef LEGOLAND_PORT
+        {
+            /* [library:input] the buttons from SDL3 (miniwin), while the window has the focus */
+            unsigned int buttons = MiniwinHasFocus() ? MiniwinMouseState(NULL, NULL) : 0;
+
+            MouseState.rgbButtons[0] = (buttons & 1) != 0 ? 0x80 : 0;
+            MouseState.rgbButtons[1] = (buttons & 2) != 0 ? 0x80 : 0;
+            MouseState.rgbButtons[2] = (buttons & 4) != 0 ? 0x80 : 0;
+        }
+#else
         if (GetForegroundWindow() == WNDENV_Gethwnd()) {
             if ((GetAsyncKeyState(GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON) & 0x8000) != 0) {
                 MouseState.rgbButtons[0] = 0x80;
@@ -156,6 +173,7 @@ LEGO_EXPORT void ScanMouse(void) {
                 MouseState.rgbButtons[2] = 0x80;
             }
         }
+#endif
 #ifdef LEGOLAND_PORT
         MouseState.lZ = PortWheelTake(mouse_granularity > 0 ? mouse_granularity : WHEEL_DELTA);
 #endif
@@ -219,10 +237,18 @@ LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
     if (WinDebugMode != 0) {
         /* [library:input] windowed mode: the game's cursor follows the window's cursor (see ScanMouse) */
         POINT pos;
-
-        if (GetForegroundWindow() == WNDENV_Gethwnd() && GetCursorPos(&pos) && ScreenToClient(WNDENV_Gethwnd(), &pos)) {
 #ifdef LEGOLAND_PORT
-            PortDisplayClientToGame(WNDENV_Gethwnd(), &pos); /* [library:video] the frame is scaled in the window */
+        int mx;
+        int my;
+
+        if (MiniwinHasFocus()) {
+            /* [library:input] the pointer's position from SDL3 (miniwin), in the window's picture */
+            MiniwinMouseState(&mx, &my);
+            pos.x = mx;
+            pos.y = my;
+            PortDisplayClientToGame(&pos); /* [library:video] the frame is scaled in the window */
+#else
+        if (GetForegroundWindow() == WNDENV_Gethwnd() && GetCursorPos(&pos) && ScreenToClient(WNDENV_Gethwnd(), &pos)) {
 #endif
             dx = pos.x - buffer->x;
             dy = pos.y - buffer->y;
@@ -436,7 +462,11 @@ LEGO_EXPORT char GetInputChar(void) {
         prev = (prev >> 7) & 1;
         DAT_00668da8[i] = state;
         if ((state & 0x80) != 0 && prev == 0) {
+#ifdef LEGOLAND_PORT
+            alt = MiniwinCapsLock(); /* [library:input] Caps Lock from SDL3 */
+#else
             alt = GetKeyState(0x14) & 1;
+#endif
             if (IsLeftShiftDown() != 0 || IsRightShiftDown() != 0) {
                 alt = (alt == 0);
             }

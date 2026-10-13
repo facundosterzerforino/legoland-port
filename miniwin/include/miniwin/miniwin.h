@@ -8,6 +8,10 @@
 
 #include <windows.h>
 #include <ddraw.h>
+#ifndef DIRECTINPUT_VERSION
+#define DIRECTINPUT_VERSION 0x0500 /* the game's (input.c) */
+#endif
+#include <dinput.h>
 
 /* [library:video] DirectDraw on memory surfaces (miniwin/src/ddraw.c), called like DirectDrawCreate. It has what
  * the game uses: 16-bit RGB565 surfaces; Blt copies, stretches and colour fills, with source colour keys and clip
@@ -22,8 +26,8 @@ enum {
     MINIWIN_FULLSCREEN_MODE /* full screen in the display mode closest to width x height */
 };
 
-/* Creates the window and its renderer; returns its HWND (which DirectInput and DirectSound still need), or NULL
- * (MiniwinError says why). The system cursor is hidden over it: the game draws its own. */
+/* Creates the window and its renderer; returns its HWND (which DirectSound still needs), or NULL (MiniwinError
+ * says why). The system cursor is hidden over it: the game draws its own. */
 HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscreen);
 
 /* SDL's last error message. */
@@ -42,5 +46,23 @@ int MiniwinOutputSize(int *width, int *height);
 
 /* Shows a frame: width x height RGB565 pixels, scaled (nearest neighbour) into dest, black around it. */
 void MiniwinPresent(const void *pixels, int pitch, int width, int height, const RECT *dest);
+
+/* 1 while the window has the keyboard focus. */
+int MiniwinHasFocus(void);
+
+/* The mouse: its position in the window's picture in pixels (x, y may be NULL), and the buttons that are down
+ * (bit 0 the primary button, bit 1 the secondary, bit 2 the middle one). */
+unsigned int MiniwinMouseState(int *x, int *y);
+
+/* 1 while Caps Lock is on. */
+int MiniwinCapsLock(void);
+
+/* [library:input] DirectInput on SDL3 (miniwin/src/dinput.c), called like DirectInputCreateA: the system keyboard
+ * and mouse devices. Their state is read from SDL (which the game's message loop updates, MiniwinPumpEvents), in
+ * DirectInput's layout: the keyboard as 256 bytes by DIK code, the mouse as a DIMOUSESTATE. */
+HRESULT WINAPI MiniwinDirectInputCreate(HINSTANCE instance, DWORD version, LPDIRECTINPUTA *out, LPUNKNOWN outer);
+
+/* 1 while the key with this DIK code is down (and the window has the focus). */
+int MiniwinKeyDown(int dik);
 
 #endif

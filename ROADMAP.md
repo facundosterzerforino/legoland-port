@@ -131,8 +131,12 @@ campaign has been played on it: levels, movies, music, sound, saves, the certifi
   DirectDraw pixel by pixel (copies, colour keys, stretches with and without clip lists, fills, GDI text, error
   codes): identical. DirectDraw's stretch rounding was measured for every pair of sizes up to 640 and is
   reproduced exactly. `miniwin/src/window.c` is the SDL3 window, renderer and events; the game takes its
-  windowed code path in all three display modes. Still Windows-only underneath: GDI text on the surfaces (GetDC),
-  DirectInput, DirectSound, the registry.
+  windowed code path in all three display modes.
+- Step 4, waiting for the maintainer's test: the keyboard and mouse come from SDL3. `miniwin/src/dinput.c` is
+  DirectInput's keyboard and mouse devices on SDL (the keyboard as DirectInput's 256 bytes by DIK code, through a
+  table generated from SDL's own Windows scancode table); the windowed mouse code, the focus checks and Caps Lock
+  use SDL too. No `dinput.dll` import any more.
+- Still Windows-only underneath: GDI text on the surfaces (GetDC), DirectSound, the registry, timers.
 
 Replace the Windows-only layers with SDL3 behind `miniwin/`, one subsystem at a time, checking against phase 4's
 build after each.

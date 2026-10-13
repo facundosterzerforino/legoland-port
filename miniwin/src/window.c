@@ -93,6 +93,39 @@ int MiniwinOutputSize(int *width, int *height) {
     return renderer != NULL && SDL_GetCurrentRenderOutputSize(renderer, width, height);
 }
 
+int MiniwinHasFocus(void) {
+    return window != NULL && (SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+}
+
+unsigned int MiniwinMouseState(int *x, int *y) {
+    float fx = 0.0f;
+    float fy = 0.0f;
+    SDL_MouseButtonFlags flags = SDL_GetMouseState(&fx, &fy);
+    float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
+    unsigned int buttons = 0;
+
+    if (x != NULL) {
+        *x = (int)(fx * density);
+    }
+    if (y != NULL) {
+        *y = (int)(fy * density);
+    }
+    if ((flags & SDL_BUTTON_LMASK) != 0) {
+        buttons |= 1;
+    }
+    if ((flags & SDL_BUTTON_RMASK) != 0) {
+        buttons |= 2;
+    }
+    if ((flags & SDL_BUTTON_MMASK) != 0) {
+        buttons |= 4;
+    }
+    return buttons;
+}
+
+int MiniwinCapsLock(void) {
+    return (SDL_GetModState() & SDL_KMOD_CAPS) != 0;
+}
+
 void MiniwinPresent(const void *pixels, int pitch, int width, int height, const RECT *dest) {
     SDL_FRect rect;
 

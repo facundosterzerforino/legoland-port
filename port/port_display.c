@@ -49,14 +49,17 @@ HRESULT PortPresent(LPDIRECTDRAWSURFACE frame) {
     return DD_OK;
 }
 
-void PortDisplayClientToGame(HWND hwnd, POINT *pt) {
-    RECT client;
+void PortDisplayClientToGame(POINT *pt) {
     RECT dest;
+    int width;
+    int height;
     int dw;
     int dh;
 
-    GetClientRect(hwnd, &client);
-    PortDisplayDestRect(client.right, client.bottom, &dest);
+    if (!MiniwinOutputSize(&width, &height)) {
+        return;
+    }
+    PortDisplayDestRect(width, height, &dest);
     dw = dest.right - dest.left;
     dh = dest.bottom - dest.top;
     if (dw <= 0 || dh <= 0) {
@@ -132,11 +135,11 @@ static void CaptureFrame(LPDIRECTDRAWSURFACE frame, int index) {
     WriteBmp32(name, pixels, PORT_GAME_WIDTH, PORT_GAME_HEIGHT);
 }
 
-void PortDisplayCapture(HWND hwnd, LPDIRECTDRAWSURFACE frame) {
-    int down = (GetAsyncKeyState(VK_F12) & 0x8000) != 0 && (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+void PortDisplayCapture(LPDIRECTDRAWSURFACE frame) {
+    int down = MiniwinKeyDown(DIK_F12) && (MiniwinKeyDown(DIK_LCONTROL) || MiniwinKeyDown(DIK_RCONTROL));
 
     if (capture_left == 0) {
-        if (down && !capture_key_down && GetForegroundWindow() == hwnd) {
+        if (down && !capture_key_down) {
             char *slash;
             GetModuleFileNameA(NULL, capture_dir, sizeof(capture_dir) - 16);
             slash = strrchr(capture_dir, '\\');
