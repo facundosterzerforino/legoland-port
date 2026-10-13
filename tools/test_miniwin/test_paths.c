@@ -38,8 +38,7 @@ int main(void) {
     FILE *f;
 
     if (GetTempPathA(sizeof(cwd), cwd) == 0 || _chdir(cwd) != 0) {
-        printf("FAIL: no temp folder
-");
+        printf("FAIL: no temp folder\n");
         return 1;
     }
     system("rmdir /s /q " ROOT " 2>nul");
