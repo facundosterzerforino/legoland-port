@@ -43,6 +43,19 @@ if(LEGOLAND_MODERN_BUILD)
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
     FetchContent_MakeAvailable(SDL3)
     target_link_libraries(legoland PRIVATE SDL3::SDL3-static)
+    # [library:music] GothicKit dmusic (MIT), the portable DirectMusic, with TinySoundFont (MIT) as its synthesizer
+    # (port/dmusic/PORT.md). Built here rather than by its own CMakeLists, whose flags are for other compilers.
+    set(DMUSIC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/port/dmusic")
+    file(GLOB DMUSIC_SOURCES CONFIGURE_DEPENDS "${DMUSIC_DIR}/src/*.c" "${DMUSIC_DIR}/src/io/*.c"
+        "${DMUSIC_DIR}/src/util/*.c")
+    add_library(dmusic STATIC ${DMUSIC_SOURCES} "${DMUSIC_DIR}/src/thread/Thread.Win32.c"
+        "${DMUSIC_DIR}/src/thread/Thread.Posix.c" "${DMUSIC_DIR}/vendor/TinySoundFont/tsf.c")
+    target_include_directories(dmusic PUBLIC "${DMUSIC_DIR}/include"
+        PRIVATE "${DMUSIC_DIR}/src" "${DMUSIC_DIR}/vendor/TinySoundFont")
+    target_compile_definitions(dmusic PUBLIC DM_STATIC=1 PRIVATE DM_BUILD=1 _CRT_SECURE_NO_WARNINGS)
+    set_property(TARGET dmusic PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    set_property(TARGET dmusic PROPERTY C_STANDARD 11)
+    target_link_libraries(legoland PRIVATE dmusic)
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
     # headers (DIDEVCAPS is 0x2c bytes there; the DX3 one is 0x18 and GetCapabilities overruns it). Anything
     # below 0x0800 keeps DirectInputCreateA declared.
