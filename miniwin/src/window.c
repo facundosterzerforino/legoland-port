@@ -97,6 +97,10 @@ int MiniwinHasFocus(void) {
     return window != NULL && (SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
+int MiniwinWindowInactive(void) {
+    return window != NULL && (SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) == 0;
+}
+
 unsigned int MiniwinMouseState(int *x, int *y) {
     float fx = 0.0f;
     float fy = 0.0f;

@@ -116,6 +116,8 @@ static void MixBuffer(struct Buffer *b, int frames) {
 }
 
 static void SDLCALL Feed(void *userdata, SDL_AudioStream *s, int additional, int total) {
+    int inactive = MiniwinWindowInactive();
+
     (void)userdata;
     (void)total;
     while (additional > 0) {
@@ -132,7 +134,11 @@ static void SDLCALL Feed(void *userdata, SDL_AudioStream *s, int additional, int
         memset(mix, 0, sizeof(float) * 2 * frames);
         SDL_LockMutex(lock);
         for (b = buffers; b != NULL; b = b->next) {
-            if (b->playing && !b->primary) {
+            /* While the game's window doesn't have the focus the game waits (ProcessSystemEvents), and so do its
+             * sounds: a buffer stays "playing" with its cursor held, as DirectSound mutes buffers without
+             * DSBCAPS_GLOBALFOCUS. Otherwise loops kept repeating and the movie's sound ran past what the waiting
+             * movie had written. */
+            if (b->playing && !b->primary && (!inactive || (b->flags & DSBCAPS_GLOBALFOCUS) != 0)) {
                 MixBuffer(b, frames);
             }
         }

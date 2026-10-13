@@ -176,7 +176,7 @@ build after each.
 **Status (2026-10-13):** started.
 - Step 1, sound effects, speech and movie sound, waiting for the maintainer's test: `miniwin/src/dsound.c` is
   DirectSound on SDL3 audio (the game's buffers mixed on SDL's audio thread with DirectSound's volume, pan,
-  frequency, looping and cursors). `tools/test_miniwin/test_dsound.exe` compares it with Windows' DirectSound:
+  frequency, looping and cursors; sounds hold while the window doesn't have the focus, as the game does). `tools/test_miniwin/test_dsound.exe` compares it with Windows' DirectSound:
   identical. DirectMusic still renders through a real Windows DirectSound of its own (`port/port_audio.c`) until
   the music step; ADPCM decoding still uses Windows' ACM.
 
