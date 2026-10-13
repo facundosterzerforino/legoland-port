@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
+#include "miniwin/miniwin.h"
 #include "port_display.h"
 #include "port_watchdog.h"
 #endif
@@ -35,7 +36,12 @@ LEGO_EXPORT int InitHostSystemGPU(void) {
     if (DDRAWENV.ddraw2 != 0) {
         return 1;
     }
+#ifdef LEGOLAND_PORT
+    /* [library:video] with the SDL3 display the surfaces are miniwin's, in memory (port_display.h) */
+    if ((PortDisplaySdl ? MiniwinDirectDrawCreate : DirectDrawCreate)(NULL, &DDRAWENV.ddraw, NULL) == 0) {
+#else
     if (DirectDrawCreate(NULL, &DDRAWENV.ddraw, NULL) == 0) {
+#endif
         ddraw = DDRAWENV.ddraw;
         if (IDirectDraw_QueryInterface(ddraw, &IID_IDirectDraw2_Guid, &DDRAWENV.ddraw2) != 0) {
             IDirectDraw_Release(DDRAWENV.ddraw);
@@ -286,7 +292,15 @@ LEGO_EXPORT int InitScreen(void) {
         }
 #endif
 #ifdef LEGOLAND_PORT
-        if (PortDisplayBorderless) {
+        if (PortDisplaySdl) {
+            /* [library:window] the SDL3 window (miniwin): a window, or full screen; the frame is shown through it
+             * (PortPresent) */
+            WNDENV_Sethwnd(
+                MiniwinCreateWindow("Lego Land", PortDisplayWidth, PortDisplayHeight, PortDisplaySdlFullscreen));
+            DebugTrace("InitScreen: SDL window %dx%d (full screen %d), renderer %s%s%s", PortDisplayWidth,
+                PortDisplayHeight, PortDisplaySdlFullscreen, MiniwinRendererName(),
+                WNDENV_Gethwnd() == NULL ? ", failed: " : "", WNDENV_Gethwnd() == NULL ? MiniwinError() : "");
+        } else if (PortDisplayBorderless) {
             /* [library:video] full screen at the desktop's resolution: a borderless window over the whole
              * monitor, the display mode is left alone (port_display.h) */
             WNDENV_Sethwnd(CreateWindowExA(0, "LEGOLANDMAIN", "Lego Land", WS_POPUP | WS_VISIBLE, 0,

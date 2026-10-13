@@ -14,6 +14,9 @@ if(LEGOLAND_MODERN_BUILD)
     # [library:movie] FFmpeg's Indeo 3 and Indeo 5 decoders (LGPL-2.1+, see port/ffmpeg/README.md)
     file(GLOB PORT_FFMPEG_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/ffmpeg/*.c")
     list(APPEND PORT_SOURCES ${PORT_FFMPEG_SOURCES})
+    # [library:window] [library:video] miniwin: the Windows APIs the game calls, on SDL3 (PORTING.md)
+    file(GLOB MINIWIN_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/src/*.c")
+    list(APPEND PORT_SOURCES ${MINIWIN_SOURCES})
     # Optional features with command-line switches (extensions/extensions.h)
     file(GLOB EXTENSION_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/extensions/*.c")
     list(APPEND PORT_SOURCES ${EXTENSION_SOURCES})
@@ -41,7 +44,8 @@ if(LEGOLAND_MODERN_BUILD)
     # _CRT_SECURE_NO_WARNINGS: the code uses the standard C functions (fopen, strcpy, sscanf...), which are
     # portable; the Microsoft-only _s versions the CRT headers suggest aren't.
     target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500 _CRT_SECURE_NO_WARNINGS)
-    target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port" "${CMAKE_CURRENT_SOURCE_DIR}/extensions")
+    target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port" "${CMAKE_CURRENT_SOURCE_DIR}/extensions"
+        "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include")
     # Static C runtime, debug info in the objects, a PDB for debuggers.
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     target_compile_options(legoland PRIVATE /Z7

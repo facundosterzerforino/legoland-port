@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "miniwin/miniwin.h"
 #include "port_display.h"
 #include "port_trace.h"
 
@@ -14,6 +15,8 @@ int PortDisplayHeight = PORT_GAME_HEIGHT;
 int PortDisplayWindowed = 0;
 int PortDisplayBorderless = 0;
 int PortDisplayBpp = 16;
+int PortDisplaySdl = 0;
+int PortDisplaySdlFullscreen = MINIWIN_WINDOW;
 
 /* RGB565 -> the 32-bit screen's format, one entry per 16-bit colour (built for the screen's channel masks) */
 static uint32_t *rgb565_to_32;
@@ -325,7 +328,32 @@ const unsigned int *PortDisplayWindowImage(int *width, int *height) {
     return (const unsigned int *)window_bits;
 }
 
+/* SDL3: the whole frame, scaled by the renderer into the same 4:3 area as above (nearest neighbour). */
+static HRESULT PresentSdl(LPDIRECTDRAWSURFACE frame) {
+    DDSURFACEDESC desc;
+    RECT dest;
+    HRESULT hr;
+    int width;
+    int height;
+
+    if (!MiniwinOutputSize(&width, &height) || width <= 0 || height <= 0) {
+        return DD_OK; /* minimized */
+    }
+    desc.dwSize = sizeof(desc);
+    hr = IDirectDrawSurface_Lock(frame, NULL, &desc, DDLOCK_WAIT | DDLOCK_READONLY, NULL);
+    if (hr != DD_OK) {
+        return hr;
+    }
+    PortDisplayDestRect(width, height, &dest);
+    MiniwinPresent(desc.lpSurface, (int)desc.lPitch, (int)desc.dwWidth, (int)desc.dwHeight, &dest);
+    IDirectDrawSurface_Unlock(frame, desc.lpSurface);
+    return DD_OK;
+}
+
 HRESULT PortPresent(HWND hwnd, LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src) {
+    if (PortDisplaySdl) {
+        return PresentSdl(frame);
+    }
     if (PortDisplayWindowed) {
         return PresentWindowed(hwnd, frame, src);
     }

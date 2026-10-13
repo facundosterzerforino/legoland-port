@@ -18,6 +18,11 @@ extern int PortDisplayWindowed; /* 1: a window (same as the WINDEBUG switch), al
 extern int PortDisplayBorderless; /* 1: full screen at the desktop's resolution, a borderless window covering it */
 extern int PortDisplayBpp; /* full screen with a mode change: 32 (the game's RGB565 frame is converted when
                                    * shown) or 16 when the display refused 32 (copied as is) */
+/* 1: the SDL3 window and picture (miniwin, phase 5 of ROADMAP.md) instead of DirectDraw and a Windows window. The
+ * game then takes its windowed code path (PortDisplayWindowed is 1), and PortDisplaySdlFullscreen says how the SDL
+ * window is shown: MINIWIN_WINDOW, MINIWIN_FULLSCREEN_DESKTOP or MINIWIN_FULLSCREEN_MODE (miniwin/miniwin.h). */
+extern int PortDisplaySdl;
+extern int PortDisplaySdlFullscreen;
 
 /* 1 when the frame is shown at another size than 640x480. */
 int PortDisplayScaled(void);
@@ -29,7 +34,8 @@ int PortDisplayCustomPresent(void);
 void PortDisplayDestRect(int area_width, int area_height, RECT *dest);
 
 /* Shows the part src (game coordinates; NULL: the whole frame) of the game's frame surface: scaled into the
- * fullscreen primary surface, or with GDI into the window. Returns a DirectDraw result. */
+ * fullscreen primary surface, with GDI into the window, or (PortDisplaySdl) the whole frame through SDL3. Returns a
+ * DirectDraw result. */
 HRESULT PortPresent(HWND hwnd, LPDIRECTDRAWSURFACE frame, LPDIRECTDRAWSURFACE primary, const RECT *src);
 
 /* Windowed: the last picture copied to the window (32-bit, the client area's size), for tools/test_display. */

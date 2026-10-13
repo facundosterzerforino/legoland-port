@@ -97,8 +97,10 @@ describe how `main` works.
   `(&param_4)[1]`). Run the audits in step 5 of the merge steps above after every decomp merge.
 
 Status: phase 4 is done (2026-10-13, after the maintainer's full playthrough; see `ROADMAP.md`). No reference
-VM: this port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08). Next is
-phase 5 (miniwin + SDL3). The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
+VM: this port, on the original DirectX APIs, is the reference for phases 5+ (decided 2026-10-08). Phase 5
+(miniwin + SDL3) is under way: see its status in `ROADMAP.md`. After changing `miniwin/src/ddraw.c`, run
+`tools/test_miniwin/build.sh && tools/test_miniwin/test_miniwin.exe` (a console program, no window; it compares
+miniwin's DirectDraw with Windows' own and must report 0 failed). The playthrough's diagnostics are gone; the watchpoint mechanism stays, with nothing
 armed (`PortWatchRequest`).
 
 ---
