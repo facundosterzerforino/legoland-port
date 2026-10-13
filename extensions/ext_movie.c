@@ -8,7 +8,7 @@
 #include "miniwin/acm.h"
 #include "miniwin/miniwin.h"
 
-int ExtPauseMovies = 0;
+int ExtPauseMovies = 1;
 
 static int waiting_now;
 static Uint64 wait_started;

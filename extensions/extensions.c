@@ -22,8 +22,6 @@ void ExtensionsParseCommandLine(const char *cmdline) {
     }
     if (strstr(cmdline, "-no-pause-movies") != NULL) {
         ExtPauseMovies = 0;
-    } else if (strstr(cmdline, "-pause-movies") != NULL) {
-        ExtPauseMovies = 1;
     }
     ExtPauseMoviesApply();
     if (strstr(cmdline, "-console") != NULL) {

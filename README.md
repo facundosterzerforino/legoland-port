@@ -113,10 +113,10 @@ These are new in the port and off unless you turn them on (`extensions/`):
   codes. With this on, each level plays the theme that fits its story (Western, Castle, Egypt or Inca; the
   tutorials and some levels keep the main theme), and the menus go back to the main theme. The table is in
   `extensions/ext_music.c`.
-- **Pause movies in the background** (a box in the launcher, or `-pause-movies` / `-no-pause-movies`): the
-  original keeps a movie running while the game is in the background (Alt+Tab, a click elsewhere), so when you come
-  back it jumps ahead and skips what it "played" meanwhile. With this on, the movie stops while you are away and goes
-  on where it was, picture and sound together. It also fixes the original's catch-up after a longer stall, which
+- **Movies pause in the background** (on by default; `-no-pause-movies` turns it off): the original keeps a
+  movie running while the game is in the background (Alt+Tab, a click elsewhere), so when you come back it jumps
+  ahead and skips what it "played" meanwhile. In the port the movie stops while you are away and goes on where it
+  was, picture and sound together. It also fixes the original's catch-up after a longer stall, which
   left the rest of most movies silent or out of step.
 - **Debug console** (`-console`): see `docs/debug-console.md`.
 - The LEGO Media logo at startup can be skipped with a click (on by default; `-no-skip-logo` turns it off).
