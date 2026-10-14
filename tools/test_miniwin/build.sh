@@ -1,6 +1,6 @@
 #!/bin/sh
 # Builds the miniwin tests (clang-cl + lld-link with the xwin SDK, like the clang-cl-x86 preset): test_miniwin,
-# test_paths, test_dsound, test_acm, test_avifile, test_dmusic, capture_dmusic and instruments_dmusic. Most link the
+# test_paths, test_dsound, test_acm, test_avifile, test_dmusic, capture_dmusic, instruments_dmusic and test_setup. Most link the
 # SDL3 that the port build fetched, and the last three port/dmusic and the FluidSynth it built, as the game does:
 # build the build-clang-x86 preset first.
 set -e
@@ -41,4 +41,6 @@ clang-cl $CFLAGS -std:c11 -DDM_STATIC=1 $FLUID -DDM_BUILD=1 $INCLUDES -I../../mi
     -I$DM/src -I$DM/vendor/TinySoundFont instruments_dmusic.c ../../miniwin/src/dsound.c ../../miniwin/src/window.c \
     ../../miniwin/src/dmusic.c ../../miniwin/src/dmengine.c ../../miniwin/src/dmreverb.c ../../miniwin/src/files.c \
     $DMSOURCES /Feinstruments_dmusic.exe /link /machine:x86 $LIBPATHS $SDLLIBS dxguid.lib $FLUIDLIB
+clang-cl $CFLAGS $INCLUDES -I../../port $SDLINC test_setup.c ../../port/port_setup.c ../../port/blast/blast.c \
+    /Fetest_setup.exe /link /machine:x86 $LIBPATHS $SDLLIBS
 rm -f *.obj

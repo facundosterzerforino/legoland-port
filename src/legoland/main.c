@@ -14,6 +14,8 @@
 #include "port_data.h"
 #include "port_launcher.h"
 #include "port_sdl.h"
+#include "port_setup.h"
+#include "port_setup_win.h"
 #include "port_trace.h"
 #include "port_watchdog.h"
 #endif
@@ -62,6 +64,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
     }
     PortTrace("WinMain: cmdline \"%s\"", lpCmdLine);
+    if (!PortSetupFindData() && !PortSetupRun(hInstance)) {
+        /* [library:filesystem] the game's data: the current folder, else next to the exe, else built there from
+         * the CD on the first run (port/port_setup.h) */
+        return 0;
+    }
     if (!PortLauncherRun(hInstance, lpCmdLine)) {
         /* [library:config] resolution and window mode (port/port_launcher.c); before the watchdog, which
          * would take the open launcher for a frozen game */

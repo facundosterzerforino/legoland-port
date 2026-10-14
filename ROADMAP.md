@@ -173,7 +173,7 @@ build after each.
 
 ## Phase 6: sound, movies and music
 
-**Status (2026-10-13):** started.
+**Status:** done 2026-10-14: sound, speech, movies and music all on the port's own code, the music by default.
 - Step 1, sound effects, speech and movie sound, waiting for the maintainer's test: `miniwin/src/dsound.c` is
   DirectSound on SDL3 audio (the game's buffers mixed on SDL's audio thread with DirectSound's volume, pan,
   frequency, looping and cursors; muted, still moving, while the window doesn't have the focus, as DirectSound does). `tools/test_miniwin/test_dsound.exe` compares it with Windows' DirectSound:
@@ -232,6 +232,14 @@ build after each.
    (unpacks `main.z`, copies `volumes\`, `speech\`, `FMV\`).
 
 **Done when:** the whole game can be played start to finish on Windows 11. This is the first release.
+
+**Status (2026-10-14):** started.
+- Step 4, the setup part: `port/port_setup.c` builds the data folder from the CD (`main.z`, an InstallShield 3
+  archive, unpacked with zlib's blast; `FMV\`, `speech\`, `volumes\` copied) or from an install, and
+  `port/port_setup_win.c` is the first-run window (the CD found in a CD drive or a mounted ISO, or a chosen folder;
+  progress and Cancel). The game's data folder is the current folder or the exe's. `tools/test_miniwin/test_setup.exe`
+  builds the folder from a stand-in CD (`main.z` and the three folders) and from an install: identical to the
+  maintainer's install, byte for byte.
 
 ## Phase 8: 64-bit and Linux
 

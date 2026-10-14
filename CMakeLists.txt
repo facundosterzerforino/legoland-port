@@ -14,6 +14,8 @@ if(LEGOLAND_MODERN_BUILD)
     # [library:movie] FFmpeg's Indeo 3 and Indeo 5 decoders (LGPL-2.1+, see port/ffmpeg/README.md)
     file(GLOB PORT_FFMPEG_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/ffmpeg/*.c")
     list(APPEND PORT_SOURCES ${PORT_FFMPEG_SOURCES})
+    # [library:filesystem] zlib's blast (zlib license, port/blast/README.md): main.z, for the first-run setup
+    list(APPEND PORT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/port/blast/blast.c")
     # [library:window] [library:video] miniwin: the Windows APIs the game calls, on SDL3 (PORTING.md)
     file(GLOB MINIWIN_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/src/*.c")
     list(APPEND PORT_SOURCES ${MINIWIN_SOURCES})
@@ -114,7 +116,7 @@ if(LEGOLAND_MODERN_BUILD)
         -Wno-error=return-mismatch)
     target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
     target_link_libraries(legoland PRIVATE
-        dxguid winmm version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
+        dxguid comctl32 shell32 winmm version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
     # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
     # external/legoland.exe at build time rather than committed (tools/extract_resources.py).
     set(LEGOLAND_ORIGINAL_EXE "${CMAKE_CURRENT_SOURCE_DIR}/external/legoland.exe")

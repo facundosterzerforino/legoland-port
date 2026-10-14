@@ -15,7 +15,7 @@ modern Windows support.
 | | |
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
-| Runs on Windows 11 | **not yet**: builds with clang-cl and loads the original data at startup (`-port-selftest` passes); first boot is phase 4 |
+| Runs on Windows 11 | **yes**: played start to finish (phase 4); on SDL3 with its own sound, movies and music (phases 5-6); the first release is phase 7 |
 | Hand-written assembly | **done**: all 44 inline-asm functions are plain C (phase 1 of `ROADMAP.md`) |
 
 ## Goal and approach
@@ -80,8 +80,15 @@ More presets (x64, Linux, Android) come with later milestones.
 
 ## You need your own game
 
-The port reads data from an original LEGOLAND installation (the `.res` volumes, sounds, movies, and
-`legoland.exe` itself for the initialized data). No proprietary files are committed to this repository.
+The port plays the original game's data: the `.res` volumes, speech, movies and music from the LEGOLAND CD. No
+proprietary files are committed to this repository (the original `legoland.exe` the build generates the game's
+startup data from is the one exception, and the port doesn't need it at runtime).
+
+The data folder is the folder the game starts in, or the exe's own folder. When neither has the data, the first
+start shows a setup window: it finds the LEGOLAND CD in a CD drive (a mounted ISO image counts: double-click it), or
+takes a folder with a copy of the CD or an installed LEGOLAND, and copies the files next to the exe (about 400 MB:
+it unpacks the CD's `main.z` and copies `FMV`, `speech` and `volumes`; from an install, everything, saves
+included). See `port/port_setup.h`.
 
 ## Resolution and window mode
 
