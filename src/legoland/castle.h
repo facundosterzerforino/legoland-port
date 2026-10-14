@@ -254,6 +254,9 @@ struct LmsFile {
     /* 0x2c */ int field_2c;
     /* 0x30 */ struct FVec3 box[8]; /* the bounding box's corners */
 };
+#ifdef LEGOLAND_PORT
+#define PORT_LMS_FILE_HEADER 0x90 /* [port] the header's size in the file (32-bit offsets) */
+#endif
 
 /* a visitor queueing for the castle (CastleState.visitors is the queue's sentinel) */
 struct CastleVisitor {

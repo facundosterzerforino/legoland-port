@@ -2358,6 +2358,51 @@ struct LmsFile *LoadLmsFile(const char *name) {
     struct LmsFile *f;
     // STRING: LEGOLAND 0x004b56c8
     wsprintfA(buffer, "%s.lms", name);
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] the file's header holds 32-bit offsets of its tables: the whole file goes after a native header,
+           and the header's pointers point into that copy (the same on 32 and 64 bits) */
+        static const unsigned char tables[6] = {0x0c, 0x10, 0x14, 0x18, 0x20, 0x28};
+        void **pointers[6];
+        unsigned int size = 0;
+        unsigned char *raw = LoadCreatedDataFile(buffer, &size);
+        unsigned char *copy;
+        unsigned int off;
+        int i;
+
+        if (raw == 0) {
+            return 0;
+        }
+        f = size >= PORT_LMS_FILE_HEADER ? FUN_004775b0(sizeof(struct LmsFile) + size, 0, 0, 0) : 0;
+        if (f == 0) {
+            FUN_004775d0(raw);
+            return 0;
+        }
+        copy = (unsigned char *)(f + 1);
+        memcpy(copy, raw, size);
+        FUN_004775d0(raw);
+        memcpy(f->pad_0, copy, sizeof(f->pad_0));
+        memcpy(&f->field_1c, copy + 0x1c, 4);
+        memcpy(&f->field_24, copy + 0x24, 4);
+        memcpy(&f->field_2c, copy + 0x2c, 4);
+        memcpy(f->box, copy + 0x30, sizeof(f->box));
+        pointers[0] = &f->field_c;
+        pointers[1] = &f->field_10;
+        pointers[2] = &f->field_14;
+        pointers[3] = (void **)&f->field_18;
+        pointers[4] = (void **)&f->field_20;
+        pointers[5] = (void **)&f->field_28;
+        for (i = 0; i < 6; i++) {
+            memcpy(&off, copy + tables[i], 4);
+            if (off > size) {
+                FUN_004775d0(f);
+                return 0;
+            }
+            *pointers[i] = copy + off;
+        }
+        return f;
+    }
+#else
     f = LoadCreatedDataFile(buffer, 0);
     if (f != 0) {
         *(UINT_PTR *)&f->field_c += (UINT_PTR)f;
@@ -2369,6 +2414,7 @@ struct LmsFile *LoadLmsFile(const char *name) {
         return f;
     }
     return 0;
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x004206b0

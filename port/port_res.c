@@ -13,6 +13,8 @@
 #include "../src/legoland/binv.h"
 #include "../src/legoland/resource.h"
 #include "../src/legoland/man3d.h"
+#include "../src/legoland/castle.h"
+#include "../src/legoland/movie_pool.h"
 #include "port_res.h"
 #include "port_x86.h"
 
@@ -175,6 +177,56 @@ static int PortResCheckLoc(FILE *dump) {
     return n;
 }
 
+/* Every roller coaster mesh (CreatedData\*.lms) through LoadLmsFile: the header's counts, where each table is
+   in the file, and hashes of the vertices, the three face lists and the box, to dump. Returns the files read. */
+static int PortResCheckLms(FILE *dump) {
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA("RollerCoaster\\RollerCoaster\\CreatedData\\*.lms", &fd);
+    int files = 0;
+
+    if (h == INVALID_HANDLE_VALUE) {
+        fprintf(PortResReport, "lms: no CreatedData\\*.lms\n");
+        PortResProblems++;
+        return 0;
+    }
+    do {
+        char name[MAX_PATH];
+        char *dot;
+        struct LmsFile *lms;
+        int count;
+
+        strcpy(name, fd.cFileName);
+        dot = strrchr(name, '.');
+        if (dot != NULL) {
+            *dot = 0;
+        }
+        lms = LoadLmsFile(name);
+        if (lms == NULL) {
+            fprintf(PortResReport, "lms %s: not loaded\n", fd.cFileName);
+            PortResProblems++;
+            continue;
+        }
+        memcpy(&count, lms->pad_0, 4);
+        fprintf(dump, "%s verts=%d flat=%d smooth=%d textured=%d at %x %x %x %x %x %x\n", fd.cFileName, count,
+                lms->field_1c, lms->field_24, lms->field_2c,
+                (unsigned int)((unsigned char *)lms->field_c - (unsigned char *)(lms + 1)),
+                (unsigned int)((unsigned char *)lms->field_10 - (unsigned char *)(lms + 1)),
+                (unsigned int)((unsigned char *)lms->field_14 - (unsigned char *)(lms + 1)),
+                (unsigned int)((unsigned char *)lms->field_18 - (unsigned char *)(lms + 1)),
+                (unsigned int)((unsigned char *)lms->field_20 - (unsigned char *)(lms + 1)),
+                (unsigned int)((unsigned char *)lms->field_28 - (unsigned char *)(lms + 1)));
+        fprintf(dump, " %08x %08x %08x %08x %08x\n", PortResHash(2166136261u, lms->field_c, count * 12),
+                PortResHash(2166136261u, lms->field_18, lms->field_1c * sizeof(struct LmsRef)),
+                PortResHash(2166136261u, lms->field_20, lms->field_24 * sizeof(struct LmsRef)),
+                PortResHash(2166136261u, lms->field_28, lms->field_2c * sizeof(struct LmsRef)),
+                PortResHash(2166136261u, lms->box, sizeof(lms->box)));
+        FUN_004775d0(lms);
+        files++;
+    } while (FindNextFileA(h, &fd));
+    FindClose(h);
+    return files;
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -216,6 +268,14 @@ int PortResSelfTest(const char *path) {
         if (loc != NULL) {
             fprintf(PortResReport, "loc: %d files read (port-selftest-loc.txt)\n", PortResCheckLoc(loc));
             fclose(loc);
+        }
+    }
+    {
+        FILE *lms = fopen("port-selftest-lms.txt", "w");
+
+        if (lms != NULL) {
+            fprintf(PortResReport, "lms: %d files read (port-selftest-lms.txt)\n", PortResCheckLms(lms));
+            fclose(lms);
         }
     }
     if (PortResDump != NULL) {
