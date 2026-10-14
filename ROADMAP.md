@@ -240,6 +240,9 @@ build after each.
   progress and Cancel). The game's data folder is the current folder or the exe's. `tools/test_miniwin/test_setup.exe`
   builds the folder from a stand-in CD (`main.z` and the three folders) and from an install: identical to the
   maintainer's install, byte for byte.
+- Step 4, the release: `tools/release/make_release.py` packs `LEGOLAND.exe`, a README for players and the licenses
+  (2 MB); the PDB goes in a separate zip.
+- Step 2: `docs/checklist.md`, every screen and feature with phase 4's result and the current one.
 
 ## Phase 8: 64-bit and Linux
 
