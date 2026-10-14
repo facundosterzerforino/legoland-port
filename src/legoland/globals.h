@@ -371,8 +371,7 @@ struct Int16Pair {
 
 /* castle track-segment list node (0x60f914 table entries; also embedded in castle nodes) */
 struct LSub {
-    /* 0x00 */ int r[4];
-    /* 0x10 */ struct LSub *next;
+    /* 0x00 */ struct Footprint fp; /* a link of the castle cursor's footprint chain (DAT_00829a80) */
     /* 0x14 */ struct Int16Pair xy;
     /* 0x18 */ unsigned int k;
     /* 0x1c */ float a;
@@ -407,11 +406,6 @@ struct NewObjTable {
     /* 0x50 */ struct Sprite *sprites[20];
     /* 0xa0 */ unsigned int count;
     /* 0xa4 */ int current;
-};
-
-struct EditFootPrint {
-    unsigned char data[16];
-    void *next;
 };
 
 struct ProfileData {
@@ -797,7 +791,7 @@ extern struct Footprint DAT_004b53c0;
 // 0x004b53d4
 extern unsigned char DAT_004b53d4[0x190];
 // 0x004b5570
-extern unsigned int DAT_004b5570[5];
+extern struct AreaNode DAT_004b5570;
 // 0x004b5584
 extern short DAT_004b5584[4][2];
 // 0x004b55f4
@@ -850,16 +844,22 @@ extern unsigned int DAT_004b5cc4;
 extern unsigned int DAT_004b5cc8;
 // 0x004b5d20
 extern char RollerCoasterSavePath[32];
-extern unsigned int DAT_004b5d20[14];
 
 // 0x004b5d58
-extern unsigned int DAT_004b5d58[14];
 
 // 0x004b5d90
-extern unsigned int DAT_004b5d90[14];
 
 // 0x004b5dc8
-extern unsigned int DAT_004b5dc8[14];
+extern struct PieceClass DAT_004b5d20;
+
+// 0x004b5d58
+extern struct PieceClass DAT_004b5d58;
+
+// 0x004b5d90
+extern struct PieceClass DAT_004b5d90;
+
+// 0x004b5dc8
+extern struct PieceClass DAT_004b5dc8;
 // 0x004b5e00
 extern float DAT_004b5e00[4][3];
 // 0x004b5e30
@@ -1661,14 +1661,13 @@ extern struct PathNode *DAT_004d8240;
 // 0x004d8244
 extern struct PathNode *DAT_004d8244;
 // 0x004d8250
-struct SprOwner;
 struct SprEnt {
     unsigned int field_0;
-    struct SprOwner *owner;
+    struct CastleState *owner;
     int id_a;
-    unsigned int h_a;
+    struct PathSeg *h_a;
     int id_b;
-    unsigned int h_b;
+    struct PathSeg *h_b;
 };
 extern struct SprEnt DAT_004d8250;
 // 0x004d8268
@@ -1762,8 +1761,8 @@ extern Vector3 DAT_00611658[4];
 // 0x00611688
 /* castle.c lookup table: FUN_00427c00 finds value by key; DAT_00611958 counts the entries */
 struct KeyValuePair {
-    unsigned int key;
-    unsigned int value;
+    struct Element *key;
+    struct PieceClass *value;
 };
 extern struct KeyValuePair DAT_00611688[11];
 // 0x006116e0
@@ -4020,61 +4019,25 @@ extern float DAT_00829a60;
 extern unsigned int DAT_00829a64;
 
 // 0x00829a80
-extern struct EditFootPrint DAT_00829a80;
+extern struct Footprint DAT_00829a80;
 // 0x00829abc
 extern struct Element *DAT_00829abc;
-struct CastleState {
-    /* 0x00 */ unsigned int field_0;
-    /* 0x04 */ unsigned int field_4;
-    /* 0x08 */ short field_8[2];
-    /* 0x0c */ unsigned int field_c;
-    /* 0x10 */ unsigned int field_10;
-    /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned int field_18[3];
-    /* 0x24 */ unsigned int field_24[2];
-    /* 0x2c */ unsigned int field_2c;
-    /* 0x30 */ unsigned char pad_30[0xa8 - 0x30];
-    /* 0xa8 */ unsigned int field_a8;
-    /* 0xac */ unsigned int field_ac;
-    /* 0xb0 */ short field_b0[4][2];
-    /* 0xc0 */ unsigned int field_c0;
-    /* 0xc4 */ unsigned int field_c4;
-    /* 0xc8 */ short field_c8[4][2];
-    /* 0xd8 */ unsigned char pad_d8[0x10c - 0xd8];
-    /* 0x10c */ void *method_10c; /* FUN_00424850: called through it by FUN_0041e500 */
-    /* 0x110 */ void *method_110; /* FUN_00424890: FUN_0041e0e0 */
-    /* 0x114 */ void *method_114; /* FUN_00424990: FUN_0041e100 */
-};
 // 0x00829ae0
 extern struct CastleState DAT_00829ae0;
 // 0x004b5b48: the castle object's class (DAT_00829ae0.field_10 points here): data, then three methods the
 // code calls through it (+0x1c FUN_00423940, +0x20 FUN_00423970, +0x24 FUN_00423990).
-struct CastleClass {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_c;
-    unsigned short field_10;
-    unsigned short field_12;
-    int field_14;
-    unsigned short field_18;
-    unsigned short field_1a;
-    void *method_1c;
-    void *method_20;
-    void *method_24;
-};
-extern struct CastleClass DAT_004b5b48;
+extern struct PieceClass DAT_004b5b48;
 // 0x00829bf8
-extern unsigned int DAT_00829bf8;
+extern struct Ride *DAT_00829bf8;
 // 0x00829bfc
 extern unsigned int DAT_00829bfc;
 
 // 0x00829c00
-extern int DAT_00829c00;
+extern struct Element *DAT_00829c00;
 // 0x00829c04
 extern struct Sprite *CastleMatteSprite;
 // 0x00829c08
-extern unsigned int DAT_00829c08;
+extern struct Ride *DAT_00829c08;
 
 // 0x00829c34
 extern int DAT_00829c34;

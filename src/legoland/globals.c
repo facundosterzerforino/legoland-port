@@ -1,6 +1,7 @@
 #include "globals.h"
 #include <dinput.h> /* this TU defines the DInput data symbols (c_dfDI*, GUID_Sys*, MouseState) */
 #include "bloke.h"
+#include "castle.h"
 #include "icon.h"
 #include "interface.h"
 #include "math.h"
@@ -419,7 +420,7 @@ struct Footprint DAT_004b53c0;
 unsigned char DAT_004b53d4[0x190];
 
 // GLOBAL: LEGOLAND 0x004b5570
-unsigned int DAT_004b5570[5] = {0, 0, 2, 2, 0};
+struct AreaNode DAT_004b5570;
 
 // GLOBAL: LEGOLAND 0x004b5584
 short DAT_004b5584[4][2] = {{0, -2}, {2, 0}, {0, 2}, {-2, 0}};
@@ -523,16 +524,16 @@ unsigned int DAT_004b5cc8;
 char RollerCoasterSavePath[32] = "RollerCoaster\\RollerCoaster.sav";
 
 // GLOBAL: LEGOLAND 0x004b5d20
-unsigned int DAT_004b5d20[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
+struct PieceClass DAT_004b5d20; /* filled from the original */
 
 // GLOBAL: LEGOLAND 0x004b5d58
-unsigned int DAT_004b5d58[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
+struct PieceClass DAT_004b5d58;
 
 // GLOBAL: LEGOLAND 0x004b5d90
-unsigned int DAT_004b5d90[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
+struct PieceClass DAT_004b5d90;
 
 // GLOBAL: LEGOLAND 0x004b5dc8
-unsigned int DAT_004b5dc8[14]; /* struct SprInfo, 0x38 bytes (filled from the original) */
+struct PieceClass DAT_004b5dc8;
 
 // GLOBAL: LEGOLAND 0x004b5e00
 float DAT_004b5e00[4][3] = {{1.0f, 0.0f, 0.0f}, {2.0f, 1.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {0.0f, 1.0f, 0.0f}};
@@ -5281,7 +5282,7 @@ float DAT_00829a60;
 unsigned int DAT_00829a64;
 
 // GLOBAL: LEGOLAND 0x00829a80
-struct EditFootPrint DAT_00829a80;
+struct Footprint DAT_00829a80;
 
 // GLOBAL: LEGOLAND 0x00829abc
 struct Element *DAT_00829abc;
@@ -5292,22 +5293,22 @@ struct Element *DAT_00829abc;
 struct CastleState DAT_00829ae0;
 
 // GLOBAL: LEGOLAND 0x004b5b48
-struct CastleClass DAT_004b5b48;
+struct PieceClass DAT_004b5b48;
 
 // GLOBAL: LEGOLAND 0x00829bf8
-unsigned int DAT_00829bf8;
+struct Ride *DAT_00829bf8;
 
 // GLOBAL: LEGOLAND 0x00829bfc
 unsigned int DAT_00829bfc;
 
 // GLOBAL: LEGOLAND 0x00829c00
-int DAT_00829c00;
+struct Element *DAT_00829c00;
 
 // GLOBAL: LEGOLAND 0x00829c04
 struct Sprite *CastleMatteSprite;
 
 // GLOBAL: LEGOLAND 0x00829c08
-unsigned int DAT_00829c08;
+struct Ride *DAT_00829c08;
 
 // GLOBAL: LEGOLAND 0x00829c34
 int DAT_00829c34;
