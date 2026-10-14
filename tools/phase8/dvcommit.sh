@@ -18,6 +18,13 @@ bash $S/dvcheck.sh > /tmp/dvc.out 2>&1
 ok=$?
 head -6 /tmp/dvc.out
 [ $ok -eq 0 ] || { echo "not committed: the match got worse or the build failed"; exit 1; }
+# any function that got worse blocks the commit, except the two whose codegen flips between builds
+if grep '^WORSE' /tmp/dvc.out | grep -vqE ' (MusicThreadProc|FUN_00425e20) '; then
+  grep '^WORSE' /tmp/dvc.out
+  echo "not committed: functions got worse"
+  exit 1
+fi
+grep -q 'functions$' /tmp/dvc.out || { echo "not committed: no verify result"; exit 1; }
 old=$(git rev-parse HEAD)
 git add $files
 git commit -q -F $MSG || exit 1
@@ -36,3 +43,5 @@ git log --oneline -1 main
 git status --short | head
 # the new baseline
 cp /tmp/dv_new.json /tmp/dv_baseline.json
+# push the decomp (fast-forward only to the fork)
+bash ~/push-decomp.sh 2>&1 | tail -1

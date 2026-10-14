@@ -56,3 +56,25 @@ Typing patterns that keep the match: `INT_PTR`/`UINT_PTR` (MSVC6: `long`) for po
 integers; `idx * sizeof(struct T) + offsetof(struct T, f)` where the original indexes a table by bytes; unions
 of same-size aliases (`float start` / `unsigned int start_bits`) where code passes the raw bits; anonymous
 embedded structs (`struct PieceHead;`, MS extension, MSVC6 and clang accept it) for a common header.
+
+## Later tools (2026-10-14)
+
+- `dx64.sh [file.c...]`: the scratch decomp's own files compiled as 64-bit (clang, xwin SDK, syntax only; the
+  MSVC6 math.h maps to the SDK's): warnings in `/tmp/dx64.txt` with the decomp's line numbers. `dw.py file.c...`
+  lists them with the source line and function.
+- `cmpfix.py [--dry]`: pointer casts compared as integers (`(int)p < (int)&X`) become INT_PTR/UINT_PTR.
+- `retglob.py NAME=TYPE...`: retypes globals (globals.h and globals.c) and drops the integer casts assigned to them.
+- `sizefix.py` (run through `sf.sh`): constant sizes of pointer-holding structs in malloc/memset/memcpy/
+  SaveGameRead/SaveGameWrite become `sizeof(struct ...)`.
+- `elemchain.py file.c`: retargets a ride file's Element/Ride/RideNode/Sprite views in one go;
+  `dangling.py`/`danglefix.py` find and rename references to view structs a retarget removed.
+- Merging into the port: `conf.py` (conflict hunks), `resolve.py file:spec` (o/t per hunk), `dupchk.py`
+  (globals declared twice), `dupproto.py`/`dupfix.py` (prototypes duplicated by the merge; keeps the decomp's).
+- `whichglob.py [--decomp] addr...` (the annotated global containing an address), `dumpva.py va len` (the
+  original exe's bytes there), `vf.sh addr...` (incremental build + reccmp for those functions).
+- `dvcommit.sh` refuses a commit when any function got worse (except MusicThreadProc and FUN_00425e20, which
+  move with unrelated edits) and pushes the decomp with `~/push-decomp.sh`.
+
+The data loader (`tools/gen_data.py` with `tools/port_layout.py`) loads every global that holds pointers field by
+field, so the 64-bit exe's `-port-selftest` passes; `gen_data.py --report` lists words that only look like
+pointers (left unpatched) and pointer slots outside the filled globals.

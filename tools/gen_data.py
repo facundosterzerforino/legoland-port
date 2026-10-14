@@ -308,6 +308,16 @@ if "--no-typed" not in sys.argv:
     finally:
         os.unlink(slots_file.name)
 typed = [(a, name, gap) for a, name, gap in fill if name in layouts]
+# pointer slots outside every filled global: in unnamed data (reached through 'I' pointers) or in globals that
+# aren't filled. 32-bit builds patch them in the copy; a 64-bit build can't (the slot is 4 bytes)
+_filled_ranges = sorted((a - DATA_LO, a - DATA_LO + gap) for a, name, gap in fill)
+outside = []
+for fx in fixups:
+    o = fx[0]
+    import bisect
+    i = bisect.bisect_right(_filled_ranges, (o, 1 << 40)) - 1
+    if i < 0 or not (_filled_ranges[i][0] <= o < _filled_ranges[i][1]):
+        outside.append(fx)
 fill = [(a, name, gap) for a, name, gap in fill if name not in layouts]
 
 
@@ -353,10 +363,15 @@ print("globals filled: %d (%d by their original bytes, %d field by field), skipp
 print("pointer slots patched: %d (globals %d, functions %d, into the copy %d), left unchanged: %d"
       % (len(fixups), kinds.get("G", 0), kinds.get("F", 0), kinds.get("I", 0), len(unresolved)))
 print("words like pointers that their global's type says are not (left unpatched): %d" % len(not_pointers))
+print("pointer slots outside the filled globals (patched in place on 32-bit only): %d" % len(outside))
 print("words skipped as text: %s" % ", ".join("%d (%s)" % (n, k) for k, n in sorted(text_skipped.items())))
 if "--report" in sys.argv:
     for a, n, why in skipped:
         print("  skipped 0x%08x %-28s %s" % (a, n, why))
+    for fx in outside:
+        g = global_containing(DATA_LO + fx[0])
+        print("  outside at 0x%08x (in %s): %s" % (DATA_LO + fx[0], ("%s+0x%x" % (globals_[g]["name"], DATA_LO + fx[0] - g))
+                                                   if g else "unnamed data", fx[1] + (" " + fx[2] if fx[2] else "")))
     for slot, name, o in not_pointers:
         print("  not a pointer by type at 0x%08x: %s+0x%x" % (slot, name, o))
     for slot, v, where in unresolved:
