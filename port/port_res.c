@@ -9,6 +9,7 @@
 #include "../src/legoland/legoland.h"
 #include "../src/legoland/globals.h"
 #include "../src/legoland/obj_instance.h"
+#include "../src/legoland/binv.h"
 #include "../src/legoland/resource.h"
 #include "port_res.h"
 #include "port_x86.h"
@@ -74,6 +75,74 @@ static void PortResCheckClass(const char *name, void *ctx) {
     RES_CloseFile(file);
 }
 
+/* FNV-1a over n bytes, for the dumps */
+static unsigned int PortResHash(unsigned int h, const void *p, unsigned int n) {
+    const unsigned char *b = (const unsigned char *)p;
+    unsigned int i;
+
+    for (i = 0; i < n; i++) {
+        h = (h ^ b[i]) * 16777619u;
+    }
+    return h;
+}
+
+/* Every Zbuffers\*.bnv through LoadBinV: frames, objects (name, count) and a hash of each object's matrix and
+   vertices, to port-selftest-bnv.txt. Returns the number of files read. */
+static int PortResCheckBinV(FILE *dump) {
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA("Zbuffers\\*.bnv", &fd);
+    int files = 0;
+
+    if (h == INVALID_HANDLE_VALUE) {
+        return 0;
+    }
+    do {
+        char path[MAX_PATH];
+        BinVFile *binv;
+        BinVFrame *frame;
+        int i;
+
+        sprintf(path, "Zbuffers\\%s", fd.cFileName);
+        binv = LoadBinV(path);
+        if (binv == NULL) {
+            FILE *f = fopen(path, "rb");
+            short magic = 0;
+
+            if (f != NULL) {
+                fread(&magic, 2, 1, f);
+                fclose(f);
+            }
+            if (magic != 0x101) {
+                /* another version (octo.bnv): the original refuses it too, and nothing loads it */
+                fprintf(dump, "%s skipped (version 0x%x)\n", fd.cFileName, (unsigned short)magic);
+                continue;
+            }
+            fprintf(PortResReport, "binv %s: not loaded\n", fd.cFileName);
+            PortResProblems++;
+            continue;
+        }
+        fprintf(dump, "%s frames=%u z=%08x\n", fd.cFileName, binv->frameCount, PortResHash(2166136261u, &binv->field_14, 4));
+        for (frame = binv->frames, i = 0; frame != NULL && i < binv->frameCount; frame = frame->next, i++) {
+            BinVObject *object = frame->objects;
+            int j;
+
+            fprintf(dump, " frame %d: %d objects\n", i, frame->count);
+            for (j = 0; j < frame->count && object != NULL; j++, object = object->next) {
+                unsigned int hash = PortResHash(2166136261u, &object->m10, 9 * sizeof(float));
+
+                if (object->vertices != NULL) {
+                    hash = PortResHash(hash, object->vertices, object->count * sizeof(Vertex));
+                }
+                fprintf(dump, "  %s %d %08x\n", object->name != NULL ? object->name : "(none)", object->count, hash);
+            }
+        }
+        FreeBinV(binv);
+        files++;
+    } while (FindNextFileA(h, &fd));
+    FindClose(h);
+    return files;
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -101,6 +170,14 @@ int PortResSelfTest(const char *path) {
     }
     fprintf(PortResReport, "resources: %d object classes read of %d (fields in port-selftest-odf.txt)\n", PortResClasses,
             files);
+    {
+        FILE *bnv = fopen("port-selftest-bnv.txt", "w");
+
+        if (bnv != NULL) {
+            fprintf(PortResReport, "binv: %d files read (port-selftest-bnv.txt)\n", PortResCheckBinV(bnv));
+            fclose(bnv);
+        }
+    }
     if (PortResDump != NULL) {
         fclose(PortResDump);
     }

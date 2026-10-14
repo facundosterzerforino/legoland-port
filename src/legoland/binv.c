@@ -7,6 +7,110 @@
 #include "binv.h"
 
 // FUNCTION: LEGOLAND 0x0044dc90
+#ifdef LEGOLAND_PORT
+/* [port] The file holds its frames and objects in the original 32-bit layout, linked by offsets from the start of
+   the file, which the original turned into pointers in place. A 64-bit pointer doesn't fit those fields, so the
+   frames and objects are built in the port's layout instead (on every build), in one block with a copy of the
+   file after them: the vertices and names stay in that copy, and FreeBinV still frees everything at once. */
+#define BINV_X86_HEADER 0x24 /* to frames_ofs, inclusive */
+#define BINV_X86_FRAME 0xc
+#define BINV_X86_OBJECT 0x34
+
+static unsigned int BinVWord(const unsigned char *raw, unsigned int size, unsigned int off) {
+    unsigned int v = 0;
+
+    if (off <= size && size - off >= 4) {
+        memcpy(&v, raw + off, 4);
+    }
+    return v;
+}
+
+LEGO_EXPORT BinVFile *LoadBinV(const char *filename) {
+    FILE *stream;
+    unsigned int size;
+    unsigned char *raw;
+    unsigned char *copy;
+    BinVFile *file;
+    BinVFrame *frames;
+    BinVObject *objects;
+    unsigned int nframes = 0;
+    unsigned int nobjects = 0;
+    unsigned int fo;
+    unsigned int oo;
+    unsigned int i;
+    unsigned int j;
+    unsigned int k;
+    unsigned int count;
+
+    stream = fopen(filename, "rb");
+    if (stream == NULL) {
+        return NULL;
+    }
+    fseek(stream, 0, SEEK_END);
+    size = ftell(stream);
+    fseek(stream, 0, SEEK_SET);
+    raw = malloc(size);
+    if (raw == NULL) {
+        fclose(stream);
+        return NULL;
+    }
+    fread(raw, 1, size, stream);
+    fclose(stream);
+    if (size < BINV_X86_HEADER || *(short *)raw != 0x101) {
+        free(raw);
+        return NULL;
+    }
+    /* count the frames and objects as LoadBinV walks them */
+    fo = BinVWord(raw, size, 0x20);
+    for (i = 0; i < *(unsigned short *)(raw + 2) && fo != 0; i++) {
+        nframes++;
+        count = BinVWord(raw, size, fo);
+        oo = BinVWord(raw, size, fo + 4);
+        for (j = 0; j < count && oo != 0; j++) {
+            nobjects++;
+            oo = BinVWord(raw, size, oo + 4);
+        }
+        fo = BinVWord(raw, size, fo + 8);
+    }
+    file = malloc(sizeof(BinVFile) + nframes * sizeof(BinVFrame) + nobjects * sizeof(BinVObject) + size);
+    if (file == NULL) {
+        free(raw);
+        return NULL;
+    }
+    frames = (BinVFrame *)(file + 1);
+    objects = (BinVObject *)(frames + nframes);
+    copy = (unsigned char *)(objects + nobjects);
+    memcpy(copy, raw, size);
+    free(raw);
+    memset(file, 0, sizeof(BinVFile));
+    memcpy(file, copy, 0x20); /* magic, frame count, field_14: no pointers before frames */
+    file->frames = nframes != 0 ? frames : NULL;
+    fo = BinVWord(copy, size, 0x20);
+    k = 0;
+    for (i = 0; i < nframes; i++) {
+        BinVFrame *frame = &frames[i];
+
+        frame->count = (int)BinVWord(copy, size, fo);
+        oo = BinVWord(copy, size, fo + 4);
+        frame->objects = oo != 0 ? &objects[k] : NULL;
+        for (j = 0; j < (unsigned int)frame->count && oo != 0; j++, k++) {
+            BinVObject *object = &objects[k];
+            unsigned int v = BinVWord(copy, size, oo + 8);
+            unsigned int n = BinVWord(copy, size, oo + 0xc);
+
+            object->count = (int)BinVWord(copy, size, oo);
+            object->vertices = v != 0 ? (Vertex *)(copy + v) : NULL;
+            object->name = n != 0 ? (char *)(copy + n) : NULL;
+            memcpy(&object->m10, copy + oo + 0x10, 9 * sizeof(float));
+            oo = BinVWord(copy, size, oo + 4);
+            object->next = oo != 0 && k + 1 < nobjects ? &objects[k + 1] : NULL;
+        }
+        fo = BinVWord(copy, size, fo + 8);
+        frame->next = fo != 0 && i + 1 < nframes ? &frames[i + 1] : NULL;
+    }
+    return file;
+}
+#else
 LEGO_EXPORT BinVFile *LoadBinV(const char *filename) {
     FILE *stream;
     unsigned int size;
@@ -56,6 +160,7 @@ LEGO_EXPORT BinVFile *LoadBinV(const char *filename) {
     }
     return NULL;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x0044dd60
 LEGO_EXPORT void FreeBinV(BinVFile *binv) {
