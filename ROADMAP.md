@@ -200,6 +200,10 @@ build after each.
   synthesizer. After the first listening test (the drums played the piano, 16 dB too quiet): the drum kits and
   variation banks fixed in dmusic, DLS's velocity curve, and the level measured against recordings of Windows'
   DirectMusic in the game's setup (`tools/test_miniwin/capture_dmusic.exe`), now within 0.6 dB on every theme.
+  After the second (bad after the first bars): compared instrument by instrument with Windows' synthesizer
+  (`tools/test_miniwin/instruments_dmusic.exe`), notes decayed 2-4 times too slowly (gm.dls's key-scaled decay was
+  lost in the conversion) and the synthesizer's default reverb was missing; both fixed, the envelopes now within
+  3 dB on average over the 53 instruments.
   Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
   of random picks. Off for now: `-portable-music` turns it on, to compare by ear.
 

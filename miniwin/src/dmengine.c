@@ -8,6 +8,7 @@
 #include <time.h>
 
 #include "_Internal.h"
+#include "dmreverb.h"
 #include "miniwin/dmengine.h"
 
 #define BEAT 768 /* ticks a quarter note */
@@ -45,6 +46,7 @@ struct DmeEngine {
     mtx_t lock;
     DmLoader *loader;
     DmSynth synth;
+    DmeReverb *reverb; /* DirectMusic's synthesizer adds one by default */
     unsigned int rate;
     double now; /* ticks */
     double tempo;
@@ -695,6 +697,7 @@ DmeEngine *Dme_create(DmLoader *loader, unsigned int rate) {
     }
     DmSynth_init(&e->synth, e->rate);
     DmSynth_setVolume(&e->synth, SYNTH_GAIN);
+    e->reverb = DmeReverb_create(e->rate);
     return e;
 }
 
@@ -705,6 +708,7 @@ void Dme_destroy(DmeEngine *e) {
     DmSegment_release(e->seg);
     DmSegment_release(e->queued);
     DmSynth_free(&e->synth);
+    DmeReverb_destroy(e->reverb);
     DmLoader_release(e->loader);
     free(e->msgs);
     free(e->ev);
@@ -816,6 +820,7 @@ void Dme_render(DmeEngine *e, short *out, int frames) {
             n = k < n ? k : n;
         }
         DmSynth_render(&e->synth, out + done * 2, (size_t)n * 2, DmRender_SHORT | DmRender_STEREO);
+        DmeReverb_process(e->reverb, out + done * 2, n);
         e->now += n * per_frame;
         done += n;
     }

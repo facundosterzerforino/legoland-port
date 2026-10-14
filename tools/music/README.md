@@ -67,4 +67,20 @@ octave. The recordings are derived from the game's music: keep them out of the r
 dmusic follows DLS where TinySoundFont differs: a channel's volume and expression are each squared, and so is the
 velocity (DLS's default 40 log10 curves); drum kits and GS variation banks (MSB 8) select their own presets (dmusic
 used the LSB alone, so the drums played the piano). With the engine's overall gain, the main theme and the four world
-themes (40 s each) are all within 0.6 dB of Windows' DirectMusic, every octave band within 1 dB.
+themes (60 s each) are all within 0.8 dB of Windows' DirectMusic, every octave band within about 1.4 dB.
+
+Instrument by instrument: `tools/test_miniwin/instruments_dmusic.exe <data folder> <windows.wav> <portable.wav>` plays
+one note of each of the 53 instruments and drum sounds the music uses, every 3 s, through Windows' synthesizer (each
+downloaded from its GM collection) and the portable one (gm.dls through dmusic's conversion, the engine's gain and
+reverb); `instruments.py <windows.wav> <portable.wav>` (numpy) compares level, decay, pitch, brightness and envelope
+per instrument and gives the mean envelope difference. Two differences found that way:
+
+- gm.dls's melodic instruments decay faster the higher the note (a "key number to decay time" connection). dmusic made
+  it a modulator, which TinySoundFont ignores, so every note decayed at the instrument's slowest rate: bells, mallets
+  and plucked notes rang 2-4 times too long and piled up. It is now SoundFont's per-key generator.
+- DirectMusic's synthesizer adds a reverb by default (its port's Waves reverb: 1 s, the highs damped, the tail about
+  15 dB under the sound); TinySoundFont has none, and notes with short releases stopped dead.
+  `miniwin/src/dmreverb.c` (Freeverb's design) has its level and damping fitted to the recordings.
+
+Mean envelope difference over the 53: 7.5 dB without the reverb (after the decay fix), 3.1 dB with it; every
+instrument's level within about 3 dB, the same pitch, envelope correlation 0.8 to 1.0.

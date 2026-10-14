@@ -173,13 +173,11 @@ int main(int argc, char **argv) {
         WaitForSingleObject(event, 5);
         ResetEvent(event);
         while (perf->v->GetNotificationPMsg(perf, &msg) == S_OK) {
-            if (IsEqualGUID(&msg->guidNotificationType, &GUID_DMNotifySegment) && msg->dwNotificationOption == 1) {
-                if (next < nplay) {
-                    perf->v->PlaySegment(perf, play[next++], 0x2000, 0, NULL);
-                } else {
-                    printf("last segment ended\n");
-                    total = written; /* stop */
-                }
+            /* as the game's music thread: on "almost end", the next segment at the next measure (the last one again
+             * and again, as the game loops a theme) */
+            if (IsEqualGUID(&msg->guidNotificationType, &GUID_DMNotifySegment) && msg->dwNotificationOption == 2) {
+                perf->v->PlaySegment(perf, play[next < nplay ? next : nplay - 1], 0x2000, 0, NULL);
+                next++;
             }
             perf->v->FreePMsg(perf, &msg->head);
         }

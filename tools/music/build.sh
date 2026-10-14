@@ -20,6 +20,6 @@ clang-cl $CFLAGS $INCLUDES -I../../miniwin/include -I$SDL/sdl3-src/include -I$SD
 for tool in check_notes check_bars; do
     clang-cl $CFLAGS $INCLUDES $DMFLAGS $tool.c $DMSOURCES /Fe$tool.exe /link /machine:x86 $LIBPATHS
 done
-clang-cl $CFLAGS $INCLUDES $DMFLAGS -I../../miniwin/include play_engine.c ../../miniwin/src/dmengine.c $DMSOURCES \
+clang-cl $CFLAGS $INCLUDES $DMFLAGS -I../../miniwin/include play_engine.c ../../miniwin/src/dmengine.c ../../miniwin/src/dmreverb.c $DMSOURCES \
     /Feplay_engine.exe /link /machine:x86 $LIBPATHS
 rm -f *.obj
