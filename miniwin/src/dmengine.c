@@ -23,6 +23,8 @@
  * tools/test_miniwin/capture_dmusic.exe and tools/music/levels.py on the main theme and the four world themes (40 s
  * each, the game's setup): all within 0.6 dB of Windows', and every octave band within 1 dB. */
 #define SYNTH_GAIN 0.95f
+/* FluidSynth's (synth.gain), measured the same way: the five themes within 0.8 dB of Windows' DirectMusic */
+#define FLUID_GAIN 0.8
 
 enum {
     EV_NOTE_OFF,
@@ -51,8 +53,7 @@ struct DmeEngine {
     DmSynth synth;
     DmeReverb *reverb; /* DirectMusic's synthesizer adds one by default */
 #ifdef DME_FLUIDSYNTH
-    /* [experiment] FluidSynth on gm.dls (its own DLS loader) instead of dmusic's synthesizer, when DME_FLUIDSYNTH is
-     * set in the environment */
+    /* FluidSynth on gm.dls (its own DLS loader, Microsoft's rules) instead of dmusic's synthesizer: Dme_useFluidSynth */
     fluid_settings_t *fluid_settings;
     fluid_synth_t *fluid;
     int fluid_font;
@@ -773,26 +774,43 @@ DmeEngine *Dme_create(DmLoader *loader, unsigned int rate) {
     DmSynth_init(&e->synth, e->rate);
     DmSynth_setVolume(&e->synth, SYNTH_GAIN);
     e->reverb = DmeReverb_create(e->rate);
-#ifdef DME_FLUIDSYNTH
-    if (getenv("DME_FLUIDSYNTH") != NULL) {
-        const char *gain = getenv("DME_FLUIDSYNTH_GAIN");
+    return e;
+}
 
+int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls) {
+#ifdef DME_FLUIDSYNTH
+    fluid_synth_t *fluid;
+    int font;
+
+    if (e == NULL || gm_dls == NULL) {
+        return 0;
+    }
+    if (e->fluid_settings == NULL) {
         e->fluid_settings = new_fluid_settings();
         fluid_settings_setnum(e->fluid_settings, "synth.sample-rate", e->rate);
-        fluid_settings_setnum(e->fluid_settings, "synth.gain", gain != NULL ? atof(gain) : 0.8);
+        fluid_settings_setnum(e->fluid_settings, "synth.gain", FLUID_GAIN);
+        /* the engine adds DirectMusic's reverb (dmreverb.c); gm.dls sets no reverb or chorus send anyway */
         fluid_settings_setint(e->fluid_settings, "synth.reverb.active", 0);
         fluid_settings_setint(e->fluid_settings, "synth.chorus.active", 0);
         fluid_settings_setint(e->fluid_settings, "synth.midi-channels", 64);
         fluid_settings_setint(e->fluid_settings, "synth.polyphony", 256);
-        e->fluid = new_fluid_synth(e->fluid_settings);
-        e->fluid_font = e->fluid ? fluid_synth_sfload(e->fluid, "C:\\Windows\\System32\\drivers\\gm.dls", 0) : -1;
-        if (e->fluid_font < 0) {
-            delete_fluid_synth(e->fluid);
-            e->fluid = NULL;
-        }
     }
+    fluid = new_fluid_synth(e->fluid_settings);
+    font = fluid != NULL ? fluid_synth_sfload(fluid, gm_dls, 0) : -1;
+    if (font < 0) {
+        delete_fluid_synth(fluid);
+        return 0;
+    }
+    mtx_lock(&e->lock);
+    e->fluid = fluid;
+    e->fluid_font = font;
+    mtx_unlock(&e->lock);
+    return 1;
+#else
+    (void)e;
+    (void)gm_dls;
+    return 0;
 #endif
-    return e;
 }
 
 void Dme_destroy(DmeEngine *e) {

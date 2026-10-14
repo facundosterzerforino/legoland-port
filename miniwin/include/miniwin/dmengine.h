@@ -41,6 +41,9 @@ enum {
 
 /* rate: the synthesizer's (the port's) sample rate. */
 DmeEngine *Dme_create(DmLoader *loader, unsigned int rate);
+/* Plays through FluidSynth on this gm.dls (DLS read by FluidSynth itself, by Microsoft's rules) instead of dmusic's
+ * synthesizer, when built with it (DME_FLUIDSYNTH); 0 when it can't (then dmusic's plays). */
+int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls);
 void Dme_destroy(DmeEngine *e);
 
 /* Loads the segment's instruments and styles (DirectMusic's GUID_Download). */

@@ -421,7 +421,7 @@ static int RenderFluid(const char *out_path) {
     int id;
 
     fluid_settings_setnum(settings, "synth.sample-rate", RATE);
-    fluid_settings_setnum(settings, "synth.gain", gain != NULL ? atof(gain) : 0.5);
+    fluid_settings_setnum(settings, "synth.gain", gain != NULL ? atof(gain) : 0.8); /* the engine's FLUID_GAIN */
     fluid_settings_setint(settings, "synth.reverb.active", rev != NULL && strcmp(rev, "fluid") == 0);
     fluid_settings_setint(settings, "synth.chorus.active", 0);
     fluid_settings_setint(settings, "synth.polyphony", 256);

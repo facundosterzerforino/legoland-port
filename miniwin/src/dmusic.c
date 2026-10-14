@@ -76,6 +76,31 @@ static void *ReadAll(const char *path, size_t *len) {
     return p;
 }
 
+/* The General MIDI instruments: a gm.dls in the data folder, else Windows' own (DirectMusic's). */
+static int GmDlsPath(char *path, size_t size) {
+    char win[MAX_PATH];
+    FILE *f;
+
+    snprintf(path, size, "gm.dls");
+    if ((f = MiniwinFopen(path, "rb")) != NULL) {
+        fclose(f);
+        return 1;
+    }
+    if (GetSystemWindowsDirectoryA(win, MAX_PATH) != 0) {
+        snprintf(path, size, "%s\\System32\\drivers\\gm.dls", win);
+        if ((f = fopen(path, "rb")) != NULL) {
+            fclose(f);
+            return 1;
+        }
+        snprintf(path, size, "%s\\Sysnative\\drivers\\gm.dls", win); /* from a 32-bit process */
+        if ((f = fopen(path, "rb")) != NULL) {
+            fclose(f);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static void *Resolve(void *ctx, char const *name, size_t *len) {
     char path[MAX_PATH * 2];
     void *p;
@@ -85,23 +110,8 @@ static void *Resolve(void *ctx, char const *name, size_t *len) {
     if ((p = ReadAll(path, len)) != NULL) {
         return p;
     }
-    if (_stricmp(name, "gm.dls") == 0) {
-        /* the General MIDI instruments: a gm.dls in the data folder, else Windows' own (DirectMusic's) */
-        char win[MAX_PATH];
-
-        if ((p = ReadAll("gm.dls", len)) != NULL) {
-            return p;
-        }
-        if (GetSystemWindowsDirectoryA(win, MAX_PATH) != 0) {
-            snprintf(path, sizeof(path), "%s\\System32\\drivers\\gm.dls", win);
-            if ((p = ReadAll(path, len)) != NULL) {
-                return p;
-            }
-            snprintf(path, sizeof(path), "%s\\Sysnative\\drivers\\gm.dls", win); /* from a 32-bit process */
-            if ((p = ReadAll(path, len)) != NULL) {
-                return p;
-            }
-        }
+    if (_stricmp(name, "gm.dls") == 0 && GmDlsPath(path, sizeof(path))) {
+        return ReadAll(path, len);
     }
     return NULL;
 }
@@ -625,8 +635,14 @@ static HRESULT __stdcall Music_CreatePort(Music *self, REFCLSID cls, DmPortParam
     p->rate = params != NULL && params->dwSampleRate != 0 ? params->dwSampleRate : 22050; /* the game's: 22050 */
     p->performance = perf;
     if (perf != NULL && perf->engine == NULL && Loader() != NULL) {
+        char gm_dls[MAX_PATH * 2];
+
         perf->engine = Dme_create(Loader(), p->rate);
         Dme_setNotificationTypes(perf->engine, perf->types);
+        /* the synthesizer: FluidSynth on gm.dls, which sounds like DirectMusic's (tools/music/README.md) */
+        if (GmDlsPath(gm_dls, sizeof(gm_dls))) {
+            Dme_useFluidSynth(perf->engine, gm_dls);
+        }
     }
     *out = p;
     return S_OK;

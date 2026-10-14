@@ -85,14 +85,15 @@ per instrument and gives the mean envelope difference. Two differences found tha
 Mean envelope difference over the 53: 7.5 dB without the reverb (after the decay fix), 3.1 dB with it; every
 instrument's level within about 3 dB, the same pitch, envelope correlation 0.8 to 1.0.
 
-## FluidSynth (experiment)
+## FluidSynth
 
-FluidSynth (LGPL) reads DLS itself, following Microsoft's rules (no conversion to a SoundFont).
-`tools/test_miniwin/build_fluid.sh` (with `FLUIDSYNTH_DIR`, an unpacked 32-bit release) builds the instrument tool with
-FluidSynth as a third synthesizer (a fourth argument, its WAV; `FLUID_GAIN`, `FLUID_REVERB=own|fluid|none`) and the
-capture tool with the engine on FluidSynth (`DME_FLUIDSYNTH=1`, `DME_FLUIDSYNTH_GAIN`; `miniwin/src/dmengine.c`
-built with `DME_FLUIDSYNTH`). At gain 0.8 with the engine's reverb: mean envelope difference 2.7 dB (TinySoundFont
-3.0), envelope correlation 0.97 to 1.0 on almost every instrument, the five themes within 0.8 dB of Windows' level.
-The sustained winds come out a few dB louder than with Windows' synthesizer (as with TinySoundFont, a little more).
-FluidSynth's own reverb does nothing on gm.dls (no reverb send). By ear (the maintainer, comparing the recordings):
-FluidSynth sounds right.
+FluidSynth (LGPL-2.1+) reads DLS itself, by Microsoft's rules (no conversion to a SoundFont), and is the portable
+music's synthesizer: the port builds it from a pinned release into the exe (CMakeLists.txt; no drivers, no sound file
+support) and `miniwin/src/dmusic.c` hands it the gm.dls it finds (`Dme_useFluidSynth`; dmusic's TinySoundFont plays
+if it can't load it). The music tools in `tools/test_miniwin/` link the same library.
+
+Against Windows' synthesizer, with the engine's reverb on top (FluidSynth's own does nothing on gm.dls: no reverb
+send) and gain 0.8: mean envelope difference 2.7 dB over the 53 instruments (TinySoundFont 3.0), envelope correlation
+0.97 to 1.0 on almost all, the five themes within 0.8 dB of Windows' level. The sustained winds come out a few dB
+louder than with Windows' synthesizer. By ear (the maintainer, comparing the recordings): FluidSynth sounds right.
+`instruments_dmusic.exe` takes a fourth WAV for FluidSynth (`FLUID_GAIN`, `FLUID_REVERB=own|fluid|none`).

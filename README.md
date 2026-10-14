@@ -57,8 +57,9 @@ cmake --preset clang-cl-x86
 cmake --build build-clang-x86    # -> build-clang-x86/legoland.exe + .pdb
 ```
 
-The first configure downloads SDL3 (a pinned release, checked by its SHA-256) and builds it with the same
-toolchain; to build offline, unpack that release somewhere and add `-DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>`.
+The first configure downloads SDL3 and FluidSynth (pinned releases, checked by their SHA-256) and builds them with
+the same toolchain; to build offline, unpack those releases somewhere and add `-DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>`
+and `-DFETCHCONTENT_SOURCE_DIR_FLUIDSYNTH=<folder>`.
 After the toolchain file changes, reconfigure with `cmake --fresh --preset clang-cl-x86`.
 Set `XWIN_DIR` if the SDK isn't in `~/xwin`. The preset defines `LEGOLAND_PORT`, leaves out the matching-only
 files (`bootstrap.c`, `imports.c`) and links the real C runtime (static) and Windows import libraries.
@@ -119,8 +120,9 @@ These are new in the port and off unless you turn them on (`extensions/`):
   was, picture and sound together. It also fixes the original's catch-up after a longer stall, which
   left the rest of most movies silent or out of step.
 - **Portable music** (`-portable-music`, off for now): the music plays through the port's own DirectMusic
-  (GothicKit dmusic and a style engine checked against Windows') instead of Windows'. The notes are the same; the
-  instruments sound a little different (another synthesizer on the same General MIDI set).
+  (GothicKit dmusic and a style engine checked against Windows', with FluidSynth playing Windows' gm.dls) instead of
+  Windows'. The notes are the same, and the instruments sound very close (compared one by one with Windows'
+  synthesizer: `tools/music/README.md`).
 - **Debug console** (`-console`): see `docs/debug-console.md`.
 - The LEGO Media logo at startup can be skipped with a click (on by default; `-no-skip-logo` turns it off).
 
@@ -132,3 +134,10 @@ These are new in the port and off unless you turn them on (`extensions/`):
 - `DECOMPILING.md`, `HEADERS.md`, `docs/decomp-tips.md`: how the matching decompilation works.
 - `docs/title-screen-port.md`: an earlier scoping study of the boot-to-title-screen path. Its match numbers
   date from when the decompilation was at 52.71%; most functions it lists as missing are done now.
+
+## Third-party code
+
+Built into the port, each under its own license: [SDL3](https://www.libsdl.org/) (zlib), FFmpeg's Indeo decoders
+(`port/ffmpeg/`, LGPL-2.1+), [GothicKit dmusic](https://github.com/GothicKit/dmusic) with TinySoundFont (`port/dmusic/`,
+MIT) and [FluidSynth](https://www.fluidsynth.org/) (LGPL-2.1+, downloaded and built from its pinned release). The
+LGPL parts can be replaced: this repository has everything needed to rebuild the exe with another version of them.

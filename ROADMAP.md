@@ -203,7 +203,10 @@ build after each.
   After the second (bad after the first bars): compared instrument by instrument with Windows' synthesizer
   (`tools/test_miniwin/instruments_dmusic.exe`), notes decayed 2-4 times too slowly (gm.dls's key-scaled decay was
   lost in the conversion) and the synthesizer's default reverb was missing; both fixed, the envelopes now within
-  3 dB on average over the 53 instruments.
+  3 dB on average over the 53 instruments. After the third (the notes right, the instruments still a little
+  different): FluidSynth (LGPL), which reads DLS by Microsoft's rules itself, is now the synthesizer, built into the
+  exe from a pinned release; 2.7 dB on average, envelope correlation 0.97-1.0, and the maintainer, comparing the
+  recordings by ear: it sounds right.
   Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
   of random picks. Off for now: `-portable-music` turns it on, to compare by ear.
 

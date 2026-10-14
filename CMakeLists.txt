@@ -56,6 +56,39 @@ if(LEGOLAND_MODERN_BUILD)
     set_property(TARGET dmusic PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     set_property(TARGET dmusic PROPERTY C_STANDARD 11)
     target_link_libraries(legoland PRIVATE dmusic)
+    # [library:music] FluidSynth (LGPL-2.1+, see ROADMAP.md phase 6), the portable music's synthesizer: it reads DLS
+    # (gm.dls) itself by Microsoft's rules. A pinned release built into the exe without its drivers, sound file support
+    # or threads; the source stays downloadable from here, as the LGPL asks. Offline: put the tarball somewhere and
+    # configure with -DFETCHCONTENT_SOURCE_DIR_FLUIDSYNTH=<folder>.
+    FetchContent_Declare(fluidsynth
+        URL https://github.com/FluidSynth/fluidsynth/archive/refs/tags/v2.6.1.tar.gz
+        URL_HASH SHA256=3d258a3bf97cc20c59eeebfe62c2432fae88adda74d3ad098681c76e0ebf446b
+        EXCLUDE_FROM_ALL)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    foreach(feature alsa aufile dbus ipv6 jack ladspa libsndfile midishare network oss dsound wasapi waveout winmidi
+            sdl3 pulseaudio pipewire readline threads openmp signalsmith systemd coreaudio coremidi framework
+            opensles oboe libinstpatch portaudio)
+        set(enable-${feature} OFF CACHE BOOL "" FORCE)
+    endforeach()
+    set(enable-native-dls ON CACHE BOOL "" FORCE)
+    set(osal "cpp11" CACHE STRING "" FORCE)
+    set(PORT_MODULE_PATH "${CMAKE_MODULE_PATH}")
+    list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/port/cmake/fluidsynth")
+    FetchContent_MakeAvailable(fluidsynth)
+    set(CMAKE_MODULE_PATH "${PORT_MODULE_PATH}")
+    foreach(target libfluidsynth libfluidsynth-OBJ)
+        if(TARGET ${target})
+            set_property(TARGET ${target} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+            # its Windows version resource is for the DLL (and needs the SDK's resource headers); its -Wall is every
+            # warning to clang-cl
+            get_target_property(sources ${target} SOURCES)
+            list(FILTER sources EXCLUDE REGEX "\.rc$")
+            set_property(TARGET ${target} PROPERTY SOURCES ${sources})
+            target_compile_options(${target} PRIVATE -w)
+        endif()
+    endforeach()
+    target_link_libraries(legoland PRIVATE libfluidsynth)
+    target_compile_definitions(legoland PRIVATE DME_FLUIDSYNTH)
     # miniwin's DirectMusic (miniwin/src/dmusic.c, dmengine.c) works with dmusic's internals
     target_include_directories(legoland PRIVATE "${DMUSIC_DIR}/src" "${DMUSIC_DIR}/vendor/TinySoundFont")
     # DirectInput 5 headers: the game requests version 3 at runtime (input.c) but was compiled against DX5+
