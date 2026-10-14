@@ -4,6 +4,7 @@
    the same file. */
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../src/legoland/legoland.h"
@@ -11,6 +12,7 @@
 #include "../src/legoland/obj_instance.h"
 #include "../src/legoland/binv.h"
 #include "../src/legoland/resource.h"
+#include "../src/legoland/man3d.h"
 #include "port_res.h"
 #include "port_x86.h"
 
@@ -143,6 +145,36 @@ static int PortResCheckBinV(FILE *dump) {
     return files;
 }
 
+/* The characters' .loc files through LoadLocFile: header, a hash of the texture table and every cell, to dump.
+   Returns the number of files read. */
+static int PortResCheckLoc(FILE *dump) {
+    static const char *const files[][2] = {{"NewProject.loc", "visitor"}, {"geoff.loc", "geoff"}, {"tracy.loc", "tracy"}};
+    int n = 0;
+    int i;
+    int j;
+
+    for (i = 0; i < 3; i++) {
+        struct LocFile *loc = LoadLocFile(files[i][0], files[i][1]);
+
+        if (loc == NULL) {
+            fprintf(PortResReport, "loc %s: not loaded\n", files[i][0]);
+            PortResProblems++;
+            continue;
+        }
+        fprintf(dump, "%s count=%d base=%d cells=%d name=%.32s textures=%08x\n", files[i][0], loc->count,
+                loc->texture_base, loc->cell_count, loc->name,
+                PortResHash(2166136261u, loc->textures, loc->count * 8));
+        for (j = 0; j < loc->cell_count; j++) {
+            struct LocCell *cell = &loc->cells[j];
+
+            fprintf(dump, " %d: %d %d,%d %dx%d\n", j, cell->texture, cell->x, cell->y, cell->w, cell->h);
+        }
+        free(loc);
+        n++;
+    }
+    return n;
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -176,6 +208,14 @@ int PortResSelfTest(const char *path) {
         if (bnv != NULL) {
             fprintf(PortResReport, "binv: %d files read (port-selftest-bnv.txt)\n", PortResCheckBinV(bnv));
             fclose(bnv);
+        }
+    }
+    {
+        FILE *loc = fopen("port-selftest-loc.txt", "w");
+
+        if (loc != NULL) {
+            fprintf(PortResReport, "loc: %d files read (port-selftest-loc.txt)\n", PortResCheckLoc(loc));
+            fclose(loc);
         }
     }
     if (PortResDump != NULL) {

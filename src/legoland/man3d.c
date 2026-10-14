@@ -1,4 +1,7 @@
 #include "man3d.h"
+#ifdef LEGOLAND_PORT
+#include <stddef.h>
+#endif
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,6 +204,29 @@ struct LocFile *LoadLocFile(const char *param_1, const char *param_2) {
     file = RES_OpenFile(path);
     if (file != 0) {
         size = RES_GetFileSize(file);
+#ifdef LEGOLAND_PORT
+        /* [port] the file's header holds 32-bit offsets of its two tables: the whole file goes after a native
+           header, and the header's pointers point into that copy (the same on 32 and 64 bits) */
+        buffer = size >= PORT_LOC_FILE_HEADER ? malloc(sizeof(struct LocFile) + size) : 0;
+        if (buffer != 0) {
+            unsigned char *copy = (unsigned char *)(buffer + 1);
+            unsigned int textures;
+            unsigned int cells;
+
+            RES_ReadFile(file, copy, size);
+            RES_CloseFile(file);
+            memcpy(buffer, copy, offsetof(struct LocFile, textures));
+            memcpy(&textures, copy + 0x2c, 4);
+            memcpy(&cells, copy + 0x30, 4);
+            if (textures > size || cells > size || cells + (unsigned int)buffer->cell_count * sizeof(struct LocCell) > size) {
+                free(buffer);
+                return 0;
+            }
+            buffer->textures = copy + textures;
+            buffer->cells = (struct LocCell *)(copy + cells);
+            return buffer;
+        }
+#else
         buffer = malloc(size);
         if (buffer != 0) {
             RES_ReadFile(file, buffer, size);
@@ -208,6 +234,7 @@ struct LocFile *LoadLocFile(const char *param_1, const char *param_2) {
             RelocateLocData(buffer);
             return buffer;
         }
+#endif
     }
     return 0;
 }

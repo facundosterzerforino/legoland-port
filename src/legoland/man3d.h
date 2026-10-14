@@ -138,6 +138,9 @@ struct LocFile {
     /* 0x2c */ void *textures; /* count entries of 8 bytes */
     /* 0x30 */ struct LocCell *cells;
 };
+#ifdef LEGOLAND_PORT
+#define PORT_LOC_FILE_HEADER 0x34 /* [port] the header's size in the file (32-bit offsets) */
+#endif
 
 void RelocateLocData(struct LocFile *buffer);
 struct LocFile *LoadLocFile(const char *param_1, const char *param_2);
