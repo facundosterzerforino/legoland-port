@@ -234,10 +234,13 @@ void PrintTitleScreen1(void) {
     }
 }
 
+#ifndef LEGOLAND_PORT /* [library:asm] the compiler's float-to-int helper, with its argument on the x87 stack; the
+                       * port's compiler converts by itself and nothing calls this */
 // FUNCTION: LEGOLAND 0x00458930
 int _ftol() {
     __asm fistp dword ptr[DAT_00667c3c] __asm mov eax, [DAT_00667c3c]
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00458940
 void FUN_00458940(void) {

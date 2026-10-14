@@ -382,9 +382,15 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
                 vid.width, vid.height);
             FUN_00488700((unsigned int)vid.bits, (struct RenderViewport *)&MousePos);
             Render_SetViewport(&clip);
+#ifdef LEGOLAND_PORT
+            /* [library:asm] the original sets the x87 control word to 0x7f (single precision, round to nearest)
+             * around this; the port's float math is SSE's, which it doesn't affect */
+            FUN_00440a30(person);
+#else
             __asm { fstcw word ptr [DAT_00638358] }
             __asm {fldcw word ptr[DAT_004b7abc]} FUN_00440a30(person);
             __asm { fldcw word ptr [DAT_00638358] }
+#endif
             if (DAT_007feb14 != 0) {
                 if (DAT_00668954 != 0 && person->bloke == GetWorkerOnMouse()) {
                     return;

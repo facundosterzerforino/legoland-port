@@ -6688,16 +6688,39 @@ void FUN_00426850(float x, float y, float z, struct EdgeObj *obj) {
     obj->edges[11].b = 7;
 }
 
+#ifdef LEGOLAND_PORT
+/* [library:asm] HASM_lego_sqrtf and HASM_lego_invsqrtf in C: the top 6 bits of the mantissa pick a linear piece
+ * (a pair in the table), applied to the mantissa scaled to [1, 2), and the exponent picks a scale. The original
+ * calls them through DAT_00829a5c / DAT_00829a58 with the argument and the result on the x87 stack. */
+static float PortTableRoot(float x, const float *table, const float *exp_table) {
+    unsigned int bits;
+    unsigned int m_bits;
+    unsigned int piece;
+    float m;
+
+    memcpy(&bits, &x, sizeof(bits));
+    m_bits = (bits & 0x007FFFFFu) | 0x3F800000u;
+    memcpy(&m, &m_bits, sizeof(m));
+    piece = (bits >> 17) & 0x3F;
+    return (float)(((double)m * table[piece * 2 + 1] + table[piece * 2]) * exp_table[(bits >> 23) & 0xFF]);
+}
+#endif
+
 // FUNCTION: LEGOLAND 0x00426960
 float lego_sqrtf(float x) {
+#ifdef LEGOLAND_PORT
+    return PortTableRoot(x, sqrtf_table, sqrtf_exp_table);
+#else
     __asm {
         fld x
         call dword ptr [DAT_00829a5c]
         fstp x
     }
     return x;
+#endif
 }
 
+#ifndef LEGOLAND_PORT /* [library:asm] see PortTableRoot */
 // FUNCTION: LEGOLAND 0x00426980
 __declspec(naked) void HASM_lego_sqrtf(void) {
     __asm {
@@ -6724,6 +6747,7 @@ __declspec(naked) void HASM_lego_sqrtf(void) {
         ret
     }
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x004269e0
 void lego_sqrtf_init(void) {
@@ -6743,24 +6767,31 @@ void lego_sqrtf_init(void) {
     for (i = 1; i <= 255; i++) {
         sqrtf_exp_table[i] = 1.0f / (float)sqrt(pow(2.0, i - 127));
     }
+#ifndef LEGOLAND_PORT /* [library:asm] the port calls PortTableRoot directly */
     __asm {
         push eax
         lea eax, HASM_lego_sqrtf
         mov DAT_00829a5c, eax
         pop eax
     }
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x00426a90
 float lego_invsqrtf(float x) {
+#ifdef LEGOLAND_PORT
+    return PortTableRoot(x, invsqrtf_table, invsqrtf_exp_table);
+#else
     __asm {
         fld x
         call dword ptr [DAT_00829a58]
         fstp x
     }
     return x;
+#endif
 }
 
+#ifndef LEGOLAND_PORT /* [library:asm] see PortTableRoot */
 // FUNCTION: LEGOLAND 0x00426ab0
 __declspec(naked) void HASM_lego_invsqrtf(void) {
     __asm {
@@ -6787,6 +6818,7 @@ __declspec(naked) void HASM_lego_invsqrtf(void) {
         ret
     }
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00426b10
 void lego_invsqrtf_init(void) {
@@ -6802,12 +6834,14 @@ void lego_invsqrtf_init(void) {
     for (j = 0; j <= 255; j++) {
         invsqrtf_exp_table[j] = (float)sqrt(pow(2.0, j - 127));
     }
+#ifndef LEGOLAND_PORT /* [library:asm] the port calls PortTableRoot directly */
     __asm {
         push eax
         lea eax, HASM_lego_invsqrtf
         mov DAT_00829a58, eax
         pop eax
     }
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x00426ba0

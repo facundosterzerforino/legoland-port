@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "legoland.h"
@@ -586,6 +587,10 @@ void FUN_00485fe0(struct Sprite *sprite, int x, int y) {
     RECT rect2;
     int offsets[2];
 
+#ifdef LEGOLAND_PORT
+    /* [library:asm] the original clears the width x height dwords with rep stosd */
+    memset(DAT_00701e5c, 0, (size_t)DAT_0066be40 * DAT_0066be44 * 4);
+#else
     __asm {
         push edi
         mov eax, DAT_0066be40
@@ -596,6 +601,7 @@ void FUN_00485fe0(struct Sprite *sprite, int x, int y) {
         rep stosd
         pop edi
     }
+#endif
     if (sprite == NULL) {
         return;
     }

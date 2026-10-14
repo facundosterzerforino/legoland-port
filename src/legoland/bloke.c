@@ -3,6 +3,9 @@
 #include <string.h>
 #include "legoland.h"
 
+#ifdef LEGOLAND_PORT
+#include "../../port/port_asm.h"
+#endif
 #include "binv.h"
 #include "bloke.h"
 #include "debug_alloc.h"
@@ -1148,6 +1151,21 @@ LEGO_EXPORT void ApplyObjectOrientationToPerson(Person *person, float *matrix, v
     person->fm[6] = -matrix[1];
     person->fm[7] = -matrix[7];
     person->fm[8] = matrix[4];
+#ifdef LEGOLAND_PORT
+    /* [library:asm] each m[i] holds a float's bits; the original turns it into 16.16 fixed point with x87
+     * fld/fmul/fistp (rounded to nearest, ties to even) */
+    {
+        int i;
+
+        (void)tmp;
+        for (i = 0; i < 9; i++) {
+            float f;
+
+            memcpy(&f, &person->m[i], sizeof(f));
+            person->m[i] = PortRound((double)f * scale);
+        }
+    }
+#else
     tmp = person->m[0];
     __asm {
         fld dword ptr [tmp]
@@ -1211,6 +1229,7 @@ LEGO_EXPORT void ApplyObjectOrientationToPerson(Person *person, float *matrix, v
         fistp dword ptr [tmp]
     }
     person->m[8] = tmp;
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x00484a70

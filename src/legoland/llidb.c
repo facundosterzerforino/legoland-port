@@ -1494,7 +1494,9 @@ LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
         return;
     }
     if (param_1->frame_count > 1000) {
+#ifndef LEGOLAND_PORT /* [library:asm] a debugger break in the original */
         __asm int 3
+#endif
     }
     while (node != NULL) {
         if (node->lls == param_1) {
