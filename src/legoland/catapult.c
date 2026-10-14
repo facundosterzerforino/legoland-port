@@ -547,8 +547,8 @@ LEGO_EXPORT int Catapult_Load(struct Element *element) {
     }
 
     while (header != 0) {
-        node = (struct CatapultLoadNode *)malloc(0x3c);
-        if (SaveGameRead(node, 0x3c) == 0) {
+        node = (struct CatapultLoadNode *)malloc(sizeof(struct CatapultLoadNode));
+        if (SaveGameRead(node, sizeof(struct CatapultLoadNode)) == 0) {
             return 0;
         }
 

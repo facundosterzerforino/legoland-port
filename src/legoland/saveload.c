@@ -279,7 +279,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 } else {
                     tile.field_a = 0;
                 }
-                if (SaveGameWrite(&tile, 0x14) == 0) {
+                if (SaveGameWrite(&tile, sizeof(struct MapElement)) == 0) {
                     {
                         // STRING: LEGOLAND 0x004bc8ac
                         LogPrintf("Failed to write mapinfo struct at (%d,%d)", x, y);
@@ -314,7 +314,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         LogPrintf("Scrolly (%d) Failed", ScrollY);
         goto fail;
     }
-    if (SaveGameWrite(&EditMode, 0xc) == 0) {
+    if (SaveGameWrite(&EditMode, sizeof(struct EditState)) == 0) {
         // STRING: LEGOLAND 0x004bc83c
         LogPrintf("EditMode Failed");
         goto fail;
@@ -825,7 +825,7 @@ LEGO_EXPORT int LoadGame(char *path) {
             DrawWatchSprite();
             for (x = 0; x < lpConfig->width; x++) {
                 tile = &GameMap[y][x];
-                if (SaveGameRead(tile, 0x14) == 0) {
+                if (SaveGameRead(tile, sizeof(struct MapElement)) == 0) {
                     goto fail;
                 }
                 if ((tile->flags & 0x8a8) != 0) {
@@ -854,7 +854,7 @@ LEGO_EXPORT int LoadGame(char *path) {
     if (SaveGameRead(&ScrollY, 4) == 0) {
         goto fail;
     }
-    if (SaveGameRead(&EditMode, 0xc) == 0) {
+    if (SaveGameRead(&EditMode, sizeof(struct EditState)) == 0) {
         goto fail;
     }
     EditMode.unk4 = 3;

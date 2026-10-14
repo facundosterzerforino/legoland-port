@@ -52,9 +52,9 @@ struct BlokeData {
 
 // FUNCTION: LEGOLAND 0x00416ec0
 void FUN_00416ec0(TileId *key) {
-    struct SlideNode *node = (struct SlideNode *)malloc(0x20);
+    struct SlideNode *node = (struct SlideNode *)malloc(sizeof(struct SlideNode));
     if (node != NULL) {
-        memset(node, 0, 0x20);
+        memset(node, 0, sizeof(struct SlideNode));
         node->key = key->id;
         node->next = SlideNodeList;
         SlideNodeList = node;
@@ -472,7 +472,7 @@ LEGO_EXPORT int SaveTempleSlide(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(p, 0x20) == 0) {
+        if (SaveGameWrite(p, sizeof(struct SlideNode)) == 0) {
             return 0;
         }
         p = p->next;
@@ -492,8 +492,8 @@ LEGO_EXPORT int LoadTempleSlide(struct Element *obj) {
     }
 
     while (marker != 0) {
-        struct SlideNode *save = malloc(0x20);
-        if (!SaveGameRead(save, 0x20)) {
+        struct SlideNode *save = malloc(sizeof(struct SlideNode));
+        if (!SaveGameRead(save, sizeof(struct SlideNode))) {
             return 0;
         }
         save->next = NULL;

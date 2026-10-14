@@ -298,10 +298,10 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
         /* build a linked list of the directory entries */
         do {
             if (tail) {
-                tail->next = malloc(12);
+                tail->next = malloc(sizeof(struct FileNode));
                 tail = tail->next;
             } else {
-                head = malloc(12);
+                head = malloc(sizeof(struct FileNode));
                 tail = head;
             }
             count++;

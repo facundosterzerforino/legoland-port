@@ -41,7 +41,7 @@ LEGO_EXPORT struct MidiFile *LoadMIDIFile(const char *filename) {
     int i;
 
     division = 0;
-    midi = (struct MidiFile *)malloc(0x18);
+    midi = (struct MidiFile *)malloc(sizeof(struct MidiFile));
     file = RES_OpenFile(filename);
     RES_ReadFile(file, &header, 4);
     ReadBigEndianU32(file, &chunkSize);

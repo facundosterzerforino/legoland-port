@@ -224,7 +224,7 @@ int Carousel_Save(struct Element *element) {
         if (!SaveGameWrite(&flag, 4)) {
             return 0;
         }
-        if (!SaveGameWrite(current, 0x2c)) {
+        if (!SaveGameWrite(current, sizeof(struct CarouselNode))) {
             return 0;
         }
         current = current->next;
@@ -250,7 +250,7 @@ int Carousel_Load(struct Element *param_1) {
     }
     while (marker != 0) {
         node = (struct CarouselNode *)malloc(sizeof(struct CarouselNode));
-        if (SaveGameRead(node, 0x2c) == 0) {
+        if (SaveGameRead(node, sizeof(struct CarouselNode)) == 0) {
             return 0;
         }
         node->next = NULL;

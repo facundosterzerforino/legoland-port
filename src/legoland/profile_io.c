@@ -505,7 +505,7 @@ char FUN_004920a0(unsigned int param1, unsigned char flags) {
 
 // FUNCTION: LEGOLAND 0x004920e0
 struct ProfileObj *FUN_004920e0(void) {
-    struct ProfileObj *v = (struct ProfileObj *)malloc(0x38);
+    struct ProfileObj *v = (struct ProfileObj *)malloc(sizeof(struct ProfileObj));
     v->next = 0;
     v->var_4 = 0;
     v->var_c = 0;

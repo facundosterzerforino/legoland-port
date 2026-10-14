@@ -219,7 +219,7 @@ void *ReadMidiTrack(struct ResFile *file) {
     unsigned int chunkSize;
     unsigned int header;
 
-    track = (struct MidiTrack *)malloc(0x1c);
+    track = (struct MidiTrack *)malloc(sizeof(struct MidiTrack));
     RES_ReadFile(file, &header, 4);
     ReadBigEndianU32(file, &chunkSize);
     track->size = chunkSize;

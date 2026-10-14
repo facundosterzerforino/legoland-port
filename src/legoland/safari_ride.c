@@ -558,7 +558,7 @@ LEGO_EXPORT int SaveSafariRide(struct Element *element) {
         if (SaveGameWrite(&value1, 0x4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(current, 0x28) == 0) {
+        if (SaveGameWrite(current, sizeof(struct SafariNode)) == 0) {
             return 0;
         }
         current = current->next;
@@ -600,8 +600,8 @@ LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
         return 0;
     }
     while (marker != 0) {
-        struct SafariNode *node = (struct SafariNode *)malloc(0x28);
-        if (!SaveGameRead(node, 0x28)) {
+        struct SafariNode *node = (struct SafariNode *)malloc(sizeof(struct SafariNode));
+        if (!SaveGameRead(node, sizeof(struct SafariNode))) {
             return 0;
         }
         node->next = NULL;

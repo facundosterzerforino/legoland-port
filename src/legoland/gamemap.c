@@ -540,7 +540,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
 LEGO_EXPORT void DefaultCursor(struct Cursor *cursor) {
     unsigned int saved_1404 = cursor->tile_x;
     unsigned int saved_1408 = cursor->tile_y;
-    memset(cursor, 0, 0x1834);
+    memset(cursor, 0, sizeof(struct Cursor));
     cursor->tile_x = saved_1404;
     cursor->field_1828 = 0xc00;
     cursor->tile_y = saved_1408;

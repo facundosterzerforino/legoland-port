@@ -2238,7 +2238,7 @@ int Restaurant1_Save(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(node, 0xc) == 0) {
+        if (SaveGameWrite(node, sizeof(struct BrollyNode)) == 0) {
             return 0;
         }
         node = node->next;
@@ -2259,7 +2259,7 @@ int Restaurant1_Load(struct Element *element) {
     }
     while (count != 0) {
         node = malloc(sizeof(struct BrollyNode));
-        if (!SaveGameRead(node, 0xc)) {
+        if (!SaveGameRead(node, sizeof(struct BrollyNode))) {
             return 0;
         }
         node->next = NULL;
@@ -2285,7 +2285,7 @@ int Restaurant2_Save(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(node, 0x40) == 0) {
+        if (SaveGameWrite(node, sizeof(struct SaveBlock)) == 0) {
             return 0;
         }
         node = node->next;
@@ -2306,8 +2306,8 @@ int Restaurant2_Load(struct Element *element) {
         return 1;
     }
     while (count != 0) {
-        current = malloc(64);
-        if (!SaveGameRead(current, 64)) {
+        current = malloc(sizeof(struct SaveBlock));
+        if (!SaveGameRead(current, sizeof(struct SaveBlock))) {
             return 0;
         }
         current->next = 0;

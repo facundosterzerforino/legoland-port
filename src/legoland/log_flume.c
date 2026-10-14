@@ -1754,7 +1754,7 @@ void LogFlumeEntranceRemoveObject(Element *obj, TileId tile, struct Cursor *curs
         if (cur != NULL) {
             do {
                 next = cur->next;
-                memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, 20);
+                memcpy(&LogFlumeTrackRide->footprint, &LogFlumeFootprint, sizeof(struct Footprint));
                 LogFlumeTrackRide->footprint.x1--;
                 LogFlumeTrackRide->footprint.y1--;
                 cursor.tile_x = cur->tile.pos.x + LogFlumeFootprint.x0;
@@ -5376,13 +5376,13 @@ struct FlumeNode *FUN_00410a50(struct FlumeEntry *owner, struct FlumeEntry *entr
     SaveGameRead(&marker, 4);
     while (marker != 0) {
         if (cur == NULL) {
-            cur = malloc(0x38);
+            cur = malloc(sizeof(struct FlumeNode));
             head = cur;
         } else {
-            cur->next = malloc(0x38);
+            cur->next = malloc(sizeof(struct FlumeNode));
             cur = cur->next;
         }
-        SaveGameRead(cur, 0x38);
+        SaveGameRead(cur, sizeof(struct FlumeNode));
         cur->prev = prev;
         cur->owner = owner;
         cur->entry = entry;
@@ -5467,17 +5467,17 @@ int LogFlumeEntrance_Load(struct Element *element) {
     SaveGameRead(&marker, 4);
     while (marker != 0) {
         if (cur == NULL) {
-            cur = malloc(0xd4);
+            cur = malloc(sizeof(struct FlumeEntry));
             FlumeEntryList = cur;
             cur->next = NULL;
         } else {
-            cur->next = malloc(0xd4);
+            cur->next = malloc(sizeof(struct FlumeEntry));
             cur = cur->next;
         }
         head = FUN_00410a50(cur, NULL);
         FUN_00410bb0(head, head);
         FUN_00412490((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &queue);
-        SaveGameRead(cur, 0xd4);
+        SaveGameRead(cur, sizeof(struct FlumeEntry));
         cur->sub = (struct FlumeEntry *)head;
         cur->queue = queue;
         cur->field_8 = IndexToFlumeNode(head, (unsigned int)(UINT_PTR)cur->field_8);

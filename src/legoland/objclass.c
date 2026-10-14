@@ -804,7 +804,7 @@ void *GetBestNodeList(void) {
 struct BestNode *AddBestNode(void) {
     struct BestNode *node;
 
-    node = (struct BestNode *)malloc(0x24);
+    node = (struct BestNode *)malloc(sizeof(struct BestNode));
     node->field_20 = 0;
     node->field_1c = 0;
     node->next = DAT_0066b44c;

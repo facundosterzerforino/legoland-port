@@ -65,10 +65,10 @@ struct JoustObject {
 
 // FUNCTION: LEGOLAND 0x00407970
 struct JoustNode *AddJoustNode(TileId *key) {
-    struct JoustNode *node = (struct JoustNode *)malloc(0x24);
+    struct JoustNode *node = (struct JoustNode *)malloc(sizeof(struct JoustNode));
 
     if (node != NULL) {
-        memset(node, 0, 0x24);
+        memset(node, 0, sizeof(struct JoustNode));
         node->id.id = key->id;
         node->next = JoustNodeList;
         node->busy = 0;
@@ -752,7 +752,7 @@ LEGO_EXPORT int SaveJoust(struct Element *element) {
         if (!SaveGameWrite(&flag, 4)) {
             return 0;
         }
-        if (!SaveGameWrite(current, 0x24)) {
+        if (!SaveGameWrite(current, sizeof(struct JoustNode))) {
             return 0;
         }
         current = current->next;
@@ -782,8 +782,8 @@ LEGO_EXPORT int LoadJoust(struct Element *arg) {
         return 0;
     }
     while (marker != 0) {
-        struct JoustNode *node = (struct JoustNode *)malloc(0x24);
-        if (!SaveGameRead(node, 0x24)) {
+        struct JoustNode *node = (struct JoustNode *)malloc(sizeof(struct JoustNode));
+        if (!SaveGameRead(node, sizeof(struct JoustNode))) {
             return 0;
         }
         node->next = NULL;

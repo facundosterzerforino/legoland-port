@@ -1288,7 +1288,7 @@ void RunLevelScript(void) {
 struct NerpsListNode *FUN_0046b4f0(unsigned int param_1) {
     struct NerpsListNode *node;
 
-    node = (struct NerpsListNode *)malloc(0x14);
+    node = (struct NerpsListNode *)malloc(sizeof(struct NerpsListNode));
     if (node != NULL) {
         node->field_8 = 0;
         node->field_4 = param_1;
@@ -2230,7 +2230,7 @@ unsigned int SaveObjectiveEventList(struct ObjectiveEvent *node) {
         node->timestamp -= DAT_007fe994;
         // STRING: LEGOLAND 0x004ba808
         DBPrintf("Saving Event, Timestamp = %d\n", node->timestamp);
-        ok = SaveGameWrite(node, 0x44);
+        ok = SaveGameWrite(node, sizeof(struct ObjectiveEvent));
         node->timestamp += DAT_007fe994;
         if (ok == 0) {
             return 0;
@@ -2266,7 +2266,7 @@ struct ObjectiveEvent *LoadObjectiveEventList(void) {
     head = NULL;
     prev = NULL;
     node = AllocObjectiveEvent((unsigned int)(UINT_PTR)prev, (int)(INT_PTR)prev);
-    while (SaveGameRead(node, 0x44) != 0) {
+    while (SaveGameRead(node, sizeof(struct ObjectiveEvent)) != 0) {
         if ((unsigned int)(UINT_PTR)node->next == 0xffffffff) {
             free(node);
             if (prev != NULL) {

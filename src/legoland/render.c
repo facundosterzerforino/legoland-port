@@ -98,9 +98,9 @@ void *FUN_00486190(struct CursorKey *key) {
 
 // FUNCTION: LEGOLAND 0x004861d0
 struct CursorCacheNode *FUN_004861d0(void *value, const unsigned char *key) {
-    struct CursorCacheNode *node = (struct CursorCacheNode *)malloc(0xc);
+    struct CursorCacheNode *node = (struct CursorCacheNode *)malloc(sizeof(struct CursorCacheNode));
     if (node != 0) {
-        memset(node, 0, 0xc);
+        memset(node, 0, sizeof(struct CursorCacheNode));
         node->b = key[2];
         node->g = key[1];
         node->r = key[0];
@@ -149,7 +149,7 @@ void *FUN_00486280(int param_1, void *param_2) {
     if (cached != 0) {
         return cached;
     }
-    frame = (struct TextureFrame *)malloc(8);
+    frame = (struct TextureFrame *)malloc(sizeof(struct TextureFrame));
     if (frame != 0) {
         frame->field_0 = param_1;
         frame->data = (unsigned short *)malloc(param_1 * 2);

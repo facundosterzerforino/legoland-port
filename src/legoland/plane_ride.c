@@ -349,7 +349,7 @@ LEGO_EXPORT int SaveZoomer(struct Element *element) {
         if (!SaveGameWrite(&flag, 4)) {
             return 0;
         }
-        if (!SaveGameWrite(current, 36)) {
+        if (!SaveGameWrite(current, sizeof(struct PlaneRideNode))) {
             return 0;
         }
         current = current->next;
@@ -391,8 +391,8 @@ LEGO_EXPORT int LoadZoomer(struct Element *arg) {
         return 0;
     }
     while (marker != 0) {
-        struct PlaneRideNode *node = (struct PlaneRideNode *)malloc(0x24);
-        if (!SaveGameRead(node, 0x24)) {
+        struct PlaneRideNode *node = (struct PlaneRideNode *)malloc(sizeof(struct PlaneRideNode));
+        if (!SaveGameRead(node, sizeof(struct PlaneRideNode))) {
             return 0;
         }
         node->next = NULL;

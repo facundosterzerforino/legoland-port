@@ -4463,7 +4463,7 @@ void FUN_00423db0(void) {
 // FUNCTION: LEGOLAND 0x00423de0
 void FUN_00423de0(void) {
     struct Ride *v0 = DAT_00829bf8;
-    memcpy(&DAT_00829a80, &v0->footprint, 20);
+    memcpy(&DAT_00829a80, &v0->footprint, sizeof(struct Footprint));
     DAT_00829a80.next = &DAT_0060f914[1].fp;
     DAT_0060f914[DAT_00610a08].fp.next = 0;
 }

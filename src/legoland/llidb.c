@@ -646,8 +646,8 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         return NULL;
     }
 
-    obj = (struct Ride *)malloc(0xd0);
-    memset(obj, 0, 0xd0);
+    obj = (struct Ride *)malloc(sizeof(struct Ride));
+    memset(obj, 0, sizeof(struct Ride));
     if (obj == NULL) {
         return NULL;
     }
@@ -950,8 +950,8 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
         return NULL;
     }
 
-    obj = (struct Ride *)malloc(0xd0);
-    memset(obj, 0, 0xd0);
+    obj = (struct Ride *)malloc(sizeof(struct Ride));
+    memset(obj, 0, sizeof(struct Ride));
     if (obj == NULL) {
         RES_CloseFile(file);
         return NULL;
@@ -1062,7 +1062,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
         return NULL;
     }
 
-    si = (struct SpriteManager *)malloc(0x24);
+    si = (struct SpriteManager *)malloc(sizeof(struct SpriteManager));
     RES_ReadFile(file, &count, 4);
     si->data_c = (int *)malloc(count * 4);
     si->data_10 = (int *)malloc(count * 4);

@@ -1012,7 +1012,7 @@ int BoatingSchool_Save(struct Element *element) {
         for (i = 0; i < 5; i++) {
             scoreCopy.blokes[i] = (struct Bloke *)(INT_PTR)GetBlokeNum(scoreCopy.blokes[i]);
         }
-        SaveGameWrite(&scoreCopy, 0x34);
+        SaveGameWrite(&scoreCopy, sizeof(struct BoatRideNode));
         score = score->next;
     }
     count = 0;
@@ -1022,7 +1022,7 @@ int BoatingSchool_Save(struct Element *element) {
     path = BoatPathList;
     SaveGameWrite(&count, 4);
     while (count--) {
-        SaveGameWrite(path, 0x1c);
+        SaveGameWrite(path, sizeof(struct PathNode));
         path = path->next;
     }
     count = 0;
@@ -1032,7 +1032,7 @@ int BoatingSchool_Save(struct Element *element) {
     mer = MermaidList;
     SaveGameWrite(&count, 4);
     while (count--) {
-        SaveGameWrite(mer, 8);
+        SaveGameWrite(mer, sizeof(struct MermaidNode));
         mer = mer->next;
     }
     count = 0;
@@ -1044,7 +1044,7 @@ int BoatingSchool_Save(struct Element *element) {
     while (count--) {
         rideCopy = *ride;
         rideCopy.bloke = (struct Bloke *)(INT_PTR)GetBlokeNum(rideCopy.bloke);
-        SaveGameWrite(&rideCopy, 0x3f4);
+        SaveGameWrite(&rideCopy, sizeof(struct BoatRide));
         ride = ride->next;
     }
     return 1;
@@ -1076,7 +1076,7 @@ int BoatingSchool_Load(struct Element *element) {
             prevScore->next = score;
             prevScore = score;
         }
-        SaveGameRead(prevScore, 0x34);
+        SaveGameRead(prevScore, sizeof(struct BoatRideNode));
         for (i = 0; i < 5; i++) {
             prevScore->blokes[i] = GetBlokePtr((int)(INT_PTR)prevScore->blokes[i]);
         }
@@ -1084,26 +1084,26 @@ int BoatingSchool_Load(struct Element *element) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevPath == NULL) {
-            BoatPathList = (struct PathNode *)malloc(0x1c);
+            BoatPathList = (struct PathNode *)malloc(sizeof(struct PathNode));
             prevPath = BoatPathList;
         } else {
-            path = (struct PathNode *)malloc(0x1c);
+            path = (struct PathNode *)malloc(sizeof(struct PathNode));
             prevPath->next = path;
             prevPath = path;
         }
-        SaveGameRead(prevPath, 0x1c);
+        SaveGameRead(prevPath, sizeof(struct PathNode));
     }
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevMer == NULL) {
-            MermaidList = (struct MermaidNode *)malloc(8);
+            MermaidList = (struct MermaidNode *)malloc(sizeof(struct MermaidNode));
             prevMer = MermaidList;
         } else {
-            mer = (struct MermaidNode *)malloc(8);
+            mer = (struct MermaidNode *)malloc(sizeof(struct MermaidNode));
             prevMer->next = mer;
             prevMer = mer;
         }
-        SaveGameRead(prevMer, 8);
+        SaveGameRead(prevMer, sizeof(struct MermaidNode));
     }
     prevRide = BoatRideList;
     SaveGameRead(&count, 4);
@@ -1116,7 +1116,7 @@ int BoatingSchool_Load(struct Element *element) {
             prevRide->next = ride;
             prevRide = ride;
         }
-        SaveGameRead(prevRide, 0x3f4);
+        SaveGameRead(prevRide, sizeof(struct BoatRide));
         prevRide->bloke = GetBlokePtr((int)(INT_PTR)prevRide->bloke);
     }
     for (score = BoatRideNodeList; score != NULL; score = score->next) {
@@ -1230,7 +1230,7 @@ void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords) {
     tile.pos.x = coords[0];
     tile.pos.y = coords[1];
     FUN_0041c690(coords[0], coords[1], &owner);
-    node = (struct MermaidNode *)malloc(8);
+    node = (struct MermaidNode *)malloc(sizeof(struct MermaidNode));
     if (node == NULL) {
         return;
     }
@@ -1759,7 +1759,7 @@ void FUN_0041c4c0(int x, int y, int mask, unsigned short *owner) {
     tile.pos.y = y;
     node = FindBoatPathAt(x, y);
     if (node == NULL) {
-        node = (struct PathNode *)malloc(0x1c);
+        node = (struct PathNode *)malloc(sizeof(struct PathNode));
         if (node == NULL) {
             return;
         }

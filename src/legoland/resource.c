@@ -95,7 +95,7 @@ struct MasterDirNode *FindOrAddMasterDir(char *name) {
         }
     }
 
-    new_node = (struct MasterDirNode *)malloc(0xc);
+    new_node = (struct MasterDirNode *)malloc(sizeof(struct MasterDirNode));
     copy = (char *)malloc(strlen(name) + 1);
     new_node->name = copy;
     strcpy(copy, name);
@@ -157,7 +157,7 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
     master = FindOrAddMasterDir(buffer);
 
     if (node->is_dir == 0) {
-        entry = (struct ResVolEntry *)malloc(0x20);
+        entry = (struct ResVolEntry *)malloc(sizeof(struct ResVolEntry));
         entry->next_all = (struct ResVolEntry *)DAT_0079862c;
         DAT_0079862c = entry;
         entry->next_dir = (struct ResVolEntry *)master->entries;
@@ -206,7 +206,7 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
 
     HANDLE handle;
     HANDLE close_handle;
-    volume = (struct ResVolume *)malloc(0x28);
+    volume = (struct ResVolume *)malloc(sizeof(struct ResVolume));
     cur = MasterVolList;
 
     _splitpath(path, 0, 0, fname, 0);
@@ -346,7 +346,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFileFromVolume(const char *path, const char 
     while (entry != 0) {
         if (entry->dir == dir) {
             if (_stricmp(entry->name, last_bs) == 0) {
-                file = (struct ResFile *)malloc(0x10);
+                file = (struct ResFile *)malloc(sizeof(struct ResFile));
                 file->size = entry->size;
                 file->base = entry->base;
                 file->volume = entry->volume;
@@ -418,7 +418,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
 
     for (entry = (struct ResDirEntry *)dir->entries; entry != 0; entry = entry->next) {
         if (_stricmp(entry->name, file_name) == 0) {
-            file = (struct ResFile *)malloc(0x10);
+            file = (struct ResFile *)malloc(sizeof(struct ResFile));
             file->size = entry->size;
             file->base = entry->base;
             file->volume = entry->volume;

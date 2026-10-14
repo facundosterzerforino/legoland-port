@@ -568,7 +568,7 @@ int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
     int t;
 
     e = FUN_00412650(id);
-    b = (struct NewBloke *)malloc(0xd0);
+    b = (struct NewBloke *)malloc(sizeof(struct NewBloke));
     if (b == 0) {
         return -1;
     }

@@ -2829,7 +2829,7 @@ void FUN_00462c00(struct OverlayParam *param) {
         current = current->next;
     }
     if (OverlayILF != 0) {
-        node = (struct Overlay *)malloc(0x24);
+        node = (struct Overlay *)malloc(sizeof(struct Overlay));
         node->next = 0;
         if (current != 0) {
             current->next = node;

@@ -69,11 +69,11 @@ struct SlotArray {
 
 // FUNCTION: LEGOLAND 0x004158f0
 int AddSpiderNode(TileId *key) {
-    struct SpiderNode *node = (struct SpiderNode *)malloc(0x30);
+    struct SpiderNode *node = (struct SpiderNode *)malloc(sizeof(struct SpiderNode));
     if (node == NULL) {
         return;
     }
-    memset(node, 0, 0x30);
+    memset(node, 0, sizeof(struct SpiderNode));
     node->tile_id = key->id;
     node->next = SpiderNodeList;
     SpiderNodeList = node;
@@ -598,7 +598,7 @@ LEGO_EXPORT int SaveSpider(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(node, 0x30) == 0) {
+        if (SaveGameWrite(node, sizeof(struct SpiderNode)) == 0) {
             return 0;
         }
         node = node->next;
@@ -636,8 +636,8 @@ LEGO_EXPORT int LoadSpider(struct Element *arg) {
         return 0;
     }
     while (marker != 0) {
-        struct SpiderNode *node = (struct SpiderNode *)malloc(0x30);
-        if (!SaveGameRead(node, 0x30)) {
+        struct SpiderNode *node = (struct SpiderNode *)malloc(sizeof(struct SpiderNode));
+        if (!SaveGameRead(node, sizeof(struct SpiderNode))) {
             return 0;
         }
         node->next = NULL;

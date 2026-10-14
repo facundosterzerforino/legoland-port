@@ -66,7 +66,7 @@ struct NeighborResult {
 
 // FUNCTION: LEGOLAND 0x004132a0
 void FUN_004132a0(TileId tile, int param_2, int param_3, unsigned int param_4, unsigned int param_5) {
-    struct RoadQueueEntry *entry = malloc(0x20);
+    struct RoadQueueEntry *entry = malloc(sizeof(struct RoadQueueEntry));
 
     entry->field_8 = tile.id;
     entry->x = param_2;

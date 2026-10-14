@@ -801,7 +801,7 @@ LEGO_EXPORT int SaveJailCells(struct Element *element) {
         if (SaveGameWrite(&marker, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(cell, 0x1c) == 0) {
+        if (SaveGameWrite(cell, sizeof(struct JailCell)) == 0) {
             return 0;
         }
         cell = cell->next;
@@ -818,8 +818,8 @@ LEGO_EXPORT int LoadJailCells(struct Element *element) {
         return 0;
     }
     while (marker != 0) {
-        struct JailCell *cell = malloc(0x1c);
-        if (SaveGameRead(cell, 0x1c) == 0) {
+        struct JailCell *cell = malloc(sizeof(struct JailCell));
+        if (SaveGameRead(cell, sizeof(struct JailCell)) == 0) {
             return 0;
         }
         cell->next = NULL;

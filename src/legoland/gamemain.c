@@ -199,7 +199,7 @@ struct GameMainNode *FUN_004777f0(struct Point *pos, int *result) {
         return node;
     }
     *result = 0;
-    node = (struct GameMainNode *)malloc(0x28);
+    node = (struct GameMainNode *)malloc(sizeof(struct GameMainNode));
     if (pos->x >= 0 && pos->x < lpConfig->width && pos->y >= 0 && pos->y < lpConfig->height) {
         tile = &GameMap[pos->y][pos->x];
     } else {

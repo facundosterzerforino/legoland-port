@@ -686,7 +686,7 @@ void MonkeyTreeAddObject(struct Element *param_1, int *param_2) {
     temp[1] = (unsigned char)param_2[1];
     coord = *(unsigned short *)temp;
     FUN_00436fb0(param_2[0], param_2[1], (unsigned short *)&local_4);
-    obj = (struct JungleObj *)malloc(8);
+    obj = (struct JungleObj *)malloc(sizeof(struct JungleObj));
     if (obj != NULL) {
         obj->tile.id = coord;
         obj->owner = (unsigned short)local_4;

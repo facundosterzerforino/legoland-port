@@ -583,7 +583,7 @@ int DrivingSchool_Save(struct Element *element) {
     countNode = (struct CountNode *)DrivingSchoolCountList;
     SaveGameWrite(&count, 4);
     while (count--) {
-        SaveGameWrite(countNode, 0xc);
+        SaveGameWrite(countNode, sizeof(struct CountNode));
         countNode = countNode->next;
     }
 
@@ -605,7 +605,7 @@ int DrivingSchool_Save(struct Element *element) {
     pump = (struct PumpNode *)PumpList;
     SaveGameWrite(&count, 4);
     while (count--) {
-        SaveGameWrite(pump, 0x10);
+        SaveGameWrite(pump, sizeof(struct PumpNode));
         pump = pump->next;
     }
 
@@ -678,11 +678,11 @@ int DrivingSchool_Load(struct Element *element) {
             DrivingSchoolCountList = (struct CountNode *)malloc(0xc);
             countPrev = DrivingSchoolCountList;
         } else {
-            countNode = (struct CountNode *)malloc(0xc);
+            countNode = (struct CountNode *)malloc(sizeof(struct CountNode));
             countPrev->next = countNode;
             countPrev = countNode;
         }
-        SaveGameRead(countPrev, 0xc);
+        SaveGameRead(countPrev, sizeof(struct CountNode));
     }
 
     DAT_004cbeac = NULL;
@@ -706,11 +706,11 @@ int DrivingSchool_Load(struct Element *element) {
             PumpList = (struct PumpNode *)malloc(0x10);
             pumpPrev = PumpList;
         } else {
-            pumpNode = (struct PumpNode *)malloc(0x10);
+            pumpNode = (struct PumpNode *)malloc(sizeof(struct PumpNode));
             pumpPrev->next = pumpNode;
             pumpPrev = pumpNode;
         }
-        SaveGameRead(pumpPrev, 0x10);
+        SaveGameRead(pumpPrev, sizeof(struct PumpNode));
     }
 
     DAT_004c10d4 = NULL;

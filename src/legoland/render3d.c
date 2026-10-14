@@ -246,10 +246,10 @@ LEGO_EXPORT struct RinData *LoadRin(const char *path, const char *dir) {
     int i;
     int j;
 
-    rin = (struct RinData *)malloc(0x20);
+    rin = (struct RinData *)malloc(sizeof(struct RinData));
     file = RES_OpenFile(path);
     if (file != NULL) {
-        memset(rin, 0, 0x20);
+        memset(rin, 0, sizeof(struct RinData));
         RES_ReadFile(file, &rin->sprite_count, 4);
         rin->sprites = (struct Sprite **)malloc(rin->sprite_count << 2);
         i = 0;

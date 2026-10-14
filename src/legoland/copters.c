@@ -943,7 +943,7 @@ LEGO_EXPORT int Copters_Save(struct Element *element) {
                     node->layer[i].rider = NULL;
                 }
             }
-            if (SaveGameWrite(node, 0xd8) == 0) {
+            if (SaveGameWrite(node, sizeof(struct CopterNode)) == 0) {
                 return 0;
             }
             for (i = 0; i < 6; i++) {

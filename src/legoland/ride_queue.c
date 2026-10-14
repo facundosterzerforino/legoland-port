@@ -149,7 +149,7 @@ void QueueUnlinkHead(struct Queue *queue) {
 
 // FUNCTION: LEGOLAND 0x00411f20
 void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
-    struct QueueNode *node = (struct QueueNode *)malloc(8);
+    struct QueueNode *node = (struct QueueNode *)malloc(sizeof(struct QueueNode));
     if (node != NULL) {
         memset(node, 0, sizeof(*node));
         node->field_4 = mid;
@@ -399,10 +399,10 @@ void FUN_00412490(struct QueueNode *start, struct Queue *queue) {
     SaveGameRead(&n, 4);
     while (n-- != 0) {
         if (queue->tail == NULL) {
-            queue->tail = (struct QueueNode *)malloc(8);
+            queue->tail = (struct QueueNode *)malloc(sizeof(struct QueueNode));
             queue->head = queue->tail;
         } else {
-            queue->tail->next = (struct QueueNode *)malloc(8);
+            queue->tail->next = (struct QueueNode *)malloc(sizeof(struct QueueNode));
             queue->tail = queue->tail->next;
         }
         queue->tail->next = NULL;

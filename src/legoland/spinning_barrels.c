@@ -24,11 +24,11 @@ struct BarrelSource {
 
 // FUNCTION: LEGOLAND 0x0043bdb0
 void FUN_0043bdb0(void *param1) {
-    struct BarrelNode *block = (struct BarrelNode *)malloc(0x34);
+    struct BarrelNode *block = (struct BarrelNode *)malloc(sizeof(struct BarrelNode));
     if (block == NULL) {
         return;
     }
-    memset(block, 0, 0x34);
+    memset(block, 0, sizeof(struct BarrelNode));
     block->tile_id = ((struct BarrelSource *)param1)->field_0;
     block->frame = 0;
     block->next = SpinningBarrelList;
@@ -300,7 +300,7 @@ LEGO_EXPORT int SaveSBarrel(struct Element *element) {
     if (node != NULL) {
         do {
             if (SaveGameWrite(&marker, 4)) {
-                if (SaveGameWrite(node, 0x34)) {
+                if (SaveGameWrite(node, sizeof(struct BarrelNode))) {
                     node = node->next;
                 } else {
                     return 0;
@@ -344,8 +344,8 @@ LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
         return 0;
     }
     while (marker != 0) {
-        struct BarrelNode *node = (struct BarrelNode *)malloc(0x34);
-        if (!SaveGameRead(node, 0x34)) {
+        struct BarrelNode *node = (struct BarrelNode *)malloc(sizeof(struct BarrelNode));
+        if (!SaveGameRead(node, sizeof(struct BarrelNode))) {
             return 0;
         }
         node->next = NULL;

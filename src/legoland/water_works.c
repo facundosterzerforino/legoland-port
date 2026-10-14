@@ -814,7 +814,7 @@ LEGO_EXPORT int Save_WaterBlock(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(current, 12) == 0) {
+        if (SaveGameWrite(current, sizeof(struct WaterListItem)) == 0) {
             return 0;
         }
         current = current->next;
@@ -833,8 +833,8 @@ LEGO_EXPORT int Load_WaterBlock(struct Element *element) {
         return 0;
     }
     while (count != 0) {
-        node = (struct WaterNode *)malloc(12);
-        if (SaveGameRead(node, 12) == 0) {
+        node = (struct WaterNode *)malloc(sizeof(struct WaterNode));
+        if (SaveGameRead(node, sizeof(struct WaterNode)) == 0) {
             return 0;
         }
         node->next = NULL;
@@ -864,7 +864,7 @@ LEGO_EXPORT int Save_ElephantF(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(current, 12) == 0) {
+        if (SaveGameWrite(current, sizeof(struct WaterListItem)) == 0) {
             return 0;
         }
         current = current->next;
@@ -883,8 +883,8 @@ LEGO_EXPORT int Load_ElephantF(struct Element *element) {
         return 0;
     }
     while (count != 0) {
-        node = (struct WaterNode *)malloc(12);
-        if (SaveGameRead(node, 12) == 0) {
+        node = (struct WaterNode *)malloc(sizeof(struct WaterNode));
+        if (SaveGameRead(node, sizeof(struct WaterNode)) == 0) {
             return 0;
         }
         node->next = NULL;

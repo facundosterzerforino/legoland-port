@@ -346,7 +346,7 @@ void FUN_00482240(int x, int y, struct DirNode *parent) {
         return;
     }
 
-    node = malloc(16);
+    node = malloc(sizeof(struct DirNode));
     if (node == 0) {
         return;
     }
@@ -364,7 +364,7 @@ void FUN_00482240(int x, int y, struct DirNode *parent) {
 struct DirNode *FUN_00482300(unsigned int x, unsigned int y) {
     struct DirNode *node;
 
-    node = malloc(16);
+    node = malloc(sizeof(struct DirNode));
     if (node != NULL) {
         node->next = DAT_0066b458;
         DAT_0066b458 = node;
@@ -532,7 +532,7 @@ void FUN_00482620(int x, int y, struct DirNode *parent) {
         return;
     }
 
-    node = malloc(16);
+    node = malloc(sizeof(struct DirNode));
     node->next = DirSearchNodeList;
     DirSearchNodeList = node;
     node->parent = parent;
@@ -655,7 +655,7 @@ int FUN_00482920(void) {
     }
 
     while (count-- != 0) {
-        node = malloc(0x24);
+        node = malloc(sizeof(struct BestNode));
         node->next = DAT_0066b44c;
         DAT_0066b44c = node;
         if (SaveGameRead(&node->x_min, 0x14) == 0) {

@@ -92,9 +92,9 @@ static struct Point Gold_Points[3] = {{0x400, 0x60}, {0x400, 0x3d0}, {0x400, 0x7
 
 // FUNCTION: LEGOLAND 0x00406920
 void AddGoldWashNode(struct GoldNode *src) {
-    struct GoldNode *node = (struct GoldNode *)malloc(0x2c);
+    struct GoldNode *node = (struct GoldNode *)malloc(sizeof(struct GoldNode));
     if (node != NULL) {
-        memset(node, 0, 0x2c);
+        memset(node, 0, sizeof(struct GoldNode));
         node->key = src->key;
         node->next = GoldWashList;
         GoldWashList = node;
@@ -590,7 +590,7 @@ LEGO_EXPORT int SaveGoldWash(struct Element *element) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(node, 0x2c) == 0) {
+        if (SaveGameWrite(node, sizeof(struct GoldNode)) == 0) {
             return 0;
         }
         node = node->next;
@@ -608,8 +608,8 @@ LEGO_EXPORT int LoadGoldWash(struct Element *element) {
         return 0;
     }
     while (count != 0) {
-        node = malloc(0x2c);
-        if (!SaveGameRead(node, 0x2c)) {
+        node = malloc(sizeof(struct GoldNode));
+        if (!SaveGameRead(node, sizeof(struct GoldNode))) {
             return 0;
         }
         node->next = NULL;

@@ -38,7 +38,7 @@ LEGO_EXPORT struct Position *LoadPos(const char *path) {
     struct PosFrame *volatile frames; /* volatile: the original re-reads this from its stack slot */
 
     file = RES_OpenFile(path);
-    pos = (struct Position *)malloc(0x28);
+    pos = (struct Position *)malloc(sizeof(struct Position));
     pos->field_8 = 1.0f;
     pos->field_c = 1.0f;
     pos->field_10 = 1.0f;
@@ -151,9 +151,9 @@ LEGO_EXPORT struct Person *Find3DPersonFromBloke(struct Bloke *bloke) {
 struct Person *FUN_0043f8c0(struct Bloke *param_1, unsigned int param_2) {
     struct Person *person;
 
-    person = malloc(0x94);
+    person = malloc(sizeof(struct Person));
     if (person != 0) {
-        memset(person, 0, 0x94);
+        memset(person, 0, sizeof(struct Person));
         if (param_2 == 1) {
             person->random = rand() & 1;
         } else {

@@ -284,7 +284,7 @@ int EarthSlideRide_Save(struct Element *element) {
     node = EarthNodeHead;
     terminator = 0;
     while (node != NULL) {
-        if (SaveGameWrite(&flag, 4) == 0 || SaveGameWrite(node, 0x24) == 0) {
+        if (SaveGameWrite(&flag, 4) == 0 || SaveGameWrite(node, sizeof(struct EarthNode)) == 0) {
             return 0;
         }
         count = 0;
@@ -338,7 +338,7 @@ int EarthSlideRide_Load(struct Element *element) {
             node->next = next;
             node = next;
         }
-        if (SaveGameRead(node, 0x24) == 0) {
+        if (SaveGameRead(node, sizeof(struct EarthNode)) == 0) {
             return 0;
         }
         if (SaveGameRead(&count, 4) == 0) {
