@@ -2083,7 +2083,7 @@ struct Sprite *BZBlueCarM1Sprite;
 struct BalloonNode *BalloonNodeList;
 
 // GLOBAL: LEGOLAND 0x00616068
-void *CarouselLayer;
+struct Sprite *CarouselLayer;
 
 // GLOBAL: LEGOLAND 0x0061606c
 struct Sprite *CarouselEntranceMatteSprite;
@@ -2113,7 +2113,7 @@ void *DAT_00616090[3]; /* carousel BinVs (on, ride, off), indexed by the saved p
 struct Sprite *ZCarouselSprite;
 
 // GLOBAL: LEGOLAND 0x006160bc
-struct CarouselRide *DAT_006160bc;
+struct Ride *DAT_006160bc;
 
 // GLOBAL: LEGOLAND 0x006160c0
 struct Sprite *DAT_006160c0;
@@ -2173,7 +2173,7 @@ struct Sprite *EntranceMatte4Sprite;
 struct Sprite *Booth1Sprite;
 
 // GLOBAL: LEGOLAND 0x00616118
-unsigned int EateryLayerOwner;
+struct Sprite *EateryLayerOwner;
 
 // GLOBAL: LEGOLAND 0x00616120
 struct RideSpriteInfo DAT_00616120;
@@ -2983,7 +2983,7 @@ unsigned int DAT_0066872c[0x15];
 unsigned int DAT_00668780;
 
 // GLOBAL: LEGOLAND 0x00668784
-void *ScriptEventList;
+struct ObjectiveEvent *ScriptEventList;
 
 // GLOBAL: LEGOLAND 0x00668788
 unsigned int ScriptPurgePending;
@@ -2998,10 +2998,10 @@ unsigned int ScriptSectionStarted;
 unsigned int ScriptEvalTime;
 
 // GLOBAL: LEGOLAND 0x00668798
-void *ScriptSectionList;
+struct NerpsListNode *ScriptSectionList;
 
 // GLOBAL: LEGOLAND 0x0066879c
-unsigned int CurrentScriptSection;
+struct NerpsListNode *CurrentScriptSection;
 
 // GLOBAL: LEGOLAND 0x006687a0
 unsigned int ScriptLoadErrorCount;
@@ -4477,7 +4477,7 @@ unsigned char CastleThemeCount;
 unsigned char AdventurersThemeCount;
 
 // GLOBAL: LEGOLAND 0x007fe120
-unsigned int ScriptStringTable[512];
+char *ScriptStringTable[512];
 
 // GLOBAL: LEGOLAND 0x007fe920
 unsigned int DAT_007fe920;
@@ -5092,19 +5092,19 @@ void *DAT_0081cd04;
 void *HedgeObjectClass;
 
 // GLOBAL: LEGOLAND 0x0081cd0c
-unsigned int CastleBBQRide;
+struct Ride *CastleBBQRide;
 
 // GLOBAL: LEGOLAND 0x0081cd10
-unsigned int CastleBBQLayer;
+struct Sprite *CastleBBQLayer;
 
 // GLOBAL: LEGOLAND 0x0081cd14
-unsigned int FoodcartDrinkRide;
+struct Ride *FoodcartDrinkRide;
 
 // GLOBAL: LEGOLAND 0x0081cd18
-struct EateryFX *SharkCafeRide;
+struct Ride *SharkCafeRide;
 
 // GLOBAL: LEGOLAND 0x0081cd1c
-struct EateryFX *OctopusCafeRide;
+struct Ride *OctopusCafeRide;
 
 // GLOBAL: LEGOLAND 0x0081cd20
 struct Sprite *R2TowermSprite;
@@ -5113,25 +5113,25 @@ struct Sprite *R2TowermSprite;
 struct Sprite *RestMaskMainSprite;
 
 // GLOBAL: LEGOLAND 0x0081cd2c
-unsigned int EateryFxInner;
+struct Sprite *EateryFxInner;
 
 // GLOBAL: LEGOLAND 0x0081cd30
-unsigned int Restaurant2Ride;
+struct Ride *Restaurant2Ride;
 
 // GLOBAL: LEGOLAND 0x0081cd34
 struct Sprite *R2FdoormSprite;
 
 // GLOBAL: LEGOLAND 0x0081cd38
-struct EateryFX *DAT_0081cd38;
+struct Ride *DAT_0081cd38;
 
 // GLOBAL: LEGOLAND 0x0081cd3c
-unsigned int FoodcartFoodRide;
+struct Ride *FoodcartFoodRide;
 
 // GLOBAL: LEGOLAND 0x0081cd40
-unsigned int Restaurant1Ride;
+struct Ride *Restaurant1Ride;
 
 // GLOBAL: LEGOLAND 0x0081cd44
-struct EateryFX *ChuckWagonRide;
+struct Ride *ChuckWagonRide;
 
 // GLOBAL: LEGOLAND 0x0081cd48
 struct Sprite *R2Fdoorm1Sprite;
@@ -5227,7 +5227,7 @@ struct Sprite *OctTabHASprite;
 struct Sprite *OctTabHBSprite;
 
 // GLOBAL: LEGOLAND 0x0081cde0
-struct EateryFX *FoodcartIcecreamRide;
+struct Ride *FoodcartIcecreamRide;
 
 // GLOBAL: LEGOLAND 0x0081cde4
 struct Ride *BalloonzRide;

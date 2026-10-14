@@ -2,6 +2,8 @@
 
 #include "legoland.h"
 
+struct Element;
+
 struct Cursor;
 
 /* Earth-slide class node (one 0x24 allocation), head at EarthNodeHead. */
@@ -61,7 +63,7 @@ void LoadEarthSlideResources(struct EarthRideObj *param_1);
 void UnloadEarthSlideResources(struct EarthRideObj *arg1);
 void EarthSlideSetEditMode();
 void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned int param_3);
-void EarthSlideAddObject(unsigned int param_1, unsigned char *param_2);
+void EarthSlideAddObject(struct Element *param_1, unsigned char *param_2);
 int EarthSlideRide_Save(void);
 int EarthSlideRide_Load(void);
 void EarthSlideRideUpdate(struct Element *obj);

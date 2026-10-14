@@ -854,7 +854,7 @@ unsigned int *GetShopSpriteInfo(struct ShopRideObject *obj, unsigned short param
 
 // FUNCTION: LEGOLAND 0x0043a3d0
 void RemoveObjectAndBlokes(struct ShopRideObject *obj, TileId tile, void *param_3) {
-    StandardRemoveObject((unsigned int)obj, tile, (unsigned int)param_3);
+    StandardRemoveObject(obj, tile, (unsigned int)param_3);
     RemoveAllBlokesFromRide((unsigned int)obj->building, tile);
 }
 

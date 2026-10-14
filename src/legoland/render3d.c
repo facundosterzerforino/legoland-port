@@ -346,7 +346,7 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
         }
         frame = (int *)param_1->index_array[sprite_id];
         if (frame != NULL) {
-            LLSSetFrame((struct LLS *)GetLLSForSprite((struct SpriteLLS *)frame), param_2);
+            LLSSetFrame(GetLLSForSprite((struct Sprite *)frame), param_2);
         }
         offset.x = param_1->x;
         y = param_1->y;
@@ -359,17 +359,12 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
     }
 }
 
-struct SpriteLLS {
-    unsigned char pad_0[8];
-    unsigned int *field_8;
-};
-
 // FUNCTION: LEGOLAND 0x00441e80
-LEGO_EXPORT unsigned int GetLLSForSprite(struct SpriteLLS *sprite) {
+LEGO_EXPORT struct LLS *GetLLSForSprite(struct Sprite *sprite) {
     if (sprite != NULL) {
-        return *sprite->field_8;
+        return *sprite->lls;
     }
-    return 0;
+    return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00441ea0
@@ -397,7 +392,7 @@ LEGO_EXPORT struct Point GetRenderOffsetForLayer(struct Sprite *sprite, int inde
 
 // FUNCTION: LEGOLAND 0x00441f00
 LEGO_EXPORT void StopLayerPlaying(struct Sprite *sprite, unsigned int index) {
-    LLSStop((unsigned int)GetLLSForLayer(sprite, index));
+    LLSStop((struct LLS *)GetLLSForLayer(sprite, index));
 }
 
 #pragma intrinsic(memset)

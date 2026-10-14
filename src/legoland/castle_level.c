@@ -176,7 +176,7 @@ void CastleLevelRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x00403060
-void CastleLevelAddObject(unsigned int param1, unsigned int param2) {
+void CastleLevelAddObject(struct Element *param1, unsigned int param2) {
     AddBasicObject(param1, param2);
 }
 

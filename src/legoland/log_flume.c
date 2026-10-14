@@ -1439,7 +1439,7 @@ void LogFlumeEntranceLoad(Element *elem) {
     // STRING: LEGOLAND 0x004b4998
     LogFlumeBarrelMatteSprite = LoadSprite("barrelmatte.lls", 1);
     if (LogFlumeBarrelSprite != NULL) {
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeBarrelSprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeBarrelSprite);
         if (lls != NULL) {
             LLSPlay(lls, (unsigned int)LogFlumeBarrelSprite->image);
         }
@@ -1960,11 +1960,11 @@ void DrawLogFlumeBarrel(struct FlumeSlot *slot, struct FlumeEntry *other, int dr
             struct LLS *lls;
 
             frame = 0;
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)spriteB);
+            lls = GetLLSForSprite((struct Sprite *)spriteB);
             if (lls != NULL) {
                 frame = lls->frame;
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)spriteA);
+            lls = GetLLSForSprite((struct Sprite *)spriteA);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -2086,11 +2086,11 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
     if (ok) {
         struct Point off;
         int frame;
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer(ride->layer, 0));
+        lls = GetLLSForSprite((struct Sprite *)GetSpriteForLayer(ride->layer, 0));
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEnta3MSprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeEnta3MSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -2135,13 +2135,13 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
         lls = NULL;
         sprite = GetSpriteForLayer(ride->layer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
         }
         if (lls != NULL) {
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance3Sprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeEntrance3Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -2167,13 +2167,13 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
         lls = NULL;
         sprite = GetSpriteForLayer(ride->layer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
         }
         if (lls != NULL) {
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance1Sprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeEntrance1Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -2196,13 +2196,13 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
         lls = NULL;
         sprite = GetSpriteForLayer(ride->layer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
         }
         if (lls != NULL) {
             frame = lls->frame;
         }
         AdjustOffsetForViewMode(&off);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeEntrance2Sprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeEntrance2Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -2229,12 +2229,12 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
         lls = NULL;
         sprite = GetSpriteForLayer(ride->layer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
         }
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSignSprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeSignSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -2824,7 +2824,7 @@ void LogFlumeTrackDCalcCursor(int unused, struct Point *pt) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c780
-void LogFlumeTrackAddObject(int unused, struct Point *pt) {
+void LogFlumeTrackAddObject(struct Element *unused, struct Point *pt) {
     TileId t;
     int coords[2];
     struct FlumeEntry *entry;
@@ -2915,7 +2915,7 @@ struct RideSpriteInfo *GetLogFlumeTrackSpriteInfo(int unused, TileId tile) {
         DAT_004c74d8.x = LogFlumeImageList->offset_x[(unsigned char)idx] >> 1;
         DAT_004c74d8.y = LogFlumeImageList->offset_y[(unsigned char)idx] >> 1;
         DAT_004c74d8.field_10 = 0;
-        lls = GetLLSForSprite((struct SpriteLLS *)spr);
+        lls = GetLLSForSprite((struct Sprite *)spr);
         if (lls != 0) {
             LLSStop(lls);
             LLSSetFrame((struct LLS *)lls, entry->parent->submode);
@@ -3625,8 +3625,8 @@ void FUN_0040da10(struct Context *a, struct LinkList *list) {
 }
 
 // FUNCTION: LEGOLAND 0x0040db00
-void FUN_0040db00(unsigned int param_1, unsigned int param_2, unsigned int param_3, FlumeCallback param_4) {
-    struct FlumeEntry *entry = FindFlumeSubEntryByTile((TileId *)&param_2);
+void FUN_0040db00(struct Element *param_1, TileId param_2, struct Cursor *param_3, FlumeCallback param_4) {
+    struct FlumeEntry *entry = FindFlumeSubEntryByTile(&param_2);
     struct Footprint *fp;
     TileId t;
     struct InputBuffer buf;
@@ -3635,8 +3635,8 @@ void FUN_0040db00(unsigned int param_1, unsigned int param_2, unsigned int param
     if (entry != NULL) {
         FUN_004119a0((struct ParticleEmitter *)entry->parent, -3);
         FUN_0040d090(entry, &fp, &t);
-        ((struct Cursor *)param_3)->footprint = *fp;
-        StandardRemoveObject((Element *)param_1, t, (struct Cursor *)param_3);
+        param_3->footprint = *fp;
+        StandardRemoveObject(param_1, t, param_3);
         param_4(*(struct FlumeXY *)&t, (unsigned int *)&buf);
         FUN_0040cf10(&buf, &list);
         FUN_0040da10((struct Context *)entry, (struct LinkList *)list);
@@ -4316,7 +4316,7 @@ void LogFlumeSpecialCorner4UnloadSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0040ead0
-void LogFlumeSpecialCorner1AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner1AddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4327,7 +4327,7 @@ void LogFlumeSpecialCorner1AddObject(unsigned int param_1, struct FlumeBytes *pa
 }
 
 // FUNCTION: LEGOLAND 0x0040eb40
-void LogFlumeSpecialCorner2AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner2AddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4338,7 +4338,7 @@ void LogFlumeSpecialCorner2AddObject(unsigned int param_1, struct FlumeBytes *pa
 }
 
 // FUNCTION: LEGOLAND 0x0040ebb0
-void LogFlumeSpecialCorner3AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner3AddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4349,7 +4349,7 @@ void LogFlumeSpecialCorner3AddObject(unsigned int param_1, struct FlumeBytes *pa
 }
 
 // FUNCTION: LEGOLAND 0x0040ec20
-void LogFlumeSpecialCorner4AddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeSpecialCorner4AddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     unsigned int local[5];
     *((unsigned char *)&packed) = param_2->b0;
@@ -4360,27 +4360,25 @@ void LogFlumeSpecialCorner4AddObject(unsigned int param_1, struct FlumeBytes *pa
 }
 
 // FUNCTION: LEGOLAND 0x0040ec90
-void LogFlumeSpecialCorner1RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner1RemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     DAT_004c2af4 = 0;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
 }
 
 // FUNCTION: LEGOLAND 0x0040ecc0
-unsigned int LogFlumeSpecialCorner2RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner2RemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     DAT_004c2af4 = 1;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
-    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ecf0
-unsigned int LogFlumeSpecialCorner3RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner3RemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     DAT_004c2af4 = 2;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
-    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x0040ed20
-void LogFlumeSpecialCorner4RemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeSpecialCorner4RemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     DAT_004c2af4 = 3;
     FUN_0040db00(param_1, param_2, param_3, FUN_0040e440);
 }
@@ -4410,15 +4408,15 @@ void RenderLogFlumeSpecialCorner1(Element *elem, unsigned int param_2, unsigned 
 
     DAT_004c2af4 = 0;
     pos = GetScreenCoordsForObject(tile, ride);
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
+    lls = GetLLSForSprite((struct Sprite *)ride->layer);
     if (lls != NULL) {
         frame = lls->frame;
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc1M1Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeFc1M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc1M2Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeFc1M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -4442,11 +4440,11 @@ void RenderLogFlumeSpecialCorner2(Element *elem, unsigned int param_2, unsigned 
     entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         frame = 0;
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
+        lls = GetLLSForSprite((struct Sprite *)ride->layer);
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc2M1Sprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeFc2M1Sprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -4468,15 +4466,15 @@ void RenderLogFlumeSpecialCorner3(Element *elem, unsigned int param_2, unsigned 
 
     DAT_004c2af4 = 2;
     frame = 0;
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
+    lls = GetLLSForSprite((struct Sprite *)ride->layer);
     if (lls != NULL) {
         frame = lls->frame;
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc3M1Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeFc3M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc3M2Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeFc3M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -4501,11 +4499,11 @@ void RenderLogFlumeSpecialCorner4(Element *elem, unsigned int param_2, unsigned 
     entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         frame = 0;
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
+        lls = GetLLSForSprite((struct Sprite *)ride->layer);
         if (lls != NULL) {
             frame = lls->frame;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeFc4MSprite);
+        lls = GetLLSForSprite((struct Sprite *)LogFlumeFc4MSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -4648,9 +4646,9 @@ void RenderLogFlumeTunnel(Element *elem, unsigned int param_2, unsigned int para
     entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         if (LogFlumeTunelMSprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ride->layer);
+            lls = GetLLSForSprite((struct Sprite *)ride->layer);
             frame = lls != NULL ? lls->frame : frame;
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeTunelMSprite);
+            lls = GetLLSForSprite((struct Sprite *)LogFlumeTunelMSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -4674,7 +4672,7 @@ void LogFlumeTunnelCalcCursor(unsigned int param_1, unsigned int param_2, unsign
 }
 
 // FUNCTION: LEGOLAND 0x0040f540
-void LogFlumeTunnelAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeTunnelAddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -4682,7 +4680,7 @@ void LogFlumeTunnelAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f580
-void LogFlumeTunnelRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeTunnelRemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040f360);
 }
 
@@ -4806,11 +4804,11 @@ void RenderLogFlumeCsaw(Element *elem, unsigned int param_2, unsigned int param_
     entry = FindFlumeSubEntryByTile(tile);
     if (FUN_0040cdf0(tile)) {
         if (LogFlumeCsaw2MSprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer(ride->layer, 1));
+            lls = GetLLSForSprite((struct Sprite *)GetSpriteForLayer(ride->layer, 1));
             if (lls != NULL) {
                 frame = lls->frame;
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeCsaw2MSprite);
+            lls = GetLLSForSprite((struct Sprite *)LogFlumeCsaw2MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -4842,7 +4840,7 @@ void LogFlumeCsawDCalcCursor(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fa60
-void LogFlumeCsawAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeCsawAddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -4851,9 +4849,8 @@ void LogFlumeCsawAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fab0
-unsigned int LogFlumeCsawRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeCsawRemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040f830);
-    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 #define NEW_FLUME_NODE(node, parent, mode_, submode_, y_, x_) \
@@ -5018,16 +5015,16 @@ void RenderLogFlumeHoldUp(Element *elem, unsigned int param_2, unsigned int para
     frame = 0;
     sprite = GetSpriteForLayer(ride->layer, 1);
     if (sprite != NULL) {
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+        lls = GetLLSForSprite((struct Sprite *)sprite);
         if (lls != NULL) {
             frame = lls->frame;
         }
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeHup1M1Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeHup1M1Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeHup1M2Sprite);
+    lls = GetLLSForSprite((struct Sprite *)LogFlumeHup1M2Sprite);
     if (lls != NULL) {
         LLSSetFrame(lls, frame);
     }
@@ -5061,7 +5058,7 @@ void LogFlumeHoldUpDCalcCursor(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410110
-void LogFlumeHoldUpAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeHoldUpAddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -5070,9 +5067,8 @@ void LogFlumeHoldUpAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410160
-unsigned int LogFlumeHoldUpRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeHoldUpRemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_0040feb0);
-    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x00410180
@@ -5219,23 +5215,23 @@ void RenderLogFlumeDrop(Element *elem, unsigned int param_2, unsigned int param_
             frame = 0;
             sprite = GetSpriteForLayer(ride->layer, 0);
             if (sprite != NULL) {
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+                lls = GetLLSForSprite((struct Sprite *)sprite);
                 if (lls != NULL) {
                     frame = lls->frame;
                 }
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeDrop1MSprite);
+            lls = GetLLSForSprite((struct Sprite *)LogFlumeDrop1MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
             sprite = GetSpriteForLayer(ride->layer, 1);
             if (sprite != NULL) {
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+                lls = GetLLSForSprite((struct Sprite *)sprite);
                 if (lls != NULL) {
                     frame = lls->frame;
                 }
             }
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeDrop2MSprite);
+            lls = GetLLSForSprite((struct Sprite *)LogFlumeDrop2MSprite);
             if (lls != NULL) {
                 LLSSetFrame(lls, frame);
             }
@@ -5259,9 +5255,9 @@ void RenderLogFlumeDrop(Element *elem, unsigned int param_2, unsigned int param_
             AdjustOffsetForViewMode(&off);
             if (LogFlumeSplashSprite != NULL) {
                 frame = entry->field_24->i24;
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSplashSprite);
+                lls = GetLLSForSprite((struct Sprite *)LogFlumeSplashSprite);
                 if (lls != NULL) {
-                    LLSStop((unsigned int)lls);
+                    LLSStop((struct LLS *)lls);
                     LLSSetFrame(lls, frame);
                 }
                 PrintSprite(LogFlumeSplashSprite, pos.x + off.x, pos.y + off.y, clip, 0);
@@ -5288,7 +5284,7 @@ void LogFlumeDropDCalcCursor(unsigned int param_1, struct Point *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410740
-void LogFlumeDropAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
+void LogFlumeDropAddObject(struct Element *param_1, struct FlumeBytes *param_2) {
     unsigned int packed;
     *((unsigned char *)&packed) = param_2->b0;
     *((unsigned char *)&packed + 1) = param_2->b4;
@@ -5297,9 +5293,8 @@ void LogFlumeDropAddObject(unsigned int param_1, struct FlumeBytes *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00410790
-unsigned int LogFlumeDropRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void LogFlumeDropRemoveObject(struct Element *param_1, TileId param_2, struct Cursor *param_3) {
     FUN_0040db00(param_1, param_2, param_3, FUN_00410360);
-    return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
 
 // FUNCTION: LEGOLAND 0x004107b0
@@ -6012,7 +6007,7 @@ void FUN_00411810(struct FlumeMover *m) {
             if (owner != NULL && !(owner->flags & 2)) {
                 owner->flags |= 2;
                 owner->field_24 = 0;
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)LogFlumeSplashSprite);
+                lls = GetLLSForSprite((struct Sprite *)LogFlumeSplashSprite);
                 if (lls != NULL) {
                     owner->field_28 = lls->frame_count;
                 }

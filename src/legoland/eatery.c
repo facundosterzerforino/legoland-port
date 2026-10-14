@@ -18,29 +18,7 @@
 
 #include "image_sprite.h"
 
-struct EateryObj;
-struct EateryFX;
-struct EateryInner;
 struct BlokeNode;
-
-struct EateryFX {
-    /* 0x00 */ unsigned char pad_0[0x14];
-    /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned int field_18;
-    /* 0x1c */ unsigned int flags_1c;
-    /* 0x20 */ unsigned char pad_20[0x44];
-    /* 0x64 */ struct EateryInner *inner_64;
-};
-
-struct EateryInner {
-    unsigned char pad_0[0x10];
-    unsigned int flags_10;
-};
-
-struct EateryObj {
-    unsigned char pad_0[0xc];
-    struct EateryFX *fx_c;
-};
 
 struct BrollyData {
     /* 0x00 */ unsigned char pad_0[4];
@@ -114,13 +92,13 @@ struct SaveBlock {
 };
 
 // FUNCTION: LEGOLAND 0x0042e220
-void LoadChuckWagonResources(struct EateryObj *obj) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner;
+void LoadChuckWagonResources(struct Element *obj) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner;
     ChuckWagonRide = fx;
-    fx->flags_1c |= 0x20;
-    inner = ChuckWagonRide->inner_64;
-    inner->flags_10 |= 0x2000;
+    fx->flags |= 0x20;
+    inner = ChuckWagonRide->layer;
+    inner->flags |= 0x2000;
     LoadMoneySFX();
 }
 
@@ -212,9 +190,9 @@ void ChuckWagonUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e460
-void LoadBrollyImages(struct EateryObj *obj) {
-    DAT_0081cd38 = obj->fx_c;
-    DAT_0081cd38->flags_1c |= 0x400;
+void LoadBrollyImages(struct Element *obj) {
+    DAT_0081cd38 = obj->ride;
+    DAT_0081cd38->flags |= 0x400;
     // STRING: LEGOLAND 0x004b6ec8
     if (LLIDB_FindElement("BROLLY IMAGES", &BrollyImagesHandle, 0) == 0) {
         BrollyImagesData = (struct BrollyData *)LLIDB_LoadData((void *)BrollyImagesHandle);
@@ -228,7 +206,7 @@ void UnloadBrollyImages(void) {
 
 // FUNCTION: LEGOLAND 0x0042e4c0
 void BrollySetEditMode(void) {
-    struct EateryFX *temp = DAT_0081cd38;
+    struct Ride *temp = DAT_0081cd38;
     EditMode.unk0 = 1;
     EditMode.unk8 = temp;
     DefaultCursor(&EditCursor);
@@ -236,7 +214,7 @@ void BrollySetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e500
-void BrollyAddObject(int param_1, unsigned char *param_2) {
+void BrollyAddObject(struct Element *param_1, unsigned char *param_2) {
     TileId id;
     id.pos.x = param_2[0];
     id.pos.y = param_2[4];
@@ -259,13 +237,13 @@ struct RideSpriteInfo *GetBrollySpriteInfo(int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e5d0
-void LoadSharkCafeResources(struct EateryObj *obj) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner;
+void LoadSharkCafeResources(struct Element *obj) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner;
     SharkCafeRide = fx;
-    SharkCafeRide->flags_1c |= 0x20;
-    inner = SharkCafeRide->inner_64;
-    inner->flags_10 |= 0x2000;
+    SharkCafeRide->flags |= 0x20;
+    inner = SharkCafeRide->layer;
+    inner->flags |= 0x2000;
     LoadMoneySFX();
 }
 
@@ -334,13 +312,13 @@ void SharkCafeUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e770
-void LoadFoodcartDrinkResources(struct EateryObj *obj) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner;
-    FoodcartDrinkRide = (unsigned int)fx;
-    fx->flags_1c |= 0x20;
-    inner = ((struct EateryFX *)FoodcartDrinkRide)->inner_64;
-    inner->flags_10 |= 0x2000;
+void LoadFoodcartDrinkResources(struct Element *obj) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner;
+    FoodcartDrinkRide = fx;
+    fx->flags |= 0x20;
+    inner = FoodcartDrinkRide->layer;
+    inner->flags |= 0x2000;
     LoadMoneySFX();
 }
 
@@ -348,13 +326,13 @@ void LoadFoodcartDrinkResources(struct EateryObj *obj) {
 void UnloadFoodcartDrinkResources(void) { KillMoneySFX(); }
 
 // FUNCTION: LEGOLAND 0x0042e7b0
-void LoadFoodcartIcecreamResources(struct EateryObj *obj) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner;
+void LoadFoodcartIcecreamResources(struct Element *obj) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner;
     FoodcartIcecreamRide = fx;
-    fx->flags_1c |= 0x20;
-    inner = FoodcartIcecreamRide->inner_64;
-    inner->flags_10 |= 0x2000;
+    fx->flags |= 0x20;
+    inner = FoodcartIcecreamRide->layer;
+    inner->flags |= 0x2000;
     LoadMoneySFX();
 }
 
@@ -362,13 +340,13 @@ void LoadFoodcartIcecreamResources(struct EateryObj *obj) {
 void UnloadFoodcartIcecreamResources(void) { KillMoneySFX(); }
 
 // FUNCTION: LEGOLAND 0x0042e7f0
-void LoadFoodcartFoodResources(struct EateryObj *obj) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner;
-    FoodcartFoodRide = (unsigned int)fx;
-    fx->flags_1c |= 0x20;
-    inner = ((struct EateryFX *)FoodcartFoodRide)->inner_64;
-    inner->flags_10 |= 0x2000;
+void LoadFoodcartFoodResources(struct Element *obj) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner;
+    FoodcartFoodRide = fx;
+    fx->flags |= 0x20;
+    inner = FoodcartFoodRide->layer;
+    inner->flags |= 0x2000;
     LoadMoneySFX();
 }
 
@@ -391,11 +369,11 @@ void FUN_0042e830(struct BlokeArg *arg, unsigned int param2, unsigned int param3
 }
 
 // FUNCTION: LEGOLAND 0x0042e870
-void LoadCastleBBQResources(struct EateryObj *obj) {
-    CastleBBQRide = (unsigned int)obj->fx_c;
-    ((struct EateryFX *)CastleBBQRide)->flags_1c |= 0x20;
-    CastleBBQLayer = (unsigned int)((struct EateryFX *)CastleBBQRide)->inner_64;
-    ((struct EateryInner *)CastleBBQLayer)->flags_10 |= 0x2000;
+void LoadCastleBBQResources(struct Element *obj) {
+    CastleBBQRide = obj->ride;
+    CastleBBQRide->flags |= 0x20;
+    CastleBBQLayer = CastleBBQRide->layer;
+    CastleBBQLayer->flags |= 0x2000;
     Load_FXList(RESTAURANT_SFX, 1);
     LoadMoneySFX();
 }
@@ -427,19 +405,19 @@ void RenderCastleBBQ(int param_1, unsigned int param_2, unsigned int param_3, sh
             IP_RenderBlokeIn3DNow((struct Bloke *)node[2]);
         }
     }
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
-    offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)CastleBBQLayer, 1);
+    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+    offset = GetRenderOffsetForLayer(CastleBBQLayer, 1);
     AdjustOffsetForViewMode(&offset);
-    if (GetSpriteForLayer((struct LayerContainer *)CastleBBQLayer, 1) != 0) {
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)CastleBBQLayer, 1),
+    if (GetSpriteForLayer(CastleBBQLayer, 1) != 0) {
+        PrintSprite((struct Sprite *)GetSpriteForLayer(CastleBBQLayer, 1),
             offset.x + coords.x, offset.y + coords.y, param_6, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0042e9c0
-void CastleBBQAddObject(unsigned int param_1, unsigned int *param_2) {
+void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2) {
     struct SampleParams params;
-    AddBasicObject(param_1, (unsigned int)param_2);
+    AddBasicObject(param_1, (int *)param_2);
     params.x = *param_2;
     params.y = param_2[1];
     params.field_0 = 2;
@@ -447,7 +425,7 @@ void CastleBBQAddObject(unsigned int param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ea10
-void CastleBBQRemoveObject(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+void CastleBBQRemoveObject(struct Element *param_1, unsigned int param_2, unsigned int param_3) {
     unsigned char *b = (unsigned char *)&param_2;
     struct SampleParams params;
     StandardRemoveObject(param_1, *(TileId *)&param_2, param_3);
@@ -670,11 +648,11 @@ struct BrollyNode *FUN_0042eec0(unsigned short *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ef10
-void Restaurant1AddObject(unsigned int param_1, unsigned char *param_2) {
+void Restaurant1AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, (unsigned int)param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042eec0((unsigned short *)id);
 }
 
@@ -713,14 +691,14 @@ void FUN_0042ef70(struct BrollyNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0042efb0
-void Restaurant1RemoveObject(unsigned int param_1, TileId tile, unsigned int param_3) {
+void Restaurant1RemoveObject(struct Element *param_1, TileId tile, unsigned int param_3) {
     struct SampleParams params;
     struct BrollyNode *node = FUN_0042ef40(&tile.id);
     if (node != NULL) {
         FUN_0042ef70(node);
     }
     StandardRemoveObject(param_1, tile, param_3);
-    RemoveAllBlokesFromRide((unsigned int)((struct EateryObj *)param_1)->fx_c, tile);
+    RemoveAllBlokesFromRide(((struct Element *)param_1)->ride, tile);
     params.x = tile.pos.x;
     params.y = tile.pos.y;
     params.field_0 = 2;
@@ -728,11 +706,11 @@ void Restaurant1RemoveObject(unsigned int param_1, TileId tile, unsigned int par
 }
 
 // FUNCTION: LEGOLAND 0x0042f030
-void LoadRestaurant1Resources(struct EateryObj *obj) {
-    Restaurant1Ride = (unsigned int)obj->fx_c;
-    ((struct EateryFX *)Restaurant1Ride)->flags_1c |= 0x20;
-    EateryFxInner = (unsigned int)((struct EateryFX *)Restaurant1Ride)->inner_64;
-    ((struct EateryInner *)EateryFxInner)->flags_10 |= 0x2000;
+void LoadRestaurant1Resources(struct Element *obj) {
+    Restaurant1Ride = obj->ride;
+    Restaurant1Ride->flags |= 0x20;
+    EateryFxInner = Restaurant1Ride->layer;
+    EateryFxInner->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b6f2c
     RestMaskMainSprite = LoadSprite("RestMask_Main.lls", 1);
     // STRING: LEGOLAND 0x004b6f14
@@ -743,7 +721,7 @@ void LoadRestaurant1Resources(struct EateryObj *obj) {
     RestMaskLevel2Sprite = LoadSprite("RestMaskLevel2.lls", 1);
     // STRING: LEGOLAND 0x004b6ed8
     RestMaskLevel3Sprite = LoadSprite("RestMaskLevel3.lls", 1);
-    HideLayer((struct LayerOwner *)EateryFxInner, 1);
+    HideLayer(EateryFxInner, 1);
     StopLayerPlaying(EateryFxInner, 1);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryFxInner, 1), 0);
     LoadMoneySFX();
@@ -900,62 +878,62 @@ void Restaurant1Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042f4c0
-void RenderRestaurant1(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
-    int ride = *(int *)(param_1 + 0xc);
-    int *node;
-    int blokes[8];
+void RenderRestaurant1(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
+    struct Ride *ride = param_1->ride;
+    struct RideNode *node;
+    struct Bloke *blokes[8];
     int count;
     int i;
-    int *p;
+    struct Bloke **p;
     struct BrollyNode *state;
     struct Point coords;
     struct Point offset;
     struct {
         /* 0x00 */ int field_0;
-        /* 0x04 */ int field_4;
+        /* 0x04 */ struct Element *field_4;
         /* 0x08 */ short field_8;
     } cfg;
-    node = *(int **)(ride + 0xcc);
+    node = ride->riders;
     cfg.field_0 = 0x103;
-    cfg.field_4 = *(int *)(ride + 0xc4);
+    cfg.field_4 = ride->element;
     cfg.field_8 = *param_4;
     p = blokes;
     blokes[0] = 0;
     for (i = 7; p = p + 1, i != 0; i = i - 1) {
-        *p = 0;
+        *p = NULL;
     }
     count = 0;
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
+    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
     if (node != NULL) {
         short v = *param_4;
         p = blokes;
         do {
-            if (v == (short)node[3]) {
+            if (v == (short)node->tile.id) {
                 count = count + 1;
-                *p = node[2];
+                *p = node->rider;
                 p = p + 1;
             }
-            node = (int *)*node;
+            node = node->next;
         } while (node != NULL);
         if (count != 0) {
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x37) == 1) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->field_37 == 1) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(RestMaskLevel1aaSprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x37) == 2) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->field_37 == 2) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(RestMaskLevel1Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x37) == 3) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->field_37 == 3) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(RestMaskLevel2Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x37) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->field_37 == 4) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(RestMaskLevel3Sprite, param_2, param_3, param_6, 0);
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x37) == 5) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->field_37 == 5) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(RestMaskMainSprite, param_2, param_3, param_6, 0);
         }
@@ -967,9 +945,9 @@ void RenderRestaurant1(int param_1, unsigned int param_2, unsigned int param_3, 
             frame = 0;
         }
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryFxInner, 1), frame);
-        offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryFxInner, 1);
+        offset = GetRenderOffsetForLayer(EateryFxInner, 1);
         AdjustOffsetForViewMode(&offset);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryFxInner, 1),
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryFxInner, 1),
             coords.x + offset.x, coords.y + offset.y, param_6, (int *)&cfg);
         state->field_9 = frame;
     }
@@ -986,13 +964,13 @@ void KillRestMaskSpritesAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042f770
-void LoadRestaurant2Resources(struct EateryObj *obj) {
+void LoadRestaurant2Resources(struct Element *obj) {
     Load_FXList(OCTOPUS_SFX, 3);
     LoadMoneySFX();
-    Restaurant2Ride = (unsigned int)obj->fx_c;
-    ((struct EateryFX *)Restaurant2Ride)->flags_1c |= 0x420;
-    EateryLayerOwner = (unsigned int)((struct EateryFX *)Restaurant2Ride)->inner_64;
-    ((struct EateryInner *)EateryLayerOwner)->flags_10 |= 0x2000;
+    Restaurant2Ride = obj->ride;
+    Restaurant2Ride->flags |= 0x420;
+    EateryLayerOwner = Restaurant2Ride->layer;
+    EateryLayerOwner->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b6f70
     R2FdoormSprite = LoadSprite("R2Fdoor_m.lls", 1);
     // STRING: LEGOLAND 0x004b6f60
@@ -1001,20 +979,20 @@ void LoadRestaurant2Resources(struct EateryObj *obj) {
     R2BdoormSprite = LoadSprite("R2Bdoor_m.lls", 1);
     // STRING: LEGOLAND 0x004b6f40
     R2TowermSprite = LoadSprite("R2Tower_m.lls", 1);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 0);
+    HideLayer(EateryLayerOwner, 0);
     StopLayerPlaying(EateryLayerOwner, 0);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 0), 0);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 6);
+    HideLayer(EateryLayerOwner, 6);
     StopLayerPlaying(EateryLayerOwner, 6);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 6), 0);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 2);
+    HideLayer(EateryLayerOwner, 2);
     StopLayerPlaying(EateryLayerOwner, 2);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 2), 0);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 5);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 1);
+    HideLayer(EateryLayerOwner, 5);
+    HideLayer(EateryLayerOwner, 1);
     StopLayerPlaying(EateryLayerOwner, 1);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), 0);
-    HideLayer((struct LayerOwner *)EateryLayerOwner, 3);
+    HideLayer(EateryLayerOwner, 3);
     StopLayerPlaying(EateryLayerOwner, 3);
     LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), 0);
 }
@@ -1026,7 +1004,7 @@ void FUN_0042f920(unsigned short *param_1) {
         unsigned int *p = (unsigned int *)node;
         int i;
         for (i = 0x10; i != 0; i = i - 1) {
-            *p = 0;
+            *p = NULL;
             p = p + 1;
         }
         node->value = *param_1;
@@ -1054,11 +1032,11 @@ void FUN_0042f920(unsigned short *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042f9a0
-void Restaurant2AddObject(unsigned int param_1, unsigned char *param_2) {
+void Restaurant2AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, (unsigned int)param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042f920((unsigned short *)id);
 }
 
@@ -1102,13 +1080,13 @@ void RemoveSaveBlock(struct SaveBlock *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0042fa40
-void Restaurant2RemoveObject(unsigned int arg1, TileId tile, unsigned int arg3, unsigned int arg4, unsigned int arg5) {
+void Restaurant2RemoveObject(struct Element *arg1, TileId tile, unsigned int arg3, unsigned int arg4, unsigned int arg5) {
     struct SaveBlock *result = FindSaveBlock(&tile.id);
     if (result != NULL) {
         RemoveSaveBlock(result);
     }
     StandardRemoveObject(arg1, tile, arg3);
-    RemoveAllBlokesFromRide((unsigned int)((struct EateryObj *)arg1)->fx_c, tile);
+    RemoveAllBlokesFromRide((unsigned int)((struct Element *)arg1)->ride, tile);
 }
 
 // FUNCTION: LEGOLAND 0x0042fa90
@@ -1509,15 +1487,15 @@ void Restaurant2Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004304a0
-void *GetRestaurant2SpriteInfo(struct EateryObj *obj, unsigned short a2) {
-    struct EateryFX *fx = obj->fx_c;
-    struct EateryInner *inner = fx->inner_64;
+void *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2) {
+    struct Ride *fx = obj->ride;
+    struct Sprite *inner = fx->layer;
     DAT_00616120.sprite = inner;
     DAT_00616120.x = fx->field_14;
     DAT_00616120.y = fx->field_18;
     DAT_00616120.id = a2;
-    inner = fx->inner_64;
-    inner->flags_10 |= 0x2000;
+    inner = fx->layer;
+    inner->flags |= 0x2000;
     return (void *)&DAT_00616120;
 }
 
@@ -1556,81 +1534,81 @@ void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int p
     switch (state->field_18) {
     case 0:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 3);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         if (state->field_c == 0) {
             return;
         }
         goto set_l6;
     case 1:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 3);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
     set_l6:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 6), c8);
         return;
     case 2:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
     case 4:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 2), c6);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 2);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 2);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 2), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 2), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 0), c6);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 0);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 0);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
     case 5:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 2), c6);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 2);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 2);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 2), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 2), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 0), c6);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 0);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 0);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 0), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
     case 3:
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 1), c7);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 1);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 1);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 1), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 3);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 3), off.x + sx, off.y + sy, param_3, (int *)&cfg);
         return;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00430b10
-void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
-    int ride = *(int *)(param_1 + 0xc);
-    int *node = *(int **)(ride + 0xcc);
-    int *p;
+void RenderRestaurant2(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
+    struct Ride *ride = param_1->ride;
+    struct RideNode *node = ride->riders;
+    struct Bloke **p;
     int i;
     int count;
     struct SaveBlock *state;
@@ -1639,12 +1617,12 @@ void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, 
     unsigned int f11;
     int f38;
     int f3c;
-    int blokes[30];
+    struct Bloke *blokes[30];
     struct Point coords;
     struct Point off;
     struct {
         /* 0x00 */ int field_0;
-        /* 0x04 */ int field_4;
+        /* 0x04 */ struct Element *field_4;
         /* 0x08 */ short field_8;
     } cfg;
     int sx;
@@ -1654,7 +1632,7 @@ void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, 
     p = blokes;
     blokes[0] = 0;
     for (i = 0x1d; p = p + 1, i != 0; i = i - 1) {
-        *p = 0;
+        *p = NULL;
     }
     cfg.field_0 = 0x103;
     count = 0;
@@ -1668,18 +1646,18 @@ void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, 
     f38 = state->field_38;
     f3c = state->field_3c;
     RenderEateryBaseLayers((unsigned short *)param_4, ride, param_6);
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, (void *)ride);
+    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
     if (node == NULL) {
         return;
     }
     p = blokes;
     do {
-        if (*param_4 == (short)node[3]) {
+        if (*param_4 == (short)node->tile.id) {
             count = count + 1;
-            *p = node[2];
+            *p = node->rider;
             p = p + 1;
         }
-        node = (int *)*node;
+        node = node->next;
     } while (node != NULL);
     if (count == 0) {
         return;
@@ -1687,82 +1665,82 @@ void RenderRestaurant2(int param_1, unsigned int param_2, unsigned int param_3, 
     sx = coords.x;
     sy = coords.y;
     if (s18 == 0 || s18 == 1) {
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 5);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 5);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 5), off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 5), off.x + sx, off.y + sy, param_6, (int *)&cfg);
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 5) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 5) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 6) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 6) IP_RenderBlokeIn3DNow(blokes[i]);
         }
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 6);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 6);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 6), off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 6), off.x + sx, off.y + sy, param_6, (int *)&cfg);
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 4) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         PrintSprite(R2Fdoorm1Sprite, off.x + sx, off.y + sy, param_6, (int *)&cfg);
     } else if (s18 == 2) {
         if (f11 != 0) {
             for (i = 0; i < count; i = i + 1) {
-                if (*(char *)(blokes[i] + 0x60) == 0xc) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+                if (blokes[i]->param_action == 0xc) IP_RenderBlokeIn3DNow(blokes[i]);
             }
             PrintSprite(R2BdoormSprite, sx, f3c / 2 + sy, param_6, (int *)&cfg);
         }
         PrintSprite(R2TowermSprite, sx, sy, param_6, (int *)&cfg);
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 6) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 6) IP_RenderBlokeIn3DNow(blokes[i]);
         }
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 6);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 6);
         AdjustOffsetForViewMode(&off);
         PrintSprite(R2FdoormSprite, off.x + sx, f38 / 2 + sy, param_6, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 3);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 3), off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 3), off.x + sx, off.y + sy, param_6, (int *)&cfg);
     } else if (s18 == 5 || s18 == 4) {
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 7) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 7) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 8) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 8) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 9) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 9) IP_RenderBlokeIn3DNow(blokes[i]);
         }
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 0);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 0);
         AdjustOffsetForViewMode(&off);
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 0xd) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 0xd) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 0xe) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 0xe) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         for (i = 0; i < count; i = i + 1) {
-            if (*(char *)(blokes[i] + 0x60) == 0xf) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+            if (blokes[i]->param_action == 0xf) IP_RenderBlokeIn3DNow(blokes[i]);
         }
         PrintSprite(R2BdoormSprite, sx, off.y + sy, param_6, (int *)&cfg);
         PrintSprite(R2TowermSprite, sx, sy, param_6, (int *)&cfg);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 2);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 2);
         AdjustOffsetForViewMode(&off);
         PrintSprite(R2FdoormSprite, off.x + sx, off.y + sy, param_6, (int *)&cfg);
         LLSSetFrame((struct LLS *)GetLLSForLayer(EateryLayerOwner, 3), c9);
-        off = GetRenderOffsetForLayer((struct LayerOffsetHolder *)EateryLayerOwner, 3);
+        off = GetRenderOffsetForLayer(EateryLayerOwner, 3);
         AdjustOffsetForViewMode(&off);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)EateryLayerOwner, 3), off.x + sx, off.y + sy, param_6, (int *)&cfg);
+        PrintSprite((struct Sprite *)GetSpriteForLayer(EateryLayerOwner, 3), off.x + sx, off.y + sy, param_6, (int *)&cfg);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x60) == 0) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->param_action == 0) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x60) == 1) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->param_action == 1) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x60) == 2) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->param_action == 2) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x60) == 3) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->param_action == 3) IP_RenderBlokeIn3DNow(blokes[i]);
     }
 }
 
@@ -1836,19 +1814,19 @@ void FoodcartIcecreamUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004312c0
-void EateryRemoveObject(unsigned int param_1, TileId tile, unsigned int param_3) {
+void EateryRemoveObject(struct Element *param_1, TileId tile, unsigned int param_3) {
     StandardRemoveObject(param_1, tile, param_3);
-    RemoveAllBlokesFromRide(*(unsigned int *)(param_1 + 0xc), tile);
+    RemoveAllBlokesFromRide(param_1->ride, tile);
     StopMoneySFX(&tile.pos.x);
 }
 
 // FUNCTION: LEGOLAND 0x00431300
-void LoadOctopusCafeResources(struct EateryObj *obj) {
-    struct EateryInner *inner;
-    OctopusCafeRide = obj->fx_c;
-    OctopusCafeRide->flags_1c |= 0x20;
-    inner = OctopusCafeRide->inner_64;
-    inner->flags_10 |= 0x2000;
+void LoadOctopusCafeResources(struct Element *obj) {
+    struct Sprite *inner;
+    OctopusCafeRide = obj->ride;
+    OctopusCafeRide->flags |= 0x20;
+    inner = OctopusCafeRide->layer;
+    inner->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b7100
     OctTentASprite = LoadSprite("OctTentA.lls", 1);
     // STRING: LEGOLAND 0x004b70f0
@@ -1903,8 +1881,8 @@ void LoadOctopusCafeResources(struct EateryObj *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004314f0
-void OctopusCafeAddObject(unsigned int param_1, struct UserFlagsArg *param_2) {
-    AddBasicObject(param_1, (unsigned int)param_2);
+void OctopusCafeAddObject(struct Element *param_1, struct UserFlagsArg *param_2) {
+    AddBasicObject(param_1, (int *)param_2);
     Set_UserFlags(param_2->var_0, param_2->var_4, 0);
 }
 
@@ -2154,52 +2132,52 @@ void OctopusCafeUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00431c50
-void FUN_00431c50(unsigned int param_1, unsigned int param_2, struct Sprite *param_3, struct Sprite *param_4, struct Sprite *param_5, int param_6, int param_7, int param_8, int param_9, unsigned int param_10) {
+void FUN_00431c50(unsigned int param_1, unsigned int param_2, struct Sprite *param_3, struct Sprite *param_4, struct Sprite *param_5, struct Bloke *param_6, struct Bloke *param_7, struct Bloke *param_8, struct Bloke *param_9, unsigned int param_10) {
     PrintSprite(param_3, param_1, param_2, param_10, 0);
     if (param_6 != 0 || param_7 != 0) {
         if (param_6 != 0) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)param_6);
+            IP_RenderBlokeIn3DNow(param_6);
         }
         if (param_7 != 0) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)param_7);
+            IP_RenderBlokeIn3DNow(param_7);
         }
         PrintSprite(param_4, param_1, param_2, param_10, 0);
     }
     if (param_8 != 0 || param_9 != 0) {
         if (param_8 != 0) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)param_8);
+            IP_RenderBlokeIn3DNow(param_8);
         }
         if (param_9 != 0) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)param_9);
+            IP_RenderBlokeIn3DNow(param_9);
         }
         PrintSprite(param_5, param_1, param_2, param_10, 0);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00431d00
-void RenderOctopusCafe(int param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6) {
-    int buckets[0x20];
-    int blokes[0x20];
+void RenderOctopusCafe(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6) {
+    struct Bloke *buckets[0x20];
+    struct Bloke *blokes[0x20];
     int count;
     int i;
-    int *p;
+    struct Bloke **p;
     struct Bloke *bloke;
     struct RideNode *node;
     TileId *tile = (TileId *)param_4;
     p = buckets;
     buckets[0] = 0;
     for (i = 0x1f; p = p + 1, i != 0; i = i - 1) {
-        *p = 0;
+        *p = NULL;
     }
     count = 0;
-    node = ((struct Ride *)*(int *)(param_1 + 0xc))->riders;
+    node = param_1->ride->riders;
     while (node != NULL) {
         if (tile->id == node->tile.id) {
             bloke = node->rider;
             if (bloke->field_40 != 0) {
-                buckets[bloke->field_36] = (int)bloke;
+                buckets[bloke->field_36] = bloke;
             } else {
-                blokes[count] = (int)bloke;
+                blokes[count] = bloke;
                 count = count + 1;
                 bloke->field_37 = DAT_004b6d58[(((bloke->pos.x >> 8) - tile->pos.x) * 0xb - (bloke->pos.y >> 8) + tile->pos.y) * 4];
             }
@@ -2207,70 +2185,70 @@ void RenderOctopusCafe(int param_1, unsigned int param_2, unsigned int param_3, 
         node = node->next;
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 1) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 1) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 2) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 2) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentESprite, OctTabEASprite, OctTabEBSprite, buckets[14], buckets[15], buckets[12], buckets[13], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 3) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 3) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 4) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 4) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentFSprite, OctTabFASprite, OctTabFBSprite, buckets[17], buckets[18], buckets[16], buckets[19], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 5) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 5) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 6) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 6) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentDSprite, OctTabDASprite, OctTabDBSprite, buckets[10], buckets[11], buckets[8], buckets[9], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 7) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 7) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentCSprite, OctTabCASprite, OctTabCBSprite, buckets[4], buckets[7], buckets[5], buckets[6], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 8) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 8) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 9) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 9) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 10) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 10) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     PrintSprite(OctoKioskSprite, param_2, param_3, param_6, 0);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0xb) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0xb) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0xc) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0xc) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentGSprite, OctTabGASprite, OctTabGBSprite, buckets[21], buckets[22], buckets[20], buckets[23], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0xd) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0xd) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0xe) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0xe) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentHSprite, OctTabHASprite, OctTabHBSprite, buckets[24], buckets[25], buckets[26], buckets[27], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0xf) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0xf) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0x10) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0x10) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentBSprite, OctTabBASprite, OctTabBBSprite, buckets[0], buckets[3], buckets[1], buckets[2], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0x11) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0x11) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0x12) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0x12) IP_RenderBlokeIn3DNow(blokes[i]);
     }
     FUN_00431c50(param_2, param_3, OctTentASprite, OctTabAASprite, OctTabABSprite, buckets[28], buckets[29], buckets[30], buckets[31], param_6);
     for (i = 0; i < count; i = i + 1) {
-        if (*(char *)(blokes[i] + 0x37) == 0x13) IP_RenderBlokeIn3DNow((struct Bloke *)blokes[i]);
+        if (blokes[i]->field_37 == 0x13) IP_RenderBlokeIn3DNow(blokes[i]);
     }
 }
 

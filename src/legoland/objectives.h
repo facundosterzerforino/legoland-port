@@ -1,6 +1,5 @@
 #pragma once
 
-struct NerpsArg;
 struct RewardArg;
 struct MapRectArg;
 
@@ -17,8 +16,14 @@ struct Vec4 {
  * the boundary casts disappear. */
 struct ObjectiveEvent {
     struct ObjectiveEvent *next;
-    unsigned int field_4;
-    unsigned int field_8;
+    union {
+        unsigned int field_4;
+        struct Element *element; /* the object class the event is about */
+    };
+    union {
+        unsigned int field_8;
+        char *text; /* a message, a file name */
+    };
     unsigned int type;
     unsigned char flags_10;
     unsigned char pad_11[0x14 - 0x11];
@@ -27,7 +32,15 @@ struct ObjectiveEvent {
     unsigned int field_1c;
     unsigned int field_20;
     unsigned int field_24;
-    struct Vec4 vec_28;
+    union {
+        struct Vec4 vec_28;
+        struct {
+            unsigned int field_28;
+            unsigned int field_2c;
+            int field_30;
+            int field_34;
+        };
+    };
     int sort_key;
     unsigned int timestamp;
     unsigned int field_40;
@@ -52,29 +65,29 @@ struct ObjectiveEvent *PostObjectiveMessage(const char *format, ...);
 void ShowNextObjectiveMessage(void);
 void ResetObjectiveHintTimer(void);
 int IsObjectiveHintDue(void);
-int QueueCustomObjectiveHint(struct NerpsArg *arg);
-void QueueBuildMoreObjectsHint(struct NerpsArg *object, unsigned int a, int b);
-void QueueConnectToPathHint(struct NerpsArg *object, unsigned int a);
-void QueueLinkToEntranceHint(struct NerpsArg *object, unsigned int a);
-void QueueClearAreaHint(struct NerpsArg *object, int a);
-void QueueBuildRangeAttractionsHint(struct NerpsArg *arg, unsigned int class_id, int count, int sum);
-void QueueDeleteRangeAttractionsHint(struct NerpsArg *arg, unsigned int class_id, int count, int sum);
-void QueueDeleteObjectsHint(struct NerpsArg *arg, unsigned int class_id, int count);
-void QueueAttractVisitorsHint(struct NerpsArg *object, int count);
-void QueueMoreGardenersHint(struct NerpsArg *object, int a);
-void QueueFewerGardenersHint(struct NerpsArg *object, int a);
-void QueueMoreMechanicsHint(struct NerpsArg *object, unsigned int a);
-void QueueFewerMechanicsHint(struct NerpsArg *object, int a);
-void QueueSaveCoinsHint(struct NerpsArg *arg, int count);
-void QueueFewerHungryVisitorsHint(struct NerpsArg *object, unsigned int a, unsigned int b);
-void QueueMoreFedVisitorsHint(struct NerpsArg *object, unsigned int a, unsigned int b);
-void QueueHappyVisitorsHint(struct NerpsArg *object, int a, unsigned int b);
-void QueueRepairObjectsHint(struct NerpsArg *arg, int param_2, unsigned int param_3);
-void QueueRideVisitorsHint(struct NerpsArg *object, unsigned int a, unsigned int b);
-void QueueAddRidePartsHint(struct NerpsArg *arg, unsigned int class_id, int sum, int count);
-void QueueCoverSquaresHint(struct NerpsArg *object, unsigned int param_2, int count);
-void QueuePathSceneryHint(struct NerpsArg *object, int count);
-void QueueCustomObjectiveHintIfDue(struct NerpsArg *object);
+int QueueCustomObjectiveHint(struct ObjectiveEvent *arg);
+void QueueBuildMoreObjectsHint(struct ObjectiveEvent *object, unsigned int a, int b);
+void QueueConnectToPathHint(struct ObjectiveEvent *object, unsigned int a);
+void QueueLinkToEntranceHint(struct ObjectiveEvent *object, unsigned int a);
+void QueueClearAreaHint(struct ObjectiveEvent *object, int a);
+void QueueBuildRangeAttractionsHint(struct ObjectiveEvent *arg, unsigned int class_id, int count, int sum);
+void QueueDeleteRangeAttractionsHint(struct ObjectiveEvent *arg, unsigned int class_id, int count, int sum);
+void QueueDeleteObjectsHint(struct ObjectiveEvent *arg, unsigned int class_id, int count);
+void QueueAttractVisitorsHint(struct ObjectiveEvent *object, int count);
+void QueueMoreGardenersHint(struct ObjectiveEvent *object, int a);
+void QueueFewerGardenersHint(struct ObjectiveEvent *object, int a);
+void QueueMoreMechanicsHint(struct ObjectiveEvent *object, unsigned int a);
+void QueueFewerMechanicsHint(struct ObjectiveEvent *object, int a);
+void QueueSaveCoinsHint(struct ObjectiveEvent *arg, int count);
+void QueueFewerHungryVisitorsHint(struct ObjectiveEvent *object, unsigned int a, unsigned int b);
+void QueueMoreFedVisitorsHint(struct ObjectiveEvent *object, unsigned int a, unsigned int b);
+void QueueHappyVisitorsHint(struct ObjectiveEvent *object, int a, unsigned int b);
+void QueueRepairObjectsHint(struct ObjectiveEvent *arg, int param_2, unsigned int param_3);
+void QueueRideVisitorsHint(struct ObjectiveEvent *object, unsigned int a, unsigned int b);
+void QueueAddRidePartsHint(struct ObjectiveEvent *arg, unsigned int class_id, int sum, int count);
+void QueueCoverSquaresHint(struct ObjectiveEvent *object, unsigned int param_2, int count);
+void QueuePathSceneryHint(struct ObjectiveEvent *object, int count);
+void QueueCustomObjectiveHintIfDue(struct ObjectiveEvent *object);
 void PostPendingObjectiveHints(void);
 void PlaceObjectAtTile(unsigned int a, void *b);
 int ScriptEventPlace(struct ObjectiveEvent *event);
@@ -90,7 +103,7 @@ int ScriptEventExtendPark(struct RewardArg *arg);
 int ScriptEventFmv(struct RewardArg *arg);
 int ScriptEventInterval(struct RewardArg *arg);
 int ScriptEventMessage(struct RewardArg *arg);
-void TakeRewardObject(struct NerpsArg *object);
+void TakeRewardObject(struct ObjectiveEvent *object);
 int ProcessUnimplementedReward(struct RewardArg *arg);
 int ProcessUnimplementedObjective(struct RewardArg *arg);
-void GiveRewardObject(struct NerpsArg *object, unsigned int a, unsigned int b);
+void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned int b);

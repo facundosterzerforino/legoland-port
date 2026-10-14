@@ -1,6 +1,8 @@
 #pragma once
 
 #include "legoland.h"
+
+struct Element;
 #include "llidb.h"
 
 struct CallbackTable;
@@ -14,4 +16,4 @@ void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3,
 void CastleLevel1Update(Element *obj);
 void CastleLevelSetEditMode(void);
 void CastleLevelRemoveObject(Element *obj, TileId tile, struct Cursor *cursor);
-void CastleLevelAddObject(unsigned int param1, unsigned int param2);
+void CastleLevelAddObject(struct Element *param1, unsigned int param2);

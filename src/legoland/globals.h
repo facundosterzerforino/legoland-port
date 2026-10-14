@@ -33,6 +33,8 @@ struct CtrlBuffer;
 // layout comes from gamemap.h, used by the EditCursor / QueryCursor instances.)
 // ---------------------------------------------------------------------------
 struct Sprite;
+struct NerpsListNode;
+struct ObjectiveEvent;
 struct SampleDef;
 /* One entry of the game's sound-effect list (GameFX), loaded by Load_FXList. */
 struct FXItem {
@@ -105,7 +107,7 @@ struct MapElement;
 struct WaterContext;
 struct WaterSub;
 struct WaterNode;
-struct EateryFX;
+
 struct BrollyData;
 struct BrollyNode;
 struct BlokeNode;
@@ -131,7 +133,6 @@ struct CopterNode;
 struct RenderItemNode;
 struct GoldNode;
 struct CarouselNode;
-struct CarouselRide;
 struct EarthNode;
 struct JoustNode;
 struct InterfaceIconNode;
@@ -1855,7 +1856,7 @@ extern struct Sprite *BZBlueCarM1Sprite;
 // 0x00616060
 extern struct BalloonNode *BalloonNodeList;
 // 0x00616068
-extern void *CarouselLayer;
+extern struct Sprite *CarouselLayer;
 // 0x0061606c
 extern struct Sprite *CarouselEntranceMatteSprite;
 // 0x00616070
@@ -1875,7 +1876,7 @@ extern void *DAT_00616090[3];
 // 0x006160b8
 extern struct Sprite *ZCarouselSprite;
 // 0x006160bc
-extern struct CarouselRide *DAT_006160bc;
+extern struct Ride *DAT_006160bc;
 // 0x006160c0
 extern struct Sprite *DAT_006160c0;
 // 0x006160c4
@@ -1915,7 +1916,7 @@ extern struct Sprite *EntranceMatte4Sprite;
 // 0x0061610c
 extern struct Sprite *Booth1Sprite;
 // 0x00616118
-extern unsigned int EateryLayerOwner;
+extern struct Sprite *EateryLayerOwner;
 // 0x00616120
 extern struct RideSpriteInfo DAT_00616120;
 // 0x0061613c
@@ -2464,7 +2465,7 @@ extern unsigned int DAT_0066872c[0x15];
 // 0x00668780
 extern unsigned int DAT_00668780;
 // 0x00668784
-extern void *ScriptEventList;
+extern struct ObjectiveEvent *ScriptEventList;
 // 0x00668788
 extern unsigned int ScriptPurgePending;
 // 0x0066878c
@@ -2474,9 +2475,9 @@ extern unsigned int ScriptSectionStarted;
 // 0x00668794
 extern unsigned int ScriptEvalTime;
 // 0x00668798
-extern void *ScriptSectionList;
+extern struct NerpsListNode *ScriptSectionList;
 // 0x0066879c
-extern unsigned int CurrentScriptSection;
+extern struct NerpsListNode *CurrentScriptSection;
 // 0x006687a0
 extern unsigned int ScriptLoadErrorCount;
 // 0x006687a4
@@ -3480,7 +3481,7 @@ extern unsigned char CastleThemeCount;
 // 0x007fe117
 extern unsigned char AdventurersThemeCount;
 // 0x007fe120
-extern unsigned int ScriptStringTable[512];
+extern char *ScriptStringTable[512];
 // 0x007fe920
 extern unsigned int DAT_007fe920;
 // 0x007fe930
@@ -3892,33 +3893,33 @@ extern void *DAT_0081cd04;
 // 0x0081cd08
 extern void *HedgeObjectClass;
 // 0x0081cd0c
-extern unsigned int CastleBBQRide;
+extern struct Ride *CastleBBQRide;
 // 0x0081cd10
-extern unsigned int CastleBBQLayer;
+extern struct Sprite *CastleBBQLayer;
 // 0x0081cd14
-extern unsigned int FoodcartDrinkRide;
+extern struct Ride *FoodcartDrinkRide;
 // 0x0081cd18
-extern struct EateryFX *SharkCafeRide;
+extern struct Ride *SharkCafeRide;
 // 0x0081cd1c
-extern struct EateryFX *OctopusCafeRide;
+extern struct Ride *OctopusCafeRide;
 // 0x0081cd20
 extern struct Sprite *R2TowermSprite;
 // 0x0081cd28
 extern struct Sprite *RestMaskMainSprite;
 // 0x0081cd2c
-extern unsigned int EateryFxInner;
+extern struct Sprite *EateryFxInner;
 // 0x0081cd30
-extern unsigned int Restaurant2Ride;
+extern struct Ride *Restaurant2Ride;
 // 0x0081cd34
 extern struct Sprite *R2FdoormSprite;
 // 0x0081cd38
-extern struct EateryFX *DAT_0081cd38;
+extern struct Ride *DAT_0081cd38;
 // 0x0081cd3c
-extern unsigned int FoodcartFoodRide;
+extern struct Ride *FoodcartFoodRide;
 // 0x0081cd40
-extern unsigned int Restaurant1Ride;
+extern struct Ride *Restaurant1Ride;
 // 0x0081cd44
-extern struct EateryFX *ChuckWagonRide;
+extern struct Ride *ChuckWagonRide;
 // 0x0081cd48
 extern struct Sprite *R2Fdoorm1Sprite;
 // 0x0081cd60
@@ -3982,7 +3983,7 @@ extern struct Sprite *OctTabHASprite;
 // 0x0081cddc
 extern struct Sprite *OctTabHBSprite;
 // 0x0081cde0
-extern struct EateryFX *FoodcartIcecreamRide;
+extern struct Ride *FoodcartIcecreamRide;
 // 0x0081cde4
 extern struct Ride *BalloonzRide;
 // 0x0081cde8

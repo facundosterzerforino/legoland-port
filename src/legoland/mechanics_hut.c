@@ -26,7 +26,7 @@ void LoadMechHutMaskSprite(Element *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d2a0
-unsigned int MechanicsHutAddObject(unsigned int param1, unsigned int param2) {
+unsigned int MechanicsHutAddObject(struct Element *param1, unsigned int param2) {
     return AddBasicObject(param1, param2);
 }
 

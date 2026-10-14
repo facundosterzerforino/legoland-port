@@ -295,7 +295,7 @@ struct SafariBasicObject {
 };
 
 // FUNCTION: LEGOLAND 0x00414fc0
-void SafariAddObject(unsigned int uid, struct SafariBasicObject *a1) {
+void SafariAddObject(struct Element *uid, struct SafariBasicObject *a1) {
     unsigned short local;
 
     *(unsigned char *)&local = a1->field_0;

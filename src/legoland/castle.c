@@ -1867,7 +1867,7 @@ void FUN_0041eca0(unsigned int idx, short *p) {
 }
 
 // FUNCTION: LEGOLAND 0x0041ece0
-void CastleDispatchAddObject(unsigned int obj, unsigned int a) {
+void CastleDispatchAddObject(struct Element *obj, unsigned int a) {
     ((void (*)(unsigned int, unsigned int)) * (unsigned int *)(CastleDispatchTable + CastleDispatchIndex(obj) * 24 + 0xc))(obj, a);
 }
 
@@ -1877,7 +1877,7 @@ void CastleDispatchDCalcCursor(unsigned int obj, unsigned int a) {
 }
 
 // FUNCTION: LEGOLAND 0x0041ed50
-void CastleDispatchRemoveObject(unsigned int obj, unsigned int a, unsigned int b) {
+void CastleDispatchRemoveObject(struct Element *obj, unsigned int a, unsigned int b) {
     ((void (*)(unsigned int, unsigned int, unsigned int)) * (unsigned int *)(CastleDispatchTable + CastleDispatchIndex(obj) * 24 + 0x14))(obj, a, b);
 }
 

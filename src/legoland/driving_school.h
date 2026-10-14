@@ -15,7 +15,7 @@ void FUN_00406020(unsigned short arg1, unsigned int arg2);
 void LoadDrivingSchoolResources(struct DSHead *param_1);
 void UnloadDrivingSchoolResources();
 void DrivingSchoolSetEditMode();
-void DrivingSchoolAddObject(unsigned int param_1, int *coords);
+void DrivingSchoolAddObject(struct Element *param_1, int *coords);
 void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsigned int param_3);
 void DrivingSchoolDCalcCursor(unsigned int param_1, unsigned int param_2);
 void DrivingSchoolRemoveObject(Element *obj, TileId tile, unsigned int param_3);

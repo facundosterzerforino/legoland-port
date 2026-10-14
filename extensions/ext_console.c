@@ -257,10 +257,10 @@ static int EventIsCondition(unsigned int type) {
 /* The steps still to run are ScriptSectionList, sorted, with the current one (CurrentScriptSection) at its head until it
  * is done (RunLevelScript). */
 static int IsLastStep(void) {
-    struct SortNode *current;
+    struct NerpsListNode *current;
 
-    current = (struct SortNode *)ScriptSectionList;
-    return current != NULL && (unsigned int)current == CurrentScriptSection && current->next == NULL;
+    current = ScriptSectionList;
+    return current != NULL && current == CurrentScriptSection && current->next == NULL;
 }
 
 /* What RANGE counts (ScriptEventRange): the object classes of a theme that have objects in the park, and how many

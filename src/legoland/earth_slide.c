@@ -257,17 +257,17 @@ void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned 
     if (node != NULL) {
         RemoveEarthNode(node);
     }
-    StandardRemoveObject((unsigned int)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     RemoveAllBlokesFromRide(param_1->ride, tile);
 }
 
 // FUNCTION: LEGOLAND 0x0042d2c0
-void EarthSlideAddObject(unsigned int param_1, unsigned char *param_2) {
+void EarthSlideAddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char buffer[2];
 
     buffer[0] = param_2[0];
     buffer[1] = param_2[4];
-    AddBasicObject(param_1, (unsigned int)param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042cd70((unsigned short *)buffer);
 }
 

@@ -747,17 +747,17 @@ void FUN_00478650(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478690
-int FUN_00478690(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+int FUN_00478690(void *param_1, unsigned int param_2, unsigned int param_3) {
     return (int)param_2 >= (int)param_3;
 }
 
 // FUNCTION: LEGOLAND 0x004786a0
-int FUN_004786a0(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+int FUN_004786a0(void *param_1, unsigned int param_2, unsigned int param_3) {
     return (DAT_00669054 & param_3) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x004786c0
-unsigned int FUN_004786c0(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
+unsigned int FUN_004786c0(void *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     if (FUN_004786a0(param_1, param_2, param_3) == 0) {
         return 0;
     }

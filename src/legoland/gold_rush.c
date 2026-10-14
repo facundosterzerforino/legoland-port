@@ -241,12 +241,12 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
         frame = 0;
         spr = GetSpriteForLayer(GoldRushLayer, 1);
         if (spr != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)spr);
+            lls = GetLLSForSprite((struct Sprite *)spr);
             if (lls != NULL) {
                 frame = *(short *)lls % 8;
             }
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)GoldMaskSprite);
+        lls = GetLLSForSprite((struct Sprite *)GoldMaskSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }

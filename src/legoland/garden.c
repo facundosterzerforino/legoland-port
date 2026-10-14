@@ -189,7 +189,7 @@ void FlowersSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432900
-void FlowersAddObject(int param_1, int *param_2) {
+void FlowersAddObject(struct Element *param_1, int *param_2) {
     TileId packed;
     packed.pos.x = param_2[0];
     packed.pos.y = param_2[1];

@@ -3,6 +3,10 @@
 #include "legoland.h"
 
 struct Bloke;
+struct Cursor;
+struct Element;
+struct Ride;
+struct RideNode;
 
 /* Carousel ride node (one 0x2c allocation), head at CarouselNodeList. */
 struct CarouselNode {
@@ -22,32 +26,6 @@ struct CarouselNode {
     /* 0x20 */ unsigned char slots[0x2c - 0x20];
 };
 
-struct CarouselListElem {
-    /* 0x00 */ struct CarouselListElem *next;
-    /* 0x04 */ unsigned char pad_4[0x8 - 0x4];
-    /* 0x08 */ struct Bloke *bloke;
-    /* 0x0c */ unsigned short id;
-};
-
-struct CarouselRide {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ unsigned int x;
-    /* 0x10 */ unsigned int y;
-    /* 0x14 */ unsigned char pad_14[0x1c - 0x14];
-    /* 0x1c */ unsigned int flags;
-    /* 0x20 */ unsigned char pad_20[0x2e - 0x20];
-    /* 0x2e */ unsigned short capacity;
-    /* 0x30 */ unsigned char pad_30[0x64 - 0x30];
-    /* 0x64 */ void *layer;
-    /* 0x68 */ unsigned char pad_68[0xcc - 0x68];
-    /* 0xcc */ struct CarouselListElem *list;
-};
-
-struct CarouselRideObj {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct CarouselRide *ride;
-};
-
 void AddCarouselNode(unsigned short *param_1);
 void RemoveCarouselNode(struct CarouselNode *node);
 void FreeAllCarouselNodes(void);
@@ -55,15 +33,15 @@ struct CarouselNode *FindCarouselNode(unsigned short *param_1);
 void FUN_0042bc90(struct CarouselNode *node);
 void FUN_0042c210(struct CarouselNode *node);
 void FUN_0042c800(void);
-int FUN_0042cd20(struct CarouselListElem *elem, struct CarouselNode *node, signed char divisor);
+int FUN_0042cd20(struct RideNode *elem, struct CarouselNode *node, signed char divisor);
 
-void RenderCarousel(struct CarouselRideObj *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6);
-void LoadCarouselResources(struct CarouselRideObj *param_1);
-void UnloadCarouselResources(struct CarouselRideObj *input);
+void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6);
+void LoadCarouselResources(struct Element *param_1);
+void UnloadCarouselResources(struct Element *input);
 void CarouselSetEditMode();
-void CarouselRemoveObject(struct CarouselRideObj *param_1, TileId tile, unsigned int param_3);
-void CarouselAddObject(unsigned int param_1, unsigned char *param_2);
-struct RideSpriteInfo *GetCarouselSpriteInfo(struct CarouselRideObj *param1, unsigned short param2);
+void CarouselRemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3);
+void CarouselAddObject(struct Element *param_1, unsigned char *param_2);
+struct RideSpriteInfo *GetCarouselSpriteInfo(struct Element *param1, unsigned short param2);
 int Carousel_Save(void);
-int Carousel_Load(struct CarouselRideObj *param_1);
-void CarouselUpdate(struct CarouselRideObj *param_1);
+int Carousel_Load(struct Element *param_1);
+void CarouselUpdate(struct Element *param_1);

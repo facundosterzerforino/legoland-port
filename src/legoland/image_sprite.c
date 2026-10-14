@@ -343,7 +343,7 @@ LEGO_EXPORT int ReloadImageBitmapAndBuildSprites(struct Image *image) {
 
     bVar4 = 0;
     if ((image->field_14 == 2 || image->field_14 == 3) &&
-        LLSStop((unsigned int)image->data) != 0) {
+        LLSStop((struct LLS *)image->data) != 0) {
         bVar4 = 1;
         memcpy(local_buf, image->data, 24);
     }
@@ -407,7 +407,7 @@ LEGO_EXPORT int KillImage(struct Image *image) {
     image->refcount--;
     if (image->refcount == 0) {
         if (image->field_14 == 2 || image->field_14 == 3) {
-            LLSStop((unsigned int)image->data);
+            LLSStop((struct LLS *)image->data);
         }
         if (image->data != 0) {
             free(image->data);
@@ -463,7 +463,7 @@ void UnlinkAndFreeSprite(struct Sprite *sprite) {
 // FUNCTION: LEGOLAND 0x00497610
 LEGO_EXPORT void FreeBitmapResources(struct Image *image) {
     if (image->data != 0) {
-        LLSStop((unsigned int)image->data);
+        LLSStop((struct LLS *)image->data);
         free(image->data);
         image->data = 0;
     }

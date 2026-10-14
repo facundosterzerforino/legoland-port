@@ -206,7 +206,7 @@ void TempleSlideLoad(struct SlideContext *arg) {
     TempSlideBinV = LoadBinV(
         // STRING: LEGOLAND 0x004b4f64
         "Zbuffers\\tempslide.bnv");
-    GetLLSForSprite((struct SpriteLLS *)DAT_004cbf80->var_64);
+    GetLLSForSprite((struct Sprite *)DAT_004cbf80->var_64);
     DAT_004cbfc8 = 0;
     DAT_004cbfcc[0] = 1;
     DAT_004cbf88 = 13;

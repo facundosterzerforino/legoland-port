@@ -223,7 +223,7 @@ void WaterWorksEntranceAddObject(struct EditObject *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00417c70
-void WaterWorksEntranceRemoveObject(unsigned int a, unsigned int b, unsigned int c) {
+void WaterWorksEntranceRemoveObject(struct Element *a, unsigned int b, unsigned int c) {
     RemoveSoundObject(a, b, c);
 }
 
@@ -377,7 +377,7 @@ void WaterWorksWaterBlockUpdate(Element *obj) {
             idx = node->block_index;
             lls = *(int *)(*(int *)((char *)WaterWorksImageListData + 8) + (unsigned char)idx * 4);
             if (lls != 0) {
-                lls = GetLLSForSprite((struct SpriteLLS *)lls);
+                lls = GetLLSForSprite((struct Sprite *)lls);
                 if (lls != 0) {
                     limit = *(short *)(lls + 0x10);
                 } else {
@@ -394,7 +394,7 @@ void WaterWorksWaterBlockUpdate(Element *obj) {
             }
         } else {
             lls = *(int *)(*(int *)((char *)WaterWorksImageListData + 8) + node->block_index * 4);
-            lls = GetLLSForSprite((struct SpriteLLS *)lls);
+            lls = GetLLSForSprite((struct Sprite *)lls);
             if (lls != 0) {
                 node->frame = 0;
             } else {
@@ -482,7 +482,7 @@ void WaterBlockAddObject(struct EditObject *editObj, unsigned char *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00418230
-void WaterBlockRemoveObject(unsigned int a, unsigned int b, unsigned int c) {
+void WaterBlockRemoveObject(struct Element *a, unsigned int b, unsigned int c) {
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
@@ -566,7 +566,7 @@ void WaterWorksShowerUpdate(void) {
         if (node->field_8 == 2) {
             limit = 0;
             node->frame++;
-            lls = GetLLSForSprite((struct SpriteLLS *)ShowerSprite);
+            lls = GetLLSForSprite((struct Sprite *)ShowerSprite);
             if (lls != 0) {
                 limit = *(short *)(lls + 0x10);
             }
@@ -602,7 +602,7 @@ void RenderShower(struct WaterRender *render, unsigned int p2, unsigned int p3, 
         offset.y = 0x14;
         AdjustOffsetForViewMode((struct Point *)&offset);
         sc = GetScreenCoordsForObject(coords, ctx);
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)ShowerSprite);
+        lls = GetLLSForSprite((struct Sprite *)ShowerSprite);
         LLSSetFrame(lls, node->frame);
         PrintSprite(ShowerSprite, sc.x + offset.x, sc.y + offset.y, p6, 0);
     }
@@ -619,7 +619,7 @@ void ShowerAddObject(struct EditObject *editObj, unsigned char *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00418510
-void ShowerRemoveObject(unsigned int a, unsigned int b, unsigned int c) {
+void ShowerRemoveObject(struct Element *a, unsigned int b, unsigned int c) {
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
@@ -755,7 +755,7 @@ void WaterWorksElephantFountainUpdate(void) {
     for (node = ElephantFountainList; node != NULL; node = node->next) {
         if (node->field_8 == 1) {
             limit = 0;
-            lls = GetLLSForSprite((struct SpriteLLS *)WwElsquirtSprite);
+            lls = GetLLSForSprite((struct Sprite *)WwElsquirtSprite);
             if (lls != 0) {
                 limit = *(short *)(lls + 0x10);
             }
@@ -793,7 +793,7 @@ void ElephantFountainAddObject(struct EditObject *editObj, unsigned char *coords
 }
 
 // FUNCTION: LEGOLAND 0x00418910
-void ElephantFountainRemoveObject(unsigned int a, unsigned int b, unsigned int c) {
+void ElephantFountainRemoveObject(struct Element *a, unsigned int b, unsigned int c) {
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
@@ -832,7 +832,7 @@ void CrocodileFountainAddObject(struct EditObject *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00418a10
-void CrocodileFountainRemoveObject(unsigned int a, unsigned int b, unsigned int c) {
+void CrocodileFountainRemoveObject(struct Element *a, unsigned int b, unsigned int c) {
     RemoveSoundObject(a, b, c);
 }
 

@@ -99,7 +99,7 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor);
 void LoadBrijMaskSprite(Element *obj);
 void KillBrijMaskSprite();
 void MonkeyTreeSetEditMode();
-void MonkeyTreeAddObject(unsigned int param_1, int *param_2);
+void MonkeyTreeAddObject(struct Element *param_1, int *param_2);
 void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3);
 unsigned int JungleCruiseMonkeyTreeDCalcCursor(unsigned int param_1, unsigned int param_2);
 struct RideSpriteInfo *GetMonkeyTreeSpriteInfo(Element *obj, unsigned short param_2);

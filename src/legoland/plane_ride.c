@@ -310,7 +310,7 @@ void PlaneRideRemoveObject(struct PlaneRideObject *a1, TileId a2, struct PlaneRi
     if (temp != 0) {
         RemovePlaneRideNode((void *)temp);
     }
-    StandardRemoveObject((unsigned int)a1, a2, (unsigned int)a3);
+    StandardRemoveObject(a1, a2, (unsigned int)a3);
     RemoveAllBlokesFromRide(a1->ride, a2);
 }
 

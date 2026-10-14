@@ -2,15 +2,17 @@
 
 #include "legoland.h"
 
-LEGO_EXPORT void RemoveSoundObject(unsigned int a, unsigned int b, unsigned int c);
+struct Element;
+
+LEGO_EXPORT void RemoveSoundObject(struct Element *a, unsigned int b, unsigned int c);
 
 void LoadFountainSFX();
 void KillFountainSFX();
-void FountainAddObject(unsigned int param_1, int *param_2);
+void FountainAddObject(struct Element *param_1, int *param_2);
 void LoadPowerStationSFX();
 void LoadDinoSFX();
 void KillPowerStationSFX();
-void SmallPowerStationAddObject(unsigned int param_1, int *param_2);
-void CrystalPowerStationAddObject(unsigned int param_1, int *param_2);
+void SmallPowerStationAddObject(struct Element *param_1, int *param_2);
+void CrystalPowerStationAddObject(struct Element *param_1, int *param_2);
 void KillDinoSFX();
-void DinoAddObject(unsigned int param_1, int *param_2);
+void DinoAddObject(struct Element *param_1, int *param_2);

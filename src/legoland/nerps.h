@@ -1,25 +1,18 @@
 #pragma once
 
+/* A section of the level script: its number, a string, its timed events and its events. */
+struct ObjectiveEvent;
+
 struct NerpsListNode {
     struct NerpsListNode *next;
-    unsigned int field_4;
-    unsigned int field_8;
-    unsigned int field_c;
-    unsigned int field_10;
-};
-
-struct SortNode {
-    struct SortNode *next;
-    int val;
+    int field_4; /* the section's number; the list is sorted by it */
+    char *field_8;
+    struct ObjectiveEvent *field_c;
+    struct ObjectiveEvent *field_10;
 };
 
 struct StringHolder;
 struct Vec4;
-struct NerpsArg;
-struct WrapperNode;
-struct Ctx6b0;
-struct AppendArgC;
-struct AppendArg10;
 
 void SetScriptFeature(unsigned int param_1, unsigned int param_2);
 void FUN_0046a140(int index, unsigned int param_2, unsigned int param_3);
@@ -27,13 +20,13 @@ void SetScriptStopped(unsigned int param_1);
 unsigned int IsScriptStopped(void);
 void RunLevelScript(void);
 struct NerpsListNode *FUN_0046b4f0(unsigned int param_1);
-void FUN_0046b520(struct WrapperNode *node);
-int RemoveScriptSection(struct SortNode *node);
-void InsertScriptSection(struct SortNode *node);
-void FUN_0046b6b0(struct Ctx6b0 *ctx, unsigned int param_2);
-void AppendObjectiveEventList(struct AppendArgC *arg);
-void AppendSectionRewards(struct AppendArg10 *arg);
-void FUN_0046b650(const char *src, struct StringHolder *holder);
+void FUN_0046b520(struct NerpsListNode *node);
+int RemoveScriptSection(struct NerpsListNode *node);
+void InsertScriptSection(struct NerpsListNode *node);
+void FUN_0046b6b0(struct NerpsListNode *ctx, unsigned int param_2);
+void AppendObjectiveEventList(struct NerpsListNode *arg);
+void AppendSectionRewards(struct NerpsListNode *arg);
+void FUN_0046b650(const char *src, struct NerpsListNode *holder);
 unsigned int FUN_0046b700(void);
 unsigned int FUN_0046b760(void);
 void NewScriptGiveEvent(unsigned int param_1, unsigned int param_2);

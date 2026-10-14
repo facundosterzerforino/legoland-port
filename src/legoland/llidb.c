@@ -811,8 +811,8 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         if (sprite != 0 && (sprite->flags & 0x8000) != 0) {
             for (j = 0; j < (int)((struct Sprite *)obj->sprite_2)->image->aux; j++) {
                 sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->sprite_2, j);
-                if (sprite != 0 && (sprite = (struct Sprite *)GetLLSForSprite((struct SpriteLLS *)sprite)) != 0) {
-                    LLSStop((unsigned int)sprite);
+                if (sprite != 0 && (sprite = (struct Sprite *)GetLLSForSprite((struct Sprite *)sprite)) != 0) {
+                    LLSStop((struct LLS *)sprite);
                 }
             }
         }
@@ -1464,14 +1464,14 @@ LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d4c0
-LEGO_EXPORT int LLSStop(unsigned int handle) {
+LEGO_EXPORT int LLSStop(struct LLS *lls) {
     struct LLSNode *cur;
     struct LLSNode *prev;
 
     cur = LLSPlayList;
     prev = NULL;
     while (cur != NULL) {
-        if (cur->lls == (struct LLS *)handle) {
+        if (cur->lls == lls) {
             if (prev != NULL) {
                 prev->next = cur->next;
             } else {
@@ -1572,7 +1572,7 @@ LEGO_EXPORT void LLSAuto(void) {
                     lls->frame = 0;
                     if (lls->flags & 4) {
                         lls->flags &= ~4;
-                        LLSStop((unsigned int)lls);
+                        LLSStop((struct LLS *)lls);
                     }
                 }
                 lls->loop_delay = lls->delay;

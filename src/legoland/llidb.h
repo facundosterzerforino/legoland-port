@@ -82,7 +82,7 @@ LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle);
 
 LEGO_EXPORT void LLSAuto(void);
 void LLSAdvanceFrame(struct LLS *param_1);
-LEGO_EXPORT int LLSStop(unsigned int handle);
+LEGO_EXPORT int LLSStop(struct LLS *lls);
 LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2);
 LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, unsigned int param_2);
 LEGO_EXPORT void LLSSetFrame(struct LLS *lls, int index);

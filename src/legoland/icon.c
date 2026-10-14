@@ -1034,13 +1034,13 @@ int FUN_0046e920(struct IconNode *node) {
         } else {
             struct Sprite *alt = node->alt_sprite;
             if (alt != NULL) {
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)node->sprite);
+                lls = GetLLSForSprite((struct Sprite *)node->sprite);
                 if (lls != NULL) {
                     frame = *(short *)lls;
                 } else {
                     frame = 0;
                 }
-                lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)alt);
+                lls = GetLLSForSprite((struct Sprite *)alt);
                 if (lls != NULL) {
                     LLSSetFrame(lls, frame);
                 }

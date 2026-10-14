@@ -50,7 +50,7 @@ void LoadGShedMatteSprite(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043ceb0
-unsigned int PottingShedAddObject(unsigned int param_1, unsigned int param_2) {
+unsigned int PottingShedAddObject(struct Element *param_1, unsigned int param_2) {
     return AddBasicObject(param_1, param_2);
 }
 

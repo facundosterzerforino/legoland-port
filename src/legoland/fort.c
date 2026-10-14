@@ -62,9 +62,9 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
         struct Point off;
         sprite = GetSpriteForLayer(FortLayer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
             if (lls != NULL) {
-                LLSStop((unsigned int)lls);
+                LLSStop((struct LLS *)lls);
             }
         }
         off = GetRenderOffsetForLayer(FortLayer, 2);
@@ -87,14 +87,14 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
         lls = NULL;
         sprite = GetSpriteForLayer(FortLayer, 2);
         if (sprite != NULL) {
-            lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite);
+            lls = GetLLSForSprite((struct Sprite *)sprite);
         }
         if (lls != NULL) {
             frame = lls->frame;
         } else {
             frame = clip;
         }
-        lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)FortMaskSprite);
+        lls = GetLLSForSprite((struct Sprite *)FortMaskSprite);
         if (lls != NULL) {
             LLSSetFrame(lls, frame);
         }
@@ -162,7 +162,7 @@ void FortUpdate(Element *elem) {
 
     spr = GetSpriteForLayer(FortLayer, 2);
     if (spr != (int)NULL) {
-        lls = (short *)GetLLSForSprite((struct SpriteLLS *)spr);
+        lls = (short *)GetLLSForSprite((struct Sprite *)spr);
         if (lls) {
             if (++lls[0] >= lls[8]) {
                 lls[0] = 0;
@@ -233,7 +233,7 @@ void FortSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406860
-unsigned int FortAddObject(unsigned int param1, unsigned int param2) {
+unsigned int FortAddObject(struct Element *param1, unsigned int param2) {
     return AddBasicObject(param1, param2);
 }
 

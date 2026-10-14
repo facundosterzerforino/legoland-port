@@ -556,13 +556,13 @@ void LoadBoatingSchoolResources(Element *obj) {
     }
     for (i = 0; i < BoatingSchoolBoats->count; i++) {
         sprite = BoatingSchoolBoats->sprites[i & 0xff];
-        LLSPlay((struct LLS *)GetLLSForSprite((struct SpriteLLS *)sprite), *(unsigned int *)((char *)sprite + 8));
+        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(unsigned int *)((char *)sprite + 8));
     }
     // STRING: LEGOLAND 0x004b530c
     BoatingSchoolHullMaskSprite = LoadSprite("bs_hullmask.lls", 1);
     // STRING: LEGOLAND 0x004b52fc
     BoatingSchoolRailmSprite = LoadSprite("bs_railm.lls", 1);
-    lls = GetLLSForSprite((struct SpriteLLS *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 5)));
+    lls = GetLLSForSprite((struct Sprite *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 5)));
     LLSStop(lls);
     LLSSetFrame((struct LLS *)lls, *(short *)(lls + 0x10));
     BoatingSchoolFootprint = BoatingSchoolRide->footprint;
@@ -588,7 +588,7 @@ void UnloadBoatingSchoolResources(void) {
     Kill_FXList(PTR_s_Boat_Noise_wav, 2);
     for (i = 0; i < BoatingSchoolBoats->count; i++) {
         sprite = BoatingSchoolBoats->sprites[(unsigned char)i];
-        LLSStop(GetLLSForSprite((struct SpriteLLS *)sprite));
+        LLSStop(GetLLSForSprite((struct Sprite *)sprite));
     }
     if (LLIDB_FindElement("BOATING SCHOOL TILE MAPPING", &handle, 0) == 0) {
         LLIDB_UnLoadData(handle);
@@ -829,7 +829,7 @@ void BoatingSchoolUpdate(void) {
     struct SampleSource source2;
     struct Sample *sample;
 
-    lls = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)DAT_0082ae00);
+    lls = GetLLSForSprite((struct Sprite *)DAT_0082ae00);
     if (++BoatingSchoolAnimTick == 0x50) {
         BoatingSchoolAnimTick = 0;
         FUN_00419300();
@@ -970,8 +970,8 @@ void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_
     pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
     offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)BoatingSchoolRide->layer, 3);
     AdjustOffsetForViewMode(&offset);
-    lls = (short *)GetLLSForSprite((struct SpriteLLS *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 3));
-    hull = (struct LLS *)GetLLSForSprite((struct SpriteLLS *)BoatingSchoolHullMaskSprite);
+    lls = (short *)GetLLSForSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 3));
+    hull = GetLLSForSprite((struct Sprite *)BoatingSchoolHullMaskSprite);
     LLSSetFrame(hull, *lls);
     PrintSprite(BoatingSchoolHullMaskSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
     for (; node != NULL; node = node->next) {
