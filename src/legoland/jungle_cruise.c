@@ -760,12 +760,12 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, int *param_2, unsigned int p
         n++;
     }
     if (n != 0) {
-        EditCursor.field_1830 = (unsigned int)&JungleCruiseCursors[0];
+        EditCursor.next = &JungleCruiseCursors[0];
         if (n > 1) {
             c = &JungleCruiseCursors[1];
             n--;
             do {
-                c[-1].field_1830 = (unsigned int)c;
+                c[-1].next = c;
                 c++;
                 n--;
             } while (n != 0);
@@ -952,9 +952,9 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, int *param_2, int *param_3) 
                 n++;
             }
             if (n != 0) {
-                EditCursor.field_1830 = (unsigned int)&DAT_00616180[0];
+                EditCursor.next = &DAT_00616180[0];
                 for (i = 1; i < n; i++) {
-                    DAT_00616180[i - 1].field_1830 = (unsigned int)&DAT_00616180[i];
+                    DAT_00616180[i - 1].next = &DAT_00616180[i];
                 }
             }
         }
@@ -1102,7 +1102,7 @@ void LoadJungleCruiseResources(Element *obj) {
     }
     for (i = 0; i < JungleCruiseBoats->count; i++) {
         sprite = JungleCruiseBoats->sprites[(unsigned char)i];
-        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(unsigned int *)((char *)sprite + 8));
+        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(void **)((char *)sprite + 8));
     }
     // STRING: LEGOLAND 0x004b72b8
     JungMaskSprite = LoadSprite("jungmask.lls", 1);
@@ -1233,7 +1233,7 @@ void JungleCruiseCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
     ResetCursorBuildable(&PathCursor);
-    EditCursor.field_1830 = (unsigned int)&PathCursor;
+    EditCursor.next = &PathCursor;
     PathCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, obj->ride);
 }
@@ -1858,12 +1858,12 @@ void JungleCruiseWaterCalcCursor(Element *obj, int *param_2, unsigned int param_
                         n++;
                     }
                     if (n != 0) {
-                        EditCursor.field_1830 = (unsigned int)&DAT_00629c58[0];
+                        EditCursor.next = &DAT_00629c58[0];
                         if (n > 1) {
                             c = &DAT_00629c58[1];
                             n--;
                             do {
-                                c[-1].field_1830 = (unsigned int)c;
+                                c[-1].next = c;
                                 c++;
                                 n--;
                             } while (n != 0);

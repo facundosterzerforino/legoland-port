@@ -1,6 +1,8 @@
+#include <stddef.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "legoland.h"
 
 #include "clipping.h"
@@ -29,14 +31,29 @@ struct SortNode {
     /* 0x1c */ struct Sprite *sprite;
     /* 0x20 */ int x;
     /* 0x24 */ int y;
-    /* 0x28 */ int field_28;
-    /* 0x2c */ int field_2c;
-    /* 0x30 */ int field_30;
-    /* 0x34 */ int field_34;
-    /* 0x38 */ int field_38;
-    /* 0x3c */ int field_3c;
-    /* 0x40 */ int field_40;
+    union {
+        /* SortSprite / SortSpriteWithCallback */
+        struct {
+            /* 0x28 */ int mode;
+            /* 0x2c */ unsigned short *palette;
+            /* 0x30 */ int frame;
+            /* 0x34 */ void (*callback)(void *arg); /* run after the sprite is drawn (flags & 4) */
+            /* 0x38 */ void *callback_arg;
+        } plain;
+        /* SortClippedSprite (flags & 1) */
+        struct {
+            /* 0x28 */ RECT clip;
+            /* 0x38 */ int mode;
+            /* 0x3c */ unsigned short *palette;
+            /* 0x40 */ int frame;
+        } clipped;
+    };
 };
+
+/* the print list pool's bytes per node kind (0x3c, 0x4c and 0x20 on x86) */
+#define SORT_NODE_PLAIN (offsetof(struct SortNode, plain) + sizeof(((struct SortNode *)0)->plain))
+#define SORT_NODE_CLIPPED (sizeof(struct SortNode) + 8)
+#define SORT_NODE_PERSON offsetof(struct SortNode, x)
 
 struct SpriteExArg {
     /* 0x00 */ struct Sprite *sprite;
@@ -340,7 +357,7 @@ LEGO_EXPORT void ClearPrintList(void) {
 LEGO_EXPORT void DrawAndClearPrintList(void) {
     struct SortNode *node;
     struct SortNode *node_save;
-    unsigned int saved_pal;
+    unsigned short *saved_pal;
     unsigned int saved_frame;
     void *obj;
     RECT saved_clip;
@@ -351,24 +368,24 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
     DAT_0066b5ac = 0;
     for (; node != NULL; node = node->right) {
         if ((node->flags & 1) != 0) {
-            if (node->field_28 < 0 || node->field_30 > (int)(unsigned int)lpConfig->screen_width || node->field_2c < 0 || node->field_34 > (int)(unsigned int)lpConfig->screen_height) {
+            if (node->clipped.clip.left < 0 || node->clipped.clip.right > (int)(unsigned int)lpConfig->screen_width || node->clipped.clip.top < 0 || node->clipped.clip.bottom > (int)(unsigned int)lpConfig->screen_height) {
                 // STRING: LEGOLAND 0x004bdd0c
                 printf("error");
             }
             GetClipping(&saved_clip);
-            SetClipping(&node->field_28);
+            SetClipping(&node->clipped.clip);
             if (node->sprite != NULL) {
-                SetOverridePalette(node->field_3c);
-                SetOverrideFrame(node->field_40);
-                PrintSprite(node->sprite, node->x, node->y, node->field_38, (int *)&node->hit);
+                SetOverridePalette(node->clipped.palette);
+                SetOverrideFrame(node->clipped.frame);
+                PrintSprite(node->sprite, node->x, node->y, node->clipped.mode, (int *)&node->hit);
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
-                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, &node->field_28, node->field_38);
+                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, &node->clipped.clip, node->clipped.mode);
                 }
             }
             if ((node->flags & 4) != 0) {
-                (*(void (**)(int))&node_save->field_34)(node_save->field_38);
+                node_save->plain.callback(node_save->plain.callback_arg);
             }
             SetClipping(&saved_clip);
         } else if ((node->flags & 0x2000) != 0) {
@@ -376,16 +393,16 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
         } else {
             node_save = node;
             if (node->sprite != NULL) {
-                SetOverridePalette(node->field_2c);
-                SetOverrideFrame(node->field_30);
-                PrintSprite(node->sprite, node->x, node->y, node->field_28, (int *)&node->hit);
+                SetOverridePalette(node->plain.palette);
+                SetOverrideFrame(node->plain.frame);
+                PrintSprite(node->sprite, node->x, node->y, node->plain.mode, (int *)&node->hit);
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
-                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, 0, node->field_28);
+                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, 0, node->plain.mode);
                 }
                 if ((node->flags & 4) != 0) {
-                    (*(void (**)(int))&node->field_34)(node->field_38);
+                    node->plain.callback(node->plain.callback_arg);
                 }
             }
         }
@@ -449,22 +466,22 @@ void InsertSortNode(struct SortNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00485cd0
-LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, unsigned int y, int key, unsigned int param_5, unsigned int param_6, unsigned int param_7, struct HitInfo *hit) {
+LEGO_EXPORT void SortSpriteWithCallback(struct Sprite *sprite, unsigned int x, unsigned int y, int key, unsigned int param_5, void (*param_6)(void *arg), void *param_7, struct HitInfo *hit) {
     unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    PrintListBytesUsed += 0x3c;
+    PrintListBytesUsed += SORT_NODE_PLAIN;
     node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->x = x;
     node->y = y;
     node->flags = 4;
-    node->field_28 = param_5;
-    node->field_34 = param_6;
-    node->field_38 = param_7;
-    node->field_2c = GetOverridePalette();
-    node->field_30 = GetOverrideFrame();
+    node->plain.mode = param_5;
+    node->plain.callback = param_6;
+    node->plain.callback_arg = param_7;
+    node->plain.palette = GetOverridePalette();
+    node->plain.frame = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
         InsertSortNode(node);
@@ -479,16 +496,16 @@ LEGO_EXPORT void SortSprite(struct Sprite *sprite, unsigned int x, unsigned int 
     unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    PrintListBytesUsed += 0x3c;
+    PrintListBytesUsed += SORT_NODE_PLAIN;
     node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->flags = 0;
     node->x = x;
     node->y = y;
-    node->field_28 = param_5;
-    node->field_2c = GetOverridePalette();
-    node->field_30 = GetOverrideFrame();
+    node->plain.mode = param_5;
+    node->plain.palette = GetOverridePalette();
+    node->plain.frame = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
         InsertSortNode(node);
@@ -503,7 +520,7 @@ LEGO_EXPORT void SortPerson(struct Person *person, unsigned int param_2, void *p
     unsigned int original = PrintListBytesUsed;
     struct SortNode *block;
 
-    PrintListBytesUsed += 0x20;
+    PrintListBytesUsed += SORT_NODE_PERSON;
     block = (struct SortNode *)&PrintListPool[original];
     block->key = param_2;
     block->flags = 0x2000;
@@ -516,17 +533,17 @@ LEGO_EXPORT void SortClippedSprite(struct Sprite *sprite, unsigned int x, unsign
     unsigned int original = PrintListBytesUsed;
     struct SortNode *node;
 
-    PrintListBytesUsed += 0x4c;
+    PrintListBytesUsed += SORT_NODE_CLIPPED;
     node = (struct SortNode *)&PrintListPool[original];
     node->key = key;
     node->sprite = sprite;
     node->x = x;
     node->flags = 1;
     node->y = y;
-    *(RECT *)&node->field_28 = *clip;
-    node->field_38 = param_6;
-    node->field_3c = GetOverridePalette();
-    node->field_40 = GetOverrideFrame();
+    node->clipped.clip = *clip;
+    node->clipped.mode = param_6;
+    node->clipped.palette = GetOverridePalette();
+    node->clipped.frame = GetOverrideFrame();
     if (hit != NULL) {
         node->hit = *hit;
         InsertSortNode(node);

@@ -559,7 +559,7 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
             }
             if (t != NULL && IsCursorBuildable(&EditCursor) != 0) {
                 memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
-                EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
+                EditCursor.next = &DAT_0082f760;
                 DAT_0082f760.tile_x = t->x;
                 { ptmp554 = t->y; }
                 DAT_0082f760.tile_y = ptmp554;

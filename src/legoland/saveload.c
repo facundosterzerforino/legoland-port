@@ -683,9 +683,9 @@ LEGO_EXPORT int SaveGame(char *filename) {
     {
         struct OverlayNode *ov;
         int n;
-        n = strlen(((struct Element *)OverlayILFHandle)->name);
+        n = strlen(OverlayILFHandle->name);
         SaveGameWrite(&n, 4);
-        SaveGameWrite(((struct Element *)OverlayILFHandle)->name, n);
+        SaveGameWrite(OverlayILFHandle->name, n);
         if (BridgesHandle != 0) {
             n = strlen(((struct Element *)BridgesHandle)->name);
         } else {
@@ -1129,7 +1129,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         SaveGameRead(name2, u.n);
         name2[u.n] = 0;
         LLIDB_FindElement(name2, &OverlayILFHandle, 0);
-        OverlayILF = (unsigned int)LLIDB_LoadData(OverlayILFHandle);
+        OverlayILF = LLIDB_LoadData(OverlayILFHandle);
         SaveGameRead(&u.n, 4);
         if (u.n != 0) {
             SaveGameRead(name2, u.n);

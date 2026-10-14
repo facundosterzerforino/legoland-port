@@ -24,7 +24,7 @@ struct BoatRide {
     /* 0x3e0 */ unsigned int field_3e0;
     /* 0x3e4 */ unsigned int field_3e4;
     /* 0x3e8 */ unsigned int field_3e8;
-    /* 0x3ec */ unsigned int bloke;
+    /* 0x3ec */ struct Bloke *bloke;
     /* 0x3f0 */ struct BoatRide *next;
 };
 
@@ -37,7 +37,7 @@ struct BoatRideNode {
     /* 0x0c */ unsigned int field_c;
     /* 0x10 */ unsigned int field_10;
     /* 0x14 */ unsigned int bloke_count;
-    /* 0x18 */ unsigned int blokes[5];
+    /* 0x18 */ struct Bloke *blokes[5]; /* indices (GetBlokeNum) in a save */
     /* 0x2c */ struct BoatRideNode *next;
     /* 0x30 */ unsigned int value;
 };
@@ -60,7 +60,7 @@ struct MermaidNode {
 };
 
 /* LLIDB "BOATING SCHOOL BOATS" data: boat sprites with per-frame screen offsets. */
-int FUN_00418e60(TileId tile, unsigned int bloke);
+int FUN_00418e60(TileId tile, struct Bloke *bloke);
 void FUN_00418fe0(int param_1);
 void FUN_00419300(void);
 void FUN_004193c0(struct BoatRide *param_1);

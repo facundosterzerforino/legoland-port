@@ -25,7 +25,7 @@
 #include "tilemap.h"
 
 // FUNCTION: LEGOLAND 0x00418e60
-int FUN_00418e60(TileId tile, unsigned int bloke) {
+int FUN_00418e60(TileId tile, struct Bloke *bloke) {
     struct BoatRideNode *score;
     struct BoatRide *node = BoatRideList;
     struct BoatRide *fresh;
@@ -105,7 +105,7 @@ void FUN_00418fe0(int param_1) {
     struct Point b;
     int sx;
     int sy;
-    int person;
+    struct Person *person;
     struct Point off;
     struct Point seat;
     ride = BoatRideList;
@@ -130,24 +130,24 @@ void FUN_00418fe0(int param_1) {
             ride->screen_y = lpConfig->view_y + b.y + off.y + sy;
             PrintSprite(BoatingSchoolBoats->sprites[ride->step_sprite[BoatingSchoolAnimTick] & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             if (ride->bloke != 0) {
-                person = (int)Find3DPersonFromBloke(ride->bloke);
-                *(float *)(person + 0x44) = ((float)(int)ride->step_sprite[BoatingSchoolAnimTick] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
-                SetPersonRotation((struct Person *)person, (float *)(person + 0x40));
+                person = Find3DPersonFromBloke(ride->bloke);
+                person->field_44 = ((float)(int)ride->step_sprite[BoatingSchoolAnimTick] * DAT_004ab3e8 + DAT_004ab3e4) * DAT_004ab3dc * DAT_004ab3e0;
+                SetPersonRotation(person, &person->field_40);
                 off.x = lpConfig->view_x + b.x + sx;
                 off.y = lpConfig->view_y + b.y + sy;
                 AdjustBlokePosition((struct Point *)&off);
                 seat.x = DAT_004b51d8[(ride->step_sprite[BoatingSchoolAnimTick] & 0xf) * 2] + 0x44;
                 seat.y = DAT_004b51d8[(ride->step_sprite[BoatingSchoolAnimTick] & 0xf) * 2 + 1] + 0x34;
                 AdjustOffsetForViewMode(&seat);
-                *(int *)(person + 0x1c) = seat.x + off.x;
-                *(int *)(person + 0x20) = seat.y + off.y;
-                IP_RenderBlokeIn3DNow((struct Bloke *)ride->bloke);
+                person->screen.x = seat.x + off.x;
+                person->screen.y = seat.y + off.y;
+                IP_RenderBlokeIn3DNow(ride->bloke);
                 PrintSprite(BoatingSchoolBoats->sprites[(ride->step_sprite[BoatingSchoolAnimTick] + 0x30) & 0xff], ride->screen_x, ride->screen_y, 0, 0);
             }
         }
         if (ride->field_3e4 == 0x10 && ride->field_3e8 == 2 && BoatingSchoolAnimTick == 0x4f && param_1 != 0) {
             if (ride->bloke != 0) {
-                ((struct Bloke *)ride->bloke)->param_action++;
+                (ride->bloke)->param_action++;
                 ride->bloke = 0;
             }
         }
@@ -232,7 +232,7 @@ struct BoatRide *FUN_00419420(struct BoatRide *param_1) {
     if (param_1->field_3e8 == 0) {
         result = param_1->next;
         source.type = 1;
-        source.bloke = (void *)param_1->bloke;
+        source.bloke = param_1->bloke;
         UnSourceAndFadeAllSamplesFromSource(&source, -0x5a);
         FUN_00418f90(param_1);
         return result;
@@ -540,7 +540,7 @@ void LoadBoatingSchoolResources(Element *obj) {
     struct Element *handle;
     int i;
     struct Sprite *sprite;
-    int lls;
+    struct LLS *lls;
 
     Load_FXList(PTR_s_Boat_Noise_wav, 2);
     BoatingSchoolRide = obj->ride;
@@ -556,7 +556,7 @@ void LoadBoatingSchoolResources(Element *obj) {
     }
     for (i = 0; i < BoatingSchoolBoats->count; i++) {
         sprite = BoatingSchoolBoats->sprites[i & 0xff];
-        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(unsigned int *)((char *)sprite + 8));
+        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(void **)((char *)sprite + 8));
     }
     // STRING: LEGOLAND 0x004b530c
     BoatingSchoolHullMaskSprite = LoadSprite("bs_hullmask.lls", 1);
@@ -564,7 +564,7 @@ void LoadBoatingSchoolResources(Element *obj) {
     BoatingSchoolRailmSprite = LoadSprite("bs_railm.lls", 1);
     lls = GetLLSForSprite((struct Sprite *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 5)));
     LLSStop(lls);
-    LLSSetFrame((struct LLS *)lls, *(short *)(lls + 0x10));
+    LLSSetFrame(lls, lls->frame_count);
     BoatingSchoolFootprint = BoatingSchoolRide->footprint;
     DAT_004cc048 = DAT_004b5260;
     DAT_004cc048.v[1] += BoatingSchoolFootprint.v[1];
@@ -691,7 +691,7 @@ void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int
     PathCursor.field_1414[3] = EditCursor.field_1414[3];
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
-    EditCursor.field_1830 = (unsigned int)&PathCursor;
+    EditCursor.next = &PathCursor;
     ResetCursorBuildable(&EditCursor);
     ResetCursorBuildable(&PathCursor);
     ValidateCursor(&EditCursor, cursor);
@@ -712,7 +712,7 @@ void BoatingSchoolDCalcCursor(void *param_1, struct Point *param_2) {
     PathCursor.field_1414[4] = 0;
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
-    QueryCursor.field_1830 = (unsigned int)&PathCursor;
+    QueryCursor.next = &PathCursor;
     DAT_00810144 = 1;
     DefaultCursor(&DAT_0082ae20);
     *(struct Footprint *)DAT_0082ae20.field_1414 = DAT_004b53c0;
@@ -852,7 +852,7 @@ void BoatingSchoolUpdate(void) {
         case 0:
             slot = 4;
             for (i = 0; i < 5; i++) {
-                if (score->blokes[i] == (unsigned int)bloke) {
+                if (score->blokes[i] == bloke) {
                     slot = i;
                     break;
                 }
@@ -862,14 +862,14 @@ void BoatingSchoolUpdate(void) {
                     RemoveBlokeFromRide(BoatingSchoolRide, node);
                     break;
                 }
-                score->blokes[slot] = (unsigned int)bloke;
+                score->blokes[slot] = bloke;
                 score->bloke_count++;
             } else {
-                bloke = (struct Bloke *)score->blokes[slot];
+                bloke = score->blokes[slot];
                 if (score->blokes[slot - 1] != 0) {
                     break;
                 }
-                score->blokes[slot - 1] = (unsigned int)bloke;
+                score->blokes[slot - 1] = bloke;
                 score->blokes[slot] = 0;
                 if (--slot == 0) {
                     bloke->param_action++;
@@ -884,8 +884,8 @@ void BoatingSchoolUpdate(void) {
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             break;
         case 1:
-            if (bloke == (struct Bloke *)score->blokes[0] && score->connected != 0) {
-                if ((int)score->value >= (int)FUN_004192d0((struct BoatRide *)score) * 6 && FUN_00418e60(tile, (unsigned int)bloke) != 0) {
+            if (bloke == score->blokes[0] && score->connected != 0) {
+                if ((int)score->value >= (int)FUN_004192d0((struct BoatRide *)score) * 6 && FUN_00418e60(tile, bloke) != 0) {
                     BlokeSitAnim(bloke);
                     BlokeSetFrame(bloke, 0);
                     score->blokes[0] = 0;
@@ -1010,7 +1010,7 @@ int BoatingSchool_Save(struct Element *element) {
     while (count--) {
         scoreCopy = *score;
         for (i = 0; i < 5; i++) {
-            scoreCopy.blokes[i] = GetBlokeNum(scoreCopy.blokes[i]);
+            scoreCopy.blokes[i] = (struct Bloke *)(INT_PTR)GetBlokeNum(scoreCopy.blokes[i]);
         }
         SaveGameWrite(&scoreCopy, 0x34);
         score = score->next;
@@ -1043,7 +1043,7 @@ int BoatingSchool_Save(struct Element *element) {
     SaveGameWrite(&count, 4);
     while (count--) {
         rideCopy = *ride;
-        rideCopy.bloke = GetBlokeNum(rideCopy.bloke);
+        rideCopy.bloke = (struct Bloke *)(INT_PTR)GetBlokeNum(rideCopy.bloke);
         SaveGameWrite(&rideCopy, 0x3f4);
         ride = ride->next;
     }
@@ -1078,7 +1078,7 @@ int BoatingSchool_Load(struct Element *element) {
         }
         SaveGameRead(prevScore, 0x34);
         for (i = 0; i < 5; i++) {
-            prevScore->blokes[i] = GetBlokePtr(prevScore->blokes[i]);
+            prevScore->blokes[i] = GetBlokePtr((int)(INT_PTR)prevScore->blokes[i]);
         }
     }
     SaveGameRead(&count, 4);
@@ -1117,7 +1117,7 @@ int BoatingSchool_Load(struct Element *element) {
             prevRide = ride;
         }
         SaveGameRead(prevRide, 0x3f4);
-        prevRide->bloke = GetBlokePtr(prevRide->bloke);
+        prevRide->bloke = GetBlokePtr((int)(INT_PTR)prevRide->bloke);
     }
     for (score = BoatRideNodeList; score != NULL; score = score->next) {
         FUN_0041caa0(score->id);
@@ -1328,12 +1328,12 @@ void BoatingSchoolMermaidCalcCursor(Element *obj, int *param_2, unsigned int par
         n++;
     }
     if (n != 0) {
-        EditCursor.field_1830 = (unsigned int)&DAT_004cc090[0];
+        EditCursor.next = &DAT_004cc090[0];
         if (n > 1) {
             c = &DAT_004cc090[1];
             n--;
             do {
-                c[-1].field_1830 = (unsigned int)c;
+                c[-1].next = c;
                 c++;
                 n--;
             } while (n != 0);
@@ -1459,7 +1459,7 @@ void BoatingSchoolWaterAddObject(Element *obj, int *coords) {
 void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3) {
     struct BoatRideNode *score = BoatRideNodeList;
     struct PathNode *path;
-    int other;
+    struct PathNode *other;
     unsigned int mask;
 
     path = FindBoatPathAt(param_1, param_2);
@@ -1476,28 +1476,28 @@ void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3) {
             mask = mask & 0xfffffffb;
         }
         if ((mask & 8) != 0 && (mask & 1) != 0 &&
-            (other = (int)FindBoatPathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = FindBoatPathAt(param_1, (param_2 - 5)), (*(unsigned char *)&other->dir_mask & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 - 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 2, param_2 - 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 3, param_2 - 2, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 2, param_2 - 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 8) != 0 && (mask & 4) != 0 &&
-            (other = (int)FindBoatPathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = FindBoatPathAt(param_1, (param_2 + 5)), (*(unsigned char *)&other->dir_mask & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 + 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 2, param_2 + 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 3, param_2 + 2, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 - 2, param_2 + 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 2) != 0 && (mask & 1) != 0 &&
-            (other = (int)FindBoatPathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = FindBoatPathAt(param_1, (param_2 - 5)), (*(unsigned char *)&other->dir_mask & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 - 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 + 2, param_2 - 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 + 3, param_2 - 2, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 + 2, param_2 - 2, *BoatingSchoolTileMapping->tiles);
         }
         if ((mask & 2) != 0 && (mask & 4) != 0 &&
-            (other = (int)FindBoatPathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = FindBoatPathAt(param_1, (param_2 + 5)), (*(unsigned char *)&other->dir_mask & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 + 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 + 2, param_2 + 3, *BoatingSchoolTileMapping->tiles);
             SetMapTile(param_1 + 3, param_2 + 2, *BoatingSchoolTileMapping->tiles);
@@ -1573,12 +1573,12 @@ void BoatingSchoolWaterCalcCursor(Element *obj, int *param_2, unsigned int param
                         n++;
                     }
                     if (n != 0) {
-                        EditCursor.field_1830 = (unsigned int)&DAT_004d2168[0];
+                        EditCursor.next = &DAT_004d2168[0];
                         if (n > 1) {
                             c = &DAT_004d2168[1];
                             n--;
                             do {
-                                c[-1].field_1830 = (unsigned int)c;
+                                c[-1].next = c;
                                 c++;
                                 n--;
                             } while (n != 0);
@@ -1621,7 +1621,7 @@ void BoatingSchoolWaterDCalcCursor(struct Element *param_1, int *coords) {
             coords[1] = QueryObj.pos.y;
             memcpy(&QueryClass->footprint, &BoatingSchoolFootprint, sizeof(BoatingSchoolFootprint));
             fake.ride = BoatingSchoolRide;
-            BoatingSchoolDCalcCursor(&fake, (unsigned int)coords);
+            BoatingSchoolDCalcCursor(&fake, (struct Point *)coords);
             return;
         }
     }

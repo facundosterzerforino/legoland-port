@@ -120,7 +120,7 @@ struct Overlay {
     unsigned int x;
     unsigned int y;
     struct Overlay *next;
-    int sprite;
+    struct Sprite *sprite;
 };
 
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
@@ -153,7 +153,7 @@ LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3) {
                 }
                 if (tile != 0) {
                     tile->field_10 = 0;
-                    tile->field_0 = (unsigned int)param_1;
+                    tile->field_0 = param_1;
                     *(unsigned short *)&tile->field_4 = param_2.id;
                     tile->flags = (unsigned short)(((tile->flags & 0x10) | param_3) | 0x80);
                     tile->durability_level = obj->durability;
@@ -212,9 +212,9 @@ LEGO_EXPORT void SetObjRectFlags(Element *editObj, struct Point *pos, unsigned s
                             tx = node->tile_x + x;
                             ty = node->tile_y + y;
                             if (tx >= 0 && tx < cfg->width && ty >= 0 && ty < cfg->height) {
-                                tile = (struct MapElement *)((int)GameMap[ty] + tx * 0x14);
+                                tile = (struct MapElement *)((char *)GameMap[ty] + tx * 0x14);
                                 if (tile != 0) {
-                                    tile->field_0 = (unsigned int)editObj;
+                                    tile->field_0 = editObj;
                                     *(unsigned short *)&tile->field_4 = coords.id;
                                     tile->flags = (unsigned short)((tile->flags & 0x10) | flags);
                                     if (obj->flags & 0x800000) {
@@ -232,7 +232,7 @@ LEGO_EXPORT void SetObjRectFlags(Element *editObj, struct Point *pos, unsigned s
                     rect = *rect.next;
                 }
             }
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
@@ -285,7 +285,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
                     rect = *rect.next;
                 }
             }
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     node = &EditCursor;
@@ -304,7 +304,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
                                 tile = 0;
                             }
                             if (tile != 0) {
-                                tile->field_0 = (unsigned int)editObj;
+                                tile->field_0 = editObj;
                                 *(unsigned short *)&tile->field_4 = coords.id;
                                 tile->flags = (unsigned short)((tile->flags & 0x10) | flags);
                                 if (obj->flags & 0x800000) {
@@ -320,7 +320,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
                     rect = *rect.next;
                 }
             }
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
@@ -360,13 +360,13 @@ void FUN_0045e300(Element *editObj, struct Point *pos) {
                                     coord[1] = node->tile_y + y;
                                     if (coord[0] >= 0 && coord[0] < cfg->width && coord[1] >= 0 &&
                                         coord[1] < cfg->height &&
-                                        (tile = (struct MapElement *)((int)GameMap[coord[1]] + coord[0] * 0x14)) != 0 &&
+                                        (tile = (struct MapElement *)((char *)GameMap[coord[1]] + coord[0] * 0x14)) != 0 &&
                                         (tile->flags & 8) != 0 &&
                                         (gtile = (struct Obj0c *)tile->field_0)->field_c == PathControlObject) {
                                         RemovePathSquare((struct Point *)coord);
                                         tile->flags &= 0xffe7;
                                         tile->field_10 &= 0xfe;
-                                        tile = (struct MapElement *)((int)GameMap[coord[1]] + coord[0] * 0x14);
+                                        tile = (struct MapElement *)((char *)GameMap[coord[1]] + coord[0] * 0x14);
                                         tile->field_8 = tile->field_a;
                                         cfg = lpConfig;
                                     }
@@ -378,7 +378,7 @@ void FUN_0045e300(Element *editObj, struct Point *pos) {
                     }
                 }
             }
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
@@ -421,7 +421,7 @@ void FUN_0045e4a0(Element *editObj, struct Point *pos) {
                             }
                             if (tile != 0) {
                                 tile->flags = 0;
-                                tile->field_0 = (unsigned int)editObj;
+                                tile->field_0 = editObj;
                                 *(unsigned short *)&tile->field_4 = coords.id;
                                 tile->field_10 = 0;
                             }
@@ -433,7 +433,7 @@ void FUN_0045e4a0(Element *editObj, struct Point *pos) {
                     rect = *rect.next;
                 }
             }
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
@@ -504,7 +504,7 @@ void FUN_0045e770(struct ObjNode *node, int *offset) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0) {
                 tile->obj_region |= (unsigned short)FUN_0045e6b0(obj);
             }
@@ -513,7 +513,7 @@ void FUN_0045e770(struct ObjNode *node, int *offset) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0) {
                     tile->obj_region |= (unsigned short)FUN_0045e710(obj);
                 }
@@ -534,7 +534,7 @@ void FUN_0045e850(struct ObjNode *node, int *offset) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0) {
                 tile->obj_region &= ~(unsigned short)FUN_0045e6b0(obj);
             }
@@ -543,7 +543,7 @@ void FUN_0045e850(struct ObjNode *node, int *offset) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0) {
                     tile->obj_region &= ~(unsigned short)FUN_0045e710(obj);
                 }
@@ -580,7 +580,7 @@ int FUN_0045e960(struct ObjNode *node, int *offset) {
         x = offset[0] + obj->pos.x;
         y = offset[1] + obj->pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0 && FUN_0045e930((struct ObjEntry *)tile) == 0) {
                 return 0;
             }
@@ -589,7 +589,7 @@ int FUN_0045e960(struct ObjNode *node, int *offset) {
             x = offset[0] + obj->pos.x;
             y = offset[1] + obj->pos.y;
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((int)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0 && FUN_0045e930((struct ObjEntry *)tile) == 0) {
                     return 0;
                 }
@@ -693,7 +693,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         FUN_0045ea40((struct ObjBox *)obj, &out);
         out.x = out.x + coords[0];
         out.y = out.y + coords[1];
-        PutObjOnMap((struct Ride *)obj, (unsigned int)editObj, (struct Point *)coords);
+        PutObjOnMap((struct Ride *)obj, editObj, (struct Point *)coords);
         if (obj->flags & 0x400000) {
             InitEntrance1Point();
             UpdatePathLinks(1);
@@ -780,7 +780,7 @@ LEGO_EXPORT void ObjectIsBuilt(struct Ride *obj, TileId coords) {
                 }
                 next = rect.next;
             } while (next != 0);
-            node = (struct Cursor *)node->field_1830;
+            node = node->next;
         } while (node != 0);
     }
     PutObjOnMap(obj, obj->element, &pos);
@@ -839,7 +839,7 @@ LEGO_EXPORT unsigned int AddBasicObject(Element *editObj, int *coords) {
             tile = 0;
         }
         tile->field_8 = *obj->tiles;
-        tile->field_0 = (unsigned int)editObj;
+        tile->field_0 = editObj;
         tile->field_4 = (unsigned char)coords[0];
         tile->field_5 = (unsigned char)coords[1];
         if (obj->flags & 2) {
@@ -1006,14 +1006,14 @@ void PropagateCursorBlocked(struct Cursor *cursor) {
     struct Cursor *best;
 
     best = cursor;
-    for (node = cursor; node != 0; node = (struct Cursor *)node->field_1830) {
+    for (node = cursor; node != 0; node = node->next) {
         node->field_1828 |= 8;
         if (node->field_140c < best->field_140c) {
             best = node;
         }
     }
     if (IsCursorBuildable(best) == 0) {
-        for (; cursor != 0; cursor = (struct Cursor *)cursor->field_1830) {
+        for (; cursor != 0; cursor = cursor->next) {
             SetCursorBlocked(cursor, best->field_1410);
         }
     }
@@ -1027,7 +1027,7 @@ struct Cursor *FUN_0045f540(struct Cursor *cursor) {
     if (cursor == 0) {
         return 0;
     }
-    for (node = cursor; node != 0; node = (struct Cursor *)node->field_1830) {
+    for (node = cursor; node != 0; node = node->next) {
         last = node;
         if ((node->field_1828 & 0x1000) != 0) {
             return node;
@@ -1042,7 +1042,7 @@ struct Cursor *FUN_0045f540(struct Cursor *cursor) {
     PathCursor.field_1414[3] = cursor->field_1414[3] + 1;
     PathCursor.field_1828 = 0x1008;
     PathCursor.field_1830 = 0;
-    last->field_1830 = (unsigned int)&PathCursor;
+    last->next = &PathCursor;
     return &PathCursor;
 }
 
@@ -1116,7 +1116,7 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
                 } while (rect.x1 >= x);
             }
         }
-        cursor = (struct Cursor *)cursor->field_1830;
+        cursor = cursor->next;
         if (cursor == 0) {
             break;
         }
@@ -1143,7 +1143,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
         FUN_0045f540(cursor);
     }
     ResetCursorBuildable(cursor);
-    for (; cursor != 0; cursor = (struct Cursor *)cursor->field_1830) {
+    for (; cursor != 0; cursor = cursor->next) {
         if (cursor->field_1828 & 0x2000) {
             continue;
         }
@@ -1528,7 +1528,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
     }
     SetClipping(&saved_clip);
     if (cursor->field_1830 != 0) {
-        RenderCursor((struct Cursor *)cursor->field_1830);
+        RenderCursor(cursor->next);
     }
     if ((cursor->field_1828 & 0x400) == 0) {
         return;
@@ -1784,7 +1784,7 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
         if (ov->sprite == 0) {
             continue;
         }
-        PrintSpriteSimple((struct Sprite *)ov->sprite, ov->x - dx, ov->y - dy);
+        PrintSpriteSimple(ov->sprite, ov->x - dx, ov->y - dy);
         frame = ov->field_10;
         if ((frame & 0xff00) == 0 || MapStats.field_3e0[(frame >> 8) - 1] == 0) {
             continue;
@@ -1792,21 +1792,21 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
         if ((frame & 0xff) == 0) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(((struct SpriteSet *)BridgesData)->sprites[(frame + 2) & 0xff], ox + DAT_004b9218,
+            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + DAT_004b9218,
                 oy + DAT_004b921c);
             k = (ov->field_10 + 4) & 0xff;
-            if (((struct SpriteSet *)BridgesData)->count > k) {
-                sprite = ((struct SpriteSet *)BridgesData)->sprites[k];
+            if (BridgesData->count > k) {
+                sprite = BridgesData->sprites[k];
                 SortSprite(sprite, ox + DAT_00805f40, oy + DAT_00805f44, (short)sprite->height + oy + DAT_00805f44, 0, 0);
             }
         } else if ((frame & 0xff) == 1) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(((struct SpriteSet *)BridgesData)->sprites[(frame + 2) & 0xff], ox + DAT_004b9210,
+            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + DAT_004b9210,
                 oy + DAT_004b9214);
             k = (ov->field_10 + 4) & 0xff;
-            if (((struct SpriteSet *)BridgesData)->count > k) {
-                sprite = ((struct SpriteSet *)BridgesData)->sprites[k];
+            if (BridgesData->count > k) {
+                sprite = BridgesData->sprites[k];
                 SortSprite(sprite, ox + DAT_00801a60, oy + DAT_00801a64, (short)sprite->height + oy + DAT_00801a64, 0, 0);
             }
         }
@@ -2129,7 +2129,7 @@ LEGO_EXPORT unsigned char GetCurrentRFFlags(int x, int y) {
     if (tx < 0 || tx >= (int)lpConfig->width || ty < 0 || ty >= (int)lpConfig->height) {
         tile = 0;
     } else {
-        tile = (struct MapTile *)((int)MapTileGrid[ty] + tx * 0x14);
+        tile = (struct MapTile *)((char *)MapTileGrid[ty] + tx * 0x14);
     }
     callback = TileSpriteInfo[tile->tile].src->get_rf_flags;
     if (callback != 0) {
@@ -2266,7 +2266,7 @@ void SetBridgeParamsByName(const char *param_1) {
 
 #define TILE_REF(tm, hi, lo) (*(tm)[(unsigned char)(((((hi) << 8) - 1) | (lo)) >> 8)].tiles + (unsigned short)(lo))
 // FUNCTION: LEGOLAND 0x00461a50
-LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
+LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
     struct ResFile *file;
     struct Element *elem;
     unsigned int len;
@@ -2277,7 +2277,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     unsigned int blocklen; /* RLE block size; later the overlay-tile repeat count */
     int phase;
     struct MapElement *tile;
-    int obj;
+    struct Element *obj;
     int cury;
     int curx;
     char hdr[200];
@@ -2291,7 +2291,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     if (MapDataLoaded != 0) {
         return 0xffffffff;
     }
-    if (LLIDB_FindElement((const char *)param_1, &elem, 0) != 0) {
+    if (LLIDB_FindElement(param_1, &elem, 0) != 0) {
         return 0xfffffffe;
     }
     LevelMapHandle = elem;
@@ -2309,15 +2309,15 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
     RES_ReadFile(file, namebuf, len);
     namebuf[len] = 0;
     LLIDB_FindElement(namebuf, &elem, 0);
-    LevelTileMapHandle = (void *)elem;
+    LevelTileMapHandle = elem;
     tilemap = (struct TileMap *)LLIDB_LoadData((void *)elem);
     DAT_00667ca4 = *(unsigned int *)tilemap[0].tiles;
     RES_ReadFile(file, &len, 4);
     RES_ReadFile(file, namebuf, len);
     namebuf[len] = 0;
     LLIDB_FindElement(namebuf, &elem, 0);
-    OverlayILFHandle = (void *)elem;
-    OverlayILF = (unsigned int)LLIDB_LoadData((void *)elem);
+    OverlayILFHandle = elem;
+    OverlayILF = LLIDB_LoadData((void *)elem);
     RES_ReadFile(file, &lpConfig->width, 2);
     RES_ReadFile(file, &lpConfig->height, 2);
     if (RES_ReadFile(file, &DAT_00801b28, 4) != 4) {
@@ -2341,7 +2341,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         RES_ReadFile(file, strbuf, len);
         strbuf[len] = 0;
         LLIDB_FindElement(strbuf, &elem, 0);
-        *(int *)((int)DAT_00801a68 + i * 4) = elem;
+        DAT_00801a68[i] = elem;
         LLIDB_LoadData((void *)elem);
         if (elem->data != 0) {
             elem->flags = elem->flags | 4;
@@ -2356,9 +2356,9 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         DrawWatchSprite();
         RES_ReadFile(file, &idx, 4);
         RES_ReadFile(file, &pos, 8);
-        *(int *)(*(int *)(*(int *)((int)DAT_00801a68 + idx * 4) + 0xc) + 0x4c) = 0;
-        obj = *(int *)((int)DAT_00801a68 + idx * 4);
-        PutObjOnMap((struct Ride *)*(int *)(obj + 0xc), obj, &pos);
+        DAT_00801a68[idx]->ride->footprint.next = NULL;
+        obj = DAT_00801a68[idx];
+        PutObjOnMap(obj->ride, obj, &pos);
         i++;
     }
     RES_ReadFile(file, &curx, 4);
@@ -2371,10 +2371,10 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
         strbuf[len] = 0;
         LLIDB_FindElement(strbuf, &elem, 0);
         LLIDB_LoadData((void *)elem);
-        *(int *)((int)DAT_00801a70 + i * 4) = (int)elem->data;
-        obj = *(int *)(*(int *)((int)DAT_00801a70 + i * 4) + 0x14);
-        if (obj != 0 && *(int *)(obj + 0xc) != 0) {
-            *(unsigned int *)(obj + 8) = *(unsigned int *)(obj + 8) | 4;
+        DAT_00801a70[i] = elem->data;
+        obj = DAT_00801a70[i]->element;
+        if (obj != NULL && obj->data != NULL) {
+            obj->flags = obj->flags | 4;
         }
     }
 
@@ -2413,9 +2413,9 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                         } else {
                             tile = 0;
                         }
-                        obj = ((int **)DAT_00801a70)[prev & 0x1f][5];
-                        tile->field_0 = (struct Element *)obj;
-                        PutObjOnMap(*(struct Ride **)(0xc + obj), obj, &pos);
+                        obj = DAT_00801a70[prev & 0x1f]->element;
+                        tile->field_0 = obj;
+                        PutObjOnMap(obj->ride, obj, &pos);
                         phase++;
                     } else {
                         GameMap[cury][curx].field_a = TILE_REF(tilemap, prev, stream[phase]);
@@ -2440,9 +2440,9 @@ LEGO_EXPORT unsigned int LoadBaseMap(unsigned int param_1) {
                         } else {
                             tile = 0;
                         }
-                        obj = ((int **)DAT_00801a70)[prev & 0x1f][5];
-                        tile->field_0 = (struct Element *)obj;
-                        PutObjOnMap(*(struct Ride **)(obj + 0xc), obj, &pos);
+                        obj = DAT_00801a70[prev & 0x1f]->element;
+                        tile->field_0 = obj;
+                        PutObjOnMap(obj->ride, obj, &pos);
                     } else {
                         GameMap[cury][curx].field_a = TILE_REF(tilemap, prev, stream[phase]);
                         SetMapTile(curx, cury, TILE_REF(tilemap, prev, stream[phase]));
@@ -2771,7 +2771,7 @@ unsigned int UnloadBaseMap(void) {
     i = 0;
     if (0 < DAT_00801a74) {
         do {
-            LLIDB_FindElementFromDataPtr(*(void **)((char *)DAT_00801a70 + i * 4), &elem2, 0);
+            LLIDB_FindElementFromDataPtr(DAT_00801a70[i], &elem2, 0);
             *(unsigned int *)((char *)elem2 + 8) = *(unsigned int *)((char *)elem2 + 8) & 0xfffcfff1;
             LLIDB_UnLoadData(elem2);
             i = i + 1;
@@ -2788,8 +2788,8 @@ unsigned int UnloadBaseMap(void) {
 LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
     struct Overlay *cur;
     struct Overlay *node;
-    int sample;
-    int *lls;
+    struct Sprite *sample;
+    struct SpriteAnim *lls;
 
     cur = (struct Overlay *)OverlayList;
     while (cur != 0 && cur->next != 0) {
@@ -2807,14 +2807,14 @@ LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
         node->y = param->y;
         *(struct OverlayParam *)node = *param;
         if (param->field_10 & 0xff00) {
-            sample = *(int *)(*(int *)((int)BridgesData + 8) + (param->field_10 & 0xff) * 4);
+            sample = BridgesData->sprites[param->field_10 & 0xff];
         } else {
-            sample = *(int *)(*(int *)(OverlayILF + 8) + (param->field_10 & 0xff) * 4);
+            sample = OverlayILF->sprites[param->field_10 & 0xff];
         }
         node->sprite = sample;
-        lls = *(int **)(sample + 8);
-        if ((lls[5] == 2 || lls[5] == 3) && 1 < *(short *)(*lls + 0x10)) {
-            LLSPlay((struct LLS *)*lls, (unsigned int)lls);
+        lls = sample->anim;
+        if ((lls->type == 2 || lls->type == 3) && 1 < lls->lls->frame_count) {
+            LLSPlay(lls->lls, lls);
         }
     }
 }
@@ -2845,25 +2845,25 @@ void FUN_00462c00(struct OverlayParam *param) {
 // FUNCTION: LEGOLAND 0x00462c60
 void FUN_00462c60(void) {
     struct Overlay *node;
-    int sample;
-    int *lls;
+    struct Sprite *sample;
+    struct SpriteAnim *lls;
 
     for (node = (struct Overlay *)OverlayList; node != 0; node = node->next) {
         if (node->field_10 & 0xff00) {
             if (BridgesData != 0) {
-                sample = *(int *)(*(int *)((int)BridgesData + 8) + (*(volatile unsigned int *)&node->field_10 & 0xff) * 4);
+                sample = BridgesData->sprites[*(volatile unsigned int *)&node->field_10 & 0xff];
             } else {
                 node->sprite = 0;
                 continue;
             }
         } else {
-            sample = *(int *)(*(int *)(OverlayILF + 8) + (*(volatile unsigned int *)&node->field_10 & 0xff) * 4);
+            sample = OverlayILF->sprites[*(volatile unsigned int *)&node->field_10 & 0xff];
         }
         node->sprite = sample;
         if (sample != 0) {
-            lls = *(int **)(sample + 8);
-            if ((lls[5] == 2 || lls[5] == 3) && *(short *)(*lls + 0x10) > 1) {
-                LLSPlay((struct LLS *)*lls, (unsigned int)lls);
+            lls = sample->anim;
+            if ((lls->type == 2 || lls->type == 3) && lls->lls->frame_count > 1) {
+                LLSPlay(lls->lls, lls);
             }
         }
     }

@@ -55,7 +55,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->string = GetString(0x3e);
     icon->flags |= flag_mask;
     icon->event_handler = (void *)FUN_0048f0a0;
-    DAT_006687c0 = (unsigned int)FUN_0048f0a0;
+    DAT_006687c0 = FUN_0048f0a0;
 
     // STRING: LEGOLAND 0x004bf45c
     icon = LoadSpriteIcon("Load_on_Options.lls", 4, 0x168, 0x13a, 7);
@@ -245,7 +245,7 @@ LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2) {
 
     for (;;) {
         if (DAT_0080ff80.unk8 == 5) {
-            DAT_006687bc = (unsigned int)FUN_0048f440;
+            DAT_006687bc = FUN_0048f440;
             if (GetGameTimerSinceMark() > 0xea60) {
                 DAT_00798754 = 1;
                 // STRING: LEGOLAND 0x004bf4c4
@@ -255,7 +255,7 @@ LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2) {
             }
             DAT_00798754 = 0;
         } else {
-            DAT_006687bc = (unsigned int)FUN_0048ef90;
+            DAT_006687bc = FUN_0048ef90;
             DAT_00798754 = 0;
         }
         // STRING: LEGOLAND 0x004bf4b0
@@ -278,7 +278,7 @@ LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2) {
     PopUpCloseIcon->event_handler = (void *)FUN_0048f4b0;
     DAT_007cb318 = 0;
     DAT_007cb310 = 0;
-    DAT_006687c0 = (unsigned int)FUN_0048f4b0;
+    DAT_006687c0 = FUN_0048f4b0;
 }
 
 // FUNCTION: LEGOLAND 0x0048f2d0

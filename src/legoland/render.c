@@ -548,9 +548,9 @@ void FUN_004886e0(unsigned int index) {
 }
 
 // FUNCTION: LEGOLAND 0x00488700
-void FUN_00488700(unsigned int base, struct RenderViewport *vp) {
+void FUN_00488700(unsigned char *base, struct RenderViewport *vp) {
     DAT_007feb14 = 0;
-    DAT_007fe9a8 = base + (vp->y * DAT_00701e58) + (vp->x * 2);
+    DAT_007fe9a8 = (unsigned short *)(base + (vp->y * DAT_00701e58) + (vp->x * 2));
 }
 
 // FUNCTION: LEGOLAND 0x00488730

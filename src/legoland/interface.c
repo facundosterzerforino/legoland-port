@@ -333,8 +333,8 @@ unsigned char FUN_00474830(unsigned int a, unsigned int flags, unsigned int c, u
 
 // FUNCTION: LEGOLAND 0x00474880
 void FUN_00474880(void) {
-    DAT_006687bc = (unsigned int)FUN_00474820;
-    DAT_006687c0 = (unsigned int)FUN_00474830;
+    DAT_006687bc = FUN_00474820;
+    DAT_006687c0 = FUN_00474830;
 }
 
 // FUNCTION: LEGOLAND 0x004748a0
@@ -503,7 +503,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->event_handler = (void *)FUN_00474fa0;
         icon->flags |= 0x4008;
         icon->render_func = (void *)RenderAdvisorIcon;
-        ScriptEndIcon = (unsigned int)icon;
+        ScriptEndIcon = icon;
         if (a != 0) {
             SetScriptStopped(0);
             if (CurrentProfile.field_45 == 2) {
@@ -689,7 +689,7 @@ unsigned char FUN_004751a0(struct IconNode *param_1, unsigned char flags) {
                 result = TestMenu(DAT_004bafa8);
                 if (result == 1) {
                     FUN_00474750();
-                    SelectedThemeIcon = (unsigned int)param_1;
+                    SelectedThemeIcon = param_1;
                     SetIconSprite(param_1, LegolandThemeOnSprite);
                     DAT_004bb094 = 0;
                 } else {
@@ -727,7 +727,7 @@ unsigned char FUN_004752a0(struct IconNode *param_1, unsigned char flags) {
             result = TestMenu(&DAT_004bafa8[15]);
             if (result == 1) {
                 FUN_00474750();
-                SelectedThemeIcon = (unsigned int)param_1;
+                SelectedThemeIcon = param_1;
                 SetIconSprite(param_1, AdventurersThemeOnSprite);
                 DAT_004bb0a0 = 0;
                 return 1;
@@ -764,7 +764,7 @@ unsigned char FUN_004753a0(struct IconNode *param_1, unsigned char flags) {
             result = TestMenu(&DAT_004bafa8[10]);
             if (result == 1) {
                 FUN_00474750();
-                SelectedThemeIcon = (unsigned int)param_1;
+                SelectedThemeIcon = param_1;
                 SetIconSprite(param_1, CastleThemeOnSprite);
                 DAT_004bb098 = 0;
                 return 1;
@@ -805,7 +805,7 @@ unsigned char FUN_004754b0(struct IconNode *param_1, unsigned char flags) {
             result = TestMenu(&DAT_004bafa8[5]);
             if (result == 1) {
                 FUN_00474750();
-                SelectedThemeIcon = (unsigned int)param_1;
+                SelectedThemeIcon = param_1;
                 SetIconSprite(param_1, WesternThemeOnSprite);
                 DAT_004bb09c = 0;
                 return 1;
@@ -1024,7 +1024,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
         panel_arg = 0xffffff86;
         DAT_007fdd80 = 0;
     }
-    icon = SetupInterfacePanelIcons((unsigned int)panel, panel_arg, param_3, 1, param_4, param_1);
+    icon = SetupInterfacePanelIcons(panel, panel_arg, param_3, 1, param_4, param_1);
     panel->icon = icon;
     x = icon->x;
     panel->clip_left = x;
@@ -1039,7 +1039,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
     SetNewGroup_Callbacks(0, (void *)RenderBuildObjectIcon, (void *)FUN_00470000);
     while (node != NULL) {
         if (node->flag != 0) {
-            AddGBarClassIcon((unsigned int)panel, (struct InfoSource *)node->data, x, y, param_1, 1);
+            AddGBarClassIcon(panel, (struct InfoSource *)node->data, x, y, param_1, 1);
             y = y + 0x42;
             ctx = node;
             node = node->next;
@@ -1048,7 +1048,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
             CloseChildrenBar(ctx, param_1, (short)x, (short)y);
             y += 0x1a;
             while (node != NULL && node->flag == 0) {
-                last_icon = AddGBarClassIcon((unsigned int)panel, (struct InfoSource *)node->data, x, y, param_1, 1);
+                last_icon = AddGBarClassIcon(panel, (struct InfoSource *)node->data, x, y, param_1, 1);
                 last_icon->field_20b = 1;
                 ctx = node;
                 node = node->next;
@@ -1066,7 +1066,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
             }
         }
     }
-    AddFullScreenIcon((void *)(param_1 + 6));
+    AddFullScreenIcon(param_1 + 6);
     panel->field_14 = x;
     panel->content_bottom = y;
     if (y < panel->icon->height + panel->icon->y) {
@@ -1088,7 +1088,7 @@ LEGO_EXPORT int MakeUpObjectList(int param_1, int param_2, int param_3, int para
 }
 
 // FUNCTION: LEGOLAND 0x00475bb0
-LEGO_EXPORT void ListChildrenBar(void *node, int group, short x, short y) {
+LEGO_EXPORT void ListChildrenBar(struct InterfaceListNode *node, int group, short x, short y) {
     struct IconNode *icon;
 
     // STRING: LEGOLAND 0x004bb4a8
@@ -1101,7 +1101,7 @@ LEGO_EXPORT void ListChildrenBar(void *node, int group, short x, short y) {
 }
 
 // FUNCTION: LEGOLAND 0x00475c00
-LEGO_EXPORT void CloseChildrenBar(void *node, int group, short x, short y) {
+LEGO_EXPORT void CloseChildrenBar(struct InterfaceListNode *node, int group, short x, short y) {
     struct IconNode *icon;
 
     // STRING: LEGOLAND 0x004bb4bc
@@ -1114,20 +1114,20 @@ LEGO_EXPORT void CloseChildrenBar(void *node, int group, short x, short y) {
 }
 
 // FUNCTION: LEGOLAND 0x00475c50
-char FUN_00475c50(int param_1, unsigned char param_2) {
+char FUN_00475c50(struct IconNode *param_1, unsigned char param_2) {
     if (param_2 & 2) {
         Hover.type = 0x100;
-        *(unsigned int *)(*(int *)(*(int *)(*(int *)(param_1 + 0x18) + 4) + 0xc4) + 8) |= 8;
+        ((struct Ride *)((struct InterfaceListNode *)param_1->field_18p)->data)->element->flags |= 8;
         MakeUpObjectList(0xd2, 3, 0x21, 0x154);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00475c90
-char FUN_00475c90(int param_1, unsigned char param_2) {
+char FUN_00475c90(struct IconNode *param_1, unsigned char param_2) {
     if (param_2 & 2) {
         Hover.type = 0x100;
-        *(unsigned int *)(*(int *)(*(int *)(*(int *)(param_1 + 0x18) + 4) + 0xc4) + 8) &= ~8;
+        ((struct Ride *)((struct InterfaceListNode *)param_1->field_18p)->data)->element->flags &= ~8;
         MakeUpObjectList(0xd2, 3, 0x21, 0x154);
     }
     return 1;
@@ -1816,27 +1816,27 @@ int OpenMovieAudio(struct MovieHandle *handle) {
     DAT_00668f4c = AviPcmFormat.wBitsPerSample;
     AviAudioStream = handle->audio_stream;
     AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(&AviPcmFormat, AviSoundBytesPerFrame * DAT_00668fa4);
-    p = AviAcmStreamHeader;
-    for (i = 0x15; i != 0; i--) {
+    p = (unsigned int *)&AviAcmStreamHeader;
+    for (i = sizeof(AviAcmStreamHeader) / 4; i != 0; i--) {
         *p = 0;
         p++;
     }
-    AviAcmStreamHeader[8] = AviSoundBytesPerFrame;
-    AviAcmStreamHeader[0] = 0x54;
-    acmStreamSize(AviAcmStream, AviSoundBytesPerFrame, &AviAcmStreamHeader[4], 1);
-    AviAcmStreamHeader[3] = (unsigned int)malloc(AviAcmStreamHeader[4]);
-    AviAcmStreamHeader[7] = (unsigned int)malloc(AviAcmStreamHeader[8] * 3);
-    AviAcmDstBase = (void *)AviAcmStreamHeader[7];
+    AviAcmStreamHeader.cbDstLength = AviSoundBytesPerFrame;
+    AviAcmStreamHeader.cbStruct = sizeof(AviAcmStreamHeader);
+    acmStreamSize(AviAcmStream, AviSoundBytesPerFrame, &AviAcmStreamHeader.cbSrcLength, 1);
+    AviAcmStreamHeader.pbSrc = malloc(AviAcmStreamHeader.cbSrcLength);
+    AviAcmStreamHeader.pbDst = malloc(AviAcmStreamHeader.cbDstLength * 3);
+    AviAcmDstBase = AviAcmStreamHeader.pbDst;
     DAT_00668f54 = 0;
-    if (AviAcmStreamHeader[3] != 0 && AviAcmStreamHeader[7] != 0) {
+    if (AviAcmStreamHeader.pbSrc != NULL && AviAcmStreamHeader.pbDst != NULL) {
         return 1;
     }
     acmStreamClose(AviAcmStream, 0);
-    if (AviAcmStreamHeader[3] != 0) {
-        free((void *)AviAcmStreamHeader[3]);
+    if (AviAcmStreamHeader.pbSrc != NULL) {
+        free(AviAcmStreamHeader.pbSrc);
     }
-    if (AviAcmStreamHeader[7] != 0) {
-        free((void *)AviAcmStreamHeader[7]);
+    if (AviAcmStreamHeader.pbDst != NULL) {
+        free(AviAcmStreamHeader.pbDst);
     }
     return 0;
 }
@@ -1867,9 +1867,9 @@ int StopMovieAudio(void) {
         DAT_00668f9c = 0;
         KLIBAUDIO_StopAVISoundBuffer(AviSoundBuffer);
         if (DAT_00668ee0 != 0) {
-            if (AviAcmStreamHeader[3] != 0) {
-                free((void *)AviAcmStreamHeader[3]);
-                AviAcmStreamHeader[3] = 0;
+            if (AviAcmStreamHeader.pbSrc != NULL) {
+                free(AviAcmStreamHeader.pbSrc);
+                AviAcmStreamHeader.pbSrc = NULL;
             }
             if (AviAcmDstBase != NULL) {
                 free(AviAcmDstBase);
@@ -1938,13 +1938,13 @@ int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
                                 }
                             } else {
                                 while (DAT_00668fb4 < AviSoundBytesPerFrame) {
-                                    AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, (void *)AviAcmStreamHeader[3], AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
-                                    AviAcmStreamHeader[7] = (unsigned int)AviAcmDstBase + produced;
-                                    acmStreamPrepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
-                                    acmStreamConvert(AviAcmStream, AviAcmStreamHeader, 0x10);
-                                    acmStreamUnprepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
-                                    produced += AviAcmStreamHeader[9];
-                                    DAT_00668fb4 += AviAcmStreamHeader[9];
+                                    AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, AviAcmStreamHeader.pbSrc, AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
+                                    AviAcmStreamHeader.pbDst = (unsigned char *)AviAcmDstBase + produced;
+                                    acmStreamPrepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
+                                    acmStreamConvert(AviAcmStream, &AviAcmStreamHeader, 0x10);
+                                    acmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
+                                    produced += AviAcmStreamHeader.cbDstLengthUsed;
+                                    DAT_00668fb4 += AviAcmStreamHeader.cbDstLengthUsed;
                                     AviAudioSamplePos++;
                                 }
                                 memcpy(dst + (AviSoundBytesPerFrame - rem), AviAcmDstBase, rem);
@@ -1962,13 +1962,13 @@ int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
                         }
                     } else {
                         while (DAT_00668fb4 < AviSoundBytesPerFrame) {
-                            AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, (void *)AviAcmStreamHeader[3], AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
-                            AviAcmStreamHeader[7] = (unsigned int)AviAcmDstBase + produced;
-                            acmStreamPrepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
-                            acmStreamConvert(AviAcmStream, AviAcmStreamHeader, 0x10);
-                            acmStreamUnprepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
-                            produced += AviAcmStreamHeader[9];
-                            DAT_00668fb4 += AviAcmStreamHeader[9];
+                            AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, AviAcmStreamHeader.pbSrc, AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
+                            AviAcmStreamHeader.pbDst = (unsigned char *)AviAcmDstBase + produced;
+                            acmStreamPrepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
+                            acmStreamConvert(AviAcmStream, &AviAcmStreamHeader, 0x10);
+                            acmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
+                            produced += AviAcmStreamHeader.cbDstLengthUsed;
+                            DAT_00668fb4 += AviAcmStreamHeader.cbDstLengthUsed;
                             AviAudioSamplePos++;
                         }
                         memcpy(dst, (char *)AviAcmDstBase + DAT_00668f54, AviSoundBytesPerFrame);

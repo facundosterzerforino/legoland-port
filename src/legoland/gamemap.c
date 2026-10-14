@@ -174,7 +174,7 @@ void FUN_00459970(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459ad0
-LEGO_EXPORT void PutObjOnMap(struct Ride *obj, unsigned int classid, struct Point *pos) {
+LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct Point *pos) {
     int area;
     struct Ride *entrance;
     struct MapCell *cell;
@@ -227,7 +227,7 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, unsigned int classid, struct Poin
 }
 
 // FUNCTION: LEGOLAND 0x00459c90
-LEGO_EXPORT void RemObjFromMap(struct Ride *obj, unsigned int classid, TileId tile, void *cursor) {
+LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId tile, void *cursor) {
     int area;
     struct MapCell *cell;
     struct Cursor *query;
@@ -309,7 +309,7 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, unsigned int classid, TileId ti
             }
             break;
         }
-        query = (struct Cursor *)query->field_1830;
+        query = query->next;
     }
     ScriptDirtyCategories = ScriptDirtyCategories | 4;
 }
@@ -450,7 +450,7 @@ void FUN_0045a0d0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0045a130
-LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos) {
+LEGO_EXPORT void AddObjectsPowerStats(struct Element *classid, struct Point *pos) {
     int power;
     struct MapCell *cell;
     int amount;
@@ -487,7 +487,7 @@ LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x0045a230
-LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, TileId coords) {
+LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords) {
     int power;
     struct MapCell *cell;
     int amount;

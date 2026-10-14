@@ -358,7 +358,7 @@ int SpeechLoadWavFile(const char *param_1) {
                 acmStreamOpen(&SpeechAcmStream, NULL, SpeechSourceFormat, &SpeechPcmFormat, NULL, 0, 0, 4);
                 acmStreamSize(SpeechAcmStream, SpeechAcmSrcSize, &out_size, 0);
                 SpeechAcmDstBuffer = malloc(out_size);
-                SpeechAcmHeader.cbStruct = 0x54;
+                SpeechAcmHeader.cbStruct = sizeof(SpeechAcmHeader);
                 SpeechAcmHeader.fdwStatus = 0;
                 SpeechAcmHeader.pbSrc = SpeechAcmSrcBuffer;
                 SpeechAcmHeader.cbSrcLength = SpeechAcmSrcSize;

@@ -22,13 +22,6 @@
 #include "worker.h"
 
 /* A script command's words: the command's name, then its arguments. */
-struct CommandArgs {
-    char *name;
-    char *arg1;
-    char *arg2;
-    char *arg3;
-};
-
 // FUNCTION: LEGOLAND 0x004787b0
 int IsStringEmpty(char **pp_str) {
     if (strlen(*pp_str) == 0) {
@@ -50,7 +43,7 @@ void FUN_004787d0(void) {
 void FUN_004787f0(void) {
     unsigned int id = DAT_00669098;
     DAT_00669098 = DAT_00669098 + 1;
-    CurrentScriptSection = (unsigned int)FUN_0046b4f0(id);
+    CurrentScriptSection = FUN_0046b4f0(id);
     DAT_007fdca4 = 0;
 }
 
@@ -71,8 +64,8 @@ int ScriptCmdEnd(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00478870
-int ScriptCmdInit(unsigned int *param_1) {
-    FUN_004785d0((char *)*param_1, 1);
+int ScriptCmdInit(char **param_1) {
+    FUN_004785d0(*param_1, 1);
     return 1;
 }
 
@@ -102,12 +95,12 @@ int ScriptCmdAges(struct CommandArgs *arg, int argc) {
 }
 
 // FUNCTION: LEGOLAND 0x00478930
-int ScriptCmdObjective(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdObjective(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 7) == 0) {
             return 0;
         }
-        FUN_004785d0(*(char **)param_1, 2);
+        FUN_004785d0(param_1->name, 2);
         SetScriptObjectiveKind(1);
         FUN_004787d0();
         FUN_004787f0();
@@ -116,7 +109,7 @@ int ScriptCmdObjective(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478980
-int ScriptCmdOneOff(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdOneOff(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -128,7 +121,7 @@ int ScriptCmdOneOff(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004789c0
-int ScriptCmdOngoing(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdOngoing(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -140,7 +133,7 @@ int ScriptCmdOngoing(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478a00
-int ScriptCmdPermanent(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdPermanent(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -153,7 +146,7 @@ int ScriptCmdPermanent(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478a40
-int ScriptCmdReminder(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdReminder(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -166,19 +159,19 @@ int ScriptCmdReminder(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478a80
-int ScriptCmdReward(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdReward(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 2) == 0) {
             return 0;
         }
-        FUN_004785d0(*(char **)param_1, 4);
+        FUN_004785d0(param_1->name, 4);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00478ac0
-int ScriptCmdMap(unsigned int param_1, unsigned int param_2) {
-    unsigned int map;
+int ScriptCmdMap(struct CommandArgs *param_1, unsigned int param_2) {
+    char *map;
 
     if (ScriptConditionActive == 0) {
         return 1;
@@ -197,8 +190,8 @@ int ScriptCmdMap(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478b20
-int FUN_00478b20(unsigned int arg) {
-    struct GameObject *obj = (struct GameObject *)ElemID((const char *)arg);
+int FUN_00478b20(char *arg) {
+    struct GameObject *obj = (struct GameObject *)ElemID(arg);
 
     if (obj != NULL) {
         if ((obj->flags & 4) == 0) {
@@ -214,7 +207,7 @@ int FUN_00478b20(unsigned int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00478b70
-int ScriptCmdLoad(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdLoad(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -225,13 +218,13 @@ int ScriptCmdLoad(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478bc0
-unsigned int ScriptCmdBlueprint(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
+unsigned int ScriptCmdBlueprint(struct CommandArgs *param_1, unsigned int param_2, unsigned int param_3) {
     return ScriptCmdEnable(param_1, param_2, param_3);
 }
 
 // FUNCTION: LEGOLAND 0x00478be0
-unsigned int ScriptCmdEnable(unsigned int param_1, unsigned int param_2, unsigned int param_3) {
-    unsigned int name;
+unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, unsigned int param_3) {
+    char *name;
 
     if (ScriptConditionActive == 0) {
         return 1;
@@ -242,7 +235,7 @@ unsigned int ScriptCmdEnable(unsigned int param_1, unsigned int param_2, unsigne
     if (DAT_00669054 == 1) {
         name = FUN_004787a0(param_1, param_2);
         if (FUN_00478b20(name) != 0) {
-            GiveRewardObject((struct ObjectiveEvent *)ElemID((const char *)name), 0, 1);
+            GiveRewardObject((struct ObjectiveEvent *)ElemID(name), 0, 1);
         }
         return 1;
     }
@@ -286,17 +279,19 @@ int ScriptCmdHappinessEnv(char **argv, int argc) {
 }
 
 // FUNCTION: LEGOLAND 0x00478d30
-int ScriptCmdLookAt(int param_1, int param_2) {
+int ScriptCmdLookAt(struct CommandArgs *param_1, int param_2) {
     int local[2];
     char **args;
     int a;
     int b;
+    int w;
+    int h;
 
     if (ScriptConditionActive == 0) {
         return 1;
     }
     args = (char **)param_1;
-    if (FUN_004786c0((int)args, param_2, 5, 2) == 0) {
+    if (FUN_004786c0(args, param_2, 5, 2) == 0) {
         return 0;
     }
     ParseIntPair(local, args, 1);
@@ -305,9 +300,9 @@ int ScriptCmdLookAt(int param_1, int param_2) {
     if (DAT_00669054 == 1) {
         b = local[1];
         a = local[0];
-        GetTileDimensions(&param_2, &param_1);
-        local[0] = ((a - b) * param_2) >> 9;
-        local[1] = ((a + b) * param_1) >> 9;
+        GetTileDimensions(&w, &h);
+        local[0] = ((a - b) * w) >> 9;
+        local[1] = ((a + b) * h) >> 9;
         ScrollX = (local[0] - (lpConfig->screen_width >> 1)) << 8;
         ScrollY = (local[1] - (lpConfig->screen_height >> 1)) << 8;
         return 1;
@@ -317,39 +312,39 @@ int ScriptCmdLookAt(int param_1, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478e20
-int ScriptCmdBriefingFile(int param_1, int param_2) {
+int ScriptCmdBriefingFile(struct CommandArgs *param_1, int param_2) {
     char *name = DAT_004d8bb0;
     if (ScriptConditionActive != 0) {
         if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
         if (param_2 >= 1) {
-            name = *(char **)(param_1 + 4);
+            name = param_1->arg1;
         }
         if (DAT_00669054 == 1) {
             FUN_004687f0(name);
             return 1;
         }
-        NewScriptBriefingFileEvent((unsigned int)name);
+        NewScriptBriefingFileEvent(name);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00478e90
-int ScriptCmdHintsFile(int param_1, int param_2) {
+int ScriptCmdHintsFile(struct CommandArgs *param_1, int param_2) {
     char *name = DAT_004d8bb0;
     if (ScriptConditionActive != 0) {
         if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
         if (param_2 >= 1) {
-            name = *(char **)(param_1 + 4);
+            name = param_1->arg1;
         }
         if (DAT_00669054 == 1) {
             SetHintsFileName(name);
             return 1;
         }
-        NewScriptHintsFileEvent((unsigned int)name);
+        NewScriptHintsFileEvent(name);
     }
     return 1;
 }
@@ -466,7 +461,7 @@ int ScriptCmdIntro(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004791f0
 int ScriptCmdNeed(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int count;
 
     if (ScriptConditionActive == 0) {
@@ -492,7 +487,7 @@ int ScriptCmdNeed(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479270
 int ScriptCmdNeedAt(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int vals[2];
 
     if (ScriptConditionActive == 0) {
@@ -512,7 +507,7 @@ int ScriptCmdNeedAt(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479300
 int ScriptCmdNeedIn(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v;
     struct Vec4 vec;
 
@@ -533,7 +528,7 @@ int ScriptCmdNeedIn(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479390
 int ScriptCmdConnect(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
 
     if (ScriptConditionActive != 0) {
         if (FUN_004786c0(arg, argc, 2, 1) == 0) {
@@ -549,7 +544,7 @@ int ScriptCmdConnect(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004793e0
 int ScriptCmdLink(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
 
     if (ScriptConditionActive != 0) {
         if (FUN_004786c0(arg, argc, 2, 1) == 0) {
@@ -571,7 +566,7 @@ int ScriptCmdLink(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479450
 int ScriptCmdRange(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     int v1;
     unsigned int v2;
 
@@ -616,7 +611,7 @@ int ScriptCmdClearArea(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479550
 int ScriptCmdRemove(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
@@ -637,7 +632,7 @@ int ScriptCmdRemove(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004795c0
 int ScriptCmdRemoveRange(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v2;
     unsigned int v3;
 
@@ -662,7 +657,7 @@ int ScriptCmdRemoveRange(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479640
 int ScriptCmdComposite(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     int n;
     unsigned int v;
 
@@ -690,7 +685,7 @@ int ScriptCmdComposite(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004796d0
 int ScriptCmdLoopComposite(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     int count;
 
     if (ScriptConditionActive == 0) {
@@ -712,7 +707,7 @@ int ScriptCmdLoopComposite(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479740
 int ScriptCmdTechLevel(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v;
 
     if (ScriptConditionActive == 0) {
@@ -757,7 +752,7 @@ int ScriptCmdParkVisitors(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x00479850
 int ScriptCmdRideVisitors(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     int value;
 
     if (ScriptConditionActive == 0) {
@@ -776,7 +771,7 @@ int ScriptCmdRideVisitors(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x004798c0
 int ScriptCmdRiders(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v;
 
     if (ScriptConditionActive == 0) {
@@ -1232,7 +1227,7 @@ int ScriptCmdForever(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a480
 int ScriptCmdGive(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     int popup = 1;
 
     if (ScriptConditionActive == 0) {
@@ -1256,7 +1251,7 @@ int ScriptCmdGive(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a500
 int ScriptCmdTake(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
 
     if (ScriptConditionActive == 0) {
         return 1;
@@ -1289,7 +1284,7 @@ int ScriptCmdAddBricks(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047a5a0
 int ScriptCmdPlace(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int coords[2];
     unsigned int v;
 
@@ -1561,7 +1556,7 @@ int ScriptCmdCapacityCap(struct CommandArgs *arg, int argc) {
 
 // FUNCTION: LEGOLAND 0x0047ac00
 int ScriptCmdDegrade(struct CommandArgs *arg, int argc) {
-    unsigned int id;
+    struct Element *id;
     unsigned int v2;
     unsigned int v3;
 
@@ -1712,7 +1707,7 @@ int ScriptCmdFlashButtonOff(char **argv, int argc) {
 }
 
 // FUNCTION: LEGOLAND 0x0047af50
-int ScriptCmdPurge(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdPurge(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
@@ -1724,7 +1719,7 @@ int ScriptCmdPurge(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0047af80
-int ScriptCmdEndLevel(unsigned int param_1, unsigned int param_2) {
+int ScriptCmdEndLevel(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
         if (FUN_004786a0(param_1, param_2, 4) == 0) {
             return 0;

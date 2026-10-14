@@ -16,7 +16,7 @@ typedef struct LLS LLS;
 struct LLSNode {
     struct LLS *lls;
     struct LLSNode *next;
-    unsigned int param; /* LLSPlay's second argument */
+    void *param; /* LLSPlay's second argument */
 };
 
 /* An LLIDB element (0x14 bytes).  For object classes `data` is the class's Ride
@@ -83,8 +83,8 @@ LEGO_EXPORT void LLIDB_UnLoadData(struct Element *handle);
 LEGO_EXPORT void LLSAuto(void);
 void LLSAdvanceFrame(struct LLS *param_1);
 LEGO_EXPORT int LLSStop(struct LLS *lls);
-LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2);
-LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, unsigned int param_2);
+LEGO_EXPORT void LLSPlay(struct LLS *param_1, void *param_2);
+LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, void *param_2);
 LEGO_EXPORT void LLSSetFrame(struct LLS *lls, int index);
 LEGO_EXPORT void LLSNextFrame(struct LLS *param_1);
 

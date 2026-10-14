@@ -1396,14 +1396,14 @@ void InitAppraisalScreen(int pages) {
     icon->string = GetString(0xde);
     icon->flags |= 0x6002;
     icon->event_handler = (void *)AppraisalBackClicked;
-    DAT_006687c0 = (unsigned int)AppraisalBackClicked;
+    DAT_006687c0 = AppraisalBackClicked;
     AppraisalNextIcon = InsertIcon(0x1b9, 0x1ae, 1, NextPageSprite);
     AppraisalNextIcon->string_id = 0xdc;
     AppraisalNextIcon->string = GetString(0xdc);
     AppraisalNextIcon->flags |= 0x2000;
     AppraisalNextIcon->flags |= 0x4002;
     AppraisalNextIcon->event_handler = (void *)AppraisalNextPageClicked;
-    DAT_006687bc = (unsigned int)AppraisalNextPageClicked;
+    DAT_006687bc = AppraisalNextPageClicked;
     AppraisalPrevIcon = InsertIcon(6, 0x1ae, 1, PreviousPageSprite);
     AppraisalPrevIcon->string_id = 0xdd;
     AppraisalPrevIcon->string = GetString(0xdd);

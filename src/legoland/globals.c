@@ -2663,10 +2663,10 @@ int MapWorldWidth;
 int MapCenterOffsetY;
 
 // GLOBAL: LEGOLAND 0x00667c10
-unsigned int DAT_00667c10;
+void *DAT_00667c10;
 
 // GLOBAL: LEGOLAND 0x00667c28
-unsigned int DAT_00667c28;
+void *DAT_00667c28;
 
 // GLOBAL: LEGOLAND 0x00667c2c
 struct Sprite *FullMapSprite;
@@ -2747,10 +2747,10 @@ unsigned int DAT_00667ca4;
 LEGO_EXPORT void *OverlayList;
 
 // GLOBAL: LEGOLAND 0x00667cac
-LEGO_EXPORT unsigned int OverlayILF;
+LEGO_EXPORT struct SpriteSet *OverlayILF;
 
 // GLOBAL: LEGOLAND 0x00667cb0
-void *BridgesData;
+struct SpriteSet *BridgesData;
 
 // GLOBAL: LEGOLAND 0x00667cb4
 LEGO_EXPORT int ScrollX;
@@ -2918,7 +2918,7 @@ int DAT_00668164[32];
 int RenderingStatusStackDepth;
 
 // GLOBAL: LEGOLAND 0x006681e8
-unsigned int OverridePalette;
+unsigned short *OverridePalette;
 
 // GLOBAL: LEGOLAND 0x006681ec
 void *DAT_006681ec;
@@ -3020,10 +3020,10 @@ unsigned int DAT_006687b0;
 unsigned int DAT_006687b4;
 
 // GLOBAL: LEGOLAND 0x006687bc
-unsigned int DAT_006687bc;
+void *DAT_006687bc;
 
 // GLOBAL: LEGOLAND 0x006687c0
-unsigned int DAT_006687c0;
+void *DAT_006687c0;
 
 // GLOBAL: LEGOLAND 0x006687c8
 struct IconNode *IconListHead;
@@ -3293,13 +3293,13 @@ struct Sprite *ScriptEndSprite;
 unsigned int DAT_00668ea4;
 
 // GLOBAL: LEGOLAND 0x00668eb0
-unsigned int SelectedThemeIcon;
+struct IconNode *SelectedThemeIcon;
 
 // GLOBAL: LEGOLAND 0x00668eb4
 unsigned int DAT_00668eb4;
 
 // GLOBAL: LEGOLAND 0x00668eb8
-unsigned int ScriptEndIcon;
+struct IconNode *ScriptEndIcon;
 
 // GLOBAL: LEGOLAND 0x00668ebc
 unsigned int DAT_00668ebc;
@@ -3314,7 +3314,7 @@ struct InterfaceResearchNode *ResearchList;
 int DAT_00668ee0;
 
 // GLOBAL: LEGOLAND 0x00668ee8
-unsigned int AviAcmStreamHeader[0x15];
+struct AcmHeader AviAcmStreamHeader;
 
 // GLOBAL: LEGOLAND 0x00668f3c
 unsigned int AviSoundBytesPerFrame;
@@ -3716,7 +3716,7 @@ struct IconNode *PopUpOkIcon;
 struct IconNode *PopUpCloseIcon;
 
 // GLOBAL: LEGOLAND 0x007986e0
-unsigned int AcceptIcon;
+struct IconNode *AcceptIcon;
 
 // GLOBAL: LEGOLAND 0x007986e4
 unsigned int DeletePopUpShown;
@@ -3728,10 +3728,10 @@ unsigned int NewProfilePopUpShown;
 unsigned int DAT_007986f0;
 
 // GLOBAL: LEGOLAND 0x007986f4
-unsigned int DAT_007986f4;
+void *DAT_007986f4;
 
 // GLOBAL: LEGOLAND 0x007986f8
-unsigned int DAT_007986f8;
+void *DAT_007986f8;
 
 // GLOBAL: LEGOLAND 0x00798700
 unsigned int DAT_00798700;
@@ -3779,10 +3779,10 @@ void *SavedGameList;
 int DAT_00798738;
 
 // GLOBAL: LEGOLAND 0x0079873c
-unsigned int DAT_0079873c;
+void *DAT_0079873c;
 
 // GLOBAL: LEGOLAND 0x00798740
-unsigned int DAT_00798740;
+void *DAT_00798740;
 
 // GLOBAL: LEGOLAND 0x00798748
 struct IconNode *SpeechVolumeMarkerIcon;
@@ -4490,7 +4490,7 @@ unsigned int DAT_007fe994;
 unsigned short DAT_007fe998;
 
 // GLOBAL: LEGOLAND 0x007fe9a8
-unsigned int DAT_007fe9a8;
+unsigned short *DAT_007fe9a8;
 
 // GLOBAL: LEGOLAND 0x007fe9c0
 struct Sprite *PointerSprites[9];
@@ -4523,7 +4523,7 @@ unsigned short DAT_007febb8;
 LEGO_EXPORT struct Cursor EditCursor;
 
 // GLOBAL: LEGOLAND 0x008003f4
-int LevelMapHandle;
+struct Element *LevelMapHandle;
 
 // GLOBAL: LEGOLAND 0x008003f8
 unsigned int DAT_008003f8;
@@ -4541,7 +4541,7 @@ struct Element *BridgesHandle;
 unsigned int DAT_00801408;
 
 // GLOBAL: LEGOLAND 0x0080140c
-void *LevelTileMapHandle;
+struct Element *LevelTileMapHandle;
 
 // GLOBAL: LEGOLAND 0x00801410
 struct Element *OverlayILFHandle;
@@ -4556,13 +4556,13 @@ int DAT_00801a60;
 int DAT_00801a64;
 
 // GLOBAL: LEGOLAND 0x00801a68
-void *DAT_00801a68;
+struct Element **DAT_00801a68;
 
 // GLOBAL: LEGOLAND 0x00801a6c
 int *DAT_00801a6c;
 
 // GLOBAL: LEGOLAND 0x00801a70
-void *DAT_00801a70;
+struct MapTileSet **DAT_00801a70;
 
 // GLOBAL: LEGOLAND 0x00801a74
 int DAT_00801a74;

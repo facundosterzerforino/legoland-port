@@ -56,7 +56,7 @@ struct GameListNode {
     unsigned char pad_4[0x14];
     unsigned char field_18;
     unsigned char pad_19[3];
-    unsigned int field_1c;
+    char *field_1c; /* the icon's object name */
 };
 
 // LLIDB element fields read by InitFreePlayScreen (real Element is opaque).
@@ -112,7 +112,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     icon->string = GetString(0x26);
     icon->flags |= 0x6002;
     icon->event_handler = (void *)FUN_0048fb80;
-    DAT_006687c0 = (unsigned int)FUN_0048fb80;
+    DAT_006687c0 = FUN_0048fb80;
 
     // STRING: LEGOLAND 0x004bea70
     icon = LoadSpriteIcon("Accept_On_FreePlay.lls", 4, 0x1e4, 0x14b, 7);
@@ -120,7 +120,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     icon->string = GetString(0x32);
     icon->flags |= 0x6002;
     icon->event_handler = (void *)FUN_0048ac60;
-    DAT_006687bc = (unsigned int)FUN_0048ac60;
+    DAT_006687bc = FUN_0048ac60;
     icon->flags |= 0x400;
     DAT_0079864c = icon;
 
@@ -171,7 +171,7 @@ void FUN_0048ab60(void) {
         DrawWatchSprite();
         if (node->field_18 == 1) {
             if (FUN_00478b20(node->field_1c) != 0) {
-                GiveRewardObject((struct ObjectiveEvent *)ElemID((const char *)node->field_1c), 0, 1);
+                GiveRewardObject((struct ObjectiveEvent *)ElemID(node->field_1c), 0, 1);
             }
         }
         node = node->next;
@@ -503,7 +503,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         list = list->next;
         y += 0x42;
     } while (list != NULL);
-    AddFullScreenIcon((void *)(a + 6));
+    AddFullScreenIcon(a + 6);
     group->field_14 = b;
     group->content_bottom = y;
     icon = FindIcon(a + 4);

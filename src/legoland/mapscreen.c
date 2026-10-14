@@ -62,8 +62,8 @@ LEGO_EXPORT void InitMapScreen(void) {
         FullMapSprite->src_y = 0;
     }
     FUN_004562c0();
-    DAT_006687c0 = (unsigned int)FUN_00475080;
-    DAT_006687bc = (unsigned int)FUN_00475080;
+    DAT_006687c0 = FUN_00475080;
+    DAT_006687bc = FUN_00475080;
 }
 
 // FUNCTION: LEGOLAND 0x00456370

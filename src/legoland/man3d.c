@@ -380,7 +380,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
         if (GetVideoSurface(&vid) != 0) {
             FUN_00485f30((unsigned int)vid.bits + person->screen.y * vid.pitch + person->screen.x * 2, vid.pitch,
                 vid.width, vid.height);
-            FUN_00488700((unsigned int)vid.bits, (struct RenderViewport *)&MousePos);
+            FUN_00488700((unsigned char *)vid.bits, (struct RenderViewport *)&MousePos);
             Render_SetViewport(&clip);
 #ifdef LEGOLAND_PORT
             /* [library:asm] the original sets the x87 control word to 0x7f (single precision, round to nearest)

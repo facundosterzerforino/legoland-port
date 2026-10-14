@@ -2252,9 +2252,9 @@ extern int MapWorldWidth;
 // 0x00667c20
 extern int MapCenterOffsetY;
 // 0x00667c10
-extern unsigned int DAT_00667c10;
+extern void *DAT_00667c10;
 // 0x00667c28
-extern unsigned int DAT_00667c28;
+extern void *DAT_00667c28;
 // 0x00667c2c
 extern struct Sprite *FullMapSprite;
 // 0x00667c30
@@ -2306,9 +2306,9 @@ extern unsigned int DAT_00667ca4;
 // 0x00667ca8
 extern LEGO_EXPORT void *OverlayList;
 // 0x00667cac
-extern LEGO_EXPORT unsigned int OverlayILF;
+extern LEGO_EXPORT struct SpriteSet *OverlayILF;
 // 0x00667cb0
-extern void *BridgesData;
+extern struct SpriteSet *BridgesData;
 // 0x00667cb4
 extern LEGO_EXPORT int ScrollX;
 // 0x00667cb8
@@ -2430,7 +2430,7 @@ extern int DAT_00668164[32];
 // 0x006681e4
 extern int RenderingStatusStackDepth;
 // 0x006681e8
-extern unsigned int OverridePalette;
+extern unsigned short *OverridePalette;
 // 0x006681ec
 extern void *DAT_006681ec;
 // 0x006681f0
@@ -2498,9 +2498,9 @@ extern unsigned int DAT_006687b0;
 // 0x006687b4
 extern unsigned int DAT_006687b4;
 // 0x006687bc
-extern unsigned int DAT_006687bc;
+extern void *DAT_006687bc;
 // 0x006687c0
-extern unsigned int DAT_006687c0;
+extern void *DAT_006687c0;
 // 0x006687c8
 extern struct IconNode *IconListHead;
 // 0x006687cc
@@ -2680,11 +2680,11 @@ extern struct Sprite *ScriptEndSprite;
 // 0x00668ea4
 extern unsigned int DAT_00668ea4;
 // 0x00668eb0
-extern unsigned int SelectedThemeIcon;
+extern struct IconNode *SelectedThemeIcon;
 // 0x00668eb4
 extern unsigned int DAT_00668eb4;
 // 0x00668eb8
-extern unsigned int ScriptEndIcon;
+extern struct IconNode *ScriptEndIcon;
 // 0x00668ebc
 extern unsigned int DAT_00668ebc;
 extern unsigned int DAT_00668ec0;
@@ -2693,7 +2693,7 @@ extern struct InterfaceResearchNode *ResearchList;
 // 0x00668ee0
 extern int DAT_00668ee0;
 // 0x00668ee8
-extern unsigned int AviAcmStreamHeader[0x15];
+extern struct AcmHeader AviAcmStreamHeader;
 // 0x00668f3c
 extern unsigned int AviSoundBytesPerFrame;
 // 0x00668f44
@@ -2964,7 +2964,7 @@ extern struct IconNode *PopUpOkIcon;
 // 0x007986dc
 extern struct IconNode *PopUpCloseIcon;
 // 0x007986e0
-extern unsigned int AcceptIcon;
+extern struct IconNode *AcceptIcon;
 // 0x007986e4
 extern unsigned int DeletePopUpShown;
 // 0x007986e8
@@ -2972,9 +2972,9 @@ extern unsigned int NewProfilePopUpShown;
 // 0x007986f0
 extern unsigned int DAT_007986f0;
 // 0x007986f4
-extern unsigned int DAT_007986f4;
+extern void *DAT_007986f4;
 // 0x007986f8
-extern unsigned int DAT_007986f8;
+extern void *DAT_007986f8;
 // 0x00798700
 extern unsigned int DAT_00798700;
 // 0x00798704
@@ -3006,9 +3006,9 @@ extern void *SavedGameList;
 // 0x00798738
 extern int DAT_00798738;
 // 0x0079873c
-extern unsigned int DAT_0079873c;
+extern void *DAT_0079873c;
 // 0x00798740
-extern unsigned int DAT_00798740;
+extern void *DAT_00798740;
 // 0x00798748
 extern struct IconNode *SpeechVolumeMarkerIcon;
 // 0x0079874c
@@ -3153,22 +3153,20 @@ extern unsigned char SpeechRawBuffer[0x10000];
 // 0x007aac24
 extern int SpeechConvertedUsed;
 // 0x007aac40
+/* The speech stream's ACMSTREAMHEADER (see struct AcmHeader; its lengths are compared signed). */
 struct AcmHdr {
     unsigned int cbStruct;
     unsigned int fdwStatus;
-    unsigned int dwUser;
+    UINT_PTR dwUser;
     unsigned char *pbSrc;
     int cbSrcLength;
     int cbSrcLengthUsed;
-    unsigned int dwSrcUser;
+    UINT_PTR dwSrcUser;
     unsigned char *pbDst;
     int cbDstLength;
     int cbDstLengthUsed;
-    /* ACMSTREAMHEADER goes on to 0x54 bytes: the ACM driver keeps its state in these while the header is
-     * prepared. The original reserves 0x60 bytes here (0x7aac40..0x7aaca0). */
-    unsigned int dwDstUser;
-    unsigned int dwReservedDriver[10];
-    unsigned char pad_54[0x60 - 0x54];
+    UINT_PTR dwDstUser;
+    unsigned int dwReservedDriver[ACM_DRV_RESERVED];
 };
 extern struct AcmHdr SpeechAcmHeader;
 
@@ -3498,7 +3496,7 @@ extern unsigned int DAT_007fe994;
 // 0x007fe998
 extern unsigned short DAT_007fe998;
 // 0x007fe9a8
-extern unsigned int DAT_007fe9a8;
+extern unsigned short *DAT_007fe9a8;
 // 0x007fe9c0
 extern struct Sprite *PointerSprites[9];
 // 0x007fea10
@@ -3520,7 +3518,7 @@ extern unsigned short DAT_007febb8;
 // 0x007febc0
 extern LEGO_EXPORT struct Cursor EditCursor;
 // 0x008003f4
-extern int LevelMapHandle;
+extern struct Element *LevelMapHandle;
 // 0x008003f8
 extern unsigned int DAT_008003f8;
 // 0x00800400
@@ -3532,7 +3530,7 @@ extern struct Element *BridgesHandle;
 // 0x00801408
 extern unsigned int DAT_00801408;
 // 0x0080140c
-extern void *LevelTileMapHandle;
+extern struct Element *LevelTileMapHandle;
 // 0x00801410
 extern struct Element *OverlayILFHandle;
 // 0x00801420
@@ -3542,11 +3540,11 @@ extern int DAT_00801a60;
 // 0x00801a64
 extern int DAT_00801a64;
 // 0x00801a68
-extern void *DAT_00801a68;
+extern struct Element **DAT_00801a68; /* the level's object classes */
 // 0x00801a6c
 extern int *DAT_00801a6c;
 // 0x00801a70
-extern void *DAT_00801a70;
+extern struct MapTileSet **DAT_00801a70; /* the level's tile object sets */
 // 0x00801a74
 extern int DAT_00801a74;
 // 0x00801a80

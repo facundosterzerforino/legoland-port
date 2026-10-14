@@ -730,7 +730,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             if (sprite != 0 && (sprite_image = sprite->image) != NULL) {
                 if ((sprite->flags & 0x8000) == 0 &&
                     (sprite_image->field_14 == 2 || sprite_image->field_14 == 3)) {
-                    LLSPlay((struct LLS *)sprite_image->data, (unsigned int)sprite_image);
+                    LLSPlay((struct LLS *)sprite_image->data, sprite_image);
                 }
                 obj->flags |= 4;
             }
@@ -1094,7 +1094,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
             si->sprites[i] = LoadSprite(filename, 1);
             anim = si->sprites[i]->image;
             if ((anim->field_14 == 2 || (int)anim->field_14 == 3) && ((struct LLS *)anim->data)->frame_count > 1) {
-                LLSPlay((struct LLS *)anim->data, (unsigned int)anim);
+                LLSPlay((struct LLS *)anim->data, anim);
             }
             i += 1;
         } while (i < (int)count);
@@ -1444,7 +1444,7 @@ LEGO_EXPORT int LLSStop(struct LLS *lls) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d520
-LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
+LEGO_EXPORT void LLSPlay(struct LLS *param_1, void *param_2) {
     struct LLSNode *node = LLSPlayList;
 
     if (param_1 == NULL || param_1->frame_count <= 1) {
@@ -1469,7 +1469,7 @@ LEGO_EXPORT void LLSPlay(struct LLS *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d580
-LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, unsigned int param_2) {
+LEGO_EXPORT void LLSPlayOnce(struct LLS *param_1, void *param_2) {
     LLSPlay(param_1, param_2);
     param_1->flags |= 0x4;
 }

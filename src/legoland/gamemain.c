@@ -38,16 +38,6 @@ struct GameMainNode {
     int field_24;
 };
 
-struct GameMainArg {
-    unsigned int field_0;
-    unsigned int field_4;
-};
-
-struct GameMainEntry {
-    unsigned char pad_0[0x4];
-    char *name;
-};
-
 struct EventNode {
     struct EventNode *next;
     unsigned char pad_4[0x1c - 0x4];
@@ -320,7 +310,7 @@ void FUN_004779d0(struct Point *p) {
                 RemoveObjectFromMap(t);
             }
         } else {
-            RemObjFromMap(QueryClass, (unsigned int)elem, t, &QueryCursor);
+            RemObjFromMap(QueryClass, elem, t, &QueryCursor);
         }
         memcpy(&QueryCursor, &saved, sizeof(struct Cursor));
         QueryClass = saved_class;
@@ -732,14 +722,12 @@ void SetScriptObjectiveKind(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00478650
-void FUN_00478650(unsigned int param_1, unsigned int param_2) {
-    // param_1 is an opaque command-block handle reinterpreted as a GameMainEntry
-    struct GameMainEntry *entry = (struct GameMainEntry *)param_1;
+void FUN_00478650(struct CommandArgs *param_1, unsigned int param_2) {
     if (param_2 == 0) {
         return;
     }
     // STRING: LEGOLAND 0x004bb9ec
-    if (_stricmp(entry->name, "PURGE") == 0) {
+    if (_stricmp(param_1->arg1, "PURGE") == 0) {
         CurrentObjectiveEventFlags |= 0x8;
     } else {
         CurrentObjectiveEventFlags &= 0xf7;
@@ -792,7 +780,6 @@ void ParseIntPair(int *param_1, char **param_2, int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x004787a0
-unsigned int FUN_004787a0(unsigned int param_1, unsigned int param_2) {
-    // param_1 is an opaque command-block handle reinterpreted as a GameMainArg
-    return ((struct GameMainArg *)param_1)->field_4;
+char *FUN_004787a0(struct CommandArgs *param_1, unsigned int param_2) {
+    return param_1->arg1;
 }

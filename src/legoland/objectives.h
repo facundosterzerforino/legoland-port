@@ -60,7 +60,7 @@ void FreeObjectiveEventList(struct ObjectiveEvent *node);
 void FreeScriptStrings(void);
 unsigned int AddScriptString(char *param_1, char *param_2, int param_3);
 void InsertObjectiveMessageSorted(struct ObjectiveEvent *node);
-void SetObjectiveEventText(struct ObjectiveEvent *node, unsigned int param_2, unsigned int param_3);
+void SetObjectiveEventText(struct ObjectiveEvent *node, char *param_2, unsigned int param_3);
 struct ObjectiveEvent *PostObjectiveMessage(const char *format, ...);
 void ShowNextObjectiveMessage(void);
 void ResetObjectiveHintTimer(void);
@@ -89,7 +89,7 @@ void QueueCoverSquaresHint(struct ObjectiveEvent *object, unsigned int param_2, 
 void QueuePathSceneryHint(struct ObjectiveEvent *object, int count);
 void QueueCustomObjectiveHintIfDue(struct ObjectiveEvent *object);
 void PostPendingObjectiveHints(void);
-void PlaceObjectAtTile(unsigned int a, void *b);
+void PlaceObjectAtTile(struct Element *a, void *b);
 int ScriptEventPlace(struct ObjectiveEvent *event);
 int ScriptEventGive(struct ObjectiveEvent *event);
 int FUN_00469b50(struct ObjectiveEvent *event);

@@ -36,20 +36,6 @@ struct SaveNode {
     unsigned char slot;
 };
 
-struct SaveScreenIcon {
-    unsigned char pad_0[0x18];
-    void *field_18;
-    unsigned char slot;
-    unsigned char pad_1d[0x20 - 0x1d];
-    unsigned char field_20;
-    unsigned char pad_21[0x2c - 0x21];
-    void *event_handler;
-    unsigned char pad_30[0x34 - 0x30];
-    unsigned int flags;
-    unsigned int string;
-    unsigned int string_id;
-};
-
 struct SaveScreenNode {
     struct SaveScreenNode *next;
     char name[0x24];
@@ -61,7 +47,7 @@ struct SaveScreenNode {
 
 // FUNCTION: LEGOLAND 0x0048d4b0
 LEGO_EXPORT void InitSavedGameScreen(void) {
-    struct SaveScreenIcon *icon;
+    struct IconNode *icon;
     struct SaveScreenNode *node;
 
     // STRING: LEGOLAND 0x004bf2a0
@@ -99,7 +85,7 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
     RegCornerMaskSprite = LoadSprite("RegCornerMask.lls", 4);
 
     // STRING: LEGOLAND 0x004bf170
-    icon = (struct SaveScreenIcon *)LoadSpriteIcon("GoBack_on_SavedGame.lls", 4, 0x1c2, 0x13, 7);
+    icon = (struct IconNode *)LoadSpriteIcon("GoBack_on_SavedGame.lls", 4, 0x1c2, 0x13, 7);
     icon->flags |= 0x6002;
     if (DAT_007cb324) {
         icon->event_handler = (void *)FUN_0048fb80;
@@ -110,33 +96,33 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
         icon->string_id = 0x28;
         icon->string = GetString(0x28);
     }
-    DAT_006687c0 = (unsigned int)icon->event_handler;
+    DAT_006687c0 = icon->event_handler;
 
     if (!LoadMode) {
         // STRING: LEGOLAND 0x004bf15c
-        AcceptIcon = (unsigned int)LoadSpriteIcon("Accept_On_Save.lls", 4, 0x1dc, 0x142, 7);
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x2000;
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x4002;
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x400;
+        AcceptIcon = LoadSpriteIcon("Accept_On_Save.lls", 4, 0x1dc, 0x142, 7);
+        AcceptIcon->flags |= 0x2000;
+        AcceptIcon->flags |= 0x4002;
+        AcceptIcon->flags |= 0x400;
         if (DAT_007cb310) {
-            ((struct SaveScreenIcon *)AcceptIcon)->event_handler = (void *)FUN_0048f5a0;
-            ((struct SaveScreenIcon *)AcceptIcon)->string_id = 0x29;
-            ((struct SaveScreenIcon *)AcceptIcon)->string = GetString(0x29);
+            AcceptIcon->event_handler = (void *)FUN_0048f5a0;
+            AcceptIcon->string_id = 0x29;
+            AcceptIcon->string = GetString(0x29);
         } else {
-            ((struct SaveScreenIcon *)AcceptIcon)->event_handler = (void *)FUN_0048da50;
-            ((struct SaveScreenIcon *)AcceptIcon)->string_id = 0x2a;
-            ((struct SaveScreenIcon *)AcceptIcon)->string = GetString(0x2a);
+            AcceptIcon->event_handler = (void *)FUN_0048da50;
+            AcceptIcon->string_id = 0x2a;
+            AcceptIcon->string = GetString(0x2a);
         }
     } else {
-        AcceptIcon = (unsigned int)LoadSpriteIcon("Accept_On_Save.lls", 4, 0x1dc, 0x142, 7);
-        ((struct SaveScreenIcon *)AcceptIcon)->string_id = 0x2b;
-        ((struct SaveScreenIcon *)AcceptIcon)->string = GetString(0x2b);
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x2000;
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x4002;
-        ((struct SaveScreenIcon *)AcceptIcon)->flags |= 0x400;
-        ((struct SaveScreenIcon *)AcceptIcon)->event_handler = (void *)FUN_0048d970;
+        AcceptIcon = LoadSpriteIcon("Accept_On_Save.lls", 4, 0x1dc, 0x142, 7);
+        AcceptIcon->string_id = 0x2b;
+        AcceptIcon->string = GetString(0x2b);
+        AcceptIcon->flags |= 0x2000;
+        AcceptIcon->flags |= 0x4002;
+        AcceptIcon->flags |= 0x400;
+        AcceptIcon->event_handler = (void *)FUN_0048d970;
     }
-    DAT_006687bc = (unsigned int)((struct SaveScreenIcon *)AcceptIcon)->event_handler;
+    DAT_006687bc = AcceptIcon->event_handler;
 
     FUN_0048d470();
     DeleteSavedGameList();
@@ -146,30 +132,30 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
     if (node) {
         do {
             if (node->has_header) {
-                icon = (struct SaveScreenIcon *)InsertIcon(0x51, (short)(node->slot * 38 + 0x6f), 7, GetSavePanelBK(node->slot));
+                icon = (struct IconNode *)InsertIcon(0x51, (short)(node->slot * 38 + 0x6f), 7, GetSavePanelBK(node->slot));
                 icon->event_handler = (void *)FUN_0048e4a0;
                 icon->flags |= 0x4002;
-                icon->field_18 = node->name;
+                icon->field_18p = node->name;
                 icon->slot = node->slot;
                 if (node->field_28 == 1) {
-                    icon->field_20 |= 3;
+                    icon->field_20b |= 3;
                     icon->string_id = 0x2c;
                     icon->string = GetString(0x2c);
                 } else {
-                    icon->field_20 |= 5;
+                    icon->field_20b |= 5;
                     icon->string_id = 0x2d;
                     icon->string = GetString(0x2d);
                 }
             } else {
-                icon = (struct SaveScreenIcon *)InsertIcon(0x51, (short)(node->slot * 38 + 0x6f), 7, GetSavePanelBK(node->slot));
+                icon = (struct IconNode *)InsertIcon(0x51, (short)(node->slot * 38 + 0x6f), 7, GetSavePanelBK(node->slot));
                 icon->string_id = 0x2e;
                 icon->string = GetString(0x2e);
                 icon->flags |= 0x6002;
                 icon->event_handler = (void *)FUN_0048e4f0;
                 // STRING: LEGOLAND 0x004befa0
-                icon->field_18 = "EMPTY";
+                icon->field_18p = "EMPTY";
                 icon->slot = node->slot;
-                icon->field_20 |= 1;
+                icon->field_20b |= 1;
             }
             node = node->next;
         } while (node);
@@ -454,7 +440,7 @@ LEGO_EXPORT void PrintSavedGameDetails(void) {
         UpdateProfileCheckBoxIcons();
     }
 
-    btn = (struct IconNode *)AcceptIcon;
+    btn = AcceptIcon;
     if (btn != NULL) {
         if (CurrentProfile.save_slot != 0) {
             btn->flags &= ~0x400;
@@ -545,7 +531,7 @@ LEGO_EXPORT void InitNewSaveGamePOPUP(struct IconNode *icon) {
     PopUpOkIcon->flags |= 0x2000;
     PopUpOkIcon->flags |= 0x4002;
     PopUpOkIcon->event_handler = (void *)FUN_0048e720;
-    DAT_006687bc = (unsigned int)PopUpOkIcon->event_handler;
+    DAT_006687bc = PopUpOkIcon->event_handler;
 
     PopUpCloseIcon = InsertIcon(icon->x + 0xe1, icon->y - 0x18, 7, PopUpCloseSprite);
     PopUpCloseIcon->string_id = 4;
@@ -553,7 +539,7 @@ LEGO_EXPORT void InitNewSaveGamePOPUP(struct IconNode *icon) {
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
     PopUpCloseIcon->event_handler = (void *)FUN_0048e810;
-    DAT_006687c0 = (unsigned int)PopUpCloseIcon->event_handler;
+    DAT_006687c0 = PopUpCloseIcon->event_handler;
     DAT_007986f0 = 0;
 }
 

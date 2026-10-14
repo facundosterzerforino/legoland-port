@@ -129,8 +129,8 @@ LEGO_EXPORT void InitProgressScreen(void) {
             }
         }
     }
-    DAT_006687bc = (unsigned int)FUN_0048bc20;
-    DAT_006687c0 = (unsigned int)FUN_0048c020;
+    DAT_006687bc = FUN_0048bc20;
+    DAT_006687c0 = FUN_0048c020;
 }
 
 // FUNCTION: LEGOLAND 0x0048bb60
@@ -248,7 +248,7 @@ void FUN_0048bde0(void) {
         icon->string = GetString(0x262);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_0048bf90;
-        DAT_006687bc = (unsigned int)FUN_0048bf90;
+        DAT_006687bc = FUN_0048bf90;
         // STRING: LEGOLAND 0x004bef5c
         icon = LoadSpriteIcon("GoBack_on_Tut.lls", 4, 0x20a, 0xf5, 0x23);
         icon->string_id = 0x26;
@@ -263,7 +263,7 @@ void FUN_0048bde0(void) {
             icon->event_handler = (void *)FUN_0048c020;
         }
         icon->flags |= 0x6002;
-        DAT_006687c0 = (unsigned int)icon->event_handler;
+        DAT_006687c0 = icon->event_handler;
     }
     FUN_0048bd40();
     RemoveIconGroup(0x1c);

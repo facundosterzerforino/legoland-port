@@ -254,16 +254,16 @@ void InsertObjectiveMessageSorted(struct ObjectiveEvent *event) {
 }
 
 // FUNCTION: LEGOLAND 0x00468b40
-void SetObjectiveEventText(struct ObjectiveEvent *node, unsigned int param_2, unsigned int param_3) {
+void SetObjectiveEventText(struct ObjectiveEvent *node, char *param_2, unsigned int param_3) {
     char *buffer;
 
     if (param_3 != 0) {
-        buffer = (char *)malloc(strlen((char *)param_2) + 1);
-        node->field_8 = (unsigned int)buffer;
-        strcpy(buffer, (char *)param_2);
+        buffer = (char *)malloc(strlen(param_2) + 1);
+        node->text = buffer;
+        strcpy(buffer, param_2);
         node->flags_10 |= 0x20;
     } else {
-        node->field_8 = param_2;
+        node->text = param_2;
         node->flags_10 &= 0xdf;
     }
 }
@@ -277,7 +277,7 @@ struct ObjectiveEvent *PostObjectiveMessage(const char *format, ...) {
     if (event != NULL) {
         va_start(args, format);
         vsprintf(DAT_0066820c, format, args);
-        SetObjectiveEventText(event, (unsigned int)DAT_0066820c, 1);
+        SetObjectiveEventText(event, (char *)DAT_0066820c, 1);
         InsertObjectiveMessageSorted(event);
     }
     return event;
@@ -1093,26 +1093,24 @@ int ObjectiveEventSetBricks(struct ObjectiveEvent *event) {
 }
 
 // FUNCTION: LEGOLAND 0x00469bd0
-void PlaceObjectAtTile(unsigned int a, void *b) {
-    struct PlaceObject *object;
+void PlaceObjectAtTile(struct Element *a, void *b) {
     struct Ride *cls;
     struct Point centre;
 
-    object = (struct PlaceObject *)a;
-    cls = object->cls;
+    cls = a->ride;
     SetBricksLimited(0);
     GetTileCentre((struct Point *)b, &centre.x);
     EditCursor.tile_x = centre.x;
     EditCursor.tile_y = centre.y;
     cls->cb_90(a, &centre, 0x8f8);
     FUN_0045d770(&EditCursor);
-    PutObjOnMap(object->cls, a, (struct Point *)&EditCursor.tile_x);
+    PutObjOnMap(a->ride, a, (struct Point *)&EditCursor.tile_x);
     SetBricksLimited(1);
 }
 
 // FUNCTION: LEGOLAND 0x00469c40
 int ScriptEventPlace(struct ObjectiveEvent *event) {
-    PlaceObjectAtTile(event->field_4, &event->field_20);
+    PlaceObjectAtTile(event->element, &event->field_20);
     return 1;
 }
 
@@ -1189,8 +1187,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
                     BuildCursorPtr(&QueryCursor, 0, 0);
                     if (IsCursorBuildable(&QueryCursor) != 0) {
                         ClearPathUnderFootprint(QueryClass, &point.x);
-                        RemObjFromMap(QueryClass, (unsigned int)(QueryClass)->element, QueryObj,
-                            &QueryCursor);
+                        RemObjFromMap(QueryClass, (QueryClass)->element, QueryObj, &QueryCursor);
                     }
                     memcpy(&QueryCursor, &saved, sizeof(struct Cursor));
                     QueryClass = saved_class;

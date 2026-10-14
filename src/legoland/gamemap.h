@@ -44,6 +44,12 @@ struct SpriteSet {
     /* 0x10 */ int *offset_y;
 };
 
+/* A tile object set a level map names: its element is the object placed for the set's tiles. */
+struct MapTileSet {
+    /* 0x00 */ unsigned char pad_0[0x14];
+    /* 0x14 */ struct Element *element;
+};
+
 /* Sprite and draw offset a ride's cb_a0 callback returns for rendering. */
 struct RideSpriteInfo {
     /* 0x00 */ void *sprite;
@@ -101,13 +107,13 @@ struct Point;
 void FUN_004598d0(struct Point *coord, int *param_2, int *param_3);
 void FUN_00459960(void);
 void FUN_00459970(void);
-LEGO_EXPORT void PutObjOnMap(struct Ride *obj, unsigned int classid, struct Point *pos);
+LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct Point *pos);
 LEGO_EXPORT int FindObjectsPower(struct Ride *ride);
 void FUN_0045a030(int power, struct MapElement *object);
 void FUN_0045a060(void);
 void FUN_0045a0d0(void);
-LEGO_EXPORT void AddObjectsPowerStats(unsigned int classid, struct Point *pos);
-LEGO_EXPORT void RemoveObjectsPowerStats(unsigned int classid, TileId coords);
+LEGO_EXPORT void AddObjectsPowerStats(struct Element *classid, struct Point *pos);
+LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords);
 LEGO_EXPORT void DefaultCursor(struct Cursor *cursor);
 void FUN_0045a3e0(int *param);
 void FUN_0045a430(short param_1, int *param_2);
@@ -117,7 +123,7 @@ LEGO_EXPORT struct MapElement *GetFirstRenderObject(void);
 LEGO_EXPORT struct MapElement *GetNextRenderObject(struct MapElement *object);
 LEGO_EXPORT struct MapElement *GetFirstObjectMatching(struct Element *cls);
 LEGO_EXPORT struct MapElement *GetNextObjectMatching(struct MapElement *object, struct Element *cls);
-LEGO_EXPORT void RemObjFromMap(struct Ride *obj, unsigned int classid, TileId tile, void *cursor);
+LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId tile, void *cursor);
 void FUN_00459880(void);
 LEGO_EXPORT struct Point PlayfieldToMap(struct Point pos);
 LEGO_EXPORT void InitGameMap(void);

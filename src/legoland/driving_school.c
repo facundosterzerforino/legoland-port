@@ -240,8 +240,8 @@ void DrivingSchoolSetEditMode(void) {
     DAT_0082c6e0.field_1828 |= 0x200;
     DefaultCursor(&DAT_0082df20);
     memcpy(DAT_0082df20.field_1414, DAT_004b4470, 20);
-    EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
-    DAT_0082f760.field_1830 = (unsigned int)&DAT_0082c6e0;
+    EditCursor.next = &DAT_0082f760;
+    DAT_0082f760.next = &DAT_0082c6e0;
 }
 
 // FUNCTION: LEGOLAND 0x00405630
@@ -261,7 +261,7 @@ void DrivingSchoolAddObject(struct Element *param_1, int *coords) {
     node->tile = tile;
     node->next = (struct CountNode *)DrivingSchoolCountList;
     DrivingSchoolCountList = node;
-    cursor = (struct Cursor *)EditCursor.field_1830;
+    cursor = EditCursor.next;
     x = cursor->tile_x;
     y = cursor->tile_y;
 
@@ -323,9 +323,9 @@ void DrivingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int
     ValidateCursor(&DAT_0082f760, src);
     ValidateCursor(&EditCursor, src);
 
-    EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
-    DAT_0082f760.field_1830 = (unsigned int)&DAT_0082c6e0;
-    DAT_0082c6e0.field_1830 = (unsigned int)&DAT_0082df20;
+    EditCursor.next = &DAT_0082f760;
+    DAT_0082f760.next = &DAT_0082c6e0;
+    DAT_0082c6e0.next = &DAT_0082df20;
     PropagateCursorBlocked(&EditCursor);
 }
 

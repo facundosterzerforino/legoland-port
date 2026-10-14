@@ -6,6 +6,14 @@ struct Point;
 struct QueryNode;
 struct ResFile;
 
+/* A level script command line: the command name and its arguments. */
+struct CommandArgs {
+    char *name;
+    char *arg1;
+    char *arg2;
+    char *arg3;
+};
+
 int IsInMapBounds(int a, int b);
 void FUN_004776c0(struct QueryNode *node);
 void InsertOpenListSorted(struct EventNode *node);
@@ -24,10 +32,10 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
 void FUN_004784c0(void);
 void FUN_004785d0(char *param_1, unsigned int param_2);
 void SetScriptObjectiveKind(unsigned int param_1);
-void FUN_00478650(unsigned int param_1, unsigned int param_2);
+void FUN_00478650(struct CommandArgs *param_1, unsigned int param_2);
 int FUN_00478690(void *param_1, unsigned int param_2, unsigned int param_3);
 int FUN_004786a0(void *param_1, unsigned int param_2, unsigned int param_3);
 void ParseRect(int *param_1, char **param_2, int param_3);
 unsigned int FUN_004786c0(void *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4);
 void ParseIntPair(int *param_1, char **param_2, int param_3);
-unsigned int FUN_004787a0(unsigned int param_1, unsigned int param_2);
+char *FUN_004787a0(struct CommandArgs *param_1, unsigned int param_2);

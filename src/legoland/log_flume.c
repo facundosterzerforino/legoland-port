@@ -1415,7 +1415,7 @@ void LogFlumeEntranceLoad(Element *elem) {
     if (LogFlumeBarrelSprite != NULL) {
         lls = GetLLSForSprite((struct Sprite *)LogFlumeBarrelSprite);
         if (lls != NULL) {
-            LLSPlay(lls, (unsigned int)LogFlumeBarrelSprite->image);
+            LLSPlay(lls, LogFlumeBarrelSprite->image);
         }
     }
     // STRING: LEGOLAND 0x004b4984

@@ -1,6 +1,8 @@
 #ifndef LEGOLAND_H
 #define LEGOLAND_H
 
+#include <basetsd.h>
+
 #define STUB() ((void)0)
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -20,6 +22,29 @@ typedef union TileId {
         unsigned char y;
     } pos;
 } TileId;
+
+/* Windows' ACMSTREAMHEADER (msacm.h): its user fields are pointer-sized and its driver area is 15 dwords on 64-bit
+ * Windows; the ACM checks cbStruct against that size. */
+#ifdef _WIN64
+#define ACM_DRV_RESERVED 15
+#else
+#define ACM_DRV_RESERVED 10
+#endif
+
+struct AcmHeader {
+    unsigned int cbStruct;
+    unsigned int fdwStatus;
+    UINT_PTR dwUser;
+    unsigned char *pbSrc;
+    unsigned int cbSrcLength;
+    unsigned int cbSrcLengthUsed;
+    UINT_PTR dwSrcUser;
+    unsigned char *pbDst;
+    unsigned int cbDstLength;
+    unsigned int cbDstLengthUsed;
+    UINT_PTR dwDstUser;
+    unsigned int reserved[ACM_DRV_RESERVED];
+};
 
 struct Bloke;
 

@@ -53,7 +53,7 @@ int ExtPauseMoviesResync(unsigned int frame, int play_pos) {
      * decode the block holding it, and leave the rest of that block for the refill to use first. */
     DAT_00668fb4 = 0;
     DAT_00668f54 = 0;
-    if (MiniwinAcmStreamSize(AviAcmStream, AviAcmStreamHeader[4], &per_block, 0 /* ACM_STREAMSIZEF_SOURCE */) != 0 ||
+    if (MiniwinAcmStreamSize(AviAcmStream, AviAcmStreamHeader.cbSrcLength, &per_block, 0 /* ACM_STREAMSIZEF_SOURCE */) != 0 ||
         per_block == 0) {
         AviAudioSamplePos = DAT_00668f88; /* silence, as before */
         return play_pos;
@@ -64,15 +64,15 @@ int ExtPauseMoviesResync(unsigned int frame, int play_pos) {
     if (AviAudioSamplePos >= DAT_00668f88) {
         return play_pos;
     }
-    MiniwinAVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, (void *)AviAcmStreamHeader[3], AviSoundBytesPerFrame >> 2,
+    MiniwinAVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, AviAcmStreamHeader.pbSrc, AviSoundBytesPerFrame >> 2,
         &bytes, &samples);
-    AviAcmStreamHeader[7] = (unsigned int)AviAcmDstBase;
-    MiniwinAcmStreamPrepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
-    MiniwinAcmStreamConvert(AviAcmStream, AviAcmStreamHeader, 0x10 /* ACM_STREAMCONVERTF_BLOCKALIGN */);
-    MiniwinAcmStreamUnprepareHeader(AviAcmStream, AviAcmStreamHeader, 0);
+    AviAcmStreamHeader.pbDst = AviAcmDstBase;
+    MiniwinAcmStreamPrepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
+    MiniwinAcmStreamConvert(AviAcmStream, &AviAcmStreamHeader, 0x10 /* ACM_STREAMCONVERTF_BLOCKALIGN */);
+    MiniwinAcmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
     AviAudioSamplePos++;
-    if (AviAcmStreamHeader[9] > skip) {
-        DAT_00668fb4 = AviAcmStreamHeader[9] - skip;
+    if (AviAcmStreamHeader.cbDstLengthUsed > skip) {
+        DAT_00668fb4 = AviAcmStreamHeader.cbDstLengthUsed - skip;
         DAT_00668f54 = (int)skip;
     }
     return play_pos;

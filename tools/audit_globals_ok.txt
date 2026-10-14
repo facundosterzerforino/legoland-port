@@ -124,3 +124,4 @@ indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites expli
 0x007fe9c0 PointerSprites (0x24 of 0x50): reviewed, harmless (the 9 cursors debug.c loads; SetPointer indexes only those)
 0x00799258 MusicTransitionSegments (0x64 of 0x9c4): reviewed, harmless (the 5x5 theme-to-theme transitions; every index is [theme][theme] with themes 0-4)
 0x004dcbd0 DAT_004dcbd0 (0x2c of 0x30): reviewed, harmless - struct VecMath is 11 words, FUN_00421540 copies exactly those; 0x004dcbfc is never used
+0x007aac40 SpeechAcmHeader (0x54 of 0x60): reviewed, harmless - struct AcmHdr is ACMSTREAMHEADER (cbStruct = sizeof, 0x54 on x86); the original's 0xc bytes after it are never used

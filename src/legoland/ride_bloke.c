@@ -1044,17 +1044,17 @@ void FUN_00402780(struct NewBloke *b) {
     key = h + sy;
     switch (b->f_c3) {
     case 1:
-        SetOverridePalette((unsigned int)DSchoolBluePalette);
+        SetOverridePalette(DSchoolBluePalette);
         break;
     case 2:
-        SetOverridePalette((unsigned int)DSchoolYellowPalette);
+        SetOverridePalette(DSchoolYellowPalette);
         break;
     case 3:
-        SetOverridePalette((unsigned int)DSchoolRedPalette);
+        SetOverridePalette(DSchoolRedPalette);
         break;
     }
     SetOverrideFrame(b->f_b9 = b->f_b8);
-    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (unsigned int)FUN_00402550, (unsigned int)b, &hit);
+    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (void (*)(void *))FUN_00402550, b, &hit);
     ClearOverridePalette();
     ClearOverrideFrame();
 

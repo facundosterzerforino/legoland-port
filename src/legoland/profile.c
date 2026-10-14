@@ -77,15 +77,15 @@ LEGO_EXPORT void InitListProfiles(void) {
     RegHardOffSprite = LoadSprite("Reg_Hard_Off.lls", 4);
 
     // STRING: LEGOLAND 0x004befa8
-    AcceptIcon = (unsigned int)LoadSpriteIcon("Accept_On_Reg.lls", 4, 0x1ef, 0x14f, 7);
+    AcceptIcon = LoadSpriteIcon("Accept_On_Reg.lls", 4, 0x1ef, 0x14f, 7);
     ((struct IconNode *)AcceptIcon)->string_id = 6;
     ((struct IconNode *)AcceptIcon)->string = GetString(6);
     ((struct IconNode *)AcceptIcon)->flags |= 0x2000;
     ((struct IconNode *)AcceptIcon)->flags |= 0x4002;
     ((struct IconNode *)AcceptIcon)->flags |= 0x400;
     ((struct IconNode *)AcceptIcon)->event_handler = (void *)AcceptProfileClick;
-    DAT_006687bc = (unsigned int)AcceptProfileClick;
-    DAT_006687c0 = (unsigned int)FUN_004920a0;
+    DAT_006687bc = AcceptProfileClick;
+    DAT_006687c0 = FUN_004920a0;
     strcpy(DAT_007cb340, GetString(0x84));
 
     for (; node != NULL; node = node->next) {
@@ -160,7 +160,7 @@ LEGO_EXPORT void EnterNewProfileCheckBoxIcons(struct IconNode *param_1) {
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
     PopUpCloseIcon->event_handler = (void *)FUN_004920a0;
-    DAT_006687c0 = (unsigned int)PopUpCloseIcon->event_handler;
+    DAT_006687c0 = PopUpCloseIcon->event_handler;
 }
 
 // FUNCTION: LEGOLAND 0x0048c720

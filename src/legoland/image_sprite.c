@@ -359,7 +359,7 @@ LEGO_EXPORT int ReloadImageBitmapAndBuildSprites(struct Image *image) {
         lls->frame = (short)local_buf[0];
         lls->loop_delay = *(short *)((char *)local_buf + 18);
         lls->flags |= local_buf[5] & 4;
-        LLSPlay(lls, (unsigned int)image);
+        LLSPlay(lls, image);
     }
     sprite = sprite_list;
     while (sprite->image != image) {
@@ -652,7 +652,7 @@ int LoadCompSprite(struct Sprite *sprite, const char *name, unsigned int flags) 
                 if (element != NULL) {
                     image = element->image;
                     if (image->field_14 == 2 || image->field_14 == 3) {
-                        LLSPlay((struct LLS *)image->data, (unsigned int)image);
+                        LLSPlay((struct LLS *)image->data, image);
                     }
                 }
             }

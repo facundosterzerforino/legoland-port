@@ -249,8 +249,7 @@ void FUN_00457a70(void) {
                             QueryObj.pos.y = QueryCursor.tile_y = tile->field_5;
                             if ((tile->flags & 0x88) && !(tile->flags & 0x40) &&
                                 tile->field_0 == (struct Element *)((struct Ride *)DAT_0080ff6c)->element) {
-                                RemObjFromMap((struct Ride *)DAT_0080ff6c,
-                                    (unsigned int)((struct Ride *)DAT_0080ff6c)->element, QueryObj,
+                                RemObjFromMap((struct Ride *)DAT_0080ff6c, ((struct Ride *)DAT_0080ff6c)->element, QueryObj,
                                     &QueryCursor);
                             }
                         }
@@ -281,7 +280,7 @@ void FUN_00457a70(void) {
                     if (DAT_00810144 == 0) {
                         ClearPathUnderFootprint((struct PathFootprint *)QueryClass, &pt.x);
                     }
-                    RemObjFromMap(QueryClass, (unsigned int)QueryClass->element, QueryObj, &QueryCursor);
+                    RemObjFromMap(QueryClass, QueryClass->element, QueryObj, &QueryCursor);
                 }
             }
         }

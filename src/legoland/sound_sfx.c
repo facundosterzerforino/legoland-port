@@ -39,21 +39,6 @@ struct DirectSoundObj {
     struct DirectSoundVtbl *vtable;
 };
 
-struct AcmHeader {
-    unsigned int cbStruct;
-    unsigned int fdwStatus;
-    unsigned int dwUser;
-    unsigned char *pbSrc;
-    unsigned int cbSrcLength;
-    unsigned int cbSrcLengthUsed;
-    unsigned int dwSrcUser;
-    unsigned char *pbDst;
-    unsigned int cbDstLength;
-    unsigned int cbDstLengthUsed;
-    unsigned int dwDstUser;
-    unsigned int reserved[10];
-};
-
 // FUNCTION: LEGOLAND 0x004921c0
 void *ConvertWaveToPcm16(void *data, WAVEFORMATEX *has, unsigned int *size) {
     WAVEFORMATEX *src = has;
