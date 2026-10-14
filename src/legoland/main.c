@@ -15,6 +15,7 @@
 #include "port_launcher.h"
 #include "port_sdl.h"
 #include "port_res.h"
+#include "port_save.h"
 #include "port_setup.h"
 #include "port_setup_win.h"
 #include "port_trace.h"
@@ -49,7 +50,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
          * trace file). PortDataSelfTest appends its report, ending with the overall result. */
         int sdl_problems = PortSdlSelfTest("port-selftest.txt");
         int res_problems = PortResSelfTest("port-selftest.txt");
-        return PortDataSelfTest("port-selftest.txt", sdl_problems + res_problems);
+        int save_problems = 0;
+        FILE *save_report = fopen("port-selftest.txt", "a");
+
+        if (save_report != NULL) {
+            save_problems = PortSaveSelfTest(save_report);
+            fclose(save_report);
+        }
+        return PortDataSelfTest("port-selftest.txt", sdl_problems + res_problems + save_problems);
     }
     {
         /* [library:window] already running (the game's own check, in wWinMain, comes after the launcher): bring

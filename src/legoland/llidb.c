@@ -1618,6 +1618,12 @@ LEGO_EXPORT void LLS555To565(struct LLSImage *param_1) {
     }
 }
 
+#ifdef LEGOLAND_PORT
+/* [port] the functions themselves (the macros are for the callers) */
+#undef SaveGameRead
+#undef SaveGameWrite
+#endif
+
 // FUNCTION: LEGOLAND 0x0047d730
 LEGO_EXPORT unsigned int SaveGameRead(void *buffer, unsigned int count) {
     return _read(SaveFileHandle, buffer, count) == count;

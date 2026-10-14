@@ -42,6 +42,9 @@ ARGS = ["-x", "c", "--target=i686-pc-windows-msvc", "-fms-extensions", "-fms-com
         "-include", str(ROOT / "miniwin/include/miniwin/redirect.h"), "-ferror-limit=0"]
 
 
+PREFER_POINTERS = False  # set by --types
+
+
 def is_ptr_int(t):
     """a typedef chain that names a pointer-sized integer"""
     while t.kind == ci.TypeKind.TYPEDEF:
@@ -93,6 +96,13 @@ def tree(t, pointer_slots, base):
             members.append(["" if anon else f.spelling, off, sub, f])
         if all(m[2]["k"] == "B" for m in members):
             return {"k": "B", "o": 0, "n": size}
+        if is_union and PREFER_POINTERS:
+            # --types: no original image to say what a slot holds; the member with pointers (the largest) lays the
+            # union out, so the port's struct gets its pointer-sized slots (an integer member reads their low half)
+            with_ptrs = [m for m in members if any(True for _ in ptr_offsets(m[2], 0))]
+            if with_ptrs:
+                choice = max(with_ptrs, key=lambda m: m[3].type.get_size())
+                return {"k": "R", "o": 0, "f": [[desig(choice), dict(choice[2], o=0)]]}
         if is_union:
             choice = members[0]
             for m in members:
@@ -186,6 +196,8 @@ def main():
     text = "#include <windows.h>\n" + "".join('#include "%s"\n' % h.name for h in sorted(SRC.glob("*.h")))
     types = {}  # probe variable -> type spelling (--types: lay out these types instead of globals)
     if "--types" in sys.argv:
+        global PREFER_POINTERS
+        PREFER_POINTERS = True
         spellings = [x.strip() for x in open(sys.argv[sys.argv.index("--types") + 1]).read().split("\n") if x.strip()]
         for i, t in enumerate(spellings):
             types["__port_x86_%d" % i] = t

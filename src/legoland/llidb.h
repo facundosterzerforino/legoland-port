@@ -96,3 +96,10 @@ LEGO_EXPORT void LLSNextFrame(struct LLS *param_1);
 
 LEGO_EXPORT unsigned int SaveGameRead(void *buffer, unsigned int count);
 LEGO_EXPORT unsigned int SaveGameWrite(void *buffer, unsigned int count);
+#ifdef LEGOLAND_PORT
+/* [port] saved games keep the original's 32-bit struct layout on every build: the buffer's type picks the
+   converter (port_save.h) */
+#include "../../port/port_save.h"
+#define SaveGameRead(buffer, count) PortSaveRead((buffer), (count), PORT_X86_TYPE(buffer))
+#define SaveGameWrite(buffer, count) PortSaveWrite((buffer), (count), PORT_X86_TYPE(buffer))
+#endif
