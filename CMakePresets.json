@@ -22,6 +22,16 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "clang-cl-x64",
+      "displayName": "Port: clang-cl, 64-bit Windows (phase 8)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-clang-x64",
+      "toolchainFile": "${sourceDir}/cmake/clang-cl-x64.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
@@ -32,6 +42,10 @@
     {
       "name": "clang-cl-x86",
       "configurePreset": "clang-cl-x86"
+    },
+    {
+      "name": "clang-cl-x64",
+      "configurePreset": "clang-cl-x64"
     }
   ]
 }

@@ -32,6 +32,10 @@ set(CMAKE_CXX_FLAGS_INIT "${CMAKE_C_FLAGS_INIT}") # SDL3 (3rdparty) has a few C+
 set(CMAKE_EXE_LINKER_FLAGS_INIT
     "/machine:x86 /manifest:no /libpath:${XWIN_DIR}/crt/lib/x86 /libpath:${XWIN_DIR}/sdk/lib/um/x86 /libpath:${XWIN_DIR}/sdk/lib/ucrt/x86")
 
+# CMake's compiler checks build in Debug by default, which links the debug C runtime (msvcrtd.lib); xwin leaves the
+# debug runtime out.
+set(CMAKE_TRY_COMPILE_CONFIGURATION Release)
+
 # Tells CMakeLists.txt this is the runnable port build, not the MSVC6 matching build.
 set(LEGOLAND_MODERN_BUILD ON)
 
