@@ -32,7 +32,7 @@ void ResetReportFlags(void);
 void ResetAppraisalStreak(void);
 void StartAppraisalTimer(void);
 void StopAppraisalTimer(void);
-void ConfigureAppraisal(unsigned int param_1, unsigned int param_2);
+void ConfigureAppraisal(unsigned int param_1, const char *param_2);
 unsigned int GetLoadedTextureCount(void);
 void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2);
 unsigned int FUN_004443b0(unsigned int param_1, unsigned int param_2);

@@ -49,7 +49,7 @@ void LoadRestaurant2Resources(struct Element *obj);
 void Restaurant2AddObject(struct Element *param_1, unsigned char *param_2);
 void Restaurant2RemoveObject(struct Element *arg1, TileId tile, struct Cursor *arg3, unsigned int arg4, unsigned int arg5);
 void Restaurant2Update(Element *obj);
-void *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2);
+struct RideSpriteInfo *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2);
 void RenderRestaurant2(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, void *param_5, unsigned int param_6);
 void UnloadRestaurant2Resources();
 void FoodcartIcecreamUpdate(Element *obj);

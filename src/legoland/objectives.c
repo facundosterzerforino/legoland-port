@@ -160,7 +160,7 @@ struct ObjectiveEvent *AllocObjectiveEvent(unsigned int type, int sort_key) {
 void FreeObjectiveEvent(struct ObjectiveEvent *event) {
     if (event->flags_10 & 0x20) {
         if (event->field_8 != 0) {
-            free((void *)event->field_8);
+            free(event->text);
         }
     }
     free(event);
@@ -179,14 +179,14 @@ void FreeObjectiveEventList(struct ObjectiveEvent *event) {
 // FUNCTION: LEGOLAND 0x004689a0
 void FreeScriptStrings(void) {
     int i;
-    unsigned int *p;
+    char **p;
 
     i = 0;
     if ((int)ScriptStringCount > 0) {
         p = ScriptStringTable;
         do {
             if (*p != 0) {
-                free((void *)*p);
+                free(*p);
                 *p = 0;
             }
             i++;
@@ -290,7 +290,7 @@ void ShowNextObjectiveMessage(void) {
 
     event = DAT_00668724;
     if (event != NULL) {
-        at = strchr((char *)event->field_8, 0x40);
+        at = strchr(event->text, 0x40);
         if (at != NULL) {
             *at = 0;
             SpeechCloseFile();
@@ -298,7 +298,7 @@ void ShowNextObjectiveMessage(void) {
             SpeechPlay();
             FUN_0046d3a0();
         }
-        if (DisplayAdvisorHelp((char *)event->field_8, event->type == 0, 0) != 0) {
+        if (DisplayAdvisorHelp(event->text, event->type == 0, 0) != 0) {
             SetNextAdvisorAnimState(5, 0);
             DAT_00668724 = DAT_00668724->next;
             FreeObjectiveEvent(event);
@@ -776,18 +776,18 @@ void PostPendingObjectiveHints(void) {
             case 1:
                 // STRING: LEGOLAND 0x004ba6bc
                 PostObjectiveMessage("You need to build %d more of object %s", node->field_1c,
-                    ((struct PlaceObject *)node->field_4)->cls->name);
+                    ((struct PlaceObject *)node->element)->cls->name);
                 break;
             case 0xc:
                 // STRING: LEGOLAND 0x004ba69c
-                PostObjectiveMessage("You need to research object %s", ((struct PlaceObject *)node->field_4)->cls->name);
+                PostObjectiveMessage("You need to research object %s", ((struct PlaceObject *)node->element)->cls->name);
                 break;
             case 2:
                 if (node->field_1c == 0) {
                     if (node->field_4 != 0) {
                         // STRING: LEGOLAND 0x004ba674
                         PostObjectiveMessage("You need to connect your %s to a path",
-                            ((struct PlaceObject *)node->field_4)->cls->name);
+                            ((struct PlaceObject *)node->element)->cls->name);
                     } else {
                         // STRING: LEGOLAND 0x004ba648
                         PostObjectiveMessage("You need to connect all objects to a path");
@@ -796,7 +796,7 @@ void PostPendingObjectiveHints(void) {
                     if (node->field_4 != 0) {
                         // STRING: LEGOLAND 0x004ba60c
                         PostObjectiveMessage("You need to link the path from your %s to the park entrance",
-                            ((struct PlaceObject *)node->field_4)->cls->name);
+                            ((struct PlaceObject *)node->element)->cls->name);
                     } else {
                         // STRING: LEGOLAND 0x004ba5c8
                         PostObjectiveMessage("You need to link the paths from all objects to the park entrance.");
@@ -807,22 +807,22 @@ void PostPendingObjectiveHints(void) {
                 if (node->field_14 != 0) {
                     // STRING: LEGOLAND 0x004ba590
                     PostObjectiveMessage("You need to build %d new attractions from the %s range", node->field_14,
-                        *(unsigned int *)node->field_4);
+                        *(unsigned int *)node->element);
                 } else {
                     // STRING: LEGOLAND 0x004ba558
                     PostObjectiveMessage("You need to build %d more attractions from the %s range", node->field_1c,
-                        *(unsigned int *)node->field_4);
+                        *(unsigned int *)node->element);
                 }
                 break;
             case 4:
                 if (node->field_14 != 0) {
                     // STRING: LEGOLAND 0x004ba510
                     PostObjectiveMessage("You need to delete all instances of %d attractions from the %s range", node->field_14,
-                        *(unsigned int *)node->field_4);
+                        *(unsigned int *)node->element);
                 } else {
                     // STRING: LEGOLAND 0x004ba4dc
                     PostObjectiveMessage("You need delete %d attractions from the %s range", node->field_1c,
-                        *(unsigned int *)node->field_4);
+                        *(unsigned int *)node->element);
                 }
                 break;
             case 5:
@@ -832,7 +832,7 @@ void PostPendingObjectiveHints(void) {
             case 6:
                 // STRING: LEGOLAND 0x004ba48c
                 PostObjectiveMessage("You need to delete %d of object %s", node->field_1c,
-                    ((struct PlaceObject *)node->field_4)->cls->name);
+                    ((struct PlaceObject *)node->element)->cls->name);
                 break;
             case 7:
                 // STRING: LEGOLAND 0x004ba45c
@@ -915,17 +915,17 @@ void PostPendingObjectiveHints(void) {
             case 0x11:
                 // STRING: LEGOLAND 0x004ba0e4
                 PostObjectiveMessage("You need to get %d more people on the %s", node->field_1c,
-                    ((struct PlaceObject *)node->field_4)->cls->name);
+                    ((struct PlaceObject *)node->element)->cls->name);
                 break;
             case 0x12:
                 if (node->field_14 != 0) {
                     // STRING: LEGOLAND 0x004ba0b4
                     PostObjectiveMessage("You need to add %d different parts to the %s", node->field_14,
-                        ((struct PlaceObject *)node->field_4)->cls->name);
+                        ((struct PlaceObject *)node->element)->cls->name);
                 } else {
                     // STRING: LEGOLAND 0x004ba08c
                     PostObjectiveMessage("You need to add %d more parts to the %s", node->field_1c,
-                        ((struct PlaceObject *)node->field_4)->cls->name);
+                        ((struct PlaceObject *)node->element)->cls->name);
                 }
                 break;
             case 0x13:
@@ -1061,22 +1061,22 @@ int ProcessUnimplementedObjective(struct RewardArg *arg) {
 int ScriptEventGive(struct ObjectiveEvent *event) {
     struct ObjectiveEvent *object;
 
-    object = (struct ObjectiveEvent *)event->field_4;
+    object = (struct ObjectiveEvent *)event->element;
     GiveRewardObject(object, event->field_14, 0);
-    object = (struct ObjectiveEvent *)event->field_4;
+    object = (struct ObjectiveEvent *)event->element;
     ((struct ObjectiveEvent *)object)->field_8 |= 0x20000;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b50
 int FUN_00469b50(struct ObjectiveEvent *event) {
-    FUN_00469a80((struct ObjectiveEvent *)event->field_4);
+    FUN_00469a80((struct ObjectiveEvent *)event->element);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b70
 int ScriptEventTake(struct ObjectiveEvent *event) {
-    TakeRewardObject((struct ObjectiveEvent *)event->field_4);
+    TakeRewardObject((struct ObjectiveEvent *)event->element);
     return 1;
 }
 
@@ -1115,8 +1115,8 @@ int ScriptEventPlace(struct ObjectiveEvent *event) {
 }
 
 // FUNCTION: LEGOLAND 0x00469c60
-int FadeOutSampleCallback(unsigned int handle) {
-    SetSampleFade((struct Sample *)handle, -100);
+int FadeOutSampleCallback(struct Sample *handle) {
+    SetSampleFade(handle, -100);
     return 0;
 }
 

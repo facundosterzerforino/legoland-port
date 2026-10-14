@@ -104,7 +104,6 @@ struct ResVolume;
 struct RideQueueEntry;
 struct ObjectiveEvent;
 struct MapElement;
-struct WaterSub;
 struct WaterNode;
 
 struct BrollyData;
@@ -1305,11 +1304,11 @@ extern struct RenderItemNode *GoldRushBlokeRenderList;
 // 0x004c1210
 extern struct Sprite *ZJoustSprite;
 // 0x004c1214
-extern unsigned int JoustLayer;
+extern struct Sprite *JoustLayer;
 // 0x004c1218
 extern void *JoustRideBnv;
 // 0x004c121c
-extern unsigned int JoustRide;
+extern struct Ride *JoustRide;
 // 0x004c1228
 extern struct RideSpriteInfo DAT_004c1228;
 // 0x004c123c
@@ -1609,13 +1608,13 @@ extern struct Sprite *TopwaterSprite;
 // 0x004cbfdc
 extern struct Ride *ElephantFountainRide;
 // 0x004cbfe0
-extern struct WaterSub *ShowerLayer;
+extern struct Sprite *ShowerLayer;
 // 0x004cbfe4
-extern unsigned int DAT_004cbfe4;
+extern struct Element *DAT_004cbfe4;
 // 0x004cbfe8
 extern struct Element *WaterWorksImageListHandle;
 // 0x004cbfec
-extern unsigned int ElephantFountainLayer;
+extern struct Sprite *ElephantFountainLayer;
 // 0x004cbff0
 extern struct RideSpriteInfo DAT_004cbff0;
 // 0x004cc008
@@ -1623,9 +1622,9 @@ extern struct Ride *WaterBlockRide;
 // 0x004cc014
 extern struct Sprite *ShowerSprite;
 // 0x004cc018
-extern void *WaterWorksImageListData;
+extern struct SpriteSet *WaterWorksImageListData;
 // 0x004cc01c
-extern unsigned int DAT_004cc01c;
+extern struct Ride *DAT_004cc01c;
 // 0x004cc020
 extern struct Sprite *WwElsquirtSprite;
 // 0x004cc024
@@ -1889,7 +1888,7 @@ extern struct Sprite *DAT_006160c0;
 // 0x006160c4
 extern struct CarouselNode *CarouselNodeList;
 // 0x006160d0
-extern unsigned int EarthSlideRide;
+extern struct Ride *EarthSlideRide;
 // 0x006160d4
 extern struct RinData *EarthSlideRin;
 // 0x006160d8
@@ -1935,11 +1934,11 @@ extern struct BrollyNode *DAT_00616144;
 // 0x00616148
 extern struct SaveBlock *SaveBlockList;
 // 0x0061614c
-extern unsigned int HedgeImagesData;
+extern struct SpriteSet *HedgeImagesData;
 // 0x00616150
 extern struct Element *FlowerImagesHandle;
 // 0x00616158
-extern unsigned int FlowerImagesData;
+extern struct SpriteSet *FlowerImagesData;
 // 0x0061615c
 extern struct Element *HedgeImagesHandle;
 // 0x00616164
@@ -2793,7 +2792,7 @@ extern struct LibraryNode *ObjectLibraryHead;
 // 0x00669248
 extern void *ClassRideList;
 // 0x0066924c
-extern unsigned int DAT_0066924c;
+extern struct InfoNode *DAT_0066924c;
 // 0x00669250
 extern int DAT_00669250;
 // 0x00669254
@@ -3390,7 +3389,7 @@ extern int PopUpInfoY;
 // 0x007fded4
 extern struct NewObjTable NewObjects;
 // 0x007fdf7c
-extern unsigned int DAT_007fdf7c;
+extern struct Ride *DAT_007fdf7c;
 // 0x007fdf80
 extern struct InfoObjData *DAT_007fdf80;
 // 0x007fdf84

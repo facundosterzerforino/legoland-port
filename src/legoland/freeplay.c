@@ -32,7 +32,7 @@ struct PanelNode {
     char **name;
     char **after;
     void *buffer2;
-    int a;
+    struct Sprite *a;
     int key;
 };
 
@@ -271,7 +271,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
             continue;
         }
         idx = 0;
-        for (entry = DAT_004bdeb8; (int)entry < (int)&DAT_004bdeb8[0x86]; entry++, idx++) {
+        for (entry = DAT_004bdeb8; (INT_PTR)entry < (int)&DAT_004bdeb8[0x86]; entry++, idx++) {
             if (entry->id == i && LLIDB_FindElement(entry->name, &t1, 0) == 0) {
                 break;
             }
@@ -284,13 +284,13 @@ LEGO_EXPORT void InitFreePlayLists(void) {
             continue;
         }
         if (DAT_007cb3bc->name == legoland->name || DAT_007cb3bc->name == common->name) {
-            Add2FreePlayPanelLists((int)sprite, &t1->name, t4, t2, t3, 200);
+            Add2FreePlayPanelLists(sprite, &t1->name, t4, t2, t3, 200);
         } else if (DAT_007cb3bc->name == adventurers->name) {
-            Add2FreePlayPanelLists((int)sprite, &t1->name, t4, t2, t3, 300);
+            Add2FreePlayPanelLists(sprite, &t1->name, t4, t2, t3, 300);
         } else if (DAT_007cb3bc->name == castle->name) {
-            Add2FreePlayPanelLists((int)sprite, &t1->name, t4, t2, t3, 400);
+            Add2FreePlayPanelLists(sprite, &t1->name, t4, t2, t3, 400);
         } else if (DAT_007cb3bc->name == western->name) {
-            Add2FreePlayPanelLists((int)sprite, &t1->name, t4, t2, t3, 500);
+            Add2FreePlayPanelLists(sprite, &t1->name, t4, t2, t3, 500);
         } else {
             KillSprite(sprite);
         }
@@ -299,7 +299,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048aef0
-unsigned int FUN_0048aef0(unsigned int arg1, struct Element *arg2) {
+unsigned int FUN_0048aef0(const char *arg1, struct Element *arg2) {
     unsigned int result;
     struct Element *elem;
 
@@ -320,7 +320,7 @@ unsigned int FUN_0048aef0(unsigned int arg1, struct Element *arg2) {
 }
 
 // FUNCTION: LEGOLAND 0x0048af40
-void FUN_0048af40(unsigned int param) {
+void FUN_0048af40(const char *param) {
     struct ClipQueryResult *node;
 
     node = 0;
@@ -335,7 +335,7 @@ void FUN_0048af40(unsigned int param) {
 }
 
 // FUNCTION: LEGOLAND 0x0048afa0
-void FUN_0048afa0(unsigned int param) {
+void FUN_0048afa0(const char *param) {
     struct ClipQueryResult *node;
 
     node = 0;
@@ -357,11 +357,11 @@ unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
     if ((param_2 & 0x2) != 0) {
         do {
             if (icon->field_18 == 0) {
-                if (FUN_0048aef0((unsigned int)icon->field_1c, (struct Element *)icon->field_20p) != 0) {
+                if (FUN_0048aef0((const char *)icon->field_1c, (struct Element *)icon->field_20p) != 0) {
                     if (DAT_00798648 == 0) {
                         PlayInstanceOfSample(GameFX[FX_CLICK1].sample, 0, 1, 0);
                     }
-                    FUN_0048af40((unsigned int)icon->field_1c);
+                    FUN_0048af40((const char *)icon->field_1c);
                     icon->field_18 = 1;
                     ElemID((const char *)icon->field_1c)->flags |= 0x4;
                 } else {
@@ -371,12 +371,12 @@ unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
                 elem = ElemID((const char *)icon->field_1c);
                 for (node = IconListHead; node != 0; node = node->next) {
                     if (node->field_20p != 0 && node->field_18 == 1 && (struct Element *)node->field_20p == elem) {
-                        FUN_0048afa0((unsigned int)node->field_1c);
+                        FUN_0048afa0((const char *)node->field_1c);
                         node->field_18 = 0;
                     }
                 }
                 PlayInstanceOfSample(GameFX[FX_BUTTON14].sample, 0, 1, 0);
-                FUN_0048afa0((unsigned int)icon->field_1c);
+                FUN_0048afa0((const char *)icon->field_1c);
                 icon->field_18 = 0;
                 ElemID((const char *)icon->field_1c)->flags &= ~0x4u;
             }
@@ -386,7 +386,7 @@ unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0048b110
-LEGO_EXPORT void Add2FreePlayPanelLists(int a, char **name, char *name2, int key, char **after, int type) {
+LEGO_EXPORT void Add2FreePlayPanelLists(struct Sprite *a, char **name, char *name2, int key, char **after, int type) {
     struct PanelNode *cur = 0;
     struct PanelNode *prev = 0;
     struct PanelNode **head = 0;
@@ -478,13 +478,13 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         sprite2 = FreePlayUp4Sprite;
         list = DAT_007cb39c;
     } else {
-        list = (struct PanelNode *)b;
+        list = (struct PanelNode *)(INT_PTR)b;
     }
     if (list == NULL) {
         InsertIcon(b - 3, 0x15, 7, FreePlayCoverSprite);
         return 0;
     }
-    icon = AddGBarIcons((unsigned int)group, b, c, 1, d, a);
+    icon = AddGBarIcons(group, b, c, 1, d, a);
     group->icon = icon;
     b = icon->x;
     group->clip_left = b;
@@ -499,7 +499,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     group->group = (short)a;
     SetNewGroup_Callbacks(0, (void *)RenderFreePlayIcons, (void *)FUN_0048b000);
     do {
-        AddFreePlayIcon((unsigned int)group, (struct InfoSource *)list, b, y, a, 1, list->after);
+        AddFreePlayIcon(group, (struct InfoSource *)list, b, y, a, 1, list->after);
         list = list->next;
         y += 0x42;
     } while (list != NULL);
@@ -652,14 +652,14 @@ void FUN_0048b700(void) {
 
 // FUNCTION: LEGOLAND 0x0048b740
 void FUN_0048b740(void) {
-    int *esi;
+    struct Sprite **esi;
 
-    esi = (int *)&ProgressScreenTables.levels[0].sprite1;
+    esi = &ProgressScreenTables.levels[0].sprite1;
     do {
-        ReferenceSprite((struct Sprite *)esi[-1]);
-        ReferenceSprite((struct Sprite *)esi[0]);
-        esi += 7;
-    } while ((long)esi < (long)&ProgressScreenTables.levels[10].sprite1);
+        ReferenceSprite(esi[-1]);
+        ReferenceSprite(esi[0]);
+        esi = (struct Sprite **)((char *)esi + sizeof(ProgressScreenTables.levels[0]));
+    } while ((INT_PTR)esi < (INT_PTR)&ProgressScreenTables.levels[10].sprite1);
 }
 
 // FUNCTION: LEGOLAND 0x0048b770
@@ -669,7 +669,7 @@ void FUN_0048b770(void) {
     RemoveIconGroup(0x1c);
     RemoveIconGroup(0x23);
     slot = (struct FreePlaySpriteSlot *)&ProgressScreenTables.levels[0].sprite0;
-    while ((int)slot < (int)&ProgressScreenTables.levels[10].sprite0) {
+    while ((INT_PTR)slot < (INT_PTR)&ProgressScreenTables.levels[10].sprite0) {
         while (KillSprite(slot->sprite0) == 0) {
         }
         while (KillSprite(slot->sprite1) == 0) {

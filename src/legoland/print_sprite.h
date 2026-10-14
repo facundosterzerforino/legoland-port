@@ -12,6 +12,7 @@ struct HitInfo {
     union {
         int field_4;
         struct Element *element;
+        void *ptr; /* what is under the cursor (an advisor, ...) */
     };
     union {
         int field_8;

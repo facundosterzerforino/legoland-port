@@ -127,9 +127,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         else
             ncolors = 1 << bmih.biBitCount;
         hInfo = GlobalAlloc(GHND, ncolors * 4 + 40);
-        if ((unsigned int)hInfo != NULL) {
+        if (hInfo != NULL) {
             pInfo = (BITMAPINFO *)GlobalLock(hInfo);
-            if ((unsigned int)NULL == pInfo) {
+            if ((UINT_PTR)NULL == pInfo) {
                 GlobalFree(hInfo);
             } else {
                 ptmp10 = bmih.biXPelsPerMeter;
@@ -158,7 +158,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                     return 0;
                 }
                 pBits = GlobalLock(hBits);
-                if ((unsigned int)pBits == (int)NULL) {
+                if ((UINT_PTR)pBits == (INT_PTR)NULL) {
                     GlobalUnlock(hInfo);
                     GlobalFree(hInfo);
                     GlobalFree(hBits);

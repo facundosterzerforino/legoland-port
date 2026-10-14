@@ -390,6 +390,6 @@ void FUN_0048c100(void) {
             i++;
             entry += 7;
             mapping++;
-        } while ((int)entry < (int)&ProgressScreenTables.tail[12]);
+        } while ((INT_PTR)entry < (INT_PTR)&ProgressScreenTables.tail[12]);
     }
 }

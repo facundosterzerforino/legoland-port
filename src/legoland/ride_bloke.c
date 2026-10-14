@@ -804,7 +804,7 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     volatile int ptmp310;
     e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
     if (e) {
-        if (e->field_18 == (int)NULL) {
+        if (e->field_18 == (INT_PTR)NULL) {
             return PickQueueTurn(id, p, dir);
         }
         StepPointByDirection(&e->x, &pt.a, dir);

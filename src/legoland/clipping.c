@@ -110,7 +110,7 @@ void FUN_0048a790(void) {
         unsigned short type = node->field_14;
         if (type == 0xc8 || type == 0x1f4 || type == 0x190 || type == 0x12c) {
             struct ClipQueryResult *result;
-            FUN_0048a840(node->field_1c, &result);
+            FUN_0048a840((const char *)node->field_1c, &result);
             if (result->field_c) {
                 node->field_2c(node, 2, 0, 0);
             }
@@ -136,11 +136,11 @@ void FUN_0048a800(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a840
-unsigned int FUN_0048a840(unsigned int arg, struct ClipQueryResult **out) {
+unsigned int FUN_0048a840(const char *arg, struct ClipQueryResult **out) {
     struct ClipQueryResult *entry;
 
     for (entry = DAT_004bdeb8; strlen(entry->name) != 0; entry++) {
-        if (_stricmp((char *)arg, entry->name) == 0) {
+        if (_stricmp(arg, entry->name) == 0) {
             if (out != NULL) {
                 *out = entry;
             }

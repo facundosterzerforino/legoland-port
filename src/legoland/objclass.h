@@ -13,7 +13,7 @@ struct ObjClassNames;
 struct ObjectInfo;
 struct Element;
 
-LEGO_EXPORT unsigned int LoadObjectClass(struct Element *cls);
+LEGO_EXPORT void *LoadObjectClass(struct Element *cls);
 
 typedef void (*RideCallback)();
 typedef int (*RideIntCallback)();
@@ -29,14 +29,14 @@ struct LibraryNode {
     /* 0x00 */ struct LibraryNode *next;
     /* 0x04 */ void *module;
     /* 0x08 */ int refcount;
-    /* 0x0c */ void (*init)(void *context, int *out);
+    /* 0x0c */ void (*init)(void *context, void **out);
 };
 
 LEGO_EXPORT void IncrementObjectCount(struct ObjectCount *count);
 LEGO_EXPORT void DecrementObjectCount(struct ObjectCount *count);
 struct Ride;
 LEGO_EXPORT unsigned int GetObjSalvageValue(struct Ride *ride, unsigned int level);
-LEGO_EXPORT struct ObjInstance *CreateObjectInstance(unsigned int param_1, unsigned short *param_2);
+LEGO_EXPORT struct ObjInstance *CreateObjectInstance(struct Ride *param_1, unsigned short *param_2);
 LEGO_EXPORT int GetObjCost(struct Ride *ride);
 LEGO_EXPORT int GetObjRepairCost(struct Ride *ride, unsigned int level);
 struct Point;

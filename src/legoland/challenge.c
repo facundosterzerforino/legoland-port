@@ -163,7 +163,7 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004436d0
-unsigned int LoadBmpImage(const char *param_1, unsigned char param_2) {
+struct Image *LoadBmpImage(const char *param_1, unsigned char param_2) {
     struct Image *image;
 
     image = CreateSourceImage(param_1, param_2);
@@ -174,7 +174,7 @@ unsigned int LoadBmpImage(const char *param_1, unsigned char param_2) {
         KillImage(image);
         return 0;
     }
-    return (unsigned int)image;
+    return image;
 }
 
 // FUNCTION: LEGOLAND 0x00443710
@@ -197,7 +197,7 @@ void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2) {
     for (i = 0; i < param_1->count; i++) {
         // STRING: LEGOLAND 0x004b7d58
         sprintf(filename, "%s\\%s%04d.BMP", param_2, param_1->name, i);
-        image = (struct Image *)LoadBmpImage(filename, 9);
+        image = LoadBmpImage(filename, 9);
         if (image == NULL) {
             // STRING: LEGOLAND 0x004b7d3c
             DBPrintf("Failed to load texture %s", filename);
@@ -285,7 +285,7 @@ void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_
     param_2->data_8 = (unsigned char *)malloc(param_1->height * param_1->width);
     if (param_1 != NULL) {
         dst = (unsigned int *)malloc(0x404);
-        param_2->data_c = dst;
+        param_2->data_c = (void **)dst;
         for (x = 0x101; x != 0; x--) {
             *dst = 0;
             dst++;
@@ -448,11 +448,11 @@ struct AdvisorObject {
 unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1) {
     struct AnimHandle *anim;
     struct AviFrame *frame;
-    int state[3];
+    struct HitInfo state;
 
-    state[0] = 2;
-    state[1] = (int)param_1;
-    state[2] = 0;
+    state.type = 2;
+    state.ptr = param_1;
+    state.field_8 = 0;
     if (IsScriptStopped() == 0) {
         anim = (struct AnimHandle *)DAT_00665f5c;
         if (anim != NULL) {
@@ -510,14 +510,14 @@ unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1) {
             DAT_00667c40 = "Exit Advisor";
             if (frame != NULL && (int)MousePos.x >= param_1->x && (int)MousePos.y >= param_1->y &&
                 (int)MousePos.x < frame->width + param_1->x && (int)MousePos.y < frame->height + param_1->y) {
-                Hover.type = state[0];
-                Hover.ptr = state[1];
-                Hover.data.value = state[2];
+                Hover.type = state.type;
+                Hover.ptr = (struct Bloke *)state.ptr;
+                Hover.data.value = state.field_8;
             }
         }
     } else {
         PushRenderingStatusAndLockVideoSurface();
-        PrintSprite(param_1->sprite, param_1->x, param_1->y, 0, state);
+        PrintSprite(param_1->sprite, param_1->x, param_1->y, 0, (int *)&state);
         PopRenderingStatus();
     }
     return 0;
@@ -1100,7 +1100,7 @@ void CountClassesOfType1Or3(int *param_1, int *param_2) {
 
 // FUNCTION: LEGOLAND 0x00444c40
 int IsRidePartClass(struct ObjectClass *node) {
-    return FindStringNoCase((const char *)**(int **)((char *)node + 0xc4), &DAT_004b7e9c, 0x16) >= 0;
+    return FindStringNoCase(((struct Ride *)node)->element->name, &DAT_004b7e9c, 0x16) >= 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444c70
@@ -5013,8 +5013,8 @@ int CheckAppraisalDue(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0044dc70
-void ConfigureAppraisal(unsigned int param_1, unsigned int param_2) {
+void ConfigureAppraisal(unsigned int param_1, const char *param_2) {
     MapStats.appraisal_fail_limit = param_1;
     ResetAppraisalStreak();
-    FUN_004597e0(0, (const char *)param_2);
+    FUN_004597e0(0, param_2);
 }

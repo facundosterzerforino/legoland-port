@@ -208,10 +208,10 @@ void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info) {
 }
 
 // FUNCTION: LEGOLAND 0x00480b40
-LEGO_EXPORT unsigned int LoadObjectClass(struct Element *cls) {
-    unsigned int result;
+LEGO_EXPORT void *LoadObjectClass(struct Element *cls) {
+    void *result;
 
-    result = (unsigned int)LLIDB_LoadData(cls);
+    result = LLIDB_LoadData(cls);
     if (result != 0) {
         cls->flags |= 0x4;
     }
@@ -406,7 +406,7 @@ LEGO_EXPORT int LoadObjectLibrary(void *object, const char *name) {
     struct Ride *obj;
     struct LibraryNode *node;
     struct LibraryNode *staging;
-    int results[14];
+    void *results[14];
     char fname[256];
     char path[260];
 
@@ -739,11 +739,11 @@ LEGO_EXPORT int ShuffleObjKeys(struct Point *goal, struct Ride **ride) {
 
     slot = (struct InfoNode **)&ClassRideList;
     node = ClassRideList;
-    if (ClassRideList != (void *)DAT_0066924c) {
+    if (ClassRideList != DAT_0066924c) {
         while (node != 0) {
             next = node->next;
-            if ((unsigned int)next == DAT_0066924c) {
-                DAT_0066924c = (unsigned int)node;
+            if (next == DAT_0066924c) {
+                DAT_0066924c = node;
                 goal->x = node->x << 8;
                 goal->y = node->y << 8;
                 *ride = node->classid;
@@ -769,14 +769,14 @@ LEGO_EXPORT void ResetBestPtr(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004816a0
-LEGO_EXPORT struct ObjInstance *CreateObjectInstance(unsigned int param_1, unsigned short *param_2) {
+LEGO_EXPORT struct ObjInstance *CreateObjectInstance(struct Ride *param_1, unsigned short *param_2) {
     struct ObjInstance *obj;
 
     obj = malloc(sizeof(struct ObjInstance));
     if (obj != 0) {
         memset(obj, 0, sizeof(struct ObjInstance));
         obj->uid = *param_2;
-        obj->field_8 = param_1;
+        obj->ride = param_1;
     }
     return obj;
 }

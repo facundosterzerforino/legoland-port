@@ -21,6 +21,12 @@ struct LLSNode {
 
 /* An LLIDB element (0x14 bytes).  For object classes `data` is the class's Ride
    record; placed-object code (map_object.c, the ride TUs) reaches it as `ride`. */
+/* A TSM file entry once loaded: the element and its data; the list ends with both -1. */
+struct TSMEntry {
+    struct Element *element;
+    void *data;
+};
+
 struct Element {
     /* 0x00 */ char *name;
     /* 0x04 */ char *path;

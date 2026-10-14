@@ -378,16 +378,16 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.low_level_action = bloke->low_level_action;
             BlokeSaveBuffer.pending_action = bloke->pending_action;
             if (bloke->target != 0) {
-                BlokeSaveBuffer.target = (int)bloke->target;
-                FindeIneList((union SavedElement *)&BlokeSaveBuffer.target);
+                BlokeSaveBuffer.target.element = bloke->target;
+                FindeIneList(&BlokeSaveBuffer.target);
             } else {
-                BlokeSaveBuffer.target = -1;
+                BlokeSaveBuffer.target.index = -1;
             }
             if (bloke->last_ride != 0) {
-                BlokeSaveBuffer.last_ride = (int)bloke->last_ride;
-                FindeIneList((union SavedElement *)&BlokeSaveBuffer.last_ride);
+                BlokeSaveBuffer.last_ride.element = bloke->last_ride;
+                FindeIneList(&BlokeSaveBuffer.last_ride);
             } else {
-                BlokeSaveBuffer.last_ride = -1;
+                BlokeSaveBuffer.last_ride.index = -1;
             }
             BlokeSaveBuffer.field_1c = bloke->field_1c;
             BlokeSaveBuffer.field_20 = bloke->field_20;
@@ -408,14 +408,14 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.field_80 = bloke->field_80;
             BlokeSaveBuffer.field_81 = bloke->field_81;
             BlokeSaveBuffer.field_82 = bloke->field_82;
-            BlokeSaveBuffer.favourite[0] = (int)bloke->favourite_attraction_0;
-            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[0]);
-            BlokeSaveBuffer.favourite[1] = (int)bloke->favourite_attraction_1;
-            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[1]);
-            BlokeSaveBuffer.favourite[2] = (int)bloke->favourite_attraction_2;
-            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[2]);
-            BlokeSaveBuffer.favourite[3] = (int)bloke->favourite_food;
-            FindeIneList((union SavedElement *)&BlokeSaveBuffer.favourite[3]);
+            BlokeSaveBuffer.favourite[0].element = bloke->favourite_attraction_0;
+            FindeIneList(&BlokeSaveBuffer.favourite[0]);
+            BlokeSaveBuffer.favourite[1].element = bloke->favourite_attraction_1;
+            FindeIneList(&BlokeSaveBuffer.favourite[1]);
+            BlokeSaveBuffer.favourite[2].element = bloke->favourite_attraction_2;
+            FindeIneList(&BlokeSaveBuffer.favourite[2]);
+            BlokeSaveBuffer.favourite[3].element = bloke->favourite_food;
+            FindeIneList(&BlokeSaveBuffer.favourite[3]);
             BlokeSaveBuffer.pos.x = bloke->pos.x;
             BlokeSaveBuffer.pos.y = bloke->pos.y;
             BlokeSaveBuffer.height = bloke->height;
@@ -453,7 +453,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
                 }
             }
             if (BlokeSaveBuffer.block_34[8] != 0) {
-                if (SaveGameWrite((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
+                if (SaveGameWrite((void *)(UINT_PTR)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
                     {
                         // STRING: LEGOLAND 0x004bc730
                         LogPrintf("Bloke BNV path data (%d)", num);
@@ -829,7 +829,7 @@ LEGO_EXPORT int LoadGame(char *path) {
                     goto fail;
                 }
                 if ((tile->flags & 0x8a8) != 0) {
-                    tile->field_0 = SavedElementTable[(int)tile->field_0];
+                    tile->field_0 = SavedElementTable[(int)(INT_PTR)tile->field_0];
                 } else {
                     tile->field_0 = 0;
                 }
@@ -898,21 +898,21 @@ LEGO_EXPORT int LoadGame(char *path) {
             goto fail;
         }
         if (BlokeSaveBuffer.block_34[8] != 0) {
-            BlokeSaveBuffer.block_34[8] = (unsigned int)malloc(0x48);
-            if (SaveGameRead((void *)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
+            BlokeSaveBuffer.block_34[8] = (unsigned int)(UINT_PTR)malloc(0x48);
+            if (SaveGameRead((void *)(UINT_PTR)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
                 goto fail;
             }
         }
         bloke->action = BlokeSaveBuffer.action;
         bloke->low_level_action = BlokeSaveBuffer.low_level_action;
         bloke->pending_action = BlokeSaveBuffer.pending_action;
-        if (BlokeSaveBuffer.target != -1) {
-            bloke->target = SavedElementTable[BlokeSaveBuffer.target];
+        if (BlokeSaveBuffer.target.index != -1) {
+            bloke->target = SavedElementTable[BlokeSaveBuffer.target.index];
         } else {
             bloke->target = 0;
         }
-        if (BlokeSaveBuffer.last_ride != -1) {
-            bloke->last_ride = SavedElementTable[BlokeSaveBuffer.last_ride];
+        if (BlokeSaveBuffer.last_ride.index != -1) {
+            bloke->last_ride = SavedElementTable[BlokeSaveBuffer.last_ride.index];
         } else {
             bloke->last_ride = 0;
         }
@@ -935,23 +935,23 @@ LEGO_EXPORT int LoadGame(char *path) {
         bloke->field_80 = BlokeSaveBuffer.field_80;
         bloke->field_81 = BlokeSaveBuffer.field_81;
         bloke->field_82 = BlokeSaveBuffer.field_82;
-        if (BlokeSaveBuffer.favourite[0] < SavedElementCount) {
-            bloke->favourite_attraction_0 = SavedElementTable[BlokeSaveBuffer.favourite[0]];
+        if (BlokeSaveBuffer.favourite[0].index < SavedElementCount) {
+            bloke->favourite_attraction_0 = SavedElementTable[BlokeSaveBuffer.favourite[0].index];
         } else {
             bloke->favourite_attraction_0 = 0;
         }
-        if (BlokeSaveBuffer.favourite[1] < SavedElementCount) {
-            bloke->favourite_attraction_1 = SavedElementTable[BlokeSaveBuffer.favourite[1]];
+        if (BlokeSaveBuffer.favourite[1].index < SavedElementCount) {
+            bloke->favourite_attraction_1 = SavedElementTable[BlokeSaveBuffer.favourite[1].index];
         } else {
             bloke->favourite_attraction_1 = 0;
         }
-        if (BlokeSaveBuffer.favourite[2] < SavedElementCount) {
-            bloke->favourite_attraction_2 = SavedElementTable[BlokeSaveBuffer.favourite[2]];
+        if (BlokeSaveBuffer.favourite[2].index < SavedElementCount) {
+            bloke->favourite_attraction_2 = SavedElementTable[BlokeSaveBuffer.favourite[2].index];
         } else {
             bloke->favourite_attraction_2 = 0;
         }
-        if (BlokeSaveBuffer.favourite[3] < SavedElementCount) {
-            bloke->favourite_food = SavedElementTable[BlokeSaveBuffer.favourite[3]];
+        if (BlokeSaveBuffer.favourite[3].index < SavedElementCount) {
+            bloke->favourite_food = SavedElementTable[BlokeSaveBuffer.favourite[3].index];
         } else {
             bloke->favourite_food = 0;
         }
@@ -1053,13 +1053,13 @@ LEGO_EXPORT int LoadGame(char *path) {
             while (u.n-- != 0) {
                 inst = malloc(sizeof(struct ObjInstance));
                 inst->next = 0;
-                inst->field_8 = (unsigned int)ride;
+                inst->ride = ride;
                 if (inst_prev == 0) {
                     ride->instances = inst;
-                    inst->field_4 = (unsigned int)inst_prev;
+                    inst->prev = inst_prev;
                 } else {
                     inst_prev->next = inst;
-                    inst->field_4 = (unsigned int)inst_prev;
+                    inst->prev = inst_prev;
                 }
                 inst_prev = inst;
                 if (SaveGameRead(&inst->flags, 4) == 0) {

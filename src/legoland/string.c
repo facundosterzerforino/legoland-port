@@ -164,7 +164,7 @@ LEGO_EXPORT void DeleteStrings(void) {
         }
         *slot = NULL;
         slot++;
-    } while ((int)slot < (int)DAT_0079a878);
+    } while ((INT_PTR)slot < (INT_PTR)DAT_0079a878);
 }
 
 // FUNCTION: LEGOLAND 0x00499040

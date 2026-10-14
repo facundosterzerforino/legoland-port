@@ -335,7 +335,7 @@ void SpiderAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00416120
-unsigned int *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
+struct RideSpriteInfo *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
     struct CarNode *car = *(struct CarNode **)((unsigned char *)a1 + 0xc);
     DAT_004cbf40.sprite = car->next;
     DAT_004cbf40.x = car->field_14;
@@ -343,7 +343,7 @@ unsigned int *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
     DAT_004cbf40.id = a2;
     car = car->next;
     car->field_10 = car->field_10 | 0x2000;
-    return (unsigned int *)&DAT_004cbf40;
+    return &DAT_004cbf40;
 }
 
 // FUNCTION: LEGOLAND 0x00416160

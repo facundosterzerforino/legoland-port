@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <stddef.h>
 #include "debug.h"
 #include "debug_alloc.h"
 #include "globals.h"
@@ -321,25 +322,25 @@ LEGO_EXPORT unsigned int LLIDB_RegisterNewElement(const char *param_1, const cha
     }
 
     index = FUN_0047b5a0();
-    page_off = (char *)((index >> 8) * 4);
-    slot_off = (index & 0xff) * 20;
+    page_off = (char *)(UINT_PTR)((index >> 8) * sizeof(struct Element *));
+    slot_off = (index & 0xff) * sizeof(struct Element);
 
     copy = (char *)malloc(strlen(param_1) + 1);
-    *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off) = copy;
-    strcpy(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off), param_1);
+    *(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off) = copy;
+    strcpy(*(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off), param_1);
 
     if (param_2 == NULL) {
         copy = (char *)malloc(1);
-        *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4) = copy;
-        *(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4)) = '\0';
+        *(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, path)) = copy;
+        *(*(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, path))) = '\0';
     } else {
         copy = (char *)malloc(strlen(param_2) + 1);
-        *(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4) = copy;
-        strcpy(*(char **)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 4), param_2);
+        *(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, path)) = copy;
+        strcpy(*(char **)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, path)), param_2);
     }
 
-    *(unsigned int *)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 8) = param_3 & LLIDB_TYPE_MASK;
-    *(unsigned int *)(*(char **)(page_off + (unsigned int)LLIDB_Pages) + slot_off + 0x10) = 0;
+    *(unsigned int *)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, flags)) = param_3 & LLIDB_TYPE_MASK;
+    *(unsigned int *)(*(char **)(page_off + (UINT_PTR)LLIDB_Pages) + slot_off + offsetof(struct Element, field_10)) = 0;
 
     LLIDB_ElementCount++;
     return 0;
@@ -658,7 +659,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     obj->footprint.next = 0;
     obj->next = (struct Ride *)ObjectClassList;
     ObjectClassList = obj;
-    lang_count = obj->instances;
+    lang_count = (int)(INT_PTR)obj->instances; /* the file keeps the language count here */
     obj->instances = 0;
     obj->field_8 = 0;
 
@@ -766,7 +767,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         sprite = LoadSprite(name, 1);
         obj->anim = (struct Sprite *)sprite;
         if (sprite != 0 && (sprite->flags & 0x8000) != 0) {
-            for (j = 0; j < (int)((struct Sprite *)obj->anim)->image->aux; j++) {
+            for (j = 0; j < (int)(INT_PTR)((struct Sprite *)obj->anim)->image->aux; j++) {
                 sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->anim, j);
                 if (sprite != 0 && (sprite = (struct Sprite *)GetLLSForSprite((struct Sprite *)sprite)) != 0) {
                     LLSStop((struct LLS *)sprite);
@@ -1153,8 +1154,8 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
     int len;
     struct Element *element;
     struct ResFile *file;
-    unsigned int *entries;
-    unsigned int *entry;
+    struct TSMEntry *entries;
+    struct TSMEntry *entry;
     int i;
 
     // STRING: LEGOLAND 0x004bc3a8
@@ -1162,7 +1163,7 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
     file = RES_OpenFile(filename);
     if (file != NULL) {
         RES_ReadFile(file, &count, 4);
-        entries = (unsigned int *)malloc(count * 8 + 8);
+        entries = (struct TSMEntry *)malloc(count * sizeof(struct TSMEntry) + sizeof(struct TSMEntry));
         if (entries != NULL) {
             RES_ReadFile(file, &len, 4);
             RES_ReadFile(file, name, len);
@@ -1175,15 +1176,15 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
                     RES_ReadFile(file, name, len);
                     name[len] = '\0';
                     LLIDB_FindElement(name, &element, NULL);
-                    entry[0] = element;
-                    entry[1] = (unsigned int)LLIDB_LoadData((void *)element);
+                    entry->element = element;
+                    entry->data = LLIDB_LoadData((void *)element);
                     i++;
-                    entry += 2;
+                    entry++;
                 } while (i < count);
             }
 
-            entries[i * 2] = 0xffffffff;
-            entries[i * 2 + 1] = 0xffffffff;
+            entries[i].element = (struct Element *)-1;
+            entries[i].data = (void *)-1;
             RES_CloseFile(file);
             head->flags |= LLIDB_FLAG_LOADED;
             head->data = entries;
@@ -1196,17 +1197,17 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
 
 // FUNCTION: LEGOLAND 0x0047cf80
 void LLIDB_UnLoadTSM(struct LLIDBHead *head) {
-    unsigned int *base = (unsigned int *)head->data;
+    struct TSMEntry *base = (struct TSMEntry *)head->data;
 
-    if (base[1] != -1) {
-        unsigned int *q = base;
-        unsigned int *p = base;
+    if (base->data != (void *)-1) {
+        struct TSMEntry *q = base;
+        struct TSMEntry *p = base;
 
         do {
-            LLIDB_UnLoadData(*q);
-            p += 2;
+            LLIDB_UnLoadData(q->element);
+            p++;
             q = p;
-        } while (q[1] != -1);
+        } while (q->data != (void *)-1);
     }
     free(base);
 }

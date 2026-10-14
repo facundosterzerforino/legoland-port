@@ -170,7 +170,7 @@ void FUN_0046d3c0(struct IconNode *node) {
     if (FocussedIconPtr == node) {
         FocussedIconPtr = NULL;
     }
-    if (Hover.type == 2 && Hover.ptr == (unsigned int)node) {
+    if (Hover.type == 2 && Hover.ptr == (struct Bloke *)node) {
         Hover.ptr = 0;
         Hover.type = 0x100;
     }
@@ -556,26 +556,26 @@ void FUN_0046db40(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046dbc0
-LEGO_EXPORT struct IconNode *AddGBarIcons(unsigned int param_1, unsigned int param_2, int param_3, int param_4, int param_5, int param_6) {
+LEGO_EXPORT struct IconNode *AddGBarIcons(void *param_1, unsigned int param_2, int param_3, int param_4, int param_5, int param_6) {
     struct IconNode *icon;
 
     AddFullScreenIcon(param_6 + 6);
     icon = InsertIcon(param_2, param_3, param_6 + 3, IfSideBUpSprite);
-    icon->field_30 = (void *)param_1;
+    icon->field_30 = param_1;
     icon->string_id = 0x95;
     icon->string = GetString(0x95);
     icon->height = 0x1e;
     icon->flags = icon->flags | 0x2013;
     icon->event_handler = (void *)FUN_0046d980;
     icon = InsertIcon(param_2, param_5 - 0x1e + param_3, param_6 + 4, IfSideBDownSprite);
-    icon->field_30 = (void *)param_1;
+    icon->field_30 = param_1;
     icon->string_id = 0x94;
     icon->string = GetString(0x94);
     icon->height = 0x1e;
     icon->flags = icon->flags | 0x2013;
     icon->event_handler = (void *)FUN_0046da20;
     icon = InsertIcon(param_2, param_3 + 0x1e, param_6 + 5, 0);
-    icon->field_30 = (void *)param_1;
+    icon->field_30 = param_1;
     icon->width = 0x79;
     icon->height = (short)param_5 - 0x3c;
     icon->box.box_color = GetNearestColour(0, 10, 0x14);
@@ -813,7 +813,7 @@ LEGO_EXPORT int RenderFreePlayIcons(struct IconNode *node) {
         if ((char)node->field_18 != 1) {
             sprite = node->sprite;
             if (sprite != NULL) {
-                FUN_0048a840((unsigned int)node->field_1c, 0);
+                FUN_0048a840((const char *)node->field_1c, 0);
                 if (FUN_0048aef0(node->field_1c, node->field_20p) != 0) {
                     PrintSprite(node->sprite, node->x, node->y, 0, (int *)&ctx);
                     return 0;
@@ -1518,7 +1518,7 @@ LEGO_EXPORT struct IconNode *AddGBarClassIcon(void *param_1, struct InfoSource *
 }
 
 // FUNCTION: LEGOLAND 0x0046f7a0
-LEGO_EXPORT struct IconNode *AddFreePlayIcon(unsigned int param_1, struct InfoSource *src, int a3, int a4, int a5, short a6, void *a7) {
+LEGO_EXPORT struct IconNode *AddFreePlayIcon(void *param_1, struct InfoSource *src, int a3, int a4, int a5, short a6, void *a7) {
     struct IconNode *icon = InsertIcon(a3, a4, a5, GBarFrameSprite);
     if (icon != NULL) {
         struct Sprite *sprite = src->field_14;
@@ -1617,7 +1617,7 @@ int FUN_0046f9a0(int id, int kind, int param_3, int param_4, unsigned int flags,
     if (group == NULL) {
         return 0;
     }
-    icon = AddGBarIcons((unsigned int)group, param_3, param_4, flags, param_6, id);
+    icon = AddGBarIcons(group, param_3, param_4, flags, param_6, id);
     group->icon = icon;
     x = group->field_c = group->field_1c = icon->x;
     y = group->field_10 = group->field_20 = icon->y;

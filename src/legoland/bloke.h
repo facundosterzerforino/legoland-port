@@ -126,13 +126,19 @@ struct Bloke {
 typedef struct Bloke Bloke;
 
 /* The 0x124-byte save-game record of a visitor and its Person (scratch buffer BlokeSaveBuffer). */
+/* An element reference in a save: the element, turned into its index in the save game's element list. */
+union SavedElement {
+    struct Element *element;
+    int index;
+};
+
 struct BlokeSave {
     /* 0x00 */ unsigned short action;
     /* 0x02 */ unsigned short low_level_action;
     /* 0x04 */ unsigned short pending_action;
     /* 0x06 */ unsigned char pad_6[0x8 - 0x6];
-    /* 0x08 */ int target; /* index into the save game's element list, or -1 */
-    /* 0x0c */ int last_ride;
+    /* 0x08 */ union SavedElement target; /* index into the save game's element list, or -1 */
+    /* 0x0c */ union SavedElement last_ride;
     /* 0x10 */ unsigned int field_1c;
     /* 0x14 */ int field_20;
     /* 0x18 */ Point dest;
@@ -153,7 +159,7 @@ struct BlokeSave {
     /* 0x63 */ unsigned char field_81;
     /* 0x64 */ unsigned char field_82;
     /* 0x65 */ unsigned char pad_65[3];
-    /* 0x68 */ int favourite[4]; /* indices into the save game's element list */
+    /* 0x68 */ union SavedElement favourite[4]; /* indices into the save game's element list */
     /* 0x78 */ Point pos;
     /* 0x80 */ unsigned short height;
     /* 0x82 */ unsigned char dir;

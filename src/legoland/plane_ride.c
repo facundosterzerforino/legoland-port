@@ -307,7 +307,7 @@ void PlaneRideAddObject(Element *a, int *p) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e010
-unsigned int *GetPlaneRideSpriteInfo(struct Element *param1, unsigned short param2) {
+struct RideSpriteInfo *GetPlaneRideSpriteInfo(struct Element *param1, unsigned short param2) {
     struct Ride *block = param1->ride;
 
     DAT_0062fe60.sprite = block->layer;
@@ -316,7 +316,7 @@ unsigned int *GetPlaneRideSpriteInfo(struct Element *param1, unsigned short para
     DAT_0062fe60.id = param2;
     block->layer->flags |= 0x2000;
 
-    return (unsigned int *)&DAT_0062fe60;
+    return &DAT_0062fe60;
 }
 
 // FUNCTION: LEGOLAND 0x0043e050

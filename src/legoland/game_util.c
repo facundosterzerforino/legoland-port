@@ -195,7 +195,7 @@ int FUN_00478b20(char *arg) {
 
     if (obj != NULL) {
         if ((obj->flags & 4) == 0) {
-            if (LoadObjectClass(obj) == 0) {
+            if (LoadObjectClass(obj) == NULL) {
                 return 0;
             }
             obj->flags |= 4;
@@ -272,7 +272,7 @@ int ScriptCmdHappinessEnv(char **argv, int argc) {
                 *out = atoi(*argv);
                 argv++;
                 out++;
-            } while ((int)out < (int)MapStats.mood_delta);
+            } while ((INT_PTR)out < (INT_PTR)MapStats.mood_delta);
         }
     }
     return 1;
@@ -884,7 +884,7 @@ int ScriptCmdAppraisal(struct CommandArgs *arg, int argc) {
     if (argc >= 3) {
         strcat(buf, arg->arg3);
     }
-    ConfigureAppraisal(v, (unsigned int)buf);
+    ConfigureAppraisal(v, buf);
     return 1;
 }
 

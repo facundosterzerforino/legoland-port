@@ -218,7 +218,7 @@ void TempleSlideAddObject(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00417300
-unsigned int *GetTempleSlideSpriteInfo(struct Element *ctx, unsigned short param) {
+struct RideSpriteInfo *GetTempleSlideSpriteInfo(struct Element *ctx, unsigned short param) {
     struct Ride *track = ctx->ride;
     struct Sprite *car = track->layer;
 
@@ -230,7 +230,7 @@ unsigned int *GetTempleSlideSpriteInfo(struct Element *ctx, unsigned short param
     car = track->layer;
     car->flags |= 0x2000;
 
-    return (unsigned int *)&DAT_004cbf98;
+    return &DAT_004cbf98;
 }
 
 // FUNCTION: LEGOLAND 0x00417340

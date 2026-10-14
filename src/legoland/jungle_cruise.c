@@ -1563,7 +1563,7 @@ void RenderJungleCruise(struct Element *param_1, unsigned int param_2, unsigned 
     struct Ride *ride = param_1->ride;
     struct RideNode *node = ride->riders;
     short *lls1;
-    unsigned int lls2;
+    struct LLS *lls2;
     struct Point coords;
 
     DrawJungleCruiseBoats(1);
@@ -1575,7 +1575,7 @@ void RenderJungleCruise(struct Element *param_1, unsigned int param_2, unsigned 
     coords = GetScreenCoordsForObject((TileId *)param_4, ride);
     lls1 = (short *)GetLLSForSprite((struct Sprite *)JungleCruiseRide->layer);
     lls2 = GetLLSForSprite((struct Sprite *)JungMaskSprite);
-    LLSSetFrame((struct LLS *)lls2, *lls1);
+    LLSSetFrame(lls2, *lls1);
     PrintSprite(JungMaskSprite, coords.x, coords.y, param_6, 0);
 }
 
@@ -1605,7 +1605,7 @@ int JungleCruise_Save(struct Element *element) {
     while (count--) {
         scoreCopy = *score;
         for (i = 0; i < 5; i++) {
-            scoreCopy.blokes[i] = (struct Bloke *)GetBlokeNum(scoreCopy.blokes[i]);
+            scoreCopy.blokes[i] = (struct Bloke *)(INT_PTR)GetBlokeNum(scoreCopy.blokes[i]);
         }
         SaveGameWrite(&scoreCopy, sizeof(scoreCopy));
         score = score->next;
@@ -1649,7 +1649,7 @@ int JungleCruise_Save(struct Element *element) {
     while (count--) {
         rideCopy = *ride;
         for (i = 0; i < 3; i++) {
-            rideCopy.blokes[i] = GetBlokeNum((struct Bloke *)rideCopy.blokes[i]);
+            rideCopy.blokes[i] = (struct Bloke *)(INT_PTR)GetBlokeNum(rideCopy.blokes[i]);
         }
         SaveGameWrite(&rideCopy, sizeof(rideCopy));
         ride = ride->next;
@@ -1688,7 +1688,7 @@ int JungleCruise_Load(struct Element *element) {
         }
         SaveGameRead(prevScore, sizeof(struct JungleScore));
         for (i = 0; i < 5; i++) {
-            prevScore->blokes[i] = GetBlokePtr((int)prevScore->blokes[i]);
+            prevScore->blokes[i] = GetBlokePtr((int)(INT_PTR)prevScore->blokes[i]);
         }
     }
     SaveGameRead(&count, 4);
@@ -1740,7 +1740,7 @@ int JungleCruise_Load(struct Element *element) {
         }
         SaveGameRead(prevRide, sizeof(struct JungleRide));
         for (i = 0; i < 3; i++) {
-            prevRide->blokes[i] = (unsigned int)GetBlokePtr(prevRide->blokes[i]);
+            prevRide->blokes[i] = GetBlokePtr((int)(INT_PTR)prevRide->blokes[i]);
         }
     }
     for (score = JungleScoreList; score != NULL; score = score->next) {
@@ -1970,7 +1970,7 @@ void JungleCruiseWaterAddObject(Element *obj, int *coords) {
 void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
     struct JungleScore *score = JungleScoreList;
     struct JunglePath *path;
-    int other;
+    struct JunglePath *other;
     unsigned int mask;
 
     path = FindJunglePathAt(param_1, param_2);
@@ -1987,28 +1987,28 @@ void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
             mask = mask & 0xfffffffb;
         }
         if ((mask & 8) != 0 && (mask & 1) != 0 &&
-            (other = (int)FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)&other->dir_mask & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 8) != 0 && (mask & 4) != 0 &&
-            (other = (int)FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 8) != 0)) {
+            (other = FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)&other->dir_mask & 8) != 0)) {
             SetMapTile(param_1 - 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 3, param_2 + 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 - 2, param_2 + 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 1) != 0 &&
-            (other = (int)FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = FindJunglePathAt(param_1, (param_2 - 5)), (*(unsigned char *)&other->dir_mask & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 - 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 3, param_2 - 2, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 - 2, *BoatingSchoolTileMap->tiles);
         }
         if ((mask & 2) != 0 && (mask & 4) != 0 &&
-            (other = (int)FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)(other + 4) & 2) != 0)) {
+            (other = FindJunglePathAt(param_1, (param_2 + 5)), (*(unsigned char *)&other->dir_mask & 2) != 0)) {
             SetMapTile(param_1 + 3, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 2, param_2 + 3, *BoatingSchoolTileMap->tiles);
             SetMapTile(param_1 + 3, param_2 + 2, *BoatingSchoolTileMap->tiles);

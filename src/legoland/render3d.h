@@ -42,7 +42,7 @@ LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1);
 LEGO_EXPORT unsigned int GetArmColourOfBloke(struct BlokeSex0 *param_1);
 LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char *param_2, int param_3, int *param_4);
 LEGO_EXPORT void Put3DBlokesOnRide2(Element *ride, Element *obj);
-LEGO_EXPORT void RenderBlokesNotInSeats(unsigned int a1, unsigned int a2);
+LEGO_EXPORT void RenderBlokesNotInSeats(struct Ride *a1, TileId *a2);
 LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct ViewportEntry *param_3, unsigned char *param_4);
 LEGO_EXPORT struct RinData *LoadRin(const char *path, const char *dir);
 LEGO_EXPORT void UnLoadRin(struct RinData *rin);

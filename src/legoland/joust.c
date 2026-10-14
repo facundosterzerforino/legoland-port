@@ -159,9 +159,9 @@ void JoustRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor) {
 // FUNCTION: LEGOLAND 0x00407b50
 void JoustLoadResources(struct Element *root) {
     Load_FXList(JOUST_SFX, 1);
-    JoustRide = (unsigned int)root->ride;
+    JoustRide = root->ride;
     ((struct Ride *)JoustRide)->flags |= 0x420;
-    JoustLayer = (unsigned int)((struct Ride *)JoustRide)->layer;
+    JoustLayer = ((struct Ride *)JoustRide)->layer;
     ((struct Sprite *)JoustLayer)->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b46f4
     JoustFMaskSprite = LoadSprite("Joust_fmask.lls", 1);
@@ -730,7 +730,7 @@ void JoustFreeResources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00408c50
-unsigned int *GetJoustSpriteInfo(struct Element *param1, unsigned short param2) {
+struct RideSpriteInfo *GetJoustSpriteInfo(struct Element *param1, unsigned short param2) {
     struct Ride *block = param1->ride;
 
     DAT_004c1228.sprite = block->layer;
@@ -739,7 +739,7 @@ unsigned int *GetJoustSpriteInfo(struct Element *param1, unsigned short param2) 
     DAT_004c1228.id = param2;
     block->layer->flags |= 0x2000;
 
-    return (unsigned int *)&DAT_004c1228;
+    return &DAT_004c1228;
 }
 
 // FUNCTION: LEGOLAND 0x00408c90

@@ -1468,7 +1468,7 @@ void Restaurant2Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004304a0
-void *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2) {
+struct RideSpriteInfo *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2) {
     struct Ride *fx = obj->ride;
     struct Sprite *inner = fx->layer;
     DAT_00616120.sprite = inner;
@@ -1477,7 +1477,7 @@ void *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2) {
     DAT_00616120.id = a2;
     inner = fx->layer;
     inner->flags |= 0x2000;
-    return (void *)&DAT_00616120;
+    return &DAT_00616120;
 }
 
 // FUNCTION: LEGOLAND 0x004304e0

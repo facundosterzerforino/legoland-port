@@ -260,7 +260,7 @@ void SpinningBarrelsAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c570
-unsigned int *GetSpinningBarrelsRideSpriteInfo(struct Element *ride, unsigned short param2) {
+struct RideSpriteInfo *GetSpinningBarrelsRideSpriteInfo(struct Element *ride, unsigned short param2) {
     struct Ride *target = ride->ride;
     struct Sprite *layer;
 
@@ -271,7 +271,7 @@ unsigned int *GetSpinningBarrelsRideSpriteInfo(struct Element *ride, unsigned sh
 
     layer = target->layer;
     layer->flags |= 0x2000;
-    return (unsigned int *)&DAT_0062fdb0;
+    return &DAT_0062fdb0;
 }
 
 // FUNCTION: LEGOLAND 0x0043c5b0

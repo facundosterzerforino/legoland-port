@@ -5,12 +5,8 @@
 struct Element;
 
 /* An element pointer that FindeIneList replaces with its save-game index. */
-union SavedElement {
-    struct Element *element;
-    int index;
-};
-
 LEGO_EXPORT int SaveGame(char *filename);
+union SavedElement;
 LEGO_EXPORT int FindeIneList(union SavedElement *handle);
 LEGO_EXPORT struct Element *GeteListPtr(int idx);
 void MarkGameTimer(void);

@@ -10,7 +10,7 @@ struct TextureNode {
     /* 0x00 */ int format_w;
     /* 0x04 */ int format_h;
     /* 0x08 */ unsigned char *data_8;
-    /* 0x0c */ unsigned int *data_c;
+    /* 0x0c */ void **data_c; /* colour ramps (FUN_00486280) */
     /* 0x10 */ int width_m1;
     /* 0x14 */ int height_m1;
     /* 0x18 */ unsigned char pad_18[0x2c - 0x18];
@@ -36,8 +36,8 @@ LEGO_EXPORT unsigned int RenderTiledSprite(struct Sprite *sprite, int param_2, i
 LEGO_EXPORT unsigned int RenderScaledSprite(struct Sprite *param_1, int param_2, int param_3, int param_4, int param_5);
 void FUN_004860f0(void);
 void FUN_00486250(void);
-unsigned int FUN_00486280(int param_1, void *param_2);
 void FUN_004864e0(unsigned int param_1);
+void *FUN_00486280(int param_1, void *param_2);
 void FUN_00488700(unsigned char *base, struct RenderViewport *vp);
 int FUN_00486540(void);
 void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);

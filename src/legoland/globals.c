@@ -1252,13 +1252,13 @@ struct RenderItemNode *GoldRushBlokeRenderList;
 struct Sprite *ZJoustSprite;
 
 // GLOBAL: LEGOLAND 0x004c1214
-unsigned int JoustLayer;
+struct Sprite *JoustLayer;
 
 // GLOBAL: LEGOLAND 0x004c1218
 void *JoustRideBnv;
 
 // GLOBAL: LEGOLAND 0x004c121c
-unsigned int JoustRide;
+struct Ride *JoustRide;
 
 // GLOBAL: LEGOLAND 0x004c1228
 struct RideSpriteInfo DAT_004c1228;
@@ -1705,16 +1705,16 @@ struct Sprite *TopwaterSprite;
 struct Ride *ElephantFountainRide;
 
 // GLOBAL: LEGOLAND 0x004cbfe0
-struct WaterSub *ShowerLayer;
+struct Sprite *ShowerLayer;
 
 // GLOBAL: LEGOLAND 0x004cbfe4
-unsigned int DAT_004cbfe4;
+struct Element *DAT_004cbfe4;
 
 // GLOBAL: LEGOLAND 0x004cbfe8
 struct Element *WaterWorksImageListHandle;
 
 // GLOBAL: LEGOLAND 0x004cbfec
-unsigned int ElephantFountainLayer;
+struct Sprite *ElephantFountainLayer;
 
 // GLOBAL: LEGOLAND 0x004cbff0
 struct RideSpriteInfo DAT_004cbff0;
@@ -1726,10 +1726,10 @@ struct Ride *WaterBlockRide;
 struct Sprite *ShowerSprite;
 
 // GLOBAL: LEGOLAND 0x004cc018
-void *WaterWorksImageListData;
+struct SpriteSet *WaterWorksImageListData;
 
 // GLOBAL: LEGOLAND 0x004cc01c
-unsigned int DAT_004cc01c;
+struct Ride *DAT_004cc01c;
 
 // GLOBAL: LEGOLAND 0x004cc020
 struct Sprite *WwElsquirtSprite;
@@ -2126,7 +2126,7 @@ unsigned int DAT_006160c8;
 unsigned int DAT_006160cc;
 
 // GLOBAL: LEGOLAND 0x006160d0
-unsigned int EarthSlideRide;
+struct Ride *EarthSlideRide;
 
 // GLOBAL: LEGOLAND 0x006160d4
 struct RinData *EarthSlideRin;
@@ -2189,13 +2189,13 @@ struct BrollyNode *DAT_00616144;
 struct SaveBlock *SaveBlockList;
 
 // GLOBAL: LEGOLAND 0x0061614c
-unsigned int HedgeImagesData;
+struct SpriteSet *HedgeImagesData;
 
 // GLOBAL: LEGOLAND 0x00616150
 struct Element *FlowerImagesHandle;
 
 // GLOBAL: LEGOLAND 0x00616158
-unsigned int FlowerImagesData;
+struct SpriteSet *FlowerImagesData;
 
 // GLOBAL: LEGOLAND 0x0061615c
 struct Element *HedgeImagesHandle;
@@ -3461,7 +3461,7 @@ struct LibraryNode *ObjectLibraryHead;
 void *ClassRideList;
 
 // GLOBAL: LEGOLAND 0x0066924c
-unsigned int DAT_0066924c;
+struct InfoNode *DAT_0066924c;
 
 // GLOBAL: LEGOLAND 0x00669250
 int DAT_00669250;
@@ -4331,7 +4331,7 @@ int PopUpInfoY;
 struct NewObjTable NewObjects;
 
 // GLOBAL: LEGOLAND 0x007fdf7c
-unsigned int DAT_007fdf7c;
+struct Ride *DAT_007fdf7c;
 
 // GLOBAL: LEGOLAND 0x007fdf80
 struct InfoObjData *DAT_007fdf80;

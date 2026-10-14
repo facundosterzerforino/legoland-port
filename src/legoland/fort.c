@@ -161,7 +161,7 @@ void FortUpdate(Element *elem) {
     unsigned char dir;
 
     spr = GetSpriteForLayer(FortLayer, 2);
-    if (spr != (int)NULL) {
+    if (spr != (INT_PTR)NULL) {
         lls = (short *)GetLLSForSprite((struct Sprite *)spr);
         if (lls) {
             if (++lls[0] >= lls[8]) {

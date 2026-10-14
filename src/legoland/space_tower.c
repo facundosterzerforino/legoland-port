@@ -617,7 +617,7 @@ void SpaceTowerAddObject(struct EditObject *param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0043b4e0
-void *GetSpaceTowerRideSpriteInfo(struct Element *param_1, unsigned short param_2) {
+struct RideSpriteInfo *GetSpaceTowerRideSpriteInfo(struct Element *param_1, unsigned short param_2) {
     struct Ride *ride;
 
     ride = param_1->ride;

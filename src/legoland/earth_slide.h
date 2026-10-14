@@ -42,7 +42,7 @@ struct EarthBlokeElem {
 /* Callback argument; field_c points at the ride/cursor object (EarthSlideRide). */
 struct EarthRideObj {
     /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct Cursor *ride;
+    /* 0x0c */ struct Ride *ride;
 };
 
 void FUN_0042cd70(unsigned short *a1);

@@ -26,7 +26,7 @@ struct CursorCacheNode {
     unsigned char g;
     unsigned char b;
     unsigned char pad_7;
-    unsigned int value;
+    void *value; /* the cached colour ramp (struct TextureFrame) */
 };
 
 struct CursorKey {
@@ -46,7 +46,7 @@ struct RenderViewport {
 };
 
 struct TextureFrame {
-    /* 0x00 */ void *field_0;
+    /* 0x00 */ int field_0; /* entry count */
     /* 0x04 */ unsigned short *data;
 };
 
@@ -81,7 +81,7 @@ void FUN_004860f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00486190
-unsigned int FUN_00486190(struct CursorKey *key) {
+void *FUN_00486190(struct CursorKey *key) {
     struct CursorCacheNode *node;
 
     if (DAT_00797e6c != 0) {
@@ -97,7 +97,7 @@ unsigned int FUN_00486190(struct CursorKey *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004861d0
-struct CursorCacheNode *FUN_004861d0(unsigned int value, const unsigned char *key) {
+struct CursorCacheNode *FUN_004861d0(void *value, const unsigned char *key) {
     struct CursorCacheNode *node = (struct CursorCacheNode *)malloc(0xc);
     if (node != 0) {
         memset(node, 0, 0xc);
@@ -129,17 +129,17 @@ void FUN_00486250(void) {
     struct CursorCacheNode *node = DAT_00797e6c;
     while (node != 0) {
         struct CursorCacheNode *next = node->next;
-        FUN_00486220((void *)node->value);
+        FUN_00486220(node->value);
         free(node);
         node = next;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00486280
-unsigned int FUN_00486280(int param_1, void *param_2) {
+void *FUN_00486280(int param_1, void *param_2) {
     struct CursorKey *key = (struct CursorKey *)param_2;
     struct TextureFrame *frame;
-    unsigned int cached;
+    void *cached;
     float fb, fg, fr;
     float sb, sg, sr;
     float ab, ag, ar;
@@ -151,7 +151,7 @@ unsigned int FUN_00486280(int param_1, void *param_2) {
     }
     frame = (struct TextureFrame *)malloc(8);
     if (frame != 0) {
-        frame->field_0 = (void *)param_1;
+        frame->field_0 = param_1;
         frame->data = (unsigned short *)malloc(param_1 * 2);
         fb = key->b;
         fg = key->g;
@@ -188,8 +188,8 @@ unsigned int FUN_00486280(int param_1, void *param_2) {
             } while (--param_1 != 0);
         }
     }
-    FUN_004861d0((unsigned int)frame, (unsigned char *)key);
-    return (unsigned int)frame;
+    FUN_004861d0(frame, (unsigned char *)key);
+    return frame;
 }
 
 // FUNCTION: LEGOLAND 0x004864e0
@@ -585,7 +585,7 @@ unsigned int FUN_00488820(unsigned int x, unsigned int y) {
 
 // FUNCTION: LEGOLAND 0x00488840
 LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, struct Sprite *param_2, int param_3, int param_4, int param_5) {
-    volatile int ptmp19;
+    int *volatile ptmp19;
     int w = (short)sprite->width;
     int h = (short)sprite->height;
     struct ZBlitDesc local;
