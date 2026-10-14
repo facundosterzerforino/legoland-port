@@ -10,6 +10,24 @@
 #define STACK_WORDS 2048
 #define MAX_FRAMES 48
 
+/* [port] addresses and stack words are pointer-sized; the registers have the architecture's names */
+#ifdef _WIN64
+typedef DWORD64 Word;
+#define REG_IP Rip
+#define REG_SP Rsp
+#define REG_BP Rbp
+#define WORD_HEX "%016llx"
+#define WORD_ARG(x) ((unsigned long long)(x))
+#else
+typedef DWORD Word;
+#define REG_IP Eip
+#define REG_SP Esp
+#define REG_BP Ebp
+#define WORD_HEX "%08lx"
+#define WORD_ARG(x) ((unsigned long)(x))
+#endif
+#define RVA(x) ((unsigned long)((x) - module_base))
+
 static volatile LONG heartbeat;
 static const char *volatile current_phase = "startup";
 static volatile LONG paused;
@@ -23,13 +41,13 @@ static volatile DWORD crash_thread_id;
 static volatile LONG crash_claimed;
 
 static char exe_dir[MAX_PATH];
-static DWORD module_base;
+static Word module_base;
 static DWORD module_size;
 static int symbols_ready;
 
 /* Copied from the stopped thread, examined after it runs again: nothing here may take a lock it might hold. */
 static CONTEXT report_context;
-static DWORD report_stack[STACK_WORDS];
+static Word report_stack[STACK_WORDS];
 static int report_stack_words;
 
 /* Hardware write watchpoints (debug registers DR0-DR3, set with PortWatchRequest while debugging). A write is
@@ -55,9 +73,9 @@ void PortSetPaused(int value) {
     InterlockedIncrement(&heartbeat);
 }
 
-static int InModule(DWORD address) { return address >= module_base && address < module_base + module_size; }
+static int InModule(Word address) { return address >= module_base && address < module_base + module_size; }
 
-static void Describe(DWORD address, char *out, size_t size) {
+static void Describe(Word address, char *out, size_t size) {
     char buffer[sizeof(SYMBOL_INFO) + 256];
     SYMBOL_INFO *symbol = (SYMBOL_INFO *)buffer;
     DWORD64 displacement = 0;
@@ -74,14 +92,14 @@ static void Describe(DWORD address, char *out, size_t size) {
     }
 }
 
-/* Copy the thread's stack from its ESP, stopping at the first unreadable page. */
-static void CopyStack(DWORD esp) {
+/* Copy the thread's stack from its stack pointer, stopping at the first unreadable page. */
+static void CopyStack(Word esp) {
     SIZE_T got = 0;
     int words = STACK_WORDS;
 
     report_stack_words = 0;
     while (words > 0) {
-        if (ReadProcessMemory(GetCurrentProcess(), (void *)esp, report_stack, words * 4, &got)) {
+        if (ReadProcessMemory(GetCurrentProcess(), (void *)esp, report_stack, words * sizeof(Word), &got)) {
             report_stack_words = words;
             return;
         }
@@ -89,38 +107,39 @@ static void CopyStack(DWORD esp) {
     }
 }
 
-static DWORD StackWord(DWORD address) {
-    DWORD esp = report_context.Esp;
+static Word StackWord(Word address) {
+    Word esp = report_context.REG_SP;
 
-    if (address < esp || address + 4 > esp + (DWORD)report_stack_words * 4 || (address & 3) != 0) {
+    if (address < esp || address + sizeof(Word) > esp + (Word)report_stack_words * sizeof(Word) ||
+        (address & (sizeof(Word) - 1)) != 0) {
         return 0;
     }
-    return report_stack[(address - esp) / 4];
+    return report_stack[(address - esp) / sizeof(Word)];
 }
 
-static void TraceAddress(const char *label, DWORD address) {
+static void TraceAddress(const char *label, Word address) {
     char name[300];
 
     Describe(address, name, sizeof(name));
     if (InModule(address)) {
-        PortTrace("  %s rva %08lx %s", label, address - module_base, name);
+        PortTrace("  %s rva %08lx %s", label, RVA(address), name);
     } else {
-        PortTrace("  %s %08lx %s", label, address, name);
+        PortTrace("  %s " WORD_HEX " %s", label, WORD_ARG(address), name);
     }
 }
 
 static void Report(const char *what) {
-    DWORD ebp = report_context.Ebp;
-    DWORD ret;
+    Word ebp = report_context.REG_BP;
+    Word ret;
     char label[32];
     int i;
 
-    PortTrace("%s: last phase \"%s\", eip %08lx esp %08lx ebp %08lx", what, current_phase, report_context.Eip,
-        report_context.Esp, report_context.Ebp);
-    TraceAddress("at  ", report_context.Eip);
+    PortTrace("%s: last phase \"%s\", ip " WORD_HEX " sp " WORD_HEX " bp " WORD_HEX, what, current_phase,
+        WORD_ARG(report_context.REG_IP), WORD_ARG(report_context.REG_SP), WORD_ARG(report_context.REG_BP));
+    TraceAddress("at  ", report_context.REG_IP);
     /* frame-pointer chain (the port builds keep frame pointers in most functions) */
     for (i = 0; i < MAX_FRAMES; i++) {
-        ret = StackWord(ebp + 4);
+        ret = StackWord(ebp + sizeof(Word));
         if (ret == 0) {
             break;
         }
@@ -135,7 +154,7 @@ static void Report(const char *what) {
     PortTrace("  stack words into the exe:");
     for (i = 0; i < report_stack_words; i++) {
         if (InModule(report_stack[i])) {
-            snprintf(label, sizeof(label), "stack+%04x", i * 4);
+            snprintf(label, sizeof(label), "stack+%04x", i * (int)sizeof(Word));
             TraceAddress(label, report_stack[i]);
         }
     }
@@ -186,10 +205,10 @@ static void ArmWatches(void) {
                 dr7 |= (1u << (i * 2)) /* Li */ | (0x1u << (16 + i * 4)) /* write */ | (0x3u << (18 + i * 4)) /* 4 bytes */;
             }
         }
-        ctx.Dr0 = (DWORD)watches[0].address;
-        ctx.Dr1 = (DWORD)watches[1].address;
-        ctx.Dr2 = (DWORD)watches[2].address;
-        ctx.Dr3 = (DWORD)watches[3].address;
+        ctx.Dr0 = (ULONG_PTR)watches[0].address;
+        ctx.Dr1 = (ULONG_PTR)watches[1].address;
+        ctx.Dr2 = (ULONG_PTR)watches[2].address;
+        ctx.Dr3 = (ULONG_PTR)watches[3].address;
         ctx.Dr7 = dr7;
         if (SetThreadContext(main_thread, &ctx)) {
             for (i = 0; i < 4; i++) {
@@ -206,7 +225,7 @@ void PortWatchRequest(int slot, void *address, const char *name) {
     if (slot < 0 || slot > 3) {
         return;
     }
-    watches[slot].address = (void *)((DWORD)address & ~3u);
+    watches[slot].address = (void *)((ULONG_PTR)address & ~(ULONG_PTR)3);
     watches[slot].name = name;
     InterlockedExchange(&watch_rearm, 1);
 }
@@ -214,17 +233,17 @@ void PortWatchRequest(int slot, void *address, const char *name) {
 /* A watched global was written: log the value, the writing code and the stack, then carry on. */
 static LONG WatchHit(EXCEPTION_POINTERS *pointers) {
     CONTEXT *ctx = pointers->ContextRecord;
-    DWORD *sp = (DWORD *)ctx->Esp;
+    Word *sp = (Word *)ctx->REG_SP;
     int i;
     int shown = 0;
 
     for (i = 0; i < 4; i++) {
         if ((ctx->Dr6 & (1u << i)) != 0 && InterlockedIncrement(&watch_reports) <= MAX_WATCH_REPORTS) {
             PortTrace("watch: %s = %08lx, written by the instruction before rva %08lx (phase \"%s\")", watches[i].name,
-                *(DWORD *)watches[i].address, ctx->Eip - module_base, current_phase);
-            for (shown = 0; shown < 16 && (DWORD)(sp + 1) < (DWORD)ctx->Esp + 0x4000; sp++) {
-                if (!IsBadReadPtr(sp, 4) && InModule(*sp)) {
-                    PortTrace("  stack+%04lx rva %08lx", (DWORD)sp - ctx->Esp, *sp - module_base);
+                *(DWORD *)watches[i].address, RVA(ctx->REG_IP), current_phase);
+            for (shown = 0; shown < 16 && (Word)(sp + 1) < ctx->REG_SP + 0x4000; sp++) {
+                if (!IsBadReadPtr(sp, sizeof(Word)) && InModule(*sp)) {
+                    PortTrace("  stack+%04lx rva %08lx", (unsigned long)((Word)sp - ctx->REG_SP), RVA(*sp));
                     shown++;
                 }
             }
@@ -245,7 +264,7 @@ static LONG CALLBACK FirstChanceHandler(EXCEPTION_POINTERS *pointers) {
     if (code != EXCEPTION_ACCESS_VIOLATION && code != EXCEPTION_STACK_OVERFLOW) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
-    if (code == EXCEPTION_ACCESS_VIOLATION && !InModule(pointers->ContextRecord->Eip)) {
+    if (code == EXCEPTION_ACCESS_VIOLATION && !InModule(pointers->ContextRecord->REG_IP)) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
     if (InterlockedExchange(&crash_claimed, 1) != 0) {
@@ -281,7 +300,7 @@ static int SampleMainThread(void) {
     }
     report_context.ContextFlags = CONTEXT_FULL;
     GetThreadContext(main_thread, &report_context);
-    CopyStack(report_context.Esp);
+    CopyStack(report_context.REG_SP);
     ResumeThread(main_thread);
     return 1;
 }
@@ -314,10 +333,10 @@ static DWORD WINAPI WatchdogThread(LPVOID unused) {
         if (WaitForSingleObject(crash_event, 250) == WAIT_OBJECT_0) {
             record = crash_pointers->ExceptionRecord;
             report_context = *crash_pointers->ContextRecord;
-            CopyStack(report_context.Esp);
-            PortTrace("CRASH: exception %08lx at %08lx (thread %lu%s), address %08lx", record->ExceptionCode,
-                (DWORD)record->ExceptionAddress, crash_thread_id, crash_thread_id == main_thread_id ? ", main" : "",
-                record->NumberParameters > 1 ? (DWORD)record->ExceptionInformation[1] : 0);
+            CopyStack(report_context.REG_SP);
+            PortTrace("CRASH: exception %08lx at " WORD_HEX " (thread %lu%s), address " WORD_HEX, record->ExceptionCode,
+                WORD_ARG(record->ExceptionAddress), crash_thread_id, crash_thread_id == main_thread_id ? ", main" : "",
+                WORD_ARG(record->NumberParameters > 1 ? record->ExceptionInformation[1] : 0));
             Report("CRASH");
             WriteDump("crash", crash_thread_id, crash_pointers);
             SetEvent(crash_done);
@@ -365,7 +384,7 @@ void PortWatchdogStart(void) {
     IMAGE_NT_HEADERS *nt;
     char *slash;
 
-    module_base = (DWORD)GetModuleHandleA(NULL);
+    module_base = (Word)GetModuleHandleA(NULL);
     dos = (IMAGE_DOS_HEADER *)module_base;
     nt = (IMAGE_NT_HEADERS *)(module_base + dos->e_lfanew);
     module_size = nt->OptionalHeader.SizeOfImage;

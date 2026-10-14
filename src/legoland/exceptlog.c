@@ -1,4 +1,17 @@
 #include "exceptlog.h"
+#if defined(LEGOLAND_PORT) && defined(_WIN64)
+/* [port] 64-bit: the report shows the x64 registers under the original's names (their low 32 bits, as it prints
+ * them; the port's own lines below print the full stack pointer's words) */
+#define Eip Rip
+#define Esp Rsp
+#define Ebp Rbp
+#define Eax Rax
+#define Ebx Rbx
+#define Ecx Rcx
+#define Edx Rdx
+#define Esi Rsi
+#define Edi Rdi
+#endif
 #include <windows.h>
 #include <stdarg.h>
 #include <string.h>
@@ -114,16 +127,16 @@ int stackdump(void *exc_info, const char *filename) {
         {
             /* [port] list the stack words that point into the exe, as RVAs, so the crash site's callers can be
              * resolved with llvm-symbolizer against legoland.pdb */
-            DWORD *psp = (DWORD *)ctx->Esp;
-            DWORD mod = (DWORD)GetModuleHandleA(NULL);
+            ULONG_PTR *psp = (ULONG_PTR *)ctx->Esp;
+            ULONG_PTR mod = (ULONG_PTR)GetModuleHandleA(NULL);
             DWORD size = ((IMAGE_NT_HEADERS *)(mod + ((IMAGE_DOS_HEADER *)mod)->e_lfanew))->OptionalHeader.SizeOfImage;
             int k;
 
-            PortTrace("crash: eip rva %08lx (module at %08lx)", ctx->Eip - mod, mod);
+            PortTrace("crash: eip rva %08lx (module at %p)", (unsigned long)(ctx->Eip - mod), (void *)mod);
             __try {
                 for (k = 0; k < 1024; k++) {
                     if (psp[k] >= mod && psp[k] < mod + size) {
-                        PortTrace("  stack+%04x: rva %08lx", k * 4, psp[k] - mod);
+                        PortTrace("  stack+%04x: rva %08lx", k * (int)sizeof(ULONG_PTR), (unsigned long)(psp[k] - mod));
                     }
                 }
             } __except (1) {
