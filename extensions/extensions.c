@@ -25,7 +25,9 @@ void ExtensionsParseCommandLine(const char *cmdline) {
         ExtPauseMovies = 0;
     }
     ExtPauseMoviesApply();
-    if (strstr(cmdline, "-portable-music") != NULL) {
+    if (strstr(cmdline, "-windows-music") != NULL) {
+        MiniwinUsePortableMusic(0);
+    } else if (strstr(cmdline, "-portable-music") != NULL) {
         MiniwinUsePortableMusic(1);
     }
     if (strstr(cmdline, "-console") != NULL) {

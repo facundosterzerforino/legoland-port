@@ -53,7 +53,7 @@ The model:
 ## The engine
 
 `miniwin/src/dmengine.c` follows the model, with dmusic for the files and the synthesizer, and
-`miniwin/src/dmusic.c` gives the game the DirectMusic objects on top (with `-portable-music`). Checked with
+`miniwin/src/dmusic.c` gives the game the DirectMusic objects on top (the default; `-windows-music` for Windows'). Checked with
 `play_engine.exe` and the same tools, 6 runs of every segment at both master grooves: all 290681 notes have the
 right pitch, all 3456 bars are the model's, and the random picks spread like DirectMusic's (2 candidates
 46.1/53.9%, 4 candidates 19-20% each and 10-12% for the two rarer; patterns 294/270).

@@ -41,7 +41,7 @@ static const GUID GUID_NotifyMeasureBeat = {0xd2ac289a, 0xb39b, 0x11d1,
 #define DMUS_E_LOADER_FAILEDOPEN ((HRESULT)0x88780170)
 #define DMUS_E_LOADER_FAILEDCREATE ((HRESULT)0x88780171)
 
-static int portable;
+static int portable = 1; /* the default (the maintainer's choice); -windows-music turns it off */
 
 void MiniwinUsePortableMusic(int on) {
     portable = on;

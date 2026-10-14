@@ -8,7 +8,8 @@
 
 #include <windows.h>
 
-/* On: the game's DirectMusic objects are miniwin's. Before the music thread starts (extensions: -portable-music). */
+/* On (the default): the game's DirectMusic objects are miniwin's; off: Windows'. Before the music thread starts
+ * (extensions: -windows-music turns it off). */
 void MiniwinUsePortableMusic(int on);
 int MiniwinPortableMusic(void);
 

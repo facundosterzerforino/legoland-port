@@ -208,7 +208,7 @@ build after each.
   exe from a pinned release; 2.7 dB on average, envelope correlation 0.97-1.0, and the maintainer, comparing the
   recordings by ear: it sounds right.
   Its output passes the same checks as Windows' DirectMusic: every pitch, every bar, the same spread
-  of random picks. Off for now: `-portable-music` turns it on, to compare by ear.
+  of random picks. On by default (the maintainer's choice); `-windows-music` plays Windows' DirectMusic instead.
 
 1. **Sound effects and speech** `[library:audio]`: DirectSound and ACM (`sound_sfx.c`, `stream.c`,
    `profile_io.c`, `interface.c`) on miniaudio. Its WAV decoder covers the MS and IMA ADPCM speech files.

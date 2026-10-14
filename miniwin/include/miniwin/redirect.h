@@ -42,7 +42,7 @@
 #define acmStreamConvert MiniwinAcmStreamConvert
 #define acmStreamUnprepareHeader MiniwinAcmStreamUnprepareHeader
 
-/* [library:music] the DirectMusic objects: miniwin's with -portable-music, else Windows' */
+/* [library:music] the DirectMusic objects: miniwin's, or Windows' with -windows-music */
 #define CoInitialize MiniwinCoInitialize
 #define CoCreateInstance MiniwinCoCreateInstance
 

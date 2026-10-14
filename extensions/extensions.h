@@ -16,8 +16,9 @@ extern int ExtSkipLogo;
 /* Pause movies (ext_movie.h): a movie stops while the game is in the background instead of running on. On by
  * default (the maintainer's choice); -no-pause-movies turns it off. */
 
-/* Portable music (-portable-music, off for now): the music plays through miniwin's DirectMusic
- * (miniwin/dmusic.h) instead of Windows', to compare the two; it becomes the default once it sounds right. */
+/* Portable music: the music plays through miniwin's DirectMusic (miniwin/dmusic.h, FluidSynth on gm.dls) instead of
+ * Windows'. On by default (the maintainer's choice, once it sounded right); -windows-music plays Windows' DirectMusic
+ * instead (-portable-music, the old switch, is still accepted). */
 
 /* Reads the switches from the command line (after the launcher, so they override its saved choices). */
 void ExtensionsParseCommandLine(const char *cmdline);
