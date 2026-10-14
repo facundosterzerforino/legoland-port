@@ -50,3 +50,4 @@ worker.c:Mechanics_Repair baseline
 worker.c:PutWorkerOnRide baseline
 worker_mouse.c:FUN_00470270 baseline
 worker_mouse.c:FUN_004704b0 baseline
+castle.c:FUN_004273e0 reviewed 2026-10-14: the seat is read before FUN_004215b0 clears it (same as the original)

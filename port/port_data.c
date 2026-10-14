@@ -119,9 +119,6 @@ extern char CopterPathTable4[];
 extern char DAT_004b4608[];
 extern char DAT_004b47b8[];
 extern char DAT_004b47e8[];
-extern char DAT_004b5648[];
-extern char DAT_004b5658[];
-extern char DAT_004b5f50[];
 void FUN_00423940();
 void FUN_00423970();
 void FUN_00423990();
@@ -5751,6 +5748,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5624, sizeof(DAT_004b5624), 0xa624, 0x4},
     {(void *)&DAT_004b5628, sizeof(DAT_004b5628), 0xa628, 0xc},
     {(void *)&FLOAT_004b5634, sizeof(FLOAT_004b5634), 0xa634, 0x14},
+    {(void *)&DAT_004b5648, sizeof(DAT_004b5648), 0xa648, 0x10},
+    {(void *)&DAT_004b5658, sizeof(DAT_004b5658), 0xa658, 0x8},
     {(void *)&DAT_004b5660, sizeof(DAT_004b5660), 0xa660, 0xa0},
     {(void *)&DAT_004b5700, sizeof(DAT_004b5700), 0xa700, 0x48},
     {(void *)&DAT_004b5748, sizeof(DAT_004b5748), 0xa748, 0xc0},
@@ -5791,6 +5790,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5ee0, sizeof(DAT_004b5ee0), 0xaee0, 0x14},
     {(void *)&DAT_004b5ef4, sizeof(DAT_004b5ef4), 0xaef4, 0x20},
     {(void *)&DAT_004b5f14, sizeof(DAT_004b5f14), 0xaf14, 0x3c},
+    {(void *)&DAT_004b5f50, sizeof(DAT_004b5f50), 0xaf50, 0x10},
     {(void *)&DAT_004b5f60, sizeof(DAT_004b5f60), 0xaf60, 0x20},
     {(void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0xaf80, 0x1d0},
     {(void *)&DAT_004b6150, sizeof(DAT_004b6150), 0xb150, 0x90},

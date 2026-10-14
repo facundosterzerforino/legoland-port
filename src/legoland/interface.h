@@ -3,7 +3,6 @@
 #include "legoland.h"
 #include "movie_pool.h"
 
-struct CastleObj;
 struct IconNode;
 struct MovieHandle;
 

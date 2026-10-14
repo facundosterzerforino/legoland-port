@@ -1,5 +1,11 @@
 #pragma once
 
+struct FVec3 {
+    float x;
+    float y;
+    float z;
+};
+
 #include "legoland.h"
 
 // This header shadows the CRT <math.h>; pull the real one in explicitly.

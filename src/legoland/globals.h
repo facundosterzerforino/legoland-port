@@ -379,14 +379,22 @@ struct LSub {
 };
 
 /* 0x6102f8: three 0x58-byte ride-path objects (doubly linked via next/prev) */
-struct CastlePathObj {
-    unsigned int f0[0x10];
-    float f40;
-    float f44;
-    float f48;
-    void **f4c;
-    struct CastlePathObj *next;
-    struct CastlePathObj *prev;
+/* a stretch of the castle track's curve: a piece's own (PathSeg.blob), one its class makes (method_24), or a
+   template (DAT_006102f8) */
+struct SegBlob {
+    /* 0x00 */ unsigned int v[16];
+    /* 0x40 */ float f40;
+    /* 0x44 */ union {
+        float start;
+        unsigned int start_bits; /* passed on as raw bits by the curve integrators */
+    };
+    /* 0x48 */ union {
+        float end;
+        unsigned int end_bits;
+    };
+    /* 0x4c */ struct CurveVt *vt;
+    /* 0x50 */ struct SegBlob *next;
+    /* 0x54 */ struct SegBlob *prev;
 };
 
 /* 0x7fded4: newly unlocked objects shown by the "new objects" popup */
@@ -1673,7 +1681,7 @@ extern struct SprEnt DAT_004d8250;
 // 0x004d8268
 extern unsigned int DAT_004d8268;
 // 0x004d8270
-extern unsigned int DAT_004d8270;
+extern struct VecMath DAT_004d8270;
 extern float DAT_004d829c[64];
 extern unsigned int DAT_004d83c0;
 // 0x004d88f4
@@ -1683,25 +1691,29 @@ extern unsigned int DAT_004d89b4[4];
 // 0x004d89c4
 extern void *DAT_004d89c4;
 // 0x004d89c8
-extern unsigned int LtxFileTable[30];
+extern void *LtxFileTable[30];
 // 0x004d8a40
-extern unsigned int LmsFileTable[31];
+extern struct LmsFile *LmsFileTable[31];
 // 0x004d8abc
-extern unsigned int LfmFileTable[30];
+extern struct LmsRec *LfmFileTable[30];
 // 0x004d8b34
 extern unsigned int LfmFileSizes[30];
 // 0x004d8bac
-extern unsigned int RollercoasterLpt;
+extern int *RollercoasterLpt;
 // 0x004d8bb0
 extern char DAT_004d8bb0[0x100];
 // 0x004dcbb8
 extern float DAT_004dcbb8[3];
 // 0x004dcbd0
-extern void *DAT_004dcbd0[10];
-// 0x004dcbf8
-extern unsigned int DAT_004dcbf8;
+extern struct VecMath DAT_004dcbd0; /* .dim was DAT_004dcbf8 */
 // 0x004dcc00
-extern unsigned char DAT_004dcc00[2520];
+/* a vector of the castle's numerical code: count floats (the pool's are 0x54 bytes) */
+struct FloatArray {
+    int count;
+    float data[20];
+};
+
+extern struct FloatArray DAT_004dcc00[30];
 // 0x004dd5d8
 extern unsigned int DAT_004dd5d8;
 // 0x004dd5e0
@@ -1710,7 +1722,7 @@ extern void *DAT_004dd5e0[24];
 /* A text file read whole: its bytes and their count (CountTextLines and FindLineStart read both through the
  * address). */
 struct CoasterTextFile {
-    unsigned int data;
+    unsigned char *data;
     unsigned int size;
 };
 extern struct CoasterTextFile CoasterTxtFile;
@@ -1733,7 +1745,7 @@ extern char DAT_004e3870[0x96000];
 // 0x0060f914
 extern struct LSub DAT_0060f914[21];
 // 0x006102f8
-extern struct CastlePathObj DAT_006102f8[3];
+extern struct SegBlob DAT_006102f8[3];
 // 0x00610a04
 extern unsigned int DAT_00610a04;
 // 0x00610a08
@@ -1801,7 +1813,7 @@ extern unsigned int DAT_00615f6c;
 // 0x00615f70
 extern unsigned int DAT_00615f70[5];
 // 0x00615f84
-extern void *DAT_00615f84;
+extern struct CurveWalker *DAT_00615f84;
 extern int DAT_00615fc4;
 extern int DAT_00615fc8;
 extern int DAT_00615fcc;
@@ -1815,7 +1827,7 @@ extern int DAT_00615fec;
 extern float *DAT_00615f8c;
 extern int (*DAT_004b63fc)(float (*fn)(unsigned int), float lo, float hi, float *out);
 
-extern void *DAT_00615f80;
+extern struct CurveWalker *DAT_00615f80;
 extern int DAT_00615ff0;
 extern float DAT_00615ff4;
 extern struct CastleFloatEnt DAT_004b5f80[3][4];
@@ -1827,11 +1839,11 @@ extern int DAT_00615f90;
 // 0x00615fd4
 extern float DAT_00615fd4;
 // 0x00615f98
-extern unsigned int DAT_00615f98;
+extern struct VecMath DAT_00615f98;
 // 0x00616000
-extern unsigned int CoasterTrainWheelLms;
+extern struct LmsFile *CoasterTrainWheelLms;
 // 0x00616004
-extern unsigned int CoasterTrainWheelLfm;
+extern struct LmsRec *CoasterTrainWheelLfm;
 // 0x00616010
 extern struct BinVFile *BalloonzBinV;
 // 0x00616018
@@ -4046,17 +4058,26 @@ extern char *DAT_00829c54;
 // 0x00829c60
 extern void *DAT_00829c60[1024];
 // 0x0082ac60
-extern void *DAT_0082ac60[48];
+extern struct FloatArray *DAT_0082ac60[48];
 // 0x0082ad20
-extern unsigned char CastleDispatchTable[0x90];
+/* castle.c: the castle parts' handlers (a row per part class; the table ends where DAT_0082adb0 starts) */
+struct DispatchRow {
+    /* 0x00 */ struct Element *element;
+    /* 0x04 */ void (*fn_4)(); /* select (edit mode) */
+    /* 0x08 */ void (*fn_8)(); /* calc cursor */
+    /* 0x0c */ void (*fn_c)(); /* add object */
+    /* 0x10 */ void (*fn_10)(); /* dcalc cursor */
+    /* 0x14 */ void (*fn_14)(); /* remove object */
+};
+extern struct DispatchRow CastleDispatchTable[6];
 // 0x0082adb0
-extern unsigned int DAT_0082adb0[6];
+extern struct Element *DAT_0082adb0[6];
 // 0x0082add0
-extern unsigned int CoasterTrainCarLms[3];
+extern struct LmsFile *CoasterTrainCarLms[3];
 // 0x0082ade0
-extern unsigned int CoasterTrainCarLfm[3];
+extern struct LmsRec *CoasterTrainCarLfm[3];
 // 0x0082adec
-extern unsigned int DAT_0082adec;
+extern struct PathSeg *DAT_0082adec;
 // 0x0082adf0
 extern struct Ride *BoatingSchoolWaterRide;
 // 0x0082adf4
@@ -4144,10 +4165,10 @@ struct PlaneSet;
 extern struct PlaneSet *DAT_004b55fc;
 
 // 0x004d83b4
-extern struct RingHost *DAT_004d83b4;
+extern struct Train *DAT_004d83b4;
 
 // 0x004d83a0
-extern unsigned int DAT_004d83a0[5];
+extern struct CurveWalker DAT_004d83a0;
 
 // 0x004b5634
 extern float FLOAT_004b5634;
@@ -4209,7 +4230,7 @@ extern int *DAT_004d87cc[32];
 // 0x004d884c
 extern int *DAT_004d884c[32];
 // 0x004d88cc
-extern unsigned int *DAT_004d88cc[5];
+extern struct FloatArray **DAT_004d88cc[5];
 
 // 0x004b5660
 extern float DAT_004b5660[4][2];
