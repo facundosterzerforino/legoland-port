@@ -135,10 +135,30 @@ static int Fail(Work *w, const char *what, const char *path) {
     return 0;
 }
 
+/* Files the data folder doesn't take: the original's exe (the port doesn't need it, and the port's own exe may have
+ * its name) and anything named like the running exe, which can't be overwritten while it runs. */
+static int Skipped(const char *target) {
+#ifdef _WIN32
+    char exe[MAX_PATH];
+    const char *name;
+
+    if (GetModuleFileNameA(NULL, exe, sizeof(exe)) > 0) {
+        name = SDL_strrchr(exe, '\\');
+        if (SDL_strcasecmp(target, name != NULL ? name + 1 : exe) == 0) {
+            return 1;
+        }
+    }
+#endif
+    return SDL_strcasecmp(target, "legoland.exe") == 0;
+}
+
 static int AddFile(Work *w, const char *source, const char *target, unsigned long long size, unsigned long z_offset,
     unsigned long z_size) {
     Job *j;
 
+    if (Skipped(target)) {
+        return 1;
+    }
     if (w->count == w->cap) {
         size_t cap = w->cap ? w->cap * 2 : 256;
         Job *grown = (Job *)realloc(w->jobs, cap * sizeof(Job));
