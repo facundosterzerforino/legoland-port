@@ -18,21 +18,12 @@
 
 #include "image_sprite.h"
 
-struct BlokeNode;
-
 struct BrollyData {
     /* 0x00 */ unsigned char pad_0[4];
     /* 0x04 */ int count_4;
     /* 0x08 */ int *table_8;
     /* 0x0c */ int *table_c;
     /* 0x10 */ int *table_10;
-};
-
-struct BlokeNode {
-    struct BlokeNode *next;
-    unsigned char pad_4[4];
-    unsigned int field_8;
-    unsigned short field_c;
 };
 
 struct Seats {
@@ -44,16 +35,6 @@ struct BrollyNode {
     /* 0x04 */ unsigned short value;
     /* 0x06 */ struct Seats seats;
     /* 0x09 */ unsigned char field_9;
-};
-
-struct BlokeOwner {
-    unsigned char pad_0[0xcc];
-    struct BlokeNode *head_cc;
-};
-
-struct BlokeArg {
-    unsigned char pad_0[0xc];
-    struct BlokeOwner *owner_c;
 };
 
 struct EditArg {
@@ -106,13 +87,13 @@ void LoadChuckWagonResources(struct Element *obj) {
 void UnloadChuckWagonResources(void) { KillMoneySFX(); }
 
 // FUNCTION: LEGOLAND 0x0042e260
-void RenderChuckWagon(struct BlokeArg *arg, unsigned int param2, unsigned int param3, unsigned short *value) {
-    struct BlokeOwner *owner = arg->owner_c;
-    struct BlokeNode *node = owner->head_cc;
+void RenderChuckWagon(struct Element *arg, unsigned int param2, unsigned int param3, unsigned short *value) {
+    struct Ride *owner = arg->ride;
+    struct RideNode *node = owner->riders;
     if (node != NULL) {
         while (node != NULL) {
-            if (*value == node->field_c) {
-                IP_RenderBlokeIn3DNow((struct Bloke *)node->field_8);
+            if (*value == node->tile.id) {
+                IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
                 GetScreenCoordsForObject((unsigned char *)value, owner);
                 break;
             }
@@ -226,7 +207,7 @@ void BrollyAddObject(struct Element *param_1, unsigned char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e560
-struct RideSpriteInfo *GetBrollySpriteInfo(int param_1, unsigned int param_2) {
+struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned int param_2) {
     unsigned char *b = (unsigned char *)&param_2;
     int i = Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xffff;
     RideSpriteInfoBuffer.sprite = (void *)BrollyImagesData->table_8[(unsigned char)i];
@@ -354,15 +335,15 @@ void LoadFoodcartFoodResources(struct Element *obj) {
 void UnloadFoodcartFoodResources(void) { KillMoneySFX(); }
 
 // FUNCTION: LEGOLAND 0x0042e830
-void FUN_0042e830(struct BlokeArg *arg, unsigned int param2, unsigned int param3, unsigned short *value) {
-    struct BlokeOwner *owner = arg->owner_c;
-    struct BlokeNode *node = owner->head_cc;
+void FUN_0042e830(struct Element *arg, unsigned int param2, unsigned int param3, unsigned short *value) {
+    struct Ride *owner = arg->ride;
+    struct RideNode *node = owner->riders;
     if (node == NULL) {
         return;
     }
     while (node != NULL) {
-        if (*value == node->field_c) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)node->field_8);
+        if (*value == node->tile.id) {
+            IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
         }
         node = node->next;
     }
@@ -395,17 +376,17 @@ void EaterySetEditMode(struct EditArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e910
-void RenderCastleBBQ(int param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
-    int ride = *(int *)(param_1 + 0xc);
-    unsigned int *node;
+void RenderCastleBBQ(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, void *param_5, unsigned int param_6) {
+    struct Ride *ride = param_1->ride;
+    struct RideNode *node;
     struct Point coords;
     struct Point offset;
-    for (node = *(unsigned int **)(ride + 0xcc); node != NULL; node = (unsigned int *)*node) {
-        if (*param_4 == *(short *)(node + 3)) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)node[2]);
+    for (node = ride->riders; node != NULL; node = node->next) {
+        if (*param_4 == *(short *)&node->tile) {
+            IP_RenderBlokeIn3DNow(node->rider);
         }
     }
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+    coords = GetScreenCoordsForObject((TileId *)param_4, ride);
     offset = GetRenderOffsetForLayer(CastleBBQLayer, 1);
     AdjustOffsetForViewMode(&offset);
     if (GetSpriteForLayer(CastleBBQLayer, 1) != 0) {
@@ -878,7 +859,7 @@ void Restaurant1Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042f4c0
-void RenderRestaurant1(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderRestaurant1(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, void *param_5, unsigned int param_6) {
     struct Ride *ride = param_1->ride;
     struct RideNode *node;
     struct Bloke *blokes[8];
@@ -1605,7 +1586,7 @@ void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int p
 }
 
 // FUNCTION: LEGOLAND 0x00430b10
-void RenderRestaurant2(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderRestaurant2(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, void *param_5, unsigned int param_6) {
     struct Ride *ride = param_1->ride;
     struct RideNode *node = ride->riders;
     struct Bloke **p;
@@ -2155,7 +2136,7 @@ void FUN_00431c50(unsigned int param_1, unsigned int param_2, struct Sprite *par
 }
 
 // FUNCTION: LEGOLAND 0x00431d00
-void RenderOctopusCafe(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderOctopusCafe(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned char *param_4, void *param_5, unsigned int param_6) {
     struct Bloke *buckets[0x20];
     struct Bloke *blokes[0x20];
     int count;
@@ -2253,7 +2234,7 @@ void RenderOctopusCafe(struct Element *param_1, unsigned int param_2, unsigned i
 }
 
 // FUNCTION: LEGOLAND 0x004322a0
-int Restaurant1_Save(void) {
+int Restaurant1_Save(struct Element *element) {
     unsigned int one = 1;
     unsigned int zero = 0;
     struct BrollyNode *node = DAT_00616144;
@@ -2270,7 +2251,7 @@ int Restaurant1_Save(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432310
-int Restaurant1_Load(void) {
+int Restaurant1_Load(struct Element *element) {
     unsigned int count;
     struct BrollyNode *prev = NULL;
     struct BrollyNode *node;
@@ -2300,7 +2281,7 @@ int Restaurant1_Load(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432390
-int Restaurant2_Save(void) {
+int Restaurant2_Save(struct Element *element) {
     unsigned int one = 1;
     unsigned int zero = 0;
     struct SaveBlock *node = SaveBlockList;
@@ -2317,7 +2298,7 @@ int Restaurant2_Save(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432400
-int Restaurant2_Load(void) {
+int Restaurant2_Load(struct Element *element) {
     unsigned int count;
     struct SaveBlock *current;
     struct SaveBlock *prev = NULL;

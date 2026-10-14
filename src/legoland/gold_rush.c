@@ -60,39 +60,11 @@ struct GoldBlokeRef {
     unsigned char field_c;
 };
 
-struct GoldRide {
-    unsigned char pad_0[0xc];
-    int x;
-    int y;
-};
-
-struct GoldEditObject {
-    unsigned char pad_0[0xc];
-    struct GoldRide *ride;
-};
-
 struct GoldNode {
     unsigned short key;
     unsigned char pad_2[0xa];
     struct GoldNode *next;
     unsigned char pad_10[0x1c];
-};
-
-struct GoldObj {
-    unsigned char pad_0[0xc];
-    struct GoldInner *inner;
-};
-
-struct GoldInner {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
-    unsigned char pad_20[0x44];
-    struct GoldLayer *layer;
-};
-
-struct GoldLayer {
-    unsigned char pad_0[0x10];
-    unsigned int flags;
 };
 
 struct GoldWalkItem {
@@ -176,14 +148,14 @@ void *FindGoldWashNode(void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00406a10
-void GoldRushLoad(struct GoldObj *obj) {
-    struct GoldInner *inner = obj->inner;
+void GoldRushLoad(struct Element *obj) {
+    struct Ride *inner = obj->ride;
     GoldRushRide = inner;
     if (inner != NULL) {
         inner->flags |= 0x20;
-        if (((struct GoldInner *)GoldRushRide)->layer != NULL) {
-            ((struct GoldInner *)GoldRushRide)->layer->flags |= 0x2000;
-            GoldRushLayer = (struct Sprite *)((struct GoldInner *)GoldRushRide)->layer;
+        if (((struct Ride *)GoldRushRide)->layer != NULL) {
+            ((struct Ride *)GoldRushRide)->layer->flags |= 0x2000;
+            GoldRushLayer = (struct Sprite *)((struct Ride *)GoldRushRide)->layer;
         }
     }
 
@@ -219,7 +191,7 @@ void GoldRushUnload(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406b10
-void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -547,10 +519,10 @@ void GoldRushSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004075f0
-void GoldRushAddObject(struct GoldEditObject *editObj, struct Point *pos) {
+void GoldRushAddObject(struct Element *editObj, struct Point *pos) {
     TileId id;
     struct Point p;
-    struct GoldRide *ride;
+    struct Ride *ride;
 
     id.pos.x = (unsigned char)pos->x;
     id.pos.y = (unsigned char)pos->y;
@@ -576,9 +548,9 @@ void GoldRushAddObject(struct GoldEditObject *editObj, struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x004076e0
-void GoldRushRemoveObject(struct GoldEditObject *editObj, TileId coords, struct Cursor *cursor) {
+void GoldRushRemoveObject(struct Element *editObj, TileId coords, struct Cursor *cursor) {
     int p[2];
-    struct GoldRide *ride = editObj->ride;
+    struct Ride *ride = editObj->ride;
     void *found = FindGoldWashNode(&coords);
 
     if (found != NULL) {
@@ -606,7 +578,7 @@ void GoldRushRemoveObject(struct GoldEditObject *editObj, TileId coords, struct 
 }
 
 // FUNCTION: LEGOLAND 0x00407800
-LEGO_EXPORT int SaveGoldWash(void) {
+LEGO_EXPORT int SaveGoldWash(struct Element *element) {
     struct GoldNode *node;
     unsigned int one;
     unsigned int zero;
@@ -627,7 +599,7 @@ LEGO_EXPORT int SaveGoldWash(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00407870
-LEGO_EXPORT int LoadGoldWash(void) {
+LEGO_EXPORT int LoadGoldWash(struct Element *element) {
     unsigned int count;
     struct GoldNode *node;
     struct GoldNode *prev = NULL;

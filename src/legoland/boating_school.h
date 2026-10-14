@@ -87,13 +87,14 @@ void BoatingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *cursor)
 void LoadBoatingSchoolResources(Element *obj);
 void UnloadBoatingSchoolResources();
 void FUN_0041a000();
+struct EditObject;
 void BoatingSchoolAddObject(struct EditObject *obj, int *coords);
-void BoatingSchoolCalcCursor(int param_1, int *param_2, unsigned int param_3);
+void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3);
 void BoatingSchoolUpdate();
 void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip);
-int BoatingSchool_Save(void);
-int BoatingSchool_Load(void);
-int FUN_0041b100(int dummy, int arg);
+int BoatingSchool_Save(struct Element *element);
+int BoatingSchool_Load(struct Element *element);
+int FUN_0041b100(struct Element *dummy, int arg);
 void InitBoatingSchoolMermaid(Element *param_1);
 void BoatingSchoolMermaidSetEditMode();
 void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords);

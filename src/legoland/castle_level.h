@@ -12,7 +12,7 @@ struct Ride;
 void CastleLevel1_GetInterfaces(struct ClassNode *name, struct Ride *ci);
 void LoadCastleLevelMatteSprite(Element *obj);
 void KillCastleLevelMatteSprite(void);
-void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip);
+void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip);
 void CastleLevel1Update(Element *obj);
 void CastleLevelSetEditMode(void);
 void CastleLevelRemoveObject(Element *obj, TileId tile, struct Cursor *cursor);

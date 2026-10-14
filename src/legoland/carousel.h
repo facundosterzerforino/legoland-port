@@ -35,13 +35,13 @@ void FUN_0042c210(struct CarouselNode *node);
 void FUN_0042c800(void);
 int FUN_0042cd20(struct RideNode *elem, struct CarouselNode *node, signed char divisor);
 
-void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6);
+void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6);
 void LoadCarouselResources(struct Element *param_1);
 void UnloadCarouselResources(struct Element *input);
 void CarouselSetEditMode();
 void CarouselRemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3);
 void CarouselAddObject(struct Element *param_1, unsigned char *param_2);
 struct RideSpriteInfo *GetCarouselSpriteInfo(struct Element *param1, unsigned short param2);
-int Carousel_Save(void);
+int Carousel_Save(struct Element *element);
 int Carousel_Load(struct Element *param_1);
 void CarouselUpdate(struct Element *param_1);

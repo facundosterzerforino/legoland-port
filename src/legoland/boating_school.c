@@ -674,8 +674,8 @@ void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a2f0
-void BoatingSchoolCalcCursor(int param_1, int *param_2, unsigned int param_3) {
-    struct Cursor *cursor = *(struct Cursor **)(param_1 + 0xc);
+void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3) {
+    struct Cursor *cursor = (struct Cursor *)param_1->data;
 
     BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
     BoatingSchoolStartFootprint.next = &DAT_004cc048;
@@ -987,7 +987,7 @@ void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x0041acf0
-int BoatingSchool_Save(void) {
+int BoatingSchool_Save(struct Element *element) {
     struct BoatRideNode *score;
     struct BoatRideNode *scoreCur;
     struct PathNode *path;
@@ -1051,7 +1051,7 @@ int BoatingSchool_Save(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041aee0
-int BoatingSchool_Load(void) {
+int BoatingSchool_Load(struct Element *element) {
     struct BoatRideNode *score;
     struct BoatRideNode *prevScore;
     struct PathNode *path;
@@ -1142,7 +1142,7 @@ void FUN_0041b0d0(unsigned short id, unsigned int value) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b100
-int FUN_0041b100(int dummy, int arg) {
+int FUN_0041b100(struct Element *dummy, int arg) {
     struct BoatRideNode *node = BoatRideNodeList;
     int result = 0;
 

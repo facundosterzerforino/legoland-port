@@ -464,7 +464,7 @@ RideSpriteInfo *GetBalloonzSpriteInfo(Element *obj, unsigned short id) {
 }
 
 // FUNCTION: LEGOLAND 0x0042b2e0
-void RenderBalloonz(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderBalloonz(Element *obj, void *param_2, void *param_3, TileId *tile, void *param_5, unsigned int param_6) {
     Ride *ride = obj->ride;
     RideNode *elem;
     RideNode *riders;
@@ -663,7 +663,7 @@ void BalloonzSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ba80
-unsigned int SaveBalloonNodes(void) {
+int SaveBalloonNodes(struct Element *element) {
     unsigned int marker;
     unsigned int terminator;
     BalloonNode *node;
@@ -687,7 +687,7 @@ unsigned int SaveBalloonNodes(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042baf0
-unsigned int Balloonz_Load(Element *obj) {
+int Balloonz_Load(Element *obj) {
     Ride *ride = obj->ride;
     BalloonNode *node;
     BalloonNode *prev;

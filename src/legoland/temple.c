@@ -43,7 +43,7 @@ void KillTempleMatteSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00416a60
-void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *coords, unsigned int param_5, unsigned int clip) {
+void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *coords, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;

@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "image_sprite.h"
 #include "man3d.h"
+#include "obj_instance.h"
 #include "print_sprite.h"
 #include "render.h"
 #include "timer.h"
@@ -363,7 +364,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
-                    (*(void (**)(void *, int, int, int *, int *, int))((char *)*(void **)((char *)obj + 0xc) + 0xb0))(obj, node->x, node->y, &node->hit.field_8, &node->field_28, node->field_38);
+                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, &node->field_28, node->field_38);
                 }
             }
             if ((node->flags & 4) != 0) {
@@ -381,7 +382,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
                     obj = (void *)node->hit.field_4;
-                    (*(void (**)(void *, int, int, int *, int, int))((char *)*(void **)((char *)obj + 0xc) + 0xb0))(obj, node->x, node->y, &node->hit.field_8, 0, node->field_28);
+                    ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, 0, node->field_28);
                 }
                 if ((node->flags & 4) != 0) {
                     (*(void (**)(int))&node->field_34)(node->field_38);

@@ -24,7 +24,7 @@ struct PathTable {
     /* 0x04 */ struct PathPair *pairs;
 };
 
-int FUN_00412100(struct PathTable *param_1);
+struct QueueTable *FUN_00412100(struct PathTable *param_1);
 
 struct RideQueueEntry {
     /* 0x00 */ struct RideQueueEntry *next;

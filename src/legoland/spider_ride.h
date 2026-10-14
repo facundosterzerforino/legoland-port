@@ -18,8 +18,8 @@ int FUN_00415a90(struct SpiderNode *node);
 void FUN_004161f0(struct SpiderNode *node);
 struct SpiderNode *FindSpiderNode(TileId *key);
 void SpiderRideUpdate(Element *obj);
-LEGO_EXPORT int SaveSpider(void);
-LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg);
+LEGO_EXPORT int SaveSpider(struct Element *element);
+LEGO_EXPORT int LoadSpider(struct Element *element);
 
 struct Ride;
 struct ClassNode;

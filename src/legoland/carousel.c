@@ -215,7 +215,7 @@ struct RideSpriteInfo *GetCarouselSpriteInfo(struct Element *param1, unsigned sh
 }
 
 // FUNCTION: LEGOLAND 0x0042c590
-int Carousel_Save(void) {
+int Carousel_Save(struct Element *element) {
     struct CarouselNode *current = CarouselNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
@@ -497,7 +497,7 @@ void CarouselUpdate(struct Element *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042bcf0
-void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
     struct Ride *ride = param_1->ride;
     struct RideNode *elem = ride->riders;
     struct RideNode *e;

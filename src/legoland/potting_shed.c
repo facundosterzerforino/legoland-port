@@ -10,24 +10,6 @@
 #include "obj_instance.h"
 #include "potting_shed.h"
 
-struct PSCarInner {
-    unsigned char pad_0[0x10];
-    unsigned int field_10;
-};
-
-struct PSCarSub {
-    unsigned char pad_0[0x14];
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned char pad_1c[0x48];
-    struct PSCarInner *layer;
-};
-
-struct PSCarLayer {
-    unsigned char pad_0[0xc];
-    struct PSCarSub *field_c;
-};
-
 #include "image_sprite.h"
 #include "mechanics_hut.h"
 #include "print_sprite.h"
@@ -160,9 +142,9 @@ void PottingShedSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d210
-struct RideSpriteInfo *GetPottingShedSpriteInfo(struct PSCarLayer *param1, unsigned short param2) {
-    struct PSCarSub *s2 = param1->field_c;
-    struct PSCarInner *s3;
+struct RideSpriteInfo *GetPottingShedSpriteInfo(struct Element *param1, unsigned short param2) {
+    struct Ride *s2 = param1->ride;
+    struct Sprite *s3;
 
     DAT_0062fe10.sprite = s2->layer;
     DAT_0062fe10.x = s2->field_14;
@@ -170,7 +152,7 @@ struct RideSpriteInfo *GetPottingShedSpriteInfo(struct PSCarLayer *param1, unsig
     DAT_0062fe10.id = param2;
 
     s3 = s2->layer;
-    s3->field_10 |= 0x2000;
+    s3->flags |= 0x2000;
 
     return &DAT_0062fe10;
 }

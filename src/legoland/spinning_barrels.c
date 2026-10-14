@@ -20,20 +20,6 @@ struct BarrelSource {
     unsigned short field_0;
 };
 
-struct BarrelCarNode {
-    /* 0x00 */ unsigned char pad_0[0x10];
-    /* 0x10 */ unsigned int field_10;
-    /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned int field_18;
-    /* 0x1c */ unsigned char pad_1c[0x48];
-    /* 0x64 */ struct BarrelCarNode *next;
-};
-
-struct BarrelRoot {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct BarrelCarNode *car;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x0043bdb0
@@ -274,17 +260,18 @@ void SpinningBarrelsAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c570
-unsigned int *GetSpinningBarrelsRideSpriteInfo(struct BarrelRoot *ride, unsigned short param2) {
-    struct BarrelCarNode *target = ride->car;
+unsigned int *GetSpinningBarrelsRideSpriteInfo(struct Element *ride, unsigned short param2) {
+    struct Ride *target = ride->ride;
+    struct Sprite *layer;
 
-    DAT_0062fdb0.sprite = target->next;
+    DAT_0062fdb0.sprite = target->layer;
     DAT_0062fdb0.x = target->field_14;
     DAT_0062fdb0.y = target->field_18;
     DAT_0062fdb0.id = param2;
 
-    target = target->next;
-    target->field_10 |= 0x2000;
-    return (void *)&DAT_0062fdb0;
+    layer = target->layer;
+    layer->flags |= 0x2000;
+    return (unsigned int *)&DAT_0062fdb0;
 }
 
 // FUNCTION: LEGOLAND 0x0043c5b0
@@ -305,7 +292,7 @@ void SpinningBarrelsRideUnload(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c620
-LEGO_EXPORT int SaveSBarrel(void) {
+LEGO_EXPORT int SaveSBarrel(struct Element *element) {
     struct BarrelNode *node = SpinningBarrelList;
     unsigned int marker = 1;
     unsigned int terminator = 0;
@@ -343,29 +330,11 @@ struct BarrelCar {
     unsigned int field_30;
 };
 
-struct BarrelListNode {
-    struct BarrelListNode *next;
-    unsigned char pad_4[4];
-    struct BarrelData *rider;
-    unsigned char pad_c[4];
-    struct BarrelCar *person;
-};
-
-struct BarrelGameObject {
-    unsigned char pad_0[0xcc];
-    struct BarrelListNode *riders;
-};
-
-struct BarrelLoadArg {
-    unsigned char pad_0[0xc];
-    struct BarrelGameObject *field_c;
-};
-
 // FUNCTION: LEGOLAND 0x0043c690
-LEGO_EXPORT int LoadSBarrel(struct BarrelLoadArg *arg) {
-    struct BarrelGameObject *obj = arg->field_c;
+LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
+    struct Ride *obj = arg->ride;
     struct BarrelNode *prev = NULL;
-    struct BarrelListNode *list;
+    struct RideNode *list;
     struct BarrelCar *car;
     struct BarrelData *data;
     struct BarrelTypeC *tc;

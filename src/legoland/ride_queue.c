@@ -228,7 +228,7 @@ void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00412100
-int FUN_00412100(struct PathTable *param_1) {
+struct QueueTable *FUN_00412100(struct PathTable *param_1) {
     int px;
     int py;
     int i;
@@ -280,7 +280,7 @@ int FUN_00412100(struct PathTable *param_1) {
         start.x += dx;
         start.y += dy;
     }
-    return (int)table;
+    return table;
 }
 
 // FUNCTION: LEGOLAND 0x00412290

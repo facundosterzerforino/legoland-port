@@ -22,40 +22,9 @@
 #include "sound_sfx.h"
 #include "tilemap.h"
 
-struct DSCursorSource {
-    /* 0x00 */ unsigned char pad_0[0x1c];
-    /* 0x1c */ unsigned int flags;
-    /* 0x20 */ unsigned char pad_20[0x3c - 0x20];
-    /* 0x3c */ int footprint_x0;
-    /* 0x40 */ int footprint_y0;
-};
-
-struct DSHead {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct DSCursorSource *ride;
-};
-
 struct Node8 {
     unsigned char pad_0[8];
     void *next;
-};
-
-struct DSCarLayer {
-    unsigned char pad_0[12];
-    struct DSCarSub *field_c;
-};
-
-struct DSCarSub {
-    unsigned char pad_0[20];
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned char pad_1c[72];
-    struct DSCarInner *layer;
-};
-
-struct DSCarInner {
-    unsigned char pad_0[16];
-    unsigned int field_10;
 };
 
 struct CountNode {
@@ -87,28 +56,6 @@ struct DSObjClass {
 struct DSBlokeNode {
     /* 0x00 */ struct DSBlokeNode *next;
     /* 0x04 */ short field_4;
-};
-
-struct DSRenderNode {
-    /* 0x00 */ struct DSRenderNode *next;
-    /* 0x04 */ unsigned char pad_4[0x8 - 0x4];
-    /* 0x08 */ struct Bloke *field_8;
-    /* 0x0c */ short field_c;
-};
-
-struct DSRenderSub {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ int field_c;
-    /* 0x10 */ int field_10;
-    /* 0x14 */ int field_14;
-    /* 0x18 */ int field_18;
-    /* 0x1c */ unsigned char pad_1c[0xcc - 0x1c];
-    /* 0xcc */ struct DSRenderNode *field_cc;
-};
-
-struct DSRenderRoot {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct DSRenderSub *field_c;
 };
 
 #include "image_sprite.h"
@@ -208,7 +155,7 @@ void FUN_00405310(TileId tile) {
 }
 
 // FUNCTION: LEGOLAND 0x00405370
-void LoadDrivingSchoolResources(struct DSHead *param_1) {
+void LoadDrivingSchoolResources(struct Element *param_1) {
     unsigned int lls;
 
     DrivingSchoolRide = param_1->ride;
@@ -339,9 +286,9 @@ void DrivingSchoolAddObject(struct Element *param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00405740
-void DrivingSchoolCalcCursor(struct DSHead *param_1, int *param_2, unsigned int param_3) {
-    struct DSCursorSource *src = param_1->ride;
-    struct DSCursorSource *c694;
+void DrivingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3) {
+    struct Ride *src = param_1->ride;
+    struct Ride *c694;
     unsigned int mapx;
     unsigned int mapy;
 
@@ -356,20 +303,20 @@ void DrivingSchoolCalcCursor(struct DSHead *param_1, int *param_2, unsigned int 
     DAT_0082f760.field_1830 = 0;
     mapy = EditCursor.tile_y;
     DAT_0082f760.field_1828 = 0x4108;
-    DAT_0082f760.tile_x = c694->footprint_x0 + mapx;
-    DAT_0082f760.tile_y = c694->footprint_y0 + mapy;
+    DAT_0082f760.tile_x = c694->footprint.x0 + mapx;
+    DAT_0082f760.tile_y = c694->footprint.y0 + mapy;
 
     memcpy(DAT_0082c6e0.field_1414, DAT_004b4458, 20);
     DAT_0082c6e0.field_1830 = 0;
     DAT_0082c6e0.field_1828 = 0x4208;
-    DAT_0082c6e0.tile_x = c694->footprint_x0 + mapx;
-    DAT_0082c6e0.tile_y = c694->footprint_y0 + mapy;
+    DAT_0082c6e0.tile_x = c694->footprint.x0 + mapx;
+    DAT_0082c6e0.tile_y = c694->footprint.y0 + mapy;
 
     memcpy(DAT_0082df20.field_1414, DAT_004b4470, 20);
     DAT_0082df20.field_1830 = 0;
     DAT_0082df20.field_1828 = 0x5008;
-    DAT_0082df20.tile_x = c694->footprint_x0 + mapx;
-    DAT_0082df20.tile_y = c694->footprint_y0 + mapy;
+    DAT_0082df20.tile_x = c694->footprint.x0 + mapx;
+    DAT_0082df20.tile_y = c694->footprint.y0 + mapy;
 
     ValidateCursor(&DAT_0082df20, src);
     ValidateCursor(&DAT_0082c6e0, src);
@@ -461,9 +408,9 @@ void DrivingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *param_3
 }
 
 // FUNCTION: LEGOLAND 0x00405ad0
-struct RideSpriteInfo *GetDrivingSchoolSpriteInfo(struct DSCarLayer *arg1, unsigned short arg2) {
-    struct DSCarSub *sub = arg1->field_c;
-    struct DSCarInner *inner = sub->layer;
+struct RideSpriteInfo *GetDrivingSchoolSpriteInfo(struct Element *arg1, unsigned short arg2) {
+    struct Ride *sub = arg1->ride;
+    struct Sprite *inner = sub->layer;
 
     RideSpriteInfoBuffer.sprite = inner;
     RideSpriteInfoBuffer.x = sub->field_14;
@@ -471,13 +418,13 @@ struct RideSpriteInfo *GetDrivingSchoolSpriteInfo(struct DSCarLayer *arg1, unsig
     RideSpriteInfoBuffer.id = arg2;
 
     inner = sub->layer;
-    inner->field_10 |= 0x2000;
+    inner->flags |= 0x2000;
 
     return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x00405b10
-void RenderDrivingSchool(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderDrivingSchool(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point ref;
@@ -617,7 +564,7 @@ void DrivingSchoolUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00405e70
-int DrivingSchool_Save(void) {
+int DrivingSchool_Save(struct Element *element) {
     struct CountNode *countNode;
     struct RideQueueEntry *queue;
     struct PumpNode *pump;
@@ -708,7 +655,7 @@ int FUN_00406050(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406070
-int DrivingSchool_Load(void) {
+int DrivingSchool_Load(struct Element *element) {
     struct CountNode *countPrev;
     struct CountNode *countNode;
     struct RideQueueEntry *queuePrev;

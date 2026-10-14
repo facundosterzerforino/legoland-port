@@ -1461,7 +1461,7 @@ void CastleDispatchSetEditMode(struct Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0041ec70
-void CastleDispatchCalcCursor(struct Element *obj, int a, unsigned int b) {
+void CastleDispatchCalcCursor(struct Element *obj, struct Point *a, unsigned int b) {
     CastleDispatchTable[CastleDispatchIndex(obj)].fn_8(obj, a, b);
 }
 
@@ -4791,7 +4791,7 @@ void FUN_00424620(struct Int16Pair *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x004246e0
-unsigned int FUN_004246e0(unsigned int param_1, unsigned int param_2) {
+unsigned int FUN_004246e0(struct Element *param_1, unsigned int param_2) {
     if (param_2 != 0 && DAT_00829ae0.flags != 2) {
         return 0;
     }
@@ -4799,7 +4799,7 @@ unsigned int FUN_004246e0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00424700
-void RenderCastleDummy(unsigned int a1, unsigned int a2, unsigned int a3, unsigned char *p) {
+void RenderCastleDummy(struct Element *a1, unsigned int a2, unsigned int a3, unsigned char *p) {
     struct FVec3 buf;
     struct SegBlob obj;
     short key[2];
@@ -5177,7 +5177,7 @@ void FUN_00424e80(void) {
 
 #pragma optimize("", off)
 // FUNCTION: LEGOLAND 0x00425050
-void RenderCastleObj(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderCastleObj(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int clip) {
     struct Ride *r;
     struct RideNode *walk;
     struct Bloke *rider;
@@ -6264,7 +6264,7 @@ struct SaveRec {
 };
 
 // FUNCTION: LEGOLAND 0x00426c20
-int CastleObj_Load(void) {
+int CastleObj_Load(struct Element *element) {
     struct SaveRec *rec = ReadSaveRec();
     void *obj;
     int i;
@@ -6295,7 +6295,7 @@ int CastleObj_Load(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00426ce0
-int CastleObj_Save(void) {
+int CastleObj_Save(struct Element *element) {
     struct Struct426d80X info;
     unsigned int zero;
     struct SaveRec *rec;
@@ -6872,7 +6872,7 @@ void FUN_004279f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00427a00
-void RenderSquareTrack(unsigned int unused0, unsigned int unused1, unsigned int unused2, const unsigned char *src) {
+void RenderSquareTrack(struct Element *unused0, unsigned int unused1, unsigned int unused2, const unsigned char *src) {
     struct CastleOuter *node;
     struct Int16Pair tile;
     tile.x = src[0];

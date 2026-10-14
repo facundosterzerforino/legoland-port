@@ -61,25 +61,6 @@ struct JoustObject {
     unsigned int field_c;
 };
 
-struct JoustBlockData {
-    unsigned char pad_0[0x10];
-    unsigned int field_10;
-};
-
-struct JoustBlock {
-    unsigned char pad_0[0x14];
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned int flags_1c;
-    unsigned char pad_20[0x44];
-    struct JoustBlockData *layer;
-};
-
-struct JoustRoot {
-    unsigned char pad_0[0xc];
-    struct JoustBlock *field_c;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00407970
@@ -176,12 +157,12 @@ void JoustRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x00407b50
-void JoustLoadResources(struct JoustRoot *root) {
+void JoustLoadResources(struct Element *root) {
     Load_FXList(JOUST_SFX, 1);
-    JoustRide = (unsigned int)root->field_c;
-    ((struct JoustBlock *)JoustRide)->flags_1c |= 0x420;
-    JoustLayer = (unsigned int)((struct JoustBlock *)JoustRide)->layer;
-    ((struct JoustBlockData *)JoustLayer)->field_10 |= 0x2000;
+    JoustRide = (unsigned int)root->ride;
+    ((struct Ride *)JoustRide)->flags |= 0x420;
+    JoustLayer = (unsigned int)((struct Ride *)JoustRide)->layer;
+    ((struct Sprite *)JoustLayer)->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b46f4
     JoustFMaskSprite = LoadSprite("Joust_fmask.lls", 1);
     // STRING: LEGOLAND 0x004b46e0
@@ -548,7 +529,7 @@ void JoustUpdate(struct Element *elem) {
 }
 
 // FUNCTION: LEGOLAND 0x00408580
-void RenderJoust(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderJoust(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int param_6) {
     struct Ride *ride;
     struct RideNode *r;
     struct JoustNode *node;
@@ -749,20 +730,20 @@ void JoustFreeResources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00408c50
-unsigned int *GetJoustSpriteInfo(struct JoustRoot *param1, unsigned short param2) {
-    struct JoustBlock *block = param1->field_c;
+unsigned int *GetJoustSpriteInfo(struct Element *param1, unsigned short param2) {
+    struct Ride *block = param1->ride;
 
     DAT_004c1228.sprite = block->layer;
     DAT_004c1228.x = block->field_14;
     DAT_004c1228.y = block->field_18;
     DAT_004c1228.id = param2;
-    block->layer->field_10 |= 0x2000;
+    block->layer->flags |= 0x2000;
 
-    return (void *)&DAT_004c1228;
+    return (unsigned int *)&DAT_004c1228;
 }
 
 // FUNCTION: LEGOLAND 0x00408c90
-LEGO_EXPORT int SaveJoust(void) {
+LEGO_EXPORT int SaveJoust(struct Element *element) {
     struct JoustNode *current = JoustNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
@@ -789,27 +770,11 @@ struct JoustCar {
     unsigned int field_30;
 };
 
-struct JoustListNode {
-    struct JoustListNode *next;
-    unsigned char pad_4[0xc];
-    struct JoustCar *person;
-};
-
-struct JoustGameObject {
-    unsigned char pad_0[0xcc];
-    struct JoustListNode *riders;
-};
-
-struct JoustLoadArg {
-    unsigned char pad_0[0xc];
-    struct JoustGameObject *field_c;
-};
-
 // FUNCTION: LEGOLAND 0x00408d00
-LEGO_EXPORT int LoadJoust(struct JoustLoadArg *arg) {
-    struct JoustGameObject *obj = arg->field_c;
+LEGO_EXPORT int LoadJoust(struct Element *arg) {
+    struct Ride *obj = arg->ride;
     struct JoustNode *prev = NULL;
-    struct JoustListNode *list;
+    struct RideNode *list;
     struct JoustCar *car;
     unsigned int marker;
 

@@ -32,25 +32,6 @@ struct SlideNode {
     unsigned int slots[4];
 };
 
-struct SlideCar {
-    unsigned char pad_0[0x10];
-    unsigned int var_10;
-};
-
-struct SlideTrack {
-    unsigned char pad_0[0x14];
-    unsigned int var_14;
-    unsigned int var_18;
-    unsigned int var_1c;
-    unsigned char pad_20[0x44];
-    struct SlideCar *var_64;
-};
-
-struct SlideContext {
-    unsigned char pad_0[0xc];
-    struct SlideTrack *var_c;
-};
-
 struct BlokeRender {
     unsigned char pad_0[0x2c];
     unsigned int field_2c;
@@ -65,24 +46,6 @@ struct SlidePath {
 struct BlokeData {
     unsigned char pad_0[0x54];
     struct SlidePath *path;
-};
-
-struct SlideRideNode {
-    struct SlideRideNode *next;
-    unsigned char pad_4[0x8 - 0x4];
-    struct BlokeData *bloke;
-    unsigned char pad_c[0x10 - 0xc];
-    struct BlokeRender *render;
-};
-
-struct SlideRide {
-    unsigned char pad_0[0xcc];
-    struct SlideRideNode *blokes;
-};
-
-struct SlideObject {
-    unsigned char pad_0[0xc];
-    struct SlideRide *ride;
 };
 
 #include "image_sprite.h"
@@ -144,7 +107,7 @@ void FUN_00416f90(struct TempleRide *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00416fa0
-void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;
@@ -195,18 +158,18 @@ void FUN_00417130(struct TempleRide *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417150
-void TempleSlideLoad(struct SlideContext *arg) {
-    DAT_004cbf80 = arg->var_c;
-    DAT_004cbf80->var_1c |= 0x20;
-    DAT_004cbf7c = DAT_004cbf80->var_64;
-    DAT_004cbf7c->var_10 |= 0x2000;
+void TempleSlideLoad(struct Element *arg) {
+    DAT_004cbf80 = arg->ride;
+    DAT_004cbf80->flags |= 0x20;
+    DAT_004cbf7c = DAT_004cbf80->layer;
+    DAT_004cbf7c->flags |= 0x2000;
     ZTempSlideSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f7c
         "z_tempslide.lls", 1);
     TempSlideBinV = LoadBinV(
         // STRING: LEGOLAND 0x004b4f64
         "Zbuffers\\tempslide.bnv");
-    GetLLSForSprite((struct Sprite *)DAT_004cbf80->var_64);
+    GetLLSForSprite((struct Sprite *)DAT_004cbf80->layer);
     DAT_004cbfc8 = 0;
     DAT_004cbfcc[0] = 1;
     DAT_004cbf88 = 13;
@@ -218,8 +181,8 @@ void TempleSlideLoad(struct SlideContext *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417200
-void TempleSlideUnload(struct SlideContext *arg) {
-    DAT_004cbf80 = arg->var_c;
+void TempleSlideUnload(struct Element *arg) {
+    DAT_004cbf80 = arg->ride;
     if (TempSlideMatteSprite != 0) {
         KillSprite(TempSlideMatteSprite);
     }
@@ -236,7 +199,7 @@ void TempleSlideSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00417280
-void RemoveSlideObject(struct SlideObject *obj, TileId tile, struct Cursor *cursor) {
+void RemoveSlideObject(struct Element *obj, TileId tile, struct Cursor *cursor) {
     struct SlideNode *node = FindSlideNode(&tile);
     if (node != NULL) {
         RemoveSlideNode(node);
@@ -255,19 +218,19 @@ void TempleSlideAddObject(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00417300
-unsigned int *GetTempleSlideSpriteInfo(struct SlideContext *ctx, unsigned short param) {
-    struct SlideTrack *track = ctx->var_c;
-    struct SlideCar *car = track->var_64;
+unsigned int *GetTempleSlideSpriteInfo(struct Element *ctx, unsigned short param) {
+    struct Ride *track = ctx->ride;
+    struct Sprite *car = track->layer;
 
     DAT_004cbf98.sprite = car;
-    DAT_004cbf98.x = track->var_14;
-    DAT_004cbf98.y = track->var_18;
+    DAT_004cbf98.x = track->field_14;
+    DAT_004cbf98.y = track->field_18;
     DAT_004cbf98.id = param;
 
-    car = track->var_64;
-    car->var_10 |= 0x2000;
+    car = track->layer;
+    car->flags |= 0x2000;
 
-    return (void *)&DAT_004cbf98;
+    return (unsigned int *)&DAT_004cbf98;
 }
 
 // FUNCTION: LEGOLAND 0x00417340
@@ -499,7 +462,7 @@ void TempleSlideUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004178c0
-LEGO_EXPORT int SaveTempleSlide(void) {
+LEGO_EXPORT int SaveTempleSlide(struct Element *element) {
     int one = 1;
     int zero = 0;
     struct SlideNode *p;
@@ -518,10 +481,10 @@ LEGO_EXPORT int SaveTempleSlide(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00417930
-LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
-    struct SlideRide *ride = obj->ride;
+LEGO_EXPORT int LoadTempleSlide(struct Element *obj) {
+    struct Ride *ride = obj->ride;
     struct SlideNode *last = NULL;
-    struct SlideRideNode *node;
+    struct RideNode *node;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -545,8 +508,8 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
         }
     }
 
-    for (node = ride->blokes; node != NULL; node = node->next) {
-        struct BlokeRender *render = node->render;
+    for (node = ride->riders; node != NULL; node = node->next) {
+        struct BlokeRender *render = node->person;
         struct BlokeData *bloke;
         struct SlidePath *path;
 
@@ -556,10 +519,10 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
             render->field_2c = render->field_30 == 1 ? (unsigned int)ZTempSlideSprite : (unsigned int)DAT_004cbfcc[render->field_30];
         } else {
             render->field_2c = 0;
-            node->render->field_30 = 0;
+            node->person->field_30 = 0;
         }
 
-        bloke = node->bloke;
+        bloke = node->rider;
         path = bloke->path;
         if (path != NULL) {
             path->field_0 = DAT_004cbfb8[path->field_4];

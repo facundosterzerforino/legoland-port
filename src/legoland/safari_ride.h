@@ -18,7 +18,6 @@ struct SafariNode {
 };
 
 struct SafariKey;
-struct SafariLoadArg;
 
 void *FUN_00414a80(struct SafariKey *key);
 void FUN_00414b10(struct SafariNode *node);
@@ -27,9 +26,8 @@ struct ClassNode;
 void SafariRideGetInterfaces(struct ClassNode *name, struct Ride *interfaces);
 struct Element;
 void SafariRideUpdate(struct Element *obj);
-int FUN_00415760(struct SafariListEntry *node, unsigned short *key);
+int FUN_00415760(struct RideNode *node, unsigned short *key);
 struct SafariSample;
-struct SafariListEntry;
 void FUN_00414ab0(struct SafariSample *a1);
-LEGO_EXPORT int SaveSafariRide(void);
-LEGO_EXPORT int LoadSafariRide(struct SafariLoadArg *arg);
+LEGO_EXPORT int SaveSafariRide(struct Element *element);
+LEGO_EXPORT int LoadSafariRide(struct Element *arg);

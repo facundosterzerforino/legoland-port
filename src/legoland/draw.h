@@ -60,7 +60,6 @@ LEGO_EXPORT int CheckHostSystemGPU(void);
 int BlitFrameToWindow(void);
 void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off);
 LEGO_EXPORT void SoftPrint_Clear(void);
-LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint);
 LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *a, RECT *b, unsigned int param_4);
 void DrawWatchSprite(void);
 int SetDisplayModeAndDetectPixelFormat(void);
@@ -94,6 +93,7 @@ struct DrawLLSIdxFrame {
 
 void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos);
 void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos);
+struct Point;
 void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos);
 void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);
 void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor);

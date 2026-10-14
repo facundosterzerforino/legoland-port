@@ -19,58 +19,12 @@
 #include "tilemap.h"
 #include "western_town.h"
 
-struct Building {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
-};
-
 struct PathArea {
     unsigned char pad_0[0x3c];
     int x0;
     int y0;
     int x1;
     int y1;
-};
-
-struct MapObject {
-    unsigned char pad_0[0xc];
-    struct Building *building;
-};
-
-struct RideBuilding {
-    unsigned char pad_0[0x10];
-    unsigned int field_10;
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned char pad_1c[0x64 - 0x1c];
-    struct RideBuilding *layer;
-};
-
-struct ShopRideObject {
-    unsigned char pad_0[0xc];
-    struct RideBuilding *building;
-};
-
-struct ShopRemoveObject {
-    unsigned char pad_0[0xc];
-    void *ride;
-};
-
-struct BlokeNode {
-    struct BlokeNode *next;
-    unsigned char pad_4[4];
-    struct Bloke *bloke;
-    unsigned short uid;
-};
-
-struct ShopBuilding {
-    unsigned char pad_0[0xcc];
-    struct BlokeNode *blokes;
-};
-
-struct ShopObject {
-    unsigned char pad_0[0xc];
-    struct ShopBuilding *building;
 };
 
 struct Coords {
@@ -81,8 +35,8 @@ struct Coords {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00439200
-void LoadLegoShop1MatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+void LoadLegoShop1MatteSpriteAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     LegoShop1Building = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b751c
@@ -141,15 +95,15 @@ void FUN_004392b0(struct PathArea *area, struct Point *origin) {
 }
 
 // FUNCTION: LEGOLAND 0x00439320
-void LegoShop1AddObject(struct MapObject *obj, void *param_2) {
-    struct Building *building = obj->building;
+void LegoShop1AddObject(struct Element *obj, void *param_2) {
+    struct Ride *building = obj->ride;
     AddBasicObject(obj, param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00439350
-void LegoShop1RemoveObject(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
-    void *ride = obj->ride;
+void LegoShop1RemoveObject(struct Element *obj, TileId coords, void *cursor) {
+    void *ride = obj->data;
     struct Point local;
 
     StandardRemoveObject(obj, coords, cursor);
@@ -177,14 +131,14 @@ void UnloadLegoShop1MatteSpriteAndMoneySFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439400
-void RenderLegoShop1(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
-    struct ShopBuilding *building = obj->building;
-    struct BlokeNode *node = building->blokes;
+void RenderLegoShop1(struct Element *obj, unsigned int param2, unsigned int param3, unsigned short *ride, void *param5, unsigned int param1) {
+    struct Ride *building = obj->ride;
+    struct RideNode *node = building->riders;
     int count = 0;
 
     while (node != 0) {
-        if (*ride == node->uid) {
-            RenderBlokeIn3D(node->bloke);
+        if (*ride == node->tile.id) {
+            RenderBlokeIn3D(node->rider);
             count++;
         }
         node = node->next;
@@ -284,8 +238,8 @@ void LegoShop1Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004396d0
-void LoadLegoShop2MatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+void LoadLegoShop2MatteSpriteAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     LegoShop2Building = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7534
@@ -310,7 +264,7 @@ void LegoShop2SetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439760
-void RenderLegoShop2(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderLegoShop2(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int param_6) {
     struct Ride *shop = obj->ride;
     struct RideNode *node = shop->riders;
     struct Bloke *blokes[10] = {0};
@@ -516,8 +470,8 @@ void LegoShop2Update(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00439c20
-void LoadLegMediaShopMaskSpritesAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+void LoadLegMediaShopMaskSpritesAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     LegoMediaShopBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7564
@@ -528,15 +482,15 @@ void LoadLegMediaShopMaskSpritesAndMoneySFX(struct MapObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00439c60
-void LegoMediaShopAddObject(struct MapObject *obj, void *param_2) {
-    struct Building *building = obj->building;
+void LegoMediaShopAddObject(struct Element *obj, void *param_2) {
+    struct Ride *building = obj->ride;
     AddBasicObject(obj, param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00439c90
-void LegoMediaShopRemoveObject(struct ShopRemoveObject *obj, TileId coords, void *cursor) {
-    void *ride = obj->ride;
+void LegoMediaShopRemoveObject(struct Element *obj, TileId coords, void *cursor) {
+    void *ride = obj->data;
     struct Point local;
 
     StandardRemoveObject(obj, coords, cursor);
@@ -563,17 +517,17 @@ void LegoMediaShopSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00439d40
-void RenderLegoMediaShop(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
-    struct ShopBuilding *building = obj->building;
+void RenderLegoMediaShop(struct Element *obj, unsigned int param2, unsigned int param3, unsigned short *ride, void *param5, unsigned int param1) {
+    struct Ride *building = obj->ride;
     char count = 0;
     char i;
-    struct BlokeNode *node = building->blokes;
+    struct RideNode *node = building->riders;
     struct Bloke *blokes[10] = {0};
     struct Point pos;
 
     while (node != 0) {
-        if (*ride == node->uid) {
-            blokes[count++] = node->bloke;
+        if (*ride == node->tile.id) {
+            blokes[count++] = node->rider;
         }
         node = node->next;
     }
@@ -727,8 +681,8 @@ void LegoMediaShopUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a0f0
-void LoadExplorersInstituteMatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+void LoadExplorersInstituteMatteSpriteAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     ExplorersInstituteBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b757c
@@ -751,14 +705,14 @@ void ExplorersInstituteSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a180
-void RenderExplorersInstitute(struct ShopObject *obj, unsigned int param2, unsigned int param3, unsigned short *ride, unsigned int param5, unsigned int param1) {
-    struct ShopBuilding *building = obj->building;
-    struct BlokeNode *node = building->blokes;
+void RenderExplorersInstitute(struct Element *obj, unsigned int param2, unsigned int param3, unsigned short *ride, void *param5, unsigned int param1) {
+    struct Ride *building = obj->ride;
+    struct RideNode *node = building->riders;
     int count = 0;
 
     while (node != 0) {
-        if (*ride == node->uid) {
-            RenderBlokeIn3D(node->bloke);
+        if (*ride == node->tile.id) {
+            RenderBlokeIn3D(node->rider);
             count++;
         }
         node = node->next;
@@ -842,20 +796,20 @@ void ExplorersInstituteUpdate(struct Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a390
-unsigned int *GetShopSpriteInfo(struct ShopRideObject *obj, unsigned short param_2) {
-    struct RideBuilding *building = obj->building;
+unsigned int *GetShopSpriteInfo(struct Element *obj, unsigned short param_2) {
+    struct Ride *building = obj->ride;
     RideSpriteInfoBuffer.sprite = building->layer;
     RideSpriteInfoBuffer.x = building->field_14;
     RideSpriteInfoBuffer.y = building->field_18;
     RideSpriteInfoBuffer.id = param_2;
-    building->layer->field_10 |= 0x2000;
+    building->layer->flags |= 0x2000;
     return &RideSpriteInfoBuffer;
 }
 
 // FUNCTION: LEGOLAND 0x0043a3d0
-void RemoveObjectAndBlokes(struct ShopRideObject *obj, TileId tile, void *param_3) {
+void RemoveObjectAndBlokes(struct Element *obj, TileId tile, void *param_3) {
     StandardRemoveObject(obj, tile, param_3);
-    RemoveAllBlokesFromRide((unsigned int)obj->building, tile);
+    RemoveAllBlokesFromRide((unsigned int)obj->ride, tile);
 }
 
 // FUNCTION: LEGOLAND 0x0043a400

@@ -19,40 +19,6 @@
 
 #include "image_sprite.h"
 
-struct SafariBlockData {
-    unsigned char pad_0[0x10];
-    unsigned int field_10;
-};
-
-struct SafariBlock {
-    unsigned char pad_0[0x14];
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned char pad_1c[0x48];
-    struct SafariBlockData *layer;
-};
-
-struct SafariRoot {
-    unsigned char pad_0[0xc];
-    struct SafariBlock *ride;
-};
-
-struct SafariListEntry;
-
-struct SafariOwner {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
-    unsigned char pad_20[0x44];
-    struct Sprite *layer;
-    unsigned char pad_68[0x64];
-    struct SafariListEntry *head;
-};
-
-struct SafariObject {
-    unsigned char pad_0[0xc];
-    struct SafariOwner *field_c;
-};
-
 struct SafariSample {
     unsigned char tile_x;
     unsigned char tile_y;
@@ -163,7 +129,7 @@ void FUN_00414b10(struct SafariNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00414b80
-void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int clip) {
+void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct SafariNode *sn;
@@ -219,8 +185,8 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x00414d90
-void SafariRideLoad(struct SafariObject *a1) {
-    SafariRide = a1->field_c;
+void SafariRideLoad(struct Element *a1) {
+    SafariRide = a1->ride;
     SafariRide->flags |= 0x420;
     SafariLayer = SafariRide->layer;
     SafariLayer->flags |= 0x2000;
@@ -247,8 +213,8 @@ void SafariRideLoad(struct SafariObject *a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ea0
-void SafariRideUnload(struct SafariObject *a1) {
-    SafariRide = a1->field_c;
+void SafariRideUnload(struct Element *a1) {
+    SafariRide = a1->ride;
     FUN_00414a60();
     Kill_FXList(SAFARI_SFX, 1);
     FreeBinV(DAT_004cbef8);
@@ -305,14 +271,14 @@ void SafariAddObject(struct Element *uid, struct SafariBasicObject *a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ff0
-unsigned int *GetSafariRideSpriteInfo(struct SafariRoot *p1, unsigned short arg2) {
-    struct SafariBlock *pB = p1->ride;
+unsigned int *GetSafariRideSpriteInfo(struct Element *p1, unsigned short arg2) {
+    struct Ride *pB = p1->ride;
     DAT_004cbed0.sprite = pB->layer;
     DAT_004cbed0.x = pB->field_14;
     DAT_004cbed0.y = pB->field_18;
     DAT_004cbed0.id = arg2;
-    pB->layer->field_10 |= 0x2000;
-    return (void *)&DAT_004cbed0;
+    pB->layer->flags |= 0x2000;
+    return (unsigned int *)&DAT_004cbed0;
 }
 
 // FUNCTION: LEGOLAND 0x00415030
@@ -464,7 +430,7 @@ void SafariRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.0f, -1618006.0f);
                 node->rider->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(DAT_004b4cac + 6, "%02d", (FUN_00415760((struct SafariListEntry *)node, &node->tile.id) >> 1) + 1);
+                sprintf(DAT_004b4cac + 6, "%02d", (FUN_00415760((struct RideNode *)node, &node->tile.id) >> 1) + 1);
                 node->rider->path = NewBNVPath(DAT_004cbefc, 1, DAT_004b4cac, -1617787.0f, -1618006.0f, coords);
                 UpdateBlokeFromBNVPath(bloke, node->rider->path);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
@@ -565,22 +531,15 @@ struct SafariSlotData {
     unsigned char index;
 };
 
-struct SafariListEntry {
-    struct SafariListEntry *next;
-    unsigned char pad_4[4];
-    struct SafariSlotData *data;
-    unsigned short key;
-};
-
 // FUNCTION: LEGOLAND 0x00415760
-int FUN_00415760(struct SafariListEntry *node, unsigned short *key) {
-    struct SafariListEntry *cur;
+int FUN_00415760(struct RideNode *node, unsigned short *key) {
+    struct RideNode *cur;
     int n = 0;
 
-    for (cur = SafariRide->head; cur != NULL; cur = cur->next) {
-        if (memcmp(&cur->key, key, 2) == 0) {
+    for (cur = SafariRide->riders; cur != NULL; cur = cur->next) {
+        if (memcmp(&cur->tile, key, 2) == 0) {
             if (cur == node) {
-                node->data->index = (unsigned char)n;
+                *((unsigned char *)node->rider + 0x36) = (unsigned char)n;
                 return n;
             }
             n++;
@@ -590,7 +549,7 @@ int FUN_00415760(struct SafariListEntry *node, unsigned short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004157b0
-LEGO_EXPORT int SaveSafariRide(void) {
+LEGO_EXPORT int SaveSafariRide(struct Element *element) {
     struct SafariNode *current = SafariNodeList;
     unsigned int value1 = 1;
     unsigned int value0 = 0;
@@ -627,29 +586,11 @@ struct SafariCar {
     unsigned int field_30;
 };
 
-struct SafariListNode {
-    struct SafariListNode *next;
-    unsigned char pad_4[4];
-    struct SafariData *field_8;
-    unsigned char pad_c[4];
-    struct SafariCar *field_10;
-};
-
-struct SafariGameObject {
-    unsigned char pad_0[0xcc];
-    struct SafariListNode *field_cc;
-};
-
-struct SafariLoadArg {
-    unsigned char pad_0[0xc];
-    struct SafariGameObject *ride;
-};
-
 // FUNCTION: LEGOLAND 0x00415820
-LEGO_EXPORT int LoadSafariRide(struct SafariLoadArg *arg) {
-    struct SafariGameObject *obj = arg->ride;
+LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
+    struct Ride *obj = arg->ride;
     struct SafariNode *prev = NULL;
-    struct SafariListNode *list;
+    struct RideNode *list;
     struct SafariCar *car;
     struct SafariData *data;
     struct SafariTypeC *tc;
@@ -675,17 +616,17 @@ LEGO_EXPORT int LoadSafariRide(struct SafariLoadArg *arg) {
         }
     }
 
-    list = obj->field_cc;
+    list = obj->riders;
     while (list != NULL) {
-        car = list->field_10;
+        car = list->person;
         if (car->field_30 != 0) {
             /* [port] the original reads DAT_004cbf04[field_30]; field_30 is 1 here, the global after it */
             car->sprite = car->field_30 == 1 ? DAT_004cbf08 : DAT_004cbf04[car->field_30];
         } else {
             car->sprite = NULL;
-            list->field_10->field_30 = 0;
+            list->person->field_30 = 0;
         }
-        data = list->field_8;
+        data = list->rider;
         tc = data->bnv;
         if (tc != NULL) {
             /* [port] the original reads (&DAT_004cbef8)[field_4], the three path BNVs laid out one after another */

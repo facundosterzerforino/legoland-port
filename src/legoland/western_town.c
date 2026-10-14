@@ -88,7 +88,7 @@ void GeneralStoreSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00437670
-void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     char count = 0;
@@ -333,7 +333,7 @@ void SheriffSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00437c30
-void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
     struct Building *ride = param_1->building;
     struct RideListElem *elem = ride->list;
     int count = 0;
@@ -564,7 +564,7 @@ void JailCellSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438150
-void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
     struct Bloke *blokes[10] = {0};
@@ -792,7 +792,7 @@ void JailCellUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00438780
-LEGO_EXPORT unsigned int SaveJailCells(void) {
+LEGO_EXPORT int SaveJailCells(struct Element *element) {
     struct JailCell *cell = JailCellList;
     unsigned int marker = 1;
     unsigned int terminator = 0;
@@ -810,7 +810,7 @@ LEGO_EXPORT unsigned int SaveJailCells(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004387f0
-LEGO_EXPORT unsigned int LoadJailCells(void) {
+LEGO_EXPORT int LoadJailCells(struct Element *element) {
     unsigned int marker;
     struct JailCell *prev = NULL;
 
@@ -861,7 +861,7 @@ void BankSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438900
-void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, unsigned int param_5, unsigned int param_6) {
+void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
     struct Building *ride = param_1->building;
     struct RideListElem *elem = ride->list;
     int count = 0;
@@ -1022,7 +1022,7 @@ void SaloonSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438d00
-void RenderSaloon(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, unsigned int param_5, unsigned int param_6) {
+void RenderSaloon(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int param_6) {
     struct Ride *ride = obj->ride;
     char count = 0;
     struct RideNode *node = ride->riders;

@@ -48,11 +48,6 @@ struct RoadCallbacks {
     void *field_20;
 };
 
-struct RoadEditArg {
-    unsigned char pad_0[0xc];
-    void *ride;
-};
-
 struct RoadPlaceArg {
     unsigned int x;
     unsigned int y;
@@ -619,7 +614,7 @@ struct RoadTile *FUN_00413e30(struct Cursor *cur) {
 }
 
 // FUNCTION: LEGOLAND 0x00413fa0
-void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param) {
+void FUN_00413fa0(struct Element *dummy, struct RoadPlaceArg *param) {
     struct RoadTile *tile = FindQueueEntryAtTile(param->x, param->y);
     unsigned int *src;
     unsigned int *dst;
@@ -649,7 +644,7 @@ void FUN_00413fa0(unsigned int dummy, struct RoadPlaceArg *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00414020
-void DrivingSchoolRoadsAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
+void DrivingSchoolRoadsAddObject(struct Element *edit, struct RoadPlaceArg *place) {
     struct NeighborResult r;
     struct RoadQueueEntry **q = (struct RoadQueueEntry **)&r;
     TileId id;
@@ -679,7 +674,7 @@ void DrivingSchoolRoadsAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *
     if (q[6] && q[6]->field_8 == id.id && (q[6]->field_14 & 0xf) != 6) UpdateQueuePathShape(id.id, x - 4, y);
     if (q[7] && q[7]->field_8 == id.id && (q[7]->field_14 & 0xf) != 6) UpdateQueuePathShape(id.id, x - 4, y - 4);
     FUN_00406020(id.id, 1);
-    IncrementObjectCount((struct ObjectCount *)edit->ride);
+    IncrementObjectCount((struct ObjectCount *)edit->data);
 }
 
 // FUNCTION: LEGOLAND 0x00414220
@@ -835,8 +830,8 @@ void ZebraCrossingSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00414880
-void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, int *param_2, unsigned int param_3) {
-    void *obj = param_1->ride;
+void ZebraCrossingCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3) {
+    void *obj = param_1->data;
     struct RoadTile *tile;
     int cost;
 
@@ -868,12 +863,12 @@ void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, int *param_2, unsigned
 }
 
 // FUNCTION: LEGOLAND 0x00414940
-void InitZebraCrossing(struct RoadEditArg *param_1) {
-    ZebraCrossingRide = param_1->ride;
+void InitZebraCrossing(struct Element *param_1) {
+    ZebraCrossingRide = param_1->data;
 }
 
 // FUNCTION: LEGOLAND 0x00414950
-void ZebraCrossingAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *place) {
+void ZebraCrossingAddObject(struct Element *edit, struct RoadPlaceArg *place) {
     struct NeighborResult r;
     struct RoadTile *tile = (struct RoadTile *)FUN_004125a0(place->x, place->y);
 
@@ -883,6 +878,6 @@ void ZebraCrossingAddObject(struct RoadEditArg *edit, struct RoadPlaceArg *place
         UpdateQueuePathShape(*(short *)((char *)tile + 8), place->x, place->y);
         tile->field_1d = 0;
         tile->field_1c = 0;
-        IncrementObjectCount((struct ObjectCount *)edit->ride);
+        IncrementObjectCount((struct ObjectCount *)edit->data);
     }
 }

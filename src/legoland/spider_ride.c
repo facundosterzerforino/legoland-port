@@ -169,7 +169,7 @@ int FUN_00415a90(struct SpiderNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00415ae0
-void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, void *param_5, unsigned int param_6) {
     Ride *ride = obj->ride;
     RideNode *elem = ride->riders;
     char count = 0;
@@ -343,7 +343,7 @@ unsigned int *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
     DAT_004cbf40.id = a2;
     car = car->next;
     car->field_10 = car->field_10 | 0x2000;
-    return (void *)&DAT_004cbf40;
+    return (unsigned int *)&DAT_004cbf40;
 }
 
 // FUNCTION: LEGOLAND 0x00416160
@@ -589,7 +589,7 @@ int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char cou
 }
 
 // FUNCTION: LEGOLAND 0x00416880
-LEGO_EXPORT int SaveSpider(void) {
+LEGO_EXPORT int SaveSpider(struct Element *element) {
     struct SpiderNode *node = SpiderNodeList;
     unsigned int one = 1;
     unsigned int zero = 0;
@@ -622,29 +622,11 @@ struct SpiderCar2 {
     unsigned int field_30;
 };
 
-struct SpiderListNode {
-    struct SpiderListNode *next;
-    unsigned char pad_4[4];
-    struct SpiderData *rider;
-    unsigned char pad_c[4];
-    struct SpiderCar2 *person;
-};
-
-struct SpiderGameObject {
-    unsigned char pad_0[0xcc];
-    struct SpiderListNode *riders;
-};
-
-struct SpiderLoadArg {
-    unsigned char pad_0[0xc];
-    struct SpiderGameObject *ride;
-};
-
 // FUNCTION: LEGOLAND 0x004168f0
-LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg) {
-    struct SpiderGameObject *obj = arg->ride;
+LEGO_EXPORT int LoadSpider(struct Element *arg) {
+    struct Ride *obj = arg->ride;
     struct SpiderNode *prev = NULL;
-    struct SpiderListNode *list;
+    struct RideNode *list;
     struct SpiderCar2 *car;
     struct SpiderData *data;
     struct SpiderTypeC *tc;

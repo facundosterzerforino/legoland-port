@@ -31,7 +31,7 @@ void FUN_0042d970(TileId *tile, unsigned int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0042d9c0
-void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int clip) {
+void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int clip) {
     struct Ride *ride = obj->ride;
     struct RideNode *node;
     struct Point pos;

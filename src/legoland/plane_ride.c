@@ -42,24 +42,6 @@ struct PlaneRideObject {
     unsigned int ride;
 };
 
-struct PlaneRideBlockData {
-    unsigned char pad_0[0x10];
-    unsigned int field_10;
-};
-
-struct PlaneRideBlock {
-    unsigned char pad_0[0x14];
-    unsigned int field_14;
-    unsigned int field_18;
-    unsigned char pad_1c[0x48];
-    struct PlaneRideBlockData *layer;
-};
-
-struct PlaneRideRoot {
-    unsigned char pad_0[0xc];
-    struct PlaneRideBlock *field_c;
-};
-
 #include "image_sprite.h"
 #include "objclass.h"
 
@@ -160,7 +142,7 @@ void FUN_0043d9f0(struct PlaneRideNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043da60
-void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, unsigned int param_5, unsigned int param_6) {
+void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int param_6) {
     struct Ride *ride;
     struct RideNode *r;
     register struct Point coords;
@@ -325,16 +307,16 @@ void PlaneRideAddObject(Element *a, int *p) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e010
-unsigned int *GetPlaneRideSpriteInfo(struct PlaneRideRoot *param1, unsigned short param2) {
-    struct PlaneRideBlock *block = param1->field_c;
+unsigned int *GetPlaneRideSpriteInfo(struct Element *param1, unsigned short param2) {
+    struct Ride *block = param1->ride;
 
     DAT_0062fe60.sprite = block->layer;
     DAT_0062fe60.x = block->field_14;
     DAT_0062fe60.y = block->field_18;
     DAT_0062fe60.id = param2;
-    block->layer->field_10 |= 0x2000;
+    block->layer->flags |= 0x2000;
 
-    return (void *)&DAT_0062fe60;
+    return (unsigned int *)&DAT_0062fe60;
 }
 
 // FUNCTION: LEGOLAND 0x0043e050
@@ -358,7 +340,7 @@ unsigned int FUN_0043e050(struct RideNode *rn, struct PlaneRideNode *node, signe
 }
 
 // FUNCTION: LEGOLAND 0x0043e0a0
-LEGO_EXPORT int SaveZoomer(void) {
+LEGO_EXPORT int SaveZoomer(struct Element *element) {
     struct PlaneRideNode *current = PlaneRideNodeList;
     unsigned int flag = 1;
     unsigned int terminator = 0;
@@ -395,29 +377,11 @@ struct ZoomerCar {
     unsigned int field_30;
 };
 
-struct ZoomerListNode {
-    struct ZoomerListNode *next;
-    unsigned char pad_4[4];
-    struct ZoomerData *rider;
-    unsigned char pad_c[4];
-    struct ZoomerCar *person;
-};
-
-struct ZoomerGameObject {
-    unsigned char pad_0[0xcc];
-    struct ZoomerListNode *riders;
-};
-
-struct ZoomerLoadArg {
-    unsigned char pad_0[0xc];
-    struct ZoomerGameObject *field_c;
-};
-
 // FUNCTION: LEGOLAND 0x0043e110
-LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
-    struct ZoomerGameObject *obj = arg->field_c;
+LEGO_EXPORT int LoadZoomer(struct Element *arg) {
+    struct Ride *obj = arg->ride;
     struct PlaneRideNode *prev = NULL;
-    struct ZoomerListNode *list;
+    struct RideNode *list;
     struct ZoomerCar *car;
     struct ZoomerData *data;
     struct ZoomerTypeC *tc;
