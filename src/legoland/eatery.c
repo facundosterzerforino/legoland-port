@@ -210,7 +210,7 @@ void BrollySetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = temp;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((void *)((unsigned int)EditMode.unk8 + 0x3c));
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0042e500
@@ -391,7 +391,7 @@ void EaterySetEditMode(struct EditArg *arg) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)temp;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((void *)((unsigned int)EditMode.unk8 + 0x3c));
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0042e910
@@ -417,7 +417,7 @@ void RenderCastleBBQ(int param_1, unsigned int param_2, unsigned int param_3, sh
 // FUNCTION: LEGOLAND 0x0042e9c0
 void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2) {
     struct SampleParams params;
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     params.x = *param_2;
     params.y = param_2[1];
     params.field_0 = 2;
@@ -425,7 +425,7 @@ void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ea10
-void CastleBBQRemoveObject(struct Element *param_1, unsigned int param_2, unsigned int param_3) {
+void CastleBBQRemoveObject(struct Element *param_1, unsigned int param_2, struct Cursor *param_3) {
     unsigned char *b = (unsigned char *)&param_2;
     struct SampleParams params;
     StandardRemoveObject(param_1, *(TileId *)&param_2, param_3);
@@ -652,7 +652,7 @@ void Restaurant1AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     FUN_0042eec0((unsigned short *)id);
 }
 
@@ -691,7 +691,7 @@ void FUN_0042ef70(struct BrollyNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0042efb0
-void Restaurant1RemoveObject(struct Element *param_1, TileId tile, unsigned int param_3) {
+void Restaurant1RemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3) {
     struct SampleParams params;
     struct BrollyNode *node = FUN_0042ef40(&tile.id);
     if (node != NULL) {
@@ -1036,7 +1036,7 @@ void Restaurant2AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     FUN_0042f920((unsigned short *)id);
 }
 
@@ -1080,7 +1080,7 @@ void RemoveSaveBlock(struct SaveBlock *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0042fa40
-void Restaurant2RemoveObject(struct Element *arg1, TileId tile, unsigned int arg3, unsigned int arg4, unsigned int arg5) {
+void Restaurant2RemoveObject(struct Element *arg1, TileId tile, struct Cursor *arg3, unsigned int arg4, unsigned int arg5) {
     struct SaveBlock *result = FindSaveBlock(&tile.id);
     if (result != NULL) {
         RemoveSaveBlock(result);
@@ -1814,7 +1814,7 @@ void FoodcartIcecreamUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004312c0
-void EateryRemoveObject(struct Element *param_1, TileId tile, unsigned int param_3) {
+void EateryRemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3) {
     StandardRemoveObject(param_1, tile, param_3);
     RemoveAllBlokesFromRide(param_1->ride, tile);
     StopMoneySFX(&tile.pos.x);
@@ -1882,7 +1882,7 @@ void LoadOctopusCafeResources(struct Element *obj) {
 
 // FUNCTION: LEGOLAND 0x004314f0
 void OctopusCafeAddObject(struct Element *param_1, struct UserFlagsArg *param_2) {
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     Set_UserFlags(param_2->var_0, param_2->var_4, 0);
 }
 

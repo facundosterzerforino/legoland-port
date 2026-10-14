@@ -143,7 +143,7 @@ void FUN_004392b0(struct PathArea *area, struct Point *origin) {
 // FUNCTION: LEGOLAND 0x00439320
 void LegoShop1AddObject(struct MapObject *obj, void *param_2) {
     struct Building *building = obj->building;
-    AddBasicObject((unsigned int)obj, (unsigned int)param_2);
+    AddBasicObject(obj, param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
@@ -152,7 +152,7 @@ void LegoShop1RemoveObject(struct ShopRemoveObject *obj, TileId coords, void *cu
     void *ride = obj->ride;
     struct Point local;
 
-    StandardRemoveObject((Element *)obj, coords, (struct Cursor *)cursor);
+    StandardRemoveObject(obj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)ride, coords);
 
     local.x = coords.pos.x;
@@ -165,7 +165,7 @@ void LegoShop1SetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = LegoShop1Building;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x004393e0
@@ -306,7 +306,7 @@ void LegoShop2SetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = LegoShop2Building;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00439760
@@ -530,7 +530,7 @@ void LoadLegMediaShopMaskSpritesAndMoneySFX(struct MapObject *obj) {
 // FUNCTION: LEGOLAND 0x00439c60
 void LegoMediaShopAddObject(struct MapObject *obj, void *param_2) {
     struct Building *building = obj->building;
-    AddBasicObject((unsigned int)obj, (unsigned int)param_2);
+    AddBasicObject(obj, param_2);
     FUN_00439230((unsigned int)building, param_2);
 }
 
@@ -539,7 +539,7 @@ void LegoMediaShopRemoveObject(struct ShopRemoveObject *obj, TileId coords, void
     void *ride = obj->ride;
     struct Point local;
 
-    StandardRemoveObject((Element *)obj, coords, (struct Cursor *)cursor);
+    StandardRemoveObject(obj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)ride, coords);
 
     local.x = coords.pos.x;
@@ -559,7 +559,7 @@ void LegoMediaShopSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = LegoMediaShopBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00439d40
@@ -747,7 +747,7 @@ void ExplorersInstituteSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = ExplorersInstituteBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0043a180
@@ -854,19 +854,19 @@ unsigned int *GetShopSpriteInfo(struct ShopRideObject *obj, unsigned short param
 
 // FUNCTION: LEGOLAND 0x0043a3d0
 void RemoveObjectAndBlokes(struct ShopRideObject *obj, TileId tile, void *param_3) {
-    StandardRemoveObject(obj, tile, (unsigned int)param_3);
+    StandardRemoveObject(obj, tile, param_3);
     RemoveAllBlokesFromRide((unsigned int)obj->building, tile);
 }
 
 // FUNCTION: LEGOLAND 0x0043a400
-void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
+void ShopsGetInterfaces(struct ClassNode *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b75fc
     if (_stricmp("GENERAL STORE", name->name) == 0) {
         ci->cb_a4 = LoadGStoreMatteSpritesAndMoneySFX;
         ci->cb_ac = KillGStoreMatteSpritesAndMoneySFX;
         ci->cb_8c = GeneralStoreSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = GeneralStoreUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = GeneralStoreUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderGeneralStore;
         return;
@@ -876,8 +876,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadSherifshutMatteSpriteAndMoneySFX;
         ci->cb_ac = KillSherifshutMatteSpriteAndMoneySFX;
         ci->cb_8c = SheriffSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = SheriffUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = SheriffUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderSheriff;
         return;
@@ -887,13 +887,13 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = JailCellLoad;
         ci->cb_ac = JailCellUnload;
         ci->cb_8c = JailCellSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = JailCellUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = JailCellUpdate;
         ci->cb_98 = JailCellAddObject;
         ci->cb_9c = JailCellRemoveObject;
         ci->cb_b0 = RenderJailCell;
-        ci->cb_b8 = LoadJailCells;
-        ci->cb_bc = SaveJailCells;
+        ci->load_hook = LoadJailCells;
+        ci->save_hook = SaveJailCells;
         return;
     }
     // STRING: LEGOLAND 0x004b75e0
@@ -901,8 +901,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadBankMatteSpriteAndMoneySFX;
         ci->cb_ac = KillBankMatteSpriteAndMoneySFX;
         ci->cb_8c = BankSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = BankUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = BankUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderBank;
         return;
@@ -912,8 +912,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadSaloonMatteSpritesAndMoneySFX;
         ci->cb_ac = KillSaloonMatteSpritesAndMoneySFX;
         ci->cb_8c = SaloonSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = SaloonUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = SaloonUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderSaloon;
         return;
@@ -923,8 +923,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadExplorersInstituteMatteSpriteAndMoneySFX;
         ci->cb_ac = UnloadExplorersInstituteMatteSpriteAndMoneySFX;
         ci->cb_8c = ExplorersInstituteSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = ExplorersInstituteUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = ExplorersInstituteUpdate;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderExplorersInstitute;
         return;
@@ -936,8 +936,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_9c = LegoShop1RemoveObject;
         ci->cb_ac = UnloadLegoShop1MatteSpriteAndMoneySFX;
         ci->cb_8c = LegoShop1SetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = LegoShop1Update;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = LegoShop1Update;
         ci->cb_b0 = RenderLegoShop1;
         return;
     }
@@ -946,8 +946,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_a4 = LoadLegoShop2MatteSpriteAndMoneySFX;
         ci->cb_ac = UnloadLegoShop2MatteSpriteAndMoneySFX;
         ci->cb_8c = LegoShop2SetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = LegoShop2Update;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = LegoShop2Update;
         ci->cb_9c = RemoveObjectAndBlokes;
         ci->cb_b0 = RenderLegoShop2;
         return;
@@ -959,8 +959,8 @@ void ShopsGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
         ci->cb_9c = LegoMediaShopRemoveObject;
         ci->cb_ac = UnloadLegMediaShopMaskSpritesAndMoneySFX;
         ci->cb_8c = LegoMediaShopSetEditMode;
-        ci->cb_a0 = GetShopSpriteInfo;
-        ci->cb_a8 = LegoMediaShopUpdate;
+        ci->cb_sprite = GetShopSpriteInfo;
+        ci->cb_pre_render = LegoMediaShopUpdate;
         ci->cb_b0 = RenderLegoMediaShop;
     }
 }

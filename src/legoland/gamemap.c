@@ -174,15 +174,15 @@ void FUN_00459970(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459ad0
-LEGO_EXPORT void PutObjOnMap(struct ObjClass *obj, unsigned int classid, struct Point *pos) {
+LEGO_EXPORT void PutObjOnMap(struct Ride *obj, unsigned int classid, struct Point *pos) {
     int area;
-    struct ObjClass *entrance;
+    struct Ride *entrance;
     struct MapCell *cell;
 
     if (classid == CastleObjElem) {
         CastlePlacedFlag = 1;
     }
-    obj->method_98(classid, pos);
+    obj->cb_98(classid, pos);
     if (obj == PathControlObject) {
         DAT_00667cf4 = DAT_00667cf4 + 1;
         DAT_00667ce0 = DAT_00667ce0 + 1;
@@ -213,7 +213,7 @@ LEGO_EXPORT void PutObjOnMap(struct ObjClass *obj, unsigned int classid, struct 
         AddObjectsPowerStats(classid, pos);
     }
     if (classid == ElemID("ENTRANCE 1")) {
-        entrance = (struct ObjClass *)((struct ClassNode *)ElemID("ENTRANCE 1"))->iface;
+        entrance = (struct Ride *)((struct ClassNode *)ElemID("ENTRANCE 1"))->iface;
         if (pos->x < 0 || pos->x >= (int)lpConfig->width || pos->y < 0 || pos->y >= (int)lpConfig->height) {
             cell = NULL;
         } else {
@@ -227,7 +227,7 @@ LEGO_EXPORT void PutObjOnMap(struct ObjClass *obj, unsigned int classid, struct 
 }
 
 // FUNCTION: LEGOLAND 0x00459c90
-LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileId tile, void *cursor) {
+LEGO_EXPORT void RemObjFromMap(struct Ride *obj, unsigned int classid, TileId tile, void *cursor) {
     int area;
     struct MapCell *cell;
     struct Cursor *query;
@@ -248,7 +248,7 @@ LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileI
         DAT_00667cdc = 1;
     }
     RemoveObjectsPowerStats(classid, tile);
-    obj->method_9c(classid, tile, cursor);
+    obj->cb_9c(classid, tile, cursor);
     if (obj == PathControlObject) {
         DAT_00667cf4 = DAT_00667cf4 + -1;
         DAT_00667ce0 = DAT_00667ce0 + -1;

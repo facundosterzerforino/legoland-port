@@ -113,10 +113,12 @@ int BuyGardener(void);
 int BuyMechanic(void);
 void FUN_0049cfc0(void);
 
+struct MapRect;
 void FUN_0049cf00(struct MapRect *rect);
 Bloke *FUN_00499c40(int *coords);
 void FUN_00499ac0(Bloke *worker, WorkOrder *order);
 WorkOrder *FUN_00499780(Element *element, int *coords, int mode);
+struct Point;
 LEGO_EXPORT WorkOrder *AddRepairOrderForObject(Ride *ride, struct Point pos);
 int GetGardenerCount(void);
 int GetMechanicCount(void);

@@ -721,7 +721,7 @@ unsigned int ScriptEventRiders(struct ObjectiveEvent *arg) {
 struct ClassListNode {
     struct ClassListNode *next;
     unsigned char pad_4[0x8 - 0x4];
-    struct CallbackTable *iface;
+    struct Ride *iface;
 };
 
 // FUNCTION: LEGOLAND 0x0046ac50
@@ -735,8 +735,8 @@ unsigned int ScriptEventRideVisitors(struct ObjectiveEvent *arg) {
     count = 0;
     node = (struct ClassListNode *)((struct TileGroupHolder *)arg->field_4)->group->list;
     while (node != NULL) {
-        if (_stricmp(*(char **)node->iface->context, *(char **)arg->field_4) == 0 &&
-            (robj = (struct RenderObj *)GetFirstObjectMatching((Element *)node->iface->context)) != NULL) {
+        if (_stricmp(*(char **)node->iface->element, *(char **)arg->field_4) == 0 &&
+            (robj = (struct RenderObj *)GetFirstObjectMatching((Element *)node->iface->element)) != NULL) {
             pt.x = robj->field_4;
             pt.y = robj->field_5;
             value = FUN_00489fd0(&pt) & 0xffff;

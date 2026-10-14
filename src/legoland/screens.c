@@ -515,7 +515,7 @@ void GameProc(void) {
                 SetPointer(8);
                 if (QueryClass != NULL) {
                     HTBubbleHelp(&help_rect, QueryClass->name, 2);
-                    FUN_0046d340(*QueryClass->element);
+                    FUN_0046d340(QueryClass->element->name);
                 }
                 break;
             case 0x10a:
@@ -562,7 +562,7 @@ void GameProc(void) {
         } else {
             if (QueryClass != NULL) {
                 HTBubbleHelp(&help_rect, QueryClass->name, 2);
-                FUN_0046d340(*QueryClass->element);
+                FUN_0046d340(QueryClass->element->name);
             }
         }
     }

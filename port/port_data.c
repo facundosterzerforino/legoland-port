@@ -5905,7 +5905,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&ScriptEventCategories, sizeof(ScriptEventCategories), 0xee5c, 0x11c},
     {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
     {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
-    {(void *)&DAT_004b9f8c, sizeof(DAT_004b9f8c), 0xef8c, 0x8f0},
     {(void *)&PTR_some_list_head_004ba87c, sizeof(PTR_some_list_head_004ba87c), 0xf87c, 0x4},
     {(void *)&PTR_DAT_004ba880, sizeof(PTR_DAT_004ba880), 0xf880, 0x4},
     {(void *)&DAT_004ba884, sizeof(DAT_004ba884), 0xf884, 0x5c},

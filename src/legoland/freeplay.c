@@ -74,7 +74,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     struct IconNode *icon;
     struct IconNode *bar;
     struct FreePlayElement *elem;
-    unsigned int path_idx;
+    struct Element *path_idx;
     unsigned int count;
     unsigned int i;
 
@@ -137,7 +137,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
         LLIDB_GetElement(i, (struct Element **)&elem);
         if ((elem->flags & 0x10) == 0) continue;
         if ((elem->flags & 0x1) == 0) continue;
-        if (path_idx == (unsigned int)elem) continue;
+        if (path_idx == elem) continue;
         if (elem->counter == 0) continue;
         elem->counter--;
         if (elem->counter != 0) continue;
@@ -248,22 +248,22 @@ LEGO_EXPORT void InitFreePlayLists(void) {
     struct Sprite *sprite;
     struct ClipQueryResult *entry;
 
-    if (LLIDB_FindElement("BUILD MENU", (unsigned int *)&build, 0) != 0) {
+    if (LLIDB_FindElement("BUILD MENU", &build, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("COMMON THEME", (unsigned int *)&common, 0) != 0) {
+    if (LLIDB_FindElement("COMMON THEME", &common, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("LEGOLAND THEME", (unsigned int *)&legoland, 0) != 0) {
+    if (LLIDB_FindElement("LEGOLAND THEME", &legoland, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("ADVENTURERS THEME", (unsigned int *)&adventurers, 0) != 0) {
+    if (LLIDB_FindElement("ADVENTURERS THEME", &adventurers, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("CASTLE THEME", (unsigned int *)&castle, 0) != 0) {
+    if (LLIDB_FindElement("CASTLE THEME", &castle, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("WESTERN THEME", (unsigned int *)&western, 0) != 0) {
+    if (LLIDB_FindElement("WESTERN THEME", &western, 0) != 0) {
         exit(1);
     }
     for (i = 0, p = CurrentProfile.field_46; i < 200; i++, p++) {
@@ -272,7 +272,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
         }
         idx = 0;
         for (entry = DAT_004bdeb8; (int)entry < (int)&DAT_004bdeb8[0x86]; entry++, idx++) {
-            if (entry->id == i && LLIDB_FindElement(entry->name, (unsigned int *)&t1, 0) == 0) {
+            if (entry->id == i && LLIDB_FindElement(entry->name, &t1, 0) == 0) {
                 break;
             }
         }

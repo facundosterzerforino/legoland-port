@@ -555,7 +555,7 @@ void GoldRushAddObject(struct GoldEditObject *editObj, struct Point *pos) {
     id.pos.x = (unsigned char)pos->x;
     id.pos.y = (unsigned char)pos->y;
     ride = editObj->ride;
-    AddBasicObject((Element *)editObj, (int *)pos);
+    AddBasicObject(editObj, pos);
     AddGoldWashNode((struct GoldNode *)&id);
 
     p.x = pos->x + ride->x - 1;
@@ -585,7 +585,7 @@ void GoldRushRemoveObject(struct GoldEditObject *editObj, TileId coords, struct 
         RemoveGoldWashNode((struct GoldNode *)found);
     }
 
-    StandardRemoveObject((Element *)editObj, coords, cursor);
+    StandardRemoveObject(editObj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)ride, coords);
 
     p[0] = coords.pos.x + ride->x - 1;
@@ -655,17 +655,17 @@ LEGO_EXPORT int LoadGoldWash(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004078f0
-void GoldRush_GetInterfaces(struct ClassNode *str, struct CallbackTable *module) {
+void GoldRush_GetInterfaces(struct ClassNode *str, struct Ride *module) {
     // STRING: LEGOLAND 0x004b4670
     if (_stricmp("GOLD RUSH", str->name) == 0) {
         module->cb_a4 = GoldRushLoad;
         module->cb_ac = GoldRushUnload;
         module->cb_8c = GoldRushSetEditMode;
-        module->cb_a8 = GoldRushUpdate;
+        module->cb_pre_render = GoldRushUpdate;
         module->cb_b0 = RenderGoldRush;
         module->cb_98 = GoldRushAddObject;
         module->cb_9c = GoldRushRemoveObject;
-        module->cb_b8 = LoadGoldWash;
-        module->cb_bc = SaveGoldWash;
+        module->load_hook = LoadGoldWash;
+        module->save_hook = SaveGoldWash;
     }
 }

@@ -18,6 +18,7 @@ void RemoveFromOpenList(struct EventNode *param_1);
 void FUN_004779d0(struct Point *p);
 void FindMapPathAStar(int x, int y, int a, int b);
 int FindStringNoCase(const char *param_1, const void *param_2, int param_3);
+struct ScriptCommand;
 int ParseScriptFile(const char *name, struct ScriptCommand *commands, int count, int flags);
 int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int count, int flags);
 void FUN_004784c0(void);

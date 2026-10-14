@@ -124,7 +124,6 @@ struct PathNode;
 struct BoatRideNode;
 struct MermaidNode;
 struct Ride;
-struct ObjClass;
 struct RideLayer;
 struct CatapultNode;
 struct Position;
@@ -1114,7 +1113,7 @@ extern int DAT_004b9f78[4];
 // 0x004b9f88
 extern unsigned int DAT_004b9f88;
 // 0x004b9f8c
-extern unsigned int DAT_004b9f8c;
+extern const char *DAT_004b9f8c;
 // 0x004ba87c
 extern void *PTR_some_list_head_004ba87c;
 // 0x004ba880
@@ -1353,11 +1352,11 @@ extern unsigned int DAT_004c2af4;
 // 0x004c2af8
 extern void *DAT_004c2af8;
 // 0x004c2afc
-extern unsigned int LogFlumeImageListId;
+extern struct Element *LogFlumeImageListId;
 // 0x004c2b0c
 extern struct CursorSource *DAT_004c2b0c;
 // 0x004c2b10
-extern unsigned int LogFlumeTrackEndyListId;
+extern struct Element *LogFlumeTrackEndyListId;
 // 0x004c2b50
 extern void *DAT_004c2b50;
 // 0x004c2b60
@@ -1617,7 +1616,7 @@ extern struct WaterSub *ShowerLayer;
 // 0x004cbfe4
 extern unsigned int DAT_004cbfe4;
 // 0x004cbfe8
-extern unsigned int WaterWorksImageListHandle;
+extern struct Element *WaterWorksImageListHandle;
 // 0x004cbfec
 extern unsigned int ElephantFountainLayer;
 // 0x004cbff0
@@ -1931,7 +1930,7 @@ extern struct Sprite *EateryLayerOwner;
 // 0x00616120
 extern struct RideSpriteInfo DAT_00616120;
 // 0x0061613c
-extern unsigned int BrollyImagesHandle;
+extern struct Element *BrollyImagesHandle;
 // 0x00616140
 extern struct BrollyData *BrollyImagesData;
 // 0x00616144
@@ -1941,11 +1940,11 @@ extern struct SaveBlock *SaveBlockList;
 // 0x0061614c
 extern unsigned int HedgeImagesData;
 // 0x00616150
-extern unsigned int FlowerImagesHandle;
+extern struct Element *FlowerImagesHandle;
 // 0x00616158
 extern unsigned int FlowerImagesData;
 // 0x0061615c
-extern unsigned int HedgeImagesHandle;
+extern struct Element *HedgeImagesHandle;
 // 0x00616164
 extern struct JungleRide *JungleRideList;
 // 0x00629c2c
@@ -2270,7 +2269,7 @@ extern int DAT_00667c3c;
 // 0x00667c54
 extern LEGO_EXPORT TileId QueryObj;
 // 0x00667c58
-extern LEGO_EXPORT struct ObjClass *QueryClass;
+extern LEGO_EXPORT struct Ride *QueryClass;
 // 0x00667c5c
 extern unsigned int DAT_00667c5c;
 // 0x00667c60
@@ -3315,7 +3314,7 @@ extern unsigned int MidiOutHandle;
 // 0x007fd640
 extern struct ResVolume *ResourceVolumes[4];
 // 0x007fd660
-extern unsigned int DAT_007fd660[256];
+extern struct Element *DAT_007fd660[256];
 // 0x007fda60
 extern struct BlokeSave BlokeSaveBuffer;
 // 0x007fdb84
@@ -3422,13 +3421,13 @@ extern unsigned int DAT_007fdfa8;
 // 0x007fdfac
 extern unsigned char PopupInfoLineCount;
 // 0x007fdfb0
-extern unsigned int PottingShedHandle;
+extern struct Element *PottingShedHandle;
 // 0x007fdfb4
-extern unsigned int MechanicsHutHandle;
+extern struct Element *MechanicsHutHandle;
 // 0x007fdfb8
-extern unsigned int PathControlHandle;
+extern struct Element *PathControlHandle;
 // 0x007fdfbc
-extern unsigned int Entrance1Handle;
+extern struct Element *Entrance1Handle;
 // 0x007fdfc0
 extern struct IconNode *ClosePopUpIcon;
 // 0x007fdfc4
@@ -3532,13 +3531,13 @@ extern LEGO_EXPORT RECT ObjectPartArray[256];
 // 0x00801400
 extern LEGO_EXPORT struct MapElement **GameMap;
 // 0x00801404
-extern void *BridgesHandle;
+extern struct Element *BridgesHandle;
 // 0x00801408
 extern unsigned int DAT_00801408;
 // 0x0080140c
 extern void *LevelTileMapHandle;
 // 0x00801410
-extern void *OverlayILFHandle;
+extern struct Element *OverlayILFHandle;
 // 0x00801420
 extern struct DeferredSprite DAT_00801420[100];
 // 0x00801a60
@@ -4028,7 +4027,7 @@ extern void (*DAT_00829a5c)(void);
 // 0x00829a60
 extern float DAT_00829a60;
 // 0x00829a64
-extern unsigned int DAT_00829a64;
+extern struct Ride *DAT_00829a64;
 
 // 0x00829a80
 extern struct Footprint DAT_00829a80;
@@ -4042,7 +4041,7 @@ extern struct PieceClass DAT_004b5b48;
 // 0x00829bf8
 extern struct Ride *DAT_00829bf8;
 // 0x00829bfc
-extern unsigned int DAT_00829bfc;
+extern struct Ride *DAT_00829bfc;
 
 // 0x00829c00
 extern struct Element *DAT_00829c00;
@@ -4052,7 +4051,7 @@ extern struct Sprite *CastleMatteSprite;
 extern struct Ride *DAT_00829c08;
 
 // 0x00829c34
-extern int DAT_00829c34;
+extern struct Ride *DAT_00829c34;
 // 0x00829c54
 extern char *DAT_00829c54;
 // 0x00829c60

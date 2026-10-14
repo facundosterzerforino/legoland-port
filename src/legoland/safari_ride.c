@@ -262,7 +262,7 @@ void SafariSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)SafariRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 struct SafariEditObj {
@@ -271,7 +271,7 @@ struct SafariEditObj {
 };
 
 // FUNCTION: LEGOLAND 0x00414f40
-void SafariRemoveObject(struct SafariEditObj *obj, TileId key, unsigned int coords, unsigned int cursor) {
+void SafariRemoveObject(struct SafariEditObj *obj, TileId key, struct Cursor *coords, unsigned int cursor) {
     void *node = FUN_00414a80(&key);
     struct SampleSource src;
 
@@ -279,7 +279,7 @@ void SafariRemoveObject(struct SafariEditObj *obj, TileId key, unsigned int coor
         return;
     }
     RemoveSafariNode((struct SafariNode *)node);
-    StandardRemoveObject((Element *)obj, key, (struct Cursor *)coords);
+    StandardRemoveObject(obj, key, (struct Cursor *)coords);
     RemoveAllBlokesFromRide((struct Ride *)obj->ride, key);
 
     src.type = 2;
@@ -300,7 +300,7 @@ void SafariAddObject(struct Element *uid, struct SafariBasicObject *a1) {
 
     *(unsigned char *)&local = a1->field_0;
     *((unsigned char *)&local + 1) = a1->field_4;
-    AddBasicObject((Element *)uid, (int *)a1);
+    AddBasicObject(uid, a1);
     FUN_004149c0((struct SafariNode *)&local);
 }
 
@@ -316,19 +316,19 @@ unsigned int *GetSafariRideSpriteInfo(struct SafariRoot *p1, unsigned short arg2
 }
 
 // FUNCTION: LEGOLAND 0x00415030
-void SafariRideGetInterfaces(struct ClassNode *name, struct CallbackTable *interfaces) {
+void SafariRideGetInterfaces(struct ClassNode *name, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b4d74
     if (_stricmp("SAFARI RIDE", name->name) == 0) {
         interfaces->cb_a4 = SafariRideLoad;
         interfaces->cb_ac = SafariRideUnload;
         interfaces->cb_8c = SafariSetEditMode;
-        interfaces->cb_a8 = SafariRideUpdate;
+        interfaces->cb_pre_render = SafariRideUpdate;
         interfaces->cb_b0 = RenderSafari;
         interfaces->cb_9c = SafariRemoveObject;
         interfaces->cb_98 = SafariAddObject;
-        interfaces->cb_a0 = GetSafariRideSpriteInfo;
-        interfaces->cb_bc = SaveSafariRide;
-        interfaces->cb_b8 = LoadSafariRide;
+        interfaces->cb_sprite = GetSafariRideSpriteInfo;
+        interfaces->save_hook = SaveSafariRide;
+        interfaces->load_hook = LoadSafariRide;
     }
 }
 
@@ -534,7 +534,7 @@ void SafariRideUpdate(Element *obj) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef((int *)&bloke->person->screen, (int *)&bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;

@@ -734,7 +734,7 @@ void JoustSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)JoustRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00408c00
@@ -849,18 +849,18 @@ LEGO_EXPORT int LoadJoust(struct JoustLoadArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00408db0
-LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct CallbackTable *iface) {
+LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b4718
     if (_stricmp("JOUST", head->name) == 0) {
         iface->cb_a4 = JoustLoadResources;
         iface->cb_ac = JoustFreeResources;
         iface->cb_8c = JoustSetEditMode;
-        iface->cb_a8 = JoustUpdate;
+        iface->cb_pre_render = JoustUpdate;
         iface->cb_b0 = RenderJoust;
         iface->cb_9c = JoustRemoveObject;
         iface->cb_98 = JoustAddObject;
-        iface->cb_a0 = GetJoustSpriteInfo;
-        iface->cb_bc = SaveJoust;
-        iface->cb_b8 = LoadJoust;
+        iface->cb_sprite = GetJoustSpriteInfo;
+        iface->save_hook = SaveJoust;
+        iface->load_hook = LoadJoust;
     }
 }

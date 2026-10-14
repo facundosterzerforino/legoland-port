@@ -11,38 +11,18 @@ struct Point;
 struct Bloke;
 struct ObjClassNames;
 struct ObjectInfo;
-struct ElemView;
+struct Element;
 
-LEGO_EXPORT unsigned int LoadObjectClass(struct ElemView *cls);
+LEGO_EXPORT unsigned int LoadObjectClass(struct Element *cls);
 
 typedef void (*RideCallback)();
 typedef int (*RideIntCallback)();
 typedef struct RideSpriteInfo *(*RidePtrCallback)();
 
-struct CallbackTable {
-    /* 0x00 */ unsigned char pad_0[0x88];
-    /* 0x88 */ struct LibraryNode *library;
-    /* 0x8c */ RideCallback cb_8c;
-    /* 0x90 */ RideCallback cb_90;
-    /* 0x94 */ RideCallback cb_94;
-    /* 0x98 */ RideCallback cb_98;
-    /* 0x9c */ RideCallback cb_9c;
-    /* 0xa0 */ RidePtrCallback cb_a0;
-    /* 0xa4 */ RideCallback cb_a4;
-    /* 0xa8 */ RideCallback cb_a8;
-    /* 0xac */ RideCallback cb_ac;
-    /* 0xb0 */ RideCallback cb_b0;
-    /* 0xb4 */ RideCallback cb_b4;
-    /* 0xb8 */ RideIntCallback cb_b8;
-    /* 0xbc */ RideIntCallback cb_bc;
-    /* 0xc0 */ RideIntCallback cb_c0;
-    /* 0xc4 */ void *context;
-};
-
 struct ClassNode {
     /* 0x00 */ char *name;
     /* 0x04 */ unsigned char pad_4[8];
-    /* 0x0c */ struct CallbackTable *iface;
+    /* 0x0c */ struct Ride *iface;
 };
 
 struct LibraryNode {
@@ -54,12 +34,13 @@ struct LibraryNode {
 
 LEGO_EXPORT void IncrementObjectCount(struct ObjectCount *count);
 LEGO_EXPORT void DecrementObjectCount(struct ObjectCount *count);
+struct Ride;
 LEGO_EXPORT unsigned int GetObjSalvageValue(struct Ride *ride, unsigned int level);
 LEGO_EXPORT struct ObjInstance *CreateObjectInstance(unsigned int param_1, unsigned short *param_2);
 LEGO_EXPORT int GetObjCost(struct Ride *ride);
 LEGO_EXPORT int GetObjRepairCost(struct Ride *ride, unsigned int level);
 struct Point;
-LEGO_EXPORT void BasicObjectDCalcCursor(unsigned int param_1, struct Point *param_2);
+LEGO_EXPORT void BasicObjectDCalcCursor(struct Element *param_1, struct Point *param_2);
 LEGO_EXPORT void ClearObjectCounters(void);
 LEGO_EXPORT unsigned int ObjCount(struct ObjCountWrap *wrap);
 LEGO_EXPORT void FreeBlokeCounters(void);
@@ -77,7 +58,7 @@ LEGO_EXPORT void ResetBestPtr(void);
 LEGO_EXPORT int ShuffleObjKeys(struct Point *goal, struct Ride **ride);
 LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke, int param_3);
 LEGO_EXPORT void UnLoadObjectLibrary(void *library);
-LEGO_EXPORT void SetStandardCallbacks(struct CallbackTable *table);
+LEGO_EXPORT void SetStandardCallbacks(struct Ride *table);
 LEGO_EXPORT int LoadObjectLibrary(void *obj, const char *name);
 void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info);
 void FUN_00481170(void);

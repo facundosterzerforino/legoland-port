@@ -244,7 +244,7 @@ void SpinningBarrelsSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = SpinningBarrelsRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((unsigned int *)((unsigned int)EditMode.unk8 + 0x3c));
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0043c4d0
@@ -411,19 +411,19 @@ LEGO_EXPORT int LoadSBarrel(struct BarrelLoadArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c760
-void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct CallbackTable *ride) {
+void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct Ride *ride) {
     // STRING: LEGOLAND 0x004b7978
     if (_stricmp("SPINNING BARRELS RIDE", str->name) == 0) {
         ride->cb_a4 = SpinningBarrelsRideLoad;
         ride->cb_8c = SpinningBarrelsSetEditMode;
-        ride->cb_a8 = SpinningBarrelsUpdate;
+        ride->cb_pre_render = SpinningBarrelsUpdate;
         ride->cb_b0 = RenderSpinningBarrels;
         ride->cb_9c = SpinningBarrelsRemoveObject;
         ride->cb_98 = SpinningBarrelsAddObject;
         ride->cb_ac = SpinningBarrelsRideUnload;
-        ride->cb_a0 = GetSpinningBarrelsRideSpriteInfo;
-        ride->cb_bc = SaveSBarrel;
-        ride->cb_b8 = LoadSBarrel;
+        ride->cb_sprite = GetSpinningBarrelsRideSpriteInfo;
+        ride->save_hook = SaveSBarrel;
+        ride->load_hook = LoadSBarrel;
     }
 }
 

@@ -166,9 +166,9 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
     ride = obj->ride;
     EditCursor.footprint = ride->footprint;
     EditCursor.field_1830 = 0;
-    ScreenToMapRef(screen, (int *)&EditCursor.tile_x, param_3);
+    ScreenToMapRef(screen, &EditCursor.tile_x, param_3);
     tile = FUN_00411dc0(&EditCursor);
-    ValidateCursor(&EditCursor, (unsigned int)ride);
+    ValidateCursor(&EditCursor, ride);
     if (GetBrickCount() < GetObjCost(ride)) {
         SetCursorBlocked(&EditCursor, 2);
         return;

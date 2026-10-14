@@ -233,7 +233,7 @@ void FortSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00406860
-unsigned int FortAddObject(struct Element *param1, unsigned int param2) {
+unsigned int FortAddObject(struct Element *param1, int *param2) {
     return AddBasicObject(param1, param2);
 }
 
@@ -244,7 +244,7 @@ void FortRemoveObject(Element *elem, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x004068b0
-void FortGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
+void FortGetInterfaces(struct ClassNode *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b45a0
     if (_stricmp("FORT", name->name) != 0) {
         return;
@@ -252,7 +252,7 @@ void FortGetInterfaces(struct ClassNode *name, struct CallbackTable *ci) {
     ci->cb_a4 = LoadFortMaskSprite;
     ci->cb_ac = KillFortMaskSprite;
     ci->cb_8c = FortSetEditMode;
-    ci->cb_a8 = FortUpdate;
+    ci->cb_pre_render = FortUpdate;
     ci->cb_b0 = RenderFort;
     ci->cb_9c = FortRemoveObject;
     ci->cb_98 = FortAddObject;

@@ -692,13 +692,13 @@ void MonkeyTreeAddObject(struct Element *param_1, int *param_2) {
         obj->owner = (unsigned short)local_4;
         obj->next = DAT_00629c2c;
         DAT_00629c2c = obj;
-        AddBasicObject(param_1, (int *)param_2);
+        AddBasicObject(param_1, param_2);
         FUN_00436130((unsigned short)local_4, 1);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00433d90
-void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseMonkeyTreeCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     struct Ride *ride;
     unsigned int mask;
     unsigned short owner;
@@ -717,7 +717,7 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsign
         SetCursorBlocked(&EditCursor, 0xe);
         return;
     }
-    ValidateCursor(&EditCursor, (unsigned int)ride);
+    ValidateCursor(&EditCursor, ride);
     if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
@@ -774,7 +774,7 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, unsigned int param_2, unsign
 }
 
 // FUNCTION: LEGOLAND 0x00433fa0
-unsigned int JungleCruiseMonkeyTreeDCalcCursor(unsigned int param_1, unsigned int param_2) {
+unsigned int JungleCruiseMonkeyTreeDCalcCursor(struct Element *param_1, struct Point *param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -784,7 +784,7 @@ void MonkeyTreeRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) 
     struct JungleObj *node = DAT_00629c2c;
     struct JungleObj *prev = NULL;
 
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     while (node->tile.id != tile.id) {
         prev = node;
         node = node->next;
@@ -883,7 +883,7 @@ void MonkeyFishAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00434330
-void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *param_3) {
+void JungleCruiseMonkeyFishCalcCursor(Element *obj, int *param_2, int *param_3) {
     struct Ride *ride;
     TileId owners[2];
     struct Footprint fp;
@@ -911,7 +911,7 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *p
             SetCursorBlocked(&EditCursor, 0xe);
             return;
         }
-        ValidateCursor(&EditCursor, (unsigned int)ride);
+        ValidateCursor(&EditCursor, ride);
         if (IsCursorBuildable(&EditCursor) != 0) {
             memcpy(&fp, EditCursor.field_1414, sizeof(fp));
             fp.v[1] += 5;
@@ -962,7 +962,7 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, unsigned int param_2, int *p
 }
 
 // FUNCTION: LEGOLAND 0x00434650
-unsigned int JungleCruiseMonkeyFishDCalcCursor(unsigned int param_1, unsigned int param_2) {
+unsigned int JungleCruiseMonkeyFishDCalcCursor(struct Element *param_1, struct Point *param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -979,7 +979,7 @@ void MonkeyFishRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) 
             RestoreBaseMap(param_3->tile_x + x, param_3->tile_y + y);
         }
     }
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     while (node->tile.id != tile.id) {
         prev = node;
         node = node->next;
@@ -1044,7 +1044,7 @@ void FUN_00434b40(void *param_1, TileId tile, struct Cursor *param_3) {
     param_3->field_1414[3] = 1;
     param_3->field_1414[0] = 0;
     param_3->field_1414[2] = 0;
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     x = param_3->tile_x - 6;
     y = param_3->tile_y;
     if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
@@ -1087,7 +1087,7 @@ void FUN_00434b40(void *param_1, TileId tile, struct Cursor *param_3) {
 
 // FUNCTION: LEGOLAND 0x00434cb0
 void LoadJungleCruiseResources(Element *obj) {
-    unsigned int handle;
+    struct Element *handle;
     int i;
     struct Sprite *sprite;
 
@@ -1122,7 +1122,7 @@ void LoadJungleCruiseResources(Element *obj) {
 
 // FUNCTION: LEGOLAND 0x00434e50
 void UnloadJungleCruiseResources(Element *obj) {
-    unsigned int handle;
+    struct Element *handle;
     int i;
     struct Sprite *sprite;
     struct JungleScore *score;
@@ -1215,7 +1215,7 @@ void JungleCruiseAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00435150
-void JungleCruiseCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     memcpy(EditCursor.field_1414, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
     EditCursor.field_1830 = 0;
     JungleCruiseFootprint.next = &JungleCruiseStartFootprint;
@@ -1235,11 +1235,11 @@ void JungleCruiseCalcCursor(Element *obj, unsigned int param_2, unsigned int par
     ResetCursorBuildable(&PathCursor);
     EditCursor.field_1830 = (unsigned int)&PathCursor;
     PathCursor.field_1830 = 0;
-    ValidateCursor(&EditCursor, (unsigned int)obj->ride);
+    ValidateCursor(&EditCursor, obj->ride);
 }
 
 // FUNCTION: LEGOLAND 0x00435230
-void JungleCruiseDCalcCursor(unsigned int param_1, struct Point *param_2) {
+void JungleCruiseDCalcCursor(struct Element *param_1, struct Point *param_2) {
     struct JunglePath *p1 = JunglePathList;
     struct JungleFish *p3 = JungleFishList;
     struct JungleObj *p4 = DAT_00629c34;
@@ -1312,7 +1312,7 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) 
     int savedX;
     int savedY;
 
-    StandardRemoveObject((Element *)obj, tile, cursor);
+    StandardRemoveObject(obj, tile, cursor);
     for (y = JungleCruiseFootprint.v[1]; y <= JungleCruiseFootprint.v[3]; y++) {
         for (x = JungleCruiseFootprint.v[0]; x <= JungleCruiseFootprint.v[2] - 1; x++) {
             RestoreBaseMap(cursor->tile_x + x, cursor->tile_y + y);
@@ -1788,11 +1788,11 @@ void JungleCruiseWaterSetEditMode(void) {
     DAT_0081cb54->footprint = DAT_004b7478;
     DefaultCursor(&EditCursor);
     EditCursor.field_1828 |= 0x8;
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00436200
-void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
+void JungleCruiseWaterCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     unsigned int mask;
     unsigned short owner;
     int n;
@@ -1810,7 +1810,7 @@ void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned in
     if (mask == 0) {
         SetCursorBlocked(&EditCursor, 0xe);
     } else {
-        ValidateCursor(&EditCursor, (unsigned int)obj->ride);
+        ValidateCursor(&EditCursor, obj->ride);
         if (IsCursorBuildable(&EditCursor) != 0) {
             rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
             rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
@@ -1880,7 +1880,7 @@ void JungleCruiseWaterCalcCursor(Element *obj, unsigned int param_2, unsigned in
 }
 
 // FUNCTION: LEGOLAND 0x00436470
-void JungleCruiseWaterDCalcCursor(unsigned int param_1, int *coords) {
+void JungleCruiseWaterDCalcCursor(struct Element *param_1, int *coords) {
     struct JungleScore *score = JungleScoreList;
     struct JungleRide *ride;
     struct MapElement *elem;
@@ -1906,13 +1906,13 @@ void JungleCruiseWaterDCalcCursor(unsigned int param_1, int *coords) {
             coords[1] = QueryObj.pos.y;
             memcpy(&QueryClass->footprint, &JungleCruiseFootprint, sizeof(JungleCruiseFootprint));
             fake.ride = JungleCruiseRide;
-            JungleCruiseDCalcCursor((unsigned int)&fake, (struct Point *)coords);
+            JungleCruiseDCalcCursor((struct Element *)&fake, (struct Point *)coords);
             return;
         }
     }
     ride = JungleRideList;
     memcpy(&QueryClass->footprint, &DAT_004b7478, sizeof(DAT_004b7478));
-    BasicObjectDCalcCursor(param_1, (struct Point *)coords);
+    BasicObjectDCalcCursor(param_1, coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->cur_x && tile.pos.y == ride->cur_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
             SetCursorBlocked(&QueryCursor, 1);
@@ -2177,7 +2177,7 @@ void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
     struct JunglePath *node = JunglePathList;
     struct JunglePath *prev = NULL;
 
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     while (node->tile.id != tile.id) {
         prev = node;
         node = node->next;

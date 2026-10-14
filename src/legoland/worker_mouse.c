@@ -91,7 +91,7 @@ LEGO_EXPORT void SetWorkersPositionAtMouse(void) {
     worker = WorkerOnMouse;
     inner = worker->inner;
     AdjustBlokePosition(&inner->pos);
-    ScreenToMapRef((unsigned int)&MousePos, pt, 0);
+    ScreenToMapRef(&MousePos, pt, 0);
     worker = WorkerOnMouse;
     worker->var_68 = pt[0] << 8;
     worker = WorkerOnMouse;

@@ -81,7 +81,7 @@ struct DSObjClass {
     /* 0x00 */ unsigned char pad_0[0x26];
     /* 0x26 */ short cost;
     /* 0x28 */ unsigned char pad_28[0xc4 - 0x28];
-    /* 0xc4 */ unsigned int element;
+    /* 0xc4 */ Element *element;
 };
 
 struct DSBlokeNode {
@@ -212,11 +212,11 @@ void LoadDrivingSchoolResources(struct DSHead *param_1) {
     unsigned int lls;
 
     DrivingSchoolRide = param_1->ride;
-    if (LLIDB_FindElement("DSCHOOL MAPPING", (unsigned int *)&param_1, 0) == 0) {
-        DSchoolMappingData = LLIDB_LoadData(param_1);
+    if (LLIDB_FindElement("DSCHOOL MAPPING", (struct Element **)&param_1, 0) == 0) {
+        DSchoolMappingData = LLIDB_LoadData((struct Element *)param_1);
     }
-    if (LLIDB_FindElement("DSCHOOL BLUE CAR", (unsigned int *)&param_1, 0) == 0) {
-        DSchoolBlueCarData = LLIDB_LoadData(param_1);
+    if (LLIDB_FindElement("DSCHOOL BLUE CAR", (struct Element **)&param_1, 0) == 0) {
+        DSchoolBlueCarData = LLIDB_LoadData((struct Element *)param_1);
     }
     DrivingSchoolRide->flags |= 0x420;
     Load_FXList(DRIVING_SCHOOL_SFX, 6);
@@ -240,7 +240,7 @@ void LoadDrivingSchoolResources(struct DSHead *param_1) {
 
 // FUNCTION: LEGOLAND 0x00405460
 void UnloadDrivingSchoolResources(void) {
-    unsigned int local;
+    struct Element *local;
 
     // STRING: LEGOLAND 0x004b454c
     if (LLIDB_FindElement("DSCHOOL MAPPING", &local, 0) == 0) {
@@ -284,7 +284,7 @@ void DrivingSchoolSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = DrivingSchoolRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
     DefaultCursor(&DAT_0082f760);
     memcpy(DAT_0082f760.field_1414, DAT_004b4440, 20);
     DAT_0082f760.field_1828 |= 0x100;
@@ -339,7 +339,7 @@ void DrivingSchoolAddObject(struct Element *param_1, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00405740
-void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsigned int param_3) {
+void DrivingSchoolCalcCursor(struct DSHead *param_1, int *param_2, unsigned int param_3) {
     struct DSCursorSource *src = param_1->ride;
     struct DSCursorSource *c694;
     unsigned int mapx;
@@ -371,10 +371,10 @@ void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsig
     DAT_0082df20.tile_x = c694->footprint_x0 + mapx;
     DAT_0082df20.tile_y = c694->footprint_y0 + mapy;
 
-    ValidateCursor(&DAT_0082df20, (unsigned int)src);
-    ValidateCursor(&DAT_0082c6e0, (unsigned int)src);
-    ValidateCursor(&DAT_0082f760, (unsigned int)src);
-    ValidateCursor(&EditCursor, (unsigned int)src);
+    ValidateCursor(&DAT_0082df20, src);
+    ValidateCursor(&DAT_0082c6e0, src);
+    ValidateCursor(&DAT_0082f760, src);
+    ValidateCursor(&EditCursor, src);
 
     EditCursor.field_1830 = (unsigned int)&DAT_0082f760;
     DAT_0082f760.field_1830 = (unsigned int)&DAT_0082c6e0;
@@ -383,7 +383,7 @@ void DrivingSchoolCalcCursor(struct DSHead *param_1, unsigned int param_2, unsig
 }
 
 // FUNCTION: LEGOLAND 0x004058a0
-void DrivingSchoolDCalcCursor(unsigned int param_1, unsigned int param_2) {
+void DrivingSchoolDCalcCursor(struct Element *param_1, struct Point *param_2) {
     struct RideQueueEntry *node = DAT_004cbeac;
 
     BasicObjectDCalcCursor(param_1, param_2);
@@ -404,14 +404,14 @@ void DrivingSchoolDCalcCursor(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00405940
-void DrivingSchoolRemoveObject(Element *obj, TileId tile, unsigned int param_3) {
+void DrivingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *param_3) {
     struct RideQueueEntry *queue = DAT_004cbeac;
     struct CountNode *count = (struct CountNode *)DrivingSchoolCountList;
     struct DSBlokeNode *blokes = (struct DSBlokeNode *)DAT_004c10d4;
     struct RideQueueEntry *next;
     struct DSBlokeNode *nextBloke;
 
-    StandardRemoveObject((Element *)obj, tile, (struct Cursor *)param_3);
+    StandardRemoveObject(obj, tile, (struct Cursor *)param_3);
     DefaultCursor(&DAT_0082f760);
     memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
 

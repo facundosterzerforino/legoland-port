@@ -4,4 +4,6 @@
 
 #include "objclass.h"
 
-void GardenGetInterfaces(struct ClassNode *head, struct CallbackTable *iface);
+struct Ride;
+struct ClassNode;
+void GardenGetInterfaces(struct ClassNode *head, struct Ride *iface);

@@ -170,7 +170,7 @@ void FUN_00452030(void) {
     EditCursor.tile_y = min_y;
     EditCursor.field_1830 = 0;
     if (validate) {
-        ValidateCursor(&EditCursor, (unsigned int)EditMode.unk8);
+        ValidateCursor(&EditCursor, EditMode.unk8);
     } else {
         ResetCursorBuildable(&EditCursor);
     }
@@ -178,7 +178,7 @@ void FUN_00452030(void) {
 
 // FUNCTION: LEGOLAND 0x00452390
 void FUN_00452390(void) {
-    struct ObjClass *cls;
+    struct Ride *cls;
 
     if (EditMode.unk0 == 2 && QueryClass != NULL) {
         cls = QueryClass;
@@ -308,7 +308,7 @@ LEGO_EXPORT void ReadGameButtons(void) {
                     GamePad = GamePad | 8;
                     DAT_00813ae0 = GetTicks();
                 }
-                ScreenToMapRef((unsigned int)&MousePos, (int *)&mp, 0);
+                ScreenToMapRef(&MousePos, &mp, 0);
                 if (MouseTileX != mp.x || MouseTileY != mp.y) {
                     MouseTileY = mp.y;
                     MouseTileX = mp.x;

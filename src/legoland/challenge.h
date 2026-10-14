@@ -24,6 +24,8 @@ struct AdvisorObject;
 
 unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1);
 void UpdateAppraisalPageButtons(void);
+struct TextureNode;
+struct Image;
 void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_2);
 void SetNextAdvisorAnimState(unsigned int param_1, unsigned int param_2);
 void ResetReportFlags(void);

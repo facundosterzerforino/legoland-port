@@ -47,4 +47,6 @@ void CoptersRenderLayer(struct CopterNode *node, int index, unsigned int param_3
 void FUN_004049a0(struct CopterNode *node, int param);
 void CoptersPlaceRider(struct CopterNode *node, int index);
 
-void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces);
+struct Ride;
+struct ClassNode;
+void CoptersRide(struct ClassNode *name, struct Ride *interfaces);

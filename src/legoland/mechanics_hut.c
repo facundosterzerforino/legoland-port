@@ -26,13 +26,13 @@ void LoadMechHutMaskSprite(Element *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d2a0
-unsigned int MechanicsHutAddObject(struct Element *param1, unsigned int param2) {
+unsigned int MechanicsHutAddObject(struct Element *param1, int *param2) {
     return AddBasicObject(param1, param2);
 }
 
 // FUNCTION: LEGOLAND 0x0043d2c0
 void MechanicsHutRemoveObject(Element *obj, unsigned int tile, struct Cursor *cursor) {
-    StandardRemoveObject((Element *)obj, *(TileId *)&tile, cursor);
+    StandardRemoveObject(obj, *(TileId *)&tile, cursor);
     FUN_0043d7c0(obj->ride, tile, 0);
 }
 

@@ -84,7 +84,7 @@ void GeneralStoreSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = GeneralStoreBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00437670
@@ -329,7 +329,7 @@ void SheriffSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = SheriffBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00437c30
@@ -531,7 +531,7 @@ void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Curso
     if (cell != NULL) {
         FUN_00437fc0(cell);
     }
-    StandardRemoveObject((Element *)editObj, coords, cursor);
+    StandardRemoveObject(editObj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)editObj->building, coords);
 }
 
@@ -560,7 +560,7 @@ void JailCellSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = DAT_0081cb10;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00438150
@@ -857,7 +857,7 @@ void BankSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = BankBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00438900
@@ -1018,7 +1018,7 @@ void SaloonSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = SaloonBuilding;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00438d00

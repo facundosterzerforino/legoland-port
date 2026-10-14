@@ -37,12 +37,12 @@
 
 // FUNCTION: LEGOLAND 0x00452c20
 LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
-    struct CallbackTable *iface = head->iface;
+    struct Ride *iface = head->iface;
 
     if (_stricmp(head->name, "PATH CONTROL") == 0) {
         iface->cb_98 = AddBasicPath;
         iface->cb_9c = RemoveBasicPath;
-        iface->cb_a0 = DrawBasicPath;
+        iface->cb_sprite = DrawBasicPath;
     }
     // STRING: LEGOLAND 0x004b8a64
     else if (_stricmp(head->name, "FOUNTAIN 1") == 0 ||
@@ -94,11 +94,11 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = DrivingSchoolDCalcCursor;
         iface->cb_98 = DrivingSchoolAddObject;
         iface->cb_9c = DrivingSchoolRemoveObject;
-        iface->cb_a8 = DrivingSchoolUpdate;
-        iface->cb_a0 = GetDrivingSchoolSpriteInfo;
+        iface->cb_pre_render = DrivingSchoolUpdate;
+        iface->cb_sprite = GetDrivingSchoolSpriteInfo;
         iface->cb_b0 = RenderDrivingSchool;
-        iface->cb_bc = DrivingSchool_Save;
-        iface->cb_b8 = DrivingSchool_Load;
+        iface->save_hook = DrivingSchool_Save;
+        iface->load_hook = DrivingSchool_Load;
         iface->cb_ac = UnloadDrivingSchoolResources;
         iface->cb_c0 = FUN_00406050;
     }
@@ -123,7 +123,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     } else if (_stricmp("ENTRANCE 1", head->name) == 0) {
         iface->cb_a4 = LoadEntranceResources;
         iface->cb_ac = UnloadEntranceResources;
-        iface->cb_a8 = Entrance1Update;
+        iface->cb_pre_render = Entrance1Update;
         iface->cb_b0 = RenderEntrance;
         iface->cb_9c = EntranceRemoveObject;
     } else if (_stricmp("POTTING SHED", head->name) == 0) {
@@ -131,32 +131,32 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_8c = PottingShedSetEditMode;
         iface->cb_98 = PottingShedAddObject;
         iface->cb_9c = PottingShedRemoveObject;
-        iface->cb_a8 = PottingShedUpdate;
+        iface->cb_pre_render = PottingShedUpdate;
         iface->cb_b0 = RenderPottingShed;
         iface->cb_ac = KillGShedMatteSprite;
-        iface->cb_a0 = GetPottingShedSpriteInfo;
+        iface->cb_sprite = GetPottingShedSpriteInfo;
     } else if (_stricmp("MECHANICS HUT", head->name) == 0) {
         iface->cb_a4 = LoadMechHutMaskSprite;
         iface->cb_8c = MechanicsHutSetEditMode;
         iface->cb_98 = MechanicsHutAddObject;
         iface->cb_9c = MechanicsHutRemoveObject;
-        iface->cb_a8 = MechanicsHutUpdate;
+        iface->cb_pre_render = MechanicsHutUpdate;
         iface->cb_b0 = RenderMechanicsHut;
         iface->cb_ac = KillMechHutMaskSprite;
-        iface->cb_a0 = GetMechanicsHutSpriteInfo;
+        iface->cb_sprite = GetMechanicsHutSpriteInfo;
     }
     // STRING: LEGOLAND 0x004b8990
     else if (_stricmp("CAROUSEL", head->name) == 0) {
         iface->cb_a4 = LoadCarouselResources;
         iface->cb_ac = UnloadCarouselResources;
         iface->cb_8c = CarouselSetEditMode;
-        iface->cb_a8 = CarouselUpdate;
+        iface->cb_pre_render = CarouselUpdate;
         iface->cb_b0 = RenderCarousel;
         iface->cb_9c = CarouselRemoveObject;
         iface->cb_98 = CarouselAddObject;
-        iface->cb_a0 = GetCarouselSpriteInfo;
-        iface->cb_b8 = Carousel_Load;
-        iface->cb_bc = Carousel_Save;
+        iface->cb_sprite = GetCarouselSpriteInfo;
+        iface->load_hook = Carousel_Load;
+        iface->save_hook = Carousel_Save;
     }
     // STRING: LEGOLAND 0x004b8984
     else if (_stricmp("BALLOONZ", head->name) == 0) {
@@ -164,31 +164,31 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_8c = BalloonzSetEditMode;
         iface->cb_98 = BalloonzAddObject;
         iface->cb_9c = BalloonzRemoveObject;
-        iface->cb_a8 = BalloonzUpdate;
+        iface->cb_pre_render = BalloonzUpdate;
         iface->cb_b0 = RenderBalloonz;
         iface->cb_ac = UnloadBalloonzResources;
-        iface->cb_a0 = GetBalloonzSpriteInfo;
-        iface->cb_bc = SaveBalloonNodes;
-        iface->cb_b8 = Balloonz_Load;
+        iface->cb_sprite = GetBalloonzSpriteInfo;
+        iface->save_hook = SaveBalloonNodes;
+        iface->load_hook = Balloonz_Load;
     }
     // STRING: LEGOLAND 0x004b8970
     else if (_stricmp("EARTH SLIDE RIDE", head->name) == 0) {
         iface->cb_a4 = LoadEarthSlideResources;
         iface->cb_ac = UnloadEarthSlideResources;
         iface->cb_8c = EarthSlideSetEditMode;
-        iface->cb_a8 = EarthSlideRideUpdate;
+        iface->cb_pre_render = EarthSlideRideUpdate;
         iface->cb_b0 = RenderEarthSlide;
         iface->cb_9c = EarthSlideRemoveObject;
         iface->cb_98 = EarthSlideAddObject;
-        iface->cb_bc = EarthSlideRide_Save;
-        iface->cb_b8 = EarthSlideRide_Load;
+        iface->save_hook = EarthSlideRide_Save;
+        iface->load_hook = EarthSlideRide_Load;
     }
     // STRING: LEGOLAND 0x004b8964
     else if (_stricmp("CASTLE BBQ", head->name) == 0) {
         iface->cb_a4 = LoadCastleBBQResources;
         iface->cb_ac = UnloadCastleBBQResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = CastleBBQUpdate;
+        iface->cb_pre_render = CastleBBQUpdate;
         iface->cb_b0 = RenderCastleBBQ;
         iface->cb_98 = CastleBBQAddObject;
         iface->cb_9c = CastleBBQRemoveObject;
@@ -198,7 +198,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartDrinkResources;
         iface->cb_ac = UnloadFoodcartDrinkResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FoodcartDrinkUpdate;
+        iface->cb_pre_render = FoodcartDrinkUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -207,7 +207,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartFoodResources;
         iface->cb_ac = UnloadFoodcartFoodResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FoodcartFoodUpdate;
+        iface->cb_pre_render = FoodcartFoodUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -216,7 +216,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadFoodcartIcecreamResources;
         iface->cb_ac = UnloadFoodcartIcecreamResources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = FoodcartIcecreamUpdate;
+        iface->cb_pre_render = FoodcartIcecreamUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = FUN_0042e830;
     }
@@ -225,7 +225,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadOctopusCafeResources;
         iface->cb_98 = OctopusCafeAddObject;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = OctopusCafeUpdate;
+        iface->cb_pre_render = OctopusCafeUpdate;
         iface->cb_9c = EateryRemoveObject;
         iface->cb_b0 = RenderOctopusCafe;
         iface->cb_ac = UnloadOctopusCafeResources;
@@ -234,25 +234,25 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
     else if (_stricmp("RESTAURANT 1", head->name) == 0) {
         iface->cb_a4 = LoadRestaurant1Resources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = Restaurant1Update;
+        iface->cb_pre_render = Restaurant1Update;
         iface->cb_98 = Restaurant1AddObject;
         iface->cb_9c = Restaurant1RemoveObject;
         iface->cb_ac = KillRestMaskSpritesAndMoneySFX;
         iface->cb_b0 = RenderRestaurant1;
-        iface->cb_bc = Restaurant1_Save;
-        iface->cb_b8 = Restaurant1_Load;
+        iface->save_hook = Restaurant1_Save;
+        iface->load_hook = Restaurant1_Load;
     }
     // STRING: LEGOLAND 0x004b8900
     else if (_stricmp("RESTAURANT 2", head->name) == 0) {
         iface->cb_a4 = LoadRestaurant2Resources;
         iface->cb_8c = EaterySetEditMode;
-        iface->cb_a8 = Restaurant2Update;
+        iface->cb_pre_render = Restaurant2Update;
         iface->cb_98 = Restaurant2AddObject;
         iface->cb_9c = Restaurant2RemoveObject;
-        iface->cb_a0 = GetRestaurant2SpriteInfo;
+        iface->cb_sprite = GetRestaurant2SpriteInfo;
         iface->cb_ac = UnloadRestaurant2Resources;
-        iface->cb_bc = Restaurant2_Save;
-        iface->cb_b8 = Restaurant2_Load;
+        iface->save_hook = Restaurant2_Save;
+        iface->load_hook = Restaurant2_Load;
         iface->cb_b0 = RenderRestaurant2;
     }
     // STRING: LEGOLAND 0x004b88f4
@@ -260,7 +260,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadChuckWagonResources;
         iface->cb_8c = EaterySetEditMode;
         iface->cb_9c = EateryRemoveObject;
-        iface->cb_a8 = ChuckWagonUpdate;
+        iface->cb_pre_render = ChuckWagonUpdate;
         iface->cb_b0 = RenderChuckWagon;
         iface->cb_ac = UnloadChuckWagonResources;
     }
@@ -270,7 +270,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_ac = UnloadSharkCafeResources;
         iface->cb_8c = EaterySetEditMode;
         iface->cb_9c = EateryRemoveObject;
-        iface->cb_a8 = SharkCafeUpdate;
+        iface->cb_pre_render = SharkCafeUpdate;
         iface->cb_b0 = FUN_0042e830;
     }
     // STRING: LEGOLAND 0x004b83dc
@@ -278,7 +278,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_a4 = LoadBrollyImages;
         iface->cb_8c = BrollySetEditMode;
         iface->cb_98 = BrollyAddObject;
-        iface->cb_a0 = GetBrollySpriteInfo;
+        iface->cb_sprite = GetBrollySpriteInfo;
         iface->cb_ac = UnloadBrollyImages;
     } else if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
         iface->cb_a4 = BoatingSchoolWaterLoad;
@@ -295,10 +295,10 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = BoatingSchoolDCalcCursor;
         iface->cb_98 = BoatingSchoolAddObject;
         iface->cb_9c = BoatingSchoolRemoveObject;
-        iface->cb_a8 = BoatingSchoolUpdate;
+        iface->cb_pre_render = BoatingSchoolUpdate;
         iface->cb_b0 = RenderBoatingSchool;
-        iface->cb_bc = BoatingSchool_Save;
-        iface->cb_b8 = BoatingSchool_Load;
+        iface->save_hook = BoatingSchool_Save;
+        iface->load_hook = BoatingSchool_Load;
         iface->cb_c0 = FUN_0041b100;
     }
     // STRING: LEGOLAND 0x004b5354
@@ -326,10 +326,10 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = JungleCruiseDCalcCursor;
         iface->cb_98 = JungleCruiseAddObject;
         iface->cb_9c = JungleCruiseRemoveObject;
-        iface->cb_a8 = JungleCruiseUpdate;
+        iface->cb_pre_render = JungleCruiseUpdate;
         iface->cb_b0 = RenderJungleCruise;
-        iface->cb_bc = JungleCruise_Save;
-        iface->cb_b8 = JungleCruise_Load;
+        iface->save_hook = JungleCruise_Save;
+        iface->load_hook = JungleCruise_Load;
         iface->cb_c0 = FUN_00436160;
     }
     // STRING: LEGOLAND 0x004b88b8
@@ -341,7 +341,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = JungleCruiseMonkeyTreeDCalcCursor;
         iface->cb_98 = MonkeyTreeAddObject;
         iface->cb_9c = MonkeyTreeRemoveObject;
-        iface->cb_a0 = GetMonkeyTreeSpriteInfo;
+        iface->cb_sprite = GetMonkeyTreeSpriteInfo;
     }
     // STRING: LEGOLAND 0x004b889c
     else if (_stricmp("JUNGLE CRUISE MONKEY FISH", head->name) == 0) {
@@ -352,7 +352,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
         iface->cb_94 = JungleCruiseMonkeyFishDCalcCursor;
         iface->cb_98 = MonkeyFishAddObject;
         iface->cb_9c = MonkeyFishRemoveObject;
-        iface->cb_a0 = GetMonkeyFishSpriteInfo;
+        iface->cb_sprite = GetMonkeyFishSpriteInfo;
     }
 
     CastleLevel1_GetInterfaces(head, iface);

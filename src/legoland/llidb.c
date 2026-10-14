@@ -21,6 +21,7 @@
 #include "wndenv.h"
 
 #include "image_sprite.h"
+#include "obj_instance.h"
 
 #define LLIDB_PAGE(id) ((id) >> 8)
 #define LLIDB_SLOT(id) ((id) & 0xff)
@@ -41,7 +42,7 @@ struct SpriteManager {
     struct Sprite **sprites;
     int *data_c;
     int *data_10;
-    unsigned int data_14;
+    struct Element *data_14;
     void *data_18;
     void *data_1c;
     void *data_20;
@@ -61,50 +62,6 @@ struct LLIDBHead {
     unsigned int flags;
     void *data;
     int refcount;
-};
-
-struct ODFAnim {
-    unsigned int handle;
-    unsigned char pad_4[0x14 - 0x4];
-    unsigned int type;
-};
-
-struct ODFSprite {
-    unsigned char pad_0[8];
-    struct ODFAnim *anim;
-};
-
-struct ODFObject {
-    struct ODFObject *next;
-    int data_4;
-    unsigned int data_8;
-    unsigned char pad_c[0x1c - 0xc];
-    unsigned int flags;
-    unsigned char pad_20[0x26 - 0x20];
-    short key_26;
-    unsigned char pad_28[0x2a - 0x28];
-    short order;
-    unsigned char pad_2c[0x4c - 0x2c];
-    unsigned int data_4c;
-    void *desc;
-    void *script;
-    unsigned int elem_58;
-    unsigned int elem_5c;
-    unsigned int elem_60;
-    struct ODFSprite *sprite_0;
-    struct ODFSprite *sprite_1;
-    struct ODFSprite *sprite_2;
-    unsigned int handle;
-    unsigned int data_74;
-    void *data_78;
-    void *data_7c;
-    void *data_80;
-    unsigned char pad_84[0xa4 - 0x84];
-    void (*callback)(void *);
-    unsigned char pad_a8[0xac - 0xa8];
-    void (*cleanup)(void *);
-    unsigned char pad_b0[0xc4 - 0xb0];
-    void *cleanup_arg;
 };
 
 // FUNCTION: LEGOLAND 0x0047aff0
@@ -205,7 +162,7 @@ LEGO_EXPORT int LLIDB_GetElement(unsigned int index, struct Element **output) {
 }
 
 // FUNCTION: LEGOLAND 0x0047b330
-LEGO_EXPORT int LLIDB_FindElement(const char *name, unsigned int *out, unsigned int *index_out) {
+LEGO_EXPORT int LLIDB_FindElement(const char *name, struct Element **out, unsigned int *index_out) {
     unsigned int i;
 
     if (name == NULL) {
@@ -220,7 +177,7 @@ LEGO_EXPORT int LLIDB_FindElement(const char *name, unsigned int *out, unsigned 
         for (i = 0; i < LLIDB_ElementCount; i++) {
             if (_stricmp(name, LLIDB_ELEM(i)->name) == 0) {
                 if (out != NULL) {
-                    *out = (unsigned int)LLIDB_ELEM(i);
+                    *out = LLIDB_ELEM(i);
                 }
                 if (index_out != NULL) {
                     *index_out = i;
@@ -242,12 +199,12 @@ LEGO_EXPORT int LLIDB_FindElement(const char *name, unsigned int *out, unsigned 
 LEGO_EXPORT struct Element *ElemID(const char *name) {
     struct Element *element;
 
-    LLIDB_FindElement(name, (unsigned int *)&element, NULL);
+    LLIDB_FindElement(name, &element, NULL);
     return element;
 }
 
 // FUNCTION: LEGOLAND 0x0047b410
-LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, unsigned int *out, unsigned int *index_out) {
+LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, struct Element **out, unsigned int *index_out) {
     unsigned int i;
 
     if (data == NULL) {
@@ -262,7 +219,7 @@ LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, unsigned int *out, unsi
         for (i = 0; i < LLIDB_ElementCount; i++) {
             if (data == LLIDB_ELEM(i)->data) {
                 if (out != NULL) {
-                    *out = (unsigned int)LLIDB_ELEM(i);
+                    *out = LLIDB_ELEM(i);
                 }
                 if (index_out != NULL) {
                     *index_out = i;
@@ -347,7 +304,7 @@ LEGO_EXPORT unsigned int LLIDB_RegisterNewElement(const char *param_1, const cha
     char *page_off;
     unsigned int slot_off;
     char *copy;
-    unsigned int found;
+    struct Element *found;
 
     if (param_1 == NULL || param_1[0] == '\0') {
         return (unsigned int)LLIDB_ERR_NOKEY;
@@ -671,10 +628,10 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     char filename[0x100];
     char dllname[0x100];
     unsigned int size;
-    unsigned int element;
+    struct Element *element;
     int lang_count;
     struct ResFile *file;
-    struct ODFObject *obj;
+    struct Ride *obj;
     struct Image *sprite_image;
     struct Sprite *sprite;
     int i;
@@ -688,22 +645,22 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         return NULL;
     }
 
-    obj = (struct ODFObject *)malloc(0xd0);
+    obj = (struct Ride *)malloc(0xd0);
     memset(obj, 0, 0xd0);
     if (obj == NULL) {
         return NULL;
     }
 
-    obj->cleanup_arg = head;
+    obj->element = head;
     head->data = obj;
     RES_ReadFile(file, &size, 4);
-    RES_ReadFile(file, &obj->data_4, size - 4);
-    obj->data_4c = 0;
-    obj->next = (struct ODFObject *)ObjectClassList;
+    RES_ReadFile(file, &obj->instances, size - 4);
+    obj->footprint.next = 0;
+    obj->next = (struct Ride *)ObjectClassList;
     ObjectClassList = obj;
-    lang_count = obj->data_4;
-    obj->data_4 = 0;
-    obj->data_8 = 0;
+    lang_count = obj->instances;
+    obj->instances = 0;
+    obj->field_8 = 0;
 
     RES_ReadFile(file, &size, 4);
     if (size != 0) {
@@ -732,9 +689,9 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     name[size] = '\0';
     if (name[0] != '\0') {
         LLIDB_FindElement(name, &element, NULL);
-        obj->elem_58 = element;
+        obj->parent_element = element;
     } else {
-        obj->elem_58 = 0;
+        obj->parent_element = 0;
     }
 
     RES_ReadFile(file, &size, 4);
@@ -746,9 +703,9 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     name[size] = '\0';
     if (name[0] != '\0') {
         LLIDB_FindElement(name, &element, NULL);
-        obj->elem_5c = element;
+        obj->theme_element = element;
     } else {
-        obj->elem_5c = 0;
+        obj->theme_element = 0;
     }
 
     RES_ReadFile(file, &size, 4);
@@ -756,9 +713,9 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     name[size] = '\0';
     if (name[0] != '\0') {
         LLIDB_FindElement(name, &element, NULL);
-        obj->elem_60 = element;
+        obj->menu_element = element;
     } else {
-        obj->elem_60 = 0;
+        obj->menu_element = 0;
     }
 
     NEWFLC_PauseType = 1;
@@ -769,7 +726,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     if ((obj->flags & LLIDB_FLAG_NODATA) == 0) {
         if (name[0] != '\0') {
             sprite = LoadSprite(name, 1);
-            obj->sprite_0 = (struct ODFSprite *)sprite;
+            obj->layer = (struct Sprite *)sprite;
             if (sprite != 0 && (sprite_image = sprite->image) != NULL) {
                 if ((sprite->flags & 0x8000) == 0 &&
                     (sprite_image->field_14 == 2 || sprite_image->field_14 == 3)) {
@@ -779,11 +736,11 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             }
         } else {
             // STRING: LEGOLAND 0x004bc37c
-            DebugTrace("Class %s has no sprite name.", *(char **)obj->cleanup_arg);
-            obj->sprite_0 = NULL;
+            DebugTrace("Class %s has no sprite name.", *(char **)obj->element);
+            obj->layer = NULL;
         }
     } else {
-        obj->sprite_0 = NULL;
+        obj->layer = NULL;
     }
     NEWFLC_PauseType = 2;
     NEWFLC_AutoPlay = 0;
@@ -791,15 +748,15 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     RES_ReadFile(file, name, size);
     name[size] = '\0';
     if (name[0] != '\0') {
-        obj->sprite_1 = (struct ODFSprite *)LoadSprite(name, 4);
+        obj->icon = (struct Sprite *)LoadSprite(name, 4);
     } else {
         // STRING: LEGOLAND 0x004bc360
-        DebugTrace("Class %s has no icon name.", *(char **)obj->cleanup_arg);
-        obj->sprite_1 = NULL;
+        DebugTrace("Class %s has no icon name.", *(char **)obj->element);
+        obj->icon = NULL;
     }
-    if (obj->sprite_1 == NULL) {
+    if (obj->icon == NULL) {
         // STRING: LEGOLAND 0x004bc34c
-        obj->sprite_1 = (struct ODFSprite *)LoadSprite("InstituteIcon.lls", 4);
+        obj->icon = (struct Sprite *)LoadSprite("InstituteIcon.lls", 4);
     }
 
     RES_ReadFile(file, &size, 4);
@@ -807,10 +764,10 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     name[size] = '\0';
     if (name[0] != '\0') {
         sprite = LoadSprite(name, 1);
-        obj->sprite_2 = (struct ODFSprite *)sprite;
+        obj->anim = (struct Sprite *)sprite;
         if (sprite != 0 && (sprite->flags & 0x8000) != 0) {
-            for (j = 0; j < (int)((struct Sprite *)obj->sprite_2)->image->aux; j++) {
-                sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->sprite_2, j);
+            for (j = 0; j < (int)((struct Sprite *)obj->anim)->image->aux; j++) {
+                sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->anim, j);
                 if (sprite != 0 && (sprite = (struct Sprite *)GetLLSForSprite((struct Sprite *)sprite)) != 0) {
                     LLSStop((struct LLS *)sprite);
                 }
@@ -818,8 +775,8 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         }
     } else {
         // STRING: LEGOLAND 0x004bc328
-        DebugTrace("Class %s has no build anim name.", *(char **)obj->cleanup_arg);
-        obj->sprite_2 = NULL;
+        DebugTrace("Class %s has no build anim name.", *(char **)obj->element);
+        obj->anim = NULL;
     }
 
     RES_ReadFile(file, &size, 4);
@@ -839,20 +796,20 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
             RES_ReadFile(file, name, size);
             name[size] = '\0';
             if (i == 0 || _stricmp(LanguageName, name) == 0) {
-                if (obj->data_78 != NULL) {
-                    free(obj->data_78);
+                if (obj->name != NULL) {
+                    free(obj->name);
                 }
                 RES_ReadFile(file, &size, 4);
-                obj->data_78 = malloc(size + 1);
-                RES_ReadFile(file, obj->data_78, size);
-                ((char *)obj->data_78)[size] = '\0';
-                if (obj->data_7c != NULL) {
-                    free(obj->data_7c);
+                obj->name = malloc(size + 1);
+                RES_ReadFile(file, obj->name, size);
+                ((char *)obj->name)[size] = '\0';
+                if (obj->field_7c != NULL) {
+                    free(obj->field_7c);
                 }
                 RES_ReadFile(file, &size, 4);
-                obj->data_7c = malloc(size + 1);
-                RES_ReadFile(file, obj->data_7c, size);
-                ((char *)obj->data_7c)[size] = '\0';
+                obj->field_7c = malloc(size + 1);
+                RES_ReadFile(file, obj->field_7c, size);
+                ((char *)obj->field_7c)[size] = '\0';
                 if (obj->data_80 != NULL) {
                     free(obj->data_80);
                 }
@@ -872,19 +829,19 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         } while (i < lang_count);
     }
 
-    obj->data_74 = 0;
+    obj->sprites = 0;
     RES_CloseFile(file);
-    SetStandardCallbacks((struct CallbackTable *)obj);
+    SetStandardCallbacks((struct Ride *)obj);
     if ((obj->flags & LLIDB_FLAG_USEDLL) == 0 || text[0] == '\0') {
-        SetCustomCallbacks(obj->cleanup_arg);
+        SetCustomCallbacks(obj->element);
     } else if (LoadObjectLibrary(obj, text) == 0) {
         obj->flags &= ~LLIDB_FLAG_USEDLL;
-        SetCustomCallbacks(obj->cleanup_arg);
-        if (obj->callback != NULL) {
-            obj->callback(obj->cleanup_arg);
+        SetCustomCallbacks(obj->element);
+        if (obj->cb_a4 != NULL) {
+            obj->cb_a4(obj->element);
         }
         // STRING: LEGOLAND 0x004bc2ec
-        DebugTrace("Class %s has OC_USEDLL attribute and DLL failed to load.", *(char **)obj->cleanup_arg);
+        DebugTrace("Class %s has OC_USEDLL attribute and DLL failed to load.", *(char **)obj->element);
     }
 
     if ((obj->flags & LLIDB_FLAG_NODATA) != 0) {
@@ -898,8 +855,8 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         }
     }
 
-    if (obj->order < 1) {
-        obj->order = 1;
+    if (obj->range < 1) {
+        obj->range = 1;
     }
     FUN_00480aa0((struct ObjClassNames *)head, (struct ObjectInfo *)obj);
     return obj;
@@ -907,21 +864,21 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
 
 // FUNCTION: LEGOLAND 0x0047c6a0
 void LLIDB_UnLoadODF(struct LLIDBHead *head) {
-    struct ODFObject *obj = (struct ODFObject *)head->data;
-    struct ODFObject *node;
+    struct Ride *obj = (struct Ride *)head->data;
+    struct Ride *node;
 
     if (obj == NULL) {
         return;
     }
 
-    if (obj->cleanup != NULL) {
-        obj->cleanup(obj->cleanup_arg);
+    if (obj->cb_ac != NULL) {
+        obj->cb_ac(obj->element);
     }
     if (obj->flags & LLIDB_FLAG_USEDLL) {
         UnLoadObjectLibrary(obj);
     }
 
-    node = (struct ODFObject *)ObjectClassList;
+    node = (struct Ride *)ObjectClassList;
     if (node == obj) {
         ObjectClassList = obj->next;
     } else {
@@ -936,33 +893,33 @@ void LLIDB_UnLoadODF(struct LLIDBHead *head) {
         }
     }
 
-    if (obj->sprite_0 != NULL) {
-        if (obj->sprite_0->anim->type == 2 || obj->sprite_0->anim->type == 3) {
-            LLSStop(obj->sprite_0->anim->handle);
+    if (obj->layer != NULL) {
+        if (obj->layer->anim->type == 2 || obj->layer->anim->type == 3) {
+            LLSStop(obj->layer->anim->lls);
         }
-        KillSprite((struct Sprite *)obj->sprite_0);
+        KillSprite((struct Sprite *)obj->layer);
     }
-    if (obj->sprite_1 != NULL) {
-        if (obj->sprite_1->anim->type == 2 || obj->sprite_1->anim->type == 3) {
-            LLSStop(obj->sprite_1->anim->handle);
+    if (obj->icon != NULL) {
+        if (obj->icon->anim->type == 2 || obj->icon->anim->type == 3) {
+            LLSStop(obj->icon->anim->lls);
         }
-        KillSprite((struct Sprite *)obj->sprite_1);
+        KillSprite((struct Sprite *)obj->icon);
     }
-    if (obj->sprite_2 != NULL) {
-        if (obj->sprite_2->anim->type == 2 || obj->sprite_2->anim->type == 3) {
-            LLSStop(obj->sprite_2->anim->handle);
+    if (obj->anim != NULL) {
+        if (obj->anim->anim->type == 2 || obj->anim->anim->type == 3) {
+            LLSStop(obj->anim->anim->lls);
         }
-        KillSprite((struct Sprite *)obj->sprite_2);
+        KillSprite((struct Sprite *)obj->anim);
     }
 
     if (obj->handle != 0) {
         LLIDB_UnLoadData(obj->handle);
     }
-    if (obj->data_78 != NULL) {
-        free(obj->data_78);
+    if (obj->name != NULL) {
+        free(obj->name);
     }
-    if (obj->data_7c != NULL) {
-        free(obj->data_7c);
+    if (obj->field_7c != NULL) {
+        free(obj->field_7c);
     }
     if (obj->data_80 != NULL) {
         free(obj->data_80);
@@ -981,7 +938,7 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
     struct Sprite *sprite;
     int size;
     struct ResFile *file;
-    struct ODFObject *obj;
+    struct Ride *obj;
     struct Element *e;
     char *text;
 
@@ -992,17 +949,17 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
         return NULL;
     }
 
-    obj = (struct ODFObject *)malloc(0xd0);
+    obj = (struct Ride *)malloc(0xd0);
     memset(obj, 0, 0xd0);
     if (obj == NULL) {
         RES_CloseFile(file);
         return NULL;
     }
 
-    obj->cleanup_arg = elem;
+    obj->element = elem;
     elem->data = NULL;
     RES_ReadFile(file, &size, 4);
-    RES_ReadFile(file, &obj->data_4, size - 4);
+    RES_ReadFile(file, &obj->instances, size - 4);
     RES_ReadFile(file, &size, 4);
     if (size != 0) {
         obj->desc = malloc(size);
@@ -1042,7 +999,7 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
     RES_ReadFile(file, name, size);
     name[size] = '\0';
     if (name[0] != '\0') {
-        LLIDB_FindElement(name, (unsigned int *)&DAT_007cb3bc, 0);
+        LLIDB_FindElement(name, &DAT_007cb3bc, 0);
         RES_ReadFile(file, &size, 4);
         RES_ReadFile(file, name, size);
         RES_ReadFile(file, &size, 4);
@@ -1074,7 +1031,7 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
         text[size] = '\0';
         RES_CloseFile(file);
         *name2 = text;
-        *key = obj->key_26;
+        *key = obj->cost;
         free(obj);
         return sprite;
     }
@@ -1090,7 +1047,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
     unsigned int count;
     int len;
     int ret;
-    unsigned int element;
+    struct Element *element;
     unsigned int tile_base;
     struct ResFile *file;
     struct SpriteManager *si;
@@ -1152,8 +1109,8 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct LLIDBHead *head) {
             if (LLIDB_FindElement(name, &element, NULL) == 0) {
                 head->data = si;
                 si->data_14 = element;
-                LLIDB_LoadData((void *)element);
-                *(struct SpriteManager **)(*(int *)(0xc + element) + 0x74) = si;
+                LLIDB_LoadData(element);
+                ((struct Ride *)element->data)->sprites = si;
             }
         }
     }
@@ -1194,7 +1151,7 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct LLIDBHead *head) {
     char name[0x200];
     int count;
     int len;
-    unsigned int element;
+    struct Element *element;
     struct ResFile *file;
     unsigned int *entries;
     unsigned int *entry;
@@ -1388,7 +1345,7 @@ LEGO_EXPORT void *LLIDB_LoadCSPData(struct LLIDBHead *head) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d3a0
-LEGO_EXPORT void *LLIDB_LoadData(void *handle) {
+LEGO_EXPORT void *LLIDB_LoadData(struct Element *handle) {
     struct LLIDBHead *head = (struct LLIDBHead *)handle;
     unsigned int flags = head->flags;
     void *data;
@@ -1433,7 +1390,7 @@ LEGO_EXPORT void *LLIDB_LoadData(void *handle) {
 }
 
 // FUNCTION: LEGOLAND 0x0047d450
-LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle) {
+LEGO_EXPORT void LLIDB_UnLoadData(struct Element *handle) {
     struct LLIDBHead *head = (struct LLIDBHead *)handle;
     unsigned int flags;
 

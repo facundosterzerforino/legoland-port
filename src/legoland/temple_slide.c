@@ -232,7 +232,7 @@ void TempleSlideSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)DAT_004cbf80;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00417280
@@ -241,7 +241,7 @@ void RemoveSlideObject(struct SlideObject *obj, TileId tile, struct Cursor *curs
     if (node != NULL) {
         RemoveSlideNode(node);
     }
-    StandardRemoveObject((Element *)obj, tile, cursor);
+    StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide((struct Ride *)obj->ride, tile);
 }
 
@@ -570,18 +570,18 @@ LEGO_EXPORT int LoadTempleSlide(struct SlideObject *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00417a00
-LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct CallbackTable *interfaces) {
+LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b4f8c
     if (_stricmp("TEMPLE SLIDE", ctx->name) == 0) {
         interfaces->cb_a4 = TempleSlideLoad;
         interfaces->cb_ac = TempleSlideUnload;
         interfaces->cb_8c = TempleSlideSetEditMode;
-        interfaces->cb_a8 = TempleSlideUpdate;
+        interfaces->cb_pre_render = TempleSlideUpdate;
         interfaces->cb_b0 = RenderTempleSlide;
         interfaces->cb_9c = RemoveSlideObject;
         interfaces->cb_98 = TempleSlideAddObject;
-        interfaces->cb_a0 = GetTempleSlideSpriteInfo;
-        interfaces->cb_bc = SaveTempleSlide;
-        interfaces->cb_b8 = LoadTempleSlide;
+        interfaces->cb_sprite = GetTempleSlideSpriteInfo;
+        interfaces->save_hook = SaveTempleSlide;
+        interfaces->load_hook = LoadTempleSlide;
     }
 }

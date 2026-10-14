@@ -309,7 +309,7 @@ void SpiderSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)DAT_004cbf20;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x004160a0
@@ -347,19 +347,19 @@ unsigned int *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
 }
 
 // FUNCTION: LEGOLAND 0x00416160
-void SpiderRide(struct ClassNode *name_ptr, struct CallbackTable *obj) {
+void SpiderRide(struct ClassNode *name_ptr, struct Ride *obj) {
     // STRING: LEGOLAND 0x004b4eb8
     if (_stricmp("SPIDER RIDE", name_ptr->name) == 0) {
         obj->cb_a4 = SpiderRideLoad;
         obj->cb_ac = SpiderRideUnload;
         obj->cb_8c = SpiderSetEditMode;
-        obj->cb_a8 = SpiderRideUpdate;
+        obj->cb_pre_render = SpiderRideUpdate;
         obj->cb_b0 = RenderSpider;
         obj->cb_9c = SpiderRemoveObject;
         obj->cb_98 = SpiderAddObject;
-        obj->cb_a0 = GetSpiderRideSpriteInfo;
-        obj->cb_bc = SaveSpider;
-        obj->cb_b8 = LoadSpider;
+        obj->cb_sprite = GetSpiderRideSpriteInfo;
+        obj->save_hook = SaveSpider;
+        obj->load_hook = LoadSpider;
     }
 }
 
@@ -543,7 +543,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef((int *)&bloke->person->screen, (int *)&bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;

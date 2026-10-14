@@ -4,10 +4,9 @@
 
 // Per-TU header for build.c — building/construction list helpers.
 
-struct ObjClass;
 struct Ride;
 
-LEGO_EXPORT int AddObjectToBuildList(struct ObjClass *obj, TileId coords);
+LEGO_EXPORT int AddObjectToBuildList(struct Ride *obj, TileId coords);
 LEGO_EXPORT void ClearBuildObjList(void);
 void RemoveObjectFromBuildList(TileId coords);
 LEGO_EXPORT void ProcessBuildingTimes(void);

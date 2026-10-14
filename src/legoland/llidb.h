@@ -28,7 +28,7 @@ struct Element {
     /* 0x0c */ union {
         void *data;
         struct Ride *ride;
-        struct MapObject *obj; /* map_object.c's view of the class */
+        struct Ride *obj; /* the class, as map_object.c names it */
     };
     /* 0x10 */ unsigned int field_10;
 };
@@ -70,15 +70,15 @@ LEGO_EXPORT unsigned int LLIDB_GetCount(void);
 LEGO_EXPORT int LLIDB_GetElement(unsigned int index, struct Element **output);
 struct Sprite;
 struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char ***after);
-LEGO_EXPORT int LLIDB_FindElement(const char *name, unsigned int *out, unsigned int *index_out);
-LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, unsigned int *out, unsigned int *index_out);
+LEGO_EXPORT int LLIDB_FindElement(const char *name, struct Element **out, unsigned int *index_out);
+LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, struct Element **out, unsigned int *index_out);
 LEGO_EXPORT struct Element *ElemID(const char *name);
 LEGO_EXPORT int LLIDB_LoadICM(void);
 LEGO_EXPORT int LLIDB_CloseICM(void);
 LEGO_EXPORT unsigned int LLIDB_RegisterNewElement(const char *param_1, const char *param_2, unsigned int param_3);
 LEGO_EXPORT void LLIDB_ClearOnLevel(void);
-LEGO_EXPORT void *LLIDB_LoadData(void *head);
-LEGO_EXPORT void LLIDB_UnLoadData(unsigned int handle);
+LEGO_EXPORT void *LLIDB_LoadData(struct Element *head);
+LEGO_EXPORT void LLIDB_UnLoadData(struct Element *handle);
 
 LEGO_EXPORT void LLSAuto(void);
 void LLSAdvanceFrame(struct LLS *param_1);

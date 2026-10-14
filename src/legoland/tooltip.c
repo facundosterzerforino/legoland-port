@@ -7,7 +7,7 @@
 #include "stream.h"
 
 // FUNCTION: LEGOLAND 0x0046d340
-void FUN_0046d340(unsigned int param_1) {
+void FUN_0046d340(const char *param_1) {
     if (SpeechIsPlaying() == 0) {
         if (param_1 == 0) {
             return;

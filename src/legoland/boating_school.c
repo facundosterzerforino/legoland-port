@@ -537,7 +537,7 @@ void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to) {
 
 // FUNCTION: LEGOLAND 0x00419d10
 void LoadBoatingSchoolResources(Element *obj) {
-    unsigned int handle;
+    struct Element *handle;
     int i;
     struct Sprite *sprite;
     int lls;
@@ -580,7 +580,7 @@ void LoadBoatingSchoolResources(Element *obj) {
 
 // FUNCTION: LEGOLAND 0x00419ef0
 void UnloadBoatingSchoolResources(void) {
-    unsigned int handle;
+    struct Element *handle;
     int i;
     struct Sprite *sprite;
     struct PathNode *path;
@@ -674,7 +674,7 @@ void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a2f0
-void BoatingSchoolCalcCursor(int param_1, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolCalcCursor(int param_1, int *param_2, unsigned int param_3) {
     struct Cursor *cursor = *(struct Cursor **)(param_1 + 0xc);
 
     BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
@@ -694,15 +694,15 @@ void BoatingSchoolCalcCursor(int param_1, unsigned int param_2, unsigned int par
     EditCursor.field_1830 = (unsigned int)&PathCursor;
     ResetCursorBuildable(&EditCursor);
     ResetCursorBuildable(&PathCursor);
-    ValidateCursor(&EditCursor, (unsigned int)cursor);
+    ValidateCursor(&EditCursor, cursor);
 }
 
 // FUNCTION: LEGOLAND 0x0041a3d0
-void BoatingSchoolDCalcCursor(void *param_1, unsigned int param_2) {
+void BoatingSchoolDCalcCursor(void *param_1, struct Point *param_2) {
     struct PathNode *path = BoatPathList;
     struct MermaidNode *node = MermaidList;
 
-    BasicObjectDCalcCursor((unsigned int)param_1, param_2);
+    BasicObjectDCalcCursor(param_1, param_2);
     PathCursor.tile_x = QueryCursor.tile_x;
     PathCursor.tile_y = QueryCursor.tile_y;
     PathCursor.field_1414[0] = QueryCursor.field_1414[2] + 1;
@@ -751,7 +751,7 @@ void BoatingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *cursor)
     int savedX;
     int savedY;
 
-    StandardRemoveObject((Element *)obj, tile, cursor);
+    StandardRemoveObject(obj, tile, cursor);
     for (y = BoatingSchoolFootprint.v[1]; y <= BoatingSchoolFootprint.v[3]; y++) {
         for (x = BoatingSchoolFootprint.v[0]; x <= BoatingSchoolFootprint.v[2]; x++) {
             RestoreBaseMap(cursor->tile_x + x, cursor->tile_y + y);
@@ -1166,7 +1166,7 @@ int FUN_0041b100(int dummy, int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b150
-LEGO_EXPORT void GetInterface(struct ClassNode *head, struct CallbackTable *iface) {
+LEGO_EXPORT void GetInterface(struct ClassNode *head, struct Ride *iface) {
     void **cb = (void **)iface;
     // STRING: LEGOLAND 0x004b537c
     if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
@@ -1266,7 +1266,7 @@ void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b4c0
-void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolMermaidCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     struct Ride *ride;
     unsigned int mask;
     unsigned short owner;
@@ -1285,7 +1285,7 @@ void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned
         SetCursorBlocked(&EditCursor, 0xe);
         return;
     }
-    ValidateCursor(&EditCursor, (unsigned int)ride);
+    ValidateCursor(&EditCursor, ride);
     if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
@@ -1342,7 +1342,7 @@ void BoatingSchoolMermaidCalcCursor(Element *obj, unsigned int param_2, unsigned
 }
 
 // FUNCTION: LEGOLAND 0x0041b6d0
-unsigned int BoatingSchoolMermaidDCalcCursor(unsigned int param_1, unsigned int param_2) {
+unsigned int BoatingSchoolMermaidDCalcCursor(struct Element *param_1, struct Point *param_2) {
     BasicObjectDCalcCursor(param_1, param_2);
     return 0; /* [port] the original returned whatever the call left in eax; callers ignore it */
 }
@@ -1356,7 +1356,7 @@ void BoatingSchoolMermaidRemoveObject(void *param_1, TileId tile, struct Cursor 
     int y;
     struct SampleSource source;
 
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     source.type = 2;
     source.x = tile.pos.x;
     source.y = tile.pos.y;
@@ -1406,7 +1406,7 @@ void BoatingSchoolSetEditMode(void) {
     memcpy(&state->footprint, &DAT_004b53c0, sizeof(DAT_004b53c0));
     DefaultCursor(&EditCursor);
     EditCursor.field_1828 |= 0x8;
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0041b8e0
@@ -1507,7 +1507,7 @@ void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0041bd40
-void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned int param_3) {
+void BoatingSchoolWaterCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     unsigned int mask;
     unsigned short owner;
     int n;
@@ -1525,7 +1525,7 @@ void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned i
     if (mask == 0) {
         SetCursorBlocked(&EditCursor, 0xe);
     } else {
-        ValidateCursor(&EditCursor, (unsigned int)obj->ride);
+        ValidateCursor(&EditCursor, obj->ride);
         if (IsCursorBuildable(&EditCursor) != 0) {
             rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
             rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
@@ -1595,7 +1595,7 @@ void BoatingSchoolWaterCalcCursor(Element *obj, unsigned int param_2, unsigned i
 }
 
 // FUNCTION: LEGOLAND 0x0041bfb0
-void BoatingSchoolWaterDCalcCursor(unsigned int param_1, int *coords) {
+void BoatingSchoolWaterDCalcCursor(struct Element *param_1, int *coords) {
     struct BoatRideNode *score = BoatRideNodeList;
     struct BoatRide *ride;
     struct MapElement *elem;
@@ -1627,7 +1627,7 @@ void BoatingSchoolWaterDCalcCursor(unsigned int param_1, int *coords) {
     }
     ride = BoatRideList;
     memcpy(&QueryClass->footprint, &DAT_004b53c0, sizeof(DAT_004b53c0));
-    BasicObjectDCalcCursor(param_1, (unsigned int)coords);
+    BasicObjectDCalcCursor(param_1, coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->tile_x && tile.pos.y == ride->tile_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
             SetCursorBlocked(&QueryCursor, 1);
@@ -1796,7 +1796,7 @@ void FUN_0041c620(void *param_1, TileId tile, struct Cursor *param_3) {
     struct PathNode *node = BoatPathList;
     struct PathNode *prev = NULL;
 
-    StandardRemoveObject((Element *)param_1, tile, param_3);
+    StandardRemoveObject(param_1, tile, param_3);
     while (node->tile.id != tile.id) {
         prev = node;
         node = node->next;

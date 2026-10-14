@@ -1032,18 +1032,18 @@ LEGO_EXPORT int Copters_Load(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00405110
-void CoptersRide(struct ClassNode *name, struct CallbackTable *interfaces) {
+void CoptersRide(struct ClassNode *name, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b43e4
     if (_stricmp("COPTERS", name->name) == 0) {
         interfaces->cb_a4 = CoptersLoad;
         interfaces->cb_8c = CoptersSetEditMode;
         interfaces->cb_98 = CoptersAddObject;
         interfaces->cb_9c = CoptersRemoveObject;
-        interfaces->cb_a8 = CoptersUpdate;
-        interfaces->cb_a0 = GetCoptersSpriteInfo;
+        interfaces->cb_pre_render = CoptersUpdate;
+        interfaces->cb_sprite = GetCoptersSpriteInfo;
         interfaces->cb_b0 = CoptersRender;
         interfaces->cb_ac = CoptersUnload;
-        interfaces->cb_bc = Copters_Save;
-        interfaces->cb_b8 = Copters_Load;
+        interfaces->save_hook = Copters_Save;
+        interfaces->load_hook = Copters_Load;
     }
 }

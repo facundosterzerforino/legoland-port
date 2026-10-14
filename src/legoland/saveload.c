@@ -212,7 +212,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         }
         for (i = 0; i < tab_count; i++) {
             DrawWatchSprite();
-            LLIDB_FindElementFromDataPtr(tab[i], (unsigned int *)&elem, 0);
+            LLIDB_FindElementFromDataPtr(tab[i], &elem, 0);
             len = strlen(elem->name);
             if (SaveGameWrite(&len, 4) == 0) {
                 {
@@ -737,7 +737,10 @@ LEGO_EXPORT int LoadGame(char *path) {
     struct RideNode *rnode_prev;
     struct Ride *entrance;
     struct MapElement *first;
-    int n;
+    union {
+        int n;
+        struct Element *e; /* the slot also holds element handles */
+    } u;
     unsigned int len;
     int m;
     char header[0x20];
@@ -779,16 +782,16 @@ LEGO_EXPORT int LoadGame(char *path) {
             goto fail;
         }
         name[len] = 0;
-        if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
+        if (LLIDB_FindElement(name, &u.e, 0) != 0) {
             goto fail;
         }
-        SavedElementTable[i] = (struct Element *)n;
+        SavedElementTable[i] = u.e;
         if (SaveGameRead(&m, 4) == 0) {
             goto fail;
         }
-        LLIDB_LoadData((void *)n);
-        ((struct Element *)n)->flags &= 0xfffcfff1;
-        ((struct Element *)n)->flags |= m;
+        LLIDB_LoadData(u.e);
+        (u.e)->flags &= 0xfffcfff1;
+        (u.e)->flags |= m;
     }
     {
         unsigned short *tab[256];
@@ -804,12 +807,12 @@ LEGO_EXPORT int LoadGame(char *path) {
                 goto fail;
             }
             name[len] = 0;
-            if (LLIDB_FindElement(name, (unsigned int *)&n, 0) != 0) {
+            if (LLIDB_FindElement(name, &u.e, 0) != 0) {
                 goto fail;
             }
-            DAT_007fd660[i] = n;
-            LLIDB_LoadData((void *)n);
-            tab[i] = ((struct Element *)n)->data;
+            DAT_007fd660[i] = u.e;
+            LLIDB_LoadData(u.e);
+            tab[i] = (u.e)->data;
         }
         if (SkipSaveGameDword() == 0) {
             goto fail;
@@ -879,12 +882,12 @@ LEGO_EXPORT int LoadGame(char *path) {
     while (FirstBloke != 0) {
         DestroyBloke(FirstBloke);
     }
-    n = 0;
+    u.n = 0;
     DrawWatchSprite();
-    if (SaveGameRead(&n, 4) == 0) {
+    if (SaveGameRead(&u.n, 4) == 0) {
         goto fail;
     }
-    while (n-- != 0) {
+    while (u.n-- != 0) {
         if (SaveGameRead(&m, 4) == 0) {
             goto fail;
         }
@@ -1043,11 +1046,11 @@ LEGO_EXPORT int LoadGame(char *path) {
                 goto fail;
             }
             inst_prev = 0;
-            n = 0;
-            if (SaveGameRead(&n, 4) == 0) {
+            u.n = 0;
+            if (SaveGameRead(&u.n, 4) == 0) {
                 goto fail;
             }
-            while (n-- != 0) {
+            while (u.n-- != 0) {
                 inst = malloc(sizeof(struct ObjInstance));
                 inst->next = 0;
                 inst->field_8 = (unsigned int)ride;
@@ -1070,11 +1073,11 @@ LEGO_EXPORT int LoadGame(char *path) {
                 }
             }
             rnode_prev = 0;
-            n = 0;
-            if (SaveGameRead(&n, 4) == 0) {
+            u.n = 0;
+            if (SaveGameRead(&u.n, 4) == 0) {
                 goto fail;
             }
-            while (n-- != 0) {
+            while (u.n-- != 0) {
                 rnode = malloc(sizeof(struct RideNode));
                 rnode->next = 0;
                 if (rnode_prev == 0) {
@@ -1122,24 +1125,24 @@ LEGO_EXPORT int LoadGame(char *path) {
     {
         char name2[0x200];
         struct OverlayParam ov;
-        SaveGameRead(&n, 4);
-        SaveGameRead(name2, n);
-        name2[n] = 0;
-        LLIDB_FindElement(name2, (unsigned int *)&OverlayILFHandle, 0);
+        SaveGameRead(&u.n, 4);
+        SaveGameRead(name2, u.n);
+        name2[u.n] = 0;
+        LLIDB_FindElement(name2, &OverlayILFHandle, 0);
         OverlayILF = (unsigned int)LLIDB_LoadData(OverlayILFHandle);
-        SaveGameRead(&n, 4);
-        if (n != 0) {
-            SaveGameRead(name2, n);
-            name2[n] = 0;
-            LLIDB_FindElement(name2, (unsigned int *)&BridgesHandle, 0);
+        SaveGameRead(&u.n, 4);
+        if (u.n != 0) {
+            SaveGameRead(name2, u.n);
+            name2[u.n] = 0;
+            LLIDB_FindElement(name2, &BridgesHandle, 0);
             BridgesData = LLIDB_LoadData(BridgesHandle);
             SetBridgeParamsByName(name2);
         } else {
             BridgesHandle = 0;
             BridgesData = 0;
         }
-        SaveGameRead(&n, 4);
-        for (i = 0; i < n; i++) {
+        SaveGameRead(&u.n, 4);
+        for (i = 0; i < u.n; i++) {
             SaveGameRead(&ov, 0x14);
             AddOvSav(&ov);
         }
@@ -1188,9 +1191,9 @@ LEGO_EXPORT void UnloadSaveGameMap(void) {
     }
 
     ClearGameMap();
-    LLIDB_UnLoadData((unsigned int)OverlayILFHandle);
+    LLIDB_UnLoadData(OverlayILFHandle);
     if (BridgesHandle != 0) {
-        LLIDB_UnLoadData((unsigned int)BridgesHandle);
+        LLIDB_UnLoadData(BridgesHandle);
     }
     ClearOverlays();
     FUN_004828f0();

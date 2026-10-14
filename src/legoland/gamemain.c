@@ -282,7 +282,7 @@ int FUN_004779a0(int x0, int y0, int x1, int y1) {
 void FUN_004779d0(struct Point *p) {
     struct MapElement *tile;
     struct Element *elem;
-    struct ObjClass *saved_class;
+    struct Ride *saved_class;
     struct Cursor saved;
     TileId t;
     struct Point pos;
@@ -305,13 +305,13 @@ void FUN_004779d0(struct Point *p) {
         elem = tile->field_0;
         saved_class = QueryClass;
         memcpy(&saved, &QueryCursor, sizeof(struct Cursor));
-        QueryClass = (struct ObjClass *)elem->data;
+        QueryClass = (struct Ride *)elem->data;
         t.pos.x = tile->field_4;
         ptmp60 = t.pos.x;
         pos.x = ptmp60;
         t.pos.y = tile->field_5;
         pos.y = t.pos.y;
-        QueryClass->method_94((unsigned int *)elem, &pos);
+        QueryClass->cb_94((unsigned int *)elem, &pos);
         if (tile->flags & 0x20) {
             if (QueryClass->flags & 0x200000) {
                 RemoveObjectFromBuildList(t);

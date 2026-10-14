@@ -97,12 +97,11 @@ struct Cursor {
 typedef struct Cursor Cursor;
 
 struct Point;
-struct ObjClass;
 
 void FUN_004598d0(struct Point *coord, int *param_2, int *param_3);
 void FUN_00459960(void);
 void FUN_00459970(void);
-LEGO_EXPORT void PutObjOnMap(struct ObjClass *obj, unsigned int classid, struct Point *pos);
+LEGO_EXPORT void PutObjOnMap(struct Ride *obj, unsigned int classid, struct Point *pos);
 LEGO_EXPORT int FindObjectsPower(struct Ride *ride);
 void FUN_0045a030(int power, struct MapElement *object);
 void FUN_0045a060(void);
@@ -118,7 +117,7 @@ LEGO_EXPORT struct MapElement *GetFirstRenderObject(void);
 LEGO_EXPORT struct MapElement *GetNextRenderObject(struct MapElement *object);
 LEGO_EXPORT struct MapElement *GetFirstObjectMatching(struct Element *cls);
 LEGO_EXPORT struct MapElement *GetNextObjectMatching(struct MapElement *object, struct Element *cls);
-LEGO_EXPORT void RemObjFromMap(struct ObjClass *obj, unsigned int classid, TileId tile, void *cursor);
+LEGO_EXPORT void RemObjFromMap(struct Ride *obj, unsigned int classid, TileId tile, void *cursor);
 void FUN_00459880(void);
 LEGO_EXPORT struct Point PlayfieldToMap(struct Point pos);
 LEGO_EXPORT void InitGameMap(void);

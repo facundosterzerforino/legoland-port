@@ -29,7 +29,7 @@ void KillFountainSFX(void) {
 // FUNCTION: LEGOLAND 0x004529e0
 void FountainAddObject(struct Element *param_1, int *param_2) {
     struct SampleParams params;
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
@@ -37,7 +37,7 @@ void FountainAddObject(struct Element *param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00452a30
-LEGO_EXPORT void RemoveSoundObject(struct Element *a, unsigned int b, unsigned int c) {
+LEGO_EXPORT void RemoveSoundObject(struct Element *a, unsigned int b, struct Cursor *c) {
     unsigned char *bb = (unsigned char *)&b;
     struct SampleParams params;
     StandardRemoveObject(a, *(TileId *)&b, c);
@@ -69,7 +69,7 @@ void KillPowerStationSFX(void) {
 // FUNCTION: LEGOLAND 0x00452ad0
 void SmallPowerStationAddObject(struct Element *param_1, int *param_2) {
     struct SampleParams params;
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
@@ -79,7 +79,7 @@ void SmallPowerStationAddObject(struct Element *param_1, int *param_2) {
 // FUNCTION: LEGOLAND 0x00452b20
 void CrystalPowerStationAddObject(struct Element *param_1, int *param_2) {
     struct SampleParams params;
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
@@ -109,7 +109,7 @@ void KillDinoSFX(void) {
 void DinoAddObject(struct Element *param_1, int *param_2) {
     struct SampleParams params;
     unsigned int r;
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     params.field_0 = 2;
     params.x = param_2[0];
     params.y = param_2[1];

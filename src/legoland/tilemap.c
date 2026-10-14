@@ -109,7 +109,7 @@ LEGO_EXPORT void FreeTileSpace(unsigned short index, unsigned short count) {
 // FUNCTION: LEGOLAND 0x0045aad0
 LEGO_EXPORT unsigned int LoadMapTiles(void) {
     unsigned short alloc_index;
-    unsigned int handle;
+    struct Element *handle;
     int offset;
     unsigned int row;
     unsigned int p;
@@ -131,7 +131,7 @@ LEGO_EXPORT unsigned int LoadMapTiles(void) {
     LLIDB_FindElement("MAPPING 1", &handle, 0);
     LLIDB_LoadData((void *)handle);
     LLIDB_FindElement("BASIC TILES 1", &handle, 0);
-    DAT_00801a6c = *(void **)(handle + 0xc);
+    DAT_00801a6c = handle->data;
     DAT_00667ca4 = *(unsigned int *)DAT_00801a6c;
     DAT_008003f8 = 0;
     DAT_00801b20 = 1;
@@ -139,7 +139,7 @@ LEGO_EXPORT unsigned int LoadMapTiles(void) {
     DAT_00805f48 = 3;
     DAT_0080ff68 = 4;
     LLIDB_FindElement("NORMAL PATH TILES", &handle, 0);
-    PathSprite = *(void **)(handle + 0xc);
+    PathSprite = handle->data;
     // STRING: LEGOLAND 0x004b9bc4
     Arrow01Sprite = LoadSprite("arrow01.lls", 1);
     // STRING: LEGOLAND 0x004b9bb8
@@ -153,7 +153,7 @@ LEGO_EXPORT unsigned int LoadMapTiles(void) {
 
 // FUNCTION: LEGOLAND 0x0045ac20
 unsigned int UnloadMapTiles(void) {
-    unsigned int handle;
+    struct Element *handle;
 
     if (GameMapRawBlock != 0) {
         free(GameMapRawBlock);

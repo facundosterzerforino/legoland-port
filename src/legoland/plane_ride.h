@@ -1,6 +1,5 @@
 #pragma once
 
-struct CallbackTable;
 struct ClassNode;
 struct Element;
 
@@ -9,4 +8,5 @@ void FUN_0043d9f0(struct PlaneRideNode *node);
 void FUN_0043d990(struct PlaneRideNode *node);
 void PlaneRideUpdate(struct Element *elem);
 
-void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface);
+struct Ride;
+void PlaneRide_GetInterfaces(struct ClassNode *name, struct Ride *iface);

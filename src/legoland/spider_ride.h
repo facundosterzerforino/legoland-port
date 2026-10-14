@@ -21,7 +21,9 @@ void SpiderRideUpdate(Element *obj);
 LEGO_EXPORT int SaveSpider(void);
 LEGO_EXPORT int LoadSpider(struct SpiderLoadArg *arg);
 
-void SpiderRide(struct ClassNode *head, struct CallbackTable *iface);
+struct Ride;
+struct ClassNode;
+void SpiderRide(struct ClassNode *head, struct Ride *iface);
 struct SlotOwner;
 struct SlotArray;
 int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char count);

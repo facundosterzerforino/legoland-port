@@ -248,11 +248,11 @@ void EarthSlideSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)EarthSlideRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0042d270
-void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned int param_3) {
+void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, struct Cursor *param_3) {
     struct EarthNode *node = FUN_0042ce20(&tile.id);
     if (node != NULL) {
         RemoveEarthNode(node);
@@ -267,7 +267,7 @@ void EarthSlideAddObject(struct Element *param_1, unsigned char *param_2) {
 
     buffer[0] = param_2[0];
     buffer[1] = param_2[4];
-    AddBasicObject(param_1, (int *)param_2);
+    AddBasicObject(param_1, param_2);
     FUN_0042cd70((unsigned short *)buffer);
 }
 

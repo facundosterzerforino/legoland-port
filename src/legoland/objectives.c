@@ -39,7 +39,7 @@ struct ThemeQueryArg {
 
 struct ThemeData {
     unsigned char pad_0[0x5c];
-    unsigned int theme_id;
+    struct Element *theme_id;
 };
 
 struct RewardArg {
@@ -75,7 +75,7 @@ struct RewardObject {
 struct PlaceObject {
     int field_0;
     unsigned char pad_4[0xc - 0x4];
-    struct ObjClass *cls;
+    struct Ride *cls;
 };
 
 struct SweepInstance {
@@ -985,7 +985,7 @@ void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned in
 // FUNCTION: LEGOLAND 0x00469980
 void CountObjectTheme(struct ThemeQueryArg *arg) {
     struct ThemeData *theme;
-    unsigned int id;
+    struct Element *id;
 
     theme = arg->theme;
     // STRING: LEGOLAND 0x004ba748
@@ -1095,7 +1095,7 @@ int ObjectiveEventSetBricks(struct ObjectiveEvent *event) {
 // FUNCTION: LEGOLAND 0x00469bd0
 void PlaceObjectAtTile(unsigned int a, void *b) {
     struct PlaceObject *object;
-    struct ObjClass *cls;
+    struct Ride *cls;
     struct Point centre;
 
     object = (struct PlaceObject *)a;
@@ -1104,7 +1104,7 @@ void PlaceObjectAtTile(unsigned int a, void *b) {
     GetTileCentre((struct Point *)b, &centre.x);
     EditCursor.tile_x = centre.x;
     EditCursor.tile_y = centre.y;
-    cls->method_90(a, &centre, 0x8f8);
+    cls->cb_90(a, &centre, 0x8f8);
     FUN_0045d770(&EditCursor);
     PutObjOnMap(object->cls, a, (struct Point *)&EditCursor.tile_x);
     SetBricksLimited(1);
@@ -1128,7 +1128,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
     RECT rect;
     short tile_x;
     struct SweepInstance *current;
-    struct ObjClass *cls;
+    struct Ride *cls;
     short tile_y;
     struct Cursor saved;
     struct Point point;
@@ -1150,8 +1150,8 @@ int ScriptEventClear(struct MapRectArg *arg) {
                 next = current;
                 do {
                     next = (struct SweepInstance *)GetNextRenderObject((MapElement *)next);
-                } while (next != NULL && (cls = next->object->cls, power = FindObjectsPower(cls), cls->field_58 != NULL) &&
-                    (0x10 & cls->field_58[8]) != 0 && power <= 0);
+                } while (next != NULL && (cls = next->object->cls, power = FindObjectsPower(cls), cls->parent_element != NULL) &&
+                    (0x10 & ((unsigned char *)cls->parent_element)[8]) != 0 && power <= 0);
                 break;
             case 1:
                 next = current;
@@ -1185,7 +1185,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
                     QueryObj.pos.x = (unsigned char)point.x;
                     QueryClass = cls;
                     QueryObj.pos.y = (unsigned char)point.y;
-                    cls->method_94(cls->element, &point);
+                    cls->cb_94(cls->element, &point);
                     BuildCursorPtr(&QueryCursor, 0, 0);
                     if (IsCursorBuildable(&QueryCursor) != 0) {
                         ClearPathUnderFootprint(QueryClass, &point.x);

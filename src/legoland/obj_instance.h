@@ -33,6 +33,9 @@ struct RideNode {
 typedef struct RideNode RideNode;
 
 /* A placed ride/attraction (the object behind Element.ride). */
+struct SpriteManager;
+struct LibraryNode;
+struct RideSpriteInfo;
 struct Ride {
     /* 0x00 */ struct Ride *next; /* ObjectClassList */
     /* 0x04 */ struct ObjInstance *instances;
@@ -60,20 +63,38 @@ struct Ride {
     /* 0x38 */ short intensity; /* compared with a bloke's thrill preference */
     /* 0x3a */ short field_3a;
     /* 0x3c */ struct Footprint footprint;
-    /* 0x50 */ unsigned char pad_50[0x64 - 0x50];
+    /* 0x50 */ void *desc; /* the ODF's description block */
+    /* 0x54 */ void *script; /* the ODF's script block */
+    /* 0x58 */ struct Element *parent_element;
+    /* 0x5c */ struct Element *theme_element;
+    /* 0x60 */ struct Element *menu_element;
     /* 0x64 */ struct Sprite *layer;
     /* 0x68 */ struct Sprite *icon; /* drawn over pending work orders */
     /* 0x6c */ struct Sprite *anim; /* build-animation sprite */
-    /* 0x70 */ unsigned char pad_70[0x78 - 0x70];
+    /* 0x70 */ struct Element *handle; /* the element of its TSF sprites */
+    /* 0x74 */ union {
+        struct SpriteManager *sprites; /* ODF objects: the TSF's sprites */
+        unsigned short *tiles; /* basic objects: their tile ids */
+    };
     /* 0x78 */ char *name;
-    /* 0x7c */ unsigned char pad_7c[0xa0 - 0x7c];
+    /* 0x7c */ char *field_7c;
+    /* 0x80 */ void *data_80;
+    /* 0x84 */ unsigned char pad_84[0x88 - 0x84];
+    /* 0x88 */ struct LibraryNode *library;
+    /* 0x8c */ void (*cb_8c)();
+    /* 0x90 */ void (*cb_90)();
+    /* 0x94 */ void (*cb_94)();
+    /* 0x98 */ void (*cb_98)();
+    /* 0x9c */ void (*cb_9c)();
     /* 0xa0 */ struct RideSpriteInfo *(*cb_sprite)(); /* sprite to draw for a placed object */
-    /* 0xa4 */ unsigned char pad_a4[0xa8 - 0xa4];
+    /* 0xa4 */ void (*cb_a4)();
     /* 0xa8 */ void (*cb_pre_render)();
-    /* 0xac */ unsigned char pad_ac[0xb8 - 0xac];
+    /* 0xac */ void (*cb_ac)();
+    /* 0xb0 */ void (*cb_b0)();
+    /* 0xb4 */ void (*cb_b4)();
     /* 0xb8 */ int (*load_hook)(struct Element *element); /* run after a save game restores this ride */
     /* 0xbc */ int (*save_hook)(struct Element *element); /* run when this ride is saved */
-    /* 0xc0 */ unsigned char pad_c0[0xc4 - 0xc0];
+    /* 0xc0 */ int (*cb_c0)();
     /* 0xc4 */ struct Element *element; /* this ride's LLIDB element */
     /* 0xc8 */ unsigned char *counters; /* per-bloke visit counts */
     /* 0xcc */ struct RideNode *riders;

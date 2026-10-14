@@ -97,7 +97,7 @@ int FUN_00457970(int dx, int dy) {
             if (elem == NULL) return 0;
             if (elem->flags & 0x8f8) return 0;
             if (elem->field_12 != 0) {
-                unsigned int idx;
+                struct Element *idx;
                 // STRING: LEGOLAND 0x004b8a70
                 LLIDB_FindElement("PATH CONTROL", &idx, 0);
                 if (EditMode.unk8->element != (struct Element *)idx) return 0;
@@ -116,7 +116,7 @@ void FUN_00457a70(void) {
     unsigned int v;
     struct Element *elem;
     unsigned short id;
-    struct ObjClass *cls;
+    struct Ride *cls;
     int x;
     int y;
 
@@ -145,7 +145,7 @@ void FUN_00457a70(void) {
                         Hover.data.tile.id = id;
                         elem = tile->field_0;
                         if (elem) {
-                            QueryClass = (struct ObjClass *)elem->ride;
+                            QueryClass = (struct Ride *)elem->ride;
                             QueryObj.id = id;
                         }
                     } else {
@@ -161,12 +161,12 @@ void FUN_00457a70(void) {
                             }
                         }
                         elem = (struct Element *)Hover.ptr;
-                        QueryClass = (struct ObjClass *)elem->ride;
+                        QueryClass = (struct Ride *)elem->ride;
                         QueryObj.id = Hover.data.tile.id;
                     }
                 } else if (Hover.type == 0x103) {
                     elem = (struct Element *)Hover.ptr;
-                    QueryClass = (struct ObjClass *)elem->ride;
+                    QueryClass = (struct Ride *)elem->ride;
                     QueryObj.id = Hover.data.tile.id;
                 } else {
                     struct TileSetView *src;
@@ -178,7 +178,7 @@ void FUN_00457a70(void) {
                 }
             } else if (Hover.type == 0x103 && EditMode.unk0 == 2) {
                 elem = (struct Element *)Hover.ptr;
-                QueryClass = (struct ObjClass *)elem->ride;
+                QueryClass = (struct Ride *)elem->ride;
                 QueryObj.id = Hover.data.tile.id;
             } else {
                 Hover.type = 0x10a;
@@ -199,11 +199,11 @@ void FUN_00457a70(void) {
         }
         if (!(GamePad & 0x1000)) {
             if (Hover.type == 0x103) {
-                QueryClass->method_94(QueryClass->element, &pt);
+                QueryClass->cb_94(QueryClass->element, &pt);
             } else if (Hover.type == 0x10c) {
-                cls->method_94(cls->element, &pt);
+                cls->cb_94(cls->element, &pt);
             } else if (Hover.type == 0x10b) {
-                cls->method_94(cls->element, &pt);
+                cls->cb_94(cls->element, &pt);
             } else {
                 memset(QueryCursor.field_1414, 0, 20);
                 QueryCursor.field_1828 = 8;
@@ -231,7 +231,7 @@ void FUN_00457a70(void) {
             SetPointer(1);
         }
         if (DAT_00813ac4 & 0x11) {
-            if (DAT_0080ff6c != NULL && (((struct ObjClass *)DAT_0080ff6c)->flags & 0x2000000)) {
+            if (DAT_0080ff6c != NULL && (((struct Ride *)DAT_0080ff6c)->flags & 0x2000000)) {
                 DAT_00667cd8 = 1;
                 DAT_00667cdc = 0;
                 for (y = DAT_00813a88; y <= DAT_00813a90; y += DAT_00813a3c) {
@@ -248,9 +248,9 @@ void FUN_00457a70(void) {
                             QueryObj.pos.x = QueryCursor.tile_x = tile->field_4;
                             QueryObj.pos.y = QueryCursor.tile_y = tile->field_5;
                             if ((tile->flags & 0x88) && !(tile->flags & 0x40) &&
-                                tile->field_0 == (struct Element *)((struct ObjClass *)DAT_0080ff6c)->element) {
-                                RemObjFromMap((struct ObjClass *)DAT_0080ff6c,
-                                    (unsigned int)((struct ObjClass *)DAT_0080ff6c)->element, QueryObj,
+                                tile->field_0 == (struct Element *)((struct Ride *)DAT_0080ff6c)->element) {
+                                RemObjFromMap((struct Ride *)DAT_0080ff6c,
+                                    (unsigned int)((struct Ride *)DAT_0080ff6c)->element, QueryObj,
                                     &QueryCursor);
                             }
                         }
@@ -277,7 +277,7 @@ void FUN_00457a70(void) {
                     } else {
                         tile = NULL;
                     }
-                    QueryClass = (struct ObjClass *)tile->field_0->ride;
+                    QueryClass = (struct Ride *)tile->field_0->ride;
                     if (DAT_00810144 == 0) {
                         ClearPathUnderFootprint((struct PathFootprint *)QueryClass, &pt.x);
                     }
@@ -311,7 +311,7 @@ void FUN_00457a70(void) {
             GamePad &= ~0x800;
         }
         if (!(GamePad & 0x400) && EditMode.unk8 != NULL) {
-            ((struct ObjClass *)EditMode.unk8)->method_90((unsigned int)EditMode.unk8->element, &MousePos, 0x8f8);
+            ((struct Ride *)EditMode.unk8)->cb_90((unsigned int)EditMode.unk8->element, &MousePos, 0x8f8);
         }
         BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0((struct ObjState *)EditMode.unk8));
         if (DAT_00813ac4 & 0x11) {
@@ -349,7 +349,7 @@ void FUN_00457a70(void) {
                     }
                     DAT_00667cd8 = 0;
                     if (DAT_00667cdc != 0) {
-                        PlayAppropriateBuildEffect((struct ObjClass *)EditMode.unk8, NULL);
+                        PlayAppropriateBuildEffect((struct Ride *)EditMode.unk8, NULL);
                         PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, 0);
                         CalculateMapRenderOrder();
                     }
@@ -374,11 +374,11 @@ void FUN_00457a70(void) {
         pt.x = v & 0xff;
         pt.y = v >> 8;
         if (Hover.type == 0x103) {
-            QueryClass->method_94(QueryClass->element, &pt);
+            QueryClass->cb_94(QueryClass->element, &pt);
         } else if (Hover.type == 0x10c) {
-            cls->method_94(cls->element, &pt);
+            cls->cb_94(cls->element, &pt);
         } else if (Hover.type == 0x10b) {
-            cls->method_94(cls->element, &pt);
+            cls->cb_94(cls->element, &pt);
         } else {
             memset(QueryCursor.field_1414, 0, 20);
             QueryCursor.field_1828 = 8;

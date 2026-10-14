@@ -63,6 +63,7 @@ struct ResFile;
 char *RES_ReadLine(struct ResFile *param_1, char *param_2, int param_3);
 int FindIndexInStringList(char *param_1, char *param_2);
 LEGO_EXPORT struct Point GetScreenCoordsForObject(TileId *tile, struct Ride *ride);
+struct Point;
 LEGO_EXPORT void AdjustBlokePosition(struct Point *pos);
 LEGO_EXPORT void UnAdjustBlokePosition(struct Point *pos);
 LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1);

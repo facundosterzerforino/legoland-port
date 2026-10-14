@@ -301,7 +301,7 @@ void PlaneRideSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)PlaneRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0043df90
@@ -310,7 +310,7 @@ void PlaneRideRemoveObject(struct PlaneRideObject *a1, TileId a2, struct PlaneRi
     if (temp != 0) {
         RemovePlaneRideNode((void *)temp);
     }
-    StandardRemoveObject(a1, a2, (unsigned int)a3);
+    StandardRemoveObject(a1, a2, a3);
     RemoveAllBlokesFromRide(a1->ride, a2);
 }
 
@@ -468,19 +468,19 @@ LEGO_EXPORT int LoadZoomer(struct ZoomerLoadArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e220
-void PlaneRide_GetInterfaces(struct ClassNode *name, struct CallbackTable *iface) {
+void PlaneRide_GetInterfaces(struct ClassNode *name, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b7a6c
     if (_stricmp("PLANE RIDE", name->name) == 0) {
         iface->cb_a4 = PlaneRideLoad;
         iface->cb_ac = PlaneRideUnload;
         iface->cb_8c = PlaneRideSetEditMode;
-        iface->cb_a8 = PlaneRideUpdate;
+        iface->cb_pre_render = PlaneRideUpdate;
         iface->cb_b0 = RenderPlaneRide;
         iface->cb_9c = PlaneRideRemoveObject;
         iface->cb_98 = PlaneRideAddObject;
-        iface->cb_a0 = GetPlaneRideSpriteInfo;
-        iface->cb_b8 = LoadZoomer;
-        iface->cb_bc = SaveZoomer;
+        iface->cb_sprite = GetPlaneRideSpriteInfo;
+        iface->load_hook = LoadZoomer;
+        iface->save_hook = SaveZoomer;
     }
 }
 
@@ -669,7 +669,7 @@ void PlaneRideUpdate(struct Element *elem) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef((int *)&bloke->person->screen, (int *)&bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;

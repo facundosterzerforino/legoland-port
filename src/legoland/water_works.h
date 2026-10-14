@@ -3,6 +3,6 @@
 #include "legoland.h"
 
 struct ClassNode;
-struct CallbackTable;
 
-void WaterWorksGetInterfaces(struct ClassNode *name, struct CallbackTable *ci);
+struct Ride;
+void WaterWorksGetInterfaces(struct ClassNode *name, struct Ride *ci);

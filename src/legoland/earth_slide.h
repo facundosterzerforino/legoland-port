@@ -62,7 +62,7 @@ void RenderEarthSlide(struct EarthRideObj *param_1, unsigned int param_2, unsign
 void LoadEarthSlideResources(struct EarthRideObj *param_1);
 void UnloadEarthSlideResources(struct EarthRideObj *arg1);
 void EarthSlideSetEditMode();
-void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, unsigned int param_3);
+void EarthSlideRemoveObject(struct EarthRideObj *param_1, TileId tile, struct Cursor *param_3);
 void EarthSlideAddObject(struct Element *param_1, unsigned char *param_2);
 int EarthSlideRide_Save(void);
 int EarthSlideRide_Load(void);

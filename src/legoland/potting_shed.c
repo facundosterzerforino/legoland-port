@@ -28,11 +28,6 @@ struct PSCarLayer {
     struct PSCarSub *field_c;
 };
 
-struct EditTarget {
-    unsigned char pad_0[0x3c];
-    unsigned char field_3c;
-};
-
 #include "image_sprite.h"
 #include "mechanics_hut.h"
 #include "print_sprite.h"
@@ -50,13 +45,13 @@ void LoadGShedMatteSprite(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0043ceb0
-unsigned int PottingShedAddObject(struct Element *param_1, unsigned int param_2) {
+unsigned int PottingShedAddObject(struct Element *param_1, int *param_2) {
     return AddBasicObject(param_1, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x0043ced0
 void PottingShedRemoveObject(Element *obj, unsigned int tile, struct Cursor *cursor) {
-    StandardRemoveObject((Element *)obj, *(TileId *)&tile, cursor);
+    StandardRemoveObject(obj, *(TileId *)&tile, cursor);
     FUN_0043d7c0(obj->ride, tile, 1);
 }
 
@@ -161,7 +156,7 @@ void PottingShedSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = p;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint(&((struct EditTarget *)EditMode.unk8)->field_3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x0043d210

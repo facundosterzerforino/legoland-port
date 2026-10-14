@@ -31,6 +31,13 @@ struct SpriteGroup {
 };
 typedef struct SpriteGroup SpriteGroup;
 
+/* an animated sprite's animation (Sprite.anim) */
+struct SpriteAnim {
+    /* 0x00 */ struct LLS *lls;
+    /* 0x04 */ unsigned char pad_4[0x14 - 0x4];
+    /* 0x14 */ unsigned int type; /* 2, 3: playing */
+};
+
 struct Sprite {
     /* 0x00 */ struct Sprite *next;
     /* 0x04 */ LPDIRECTDRAWSURFACE surface;
@@ -39,6 +46,7 @@ struct Sprite {
         int (*render_fn)(struct Sprite *);
         struct SpriteGroup *group; /* layered sprites (flags & 0x8000) */
         struct LLS **lls; /* animated (.lls) sprites */
+        struct SpriteAnim *anim; /* animated sprites: the animation and its kind */
     };
     /* 0x0c */ unsigned int field_c;
     /* 0x10 */ union {

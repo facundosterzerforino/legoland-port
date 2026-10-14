@@ -10,6 +10,7 @@ LEGO_EXPORT void ResetMoveAWorkerStruct(void);
 LEGO_EXPORT void ResetWorkersOldCoords(void);
 unsigned int FUN_004700c0(void *object);
 void *GetWorkerOnMouse(void);
+struct Bloke;
 void PickUpWorker(unsigned int type, struct Bloke *worker);
 int FUN_00470270(void);
 struct WorkOrder *FUN_00470410(struct Point *out);

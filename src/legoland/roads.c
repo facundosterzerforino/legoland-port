@@ -48,11 +48,6 @@ struct RoadCallbacks {
     void *field_20;
 };
 
-struct LLIDB_Head {
-    unsigned char pad_0[0xc];
-    struct RoadCallbacks *callbacks;
-};
-
 struct RoadEditArg {
     unsigned char pad_0[0xc];
     void *ride;
@@ -443,17 +438,17 @@ void FUN_004139e0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00413a10
-void LoadDrivingSchoolRoadsResources(struct LLIDB_Head *head) {
-    struct LLIDB_Head **handle = &head;
+void LoadDrivingSchoolRoadsResources(struct Element *head) {
+    struct Element **handle = &head;
 
-    DAT_0082c684 = head->callbacks;
+    DAT_0082c684 = head->data;
     // STRING: LEGOLAND 0x004b4c94
-    if (LLIDB_FindElement("DSCHOOL LIGHTS", (unsigned int *)handle, 0) == 0) {
+    if (LLIDB_FindElement("DSCHOOL LIGHTS", handle, 0) == 0) {
         DrivingSchoolLightsData = LLIDB_LoadData(head);
     }
     // STRING: LEGOLAND 0x004b4c80
-    if (LLIDB_FindElement("TILES FOR DSCHOOL", (unsigned int *)handle, 0) == 0) {
-        struct RoadCallbacks *callbacks = head->callbacks;
+    if (LLIDB_FindElement("TILES FOR DSCHOOL", handle, 0) == 0) {
+        struct RoadCallbacks *callbacks = head->data;
         callbacks->field_18 = FUN_00413990;
         callbacks->field_1c = FUN_004139c0;
         callbacks->field_20 = FUN_004139e0;
@@ -463,7 +458,7 @@ void LoadDrivingSchoolRoadsResources(struct LLIDB_Head *head) {
 // FUNCTION: LEGOLAND 0x00413a80
 void UnloadDrivingSchoolRoadsResources(void) {
     struct RoadQueueEntry *entry = (struct RoadQueueEntry *)DAT_004cbeac;
-    unsigned int handle;
+    struct Element *handle;
     struct RoadQueueEntry *next;
 
     if (LLIDB_FindElement("DSCHOOL LIGHTS", &handle, 0) == 0) {
@@ -513,9 +508,9 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
     memcpy(ptmp237, &ride->footprint, 20);
     bits = 0;
     EditCursor.field_1830 = bits;
-    ScreenToMapRef(param_2, (int *)&EditCursor.tile_x, param_3);
+    ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     t = FUN_00413e30(&EditCursor);
-    ValidateCursor(&EditCursor, (unsigned int)ride);
+    ValidateCursor(&EditCursor, ride);
     if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
@@ -840,7 +835,7 @@ void ZebraCrossingSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00414880
-void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, unsigned int param_2, unsigned int param_3) {
+void ZebraCrossingCalcCursor(struct RoadEditArg *param_1, int *param_2, unsigned int param_3) {
     void *obj = param_1->ride;
     struct RoadTile *tile;
     int cost;
