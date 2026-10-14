@@ -11,6 +11,11 @@ if ! cmake --build build $CLEAN > /tmp/dv_build.log 2>&1; then
   grep -iE "error" /tmp/dv_build.log | head -20
   exit 1
 fi
+# MSVC6's warnings for a prototype that differs from its definition or a pointer of another type, in the changed
+# files (C4028/C4029: a parameter differs from the declaration)
+for f in $(git diff --name-only HEAD -- src/legoland | grep '\.c$'); do
+  grep -E "$(basename $f)\([0-9]+\) : warning C(4028|4029)" /tmp/dv_build.log | head -5
+done
 ./tools/verify --silent --json /tmp/dv_new.json > /tmp/dv_verify.log 2>&1
 git checkout -q -- uv.lock 2>/dev/null
 grep -E "Accuracy|Progress" /tmp/dv_verify.log

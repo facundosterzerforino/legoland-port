@@ -11,7 +11,7 @@ when a commit is moved onto `main`.
   pointed at it), builds it and writes the baseline match report, `/tmp/dv_baseline.json`.
 - `x64check.sh [file.c...]`: the 64-bit pointer warnings the port will have after merging the scratch decomp's
   edits. It copies the port's `src/legoland` to `/tmp/x64overlay`, merges each changed file in as `git merge` would
-  (base `main`; where both sides changed the same lines it takes the decomp's and lists the file in
+  (base: the last decomp commit the port merged; where both sides changed the same lines it takes the decomp's and lists the file in
   `/tmp/x64check.conflicts`, to resolve by hand in the real merge), and compiles every file as 64-bit (syntax
   only, the port's x64 flags). Every warning goes to `/tmp/x64check.txt`. About 8 s for all files.
 - `wshow.py <warnings> <file filter> [max]`: those warnings with their code lines.

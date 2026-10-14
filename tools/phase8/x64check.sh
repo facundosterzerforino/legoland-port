@@ -13,8 +13,10 @@ cp -r $P/src/legoland $O/src/
 for d in port miniwin extensions; do ln -s $P/$d $O/$d; done
 : > /tmp/x64check.conflicts
 # each file the scratch decomp changed: merged into the port's copy as git merge will (base: main)
-for f in $(git -C $D diff --name-only main -- src/legoland); do
-  git -C $D show main:$f > /tmp/x64check.base
+# base: the last decomp commit the port merged (the port has none of the decomp's later commits yet)
+BASE=$(git -C $P merge-base port main)
+for f in $(git -C $D diff --name-only $BASE -- src/legoland); do
+  git -C $D show $BASE:$f > /tmp/x64check.base
   cp $O/$f /tmp/x64check.ours
   if ! git merge-file -q /tmp/x64check.ours /tmp/x64check.base $D/$f; then
     # both sides changed the same lines: the check takes the decomp's; the real merge resolves it by hand
