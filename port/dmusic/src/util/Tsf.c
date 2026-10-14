@@ -37,6 +37,10 @@ enum {
 	kDecayVolEnv = 36,
 	kSustainVolEnv = 37,
 	kReleaseVolEnv = 38,
+	kKeynumToModEnvHold = 31,
+	kKeynumToModEnvDecay = 32,
+	kKeynumToVolEnvHold = 39,
+	kKeynumToVolEnvDecay = 40,
 	kInstrument = 41,
 	kKeyRange = 43,
 	kVelRange = 44,
@@ -59,7 +63,52 @@ enum {
 	kLinear = 0,
 };
 
+// [port] DLS scales an envelope's hold and decay times by the key: key / 128 * scale timecents are added (gm.dls's
+// melodic instruments decay faster the higher the note). SoundFont's equivalent is a per-key generator around key 60
+// (keynumTo...: value * (60 - key) timecents) with the base time moved to key 60. TinySoundFont ignores modulators, so
+// dmusic's modulators for these left every note at the base time: bells and plucked notes rang several times too long.
+static int32_t DmSynth_keyScale(DmDlsArticulator* art, DmDlsArticulatorDestination dst) {
+	for (size_t k = 0; k < art->connection_count; ++k) {
+		struct DmDlsArticulatorConnection* con = &art->connections[k];
+		if (con->source == DmDlsArticulatorSource_KEY_NUMBER && con->control == DmDlsArticulatorSource_NONE &&
+		    con->destination == dst) {
+			return con->scale >> 16;
+		}
+	}
+	return 0;
+}
+
+static void DmSynth_insertKeyScale(SFGeneratorList* gens, DmDlsArticulator* art, DmDlsArticulatorDestination dst,
+                                   uint16_t time_gen, uint16_t keynum_gen) {
+	int32_t scale = DmSynth_keyScale(art, dst);
+	struct tsf_hydra_igen gen;
+	bool has_time = false;
+
+	if (scale == 0) {
+		return;
+	}
+	for (size_t k = 0; k < art->connection_count; ++k) {
+		struct DmDlsArticulatorConnection* con = &art->connections[k];
+		has_time |= con->source == DmDlsArticulatorSource_NONE && con->control == DmDlsArticulatorSource_NONE &&
+		            con->destination == dst;
+	}
+	if (!has_time) {
+		// the base time is DLS's default, 0 timecents (1 s), moved to key 60
+		gen.genOper = time_gen;
+		gen.genAmount.shortAmount = (tsf_s16) (scale * 60 / 128);
+		SFGeneratorList_add(gens, gen);
+	}
+	gen.genOper = keynum_gen;
+	gen.genAmount.shortAmount = (tsf_s16) clamp_s32(-scale / 128, -1200, 1200);
+	SFGeneratorList_add(gens, gen);
+}
+
 static void DmSynth_insertGenerators(SFGeneratorList* gens, DmDlsArticulator* art) {
+	DmSynth_insertKeyScale(gens, art, DmDlsArticulatorDestination_EG1_DECAY_TIME, kDecayVolEnv, kKeynumToVolEnvDecay);
+	DmSynth_insertKeyScale(gens, art, DmDlsArticulatorDestination_EG1_HOLD_TIME, kHoldVolEnv, kKeynumToVolEnvHold);
+	DmSynth_insertKeyScale(gens, art, DmDlsArticulatorDestination_EG2_DECAY_TIME, kDecayModEnv, kKeynumToModEnvDecay);
+	DmSynth_insertKeyScale(gens, art, DmDlsArticulatorDestination_EG2_HOLD_TIME, kHoldModEnv, kKeynumToModEnvHold);
+
 	for (size_t k = 0; k < art->connection_count; ++k) {
 		struct DmDlsArticulatorConnection* con = &art->connections[k];
 		struct tsf_hydra_igen gen;
@@ -143,11 +192,13 @@ static void DmSynth_insertGenerators(SFGeneratorList* gens, DmDlsArticulator* ar
 			break;
 		case DmDlsArticulatorDestination_EG1_DECAY_TIME:
 			gen.genOper = kDecayVolEnv;
-			gen.genAmount.shortAmount = con->scale >> 16;
+			gen.genAmount.shortAmount =
+			    (tsf_s16) ((con->scale >> 16) + DmSynth_keyScale(art, DmDlsArticulatorDestination_EG1_DECAY_TIME) * 60 / 128);
 			break;
 		case DmDlsArticulatorDestination_EG2_DECAY_TIME:
 			gen.genOper = kDecayModEnv;
-			gen.genAmount.shortAmount = con->scale >> 16;
+			gen.genAmount.shortAmount =
+			    (tsf_s16) ((con->scale >> 16) + DmSynth_keyScale(art, DmDlsArticulatorDestination_EG2_DECAY_TIME) * 60 / 128);
 			break;
 		case DmDlsArticulatorDestination_EG1_RELEASE_TIME:
 			gen.genOper = kReleaseVolEnv;
@@ -167,11 +218,13 @@ static void DmSynth_insertGenerators(SFGeneratorList* gens, DmDlsArticulator* ar
 			break;
 		case DmDlsArticulatorDestination_EG1_HOLD_TIME:
 			gen.genOper = kHoldVolEnv;
-			gen.genAmount.shortAmount = con->scale >> 16;
+			gen.genAmount.shortAmount =
+			    (tsf_s16) ((con->scale >> 16) + DmSynth_keyScale(art, DmDlsArticulatorDestination_EG1_HOLD_TIME) * 60 / 128);
 			break;
 		case DmDlsArticulatorDestination_EG2_HOLD_TIME:
 			gen.genOper = kHoldModEnv;
-			gen.genAmount.shortAmount = con->scale >> 16;
+			gen.genAmount.shortAmount =
+			    (tsf_s16) ((con->scale >> 16) + DmSynth_keyScale(art, DmDlsArticulatorDestination_EG2_HOLD_TIME) * 60 / 128);
 			break;
 		case DmDlsArticulatorDestination_EG1_SUSTAIN_LEVEL: {
 			gen.genOper = kSustainVolEnv;
