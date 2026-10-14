@@ -139,6 +139,9 @@ struct LocFile {
     /* 0x30 */ struct LocCell *cells;
 };
 
+void RelocateLocData(struct LocFile *buffer);
+struct LocFile *LoadLocFile(const char *param_1, const char *param_2);
+
 void RemovePersonFromList(struct Person *person);
 void FreePerson(struct Person *person);
 

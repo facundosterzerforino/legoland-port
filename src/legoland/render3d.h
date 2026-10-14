@@ -12,6 +12,7 @@ struct TexFace {
     float uv[6]; /* u0 v0 u1 v1 u2 v2 */
 };
 
+struct LocFile;
 struct Sprite;
 struct LLS;
 struct Ride;
