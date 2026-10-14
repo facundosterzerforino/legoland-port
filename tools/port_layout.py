@@ -13,6 +13,7 @@ Offsets are relative to the enclosing record/array element. For a union, the fir
 that a pointer member is used where the original holds a pointer (the slot is listed in --pointers).
 
 Usage: uv run --no-project --with libclang==18.1.1 python tools/port_layout.py names... (or --stdin)
+       ... port_layout.py --types file   (the type spellings in file, one per line, e.g. "struct Ride")
 """
 import json
 import os
@@ -171,7 +172,7 @@ def ptr_offsets(t, base):
 
 
 def main():
-    names = sys.stdin.read().split() if "--stdin" in sys.argv else [a for a in sys.argv[1:] if not a.startswith("--")]
+    names = sys.stdin.read().split() if "--stdin" in sys.argv else [a for a in sys.argv[1:] if not a.startswith("--") and not os.path.exists(a)]
     slots = set()
     if "--pointers" in sys.argv:
         slots = set(int(x, 16) for x in open(sys.argv[sys.argv.index("--pointers") + 1]).read().split())
@@ -183,6 +184,13 @@ def main():
         else:
             want[n] = 0
     text = "#include <windows.h>\n" + "".join('#include "%s"\n' % h.name for h in sorted(SRC.glob("*.h")))
+    types = {}  # probe variable -> type spelling (--types: lay out these types instead of globals)
+    if "--types" in sys.argv:
+        spellings = [x.strip() for x in open(sys.argv[sys.argv.index("--types") + 1]).read().split("\n") if x.strip()]
+        for i, t in enumerate(spellings):
+            types["__port_x86_%d" % i] = t
+            text += "extern %s __port_x86_%d;\n" % (t, i)
+            want["__port_x86_%d" % i] = 0
     path = str(ROOT / "port" / "_layout_probe.c")
     tu = ci.Index.create().parse(path, args=ARGS + ["-I%s" % SRC], unsaved_files=[(path, text)])
     errs = [d for d in tu.diagnostics if d.severity >= ci.Diagnostic.Error]
@@ -190,7 +198,8 @@ def main():
     for c in tu.cursor.get_children():
         if c.kind == ci.CursorKind.VAR_DECL and c.spelling in want and c.spelling not in out["globals"]:
             t = tree(c.type, slots, want[c.spelling])
-            out["globals"][c.spelling] = {"size": c.type.get_size(), "t": t, "ptrs": sorted(set(ptr_offsets(t, 0)))}
+            key = types.get(c.spelling, c.spelling)
+            out["globals"][key] = {"size": c.type.get_size(), "t": t, "ptrs": sorted(set(ptr_offsets(t, 0)))}
     json.dump(out, sys.stdout)
 
 

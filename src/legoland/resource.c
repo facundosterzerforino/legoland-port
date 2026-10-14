@@ -9,6 +9,9 @@
 #include "globals.h"
 #include "legoland.h"
 #include "saveload.h"
+#ifdef LEGOLAND_PORT
+#include "port_res.h"
+#endif
 
 struct ResVolume;
 struct ResVolEntry;
@@ -153,16 +156,26 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
     }
 
     if (node->sibling != -1) {
+#ifdef LEGOLAND_PORT
+        /* [port] the record's offsets aren't turned into pointers in place (a 64-bit pointer doesn't fit them;
+           the directory buffer is freed after this walk anyway) */
+        FUN_004895a0((struct ResDirRecord *)((char *)base + node->sibling), volume, base, buffer);
+#else
         node->sibling += (int)base;
         FUN_004895a0((struct ResDirRecord *)node->sibling, volume, base, buffer);
+#endif
     }
 
     if (node->child != -1) {
         strcat(buffer, node->name);
         // STRING: LEGOLAND 0x004bdd7c
         strcat(buffer, "\\");
+#ifdef LEGOLAND_PORT
+        FUN_004895a0((struct ResDirRecord *)((char *)base + node->child), volume, base, buffer); /* [port] as above */
+#else
         node->child += (int)base;
         FUN_004895a0((struct ResDirRecord *)node->child, volume, base, buffer);
+#endif
     }
 }
 
@@ -519,3 +532,21 @@ LEGO_EXPORT int RES_FileExists(const char *path) {
     RES_CloseFile(file);
     return 1;
 }
+
+#ifdef LEGOLAND_PORT
+/* [port] The files of a resource directory, for -port-selftest (port/port_res.c). */
+int PortResForEachFile(const char *dir, void (*fn)(const char *name, void *ctx), void *ctx) {
+    struct MasterDirNode *node = GetMasterDirPtr(dir);
+    struct ResVolEntry *entry;
+    int n = 0;
+
+    if (node == 0) {
+        return -1;
+    }
+    for (entry = node->entries; entry != 0; entry = entry->next_dir) {
+        fn(entry->name, ctx);
+        n++;
+    }
+    return n;
+}
+#endif

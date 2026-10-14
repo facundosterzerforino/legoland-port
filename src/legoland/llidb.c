@@ -1,6 +1,9 @@
 #include <windows.h>
 #include <commctrl.h>
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "port_x86.h"
+#endif
 
 #include <fcntl.h>
 #include <io.h>
@@ -655,7 +658,23 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
     obj->element = head;
     head->data = obj;
     RES_ReadFile(file, &size, 4);
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] the file holds the class from its instances field on, in the original 32-bit layout: read it
+           field by field (port_x86.c), so a 64-bit build gets its own struct Ride */
+        unsigned char raw[PORT_X86_SIZE_Ride];
+        unsigned int from = PORT_X86_OFF_Ride_instances;
+        unsigned int n = size - 4 <= PORT_X86_SIZE_Ride - from ? size - 4 : PORT_X86_SIZE_Ride - from;
+
+        RES_ReadFile(file, raw, n);
+        if (size - 4 > n) {
+            RES_SetFilePointer(file, RES_GetFilePointer(file) + (int)(size - 4 - n));
+        }
+        PortFromX86(obj, raw, port_x86_Ride, port_x86_Ride_count, from, from + n);
+    }
+#else
     RES_ReadFile(file, &obj->instances, size - 4);
+#endif
     obj->footprint.next = 0;
     obj->next = (struct Ride *)ObjectClassList;
     ObjectClassList = obj;
@@ -960,7 +979,23 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
     obj->element = elem;
     elem->data = NULL;
     RES_ReadFile(file, &size, 4);
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] the file holds the class from its instances field on, in the original 32-bit layout: read it
+           field by field (port_x86.c), so a 64-bit build gets its own struct Ride */
+        unsigned char raw[PORT_X86_SIZE_Ride];
+        unsigned int from = PORT_X86_OFF_Ride_instances;
+        unsigned int n = size - 4 <= PORT_X86_SIZE_Ride - from ? size - 4 : PORT_X86_SIZE_Ride - from;
+
+        RES_ReadFile(file, raw, n);
+        if (size - 4 > n) {
+            RES_SetFilePointer(file, RES_GetFilePointer(file) + (int)(size - 4 - n));
+        }
+        PortFromX86(obj, raw, port_x86_Ride, port_x86_Ride_count, from, from + n);
+    }
+#else
     RES_ReadFile(file, &obj->instances, size - 4);
+#endif
     RES_ReadFile(file, &size, 4);
     if (size != 0) {
         obj->desc = malloc(size);

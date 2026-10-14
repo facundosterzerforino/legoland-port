@@ -14,6 +14,7 @@
 #include "port_data.h"
 #include "port_launcher.h"
 #include "port_sdl.h"
+#include "port_res.h"
 #include "port_setup.h"
 #include "port_setup_win.h"
 #include "port_trace.h"
@@ -47,7 +48,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         /* [port] check the SDL3 library and the startup data and exit, without starting the game (or touching its
          * trace file). PortDataSelfTest appends its report, ending with the overall result. */
         int sdl_problems = PortSdlSelfTest("port-selftest.txt");
-        return PortDataSelfTest("port-selftest.txt", sdl_problems);
+        int res_problems = PortResSelfTest("port-selftest.txt");
+        return PortDataSelfTest("port-selftest.txt", sdl_problems + res_problems);
     }
     {
         /* [library:window] already running (the game's own check, in wWinMain, comes after the launcher): bring
