@@ -73,7 +73,7 @@ LEGO_EXPORT void RenderItems_New(void);
 LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key);
 LEGO_EXPORT void RenderBlokeList(struct RenderItemNode **list);
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport);
-void *FUN_00442580(struct Person *person, void *context, unsigned int arg3, unsigned int arg4, unsigned int arg5);
+void *FUN_00442580(struct Person *person, struct LocFile *context, unsigned int arg3, unsigned int arg4, unsigned int arg5);
 void FUN_00442980(const char *param_1, const char *param_2, const char *param_3, int param_4, unsigned int param_5);
 LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count);
 struct Vec3;

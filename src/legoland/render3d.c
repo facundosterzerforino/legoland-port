@@ -434,13 +434,6 @@ LEGO_EXPORT unsigned short *LoadPalette(const char *path) {
 
 #pragma function(memset)
 
-struct CellContainer {
-    unsigned char pad_0[4];
-    int field_4;
-    unsigned char pad_8[0x30 - 8];
-    short *entries;
-};
-
 struct CellEntry {
     short field_0;
     unsigned char x;
@@ -450,11 +443,11 @@ struct CellEntry {
 };
 
 // FUNCTION: LEGOLAND 0x00442040
-void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_3, struct TexFace *faces, int count) {
-    struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->entries + param_2 * 6);
-    struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->entries + param_3 * 6);
-    int idx1 = entry1->field_0 + param_1->field_4;
-    int idx2 = entry2->field_0 + param_1->field_4;
+void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, struct TexFace *faces, int count) {
+    struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->cells + param_2 * 6);
+    struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->cells + param_3 * 6);
+    int idx1 = entry1->field_0 + param_1->texture_base;
+    int idx2 = entry2->field_0 + param_1->texture_base;
     int lo_x = entry1->x;
     int hi_x = entry1->field_4 + entry1->x + 1;
     int lo_y = entry1->y;
@@ -507,7 +500,7 @@ void RemapTexCoordsToCell(struct CellContainer *param_1, int param_2, int param_
                     v1 = ((v1 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
                     u2 = ((u2 - entry1->x) / entry1->field_4 * entry2->field_4 + entry2->x) / w;
                     sv2 = ((sv2 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
-                    face->cell = entry2->field_0 + param_1->field_4;
+                    face->cell = entry2->field_0 + param_1->texture_base;
                     face->uv[0] = u0;
                     face->uv[1] = v0;
                     face->uv[2] = u1;
@@ -571,7 +564,7 @@ void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct C
 }
 
 // FUNCTION: LEGOLAND 0x00442580
-void *FUN_00442580(struct Person *person, void *context, unsigned int src, unsigned int count, unsigned int flag) {
+void *FUN_00442580(struct Person *person, struct LocFile *context, unsigned int src, unsigned int count, unsigned int flag) {
     int *arrA;
     int idxI;
     int valC;

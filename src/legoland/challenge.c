@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "globals.h"
 #include "legoland.h"
+#include "man3d.h"
 
 #include "bloke.h"
 #include "bloke_ai.h"
@@ -181,12 +182,6 @@ struct Image *LoadBmpImage(const char *param_1, unsigned char param_2) {
 unsigned int GetLoadedTextureCount(void) {
     return DAT_00665e8c;
 }
-
-struct LocFile {
-    /* 0x00 */ int count;
-    /* 0x04 */ unsigned char pad_4[0xc - 0x4];
-    /* 0x0c */ char name[1];
-};
 
 // FUNCTION: LEGOLAND 0x00443720
 void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2) {

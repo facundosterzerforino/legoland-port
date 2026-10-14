@@ -4941,13 +4941,13 @@ int DAT_0081c0c0[0x200];
 unsigned int DAT_0081c4c0[0x100];
 
 // GLOBAL: LEGOLAND 0x0081c8c0
-void *VisitorLocData;
+struct LocFile *VisitorLocData;
 
 // GLOBAL: LEGOLAND 0x0081c8c4
-void *TracyLocData;
+struct LocFile *TracyLocData;
 
 // GLOBAL: LEGOLAND 0x0081c8c8
-void *GeoffLocData;
+struct LocFile *GeoffLocData;
 
 // GLOBAL: LEGOLAND 0x0081c8cc
 void *DAT_0081c8cc;

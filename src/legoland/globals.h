@@ -3799,11 +3799,11 @@ extern int DAT_0081c0c0[0x200];
 // 0x0081c4c0
 extern unsigned int DAT_0081c4c0[0x100];
 // 0x0081c8c0
-extern void *VisitorLocData;
+extern struct LocFile *VisitorLocData;
 // 0x0081c8c4
-extern void *TracyLocData;
+extern struct LocFile *TracyLocData;
 // 0x0081c8c8
-extern void *GeoffLocData;
+extern struct LocFile *GeoffLocData;
 // 0x0081c8cc
 extern void *DAT_0081c8cc;
 // 0x0081c8d0

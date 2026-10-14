@@ -183,19 +183,19 @@ struct Person *FUN_0043f8c0(struct Bloke *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f970
-void RelocateLocData(void *buffer) {
-    struct Person *p = buffer;
+void RelocateLocData(struct LocFile *buffer) {
+    struct LocFile *p = buffer;
 
-    p->field_2c = p->field_2c + (unsigned int)p;
-    p->field_30 = p->field_30 + (unsigned int)p;
+    *(UINT_PTR *)&p->textures = *(UINT_PTR *)&p->textures + (UINT_PTR)p;
+    *(UINT_PTR *)&p->cells = *(UINT_PTR *)&p->cells + (UINT_PTR)p;
 }
 
 // FUNCTION: LEGOLAND 0x0043f990
-void *LoadLocFile(const char *param_1, const char *param_2) {
+struct LocFile *LoadLocFile(const char *param_1, const char *param_2) {
     char path[256];
     struct ResFile *file;
     unsigned int size;
-    void *buffer;
+    struct LocFile *buffer;
 
     sprintf(path, Path3DFormat, param_2, param_1);
     file = RES_OpenFile(path);
@@ -600,7 +600,7 @@ LEGO_EXPORT void InitMan(void) {
     ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7cdc
     VisitorLocData = LoadLocFile("NewProject.loc", "visitor");
-    ((unsigned int *)VisitorLocData)[1] = ctx;
+    VisitorLocData->texture_base = ctx;
     // STRING: LEGOLAND 0x004b7cec
     LoadTextureBitmaps(VisitorLocData, "visitor");
     // STRING: LEGOLAND 0x004b7cc4
@@ -636,7 +636,7 @@ LEGO_EXPORT void InitMan(void) {
     ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7b80
     GeoffLocData = LoadLocFile("geoff.loc", "geoff");
-    ((unsigned int *)GeoffLocData)[1] = ctx;
+    GeoffLocData->texture_base = ctx;
     // STRING: LEGOLAND 0x004b7b8c
     LoadTextureBitmaps(GeoffLocData, "geoff");
     // STRING: LEGOLAND 0x004b7b68
@@ -646,7 +646,7 @@ LEGO_EXPORT void InitMan(void) {
     ctx = GetLoadedTextureCount();
     // STRING: LEGOLAND 0x004b7b3c
     TracyLocData = LoadLocFile("tracy.loc", "tracy");
-    ((unsigned int *)TracyLocData)[1] = ctx;
+    TracyLocData->texture_base = ctx;
     // STRING: LEGOLAND 0x004b7b48
     LoadTextureBitmaps(TracyLocData, "tracy");
     // STRING: LEGOLAND 0x004b7b24
@@ -721,7 +721,7 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
     int kind;
     void **base;
     struct Mesh *mesh;
-    void *context;
+    struct LocFile *context;
 
     person = bloke->person;
     if (person->anim != (unsigned int)anim) {

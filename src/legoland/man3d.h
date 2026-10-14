@@ -120,6 +120,25 @@ struct Bloke;
 struct IntVec3;
 struct Vec3;
 void ComputeMeshElemBounds(struct MeshElem *elem, struct IntVec3 *out);
+/* A .loc file: a 3D character set's textures (<name>NNNN.BMP) and the cells their faces map to. The two tables
+   follow the header in the file; LoadLocFile turns their offsets into pointers. */
+struct LocCell {
+    /* 0x00 */ short texture;
+    /* 0x02 */ unsigned char x;
+    /* 0x03 */ unsigned char y;
+    /* 0x04 */ unsigned char w;
+    /* 0x05 */ unsigned char h;
+};
+
+struct LocFile {
+    /* 0x00 */ int count; /* textures */
+    /* 0x04 */ int texture_base; /* the first texture's id, set after loading */
+    /* 0x08 */ int cell_count;
+    /* 0x0c */ char name[0x20];
+    /* 0x2c */ void *textures; /* count entries of 8 bytes */
+    /* 0x30 */ struct LocCell *cells;
+};
+
 void RemovePersonFromList(struct Person *person);
 void FreePerson(struct Person *person);
 
