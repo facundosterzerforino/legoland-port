@@ -51,3 +51,4 @@ permuter_out/
 # built by tools/test_miniwin/build.sh
 tools/test_miniwin/*.exe
 tools/music/*.exe
+tools/test_miniwin/fluid/

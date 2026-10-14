@@ -10,6 +10,9 @@
 #include "_Internal.h"
 #include "dmreverb.h"
 #include "miniwin/dmengine.h"
+#ifdef DME_FLUIDSYNTH
+#include <fluidsynth.h>
+#endif
 
 #define BEAT 768 /* ticks a quarter note */
 #define LOOKAHEAD BEAT /* patterns are composed this far ahead: notes may start early (negative offsets) */
@@ -47,6 +50,14 @@ struct DmeEngine {
     DmLoader *loader;
     DmSynth synth;
     DmeReverb *reverb; /* DirectMusic's synthesizer adds one by default */
+#ifdef DME_FLUIDSYNTH
+    /* [experiment] FluidSynth on gm.dls (its own DLS loader) instead of dmusic's synthesizer, when DME_FLUIDSYNTH is
+     * set in the environment */
+    fluid_settings_t *fluid_settings;
+    fluid_synth_t *fluid;
+    int fluid_font;
+    int fluid_transpose[64];
+#endif
     unsigned int rate;
     double now; /* ticks */
     double tempo;
@@ -509,6 +520,40 @@ static void Start(DmeEngine *e, DmSegment *seg, long t, unsigned int repeats) {
     Notify(e, DME_SEGMENT, DME_SEG_START, 0, 0, t);
 }
 
+#ifdef DME_FLUIDSYNTH
+static void FluidBand(DmeEngine *e, const DmBand *band) {
+    size_t i;
+
+    for (i = 0; i < band->instruments_len; i++) {
+        const DmInstrument *ins = &band->instruments[i];
+        int ch = (int)ins->channel;
+
+        if (ch >= 64) {
+            continue;
+        }
+        if (ins->options & DmInstrument_VALID_PATCH) {
+            int drum = (ins->patch & DmDls_DRUM_KIT) != 0;
+            int msb = (int)(ins->patch >> 16) & 0x7f, program = (int)ins->patch & 0x7f;
+
+            fluid_synth_set_channel_type(e->fluid, ch, drum ? CHANNEL_TYPE_DRUM : CHANNEL_TYPE_MELODIC);
+            if (fluid_synth_program_select(e->fluid, ch, e->fluid_font, drum ? 128 : msb, program) != FLUID_OK) {
+                fluid_synth_program_select(e->fluid, ch, e->fluid_font, drum ? 128 : 0, drum ? 0 : program);
+            }
+        }
+        fluid_synth_cc(e->fluid, ch, 11, 127);
+        if (ins->options & DmInstrument_VALID_VOLUME) {
+            fluid_synth_cc(e->fluid, ch, 7, (int)ins->volume);
+        }
+        if (ins->options & DmInstrument_VALID_PAN) {
+            fluid_synth_cc(e->fluid, ch, 10, (int)ins->pan);
+        }
+        if (ins->options & DmInstrument_VALID_TRANSPOSE) {
+            e->fluid_transpose[ch] = ins->transpose;
+        }
+    }
+}
+#endif
+
 static void Message(DmeEngine *e, const DmMessage *m) {
     if (m->type == DmMessage_TEMPO) {
         e->tempo = m->tempo.tempo > 0 ? m->tempo.tempo : e->tempo;
@@ -516,7 +561,12 @@ static void Message(DmeEngine *e, const DmMessage *m) {
             fprintf(e->log, "tempo %ld %.4f\n", e->seg_start + MsgTime(m), e->tempo);
         }
     } else if (m->type == DmMessage_BAND && m->band.band != NULL) {
-        DmSynth_sendBandUpdate(&e->synth, m->band.band);
+#ifdef DME_FLUIDSYNTH
+        if (e->fluid != NULL) {
+            FluidBand(e, m->band.band);
+        } else
+#endif
+            DmSynth_sendBandUpdate(&e->synth, m->band.band);
         if (e->log != NULL) {
             size_t i;
 
@@ -531,6 +581,31 @@ static void Message(DmeEngine *e, const DmMessage *m) {
 }
 
 static void Apply(DmeEngine *e, const Event *ev) {
+#ifdef DME_FLUIDSYNTH
+    if (e->fluid != NULL) {
+        int ch = ev->ch & 63, key = ev->note + e->fluid_transpose[ev->ch & 63];
+
+        switch (ev->type) {
+        case EV_NOTE_ON:
+            if (key >= 0 && key < 128) {
+                fluid_synth_noteon(e->fluid, ch, key, ev->vel);
+            }
+            break;
+        case EV_NOTE_OFF:
+            if (key >= 0 && key < 128) {
+                fluid_synth_noteoff(e->fluid, ch, key);
+            }
+            break;
+        case EV_CONTROL:
+            fluid_synth_cc(e->fluid, ch, ev->note, (int)(ev->value * 127.0f + 0.5f));
+            break;
+        case EV_BEND:
+            fluid_synth_pitch_bend(e->fluid, ch, (int)ev->value);
+            break;
+        }
+        return;
+    }
+#endif
     switch (ev->type) {
     case EV_NOTE_ON:
         DmSynth_sendNoteOn(&e->synth, (uint32_t)ev->ch, (uint8_t)ev->note, (uint8_t)ev->vel);
@@ -698,6 +773,25 @@ DmeEngine *Dme_create(DmLoader *loader, unsigned int rate) {
     DmSynth_init(&e->synth, e->rate);
     DmSynth_setVolume(&e->synth, SYNTH_GAIN);
     e->reverb = DmeReverb_create(e->rate);
+#ifdef DME_FLUIDSYNTH
+    if (getenv("DME_FLUIDSYNTH") != NULL) {
+        const char *gain = getenv("DME_FLUIDSYNTH_GAIN");
+
+        e->fluid_settings = new_fluid_settings();
+        fluid_settings_setnum(e->fluid_settings, "synth.sample-rate", e->rate);
+        fluid_settings_setnum(e->fluid_settings, "synth.gain", gain != NULL ? atof(gain) : 0.8);
+        fluid_settings_setint(e->fluid_settings, "synth.reverb.active", 0);
+        fluid_settings_setint(e->fluid_settings, "synth.chorus.active", 0);
+        fluid_settings_setint(e->fluid_settings, "synth.midi-channels", 64);
+        fluid_settings_setint(e->fluid_settings, "synth.polyphony", 256);
+        e->fluid = new_fluid_synth(e->fluid_settings);
+        e->fluid_font = e->fluid ? fluid_synth_sfload(e->fluid, "C:\\Windows\\System32\\drivers\\gm.dls", 0) : -1;
+        if (e->fluid_font < 0) {
+            delete_fluid_synth(e->fluid);
+            e->fluid = NULL;
+        }
+    }
+#endif
     return e;
 }
 
@@ -709,6 +803,14 @@ void Dme_destroy(DmeEngine *e) {
     DmSegment_release(e->queued);
     DmSynth_free(&e->synth);
     DmeReverb_destroy(e->reverb);
+#ifdef DME_FLUIDSYNTH
+    if (e->fluid != NULL) {
+        delete_fluid_synth(e->fluid);
+    }
+    if (e->fluid_settings != NULL) {
+        delete_fluid_settings(e->fluid_settings);
+    }
+#endif
     DmLoader_release(e->loader);
     free(e->msgs);
     free(e->ev);
@@ -785,6 +887,11 @@ void Dme_stop(DmeEngine *e) {
     e->queued = NULL;
     e->nev = 0;
     DmSynth_sendNoteOffEverything(&e->synth);
+#ifdef DME_FLUIDSYNTH
+    if (e->fluid != NULL) {
+        fluid_synth_all_notes_off(e->fluid, -1);
+    }
+#endif
     mtx_unlock(&e->lock);
 }
 
@@ -819,7 +926,14 @@ void Dme_render(DmeEngine *e, short *out, int frames) {
 
             n = k < n ? k : n;
         }
-        DmSynth_render(&e->synth, out + done * 2, (size_t)n * 2, DmRender_SHORT | DmRender_STEREO);
+#ifdef DME_FLUIDSYNTH
+        if (e->fluid != NULL) {
+            short *p = out + done * 2;
+
+            fluid_synth_write_s16(e->fluid, n, p, 0, 2, p, 1, 2);
+        } else
+#endif
+            DmSynth_render(&e->synth, out + done * 2, (size_t)n * 2, DmRender_SHORT | DmRender_STEREO);
         DmeReverb_process(e->reverb, out + done * 2, n);
         e->now += n * per_frame;
         done += n;

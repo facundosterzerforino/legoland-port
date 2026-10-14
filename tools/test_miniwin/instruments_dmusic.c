@@ -15,6 +15,9 @@
 #include "../../miniwin/src/dmreverb.h"
 #include "miniwin/dmusic.h"
 #include "miniwin/miniwin.h"
+#ifdef WITH_FLUIDSYNTH
+#include <fluidsynth.h>
+#endif
 
 #define SLOT_SECONDS 3
 #define NOTE_START 0.25
@@ -402,15 +405,109 @@ static int RenderPortable(const char *out_path) {
     return 1;
 }
 
+#ifdef WITH_FLUIDSYNTH
+/* ---- FluidSynth on gm.dls (its own DLS loader) ---- */
+
+static int RenderFluid(const char *out_path) {
+    fluid_settings_t *settings = new_fluid_settings();
+    fluid_synth_t *syn;
+    static short pcm[RATE * 2];
+    const char *gain = getenv("FLUID_GAIN"), *rev = getenv("FLUID_REVERB");
+    int own_reverb = rev == NULL || strcmp(rev, "own") == 0;
+    DmeReverb *reverb = own_reverb ? DmeReverb_create(RATE) : NULL;
+    FILE *out;
+    unsigned int i;
+    DWORD written = 0;
+    int id;
+
+    fluid_settings_setnum(settings, "synth.sample-rate", RATE);
+    fluid_settings_setnum(settings, "synth.gain", gain != NULL ? atof(gain) : 0.5);
+    fluid_settings_setint(settings, "synth.reverb.active", rev != NULL && strcmp(rev, "fluid") == 0);
+    fluid_settings_setint(settings, "synth.chorus.active", 0);
+    fluid_settings_setint(settings, "synth.polyphony", 256);
+    syn = new_fluid_synth(settings);
+    id = fluid_synth_sfload(syn, "C:\\Windows\\System32\\drivers\\gm.dls", 0);
+    if (id < 0) {
+        printf("FluidSynth can't load gm.dls\n");
+        return 0;
+    }
+    out = OpenWav(out_path);
+    memset(pcm, 0, sizeof(pcm));
+    fwrite(pcm, 4, RATE, out);
+    written += RATE * 4;
+    for (i = 0; i < TESTS; i++) {
+        const Test *t = &tests[i];
+        int ch = t->drum ? 9 : (i % 15 == 9 ? 15 : (int)(i % 15));
+        int on = (int)(NOTE_START * RATE), off = (int)((NOTE_START + NOTE_SECONDS) * RATE);
+        int s;
+
+        if (fluid_synth_program_select(syn, ch, id, t->drum ? 128 : t->msb, t->program) != FLUID_OK &&
+            fluid_synth_program_select(syn, ch, id, t->drum ? 128 : 0, t->drum ? 0 : t->program) != FLUID_OK) {
+            printf("FluidSynth: no preset for %s\n", t->name);
+        }
+        fluid_synth_cc(syn, ch, 7, 100);
+        fluid_synth_cc(syn, ch, 11, 127);
+        fluid_synth_cc(syn, ch, 10, 64);
+        for (s = 0; s < SLOT_SECONDS; s++) {
+            int k0 = s * RATE, k1 = (s + 1) * RATE, k = k0;
+
+            while (k < k1) {
+                int until = k1;
+
+                if (on >= k && on < until) {
+                    until = on;
+                }
+                if (off >= k && off < until) {
+                    until = off;
+                }
+                if (until > k) {
+                    short *p = pcm + (k - k0) * 2;
+
+                    fluid_synth_write_s16(syn, until - k, p, 0, 2, p, 1, 2);
+                }
+                if (until == on) {
+                    fluid_synth_noteon(syn, ch, t->note, t->velocity);
+                    on = -1;
+                }
+                if (until == off) {
+                    fluid_synth_noteoff(syn, ch, t->note);
+                    off = -1;
+                }
+                k = until;
+            }
+            DmeReverb_process(reverb, pcm, RATE);
+            fwrite(pcm, 4, RATE, out);
+            written += RATE * 4;
+        }
+    }
+    memset(pcm, 0, sizeof(pcm));
+    fwrite(pcm, 4, RATE, out);
+    written += RATE * 4;
+    CloseWav(out, written);
+    delete_fluid_synth(syn);
+    delete_fluid_settings(settings);
+    DmeReverb_destroy(reverb);
+    return 1;
+}
+#endif
+
 int main(int argc, char **argv) {
     if (argc < 4) {
-        printf("usage: instruments_dmusic <data folder> <windows.wav> <portable.wav>\n");
+        printf("usage: instruments_dmusic <data folder> <windows.wav> <portable.wav> [<fluidsynth.wav>]\n");
         return 2;
     }
     if (!SetCurrentDirectoryA(argv[1])) {
         printf("can't open %s\n", argv[1]);
         return 2;
     }
+#ifdef WITH_FLUIDSYNTH
+    if (argc > 4 && !RenderFluid(argv[4])) {
+        return 1;
+    }
+    if (getenv("FLUID_ONLY") != NULL) {
+        return 0;
+    }
+#endif
     if (!RenderPortable(argv[3]) || !RenderWindows(argv[2])) {
         return 1;
     }
