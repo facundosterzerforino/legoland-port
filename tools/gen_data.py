@@ -262,12 +262,77 @@ for i, a in enumerate(gaddrs):
     else:
         fill.append((a, g["name"], gap))
 
+# ---- typed globals ---------------------------------------------------------------------------------------
+# A global that holds pointers can't be filled with the original bytes on a 64-bit build (its pointers are
+# 8 bytes there, and its fields move): tools/port_layout.py gives its original layout, and PortLoadData fills
+# it field by field, resolving each pointer slot through the fixups.
+layouts = {}
+if "--no-typed" not in sys.argv:
+    import json
+    import os
+    import subprocess
+    import tempfile
+
+    slots_file = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
+    slots_file.write("\n".join("%x" % (DATA_LO + off) for off, kind, name, x in fixups))
+    slots_file.close()
+    names = "\n".join("%s@%x" % (name, a) for a, name, gap in fill)
+    try:
+        r = subprocess.run(["uv", "run", "-q", "--no-project", "--with", "libclang==18.1.1", "python",
+                            str(Path(__file__).resolve().parent / "port_layout.py"), "--stdin", "--pointers",
+                            slots_file.name], input=names, capture_output=True, text=True, check=True)
+        lay = json.loads(r.stdout)
+        if lay["errors"]:
+            print("warning: port_layout.py: %d parse errors (first: %s)" % (len(lay["errors"]), lay["errors"][0]),
+                  file=sys.stderr)
+        layouts = {n: v for n, v in lay["globals"].items() if v["t"]["k"] != "B"}
+    except Exception as e:
+        print("warning: no layouts (%s): every global is filled with its original bytes" % e, file=sys.stderr)
+    finally:
+        os.unlink(slots_file.name)
+typed = [(a, name, gap) for a, name, gap in fill if name in layouts]
+fill = [(a, name, gap) for a, name, gap in fill if name not in layouts]
+
+
+def emit(t, dst, src, ind, depth, mode):
+    """C statements loading ('L') or checking ('C') tree t into lvalue dst from original offset expression src"""
+    pad = "    " * ind
+    k = t["k"]
+    if k == "B":
+        return [pad + "Port%sBytes(&%s, %s, 0x%xu, lim);" % ("Load" if mode == "L" else "Check", dst, src, t["n"])]
+    if k in ("P", "Q"):
+        fn = {"P": "Ptr", "Q": "PtrInt"}[k]
+        return [pad + "Port%s%s(&%s, %s, lim);" % ("Load" if mode == "L" else "Check", fn, dst, src)]
+    if k == "R":
+        out = []
+        for d, sub_t in t["f"]:
+            out += emit(sub_t, dst + d, "%s + 0x%x" % (src, sub_t["o"]) if sub_t["o"] else src, ind, depth, mode)
+        return out
+    if k == "A":
+        v = "i%d" % depth
+        out = [pad + "for (%s = 0; %s < %d; %s++) {" % (v, v, t["n"], v)]
+        out += emit(t["e"], "%s[%s]" % (dst, v), "%s + %s * 0x%x" % (src, v, t["s"]), ind + 1, depth + 1, mode)
+        out.append(pad + "}")
+        return out
+    raise ValueError(k)
+
+
+def depth_of(t):
+    if t["k"] == "A":
+        return 1 + depth_of(t["e"])
+    if t["k"] == "R":
+        return max([depth_of(x) for d, x in t["f"]] + [0])
+    return 0
+
+
+
 # ---- report ----------------------------------------------------------------------------------------------
 kinds = {}
 for f in fixups:
     kinds[f[1]] = kinds.get(f[1], 0) + 1
 print("initialized data: 0x%x..0x%x (%d bytes)" % (DATA_LO, DATA_HI, len(image)))
-print("globals filled: %d, skipped: %d" % (len(fill), len(skipped)))
+print("globals filled: %d (%d by their original bytes, %d field by field), skipped: %d"
+      % (len(fill) + len(typed), len(fill), len(typed), len(skipped)))
 print("pointer slots patched: %d (globals %d, functions %d, into the copy %d), left unchanged: %d"
       % (len(fixups), kinds.get("G", 0), kinds.get("F", 0), kinds.get("I", 0), len(unresolved)))
 print("words skipped as text: %s" % ", ".join("%d (%s)" % (n, k) for k, n in sorted(text_skipped.items())))
@@ -341,10 +406,124 @@ for a, name, gap in fill:
 out.append("};\n\n")
 out.append(r"""unsigned int PortDataOutsideTargets = 0; /* 'G' targets past the end of the port's (smaller) global */
 
+/* The pointer the original holds in the slot at port_data offset slot, as the port's pointer: through its fixup
+   (as step 1 patches it on 32-bit builds), else the original value itself (0, or a sentinel such as -1). */
+static void *PortPointerAt(unsigned int slot) {
+    unsigned int lo = 0;
+    unsigned int hi = sizeof(port_fixups) / sizeof(port_fixups[0]);
+    int v;
+
+    while (lo < hi) {
+        unsigned int mid = (lo + hi) / 2;
+        const struct PortFixup *f = &port_fixups[mid];
+
+        if (f->slot == slot) {
+            if (f->kind == 'G' && f->offset < f->size) {
+                return (char *)f->target + f->offset;
+            } else if (f->kind == 'G') {
+                return f->data != ~0u ? (void *)(port_data + f->data) : (char *)f->target + f->offset;
+            } else if (f->kind == 'F') {
+                return f->target;
+            }
+            return port_data + f->offset;
+        }
+        if (f->slot < slot) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    memcpy(&v, port_data + slot, 4);
+    return (void *)(INT_PTR)v;
+}
+
+/* the typed loaders' steps; src and lim are port_data offsets (lim: the end of the global's original data) */
+static void PortLoadBytes(void *dst, unsigned int src, unsigned int n, unsigned int lim) {
+    if (src + n <= lim) {
+        memcpy(dst, port_data + src, n);
+    } else if (src < lim) {
+        memcpy(dst, port_data + src, lim - src);
+    }
+}
+
+static void PortLoadPtr(void *dst, unsigned int src, unsigned int lim) {
+    void *p;
+
+    if (src + 4 <= lim) {
+        p = PortPointerAt(src);
+        memcpy(dst, &p, sizeof(p));
+    }
+}
+
+static void PortLoadPtrInt(void *dst, unsigned int src, unsigned int lim) {
+    UINT_PTR v;
+
+    if (src + 4 <= lim) {
+        v = (UINT_PTR)PortPointerAt(src);
+        memcpy(dst, &v, sizeof(v));
+    }
+}
+
+static unsigned int PortTypedProblems;
+static unsigned int PortTypedPointers;
+static FILE *PortTypedReport;
+
+static void PortCheckBytes(void *dst, unsigned int src, unsigned int n, unsigned int lim) {
+    if (src + n > lim) {
+        n = src < lim ? lim - src : 0;
+    }
+    if (n != 0 && memcmp(dst, port_data + src, n) != 0) {
+        fprintf(PortTypedReport, "typed global: bytes at original 0x%08x differ\n", PORT_DATA_VA + src);
+        PortTypedProblems++;
+    }
+}
+
+static void PortCheckPtr(void *dst, unsigned int src, unsigned int lim) {
+    void *have;
+    void *want;
+
+    if (src + 4 > lim) {
+        return;
+    }
+    memcpy(&have, dst, sizeof(have));
+    want = PortPointerAt(src);
+    if (have != want) {
+        fprintf(PortTypedReport, "typed global: pointer at original 0x%08x: %p, expected %p\n", PORT_DATA_VA + src,
+                have, want);
+        PortTypedProblems++;
+    }
+    PortTypedPointers++;
+}
+
+static void PortCheckPtrInt(void *dst, unsigned int src, unsigned int lim) {
+    PortCheckPtr(dst, src, lim);
+}
+""")
+for mode in ("L", "C"):
+    for a, name, gap in typed:
+        t = layouts[name]["t"]
+        lim = min(gap, layouts[name]["size"])
+        out.append("static void Port%s_%s(void) {\n" % ("Load" if mode == "L" else "Check", name))
+        out.append("    unsigned int lim = 0x%xu;\n" % (a - DATA_LO + lim))
+        for d in range(depth_of(t)):
+            out.append("    int i%d;\n" % d)
+        out.append("\n" if depth_of(t) else "")
+        out.append("\n".join(emit(t, name, "0x%xu" % (a - DATA_LO), 1, 0, mode)) + "\n}\n\n")
+out.append("static void (*const port_typed_loads[])(void) = {\n")
+for a, name, gap in typed:
+    out.append("    PortLoad_%s,\n" % name)
+out.append("    NULL\n};\n\nstatic void (*const port_typed_checks[])(void) = {\n")
+for a, name, gap in typed:
+    out.append("    PortCheck_%s,\n" % name)
+out.append("    NULL\n};\n\n")
+out.append(r"""
+
 void PortLoadData(void) {
     unsigned int i;
 
-    /* 1. patch the pointer slots in the copy */
+#if !defined(_WIN64)
+    /* 1. patch the pointer slots in the copy (on 64-bit, an 8-byte pointer doesn't fit a 4-byte slot: the typed
+       loaders resolve each pointer they need instead) */
     for (i = 0; i < sizeof(port_fixups) / sizeof(port_fixups[0]); i++) {
         const struct PortFixup *f = &port_fixups[i];
         void *p;
@@ -362,13 +541,17 @@ void PortLoadData(void) {
         }
         memcpy(port_data + f->slot, &p, sizeof(p));
     }
+#endif
 
-    /* 2. fill the globals */
+    /* 2. fill the globals: the ones without pointers with their original bytes, the others field by field */
     for (i = 0; i < sizeof(port_globals) / sizeof(port_globals[0]); i++) {
         const struct PortGlobal *g = &port_globals[i];
         unsigned int n = g->size < g->gap ? g->size : g->gap;
 
         memcpy(g->addr, port_data + g->offset, n);
+    }
+    for (i = 0; port_typed_loads[i] != NULL; i++) {
+        port_typed_loads[i]();
     }
 }
 
@@ -420,6 +603,15 @@ int PortDataSelfTest(const char *path, int earlier_problems) {
             pointers++;
         }
     }
+    /* the globals filled field by field */
+    PortTypedReport = f;
+    PortTypedProblems = 0;
+    PortTypedPointers = 0;
+    for (i = 0; port_typed_checks[i] != NULL; i++) {
+        port_typed_checks[i]();
+    }
+    bad += PortTypedProblems;
+    pointers += PortTypedPointers;
     /* globals the port declares smaller than the original's data: the bytes past their end aren't loaded */
     {
         unsigned int truncated = 0;

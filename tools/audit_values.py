@@ -86,6 +86,7 @@ def main():
     addrs = sorted(found)
     port_data = (SRC.parent.parent / "port/port_data.c").read_text(encoding="latin-1")
     filled = set(re.findall(r"\(void \*\)&?(\w+), (?:sizeof|0x)", port_data))
+    filled |= set(re.findall(r"^static void PortLoad_(\w+)\(void\)", port_data, re.M))  # filled field by field
     sym_addr = {g["name"]: a for a, g in found.items()}
     for p in SRC.glob("*.c"):
         for m in re.finditer(r"// (?:FUNCTION|STUB): LEGOLAND (0x[0-9a-f]+)\n[^\n(]*?\b(\w+)\s*\(", p.read_text(encoding="latin-1")):

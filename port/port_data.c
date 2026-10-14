@@ -5702,24 +5702,15 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b474c, sizeof(DAT_004b474c), 0x974c, 0x8},
     {(void *)&DAT_004b4754, sizeof(DAT_004b4754), 0x9754, 0x10},
     {(void *)&DAT_004b4764, sizeof(DAT_004b4764), 0x9764, 0x4},
-    {(void *)&FlumeStages_004b47f0, sizeof(FlumeStages_004b47f0), 0x97f0, 0x18},
-    {(void *)&DAT_004b4808, sizeof(DAT_004b4808), 0x9808, 0x8},
-    {(void *)&FlumeStages_004b4810, sizeof(FlumeStages_004b4810), 0x9810, 0x18},
-    {(void *)&DAT_004b4828, sizeof(DAT_004b4828), 0x9828, 0x8},
-    {(void *)&FlumeStages_004b4830, sizeof(FlumeStages_004b4830), 0x9830, 0x28},
-    {(void *)&DAT_004b4858, sizeof(DAT_004b4858), 0x9858, 0x8},
     {(void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x9860, 0x370},
     {(void *)&DAT_004b4bd0, sizeof(DAT_004b4bd0), 0x9bd0, 0x20},
     {(void *)&DAT_004b4bf0, sizeof(DAT_004b4bf0), 0x9bf0, 0x14},
     {(void *)&DAT_004b4c04, sizeof(DAT_004b4c04), 0x9c04, 0x4},
     {(void *)&DAT_004b4c08, sizeof(DAT_004b4c08), 0x9c08, 0xa4},
-    {(void *)&SAFARI_SFX, sizeof(SAFARI_SFX), 0x9cb8, 0xc},
     {(void *)&DAT_004b4cc4, sizeof(DAT_004b4cc4), 0x9cc4, 0x20},
     {(void *)&DAT_004b4ce4, sizeof(DAT_004b4ce4), 0x9ce4, 0xa4},
-    {(void *)&SpiderRide_SFX, sizeof(SpiderRide_SFX), 0x9d88, 0xc},
     {(void *)&SpiderBnvInfo, sizeof(SpiderBnvInfo), 0x9d94, 0x8c},
     {(void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0x9e20, 0xe8},
-    {(void *)&DAT_004b4f08, sizeof(DAT_004b4f08), 0x9f08, 0x10},
     {(void *)&DAT_004b4f18, sizeof(DAT_004b4f18), 0x9f18, 0x4},
     {(void *)&DAT_004b4f1c, sizeof(DAT_004b4f1c), 0x9f1c, 0x8c},
     {(void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x9fa8, 0x170},
@@ -5733,13 +5724,10 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xa2c0, 0x100},
     {(void *)&DAT_004b53c0, sizeof(DAT_004b53c0), 0xa3c0, 0x14},
     {(void *)&DAT_004b53d4, sizeof(DAT_004b53d4), 0xa3d4, 0x19c},
-    {(void *)&DAT_004b5570, sizeof(DAT_004b5570), 0xa570, 0x14},
     {(void *)&DAT_004b5584, sizeof(DAT_004b5584), 0xa584, 0x18},
     {(void *)&DAT_004b559c, sizeof(DAT_004b559c), 0xa59c, 0xc},
     {(void *)&FLOAT_004b55a8, sizeof(FLOAT_004b55a8), 0xa5a8, 0x4c},
     {(void *)&DAT_004b55f4, sizeof(DAT_004b55f4), 0xa5f4, 0x8},
-    {(void *)&DAT_004b55fc, sizeof(DAT_004b55fc), 0xa5fc, 0x4},
-    {(void *)&DAT_004b5600, sizeof(DAT_004b5600), 0xa600, 0x8},
     {(void *)&DAT_004b5608, sizeof(DAT_004b5608), 0xa608, 0x4},
     {(void *)&DAT_004b560c, sizeof(DAT_004b560c), 0xa60c, 0x4},
     {(void *)&DAT_004b5610, sizeof(DAT_004b5610), 0xa610, 0x4},
@@ -5748,22 +5736,14 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5624, sizeof(DAT_004b5624), 0xa624, 0x4},
     {(void *)&DAT_004b5628, sizeof(DAT_004b5628), 0xa628, 0xc},
     {(void *)&FLOAT_004b5634, sizeof(FLOAT_004b5634), 0xa634, 0x14},
-    {(void *)&DAT_004b5648, sizeof(DAT_004b5648), 0xa648, 0x10},
-    {(void *)&DAT_004b5658, sizeof(DAT_004b5658), 0xa658, 0x8},
     {(void *)&DAT_004b5660, sizeof(DAT_004b5660), 0xa660, 0xa0},
     {(void *)&DAT_004b5700, sizeof(DAT_004b5700), 0xa700, 0x48},
     {(void *)&DAT_004b5748, sizeof(DAT_004b5748), 0xa748, 0xc0},
     {(void *)&DAT_004b5808, sizeof(DAT_004b5808), 0xa808, 0xc0},
-    {(void *)&DAT_004b58c8, sizeof(DAT_004b58c8), 0xa8c8, 0x9c},
     {(void *)&DAT_004b5964, sizeof(DAT_004b5964), 0xa964, 0x8},
     {(void *)&DAT_004b5974, sizeof(DAT_004b5974), 0xa974, 0x8},
-    {(void *)&DAT_004b5988, sizeof(DAT_004b5988), 0xa988, 0x60},
     {(void *)&DAT_004b5abc, sizeof(DAT_004b5abc), 0xaabc, 0x64},
-    {(void *)&DAT_004b5b20, sizeof(DAT_004b5b20), 0xab20, 0x4},
-    {(void *)&DAT_004b5b24, sizeof(DAT_004b5b24), 0xab24, 0x4},
     {(void *)&DAT_004b5b28, sizeof(DAT_004b5b28), 0xab28, 0x14},
-    {(void *)&DAT_004b5b3c, sizeof(DAT_004b5b3c), 0xab3c, 0xc},
-    {(void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xab48, 0xd4},
     {(void *)&DAT_004b5c1c, sizeof(DAT_004b5c1c), 0xac1c, 0x80},
     {(void *)&DAT_004b5c9c, sizeof(DAT_004b5c9c), 0xac9c, 0x4},
     {(void *)&DAT_004b5ca0, sizeof(DAT_004b5ca0), 0xaca0, 0x4},
@@ -5778,10 +5758,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5cc4, sizeof(DAT_004b5cc4), 0xacc4, 0x4},
     {(void *)&DAT_004b5cc8, sizeof(DAT_004b5cc8), 0xacc8, 0x2c},
     {(void *)&RollerCoasterSavePath, sizeof(RollerCoasterSavePath), 0xacf4, 0x2c},
-    {(void *)&DAT_004b5d20, sizeof(DAT_004b5d20), 0xad20, 0x38},
-    {(void *)&DAT_004b5d58, sizeof(DAT_004b5d58), 0xad58, 0x38},
-    {(void *)&DAT_004b5d90, sizeof(DAT_004b5d90), 0xad90, 0x38},
-    {(void *)&DAT_004b5dc8, sizeof(DAT_004b5dc8), 0xadc8, 0x38},
     {(void *)&DAT_004b5e00, sizeof(DAT_004b5e00), 0xae00, 0x30},
     {(void *)&DAT_004b5e30, sizeof(DAT_004b5e30), 0xae30, 0x30},
     {(void *)&DAT_004b5e60, sizeof(DAT_004b5e60), 0xae60, 0x30},
@@ -5790,8 +5766,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5ee0, sizeof(DAT_004b5ee0), 0xaee0, 0x14},
     {(void *)&DAT_004b5ef4, sizeof(DAT_004b5ef4), 0xaef4, 0x20},
     {(void *)&DAT_004b5f14, sizeof(DAT_004b5f14), 0xaf14, 0x3c},
-    {(void *)&DAT_004b5f50, sizeof(DAT_004b5f50), 0xaf50, 0x10},
-    {(void *)&DAT_004b5f60, sizeof(DAT_004b5f60), 0xaf60, 0x20},
     {(void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0xaf80, 0x1d0},
     {(void *)&DAT_004b6150, sizeof(DAT_004b6150), 0xb150, 0x90},
     {(void *)&DAT_004b61e0, sizeof(DAT_004b61e0), 0xb1e0, 0x110},
@@ -5799,10 +5773,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b6300, sizeof(DAT_004b6300), 0xb300, 0x98},
     {(void *)&DAT_004b6398, sizeof(DAT_004b6398), 0xb398, 0x30},
     {(void *)&DAT_004b63c8, sizeof(DAT_004b63c8), 0xb3c8, 0x34},
-    {(void *)&DAT_004b63fc, sizeof(DAT_004b63fc), 0xb3fc, 0xc},
     {(void *)&DAT_004b6408, sizeof(DAT_004b6408), 0xb408, 0xc4},
     {(void *)&CarouselBlokeBoxName, sizeof(CarouselBlokeBoxName), 0xb4cc, 0xc},
-    {(void *)&CAROUSSEL_SFX, sizeof(CAROUSSEL_SFX), 0xb4d8, 0xe8},
     {(void *)&DAT_004b65c0, sizeof(DAT_004b65c0), 0xb5c0, 0x78},
     {(void *)&DAT_004b6638, sizeof(DAT_004b6638), 0xb638, 0x1c},
     {(void *)&ENTRANCE_DEST_RIGHT, sizeof(ENTRANCE_DEST_RIGHT), 0xb654, 0x8},
@@ -5831,10 +5803,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7290, sizeof(DAT_004b7290), 0xc290, 0x54},
     {(void *)&DAT_004b72e4, sizeof(DAT_004b72e4), 0xc2e4, 0x194},
     {(void *)&DAT_004b7478, sizeof(DAT_004b7478), 0xc478, 0x1a0},
-    {(void *)&SPACE_TOWER_SFX, sizeof(SPACE_TOWER_SFX), 0xc618, 0xa0},
     {(void *)&DAT_004b76b8, sizeof(DAT_004b76b8), 0xc6b8, 0x98},
     {(void *)&DAT_004b7750, sizeof(DAT_004b7750), 0xc750, 0x8},
-    {(void *)&DAT_004b7758, sizeof(DAT_004b7758), 0xc758, 0x40},
     {(void *)&DAT_004b7798, sizeof(DAT_004b7798), 0xc798, 0x50},
     {(void *)&DAT_004b77e8, sizeof(DAT_004b77e8), 0xc7e8, 0xcc},
     {(void *)&DAT_004b79d0, sizeof(DAT_004b79d0), 0xc9d0, 0xec},
@@ -5849,26 +5819,13 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7d78, sizeof(DAT_004b7d78), 0xcd78, 0x6},
     {(void *)&DAT_004b7d7e, sizeof(DAT_004b7d7e), 0xcd7e, 0x6},
     {(void *)&DAT_004b7d84, sizeof(DAT_004b7d84), 0xcd84, 0xb4},
-    {(void *)&DAT_004b7e9c, sizeof(DAT_004b7e9c), 0xce9c, 0x324},
-    {(void *)&GraphicsPath, sizeof(GraphicsPath), 0xd1c0, 0x4},
-    {(void *)&GraphicsPathPrefix, sizeof(GraphicsPathPrefix), 0xd1c4, 0x4},
-    {(void *)&GraphicsSmallPath, sizeof(GraphicsSmallPath), 0xd1c8, 0x4},
-    {(void *)&MasksPath, sizeof(MasksPath), 0xd1cc, 0x4},
-    {(void *)&MasksSmallPath, sizeof(MasksSmallPath), 0xd1d0, 0x4},
-    {(void *)&IconsPath, sizeof(IconsPath), 0xd1d4, 0x4},
-    {(void *)&ModelsPath, sizeof(ModelsPath), 0xd1d8, 0x140},
     {(void *)&DAT_004b8318, sizeof(DAT_004b8318), 0xd318, 0x8},
     {(void *)&DAT_004b8320, sizeof(DAT_004b8320), 0xd320, 0x8},
     {(void *)&DAT_004b8328, sizeof(DAT_004b8328), 0xd328, 0xc},
     {(void *)&DAT_004b8334, sizeof(DAT_004b8334), 0xd334, 0x10},
     {(void *)&DAT_004b8344, sizeof(DAT_004b8344), 0xd344, 0x4},
-    {(void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348), 0xd348, 0x20},
-    {(void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0xd368, 0x25c},
-    {(void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0xd5c4, 0x14c},
     {(void *)&FountainSFX, sizeof(FountainSFX), 0xd710, 0x40},
     {(void *)&PowerStationSFX, sizeof(PowerStationSFX), 0xd750, 0x18},
-    {(void *)&DINO_SFX, sizeof(DINO_SFX), 0xd768, 0x40},
-    {(void *)&MONEY_SFX, sizeof(MONEY_SFX), 0xd7a8, 0x2e0},
     {(void *)&DAT_004b8a88, sizeof(DAT_004b8a88), 0xda88, 0x4},
     {(void *)&DAT_004b8a8c, sizeof(DAT_004b8a8c), 0xda8c, 0x4},
     {(void *)&DAT_004b8a90, sizeof(DAT_004b8a90), 0xda90, 0x12c},
@@ -5880,7 +5837,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b9218, sizeof(DAT_004b9218), 0xe218, 0x4},
     {(void *)&DAT_004b921c, sizeof(DAT_004b921c), 0xe21c, 0x4},
     {(void *)&BGFullUpdate, sizeof(BGFullUpdate), 0xe220, 0x8},
-    {(void *)&GameFX, sizeof(GameFX), 0xe228, 0x118},
     {(void *)&DAT_004b9550, sizeof(DAT_004b9550), 0xe550, 0x8},
     {(void *)&DAT_004b9558, sizeof(DAT_004b9558), 0xe558, 0x24},
     {(void *)&DAT_004b957c, sizeof(DAT_004b957c), 0xe57c, 0x24},
@@ -5891,7 +5847,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b95dc, sizeof(DAT_004b95dc), 0xe5dc, 0xc},
     {(void *)&DAT_004b95e8, sizeof(DAT_004b95e8), 0xe5e8, 0x4},
     {(void *)&DAT_004b95ec, sizeof(DAT_004b95ec), 0xe5ec, 0x4},
-    {(void *)&PTR_DAT_004b95f0, sizeof(PTR_DAT_004b95f0), 0xe5f0, 0x4},
     {(void *)&DAT_004b95f4, sizeof(DAT_004b95f4), 0xe5f4, 0x4},
     {(void *)&DAT_004b95f8, sizeof(DAT_004b95f8), 0xe5f8, 0x4},
     {(void *)&DAT_004b95fc, sizeof(DAT_004b95fc), 0xe5fc, 0x4},
@@ -5900,13 +5855,10 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b9608, sizeof(DAT_004b9608), 0xe608, 0x4},
     {(void *)&DAT_004b960c, sizeof(DAT_004b960c), 0xe60c, 0x4},
     {(void *)&DAT_004b9610, sizeof(DAT_004b9610), 0xe610, 0x694},
-    {(void *)&BlitFrameFunc, sizeof(BlitFrameFunc), 0xeca4, 0x4},
     {(void *)&OverrideFrame, sizeof(OverrideFrame), 0xeca8, 0x64},
     {(void *)&ScriptEventCategories, sizeof(ScriptEventCategories), 0xee5c, 0x11c},
     {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
     {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
-    {(void *)&PTR_some_list_head_004ba87c, sizeof(PTR_some_list_head_004ba87c), 0xf87c, 0x4},
-    {(void *)&PTR_DAT_004ba880, sizeof(PTR_DAT_004ba880), 0xf880, 0x4},
     {(void *)&DAT_004ba884, sizeof(DAT_004ba884), 0xf884, 0x5c},
     {(void *)&DAT_004ba8e0, sizeof(DAT_004ba8e0), 0xf8e0, 0xcc},
     {(void *)&DAT_004ba9ac, sizeof(DAT_004ba9ac), 0xf9ac, 0x3a8},
@@ -5920,7 +5872,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004bb098, sizeof(DAT_004bb098), 0x10098, 0x4},
     {(void *)&DAT_004bb09c, sizeof(DAT_004bb09c), 0x1009c, 0x4},
     {(void *)&DAT_004bb0a0, sizeof(DAT_004bb0a0), 0x100a0, 0x4},
-    {(void *)&DAT_004bb0a4, sizeof(DAT_004bb0a4), 0x100a4, 0xe8},
     {(void *)&DAT_004bb18c, sizeof(DAT_004bb18c), 0x1018c, 0x350},
     {(void *)&DAT_004bb4dc, sizeof(DAT_004bb4dc), 0x104dc, 0x4},
     {(void *)&DAT_004bb4e0, sizeof(DAT_004bb4e0), 0x104e0, 0xb8},
@@ -5929,96 +5880,2226 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004bb5a4, sizeof(DAT_004bb5a4), 0x105a4, 0x8},
     {(void *)&DAT_004bb5ac, sizeof(DAT_004bb5ac), 0x105ac, 0x4},
     {(void *)&ScriptConditionActive, sizeof(ScriptConditionActive), 0x105b0, 0x4},
-    {(void *)&DAT_004bb5b4, sizeof(DAT_004bb5b4), 0x105b4, 0x10},
-    {(void *)&DAT_004bb5c4, sizeof(DAT_004bb5c4), 0x105c4, 0x14},
-    {(void *)&DAT_004bb5d8, sizeof(DAT_004bb5d8), 0x105d8, 0x8},
-    {(void *)&DAT_004bb5e0, sizeof(DAT_004bb5e0), 0x105e0, 0x14},
-    {(void *)&DAT_004bb5f4, sizeof(DAT_004bb5f4), 0x105f4, 0x30},
-    {(void *)&DAT_004bb624, sizeof(DAT_004bb624), 0x10624, 0x64},
-    {(void *)&DAT_004bb688, sizeof(DAT_004bb688), 0x10688, 0x34},
-    {(void *)&DAT_004bb6bc, sizeof(DAT_004bb6bc), 0x106bc, 0x18},
-    {(void *)&DAT_004bb6d4, sizeof(DAT_004bb6d4), 0x106d4, 0x24},
-    {(void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x106f8, 0x9f4},
     {(void *)&LanguageName, sizeof(LanguageName), 0x110ec, 0xab8},
-    {(void *)&lpConfig, sizeof(lpConfig), 0x11bf4, 0x1d8},
     {(void *)&DAT_004bcec0, sizeof(DAT_004bcec0), 0x11ec0, 0xc},
-    {(void *)&PTR_s_Aaron_004bcecc, sizeof(PTR_s_Aaron_004bcecc), 0x11ecc, 0x14c},
-    {(void *)&PTR_s_Abbie_004bd018, sizeof(PTR_s_Abbie_004bd018), 0x12018, 0x168},
-    {(void *)&PTR_s_Adams_004bd180, sizeof(PTR_s_Adams_004bd180), 0x12180, 0x1ac},
     {(void *)&DAT_004bd32c, sizeof(DAT_004bd32c), 0x1232c, 0x20},
-    {(void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1234c, 0x9b4},
-    {(void *)&Hover, sizeof(Hover), 0x12d00, 0x1a0},
     {(void *)&SPRITE_ClipRect, sizeof(SPRITE_ClipRect), 0x12ea0, 0x18},
-    {(void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x12eb8, 0xcc8},
-    {(void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x13b80, 0x1c0},
     {(void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x13d40, 0x25c},
     {(void *)&DAT_004bef9c, sizeof(DAT_004bef9c), 0x13f9c, 0x6d4},
     {(void *)&DAT_004bf670, sizeof(DAT_004bf670), 0x14670, 0x104},
     {(void *)&MusicEnabled, sizeof(MusicEnabled), 0x14774, 0x4},
     {(void *)&MusicState, sizeof(MusicState), 0x14778, 0x7b0},
-    {(void *)&DAT_004c10d4, sizeof(DAT_004c10d4), 0x160d4, 0x8},
-    {(void *)&CastleLevelRide, sizeof(CastleLevelRide), 0x160dc, 0x8},
-    {(void *)&CastleLevelMatteSprite, sizeof(CastleLevelMatteSprite), 0x160e4, 0x4},
-    {(void *)&DAT_004c10e8, sizeof(DAT_004c10e8), 0x160e8, 0x8},
-    {(void *)&DAT_004c10f0, sizeof(DAT_004c10f0), 0x160f0, 0x4},
-    {(void *)&ActiveCatapultRide, sizeof(ActiveCatapultRide), 0x160f4, 0xc},
-    {(void *)&DAT_004c1100, sizeof(DAT_004c1100), 0x16100, 0x18},
-    {(void *)&CatapultNodeList, sizeof(CatapultNodeList), 0x16118, 0x8},
-    {(void *)&CopterBaseMatteSprite, sizeof(CopterBaseMatteSprite), 0x16120, 0x4},
-    {(void *)&CopterQueueTables, sizeof(CopterQueueTables), 0x16124, 0x14},
-    {(void *)&CopterModelLayers, sizeof(CopterModelLayers), 0x16138, 0x4},
-    {(void *)&CopterModelSprites, sizeof(CopterModelSprites), 0x1613c, 0x28},
-    {(void *)&DAT_004c1164, sizeof(DAT_004c1164), 0x16164, 0x4},
-    {(void *)&DAT_004c1168, sizeof(DAT_004c1168), 0x16168, 0x8},
-    {(void *)&DAT_004c1170, sizeof(DAT_004c1170), 0x16170, 0x18},
-    {(void *)&DAT_004c1188, sizeof(DAT_004c1188), 0x16188, 0x8},
-    {(void *)&DAT_004c1190, sizeof(DAT_004c1190), 0x16190, 0x4},
-    {(void *)&DAT_004c1194, sizeof(DAT_004c1194), 0x16194, 0x4},
-    {(void *)&ActiveCopterRide, sizeof(ActiveCopterRide), 0x16198, 0x4},
-    {(void *)&DAT_004c119c, sizeof(DAT_004c119c), 0x1619c, 0x4},
-    {(void *)&DAT_004c11a0, sizeof(DAT_004c11a0), 0x161a0, 0x4},
-    {(void *)&DAT_004c11a4, sizeof(DAT_004c11a4), 0x161a4, 0x4},
-    {(void *)&DAT_004c11a8, sizeof(DAT_004c11a8), 0x161a8, 0x4},
-    {(void *)&DAT_004c11ac, sizeof(DAT_004c11ac), 0x161ac, 0x4},
-    {(void *)&DAT_004c11b0, sizeof(DAT_004c11b0), 0x161b0, 0x4},
-    {(void *)&CopterNodeList, sizeof(CopterNodeList), 0x161b4, 0x8},
-    {(void *)&DrivingSchoolCountList, sizeof(DrivingSchoolCountList), 0x161bc, 0x4},
     {(void *)&DAT_004c11c0, sizeof(DAT_004c11c0), 0x161c0, 0x4},
-    {(void *)&DAT_004c11c4, sizeof(DAT_004c11c4), 0x161c4, 0x4},
-    {(void *)&DAT_004c11c8, sizeof(DAT_004c11c8), 0x161c8, 0x4},
-    {(void *)&FortMaskSprite, sizeof(FortMaskSprite), 0x161cc, 0xc},
-    {(void *)&FortLayer, sizeof(FortLayer), 0x161d8, 0x4},
-    {(void *)&FortRide, sizeof(FortRide), 0x161dc, 0x4},
-    {(void *)&DAT_004c11e0, sizeof(DAT_004c11e0), 0x161e0, 0x4},
-    {(void *)&DAT_004c11e4, sizeof(DAT_004c11e4), 0x161e4, 0x4},
-    {(void *)&GoldRushLayer, sizeof(GoldRushLayer), 0x161e8, 0x8},
-    {(void *)&GoldRushRide, sizeof(GoldRushRide), 0x161f0, 0x4},
-    {(void *)&GoldMaskSprite, sizeof(GoldMaskSprite), 0x161f4, 0x4},
-    {(void *)&GoldWashMatte1Sprite, sizeof(GoldWashMatte1Sprite), 0x161f8, 0x4},
-    {(void *)&GoldWashSprite, sizeof(GoldWashSprite), 0x161fc, 0x4},
-    {(void *)&GoldWashMatte2Sprite, sizeof(GoldWashMatte2Sprite), 0x16200, 0x4},
-    {(void *)&GoldWashList, sizeof(GoldWashList), 0x16204, 0x4},
-    {(void *)&GoldRushBlokeRenderList, sizeof(GoldRushBlokeRenderList), 0x16208, 0x8},
-    {(void *)&ZJoustSprite, sizeof(ZJoustSprite), 0x16210, 0x4},
-    {(void *)&JoustLayer, sizeof(JoustLayer), 0x16214, 0x4},
-    {(void *)&JoustRideBnv, sizeof(JoustRideBnv), 0x16218, 0x4},
-    {(void *)&JoustRide, sizeof(JoustRide), 0x1621c, 0xc},
-    {(void *)&DAT_004c1228, sizeof(DAT_004c1228), 0x16228, 0x14},
-    {(void *)&DAT_004c123c, sizeof(DAT_004c123c), 0x1623c, 0x8},
-    {(void *)&JoustFMaskSprite, sizeof(JoustFMaskSprite), 0x16244, 0x4},
-    {(void *)&JoustSpecRMSprite, sizeof(JoustSpecRMSprite), 0x16248, 0x4},
-    {(void *)&JoustSpecLMSprite, sizeof(JoustSpecLMSprite), 0x1624c, 0x4},
-    {(void *)&JoustNodeList, sizeof(JoustNodeList), 0x16250, 0x8},
-    {(void *)&LogFlumeTunelMSprite, sizeof(LogFlumeTunelMSprite), 0x16258, 0x8},
-    {(void *)&DAT_004c1260, sizeof(DAT_004c1260), 0x16260, 0xda0},
 };
 
 unsigned int PortDataOutsideTargets = 0; /* 'G' targets past the end of the port's (smaller) global */
 
+/* The pointer the original holds in the slot at port_data offset slot, as the port's pointer: through its fixup
+   (as step 1 patches it on 32-bit builds), else the original value itself (0, or a sentinel such as -1). */
+static void *PortPointerAt(unsigned int slot) {
+    unsigned int lo = 0;
+    unsigned int hi = sizeof(port_fixups) / sizeof(port_fixups[0]);
+    int v;
+
+    while (lo < hi) {
+        unsigned int mid = (lo + hi) / 2;
+        const struct PortFixup *f = &port_fixups[mid];
+
+        if (f->slot == slot) {
+            if (f->kind == 'G' && f->offset < f->size) {
+                return (char *)f->target + f->offset;
+            } else if (f->kind == 'G') {
+                return f->data != ~0u ? (void *)(port_data + f->data) : (char *)f->target + f->offset;
+            } else if (f->kind == 'F') {
+                return f->target;
+            }
+            return port_data + f->offset;
+        }
+        if (f->slot < slot) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    memcpy(&v, port_data + slot, 4);
+    return (void *)(INT_PTR)v;
+}
+
+/* the typed loaders' steps; src and lim are port_data offsets (lim: the end of the global's original data) */
+static void PortLoadBytes(void *dst, unsigned int src, unsigned int n, unsigned int lim) {
+    if (src + n <= lim) {
+        memcpy(dst, port_data + src, n);
+    } else if (src < lim) {
+        memcpy(dst, port_data + src, lim - src);
+    }
+}
+
+static void PortLoadPtr(void *dst, unsigned int src, unsigned int lim) {
+    void *p;
+
+    if (src + 4 <= lim) {
+        p = PortPointerAt(src);
+        memcpy(dst, &p, sizeof(p));
+    }
+}
+
+static void PortLoadPtrInt(void *dst, unsigned int src, unsigned int lim) {
+    UINT_PTR v;
+
+    if (src + 4 <= lim) {
+        v = (UINT_PTR)PortPointerAt(src);
+        memcpy(dst, &v, sizeof(v));
+    }
+}
+
+static unsigned int PortTypedProblems;
+static unsigned int PortTypedPointers;
+static FILE *PortTypedReport;
+
+static void PortCheckBytes(void *dst, unsigned int src, unsigned int n, unsigned int lim) {
+    if (src + n > lim) {
+        n = src < lim ? lim - src : 0;
+    }
+    if (n != 0 && memcmp(dst, port_data + src, n) != 0) {
+        fprintf(PortTypedReport, "typed global: bytes at original 0x%08x differ\n", PORT_DATA_VA + src);
+        PortTypedProblems++;
+    }
+}
+
+static void PortCheckPtr(void *dst, unsigned int src, unsigned int lim) {
+    void *have;
+    void *want;
+
+    if (src + 4 > lim) {
+        return;
+    }
+    memcpy(&have, dst, sizeof(have));
+    want = PortPointerAt(src);
+    if (have != want) {
+        fprintf(PortTypedReport, "typed global: pointer at original 0x%08x: %p, expected %p\n", PORT_DATA_VA + src,
+                have, want);
+        PortTypedProblems++;
+    }
+    PortTypedPointers++;
+}
+
+static void PortCheckPtrInt(void *dst, unsigned int src, unsigned int lim) {
+    PortCheckPtr(dst, src, lim);
+}
+static void PortLoad_FlumeStages_004b47f0(void) {
+    unsigned int lim = 0x9808u;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortLoadBytes(&FlumeStages_004b47f0[i0].pad_0, 0x97f0u + i0 * 0xc, 0x4u, lim);
+        PortLoadBytes(&FlumeStages_004b47f0[i0].count, 0x97f0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&FlumeStages_004b47f0[i0].sprite, 0x97f0u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DAT_004b4808(void) {
+    unsigned int lim = 0x9810u;
+    PortLoadBytes(&DAT_004b4808.count, 0x9808u, 0x4u, lim);
+    PortLoadPtr(&DAT_004b4808.table, 0x9808u + 0x4, lim);
+}
+
+static void PortLoad_FlumeStages_004b4810(void) {
+    unsigned int lim = 0x9828u;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortLoadBytes(&FlumeStages_004b4810[i0].pad_0, 0x9810u + i0 * 0xc, 0x4u, lim);
+        PortLoadBytes(&FlumeStages_004b4810[i0].count, 0x9810u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&FlumeStages_004b4810[i0].sprite, 0x9810u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DAT_004b4828(void) {
+    unsigned int lim = 0x9830u;
+    PortLoadBytes(&DAT_004b4828.count, 0x9828u, 0x4u, lim);
+    PortLoadPtr(&DAT_004b4828.table, 0x9828u + 0x4, lim);
+}
+
+static void PortLoad_FlumeStages_004b4830(void) {
+    unsigned int lim = 0x9858u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortLoadBytes(&FlumeStages_004b4830[i0].pad_0, 0x9830u + i0 * 0xc, 0x4u, lim);
+        PortLoadBytes(&FlumeStages_004b4830[i0].count, 0x9830u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&FlumeStages_004b4830[i0].sprite, 0x9830u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DAT_004b4858(void) {
+    unsigned int lim = 0x9860u;
+    PortLoadBytes(&DAT_004b4858.count, 0x9858u, 0x4u, lim);
+    PortLoadPtr(&DAT_004b4858.table, 0x9858u + 0x4, lim);
+}
+
+static void PortLoad_SAFARI_SFX(void) {
+    unsigned int lim = 0x9cc4u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&SAFARI_SFX[i0].name, 0x9cb8u + i0 * 0xc, lim);
+        PortLoadBytes(&SAFARI_SFX[i0].pad_4, 0x9cb8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&SAFARI_SFX[i0].sample, 0x9cb8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_SpiderRide_SFX(void) {
+    unsigned int lim = 0x9d94u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&SpiderRide_SFX[i0].name, 0x9d88u + i0 * 0xc, lim);
+        PortLoadBytes(&SpiderRide_SFX[i0].pad_4, 0x9d88u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&SpiderRide_SFX[i0].sample, 0x9d88u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DAT_004b4f08(void) {
+    unsigned int lim = 0x9f18u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortLoadPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b5570(void) {
+    unsigned int lim = 0xa584u;
+    PortLoadBytes(&DAT_004b5570.x, 0xa570u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5570.y, 0xa570u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5570.w, 0xa570u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5570.h, 0xa570u + 0xc, 0x4u, lim);
+    PortLoadPtr(&DAT_004b5570.next, 0xa570u + 0x10, lim);
+}
+
+static void PortLoad_DAT_004b55fc(void) {
+    unsigned int lim = 0xa600u;
+    PortLoadPtr(&DAT_004b55fc, 0xa5fcu, lim);
+}
+
+static void PortLoad_DAT_004b5600(void) {
+    unsigned int lim = 0xa608u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004b5600[i0], 0xa600u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b5648(void) {
+    unsigned int lim = 0xa650u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004b5648[i0], 0xa648u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b5658(void) {
+    unsigned int lim = 0xa660u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004b5658[i0], 0xa658u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b58c8(void) {
+    unsigned int lim = 0xa958u;
+    PortLoadBytes(&DAT_004b58c8.f0, 0xa8c8u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b58c8.f4, 0xa8c8u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b58c8.f8, 0xa8c8u + 0x8, 0x4u, lim);
+    PortLoadPtr(&DAT_004b58c8.verts, 0xa8c8u + 0xc, lim);
+    PortLoadPtr(&DAT_004b58c8.normals, 0xa8c8u + 0x10, lim);
+    PortLoadPtr(&DAT_004b58c8.xverts, 0xa8c8u + 0x14, lim);
+    PortLoadPtr(&DAT_004b58c8.faceA, 0xa8c8u + 0x18, lim);
+    PortLoadBytes(&DAT_004b58c8.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&DAT_004b58c8.faceB, 0xa8c8u + 0x20, lim);
+    PortLoadBytes(&DAT_004b58c8.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
+    PortLoadBytes(&DAT_004b58c8.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
+}
+
+static void PortLoad_DAT_004b5988(void) {
+    unsigned int lim = 0xa9c0u;
+    PortLoadBytes(&DAT_004b5988.sex, 0xa988u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5988.leg, 0xa988u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5988.arm, 0xa988u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5988.chest, 0xa988u + 0xc, 0x14u, lim);
+    PortLoadBytes(&DAT_004b5988.face, 0xa988u + 0x20, 0x14u, lim);
+    PortLoadPtr(&DAT_004b5988.bloke, 0xa988u + 0x34, lim);
+}
+
+static void PortLoad_DAT_004b5b20(void) {
+    unsigned int lim = 0xab24u;
+    PortLoadPtr(&DAT_004b5b20, 0xab20u, lim);
+}
+
+static void PortLoad_DAT_004b5b24(void) {
+    unsigned int lim = 0xab28u;
+    PortLoadPtr(&DAT_004b5b24, 0xab24u, lim);
+}
+
+static void PortLoad_DAT_004b5b3c(void) {
+    unsigned int lim = 0xab40u;
+    PortLoadPtr(&DAT_004b5b3c, 0xab3cu, lim);
+}
+
+static void PortLoad_DAT_004b5b48(void) {
+    unsigned int lim = 0xab80u;
+    PortLoadBytes(&DAT_004b5b48.flags, 0xab48u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5b48.f4, 0xab48u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5b48.f8, 0xab48u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5b48.door_a, 0xab48u + 0xc, 0x8u, lim);
+    PortLoadBytes(&DAT_004b5b48.door_b, 0xab48u + 0x14, 0x8u, lim);
+    PortLoadPtr(&DAT_004b5b48.method_1c, 0xab48u + 0x1c, lim);
+    PortLoadPtr(&DAT_004b5b48.method_20, 0xab48u + 0x20, lim);
+    PortLoadPtr(&DAT_004b5b48.method_24, 0xab48u + 0x24, lim);
+    PortLoadPtr(&DAT_004b5b48.method_28, 0xab48u + 0x28, lim);
+    PortLoadPtr(&DAT_004b5b48.method_2c, 0xab48u + 0x2c, lim);
+    PortLoadBytes(&DAT_004b5b48.field_30, 0xab48u + 0x30, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5b48.field_34, 0xab48u + 0x34, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004b5d20(void) {
+    unsigned int lim = 0xad58u;
+    PortLoadBytes(&DAT_004b5d20.flags, 0xad20u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d20.f4, 0xad20u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d20.f8, 0xad20u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d20.door_a, 0xad20u + 0xc, 0x8u, lim);
+    PortLoadBytes(&DAT_004b5d20.door_b, 0xad20u + 0x14, 0x8u, lim);
+    PortLoadPtr(&DAT_004b5d20.method_1c, 0xad20u + 0x1c, lim);
+    PortLoadPtr(&DAT_004b5d20.method_20, 0xad20u + 0x20, lim);
+    PortLoadPtr(&DAT_004b5d20.method_24, 0xad20u + 0x24, lim);
+    PortLoadPtr(&DAT_004b5d20.method_28, 0xad20u + 0x28, lim);
+    PortLoadPtr(&DAT_004b5d20.method_2c, 0xad20u + 0x2c, lim);
+    PortLoadBytes(&DAT_004b5d20.field_30, 0xad20u + 0x30, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d20.field_34, 0xad20u + 0x34, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004b5d58(void) {
+    unsigned int lim = 0xad90u;
+    PortLoadBytes(&DAT_004b5d58.flags, 0xad58u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d58.f4, 0xad58u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d58.f8, 0xad58u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d58.door_a, 0xad58u + 0xc, 0x8u, lim);
+    PortLoadBytes(&DAT_004b5d58.door_b, 0xad58u + 0x14, 0x8u, lim);
+    PortLoadPtr(&DAT_004b5d58.method_1c, 0xad58u + 0x1c, lim);
+    PortLoadPtr(&DAT_004b5d58.method_20, 0xad58u + 0x20, lim);
+    PortLoadPtr(&DAT_004b5d58.method_24, 0xad58u + 0x24, lim);
+    PortLoadPtr(&DAT_004b5d58.method_28, 0xad58u + 0x28, lim);
+    PortLoadPtr(&DAT_004b5d58.method_2c, 0xad58u + 0x2c, lim);
+    PortLoadBytes(&DAT_004b5d58.field_30, 0xad58u + 0x30, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d58.field_34, 0xad58u + 0x34, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004b5d90(void) {
+    unsigned int lim = 0xadc8u;
+    PortLoadBytes(&DAT_004b5d90.flags, 0xad90u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d90.f4, 0xad90u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d90.f8, 0xad90u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d90.door_a, 0xad90u + 0xc, 0x8u, lim);
+    PortLoadBytes(&DAT_004b5d90.door_b, 0xad90u + 0x14, 0x8u, lim);
+    PortLoadPtr(&DAT_004b5d90.method_1c, 0xad90u + 0x1c, lim);
+    PortLoadPtr(&DAT_004b5d90.method_20, 0xad90u + 0x20, lim);
+    PortLoadPtr(&DAT_004b5d90.method_24, 0xad90u + 0x24, lim);
+    PortLoadPtr(&DAT_004b5d90.method_28, 0xad90u + 0x28, lim);
+    PortLoadPtr(&DAT_004b5d90.method_2c, 0xad90u + 0x2c, lim);
+    PortLoadBytes(&DAT_004b5d90.field_30, 0xad90u + 0x30, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5d90.field_34, 0xad90u + 0x34, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004b5dc8(void) {
+    unsigned int lim = 0xae00u;
+    PortLoadBytes(&DAT_004b5dc8.flags, 0xadc8u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5dc8.f4, 0xadc8u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5dc8.f8, 0xadc8u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5dc8.door_a, 0xadc8u + 0xc, 0x8u, lim);
+    PortLoadBytes(&DAT_004b5dc8.door_b, 0xadc8u + 0x14, 0x8u, lim);
+    PortLoadPtr(&DAT_004b5dc8.method_1c, 0xadc8u + 0x1c, lim);
+    PortLoadPtr(&DAT_004b5dc8.method_20, 0xadc8u + 0x20, lim);
+    PortLoadPtr(&DAT_004b5dc8.method_24, 0xadc8u + 0x24, lim);
+    PortLoadPtr(&DAT_004b5dc8.method_28, 0xadc8u + 0x28, lim);
+    PortLoadPtr(&DAT_004b5dc8.method_2c, 0xadc8u + 0x2c, lim);
+    PortLoadBytes(&DAT_004b5dc8.field_30, 0xadc8u + 0x30, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5dc8.field_34, 0xadc8u + 0x34, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004b5f50(void) {
+    unsigned int lim = 0xaf58u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004b5f50[i0], 0xaf50u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b5f60(void) {
+    unsigned int lim = 0xaf7cu;
+    PortLoadBytes(&DAT_004b5f60.palette, 0xaf60u, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5f60.pad_4, 0xaf60u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5f60.corner_count, 0xaf60u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004b5f60.face_count, 0xaf60u + 0xc, 0x4u, lim);
+    PortLoadPtr(&DAT_004b5f60.verts, 0xaf60u + 0x10, lim);
+    PortLoadPtr(&DAT_004b5f60.corners, 0xaf60u + 0x14, lim);
+    PortLoadPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
+}
+
+static void PortLoad_DAT_004b63fc(void) {
+    unsigned int lim = 0xb400u;
+    PortLoadPtr(&DAT_004b63fc, 0xb3fcu, lim);
+}
+
+static void PortLoad_CAROUSSEL_SFX(void) {
+    unsigned int lim = 0xb4f0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&CAROUSSEL_SFX[i0].name, 0xb4d8u + i0 * 0xc, lim);
+        PortLoadBytes(&CAROUSSEL_SFX[i0].pad_4, 0xb4d8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&CAROUSSEL_SFX[i0].sample, 0xb4d8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_SPACE_TOWER_SFX(void) {
+    unsigned int lim = 0xc624u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&SPACE_TOWER_SFX[i0].name, 0xc618u + i0 * 0xc, lim);
+        PortLoadBytes(&SPACE_TOWER_SFX[i0].pad_4, 0xc618u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&SPACE_TOWER_SFX[i0].sample, 0xc618u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DAT_004b7758(void) {
+    unsigned int lim = 0xc798u;
+    int i0;
+
+    for (i0 = 0; i0 < 8; i0++) {
+        PortLoadBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
+        PortLoadBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
+        PortLoadPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b7e9c(void) {
+    unsigned int lim = 0xcef4u;
+    int i0;
+
+    for (i0 = 0; i0 < 22; i0++) {
+        PortLoadPtr(&DAT_004b7e9c[i0], 0xce9cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_GraphicsPath(void) {
+    unsigned int lim = 0xd1c4u;
+    PortLoadPtr(&GraphicsPath, 0xd1c0u, lim);
+}
+
+static void PortLoad_GraphicsPathPrefix(void) {
+    unsigned int lim = 0xd1c8u;
+    PortLoadPtr(&GraphicsPathPrefix, 0xd1c4u, lim);
+}
+
+static void PortLoad_GraphicsSmallPath(void) {
+    unsigned int lim = 0xd1ccu;
+    PortLoadPtr(&GraphicsSmallPath, 0xd1c8u, lim);
+}
+
+static void PortLoad_MasksPath(void) {
+    unsigned int lim = 0xd1d0u;
+    PortLoadPtr(&MasksPath, 0xd1ccu, lim);
+}
+
+static void PortLoad_MasksSmallPath(void) {
+    unsigned int lim = 0xd1d4u;
+    PortLoadPtr(&MasksSmallPath, 0xd1d0u, lim);
+}
+
+static void PortLoad_IconsPath(void) {
+    unsigned int lim = 0xd1d8u;
+    PortLoadPtr(&IconsPath, 0xd1d4u, lim);
+}
+
+static void PortLoad_ModelsPath(void) {
+    unsigned int lim = 0xd1dcu;
+    PortLoadPtr(&ModelsPath, 0xd1d8u, lim);
+}
+
+static void PortLoad_PTR_DAT_004b8348(void) {
+    unsigned int lim = 0xd368u;
+    int i0;
+
+    for (i0 = 0; i0 < 8; i0++) {
+        PortLoadPtr(&PTR_DAT_004b8348[i0], 0xd348u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_PTR_Bloke_DoNothing_004b8368(void) {
+    unsigned int lim = 0xd3d0u;
+    int i0;
+
+    for (i0 = 0; i0 < 26; i0++) {
+        PortLoadPtr(&PTR_Bloke_DoNothing_004b8368[i0], 0xd368u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b85c4(void) {
+    unsigned int lim = 0xd5c8u;
+    PortLoadPtr(&DAT_004b85c4, 0xd5c4u, lim);
+}
+
+static void PortLoad_DINO_SFX(void) {
+    unsigned int lim = 0xd7a4u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&DINO_SFX[i0].name, 0xd768u + i0 * 0xc, lim);
+        PortLoadBytes(&DINO_SFX[i0].pad_4, 0xd768u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&DINO_SFX[i0].sample, 0xd768u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_MONEY_SFX(void) {
+    unsigned int lim = 0xd7c0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&MONEY_SFX[i0].name, 0xd7a8u + i0 * 0xc, lim);
+        PortLoadBytes(&MONEY_SFX[i0].pad_4, 0xd7a8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&MONEY_SFX[i0].sample, 0xd7a8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_GameFX(void) {
+    unsigned int lim = 0xe33cu;
+    int i0;
+
+    for (i0 = 0; i0 < 23; i0++) {
+        PortLoadPtr(&GameFX[i0].name, 0xe228u + i0 * 0xc, lim);
+        PortLoadBytes(&GameFX[i0].pad_4, 0xe228u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&GameFX[i0].sample, 0xe228u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_PTR_DAT_004b95f0(void) {
+    unsigned int lim = 0xe5f4u;
+    PortLoadPtr(&PTR_DAT_004b95f0, 0xe5f0u, lim);
+}
+
+static void PortLoad_BlitFrameFunc(void) {
+    unsigned int lim = 0xeca8u;
+    PortLoadPtr(&BlitFrameFunc, 0xeca4u, lim);
+}
+
+static void PortLoad_PTR_some_list_head_004ba87c(void) {
+    unsigned int lim = 0xf880u;
+    PortLoadPtr(&PTR_some_list_head_004ba87c, 0xf87cu, lim);
+}
+
+static void PortLoad_PTR_DAT_004ba880(void) {
+    unsigned int lim = 0xf884u;
+    PortLoadPtr(&PTR_DAT_004ba880, 0xf880u, lim);
+}
+
+static void PortLoad_DAT_004bb0a4(void) {
+    unsigned int lim = 0x1018cu;
+    int i0;
+
+    for (i0 = 0; i0 < 29; i0++) {
+        PortLoadPtr(&DAT_004bb0a4[i0].track_name, 0x100a4u + i0 * 0x8, lim);
+        PortLoadPtr(&DAT_004bb0a4[i0].elem_name, 0x100a4u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb5b4(void) {
+    unsigned int lim = 0x105c4u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortLoadPtr(&DAT_004bb5b4[i0], 0x105b4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb5c4(void) {
+    unsigned int lim = 0x105d8u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&DAT_004bb5c4[i0], 0x105c4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb5d8(void) {
+    unsigned int lim = 0x105e0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004bb5d8[i0], 0x105d8u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb5e0(void) {
+    unsigned int lim = 0x105f4u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&DAT_004bb5e0[i0], 0x105e0u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb5f4(void) {
+    unsigned int lim = 0x10624u;
+    int i0;
+
+    for (i0 = 0; i0 < 12; i0++) {
+        PortLoadPtr(&DAT_004bb5f4[i0], 0x105f4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb624(void) {
+    unsigned int lim = 0x10688u;
+    int i0;
+
+    for (i0 = 0; i0 < 25; i0++) {
+        PortLoadPtr(&DAT_004bb624[i0], 0x10624u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb688(void) {
+    unsigned int lim = 0x106bcu;
+    int i0;
+
+    for (i0 = 0; i0 < 13; i0++) {
+        PortLoadPtr(&DAT_004bb688[i0], 0x10688u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb6bc(void) {
+    unsigned int lim = 0x106d4u;
+    int i0;
+
+    for (i0 = 0; i0 < 6; i0++) {
+        PortLoadPtr(&DAT_004bb6bc[i0], 0x106bcu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb6d4(void) {
+    unsigned int lim = 0x106f8u;
+    int i0;
+
+    for (i0 = 0; i0 < 9; i0++) {
+        PortLoadPtr(&DAT_004bb6d4[i0], 0x106d4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004bb6f8(void) {
+    unsigned int lim = 0x109e0u;
+    int i0;
+
+    for (i0 = 0; i0 < 93; i0++) {
+        PortLoadPtr(&DAT_004bb6f8[i0].name, 0x106f8u + i0 * 0x8, lim);
+        PortLoadPtr(&DAT_004bb6f8[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortLoad_lpConfig(void) {
+    unsigned int lim = 0x11bf8u;
+    PortLoadPtr(&lpConfig, 0x11bf4u, lim);
+}
+
+static void PortLoad_PTR_s_Aaron_004bcecc(void) {
+    unsigned int lim = 0x12018u;
+    int i0;
+
+    for (i0 = 0; i0 < 83; i0++) {
+        PortLoadPtr(&PTR_s_Aaron_004bcecc[i0], 0x11eccu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_PTR_s_Abbie_004bd018(void) {
+    unsigned int lim = 0x12180u;
+    int i0;
+
+    for (i0 = 0; i0 < 90; i0++) {
+        PortLoadPtr(&PTR_s_Abbie_004bd018[i0], 0x12018u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_PTR_s_Adams_004bd180(void) {
+    unsigned int lim = 0x1232cu;
+    int i0;
+
+    for (i0 = 0; i0 < 107; i0++) {
+        PortLoadPtr(&PTR_s_Adams_004bd180[i0], 0x12180u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_PTR_FUN_004bd34c(void) {
+    unsigned int lim = 0x1238cu;
+    int i0;
+
+    for (i0 = 0; i0 < 16; i0++) {
+        PortLoadPtr(&PTR_FUN_004bd34c[i0], 0x1234cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_Hover(void) {
+    unsigned int lim = 0x12d0cu;
+    PortLoadBytes(&Hover.type, 0x12d00u, 0x4u, lim);
+    PortLoadPtr(&Hover.ptr, 0x12d00u + 0x4, lim);
+    PortLoadBytes(&Hover.data, 0x12d00u + 0x8, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004bdeb8(void) {
+    unsigned int lim = 0x13718u;
+    int i0;
+
+    for (i0 = 0; i0 < 134; i0++) {
+        PortLoadBytes(&DAT_004bdeb8[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
+        PortLoadBytes(&DAT_004bdeb8[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
+        PortLoadPtr(&DAT_004bdeb8[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
+        PortLoadBytes(&DAT_004bdeb8[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
+        PortLoadBytes(&DAT_004bdeb8[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
+    }
+}
+
+static void PortLoad_ProgressScreenTables(void) {
+    unsigned int lim = 0x13d40u;
+    int i0;
+
+    for (i0 = 0; i0 < 10; i0++) {
+        PortLoadPtr(&ProgressScreenTables.levels[i0].name0, 0x13b80u + i0 * 0x1c, lim);
+        PortLoadPtr(&ProgressScreenTables.levels[i0].name1, 0x13b80u + i0 * 0x1c + 0x4, lim);
+        PortLoadBytes(&ProgressScreenTables.levels[i0].id, 0x13b80u + i0 * 0x1c + 0x8, 0x4u, lim);
+        PortLoadBytes(&ProgressScreenTables.levels[i0].x, 0x13b80u + i0 * 0x1c + 0xc, 0x4u, lim);
+        PortLoadBytes(&ProgressScreenTables.levels[i0].y, 0x13b80u + i0 * 0x1c + 0x10, 0x4u, lim);
+        PortLoadPtr(&ProgressScreenTables.levels[i0].sprite0, 0x13b80u + i0 * 0x1c + 0x14, lim);
+        PortLoadPtr(&ProgressScreenTables.levels[i0].sprite1, 0x13b80u + i0 * 0x1c + 0x18, lim);
+    }
+    PortLoadBytes(&ProgressScreenTables.last_clicked, 0x13b80u + 0x118, 0x4u, lim);
+    PortLoadBytes(&ProgressScreenTables.pad_11c, 0x13b80u + 0x11c, 0x4u, lim);
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&ProgressScreenTables.tutorials[i0].name0, 0x13b80u + 0x120 + i0 * 0x1c, lim);
+        PortLoadPtr(&ProgressScreenTables.tutorials[i0].name1, 0x13b80u + 0x120 + i0 * 0x1c + 0x4, lim);
+        PortLoadBytes(&ProgressScreenTables.tutorials[i0].id, 0x13b80u + 0x120 + i0 * 0x1c + 0x8, 0x4u, lim);
+        PortLoadBytes(&ProgressScreenTables.tutorials[i0].x, 0x13b80u + 0x120 + i0 * 0x1c + 0xc, 0x4u, lim);
+        PortLoadBytes(&ProgressScreenTables.tutorials[i0].y, 0x13b80u + 0x120 + i0 * 0x1c + 0x10, 0x4u, lim);
+        PortLoadPtr(&ProgressScreenTables.tutorials[i0].sprite0, 0x13b80u + 0x120 + i0 * 0x1c + 0x14, lim);
+        PortLoadPtr(&ProgressScreenTables.tutorials[i0].sprite1, 0x13b80u + 0x120 + i0 * 0x1c + 0x18, lim);
+    }
+    PortLoadBytes(&ProgressScreenTables.tail, 0x13b80u + 0x1ac, 0x14u, lim);
+}
+
+static void PortLoad_DAT_004c10d4(void) {
+    unsigned int lim = 0x160d8u;
+    PortLoadPtr(&DAT_004c10d4, 0x160d4u, lim);
+}
+
+static void PortLoad_CastleLevelRide(void) {
+    unsigned int lim = 0x160e0u;
+    PortLoadPtr(&CastleLevelRide, 0x160dcu, lim);
+}
+
+static void PortLoad_CastleLevelMatteSprite(void) {
+    unsigned int lim = 0x160e8u;
+    PortLoadPtr(&CastleLevelMatteSprite, 0x160e4u, lim);
+}
+
+static void PortLoad_DAT_004c10e8(void) {
+    unsigned int lim = 0x160ecu;
+    PortLoadPtr(&DAT_004c10e8, 0x160e8u, lim);
+}
+
+static void PortLoad_DAT_004c10f0(void) {
+    unsigned int lim = 0x160f4u;
+    PortLoadPtr(&DAT_004c10f0, 0x160f0u, lim);
+}
+
+static void PortLoad_ActiveCatapultRide(void) {
+    unsigned int lim = 0x160f8u;
+    PortLoadPtr(&ActiveCatapultRide, 0x160f4u, lim);
+}
+
+static void PortLoad_DAT_004c1100(void) {
+    unsigned int lim = 0x16114u;
+    PortLoadPtr(&DAT_004c1100.sprite, 0x16100u, lim);
+    PortLoadBytes(&DAT_004c1100.x, 0x16100u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1100.y, 0x16100u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1100.id, 0x16100u + 0xc, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1100.pad_e, 0x16100u + 0xe, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1100.field_10, 0x16100u + 0x10, 0x4u, lim);
+}
+
+static void PortLoad_CatapultNodeList(void) {
+    unsigned int lim = 0x1611cu;
+    PortLoadPtr(&CatapultNodeList, 0x16118u, lim);
+}
+
+static void PortLoad_CopterBaseMatteSprite(void) {
+    unsigned int lim = 0x16124u;
+    PortLoadPtr(&CopterBaseMatteSprite, 0x16120u, lim);
+}
+
+static void PortLoad_CopterQueueTables(void) {
+    unsigned int lim = 0x16138u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&CopterQueueTables[i0], 0x16124u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_CopterModelLayers(void) {
+    unsigned int lim = 0x1613cu;
+    PortLoadPtr(&CopterModelLayers, 0x16138u, lim);
+}
+
+static void PortLoad_CopterModelSprites(void) {
+    unsigned int lim = 0x16164u;
+    int i0;
+
+    for (i0 = 0; i0 < 10; i0++) {
+        PortLoadPtr(&CopterModelSprites[i0], 0x1613cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004c1164(void) {
+    unsigned int lim = 0x16168u;
+    PortLoadPtr(&DAT_004c1164, 0x16164u, lim);
+}
+
+static void PortLoad_DAT_004c1168(void) {
+    unsigned int lim = 0x1616cu;
+    PortLoadPtr(&DAT_004c1168, 0x16168u, lim);
+}
+
+static void PortLoad_DAT_004c1170(void) {
+    unsigned int lim = 0x16184u;
+    PortLoadPtr(&DAT_004c1170.sprite, 0x16170u, lim);
+    PortLoadBytes(&DAT_004c1170.x, 0x16170u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1170.y, 0x16170u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1170.id, 0x16170u + 0xc, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1170.pad_e, 0x16170u + 0xe, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1170.field_10, 0x16170u + 0x10, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004c1188(void) {
+    unsigned int lim = 0x1618cu;
+    PortLoadPtr(&DAT_004c1188, 0x16188u, lim);
+}
+
+static void PortLoad_DAT_004c1190(void) {
+    unsigned int lim = 0x16194u;
+    PortLoadPtr(&DAT_004c1190, 0x16190u, lim);
+}
+
+static void PortLoad_DAT_004c1194(void) {
+    unsigned int lim = 0x16198u;
+    PortLoadPtr(&DAT_004c1194, 0x16194u, lim);
+}
+
+static void PortLoad_ActiveCopterRide(void) {
+    unsigned int lim = 0x1619cu;
+    PortLoadPtr(&ActiveCopterRide, 0x16198u, lim);
+}
+
+static void PortLoad_DAT_004c119c(void) {
+    unsigned int lim = 0x161a0u;
+    PortLoadPtr(&DAT_004c119c, 0x1619cu, lim);
+}
+
+static void PortLoad_DAT_004c11a0(void) {
+    unsigned int lim = 0x161a4u;
+    PortLoadPtr(&DAT_004c11a0, 0x161a0u, lim);
+}
+
+static void PortLoad_DAT_004c11a4(void) {
+    unsigned int lim = 0x161a8u;
+    PortLoadPtr(&DAT_004c11a4, 0x161a4u, lim);
+}
+
+static void PortLoad_DAT_004c11a8(void) {
+    unsigned int lim = 0x161acu;
+    PortLoadPtr(&DAT_004c11a8, 0x161a8u, lim);
+}
+
+static void PortLoad_DAT_004c11ac(void) {
+    unsigned int lim = 0x161b0u;
+    PortLoadPtr(&DAT_004c11ac, 0x161acu, lim);
+}
+
+static void PortLoad_DAT_004c11b0(void) {
+    unsigned int lim = 0x161b4u;
+    PortLoadPtr(&DAT_004c11b0, 0x161b0u, lim);
+}
+
+static void PortLoad_CopterNodeList(void) {
+    unsigned int lim = 0x161b8u;
+    PortLoadPtr(&CopterNodeList, 0x161b4u, lim);
+}
+
+static void PortLoad_DrivingSchoolCountList(void) {
+    unsigned int lim = 0x161c0u;
+    PortLoadPtr(&DrivingSchoolCountList, 0x161bcu, lim);
+}
+
+static void PortLoad_DAT_004c11c4(void) {
+    unsigned int lim = 0x161c8u;
+    PortLoadPtr(&DAT_004c11c4, 0x161c4u, lim);
+}
+
+static void PortLoad_DAT_004c11c8(void) {
+    unsigned int lim = 0x161ccu;
+    PortLoadPtr(&DAT_004c11c8, 0x161c8u, lim);
+}
+
+static void PortLoad_FortMaskSprite(void) {
+    unsigned int lim = 0x161d0u;
+    PortLoadPtr(&FortMaskSprite, 0x161ccu, lim);
+}
+
+static void PortLoad_FortLayer(void) {
+    unsigned int lim = 0x161dcu;
+    PortLoadPtr(&FortLayer, 0x161d8u, lim);
+}
+
+static void PortLoad_FortRide(void) {
+    unsigned int lim = 0x161e0u;
+    PortLoadPtr(&FortRide, 0x161dcu, lim);
+}
+
+static void PortLoad_DAT_004c11e0(void) {
+    unsigned int lim = 0x161e4u;
+    PortLoadPtr(&DAT_004c11e0, 0x161e0u, lim);
+}
+
+static void PortLoad_DAT_004c11e4(void) {
+    unsigned int lim = 0x161e8u;
+    PortLoadPtr(&DAT_004c11e4, 0x161e4u, lim);
+}
+
+static void PortLoad_GoldRushLayer(void) {
+    unsigned int lim = 0x161ecu;
+    PortLoadPtr(&GoldRushLayer, 0x161e8u, lim);
+}
+
+static void PortLoad_GoldRushRide(void) {
+    unsigned int lim = 0x161f4u;
+    PortLoadPtr(&GoldRushRide, 0x161f0u, lim);
+}
+
+static void PortLoad_GoldMaskSprite(void) {
+    unsigned int lim = 0x161f8u;
+    PortLoadPtr(&GoldMaskSprite, 0x161f4u, lim);
+}
+
+static void PortLoad_GoldWashMatte1Sprite(void) {
+    unsigned int lim = 0x161fcu;
+    PortLoadPtr(&GoldWashMatte1Sprite, 0x161f8u, lim);
+}
+
+static void PortLoad_GoldWashSprite(void) {
+    unsigned int lim = 0x16200u;
+    PortLoadPtr(&GoldWashSprite, 0x161fcu, lim);
+}
+
+static void PortLoad_GoldWashMatte2Sprite(void) {
+    unsigned int lim = 0x16204u;
+    PortLoadPtr(&GoldWashMatte2Sprite, 0x16200u, lim);
+}
+
+static void PortLoad_GoldWashList(void) {
+    unsigned int lim = 0x16208u;
+    PortLoadPtr(&GoldWashList, 0x16204u, lim);
+}
+
+static void PortLoad_GoldRushBlokeRenderList(void) {
+    unsigned int lim = 0x1620cu;
+    PortLoadPtr(&GoldRushBlokeRenderList, 0x16208u, lim);
+}
+
+static void PortLoad_ZJoustSprite(void) {
+    unsigned int lim = 0x16214u;
+    PortLoadPtr(&ZJoustSprite, 0x16210u, lim);
+}
+
+static void PortLoad_JoustLayer(void) {
+    unsigned int lim = 0x16218u;
+    PortLoadPtr(&JoustLayer, 0x16214u, lim);
+}
+
+static void PortLoad_JoustRideBnv(void) {
+    unsigned int lim = 0x1621cu;
+    PortLoadPtr(&JoustRideBnv, 0x16218u, lim);
+}
+
+static void PortLoad_JoustRide(void) {
+    unsigned int lim = 0x16220u;
+    PortLoadPtr(&JoustRide, 0x1621cu, lim);
+}
+
+static void PortLoad_DAT_004c1228(void) {
+    unsigned int lim = 0x1623cu;
+    PortLoadPtr(&DAT_004c1228.sprite, 0x16228u, lim);
+    PortLoadBytes(&DAT_004c1228.x, 0x16228u + 0x4, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1228.y, 0x16228u + 0x8, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1228.id, 0x16228u + 0xc, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1228.pad_e, 0x16228u + 0xe, 0x2u, lim);
+    PortLoadBytes(&DAT_004c1228.field_10, 0x16228u + 0x10, 0x4u, lim);
+}
+
+static void PortLoad_DAT_004c123c(void) {
+    unsigned int lim = 0x16244u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004c123c[i0], 0x1623cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_JoustFMaskSprite(void) {
+    unsigned int lim = 0x16248u;
+    PortLoadPtr(&JoustFMaskSprite, 0x16244u, lim);
+}
+
+static void PortLoad_JoustSpecRMSprite(void) {
+    unsigned int lim = 0x1624cu;
+    PortLoadPtr(&JoustSpecRMSprite, 0x16248u, lim);
+}
+
+static void PortLoad_JoustSpecLMSprite(void) {
+    unsigned int lim = 0x16250u;
+    PortLoadPtr(&JoustSpecLMSprite, 0x1624cu, lim);
+}
+
+static void PortLoad_JoustNodeList(void) {
+    unsigned int lim = 0x16254u;
+    PortLoadPtr(&JoustNodeList, 0x16250u, lim);
+}
+
+static void PortLoad_LogFlumeTunelMSprite(void) {
+    unsigned int lim = 0x1625cu;
+    PortLoadPtr(&LogFlumeTunelMSprite, 0x16258u, lim);
+}
+
+static void PortLoad_DAT_004c1260(void) {
+    unsigned int lim = 0x17000u;
+    PortLoadBytes(&DAT_004c1260.pad_0, 0x16260u, 0x14u, lim);
+    PortLoadBytes(&DAT_004c1260.field_14, 0x16260u + 0x14, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_18, 0x16260u + 0x18, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_1c, 0x16260u + 0x1c, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_20, 0x16260u + 0x20, 0x1cu, lim);
+    PortLoadBytes(&DAT_004c1260.field_3c, 0x16260u + 0x3c, 0x14u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_50, 0x16260u + 0x50, 0x14u, lim);
+    PortLoadBytes(&DAT_004c1260.field_64, 0x16260u + 0x64, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_68, 0x16260u + 0x68, 0x5cu, lim);
+    PortLoadBytes(&DAT_004c1260.field_c4, 0x16260u + 0xc4, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_c8, 0x16260u + 0xc8, 0x4u, lim);
+    PortLoadPtr(&DAT_004c1260.field_cc, 0x16260u + 0xcc, lim);
+    PortLoadBytes(&DAT_004c1260.pad_d0, 0x16260u + 0xd0, 0x1334u, lim);
+    PortLoadBytes(&DAT_004c1260.tile_x, 0x16260u + 0x1404, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.tile_y, 0x16260u + 0x1408, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_140c, 0x16260u + 0x140c, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_1410, 0x16260u + 0x1410, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_1414, 0x16260u + 0x1414, 0x14u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_1428, 0x16260u + 0x1428, 0x400u, lim);
+    PortLoadBytes(&DAT_004c1260.field_1828, 0x16260u + 0x1828, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.pad_182c, 0x16260u + 0x182c, 0x4u, lim);
+    PortLoadBytes(&DAT_004c1260.field_1830, 0x16260u + 0x1830, 0x4u, lim);
+}
+
+static void PortCheck_FlumeStages_004b47f0(void) {
+    unsigned int lim = 0x9808u;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortCheckBytes(&FlumeStages_004b47f0[i0].pad_0, 0x97f0u + i0 * 0xc, 0x4u, lim);
+        PortCheckBytes(&FlumeStages_004b47f0[i0].count, 0x97f0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&FlumeStages_004b47f0[i0].sprite, 0x97f0u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DAT_004b4808(void) {
+    unsigned int lim = 0x9810u;
+    PortCheckBytes(&DAT_004b4808.count, 0x9808u, 0x4u, lim);
+    PortCheckPtr(&DAT_004b4808.table, 0x9808u + 0x4, lim);
+}
+
+static void PortCheck_FlumeStages_004b4810(void) {
+    unsigned int lim = 0x9828u;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortCheckBytes(&FlumeStages_004b4810[i0].pad_0, 0x9810u + i0 * 0xc, 0x4u, lim);
+        PortCheckBytes(&FlumeStages_004b4810[i0].count, 0x9810u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&FlumeStages_004b4810[i0].sprite, 0x9810u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DAT_004b4828(void) {
+    unsigned int lim = 0x9830u;
+    PortCheckBytes(&DAT_004b4828.count, 0x9828u, 0x4u, lim);
+    PortCheckPtr(&DAT_004b4828.table, 0x9828u + 0x4, lim);
+}
+
+static void PortCheck_FlumeStages_004b4830(void) {
+    unsigned int lim = 0x9858u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortCheckBytes(&FlumeStages_004b4830[i0].pad_0, 0x9830u + i0 * 0xc, 0x4u, lim);
+        PortCheckBytes(&FlumeStages_004b4830[i0].count, 0x9830u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&FlumeStages_004b4830[i0].sprite, 0x9830u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DAT_004b4858(void) {
+    unsigned int lim = 0x9860u;
+    PortCheckBytes(&DAT_004b4858.count, 0x9858u, 0x4u, lim);
+    PortCheckPtr(&DAT_004b4858.table, 0x9858u + 0x4, lim);
+}
+
+static void PortCheck_SAFARI_SFX(void) {
+    unsigned int lim = 0x9cc4u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&SAFARI_SFX[i0].name, 0x9cb8u + i0 * 0xc, lim);
+        PortCheckBytes(&SAFARI_SFX[i0].pad_4, 0x9cb8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&SAFARI_SFX[i0].sample, 0x9cb8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_SpiderRide_SFX(void) {
+    unsigned int lim = 0x9d94u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&SpiderRide_SFX[i0].name, 0x9d88u + i0 * 0xc, lim);
+        PortCheckBytes(&SpiderRide_SFX[i0].pad_4, 0x9d88u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&SpiderRide_SFX[i0].sample, 0x9d88u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DAT_004b4f08(void) {
+    unsigned int lim = 0x9f18u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortCheckPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b5570(void) {
+    unsigned int lim = 0xa584u;
+    PortCheckBytes(&DAT_004b5570.x, 0xa570u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5570.y, 0xa570u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5570.w, 0xa570u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5570.h, 0xa570u + 0xc, 0x4u, lim);
+    PortCheckPtr(&DAT_004b5570.next, 0xa570u + 0x10, lim);
+}
+
+static void PortCheck_DAT_004b55fc(void) {
+    unsigned int lim = 0xa600u;
+    PortCheckPtr(&DAT_004b55fc, 0xa5fcu, lim);
+}
+
+static void PortCheck_DAT_004b5600(void) {
+    unsigned int lim = 0xa608u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004b5600[i0], 0xa600u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b5648(void) {
+    unsigned int lim = 0xa650u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004b5648[i0], 0xa648u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b5658(void) {
+    unsigned int lim = 0xa660u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004b5658[i0], 0xa658u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b58c8(void) {
+    unsigned int lim = 0xa958u;
+    PortCheckBytes(&DAT_004b58c8.f0, 0xa8c8u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b58c8.f4, 0xa8c8u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b58c8.f8, 0xa8c8u + 0x8, 0x4u, lim);
+    PortCheckPtr(&DAT_004b58c8.verts, 0xa8c8u + 0xc, lim);
+    PortCheckPtr(&DAT_004b58c8.normals, 0xa8c8u + 0x10, lim);
+    PortCheckPtr(&DAT_004b58c8.xverts, 0xa8c8u + 0x14, lim);
+    PortCheckPtr(&DAT_004b58c8.faceA, 0xa8c8u + 0x18, lim);
+    PortCheckBytes(&DAT_004b58c8.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&DAT_004b58c8.faceB, 0xa8c8u + 0x20, lim);
+    PortCheckBytes(&DAT_004b58c8.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
+    PortCheckBytes(&DAT_004b58c8.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
+}
+
+static void PortCheck_DAT_004b5988(void) {
+    unsigned int lim = 0xa9c0u;
+    PortCheckBytes(&DAT_004b5988.sex, 0xa988u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5988.leg, 0xa988u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5988.arm, 0xa988u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5988.chest, 0xa988u + 0xc, 0x14u, lim);
+    PortCheckBytes(&DAT_004b5988.face, 0xa988u + 0x20, 0x14u, lim);
+    PortCheckPtr(&DAT_004b5988.bloke, 0xa988u + 0x34, lim);
+}
+
+static void PortCheck_DAT_004b5b20(void) {
+    unsigned int lim = 0xab24u;
+    PortCheckPtr(&DAT_004b5b20, 0xab20u, lim);
+}
+
+static void PortCheck_DAT_004b5b24(void) {
+    unsigned int lim = 0xab28u;
+    PortCheckPtr(&DAT_004b5b24, 0xab24u, lim);
+}
+
+static void PortCheck_DAT_004b5b3c(void) {
+    unsigned int lim = 0xab40u;
+    PortCheckPtr(&DAT_004b5b3c, 0xab3cu, lim);
+}
+
+static void PortCheck_DAT_004b5b48(void) {
+    unsigned int lim = 0xab80u;
+    PortCheckBytes(&DAT_004b5b48.flags, 0xab48u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5b48.f4, 0xab48u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5b48.f8, 0xab48u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5b48.door_a, 0xab48u + 0xc, 0x8u, lim);
+    PortCheckBytes(&DAT_004b5b48.door_b, 0xab48u + 0x14, 0x8u, lim);
+    PortCheckPtr(&DAT_004b5b48.method_1c, 0xab48u + 0x1c, lim);
+    PortCheckPtr(&DAT_004b5b48.method_20, 0xab48u + 0x20, lim);
+    PortCheckPtr(&DAT_004b5b48.method_24, 0xab48u + 0x24, lim);
+    PortCheckPtr(&DAT_004b5b48.method_28, 0xab48u + 0x28, lim);
+    PortCheckPtr(&DAT_004b5b48.method_2c, 0xab48u + 0x2c, lim);
+    PortCheckBytes(&DAT_004b5b48.field_30, 0xab48u + 0x30, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5b48.field_34, 0xab48u + 0x34, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004b5d20(void) {
+    unsigned int lim = 0xad58u;
+    PortCheckBytes(&DAT_004b5d20.flags, 0xad20u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d20.f4, 0xad20u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d20.f8, 0xad20u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d20.door_a, 0xad20u + 0xc, 0x8u, lim);
+    PortCheckBytes(&DAT_004b5d20.door_b, 0xad20u + 0x14, 0x8u, lim);
+    PortCheckPtr(&DAT_004b5d20.method_1c, 0xad20u + 0x1c, lim);
+    PortCheckPtr(&DAT_004b5d20.method_20, 0xad20u + 0x20, lim);
+    PortCheckPtr(&DAT_004b5d20.method_24, 0xad20u + 0x24, lim);
+    PortCheckPtr(&DAT_004b5d20.method_28, 0xad20u + 0x28, lim);
+    PortCheckPtr(&DAT_004b5d20.method_2c, 0xad20u + 0x2c, lim);
+    PortCheckBytes(&DAT_004b5d20.field_30, 0xad20u + 0x30, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d20.field_34, 0xad20u + 0x34, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004b5d58(void) {
+    unsigned int lim = 0xad90u;
+    PortCheckBytes(&DAT_004b5d58.flags, 0xad58u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d58.f4, 0xad58u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d58.f8, 0xad58u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d58.door_a, 0xad58u + 0xc, 0x8u, lim);
+    PortCheckBytes(&DAT_004b5d58.door_b, 0xad58u + 0x14, 0x8u, lim);
+    PortCheckPtr(&DAT_004b5d58.method_1c, 0xad58u + 0x1c, lim);
+    PortCheckPtr(&DAT_004b5d58.method_20, 0xad58u + 0x20, lim);
+    PortCheckPtr(&DAT_004b5d58.method_24, 0xad58u + 0x24, lim);
+    PortCheckPtr(&DAT_004b5d58.method_28, 0xad58u + 0x28, lim);
+    PortCheckPtr(&DAT_004b5d58.method_2c, 0xad58u + 0x2c, lim);
+    PortCheckBytes(&DAT_004b5d58.field_30, 0xad58u + 0x30, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d58.field_34, 0xad58u + 0x34, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004b5d90(void) {
+    unsigned int lim = 0xadc8u;
+    PortCheckBytes(&DAT_004b5d90.flags, 0xad90u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d90.f4, 0xad90u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d90.f8, 0xad90u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d90.door_a, 0xad90u + 0xc, 0x8u, lim);
+    PortCheckBytes(&DAT_004b5d90.door_b, 0xad90u + 0x14, 0x8u, lim);
+    PortCheckPtr(&DAT_004b5d90.method_1c, 0xad90u + 0x1c, lim);
+    PortCheckPtr(&DAT_004b5d90.method_20, 0xad90u + 0x20, lim);
+    PortCheckPtr(&DAT_004b5d90.method_24, 0xad90u + 0x24, lim);
+    PortCheckPtr(&DAT_004b5d90.method_28, 0xad90u + 0x28, lim);
+    PortCheckPtr(&DAT_004b5d90.method_2c, 0xad90u + 0x2c, lim);
+    PortCheckBytes(&DAT_004b5d90.field_30, 0xad90u + 0x30, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5d90.field_34, 0xad90u + 0x34, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004b5dc8(void) {
+    unsigned int lim = 0xae00u;
+    PortCheckBytes(&DAT_004b5dc8.flags, 0xadc8u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5dc8.f4, 0xadc8u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5dc8.f8, 0xadc8u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5dc8.door_a, 0xadc8u + 0xc, 0x8u, lim);
+    PortCheckBytes(&DAT_004b5dc8.door_b, 0xadc8u + 0x14, 0x8u, lim);
+    PortCheckPtr(&DAT_004b5dc8.method_1c, 0xadc8u + 0x1c, lim);
+    PortCheckPtr(&DAT_004b5dc8.method_20, 0xadc8u + 0x20, lim);
+    PortCheckPtr(&DAT_004b5dc8.method_24, 0xadc8u + 0x24, lim);
+    PortCheckPtr(&DAT_004b5dc8.method_28, 0xadc8u + 0x28, lim);
+    PortCheckPtr(&DAT_004b5dc8.method_2c, 0xadc8u + 0x2c, lim);
+    PortCheckBytes(&DAT_004b5dc8.field_30, 0xadc8u + 0x30, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5dc8.field_34, 0xadc8u + 0x34, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004b5f50(void) {
+    unsigned int lim = 0xaf58u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004b5f50[i0], 0xaf50u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b5f60(void) {
+    unsigned int lim = 0xaf7cu;
+    PortCheckBytes(&DAT_004b5f60.palette, 0xaf60u, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5f60.pad_4, 0xaf60u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5f60.corner_count, 0xaf60u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004b5f60.face_count, 0xaf60u + 0xc, 0x4u, lim);
+    PortCheckPtr(&DAT_004b5f60.verts, 0xaf60u + 0x10, lim);
+    PortCheckPtr(&DAT_004b5f60.corners, 0xaf60u + 0x14, lim);
+    PortCheckPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
+}
+
+static void PortCheck_DAT_004b63fc(void) {
+    unsigned int lim = 0xb400u;
+    PortCheckPtr(&DAT_004b63fc, 0xb3fcu, lim);
+}
+
+static void PortCheck_CAROUSSEL_SFX(void) {
+    unsigned int lim = 0xb4f0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&CAROUSSEL_SFX[i0].name, 0xb4d8u + i0 * 0xc, lim);
+        PortCheckBytes(&CAROUSSEL_SFX[i0].pad_4, 0xb4d8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&CAROUSSEL_SFX[i0].sample, 0xb4d8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_SPACE_TOWER_SFX(void) {
+    unsigned int lim = 0xc624u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&SPACE_TOWER_SFX[i0].name, 0xc618u + i0 * 0xc, lim);
+        PortCheckBytes(&SPACE_TOWER_SFX[i0].pad_4, 0xc618u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&SPACE_TOWER_SFX[i0].sample, 0xc618u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DAT_004b7758(void) {
+    unsigned int lim = 0xc798u;
+    int i0;
+
+    for (i0 = 0; i0 < 8; i0++) {
+        PortCheckBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
+        PortCheckBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
+        PortCheckPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b7e9c(void) {
+    unsigned int lim = 0xcef4u;
+    int i0;
+
+    for (i0 = 0; i0 < 22; i0++) {
+        PortCheckPtr(&DAT_004b7e9c[i0], 0xce9cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_GraphicsPath(void) {
+    unsigned int lim = 0xd1c4u;
+    PortCheckPtr(&GraphicsPath, 0xd1c0u, lim);
+}
+
+static void PortCheck_GraphicsPathPrefix(void) {
+    unsigned int lim = 0xd1c8u;
+    PortCheckPtr(&GraphicsPathPrefix, 0xd1c4u, lim);
+}
+
+static void PortCheck_GraphicsSmallPath(void) {
+    unsigned int lim = 0xd1ccu;
+    PortCheckPtr(&GraphicsSmallPath, 0xd1c8u, lim);
+}
+
+static void PortCheck_MasksPath(void) {
+    unsigned int lim = 0xd1d0u;
+    PortCheckPtr(&MasksPath, 0xd1ccu, lim);
+}
+
+static void PortCheck_MasksSmallPath(void) {
+    unsigned int lim = 0xd1d4u;
+    PortCheckPtr(&MasksSmallPath, 0xd1d0u, lim);
+}
+
+static void PortCheck_IconsPath(void) {
+    unsigned int lim = 0xd1d8u;
+    PortCheckPtr(&IconsPath, 0xd1d4u, lim);
+}
+
+static void PortCheck_ModelsPath(void) {
+    unsigned int lim = 0xd1dcu;
+    PortCheckPtr(&ModelsPath, 0xd1d8u, lim);
+}
+
+static void PortCheck_PTR_DAT_004b8348(void) {
+    unsigned int lim = 0xd368u;
+    int i0;
+
+    for (i0 = 0; i0 < 8; i0++) {
+        PortCheckPtr(&PTR_DAT_004b8348[i0], 0xd348u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_PTR_Bloke_DoNothing_004b8368(void) {
+    unsigned int lim = 0xd3d0u;
+    int i0;
+
+    for (i0 = 0; i0 < 26; i0++) {
+        PortCheckPtr(&PTR_Bloke_DoNothing_004b8368[i0], 0xd368u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b85c4(void) {
+    unsigned int lim = 0xd5c8u;
+    PortCheckPtr(&DAT_004b85c4, 0xd5c4u, lim);
+}
+
+static void PortCheck_DINO_SFX(void) {
+    unsigned int lim = 0xd7a4u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&DINO_SFX[i0].name, 0xd768u + i0 * 0xc, lim);
+        PortCheckBytes(&DINO_SFX[i0].pad_4, 0xd768u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&DINO_SFX[i0].sample, 0xd768u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_MONEY_SFX(void) {
+    unsigned int lim = 0xd7c0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&MONEY_SFX[i0].name, 0xd7a8u + i0 * 0xc, lim);
+        PortCheckBytes(&MONEY_SFX[i0].pad_4, 0xd7a8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&MONEY_SFX[i0].sample, 0xd7a8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_GameFX(void) {
+    unsigned int lim = 0xe33cu;
+    int i0;
+
+    for (i0 = 0; i0 < 23; i0++) {
+        PortCheckPtr(&GameFX[i0].name, 0xe228u + i0 * 0xc, lim);
+        PortCheckBytes(&GameFX[i0].pad_4, 0xe228u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&GameFX[i0].sample, 0xe228u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_PTR_DAT_004b95f0(void) {
+    unsigned int lim = 0xe5f4u;
+    PortCheckPtr(&PTR_DAT_004b95f0, 0xe5f0u, lim);
+}
+
+static void PortCheck_BlitFrameFunc(void) {
+    unsigned int lim = 0xeca8u;
+    PortCheckPtr(&BlitFrameFunc, 0xeca4u, lim);
+}
+
+static void PortCheck_PTR_some_list_head_004ba87c(void) {
+    unsigned int lim = 0xf880u;
+    PortCheckPtr(&PTR_some_list_head_004ba87c, 0xf87cu, lim);
+}
+
+static void PortCheck_PTR_DAT_004ba880(void) {
+    unsigned int lim = 0xf884u;
+    PortCheckPtr(&PTR_DAT_004ba880, 0xf880u, lim);
+}
+
+static void PortCheck_DAT_004bb0a4(void) {
+    unsigned int lim = 0x1018cu;
+    int i0;
+
+    for (i0 = 0; i0 < 29; i0++) {
+        PortCheckPtr(&DAT_004bb0a4[i0].track_name, 0x100a4u + i0 * 0x8, lim);
+        PortCheckPtr(&DAT_004bb0a4[i0].elem_name, 0x100a4u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb5b4(void) {
+    unsigned int lim = 0x105c4u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortCheckPtr(&DAT_004bb5b4[i0], 0x105b4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb5c4(void) {
+    unsigned int lim = 0x105d8u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&DAT_004bb5c4[i0], 0x105c4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb5d8(void) {
+    unsigned int lim = 0x105e0u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004bb5d8[i0], 0x105d8u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb5e0(void) {
+    unsigned int lim = 0x105f4u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&DAT_004bb5e0[i0], 0x105e0u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb5f4(void) {
+    unsigned int lim = 0x10624u;
+    int i0;
+
+    for (i0 = 0; i0 < 12; i0++) {
+        PortCheckPtr(&DAT_004bb5f4[i0], 0x105f4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb624(void) {
+    unsigned int lim = 0x10688u;
+    int i0;
+
+    for (i0 = 0; i0 < 25; i0++) {
+        PortCheckPtr(&DAT_004bb624[i0], 0x10624u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb688(void) {
+    unsigned int lim = 0x106bcu;
+    int i0;
+
+    for (i0 = 0; i0 < 13; i0++) {
+        PortCheckPtr(&DAT_004bb688[i0], 0x10688u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb6bc(void) {
+    unsigned int lim = 0x106d4u;
+    int i0;
+
+    for (i0 = 0; i0 < 6; i0++) {
+        PortCheckPtr(&DAT_004bb6bc[i0], 0x106bcu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb6d4(void) {
+    unsigned int lim = 0x106f8u;
+    int i0;
+
+    for (i0 = 0; i0 < 9; i0++) {
+        PortCheckPtr(&DAT_004bb6d4[i0], 0x106d4u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004bb6f8(void) {
+    unsigned int lim = 0x109e0u;
+    int i0;
+
+    for (i0 = 0; i0 < 93; i0++) {
+        PortCheckPtr(&DAT_004bb6f8[i0].name, 0x106f8u + i0 * 0x8, lim);
+        PortCheckPtr(&DAT_004bb6f8[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortCheck_lpConfig(void) {
+    unsigned int lim = 0x11bf8u;
+    PortCheckPtr(&lpConfig, 0x11bf4u, lim);
+}
+
+static void PortCheck_PTR_s_Aaron_004bcecc(void) {
+    unsigned int lim = 0x12018u;
+    int i0;
+
+    for (i0 = 0; i0 < 83; i0++) {
+        PortCheckPtr(&PTR_s_Aaron_004bcecc[i0], 0x11eccu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_PTR_s_Abbie_004bd018(void) {
+    unsigned int lim = 0x12180u;
+    int i0;
+
+    for (i0 = 0; i0 < 90; i0++) {
+        PortCheckPtr(&PTR_s_Abbie_004bd018[i0], 0x12018u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_PTR_s_Adams_004bd180(void) {
+    unsigned int lim = 0x1232cu;
+    int i0;
+
+    for (i0 = 0; i0 < 107; i0++) {
+        PortCheckPtr(&PTR_s_Adams_004bd180[i0], 0x12180u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_PTR_FUN_004bd34c(void) {
+    unsigned int lim = 0x1238cu;
+    int i0;
+
+    for (i0 = 0; i0 < 16; i0++) {
+        PortCheckPtr(&PTR_FUN_004bd34c[i0], 0x1234cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_Hover(void) {
+    unsigned int lim = 0x12d0cu;
+    PortCheckBytes(&Hover.type, 0x12d00u, 0x4u, lim);
+    PortCheckPtr(&Hover.ptr, 0x12d00u + 0x4, lim);
+    PortCheckBytes(&Hover.data, 0x12d00u + 0x8, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004bdeb8(void) {
+    unsigned int lim = 0x13718u;
+    int i0;
+
+    for (i0 = 0; i0 < 134; i0++) {
+        PortCheckBytes(&DAT_004bdeb8[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
+        PortCheckBytes(&DAT_004bdeb8[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
+        PortCheckPtr(&DAT_004bdeb8[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
+        PortCheckBytes(&DAT_004bdeb8[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
+        PortCheckBytes(&DAT_004bdeb8[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
+    }
+}
+
+static void PortCheck_ProgressScreenTables(void) {
+    unsigned int lim = 0x13d40u;
+    int i0;
+
+    for (i0 = 0; i0 < 10; i0++) {
+        PortCheckPtr(&ProgressScreenTables.levels[i0].name0, 0x13b80u + i0 * 0x1c, lim);
+        PortCheckPtr(&ProgressScreenTables.levels[i0].name1, 0x13b80u + i0 * 0x1c + 0x4, lim);
+        PortCheckBytes(&ProgressScreenTables.levels[i0].id, 0x13b80u + i0 * 0x1c + 0x8, 0x4u, lim);
+        PortCheckBytes(&ProgressScreenTables.levels[i0].x, 0x13b80u + i0 * 0x1c + 0xc, 0x4u, lim);
+        PortCheckBytes(&ProgressScreenTables.levels[i0].y, 0x13b80u + i0 * 0x1c + 0x10, 0x4u, lim);
+        PortCheckPtr(&ProgressScreenTables.levels[i0].sprite0, 0x13b80u + i0 * 0x1c + 0x14, lim);
+        PortCheckPtr(&ProgressScreenTables.levels[i0].sprite1, 0x13b80u + i0 * 0x1c + 0x18, lim);
+    }
+    PortCheckBytes(&ProgressScreenTables.last_clicked, 0x13b80u + 0x118, 0x4u, lim);
+    PortCheckBytes(&ProgressScreenTables.pad_11c, 0x13b80u + 0x11c, 0x4u, lim);
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&ProgressScreenTables.tutorials[i0].name0, 0x13b80u + 0x120 + i0 * 0x1c, lim);
+        PortCheckPtr(&ProgressScreenTables.tutorials[i0].name1, 0x13b80u + 0x120 + i0 * 0x1c + 0x4, lim);
+        PortCheckBytes(&ProgressScreenTables.tutorials[i0].id, 0x13b80u + 0x120 + i0 * 0x1c + 0x8, 0x4u, lim);
+        PortCheckBytes(&ProgressScreenTables.tutorials[i0].x, 0x13b80u + 0x120 + i0 * 0x1c + 0xc, 0x4u, lim);
+        PortCheckBytes(&ProgressScreenTables.tutorials[i0].y, 0x13b80u + 0x120 + i0 * 0x1c + 0x10, 0x4u, lim);
+        PortCheckPtr(&ProgressScreenTables.tutorials[i0].sprite0, 0x13b80u + 0x120 + i0 * 0x1c + 0x14, lim);
+        PortCheckPtr(&ProgressScreenTables.tutorials[i0].sprite1, 0x13b80u + 0x120 + i0 * 0x1c + 0x18, lim);
+    }
+    PortCheckBytes(&ProgressScreenTables.tail, 0x13b80u + 0x1ac, 0x14u, lim);
+}
+
+static void PortCheck_DAT_004c10d4(void) {
+    unsigned int lim = 0x160d8u;
+    PortCheckPtr(&DAT_004c10d4, 0x160d4u, lim);
+}
+
+static void PortCheck_CastleLevelRide(void) {
+    unsigned int lim = 0x160e0u;
+    PortCheckPtr(&CastleLevelRide, 0x160dcu, lim);
+}
+
+static void PortCheck_CastleLevelMatteSprite(void) {
+    unsigned int lim = 0x160e8u;
+    PortCheckPtr(&CastleLevelMatteSprite, 0x160e4u, lim);
+}
+
+static void PortCheck_DAT_004c10e8(void) {
+    unsigned int lim = 0x160ecu;
+    PortCheckPtr(&DAT_004c10e8, 0x160e8u, lim);
+}
+
+static void PortCheck_DAT_004c10f0(void) {
+    unsigned int lim = 0x160f4u;
+    PortCheckPtr(&DAT_004c10f0, 0x160f0u, lim);
+}
+
+static void PortCheck_ActiveCatapultRide(void) {
+    unsigned int lim = 0x160f8u;
+    PortCheckPtr(&ActiveCatapultRide, 0x160f4u, lim);
+}
+
+static void PortCheck_DAT_004c1100(void) {
+    unsigned int lim = 0x16114u;
+    PortCheckPtr(&DAT_004c1100.sprite, 0x16100u, lim);
+    PortCheckBytes(&DAT_004c1100.x, 0x16100u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1100.y, 0x16100u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1100.id, 0x16100u + 0xc, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1100.pad_e, 0x16100u + 0xe, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1100.field_10, 0x16100u + 0x10, 0x4u, lim);
+}
+
+static void PortCheck_CatapultNodeList(void) {
+    unsigned int lim = 0x1611cu;
+    PortCheckPtr(&CatapultNodeList, 0x16118u, lim);
+}
+
+static void PortCheck_CopterBaseMatteSprite(void) {
+    unsigned int lim = 0x16124u;
+    PortCheckPtr(&CopterBaseMatteSprite, 0x16120u, lim);
+}
+
+static void PortCheck_CopterQueueTables(void) {
+    unsigned int lim = 0x16138u;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&CopterQueueTables[i0], 0x16124u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_CopterModelLayers(void) {
+    unsigned int lim = 0x1613cu;
+    PortCheckPtr(&CopterModelLayers, 0x16138u, lim);
+}
+
+static void PortCheck_CopterModelSprites(void) {
+    unsigned int lim = 0x16164u;
+    int i0;
+
+    for (i0 = 0; i0 < 10; i0++) {
+        PortCheckPtr(&CopterModelSprites[i0], 0x1613cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004c1164(void) {
+    unsigned int lim = 0x16168u;
+    PortCheckPtr(&DAT_004c1164, 0x16164u, lim);
+}
+
+static void PortCheck_DAT_004c1168(void) {
+    unsigned int lim = 0x1616cu;
+    PortCheckPtr(&DAT_004c1168, 0x16168u, lim);
+}
+
+static void PortCheck_DAT_004c1170(void) {
+    unsigned int lim = 0x16184u;
+    PortCheckPtr(&DAT_004c1170.sprite, 0x16170u, lim);
+    PortCheckBytes(&DAT_004c1170.x, 0x16170u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1170.y, 0x16170u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1170.id, 0x16170u + 0xc, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1170.pad_e, 0x16170u + 0xe, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1170.field_10, 0x16170u + 0x10, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004c1188(void) {
+    unsigned int lim = 0x1618cu;
+    PortCheckPtr(&DAT_004c1188, 0x16188u, lim);
+}
+
+static void PortCheck_DAT_004c1190(void) {
+    unsigned int lim = 0x16194u;
+    PortCheckPtr(&DAT_004c1190, 0x16190u, lim);
+}
+
+static void PortCheck_DAT_004c1194(void) {
+    unsigned int lim = 0x16198u;
+    PortCheckPtr(&DAT_004c1194, 0x16194u, lim);
+}
+
+static void PortCheck_ActiveCopterRide(void) {
+    unsigned int lim = 0x1619cu;
+    PortCheckPtr(&ActiveCopterRide, 0x16198u, lim);
+}
+
+static void PortCheck_DAT_004c119c(void) {
+    unsigned int lim = 0x161a0u;
+    PortCheckPtr(&DAT_004c119c, 0x1619cu, lim);
+}
+
+static void PortCheck_DAT_004c11a0(void) {
+    unsigned int lim = 0x161a4u;
+    PortCheckPtr(&DAT_004c11a0, 0x161a0u, lim);
+}
+
+static void PortCheck_DAT_004c11a4(void) {
+    unsigned int lim = 0x161a8u;
+    PortCheckPtr(&DAT_004c11a4, 0x161a4u, lim);
+}
+
+static void PortCheck_DAT_004c11a8(void) {
+    unsigned int lim = 0x161acu;
+    PortCheckPtr(&DAT_004c11a8, 0x161a8u, lim);
+}
+
+static void PortCheck_DAT_004c11ac(void) {
+    unsigned int lim = 0x161b0u;
+    PortCheckPtr(&DAT_004c11ac, 0x161acu, lim);
+}
+
+static void PortCheck_DAT_004c11b0(void) {
+    unsigned int lim = 0x161b4u;
+    PortCheckPtr(&DAT_004c11b0, 0x161b0u, lim);
+}
+
+static void PortCheck_CopterNodeList(void) {
+    unsigned int lim = 0x161b8u;
+    PortCheckPtr(&CopterNodeList, 0x161b4u, lim);
+}
+
+static void PortCheck_DrivingSchoolCountList(void) {
+    unsigned int lim = 0x161c0u;
+    PortCheckPtr(&DrivingSchoolCountList, 0x161bcu, lim);
+}
+
+static void PortCheck_DAT_004c11c4(void) {
+    unsigned int lim = 0x161c8u;
+    PortCheckPtr(&DAT_004c11c4, 0x161c4u, lim);
+}
+
+static void PortCheck_DAT_004c11c8(void) {
+    unsigned int lim = 0x161ccu;
+    PortCheckPtr(&DAT_004c11c8, 0x161c8u, lim);
+}
+
+static void PortCheck_FortMaskSprite(void) {
+    unsigned int lim = 0x161d0u;
+    PortCheckPtr(&FortMaskSprite, 0x161ccu, lim);
+}
+
+static void PortCheck_FortLayer(void) {
+    unsigned int lim = 0x161dcu;
+    PortCheckPtr(&FortLayer, 0x161d8u, lim);
+}
+
+static void PortCheck_FortRide(void) {
+    unsigned int lim = 0x161e0u;
+    PortCheckPtr(&FortRide, 0x161dcu, lim);
+}
+
+static void PortCheck_DAT_004c11e0(void) {
+    unsigned int lim = 0x161e4u;
+    PortCheckPtr(&DAT_004c11e0, 0x161e0u, lim);
+}
+
+static void PortCheck_DAT_004c11e4(void) {
+    unsigned int lim = 0x161e8u;
+    PortCheckPtr(&DAT_004c11e4, 0x161e4u, lim);
+}
+
+static void PortCheck_GoldRushLayer(void) {
+    unsigned int lim = 0x161ecu;
+    PortCheckPtr(&GoldRushLayer, 0x161e8u, lim);
+}
+
+static void PortCheck_GoldRushRide(void) {
+    unsigned int lim = 0x161f4u;
+    PortCheckPtr(&GoldRushRide, 0x161f0u, lim);
+}
+
+static void PortCheck_GoldMaskSprite(void) {
+    unsigned int lim = 0x161f8u;
+    PortCheckPtr(&GoldMaskSprite, 0x161f4u, lim);
+}
+
+static void PortCheck_GoldWashMatte1Sprite(void) {
+    unsigned int lim = 0x161fcu;
+    PortCheckPtr(&GoldWashMatte1Sprite, 0x161f8u, lim);
+}
+
+static void PortCheck_GoldWashSprite(void) {
+    unsigned int lim = 0x16200u;
+    PortCheckPtr(&GoldWashSprite, 0x161fcu, lim);
+}
+
+static void PortCheck_GoldWashMatte2Sprite(void) {
+    unsigned int lim = 0x16204u;
+    PortCheckPtr(&GoldWashMatte2Sprite, 0x16200u, lim);
+}
+
+static void PortCheck_GoldWashList(void) {
+    unsigned int lim = 0x16208u;
+    PortCheckPtr(&GoldWashList, 0x16204u, lim);
+}
+
+static void PortCheck_GoldRushBlokeRenderList(void) {
+    unsigned int lim = 0x1620cu;
+    PortCheckPtr(&GoldRushBlokeRenderList, 0x16208u, lim);
+}
+
+static void PortCheck_ZJoustSprite(void) {
+    unsigned int lim = 0x16214u;
+    PortCheckPtr(&ZJoustSprite, 0x16210u, lim);
+}
+
+static void PortCheck_JoustLayer(void) {
+    unsigned int lim = 0x16218u;
+    PortCheckPtr(&JoustLayer, 0x16214u, lim);
+}
+
+static void PortCheck_JoustRideBnv(void) {
+    unsigned int lim = 0x1621cu;
+    PortCheckPtr(&JoustRideBnv, 0x16218u, lim);
+}
+
+static void PortCheck_JoustRide(void) {
+    unsigned int lim = 0x16220u;
+    PortCheckPtr(&JoustRide, 0x1621cu, lim);
+}
+
+static void PortCheck_DAT_004c1228(void) {
+    unsigned int lim = 0x1623cu;
+    PortCheckPtr(&DAT_004c1228.sprite, 0x16228u, lim);
+    PortCheckBytes(&DAT_004c1228.x, 0x16228u + 0x4, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1228.y, 0x16228u + 0x8, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1228.id, 0x16228u + 0xc, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1228.pad_e, 0x16228u + 0xe, 0x2u, lim);
+    PortCheckBytes(&DAT_004c1228.field_10, 0x16228u + 0x10, 0x4u, lim);
+}
+
+static void PortCheck_DAT_004c123c(void) {
+    unsigned int lim = 0x16244u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004c123c[i0], 0x1623cu + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_JoustFMaskSprite(void) {
+    unsigned int lim = 0x16248u;
+    PortCheckPtr(&JoustFMaskSprite, 0x16244u, lim);
+}
+
+static void PortCheck_JoustSpecRMSprite(void) {
+    unsigned int lim = 0x1624cu;
+    PortCheckPtr(&JoustSpecRMSprite, 0x16248u, lim);
+}
+
+static void PortCheck_JoustSpecLMSprite(void) {
+    unsigned int lim = 0x16250u;
+    PortCheckPtr(&JoustSpecLMSprite, 0x1624cu, lim);
+}
+
+static void PortCheck_JoustNodeList(void) {
+    unsigned int lim = 0x16254u;
+    PortCheckPtr(&JoustNodeList, 0x16250u, lim);
+}
+
+static void PortCheck_LogFlumeTunelMSprite(void) {
+    unsigned int lim = 0x1625cu;
+    PortCheckPtr(&LogFlumeTunelMSprite, 0x16258u, lim);
+}
+
+static void PortCheck_DAT_004c1260(void) {
+    unsigned int lim = 0x17000u;
+    PortCheckBytes(&DAT_004c1260.pad_0, 0x16260u, 0x14u, lim);
+    PortCheckBytes(&DAT_004c1260.field_14, 0x16260u + 0x14, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_18, 0x16260u + 0x18, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_1c, 0x16260u + 0x1c, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_20, 0x16260u + 0x20, 0x1cu, lim);
+    PortCheckBytes(&DAT_004c1260.field_3c, 0x16260u + 0x3c, 0x14u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_50, 0x16260u + 0x50, 0x14u, lim);
+    PortCheckBytes(&DAT_004c1260.field_64, 0x16260u + 0x64, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_68, 0x16260u + 0x68, 0x5cu, lim);
+    PortCheckBytes(&DAT_004c1260.field_c4, 0x16260u + 0xc4, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_c8, 0x16260u + 0xc8, 0x4u, lim);
+    PortCheckPtr(&DAT_004c1260.field_cc, 0x16260u + 0xcc, lim);
+    PortCheckBytes(&DAT_004c1260.pad_d0, 0x16260u + 0xd0, 0x1334u, lim);
+    PortCheckBytes(&DAT_004c1260.tile_x, 0x16260u + 0x1404, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.tile_y, 0x16260u + 0x1408, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_140c, 0x16260u + 0x140c, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_1410, 0x16260u + 0x1410, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_1414, 0x16260u + 0x1414, 0x14u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_1428, 0x16260u + 0x1428, 0x400u, lim);
+    PortCheckBytes(&DAT_004c1260.field_1828, 0x16260u + 0x1828, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.pad_182c, 0x16260u + 0x182c, 0x4u, lim);
+    PortCheckBytes(&DAT_004c1260.field_1830, 0x16260u + 0x1830, 0x4u, lim);
+}
+
+static void (*const port_typed_loads[])(void) = {
+    PortLoad_FlumeStages_004b47f0,
+    PortLoad_DAT_004b4808,
+    PortLoad_FlumeStages_004b4810,
+    PortLoad_DAT_004b4828,
+    PortLoad_FlumeStages_004b4830,
+    PortLoad_DAT_004b4858,
+    PortLoad_SAFARI_SFX,
+    PortLoad_SpiderRide_SFX,
+    PortLoad_DAT_004b4f08,
+    PortLoad_DAT_004b5570,
+    PortLoad_DAT_004b55fc,
+    PortLoad_DAT_004b5600,
+    PortLoad_DAT_004b5648,
+    PortLoad_DAT_004b5658,
+    PortLoad_DAT_004b58c8,
+    PortLoad_DAT_004b5988,
+    PortLoad_DAT_004b5b20,
+    PortLoad_DAT_004b5b24,
+    PortLoad_DAT_004b5b3c,
+    PortLoad_DAT_004b5b48,
+    PortLoad_DAT_004b5d20,
+    PortLoad_DAT_004b5d58,
+    PortLoad_DAT_004b5d90,
+    PortLoad_DAT_004b5dc8,
+    PortLoad_DAT_004b5f50,
+    PortLoad_DAT_004b5f60,
+    PortLoad_DAT_004b63fc,
+    PortLoad_CAROUSSEL_SFX,
+    PortLoad_SPACE_TOWER_SFX,
+    PortLoad_DAT_004b7758,
+    PortLoad_DAT_004b7e9c,
+    PortLoad_GraphicsPath,
+    PortLoad_GraphicsPathPrefix,
+    PortLoad_GraphicsSmallPath,
+    PortLoad_MasksPath,
+    PortLoad_MasksSmallPath,
+    PortLoad_IconsPath,
+    PortLoad_ModelsPath,
+    PortLoad_PTR_DAT_004b8348,
+    PortLoad_PTR_Bloke_DoNothing_004b8368,
+    PortLoad_DAT_004b85c4,
+    PortLoad_DINO_SFX,
+    PortLoad_MONEY_SFX,
+    PortLoad_GameFX,
+    PortLoad_PTR_DAT_004b95f0,
+    PortLoad_BlitFrameFunc,
+    PortLoad_PTR_some_list_head_004ba87c,
+    PortLoad_PTR_DAT_004ba880,
+    PortLoad_DAT_004bb0a4,
+    PortLoad_DAT_004bb5b4,
+    PortLoad_DAT_004bb5c4,
+    PortLoad_DAT_004bb5d8,
+    PortLoad_DAT_004bb5e0,
+    PortLoad_DAT_004bb5f4,
+    PortLoad_DAT_004bb624,
+    PortLoad_DAT_004bb688,
+    PortLoad_DAT_004bb6bc,
+    PortLoad_DAT_004bb6d4,
+    PortLoad_DAT_004bb6f8,
+    PortLoad_lpConfig,
+    PortLoad_PTR_s_Aaron_004bcecc,
+    PortLoad_PTR_s_Abbie_004bd018,
+    PortLoad_PTR_s_Adams_004bd180,
+    PortLoad_PTR_FUN_004bd34c,
+    PortLoad_Hover,
+    PortLoad_DAT_004bdeb8,
+    PortLoad_ProgressScreenTables,
+    PortLoad_DAT_004c10d4,
+    PortLoad_CastleLevelRide,
+    PortLoad_CastleLevelMatteSprite,
+    PortLoad_DAT_004c10e8,
+    PortLoad_DAT_004c10f0,
+    PortLoad_ActiveCatapultRide,
+    PortLoad_DAT_004c1100,
+    PortLoad_CatapultNodeList,
+    PortLoad_CopterBaseMatteSprite,
+    PortLoad_CopterQueueTables,
+    PortLoad_CopterModelLayers,
+    PortLoad_CopterModelSprites,
+    PortLoad_DAT_004c1164,
+    PortLoad_DAT_004c1168,
+    PortLoad_DAT_004c1170,
+    PortLoad_DAT_004c1188,
+    PortLoad_DAT_004c1190,
+    PortLoad_DAT_004c1194,
+    PortLoad_ActiveCopterRide,
+    PortLoad_DAT_004c119c,
+    PortLoad_DAT_004c11a0,
+    PortLoad_DAT_004c11a4,
+    PortLoad_DAT_004c11a8,
+    PortLoad_DAT_004c11ac,
+    PortLoad_DAT_004c11b0,
+    PortLoad_CopterNodeList,
+    PortLoad_DrivingSchoolCountList,
+    PortLoad_DAT_004c11c4,
+    PortLoad_DAT_004c11c8,
+    PortLoad_FortMaskSprite,
+    PortLoad_FortLayer,
+    PortLoad_FortRide,
+    PortLoad_DAT_004c11e0,
+    PortLoad_DAT_004c11e4,
+    PortLoad_GoldRushLayer,
+    PortLoad_GoldRushRide,
+    PortLoad_GoldMaskSprite,
+    PortLoad_GoldWashMatte1Sprite,
+    PortLoad_GoldWashSprite,
+    PortLoad_GoldWashMatte2Sprite,
+    PortLoad_GoldWashList,
+    PortLoad_GoldRushBlokeRenderList,
+    PortLoad_ZJoustSprite,
+    PortLoad_JoustLayer,
+    PortLoad_JoustRideBnv,
+    PortLoad_JoustRide,
+    PortLoad_DAT_004c1228,
+    PortLoad_DAT_004c123c,
+    PortLoad_JoustFMaskSprite,
+    PortLoad_JoustSpecRMSprite,
+    PortLoad_JoustSpecLMSprite,
+    PortLoad_JoustNodeList,
+    PortLoad_LogFlumeTunelMSprite,
+    PortLoad_DAT_004c1260,
+    NULL
+};
+
+static void (*const port_typed_checks[])(void) = {
+    PortCheck_FlumeStages_004b47f0,
+    PortCheck_DAT_004b4808,
+    PortCheck_FlumeStages_004b4810,
+    PortCheck_DAT_004b4828,
+    PortCheck_FlumeStages_004b4830,
+    PortCheck_DAT_004b4858,
+    PortCheck_SAFARI_SFX,
+    PortCheck_SpiderRide_SFX,
+    PortCheck_DAT_004b4f08,
+    PortCheck_DAT_004b5570,
+    PortCheck_DAT_004b55fc,
+    PortCheck_DAT_004b5600,
+    PortCheck_DAT_004b5648,
+    PortCheck_DAT_004b5658,
+    PortCheck_DAT_004b58c8,
+    PortCheck_DAT_004b5988,
+    PortCheck_DAT_004b5b20,
+    PortCheck_DAT_004b5b24,
+    PortCheck_DAT_004b5b3c,
+    PortCheck_DAT_004b5b48,
+    PortCheck_DAT_004b5d20,
+    PortCheck_DAT_004b5d58,
+    PortCheck_DAT_004b5d90,
+    PortCheck_DAT_004b5dc8,
+    PortCheck_DAT_004b5f50,
+    PortCheck_DAT_004b5f60,
+    PortCheck_DAT_004b63fc,
+    PortCheck_CAROUSSEL_SFX,
+    PortCheck_SPACE_TOWER_SFX,
+    PortCheck_DAT_004b7758,
+    PortCheck_DAT_004b7e9c,
+    PortCheck_GraphicsPath,
+    PortCheck_GraphicsPathPrefix,
+    PortCheck_GraphicsSmallPath,
+    PortCheck_MasksPath,
+    PortCheck_MasksSmallPath,
+    PortCheck_IconsPath,
+    PortCheck_ModelsPath,
+    PortCheck_PTR_DAT_004b8348,
+    PortCheck_PTR_Bloke_DoNothing_004b8368,
+    PortCheck_DAT_004b85c4,
+    PortCheck_DINO_SFX,
+    PortCheck_MONEY_SFX,
+    PortCheck_GameFX,
+    PortCheck_PTR_DAT_004b95f0,
+    PortCheck_BlitFrameFunc,
+    PortCheck_PTR_some_list_head_004ba87c,
+    PortCheck_PTR_DAT_004ba880,
+    PortCheck_DAT_004bb0a4,
+    PortCheck_DAT_004bb5b4,
+    PortCheck_DAT_004bb5c4,
+    PortCheck_DAT_004bb5d8,
+    PortCheck_DAT_004bb5e0,
+    PortCheck_DAT_004bb5f4,
+    PortCheck_DAT_004bb624,
+    PortCheck_DAT_004bb688,
+    PortCheck_DAT_004bb6bc,
+    PortCheck_DAT_004bb6d4,
+    PortCheck_DAT_004bb6f8,
+    PortCheck_lpConfig,
+    PortCheck_PTR_s_Aaron_004bcecc,
+    PortCheck_PTR_s_Abbie_004bd018,
+    PortCheck_PTR_s_Adams_004bd180,
+    PortCheck_PTR_FUN_004bd34c,
+    PortCheck_Hover,
+    PortCheck_DAT_004bdeb8,
+    PortCheck_ProgressScreenTables,
+    PortCheck_DAT_004c10d4,
+    PortCheck_CastleLevelRide,
+    PortCheck_CastleLevelMatteSprite,
+    PortCheck_DAT_004c10e8,
+    PortCheck_DAT_004c10f0,
+    PortCheck_ActiveCatapultRide,
+    PortCheck_DAT_004c1100,
+    PortCheck_CatapultNodeList,
+    PortCheck_CopterBaseMatteSprite,
+    PortCheck_CopterQueueTables,
+    PortCheck_CopterModelLayers,
+    PortCheck_CopterModelSprites,
+    PortCheck_DAT_004c1164,
+    PortCheck_DAT_004c1168,
+    PortCheck_DAT_004c1170,
+    PortCheck_DAT_004c1188,
+    PortCheck_DAT_004c1190,
+    PortCheck_DAT_004c1194,
+    PortCheck_ActiveCopterRide,
+    PortCheck_DAT_004c119c,
+    PortCheck_DAT_004c11a0,
+    PortCheck_DAT_004c11a4,
+    PortCheck_DAT_004c11a8,
+    PortCheck_DAT_004c11ac,
+    PortCheck_DAT_004c11b0,
+    PortCheck_CopterNodeList,
+    PortCheck_DrivingSchoolCountList,
+    PortCheck_DAT_004c11c4,
+    PortCheck_DAT_004c11c8,
+    PortCheck_FortMaskSprite,
+    PortCheck_FortLayer,
+    PortCheck_FortRide,
+    PortCheck_DAT_004c11e0,
+    PortCheck_DAT_004c11e4,
+    PortCheck_GoldRushLayer,
+    PortCheck_GoldRushRide,
+    PortCheck_GoldMaskSprite,
+    PortCheck_GoldWashMatte1Sprite,
+    PortCheck_GoldWashSprite,
+    PortCheck_GoldWashMatte2Sprite,
+    PortCheck_GoldWashList,
+    PortCheck_GoldRushBlokeRenderList,
+    PortCheck_ZJoustSprite,
+    PortCheck_JoustLayer,
+    PortCheck_JoustRideBnv,
+    PortCheck_JoustRide,
+    PortCheck_DAT_004c1228,
+    PortCheck_DAT_004c123c,
+    PortCheck_JoustFMaskSprite,
+    PortCheck_JoustSpecRMSprite,
+    PortCheck_JoustSpecLMSprite,
+    PortCheck_JoustNodeList,
+    PortCheck_LogFlumeTunelMSprite,
+    PortCheck_DAT_004c1260,
+    NULL
+};
+
+
+
 void PortLoadData(void) {
     unsigned int i;
 
-    /* 1. patch the pointer slots in the copy */
+#if !defined(_WIN64)
+    /* 1. patch the pointer slots in the copy (on 64-bit, an 8-byte pointer doesn't fit a 4-byte slot: the typed
+       loaders resolve each pointer they need instead) */
     for (i = 0; i < sizeof(port_fixups) / sizeof(port_fixups[0]); i++) {
         const struct PortFixup *f = &port_fixups[i];
         void *p;
@@ -6036,13 +8117,17 @@ void PortLoadData(void) {
         }
         memcpy(port_data + f->slot, &p, sizeof(p));
     }
+#endif
 
-    /* 2. fill the globals */
+    /* 2. fill the globals: the ones without pointers with their original bytes, the others field by field */
     for (i = 0; i < sizeof(port_globals) / sizeof(port_globals[0]); i++) {
         const struct PortGlobal *g = &port_globals[i];
         unsigned int n = g->size < g->gap ? g->size : g->gap;
 
         memcpy(g->addr, port_data + g->offset, n);
+    }
+    for (i = 0; port_typed_loads[i] != NULL; i++) {
+        port_typed_loads[i]();
     }
 }
 
@@ -6094,6 +8179,15 @@ int PortDataSelfTest(const char *path, int earlier_problems) {
             pointers++;
         }
     }
+    /* the globals filled field by field */
+    PortTypedReport = f;
+    PortTypedProblems = 0;
+    PortTypedPointers = 0;
+    for (i = 0; port_typed_checks[i] != NULL; i++) {
+        port_typed_checks[i]();
+    }
+    bad += PortTypedProblems;
+    pointers += PortTypedPointers;
     /* globals the port declares smaller than the original's data: the bytes past their end aren't loaded */
     {
         unsigned int truncated = 0;
