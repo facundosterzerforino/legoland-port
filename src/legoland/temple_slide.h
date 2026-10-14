@@ -3,6 +3,14 @@
 #include "legoland.h"
 #include "objclass.h"
 
+struct SlideNode {
+    unsigned short key;
+    unsigned char pad_2[6];
+    struct SlideNode *next;
+    unsigned char pad_c[4];
+    unsigned int slots[4];
+};
+
 struct Ride;
 struct ClassNode;
 LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *head, struct Ride *iface);

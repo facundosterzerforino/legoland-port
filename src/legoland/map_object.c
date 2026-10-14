@@ -18,6 +18,7 @@
 #include "image_sprite.h"
 #include "llidb.h"
 #include "map_object.h"
+#include "mapscreen.h"
 #include "math.h"
 #include "obj_instance.h"
 #include "objclass.h"
@@ -111,17 +112,6 @@ struct ObjData {
     unsigned int flags;
     unsigned char pad_20[0x58 - 0x20];
     struct ObjDef *field_58;
-};
-
-struct Overlay {
-    unsigned int field_0;
-    unsigned int field_4;
-    unsigned char pad_8[0x10 - 0x8];
-    int field_10;
-    unsigned int x;
-    unsigned int y;
-    struct Overlay *next;
-    struct Sprite *sprite;
 };
 
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
@@ -1599,7 +1589,7 @@ void FUN_00460560(int index) {
     int inner;
     int outer;
 
-    for (ov = (struct Overlay *)OverlayList; ov != 0; ov = ov->next) {
+    for (ov = OverlayList; ov != 0; ov = ov->next) {
         if (ov->field_10 >> 8 == index + 1) {
             sc[0] = (lpConfig->view_x - (ScrollX >> 8)) + ov->x;
             sc[1] = (lpConfig->view_y - (ScrollY >> 8)) + ov->y;
@@ -1676,7 +1666,7 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     int ox;
     int oy;
 
-    ov = (struct Overlay *)OverlayList;
+    ov = OverlayList;
     dx = pos->x - clip->left;
     dy = pos->y - clip->top;
     SetClipping(clip);
@@ -2791,7 +2781,7 @@ LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
     struct Sprite *sample;
     struct SpriteAnim *lls;
 
-    cur = (struct Overlay *)OverlayList;
+    cur = OverlayList;
     while (cur != 0 && cur->next != 0) {
         cur = cur->next;
     }
@@ -2805,7 +2795,7 @@ LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
         }
         node->x = param->x;
         node->y = param->y;
-        *(struct OverlayParam *)node = *param;
+        node->param = *param;
         if (param->field_10 & 0xff00) {
             sample = BridgesData->sprites[param->field_10 & 0xff];
         } else {
@@ -2838,7 +2828,7 @@ void FUN_00462c00(struct OverlayParam *param) {
         }
         node->x = param->x;
         node->y = param->y;
-        *(struct OverlayParam *)node = *param;
+        node->param = *param;
     }
 }
 
@@ -2848,7 +2838,7 @@ void FUN_00462c60(void) {
     struct Sprite *sample;
     struct SpriteAnim *lls;
 
-    for (node = (struct Overlay *)OverlayList; node != 0; node = node->next) {
+    for (node = OverlayList; node != 0; node = node->next) {
         if (node->field_10 & 0xff00) {
             if (BridgesData != 0) {
                 sample = BridgesData->sprites[*(volatile unsigned int *)&node->field_10 & 0xff];

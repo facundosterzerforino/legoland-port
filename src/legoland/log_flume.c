@@ -218,24 +218,6 @@ struct FlumeInput {
     struct FlumeSlot1 *var_8;
 };
 
-struct FlumeNode {
-    struct FlumeNode *next;
-    struct FlumeNode *prev;
-    struct FlumeNode *field_8;
-    struct FlumeNode *field_c;
-    unsigned int flags;
-    TileId tile;
-    unsigned char pad_16[2];
-    int mode;
-    int submode;
-    struct Ride *ride;
-    struct FlumeEntry *owner;
-    struct FlumeNode *entry;
-    struct FlumeNode *field_2c;
-    struct FlumeNode *field_30;
-    struct FlumeNode *field_34;
-};
-
 struct FlumeBytes {
     unsigned char b0;
     unsigned char pad_1[3];
@@ -259,18 +241,6 @@ struct FlumeCounter {
 struct FlumeStatHolder {
     unsigned char pad_0[8];
     struct FlumeCounter *counter;
-};
-
-struct FlumeSlot {
-    int timer;
-    unsigned int flags;
-    struct FlumeStatHolder *busy;
-    int x;
-    int y;
-    struct FlumeWeighted *owner;
-    float weight;
-    int field_1c;
-    unsigned char pad_20[4];
 };
 
 struct FlumeQueueItem {
@@ -327,59 +297,6 @@ struct FlumeMover {
 struct FlumeInner {
     unsigned char pad_0[8];
     int id;
-};
-
-struct FlumeEntry {
-    /* 0x00 */ struct FlumeEntry *next;
-    /* 0x04 */ union {
-        struct FlumeEntry *alt;
-        unsigned int flags;
-    };
-    /* 0x08 */ union {
-        struct FlumeEntry *parent8;
-        void *field_8;
-    };
-    /* 0x0c */ void *field_c;
-    /* 0x10 */ union {
-        struct FlumeEntry *sub;
-        unsigned char flags10;
-        unsigned int flags10d;
-    };
-    /* 0x14 */ TileId tile;
-    /* 0x16 */ unsigned char pad_16[2];
-    /* 0x18 */ union {
-        int mode;
-        struct FlumeEntry *link;
-    };
-    /* 0x1c */ int submode;
-    /* 0x20 */ struct Ride *ride;
-    /* 0x24 */ union {
-        struct FlumeSlotSet *slotset;
-        struct FlumeEntry *parent;
-        struct FlumeMover *field_24;
-    };
-    /* 0x28 */ union {
-        int field_28;
-        struct FlumeEntry *link28;
-    };
-    /* 0x2c */ union {
-        struct {
-            struct FlumeEntry *sub2;
-            union {
-                struct FlumeRunNode *first;
-                struct FlumeEntry *link30;
-            };
-            union {
-                struct FlumeRunNode *last;
-                struct FlumeEntry *link34;
-            };
-        };
-        struct Queue queue;
-    };
-    /* 0x38 */ void *target;
-    /* 0x3c */ int count;
-    /* 0x40 */ struct FlumeSlot slots[4];
-    /* 0xd0 */ int field_d0;
 };
 
 struct FlumeHolder {

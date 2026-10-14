@@ -19,27 +19,11 @@
 #include "tilemap.h"
 #include "water_works.h"
 
-struct WaterNode {
-    /* 0x00 */ struct WaterNode *next;
-    /* 0x04 */ unsigned short key;
-    /* 0x06 */ unsigned char pad_6[2];
-    /* 0x08 */ unsigned char field_8;
-    /* 0x09 */ unsigned char frame;
-    /* 0x0a */ unsigned char block_index;
-    /* 0x0b */ unsigned char pad_b[1];
-};
-
 struct FxSource {
     unsigned int field_0;
     unsigned char pad_4[4];
     unsigned int field_8;
     unsigned int field_c;
-};
-
-struct WaterListItem {
-    struct WaterListItem *next;
-    unsigned char pad_4[4];
-    unsigned char pad_8[4];
 };
 
 struct WaterPoint {
@@ -803,18 +787,18 @@ void WaterWorksCrocodileFountainCalcCursor(struct Element *arg, int *a, unsigned
 
 // FUNCTION: LEGOLAND 0x00418aa0
 LEGO_EXPORT int Save_WaterBlock(struct Element *element) {
-    struct WaterListItem *current;
+    struct WaterNode *current;
     unsigned int one;
     unsigned int zero;
 
     one = 1;
     zero = 0;
-    current = (struct WaterListItem *)WaterNodeList;
+    current = WaterNodeList;
     while (current != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(current, sizeof(struct WaterListItem)) == 0) {
+        if (SaveGameWrite(current, sizeof(struct WaterNode)) == 0) {
             return 0;
         }
         current = current->next;
@@ -853,18 +837,18 @@ LEGO_EXPORT int Load_WaterBlock(struct Element *element) {
 
 // FUNCTION: LEGOLAND 0x00418b90
 LEGO_EXPORT int Save_ElephantF(struct Element *element) {
-    struct WaterListItem *current;
+    struct WaterNode *current;
     unsigned int one;
     unsigned int zero;
 
     one = 1;
     zero = 0;
-    current = (struct WaterListItem *)ElephantFountainList;
+    current = ElephantFountainList;
     while (current != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
         }
-        if (SaveGameWrite(current, sizeof(struct WaterListItem)) == 0) {
+        if (SaveGameWrite(current, sizeof(struct WaterNode)) == 0) {
             return 0;
         }
         current = current->next;

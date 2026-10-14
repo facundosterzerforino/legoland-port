@@ -19,6 +19,7 @@
 #include "main.h"
 #include "man3d.h"
 #include "map_object.h"
+#include "mapscreen.h"
 #include "nerps.h"
 #include "obj_instance.h"
 #include "pathfind.h"
@@ -33,12 +34,6 @@
 #pragma auto_inline(off)
 
 /* A node of OverlayList (the overlays saved at the end of a save game). */
-struct OverlayNode {
-    struct OverlayParam param;
-    unsigned int pad_14[2];
-    struct OverlayNode *next;
-};
-
 // FUNCTION: LEGOLAND 0x0047d790
 LEGO_EXPORT int BeginMeasuredBlock(void) {
     int pos;
@@ -395,7 +390,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.dest.y = bloke->dest.y;
             BlokeSaveBuffer.goal.x = bloke->goal.x;
             BlokeSaveBuffer.goal.y = bloke->goal.y;
-            memcpy(BlokeSaveBuffer.block_34, &bloke->field_34, sizeof(BlokeSaveBuffer.block_34));
+            memcpy(&BlokeSaveBuffer.block_34, &bloke->field_34, sizeof(BlokeSaveBuffer.block_34));
             BlokeSaveBuffer.field_5c = bloke->field_5c;
             BlokeSaveBuffer.param_action = bloke->param_action;
             BlokeSaveBuffer.flags = bloke->flags;
@@ -452,8 +447,8 @@ LEGO_EXPORT int SaveGame(char *filename) {
                     goto fail;
                 }
             }
-            if (BlokeSaveBuffer.block_34[8] != 0) {
-                if (SaveGameWrite((void *)(UINT_PTR)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
+            if (BlokeSaveBuffer.block_34.path != NULL) {
+                if (SaveGameWrite(BlokeSaveBuffer.block_34.path, sizeof(struct BNVPath)) == 0) {
                     {
                         // STRING: LEGOLAND 0x004bc730
                         LogPrintf("Bloke BNV path data (%d)", num);
@@ -681,7 +676,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         goto fail;
     }
     {
-        struct OverlayNode *ov;
+        struct Overlay *ov;
         int n;
         n = strlen(OverlayILFHandle->name);
         SaveGameWrite(&n, 4);
@@ -701,7 +696,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         }
         SaveGameWrite(&n, 4);
         for (ov = OverlayList; ov != 0; ov = ov->next) {
-            SaveGameWrite(ov, 0x14);
+            SaveGameWrite(&ov->param, sizeof(ov->param));
         }
     }
     if (EndMeasuredBlock() == 0) {
@@ -897,9 +892,9 @@ LEGO_EXPORT int LoadGame(char *path) {
         if (SaveGameRead(&BlokeSaveBuffer, sizeof(BlokeSaveBuffer)) == 0) {
             goto fail;
         }
-        if (BlokeSaveBuffer.block_34[8] != 0) {
-            BlokeSaveBuffer.block_34[8] = (unsigned int)(UINT_PTR)malloc(0x48);
-            if (SaveGameRead((void *)(UINT_PTR)BlokeSaveBuffer.block_34[8], 0x48) == 0) {
+        if (BlokeSaveBuffer.block_34.path != NULL) {
+            BlokeSaveBuffer.block_34.path = malloc(sizeof(struct BNVPath));
+            if (SaveGameRead(BlokeSaveBuffer.block_34.path, sizeof(struct BNVPath)) == 0) {
                 goto fail;
             }
         }
@@ -922,7 +917,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         bloke->dest.y = BlokeSaveBuffer.dest.y;
         bloke->goal.x = BlokeSaveBuffer.goal.x;
         bloke->goal.y = BlokeSaveBuffer.goal.y;
-        memcpy(&bloke->field_34, BlokeSaveBuffer.block_34, sizeof(BlokeSaveBuffer.block_34));
+        memcpy(&bloke->field_34, &BlokeSaveBuffer.block_34, sizeof(BlokeSaveBuffer.block_34));
         bloke->field_5c = BlokeSaveBuffer.field_5c;
         bloke->param_action = BlokeSaveBuffer.param_action;
         bloke->flags = BlokeSaveBuffer.flags;
@@ -1143,7 +1138,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         }
         SaveGameRead(&u.n, 4);
         for (i = 0; i < u.n; i++) {
-            SaveGameRead(&ov, 0x14);
+            SaveGameRead(&ov, sizeof(ov));
             AddOvSav(&ov);
         }
     }

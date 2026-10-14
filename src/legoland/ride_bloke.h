@@ -2,6 +2,59 @@
 
 /* [port] declared at file scope so prototypes below refer to the same type */
 struct RideBloke;
+#include "legoland.h"
+#include "ride_queue.h"
+
+struct NewBloke {
+    struct NewBloke *next;
+    unsigned short id;
+    unsigned char pad_6[0x8 - 0x6];
+    int sx;
+    int sy;
+    union {
+        struct Point f;
+        struct {
+            int fx;
+            int fy;
+        };
+    };
+    union {
+        struct Point p;
+        struct {
+            int px;
+            int py;
+        };
+    };
+    union {
+        struct Point t;
+        struct PathPair tp;
+        struct {
+            int tx;
+            int ty;
+        };
+    };
+    int velX;
+    int velY;
+    struct Point wp[17];
+    unsigned char f_b8;
+    unsigned char f_b9;
+    unsigned char f_ba;
+    unsigned char f_bb;
+    short f_bc;
+    unsigned short f_be;
+    unsigned short f_c0;
+    unsigned char f_c2;
+    unsigned char f_c3;
+    unsigned char f_c4;
+    unsigned char pad_c5;
+    unsigned short f_c6;
+    unsigned short f_c8;
+    unsigned char pad_ca[2];
+    union {
+        int owner; /* in the saved game: the bloke's number */
+        struct Bloke *bloke;
+    };
+};
 
 struct HistPair {
     int a;
@@ -22,4 +75,5 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir);
 int FUN_00401ae0(unsigned short id, struct Bloke *bloke);
 unsigned int FUN_00401c40(unsigned short arg0);
 void FUN_00401c60(struct RideBloke *b);
+void FUN_00401c60(struct NewBloke *b);
 void FUN_00402c10(void);

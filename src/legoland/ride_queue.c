@@ -358,9 +358,9 @@ void SaveQueue(struct QueueNode *start, struct Queue *queue) {
     struct QueueNode *node;
     int n;
 
-    SaveGameWrite(queue->count, 4);
+    SaveGameWrite(&queue->count->count, sizeof(queue->count->count));
     for (n = 0; n < queue->count->count; n++) {
-        SaveGameWrite(&queue->count->steps[n], 12);
+        SaveGameWrite(&queue->count->steps[n], sizeof(struct QueueStep));
     }
     n = 0;
     for (node = queue->head; node != NULL; node = node->next) {
@@ -388,11 +388,11 @@ void FUN_00412490(struct QueueNode *start, struct Queue *queue) {
     int idx;
 
     SaveGameRead(&n, 4);
-    queue->count = (struct QueueTable *)malloc(n * 12 + 8);
+    queue->count = (struct QueueTable *)malloc(n * sizeof(struct QueueStep) + sizeof(struct QueueTable));
     queue->count->count = n;
     queue->count->steps = (struct QueueStep *)(queue->count + 1);
     for (n = 0; n < queue->count->count; n++) {
-        SaveGameRead(&queue->count->steps[n], 12);
+        SaveGameRead(&queue->count->steps[n], sizeof(struct QueueStep));
     }
     queue->head = NULL;
     queue->tail = NULL;

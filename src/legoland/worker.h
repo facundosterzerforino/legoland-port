@@ -62,7 +62,7 @@ struct WorkerSave {
     /* 0x14 */ int field_20;
     /* 0x18 */ Point dest;
     /* 0x20 */ Point goal;
-    /* 0x28 */ unsigned int block_34[10]; /* Bloke 0x34..0x5c; [7] is the order */
+    /* 0x28 */ struct BlokeBlock34 block_34; /* the order is not saved */
     /* 0x50 */ int field_5c;
     /* 0x54 */ unsigned char param_action;
     /* 0x55 */ unsigned char pad_55[1];

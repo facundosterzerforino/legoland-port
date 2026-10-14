@@ -37,6 +37,9 @@ struct RideQueueEntry {
     /* 0x15 */ unsigned char field_15;
     /* 0x16 */ unsigned char pad_16[0x2];
     /* 0x18 */ struct RideQueueEntry *field_18;
+    /* 0x1c */ unsigned char field_1c;
+    /* 0x1d */ unsigned char field_1d;
+    /* 0x1e */ unsigned char pad_1e[0x2];
 };
 
 unsigned int FUN_00411e60(struct Queue *queue);

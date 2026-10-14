@@ -1121,7 +1121,7 @@ const int DAT_004bff28[12][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {0, 2}, {0, -
     {2, 0}, {-2, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
 // GLOBAL: LEGOLAND 0x004c10d4
-void *DAT_004c10d4;
+struct NewBloke *DAT_004c10d4;
 
 // GLOBAL: LEGOLAND 0x004c10dc
 struct Ride *CastleLevelRide;
@@ -1136,7 +1136,7 @@ struct RenderItemNode *DAT_004c10e8;
 void *DAT_004c10f0;
 
 // GLOBAL: LEGOLAND 0x004c10f4
-void *ActiveCatapultRide;
+struct Ride *ActiveCatapultRide;
 
 // GLOBAL: LEGOLAND 0x004c1100
 struct RideSpriteInfo DAT_004c1100;
@@ -1175,7 +1175,7 @@ struct RenderItemNode **DAT_004c1190;
 struct RenderItemNode **DAT_004c1194;
 
 // GLOBAL: LEGOLAND 0x004c1198
-void *ActiveCopterRide;
+struct Ride *ActiveCopterRide;
 
 // GLOBAL: LEGOLAND 0x004c119c
 struct RenderItemNode *DAT_004c119c;
@@ -1199,7 +1199,7 @@ struct RenderItemNode *DAT_004c11b0;
 struct CopterNode *CopterNodeList;
 
 // GLOBAL: LEGOLAND 0x004c11bc
-void *DrivingSchoolCountList;
+struct CountNode *DrivingSchoolCountList;
 
 // GLOBAL: LEGOLAND 0x004c11c0
 int DAT_004c11c0;
@@ -1502,7 +1502,7 @@ struct Sprite *LogFlumeEntrance1Sprite;
 unsigned int DrivingSchoolPumpsRide;
 
 // GLOBAL: LEGOLAND 0x004cbea4
-void *PumpList;
+struct PumpNode *PumpList;
 
 // GLOBAL: LEGOLAND 0x004cbeac
 struct RideQueueEntry *DAT_004cbeac;
@@ -2250,7 +2250,7 @@ void *SpaceTowerLayers;
 struct Sprite *SpaceTowerSeatMatteSprites[4];
 
 // GLOBAL: LEGOLAND 0x0062fd74
-void *SpaceTowerRideObj;
+struct Ride *SpaceTowerRideObj;
 
 // GLOBAL: LEGOLAND 0x0062fd7c
 struct Sprite *SpaceTowerMatte2Sprite;

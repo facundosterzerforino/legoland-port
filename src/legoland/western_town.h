@@ -3,6 +3,18 @@
 #include "legoland.h"
 #include "llidb.h"
 
+struct JailCell {
+    struct JailCell *next;
+    unsigned short tile_id;
+    unsigned char frame;
+    unsigned char pad_7[0x8 - 0x7];
+    unsigned int field_8;
+    unsigned int field_c;
+    unsigned int field_10;
+    unsigned int field_14;
+    unsigned int field_18;
+};
+
 struct MapObject;
 struct EditObject;
 struct Cursor;

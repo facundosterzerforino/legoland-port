@@ -1810,7 +1810,7 @@ void SaveGardeners(void) {
         rec.dest.y = worker->dest.y;
         rec.goal.x = worker->goal.x;
         rec.goal.y = worker->goal.y;
-        memcpy(rec.block_34, &worker->field_34, sizeof(rec.block_34));
+        memcpy(&rec.block_34, &worker->field_34, sizeof(rec.block_34));
         rec.field_5c = worker->field_5c;
         rec.param_action = worker->param_action;
         rec.flags = worker->flags;
@@ -1835,7 +1835,7 @@ void SaveGardeners(void) {
         memcpy(rec.m, worker->person->m, sizeof(rec.m));
         rec.prev_param = worker->prev_param;
         rec.prev_action = worker->prev_action;
-        rec.block_34[7] = 0;
+        rec.block_34.order = NULL;
         if (SaveGameWrite(&rec, sizeof(rec)) == 0) {
             return;
         }
@@ -1873,7 +1873,7 @@ void LoadGardeners(void) {
         worker->dest.y = rec.dest.y;
         worker->goal.x = rec.goal.x;
         worker->goal.y = rec.goal.y;
-        memcpy(&worker->field_34, rec.block_34, sizeof(rec.block_34));
+        memcpy(&worker->field_34, &rec.block_34, sizeof(rec.block_34));
         worker->field_5c = rec.field_5c;
         worker->param_action = rec.param_action;
         worker->flags = rec.flags;
@@ -1953,7 +1953,7 @@ void SaveMechanics(void) {
         rec.dest.y = worker->dest.y;
         rec.goal.x = worker->goal.x;
         rec.goal.y = worker->goal.y;
-        memcpy(rec.block_34, &worker->field_34, sizeof(rec.block_34));
+        memcpy(&rec.block_34, &worker->field_34, sizeof(rec.block_34));
         rec.field_5c = worker->field_5c;
         rec.param_action = worker->param_action;
         rec.flags = worker->flags;
@@ -1978,7 +1978,7 @@ void SaveMechanics(void) {
         memcpy(rec.m, worker->person->m, sizeof(rec.m));
         rec.prev_param = worker->prev_param;
         rec.prev_action = worker->prev_action;
-        rec.block_34[7] = 0;
+        rec.block_34.order = NULL;
         if (SaveGameWrite(&rec, sizeof(rec)) == 0) {
             return;
         }
@@ -2016,7 +2016,7 @@ void LoadMechanics(void) {
         worker->dest.y = rec.dest.y;
         worker->goal.x = rec.goal.x;
         worker->goal.y = rec.goal.y;
-        memcpy(&worker->field_34, rec.block_34, sizeof(rec.block_34));
+        memcpy(&worker->field_34, &rec.block_34, sizeof(rec.block_34));
         worker->field_5c = rec.field_5c;
         worker->param_action = rec.param_action;
         worker->flags = rec.flags;

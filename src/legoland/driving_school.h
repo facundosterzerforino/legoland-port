@@ -9,6 +9,12 @@ struct DSCarLayer;
 
 struct DSHead;
 struct DSRenderRoot;
+struct CountNode {
+    TileId tile;
+    unsigned char pad_2[2];
+    int field_4;
+    struct CountNode *next;
+};
 
 void FUN_00405310(TileId tile);
 void FUN_00406020(unsigned short arg1, unsigned int arg2);

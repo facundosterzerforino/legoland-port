@@ -24,14 +24,6 @@ struct MapPoint {
 };
 
 /* A sprite overlaid on the map (OverlayList). */
-struct OverlayNode {
-    unsigned char pad_0[0x14];
-    int x;
-    int y;
-    struct OverlayNode *next;
-    struct Sprite *sprite;
-};
-
 #define HALF(v) ((v) < 0 ? -(-(v) >> 1) : (v) >> 1)
 
 #include "image_sprite.h"
@@ -229,7 +221,7 @@ LEGO_EXPORT void RenderFullMap(void) {
         int bounds[4];
         struct MapElement tile;
         struct MapElement *obj;
-        struct OverlayNode *node;
+        struct Overlay *node;
 
         FUN_0045a660();
         memset(DAT_008119c0, 0, 0x2000); /* all 32 rows, DAT_008138c0 included */

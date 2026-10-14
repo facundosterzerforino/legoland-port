@@ -132,6 +132,40 @@ union SavedElement {
     int index;
 };
 
+/* Bloke 0x34..0x5c (field_34 to field_58) as the saved game holds it: the same members as struct Bloke has
+   there, so the save copies the region whole on any build. */
+struct BlokeBlock34 {
+    unsigned char field_34;
+    unsigned char field_35;
+    unsigned char field_36;
+    unsigned char field_37;
+    short field_38;
+    short field_3a;
+    short screen_x;
+    short screen_y;
+    unsigned short field_40;
+    unsigned short field_42;
+    short field_44;
+    union {
+        short field_46;
+        TileId brolly; /* Shark Cafe brolly tile being walked to */
+    };
+    unsigned char pad_48[0x4a - 0x48];
+    short field_4a;
+    unsigned short field_4c;
+    unsigned char pad_4e[0x50 - 0x4e];
+    union {
+        int field_50;
+        struct WorkOrder *order; /* gardeners and mechanics */
+    };
+    union {
+        unsigned int field_54;
+        struct BNVPath *path; /* ride code: scripted path being walked */
+        struct BNVRef *bnv; /* ride code: BNV file slot of the bloke's path */
+    };
+    int field_58;
+};
+
 struct BlokeSave {
     /* 0x00 */ unsigned short action;
     /* 0x02 */ unsigned short low_level_action;
@@ -143,7 +177,7 @@ struct BlokeSave {
     /* 0x14 */ int field_20;
     /* 0x18 */ Point dest;
     /* 0x20 */ Point goal;
-    /* 0x28 */ unsigned int block_34[10]; /* Bloke 0x34..0x5c; [8] is the BNVPath pointer */
+    /* 0x28 */ struct BlokeBlock34 block_34;
     /* 0x50 */ int field_5c;
     /* 0x54 */ unsigned char param_action;
     /* 0x55 */ unsigned char pad_55[1];

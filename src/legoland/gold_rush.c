@@ -60,13 +60,6 @@ struct GoldBlokeRef {
     unsigned char field_c;
 };
 
-struct GoldNode {
-    unsigned short key;
-    unsigned char pad_2[0xa];
-    struct GoldNode *next;
-    unsigned char pad_10[0x1c];
-};
-
 struct GoldWalkItem {
     unsigned char pad_0[8];
     struct Bloke *bloke;
@@ -515,7 +508,7 @@ void GoldRushSetEditMode(void) {
     EditMode.unk0 = 1;
     EditMode.unk8 = GoldRushRide;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint((unsigned char *)EditMode.unk8 + 0x3c);
+    SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x004075f0
