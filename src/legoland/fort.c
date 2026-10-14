@@ -57,7 +57,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
             AddBlokeToRenderList(&DAT_004c11e0, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c11e0);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
     if (FortLayer != NULL) {
         struct Point off;
         sprite = GetSpriteForLayer(FortLayer, 2);
@@ -78,7 +78,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
             AddBlokeToRenderList(&DAT_004c11e0, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c11e0);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
     if (FortMaskSprite != NULL) {
         struct Point off2;
         off2.x = 0x173;

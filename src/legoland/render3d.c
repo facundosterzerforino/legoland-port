@@ -399,7 +399,7 @@ LEGO_EXPORT void StopLayerPlaying(struct Sprite *sprite, unsigned int index) {
 #pragma intrinsic(memset)
 
 // FUNCTION: LEGOLAND 0x00441f20
-LEGO_EXPORT unsigned short *LoadPalette(unsigned int path) {
+LEGO_EXPORT unsigned short *LoadPalette(const char *path) {
     unsigned short *palette;
     unsigned short *out;
     struct ResFile *file;
@@ -411,18 +411,18 @@ LEGO_EXPORT unsigned short *LoadPalette(unsigned int path) {
     palette = (unsigned short *)malloc(0x200);
     if (palette != NULL) {
         memset(palette, 0, 0x200);
-        file = RES_OpenFile((const char *)path);
+        file = RES_OpenFile(path);
         if (file != NULL) {
             RES_ReadFile(file, header, 8);
             out = palette;
             for (i = 0x100; i != 0; i--) {
-                RES_ReadFile(file, &path, 1);
+                RES_ReadFile(file, (void *)&path, 1); /* the red byte goes into the dead parameter */
                 RES_ReadFile(file, &g, 1);
                 RES_ReadFile(file, &b, 1);
                 if (DisplayPixelFormat == 2) {
-                    *out = (((path & 0xf8) << 5 | (g & 0xfc)) << 3) | (b >> 3);
+                    *out = (unsigned short)(((((UINT_PTR)path & 0xf8) << 5 | (g & 0xfc)) << 3) | (b >> 3));
                 } else {
-                    *out = (unsigned short)((((((unsigned char)path & 0xf8) << 5) | (g & 0xf8)) << 2) | (b >> 3));
+                    *out = (unsigned short)((((((unsigned char)(UINT_PTR)path & 0xf8) << 5) | (g & 0xf8)) << 2) | (b >> 3));
                 }
                 out++;
             }
@@ -986,9 +986,16 @@ LEGO_EXPORT int TMNegParity(float *param_1) {
     return 0;
 }
 
+/* the render item pools (2048 and 20 nodes) */
+// GLOBAL: LEGOLAND 0x00630108
+struct RenderItemNode DAT_00630108[0x800];
+
+// GLOBAL: LEGOLAND 0x00638218
+struct RenderItemNode DAT_00638218[20];
+
 // FUNCTION: LEGOLAND 0x00442e90
 LEGO_EXPORT void RenderItems_New(void) {
-    DAT_0062feec[0] = (unsigned int)&DAT_00630108;
+    DAT_0062feec[0] = DAT_00630108;
     RenderItemCount = 0;
 }
 
@@ -1025,48 +1032,33 @@ LEGO_EXPORT void RenderItem_Link(struct RenderItemNode **head, struct RenderItem
     }
 }
 
-struct RenderItem {
-    unsigned int field_0;
-    unsigned int field_4;
-};
-
 struct BlokeRenderSrc {
     unsigned char pad_0[8];
-    unsigned int field_8;
+    void *field_8;
 };
 
 // FUNCTION: LEGOLAND 0x00442f20
 LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key) {
-    struct RenderItem *item = (struct RenderItem *)AllocRenderItem();
-    item->field_4 = src->field_8;
-    item->field_0 = key;
+    struct RenderItemNode *item = AllocRenderItem();
+    item->item = src->field_8;
+    item->key = key;
     RenderItem_Link(head, (struct RenderItemNode *)item, key);
 }
 
 // FUNCTION: LEGOLAND 0x00442f50
-unsigned int AllocRenderItem(void) {
-    unsigned int result = DAT_0062feec[0];
-    DAT_0062feec[0] = DAT_0062feec[0] + 16;
+struct RenderItemNode *AllocRenderItem(void) {
+    struct RenderItemNode *result = DAT_0062feec[0];
+    DAT_0062feec[0] = DAT_0062feec[0] + 1;
     RenderItemCount = RenderItemCount + 1;
     return result;
 }
 
-struct BlokeListNode {
-    unsigned int field_0;
-    unsigned int field_4;
-    struct BlokeListNode *next;
-};
-
-struct BlokeListHead {
-    struct BlokeListNode *next;
-};
-
 // FUNCTION: LEGOLAND 0x00442f70
-LEGO_EXPORT void RenderBlokeList(struct BlokeListHead *list) {
-    struct BlokeListNode *node = list->next;
+LEGO_EXPORT void RenderBlokeList(struct RenderItemNode **list) {
+    struct RenderItemNode *node = *list;
     while (node) {
-        if (node->field_4) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)node->field_4);
+        if (node->item) {
+            IP_RenderBlokeIn3DNow((struct Bloke *)node->item);
         }
         node = node->next;
     }
@@ -1126,7 +1118,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
 
 // FUNCTION: LEGOLAND 0x00443060
 LEGO_EXPORT void RenderItems2_New(void) {
-    DAT_0062fef0 = (unsigned int)&DAT_00638218;
+    DAT_0062fef0 = DAT_00638218;
     RenderItem2Count = 0;
 }
 
@@ -1163,23 +1155,18 @@ LEGO_EXPORT void RenderItem2_Link(struct RenderItemNode **head, struct RenderIte
     }
 }
 
-struct RenderItem2 {
-    unsigned int field_0;
-    unsigned int field_4;
-};
-
 // FUNCTION: LEGOLAND 0x004430f0
-LEGO_EXPORT void RenderItem2_AddItem(struct RenderItemNode **head, unsigned int param_2, int key) {
-    struct RenderItem2 *item = (struct RenderItem2 *)FUN_00443120();
-    item->field_4 = param_2;
-    item->field_0 = key;
+LEGO_EXPORT void RenderItem2_AddItem(struct RenderItemNode **head, void *param_2, int key) {
+    struct RenderItemNode *item = FUN_00443120();
+    item->item = param_2;
+    item->key = key;
     RenderItem2_Link(head, (struct RenderItemNode *)item, key);
 }
 
 // FUNCTION: LEGOLAND 0x00443120
-unsigned int FUN_00443120(void) {
-    unsigned int result = DAT_0062fef0;
-    DAT_0062fef0 = DAT_0062fef0 + 16;
+struct RenderItemNode *FUN_00443120(void) {
+    struct RenderItemNode *result = DAT_0062fef0;
+    DAT_0062fef0 = DAT_0062fef0 + 1;
     RenderItem2Count = RenderItem2Count + 1;
     return result;
 }

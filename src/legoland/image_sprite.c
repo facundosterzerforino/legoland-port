@@ -747,55 +747,51 @@ LEGO_EXPORT int KillSprite(struct Sprite *sprite) {
 }
 
 // FUNCTION: LEGOLAND 0x00497c30
-LEGO_EXPORT int GetSprite(unsigned int *param_1, struct Sprite *param_2) {
+LEGO_EXPORT int GetSprite(struct VideoArg *param_1, struct Sprite *param_2) {
     int iVar1;
-    unsigned int locals[4];
-    unsigned char surfDesc[0x6c];
+    RECT locals;
+    DDSURFACEDESC surfDesc;
 
-    locals[0] = 0;
-    locals[1] = 0;
-    locals[2] = 0;
-    locals[3] = 0;
-    *(unsigned int *)surfDesc = 0x6c;
+    locals.left = 0;
+    locals.top = 0;
+    locals.right = 0;
+    locals.bottom = 0;
+    surfDesc.dwSize = sizeof(surfDesc);
     if (param_2 != NULL) {
-        locals[2] = (unsigned int)(short)param_2->width;
-        param_1[1] = locals[2];
-        locals[3] = (unsigned int)(short)param_2->height;
-        param_1[2] = locals[3];
-        param_1[4] = (unsigned int)param_2->surface;
-        iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)param_2->surface + 0x64))(
-            param_2->surface, locals, surfDesc, 1, 0);
+        locals.right = (short)param_2->width;
+        param_1->width = locals.right;
+        locals.bottom = (short)param_2->height;
+        param_1->height = locals.bottom;
+        param_1->surface = param_2->surface;
+        iVar1 = param_2->surface->lpVtbl->Lock(param_2->surface, &locals, &surfDesc, 1, 0);
         if (iVar1 == (int)0x887601c2) {
-            (*(void(__stdcall **)(void *))(*(unsigned int *)param_2->surface + 0x6c))(param_2->surface);
-            iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)param_2->surface + 0x64))(
-                param_2->surface, locals, surfDesc, 1, 0);
+            param_2->surface->lpVtbl->Restore(param_2->surface);
+            iVar1 = param_2->surface->lpVtbl->Lock(param_2->surface, &locals, &surfDesc, 1, 0);
         }
         if (iVar1 != 0) {
             return 0;
         }
     } else {
-        locals[2] = (unsigned int)*(unsigned short *)lpConfig;
-        param_1[1] = locals[2];
-        locals[3] = (unsigned int)*((unsigned short *)lpConfig + 1);
-        param_1[2] = locals[3];
-        param_1[4] = (unsigned int)OffscreenSurface;
-        iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)OffscreenSurface + 0x64))(
-            (void *)OffscreenSurface, locals, surfDesc, 1, 0);
+        locals.right = *(unsigned short *)lpConfig;
+        param_1->width = locals.right;
+        locals.bottom = *((unsigned short *)lpConfig + 1);
+        param_1->height = locals.bottom;
+        param_1->surface = OffscreenSurface;
+        iVar1 = OffscreenSurface->lpVtbl->Lock(OffscreenSurface, &locals, &surfDesc, 1, 0);
         if (iVar1 == (int)0x887601c2) {
-            (*(void(__stdcall **)(void *))(*(unsigned int *)OffscreenSurface + 0x6c))((void *)OffscreenSurface);
-            iVar1 = (*(int(__stdcall **)(void *, unsigned int *, unsigned char *, int, int))(*(unsigned int *)OffscreenSurface + 0x64))(
-                (void *)OffscreenSurface, locals, surfDesc, 1, 0);
+            OffscreenSurface->lpVtbl->Restore(OffscreenSurface);
+            iVar1 = OffscreenSurface->lpVtbl->Lock(OffscreenSurface, &locals, &surfDesc, 1, 0);
         }
         if (iVar1 != 0) {
             return 0;
         }
     }
-    *param_1 = *(unsigned int *)(surfDesc + 0x10);
-    param_1[3] = *(unsigned int *)(surfDesc + 0x24);
+    param_1->pitch = surfDesc.lPitch;
+    param_1->bits = surfDesc.lpSurface;
     if (DisplayPixelFormat == 0) {
-        param_1[5] = 1;
+        param_1->format = 1;
     } else {
-        param_1[5] = 2;
+        param_1->format = 2;
     }
     return 1;
 }
@@ -809,13 +805,13 @@ LEGO_EXPORT void SetSubSpriteSource(struct Sprite *sprite, unsigned short a, uns
 }
 
 // FUNCTION: LEGOLAND 0x00497dc0
-LEGO_EXPORT void ReleaseSprite(struct Sprite *sprite) {
-    struct LayerHost *host;
-    unsigned int arg;
+LEGO_EXPORT void ReleaseSprite(struct VideoArg *sprite) {
+    struct IDirectDrawSurface *host;
+    void *arg;
 
-    host = sprite->host;
-    arg = sprite->field_c;
-    ((void(__stdcall *)(struct LayerHost *, unsigned int))(*(void **)((char *)host->vtable + 0x80)))(host, arg);
+    host = sprite->surface;
+    arg = sprite->bits;
+    host->lpVtbl->Unlock(host, arg);
 }
 
 // FUNCTION: LEGOLAND 0x00497de0

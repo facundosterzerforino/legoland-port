@@ -14,6 +14,7 @@ struct CursorObj;
 struct Point;
 struct ObjInstance;
 
+struct VideoArg;
 LEGO_EXPORT void RenderCursor(struct Cursor *cursor);
 struct OverlayParam {
     unsigned int x;
@@ -51,8 +52,8 @@ void ResetCursorBuildable(struct Cursor *cursor);
 void SetCursorBlocked(struct Cursor *cursor, int param);
 void PropagateCursorBlocked(struct Cursor *cursor);
 struct Cursor *FUN_0045f540(struct Cursor *cursor);
-void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, int count);
-void FUN_0045fca0(int *surface, int dir, int px, int py, unsigned char *color, int count);
+void FUN_0045fad0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count);
+void FUN_0045fca0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count);
 LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int param_3);
 LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param);
 LEGO_EXPORT void CalcBasicObjectCursor(struct CursorObj *obj, int *a2, unsigned int a3);

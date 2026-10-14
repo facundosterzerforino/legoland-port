@@ -7,7 +7,7 @@ LEGO_EXPORT int DisplayAdvisorHelp(char *param_1, unsigned int param_2, unsigned
 LEGO_EXPORT void ProcessFrontEndHelp(void);
 void UpdateSpeechPlayback(void);
 void FUN_0046d230(unsigned int a1);
-void FUN_0046d2f0(unsigned int a1);
+void FUN_0046d2f0(UINT_PTR a1);
 unsigned int PlaySpeech(unsigned int a1);
 void FUN_0046cff0(void);
 LEGO_EXPORT void KillHelp(void);

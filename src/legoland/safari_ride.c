@@ -180,7 +180,7 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             LLSSetFrame(GetLLSForLayer(SafariLayer, 0), sn->frame);
             PrintSprite(GetSpriteForLayer(SafariLayer, 0), pos.x, pos.y, clip, 0);
         }
-        RenderBlokeList((struct BlokeListHead *)&DAT_004cbecc);
+        RenderBlokeList((struct RenderItemNode **)&DAT_004cbecc);
     }
 }
 

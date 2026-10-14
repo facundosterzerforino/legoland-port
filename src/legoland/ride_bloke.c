@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <stddef.h>
 #include "legoland.h"
 
 #include "bloke.h"
@@ -158,7 +159,7 @@ struct BlokeSprite {
     unsigned char pad_ba[9];
     unsigned char var_c3;
     unsigned char pad_c4[8];
-    unsigned int var_cc;
+    struct Bloke *var_cc;
 };
 
 // FUNCTION: LEGOLAND 0x00401000
@@ -432,7 +433,7 @@ LEGO_EXPORT unsigned int IsSemiPermiable(int param_1, int param_2) {
 // FUNCTION: LEGOLAND 0x00401820
 LEGO_EXPORT unsigned char SPGetRFFlags(int param_1, int param_2) {
     struct SPHandlers *src;
-    int tile_ptr;
+    INT_PTR tile_ptr;
     int tx, ty;
     unsigned int tile_id;
 
@@ -442,9 +443,9 @@ LEGO_EXPORT unsigned char SPGetRFFlags(int param_1, int param_2) {
         ty < 0 || ty >= (int)(unsigned int)lpConfig->height) {
         tile_ptr = 0;
     } else {
-        tile_ptr = (int)GameMap[ty] + tx * 0x14;
+        tile_ptr = (INT_PTR)GameMap[ty] + tx * sizeof(struct MapElement);
     }
-    tile_id = *(unsigned short *)(tile_ptr + 8);
+    tile_id = *(unsigned short *)(tile_ptr + offsetof(struct MapElement, field_8));
     src = (struct SPHandlers *)TileSpriteInfo[tile_id].src;
     if (src->get_rf_flags != 0) {
         return src->get_rf_flags(param_1, param_2);
@@ -455,7 +456,7 @@ LEGO_EXPORT unsigned char SPGetRFFlags(int param_1, int param_2) {
 // FUNCTION: LEGOLAND 0x00401890
 LEGO_EXPORT void SPEnter(unsigned int param_1, unsigned int param_2) {
     struct SPHandlers *src;
-    int tile_ptr;
+    INT_PTR tile_ptr;
     int tx, ty;
     unsigned int tile_id;
 
@@ -465,9 +466,9 @@ LEGO_EXPORT void SPEnter(unsigned int param_1, unsigned int param_2) {
         ty < 0 || ty >= (int)(unsigned int)lpConfig->height) {
         tile_ptr = 0;
     } else {
-        tile_ptr = (int)GameMap[ty] + tx * 0x14;
+        tile_ptr = (INT_PTR)GameMap[ty] + tx * sizeof(struct MapElement);
     }
-    tile_id = *(unsigned short *)(tile_ptr + 8);
+    tile_id = *(unsigned short *)(tile_ptr + offsetof(struct MapElement, field_8));
     src = (struct SPHandlers *)TileSpriteInfo[tile_id].src;
     if (src->sp_enter != 0) {
         src->sp_enter(param_1, param_2);
@@ -477,7 +478,7 @@ LEGO_EXPORT void SPEnter(unsigned int param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x00401900
 LEGO_EXPORT void SPLeave(unsigned int param_1, unsigned int param_2) {
     struct SPHandlers *src;
-    int tile_ptr;
+    INT_PTR tile_ptr;
     int tx, ty;
     unsigned int tile_id;
 
@@ -487,9 +488,9 @@ LEGO_EXPORT void SPLeave(unsigned int param_1, unsigned int param_2) {
         ty < 0 || ty >= (int)(unsigned int)lpConfig->height) {
         tile_ptr = 0;
     } else {
-        tile_ptr = (int)GameMap[ty] + tx * 0x14;
+        tile_ptr = (INT_PTR)GameMap[ty] + tx * sizeof(struct MapElement);
     }
-    tile_id = *(unsigned short *)(tile_ptr + 8);
+    tile_id = *(unsigned short *)(tile_ptr + offsetof(struct MapElement, field_8));
     src = (struct SPHandlers *)TileSpriteInfo[tile_id].src;
     if (src->sp_enter != 0) {
         src->sp_leave(param_1, param_2);
@@ -510,7 +511,7 @@ int *FUN_00401970(int *param_1, int param_2, int param_3) {
             (piVar1 != param_1)) {
             return piVar1;
         }
-        piVar1 = (int *)*piVar1;
+        piVar1 = *(int **)piVar1;
     } while (piVar1 != 0);
     return 0;
 }
@@ -561,7 +562,7 @@ void FUN_004019c0(struct RideMover *m) {
 }
 
 // FUNCTION: LEGOLAND 0x00401ae0
-int FUN_00401ae0(unsigned short id, int bloke) {
+int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
     struct RideQueueEntry *e;
     struct NewBloke *b;
     int t;
@@ -572,7 +573,7 @@ int FUN_00401ae0(unsigned short id, int bloke) {
         return -1;
     }
     b->id = id;
-    b->owner = bloke;
+    b->bloke = bloke;
     if (DAT_004c11c0 != 0) {
         b->px = e->x;
         b->fx = e->x << 16;
@@ -804,7 +805,7 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     volatile int ptmp310;
     e = (struct RideQueueEntry *)FindQueueEntryAtTile(p->a, p->b);
     if (e) {
-        if (e->field_18 == (INT_PTR)NULL) {
+        if (e->field_18 == NULL) {
             return PickQueueTurn(id, p, dir);
         }
         StepPointByDirection(&e->x, &pt.a, dir);
@@ -935,7 +936,7 @@ struct NearBloke *FUN_00402490(struct NearBloke *b) {
 
 // FUNCTION: LEGOLAND 0x00402550
 void FUN_00402550(struct BlokeSprite *arg) {
-    IP_RenderBlokeIn3DNow((struct Bloke *)arg->var_cc);
+    IP_RenderBlokeIn3DNow(arg->var_cc);
 
     switch (arg->var_c3) {
     case 1:
@@ -1024,7 +1025,7 @@ void FUN_00402780(struct NewBloke *b) {
     struct Person *person;
 
     hit.type = 0x306;
-    hit.field_4 = b->owner;
+    hit.ptr = b->bloke;
     hit.field_8 = 0;
     /* car position on the playfield (x in the low dword, y in the high dword) */
     *(__int64 *)&pos = MapToPlayfieldInl(b->fx >> 8, b->fy >> 8);

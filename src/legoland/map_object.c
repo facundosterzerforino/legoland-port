@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1219,18 +1220,17 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
 
 // FUNCTION: LEGOLAND 0x0045fa80
 LEGO_EXPORT void CalcBasicObjectCursor(struct CursorObj *obj, int *a2, unsigned int a3) {
-    unsigned int v1;
+    struct Ride *v1;
 
     v1 = obj->field_c;
     DefaultCursor(&EditCursor);
     ScreenToMapRef(a2, &EditCursor.tile_x, a3);
-    v1 += 0x3c;
-    memcpy(EditCursor.field_1414, (void *)v1, 20);
+    memcpy(EditCursor.field_1414, &v1->footprint, sizeof(struct Footprint));
     ValidateCursor(&EditCursor, obj->field_c);
 }
 
 // FUNCTION: LEGOLAND 0x0045fad0
-void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, int count) {
+void FUN_0045fad0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count) {
     POINT pt;
     int flip;
     unsigned short c1;
@@ -1262,11 +1262,11 @@ void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, i
     pattern[9] = c1;
     pattern[10] = c1;
     pattern[11] = c1;
-    if (surface[5] != 2) {
+    if (surface->format != 2) {
         return;
     }
-    dst = (unsigned short *)(surface[0] * py + surface[3] + px * 2);
-    dst2 = (unsigned short *)((char *)dst - surface[0]);
+    dst = (unsigned short *)(surface->pitch * py + (char *)surface->bits + px * 2);
+    dst2 = (unsigned short *)((char *)dst - surface->pitch);
     switch (dir) {
     case 0:
         while (count--) {
@@ -1280,7 +1280,7 @@ void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, i
                 }
             }
             py--;
-            dst = (unsigned short *)((char *)dst - surface[0]);
+            dst = (unsigned short *)((char *)dst - surface->pitch);
             frame++;
         }
         return;
@@ -1310,7 +1310,7 @@ void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, i
         if (flip) {
             py++;
             dst2 = dst;
-            dst = (unsigned short *)((char *)dst + surface[0]);
+            dst = (unsigned short *)((char *)dst + surface->pitch);
         }
         flip ^= 1;
         frame++;
@@ -1318,7 +1318,7 @@ void FUN_0045fad0(int *surface, int dir, int px, int py, unsigned char *color, i
 }
 
 // FUNCTION: LEGOLAND 0x0045fca0
-void FUN_0045fca0(int *surface, int dir, int px, int py, unsigned char *color, int count) {
+void FUN_0045fca0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count) {
     POINT pt;
     int flip;
     unsigned short c1;
@@ -1366,11 +1366,11 @@ void FUN_0045fca0(int *surface, int dir, int px, int py, unsigned char *color, i
     pattern[25] = 0;
     pattern[26] = 0;
     pattern[27] = 0;
-    if (surface[5] != 2) {
+    if (surface->format != 2) {
         return;
     }
-    dst = (unsigned short *)(surface[0] * py + surface[3] + px * 2);
-    dst2 = (unsigned short *)((char *)dst - surface[0]);
+    dst = (unsigned short *)(surface->pitch * py + (char *)surface->bits + px * 2);
+    dst2 = (unsigned short *)((char *)dst - surface->pitch);
     switch (dir) {
     case 0:
         while (count--) {
@@ -1386,7 +1386,7 @@ void FUN_0045fca0(int *surface, int dir, int px, int py, unsigned char *color, i
                 }
             }
             py--;
-            dst = (unsigned short *)((char *)dst - surface[0]);
+            dst = (unsigned short *)((char *)dst - surface->pitch);
             frame++;
         }
         return;
@@ -1418,7 +1418,7 @@ void FUN_0045fca0(int *surface, int dir, int px, int py, unsigned char *color, i
         if (flip) {
             py++;
             dst2 = dst;
-            dst = (unsigned short *)((char *)dst + surface[0]);
+            dst = (unsigned short *)((char *)dst + surface->pitch);
         }
         flip ^= 1;
         frame++;
@@ -1503,25 +1503,25 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         if (cursor->field_1828 & 0x20) {
             switch (pts->fpts[i] & 3) {
             case 0:
-                FUN_0045fca0((int *)&surf, 0, bx, by, pat, lpConfig->field_18);
+                FUN_0045fca0(&surf, 0, bx, by, pat, lpConfig->field_18);
                 break;
             case 1:
-                FUN_0045fca0((int *)&surf, 1, bx, by, pat, size);
+                FUN_0045fca0(&surf, 1, bx, by, pat, size);
                 break;
             case 2:
-                FUN_0045fca0((int *)&surf, 2, bx, by, pat, size);
+                FUN_0045fca0(&surf, 2, bx, by, pat, size);
                 break;
             }
         } else {
             switch (pts->fpts[i] & 3) {
             case 0:
-                FUN_0045fad0((int *)&surf, 0, bx, by, pat, lpConfig->field_18);
+                FUN_0045fad0(&surf, 0, bx, by, pat, lpConfig->field_18);
                 break;
             case 1:
-                FUN_0045fad0((int *)&surf, 1, bx, by, pat, size);
+                FUN_0045fad0(&surf, 1, bx, by, pat, size);
                 break;
             case 2:
-                FUN_0045fad0((int *)&surf, 2, bx, by, pat, size);
+                FUN_0045fad0(&surf, 2, bx, by, pat, size);
                 break;
             }
         }
@@ -2743,8 +2743,8 @@ unsigned int UnloadBaseMap(void) {
                 off = 0;
                 do {
                     col = col + 1;
-                    off = off + 0x14;
-                    *(unsigned short *)(*(int *)((int)GameMap + row * 4) + -8 + off) = 0;
+                    off = off + sizeof(struct MapElement);
+                    *(unsigned short *)((char *)GameMap[row] + off - sizeof(struct MapElement) + offsetof(struct MapElement, flags)) = 0;
                 } while (col < (int)(unsigned int)lpConfig->width);
             }
             row = row + 1;

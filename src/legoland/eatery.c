@@ -21,7 +21,7 @@
 struct BrollyData {
     /* 0x00 */ unsigned char pad_0[4];
     /* 0x04 */ int count_4;
-    /* 0x08 */ int *table_8;
+    /* 0x08 */ struct Sprite **table_8;
     /* 0x0c */ int *table_c;
     /* 0x10 */ int *table_10;
 };
@@ -39,7 +39,7 @@ struct BrollyNode {
 
 struct EditArg {
     unsigned char pad_0[0xc];
-    unsigned int var_c;
+    struct Ride *var_c;
 };
 
 struct UserFlagsArg {
@@ -210,7 +210,7 @@ void BrollyAddObject(struct Element *param_1, unsigned char *param_2) {
 struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned int param_2) {
     unsigned char *b = (unsigned char *)&param_2;
     int i = Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xffff;
-    RideSpriteInfoBuffer.sprite = (void *)BrollyImagesData->table_8[(unsigned char)i];
+    RideSpriteInfoBuffer.sprite = BrollyImagesData->table_8[(unsigned char)i];
     RideSpriteInfoBuffer.x = BrollyImagesData->table_c[(unsigned char)i] >> 1;
     RideSpriteInfoBuffer.y = BrollyImagesData->table_10[(unsigned char)i] >> 1;
     RideSpriteInfoBuffer.field_10 = 0;
@@ -368,7 +368,7 @@ void UnloadCastleBBQResources(void) {
 
 // FUNCTION: LEGOLAND 0x0042e8d0
 void EaterySetEditMode(struct EditArg *arg) {
-    unsigned int temp = arg->var_c;
+    struct Ride *temp = arg->var_c;
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)temp;
     DefaultCursor(&EditCursor);
@@ -402,7 +402,7 @@ void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2) {
     params.x = *param_2;
     params.y = param_2[1];
     params.field_0 = 2;
-    PlayInstanceOfSample(*(void **)(RESTAURANT_SFX + 8), 1, 1, &params);
+    PlayInstanceOfSample(RESTAURANT_SFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x0042ea10
@@ -985,7 +985,7 @@ void FUN_0042f920(unsigned short *param_1) {
         unsigned int *p = (unsigned int *)node;
         int i;
         for (i = 0x10; i != 0; i = i - 1) {
-            *p = NULL;
+            *p = 0;
             p = p + 1;
         }
         node->value = *param_1;
@@ -1067,7 +1067,7 @@ void Restaurant2RemoveObject(struct Element *arg1, TileId tile, struct Cursor *a
         RemoveSaveBlock(result);
     }
     StandardRemoveObject(arg1, tile, arg3);
-    RemoveAllBlokesFromRide((unsigned int)((struct Element *)arg1)->ride, tile);
+    RemoveAllBlokesFromRide(((struct Element *)arg1)->ride, tile);
 }
 
 // FUNCTION: LEGOLAND 0x0042fa90
@@ -1088,8 +1088,8 @@ void FUN_0042fb00(unsigned short param_1) {
     params.x = b[0];
     params.y = b[1];
     params.field_0 = 2;
-    PlayInstanceOfSample(*(void **)(OCTOPUS_SFX + 8), 0, 1, &params);
-    PlayInstanceOfSample(*(void **)(OCTOPUS_SFX + 0x14), 1, 1, &params);
+    PlayInstanceOfSample(OCTOPUS_SFX[0].sample, 0, 1, &params);
+    PlayInstanceOfSample(OCTOPUS_SFX[1].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x0042fb60
@@ -1100,7 +1100,7 @@ void FUN_0042fb60(unsigned short param_1) {
     params.x = b[0];
     params.y = b[1];
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
-    PlayInstanceOfSample(*(void **)(OCTOPUS_SFX + 0x20), 0, 1, &params);
+    PlayInstanceOfSample(OCTOPUS_SFX[2].sample, 0, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x0042fbb0
@@ -1481,15 +1481,11 @@ struct RideSpriteInfo *GetRestaurant2SpriteInfo(struct Element *obj, unsigned sh
 }
 
 // FUNCTION: LEGOLAND 0x004304e0
-void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int param_3) {
+void RenderEateryBaseLayers(unsigned short *param_1, struct Ride *param_2, unsigned int param_3) {
     struct SaveBlock *state;
     struct Point coords;
     struct Point off;
-    struct {
-        /* 0x00 */ int field_0;
-        /* 0x04 */ int field_4;
-        /* 0x08 */ short field_8;
-    } cfg;
+    struct HitInfo cfg;
     char c8;
     char c9;
     char c6;
@@ -1497,14 +1493,14 @@ void RenderEateryBaseLayers(unsigned short *param_1, int param_2, unsigned int p
     int sx;
     int sy;
     volatile int coord_y; /* volatile: the original re-reads this from its stack slot */
-    cfg.field_0 = 0x103;
-    cfg.field_4 = *(int *)(param_2 + 0xc4);
-    cfg.field_8 = *param_1;
+    cfg.type = 0x103;
+    cfg.element = param_2->element;
+    cfg.coords = *param_1;
     state = FindSaveBlock(param_1);
     if (state == NULL) {
         return;
     }
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, (void *)param_2);
+    coords = GetScreenCoordsForObject((unsigned char *)param_1, param_2);
     sx = coords.x;
     c9 = state->field_9;
     coord_y = coords.y;

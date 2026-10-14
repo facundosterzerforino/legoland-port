@@ -36,13 +36,13 @@ struct ResVolumeEntry {
 
 struct MasterDirNode {
     struct MasterDirNode *next;
-    unsigned int pad_4;
+    void *entries; /* the directory's first ResVolEntry */
     char *name;
 };
 
 struct MasterVolNode {
     struct MasterVolNode *next;
-    unsigned int pad_4;
+    void *entries; /* the volume's first ResVolEntry */
     char name[1];
 };
 
@@ -101,7 +101,7 @@ struct MasterDirNode *FindOrAddMasterDir(char *name) {
     strcpy(copy, name);
 
     new_node->next = MasterDirList;
-    new_node->pad_4 = 0;
+    new_node->entries = 0;
     MasterDirList = new_node;
     return new_node;
 }
@@ -137,7 +137,7 @@ struct ResDirNode *FUN_00489550(const char *vol_name, const char *file_name, str
 
     master = GetMasterVolPtr(vol_name);
     if (master != 0) {
-        for (entry = (struct ResVolEntry *)master->pad_4; entry != 0; entry = entry->next) {
+        for (entry = (struct ResVolEntry *)master->entries; entry != 0; entry = entry->next) {
             if (_stricmp(file_name, entry->dir->name) == 0) {
                 *out_entry = entry;
                 return entry->dir;
@@ -160,8 +160,8 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
         entry = (struct ResVolEntry *)malloc(0x20);
         entry->next_all = (struct ResVolEntry *)DAT_0079862c;
         DAT_0079862c = entry;
-        entry->next_dir = (struct ResVolEntry *)master->pad_4;
-        master->pad_4 = (unsigned int)entry;
+        entry->next_dir = (struct ResVolEntry *)master->entries;
+        master->entries = entry;
         entry->next = volume->dir;
         volume->dir = entry;
         entry->size = node->size;
@@ -416,7 +416,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFile(const char *path) {
         return 0;
     }
 
-    for (entry = (struct ResDirEntry *)dir->pad_4; entry != 0; entry = entry->next) {
+    for (entry = (struct ResDirEntry *)dir->entries; entry != 0; entry = entry->next) {
         if (_stricmp(entry->name, file_name) == 0) {
             file = (struct ResFile *)malloc(0x10);
             file->size = entry->size;

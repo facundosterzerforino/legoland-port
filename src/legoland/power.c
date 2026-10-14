@@ -33,7 +33,7 @@ void FountainAddObject(struct Element *param_1, int *param_2) {
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
-    PlayInstanceOfSample(*(void **)&FountainSFX[8], 1, 1, &params);
+    PlayInstanceOfSample(FountainSFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452a30
@@ -73,7 +73,7 @@ void SmallPowerStationAddObject(struct Element *param_1, int *param_2) {
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
-    PlayInstanceOfSample(*(void **)&PowerStationSFX[0x14], 1, 1, &params);
+    PlayInstanceOfSample(PowerStationSFX[1].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452b20
@@ -83,7 +83,7 @@ void CrystalPowerStationAddObject(struct Element *param_1, int *param_2) {
     params.x = param_2[0];
     params.field_0 = 2;
     params.y = param_2[1];
-    PlayInstanceOfSample(*(void **)&PowerStationSFX[8], 1, 1, &params);
+    PlayInstanceOfSample(PowerStationSFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00452b70

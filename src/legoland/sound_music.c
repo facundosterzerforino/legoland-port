@@ -691,7 +691,7 @@ void AutoKillFinishedSamples(void) {
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0 && ((status == 0) & 1)) {
             // STRING: LEGOLAND 0x004bfe14
             DBPrintf("Autokilling Sample %s (%x)\n", ((struct SampleDef *)sample->active)->name, sample);
-            if (sample->active == *(unsigned int *)&JOUST_SFX[8]) {
+            if (sample->active == JOUST_SFX[0].sample) {
                 // STRING: LEGOLAND 0x004bfe00
                 DBPrintf("Killing Joust FX\n");
             }

@@ -12,8 +12,8 @@ void FUN_0046d340(const char *param_1) {
         if (param_1 == 0) {
             return;
         }
-        if (param_1 != DAT_004b9f8c) {
-            DAT_004b9f8c = param_1;
+        if ((UINT_PTR)param_1 != DAT_004b9f8c) {
+            DAT_004b9f8c = (UINT_PTR)param_1;
             DAT_007fe920 = GetTickCount();
             DAT_006687a4 = 2;
             DAT_004b9f88 = 1;

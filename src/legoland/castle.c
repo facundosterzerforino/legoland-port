@@ -4262,29 +4262,22 @@ void DrawDottedLine(void *a, void *b, short c) {
 
 // FUNCTION: LEGOLAND 0x004238a0
 void PlotClippedPoints(int *points, int count, short c) {
-    struct {
-        int pitch;
-        unsigned int f4;
-        unsigned int f8;
-        unsigned short *bits;
-        unsigned int f10;
-        unsigned int f14;
-    } surf;
+    struct VideoArg surf;
     int x;
     int y;
 
-    if (GetSprite((unsigned int *)&surf, NULL)) {
+    if (GetSprite(&surf, NULL)) {
         while (count-- > 0) {
             x = points[0];
             if (x > DAT_008299ac[0] && x < DAT_008299ac[2]) {
                 y = points[1];
                 if (y > DAT_008299ac[1] && y < DAT_008299ac[3]) {
-                    surf.bits[x + (surf.pitch >> 1) * y] = c;
+                    ((unsigned short *)surf.bits)[x + (surf.pitch >> 1) * y] = c;
                 }
             }
             points += 4;
         }
-        ReleaseSprite((struct Sprite *)&surf);
+        ReleaseSprite(&surf);
     }
 }
 
@@ -5200,7 +5193,7 @@ void RenderCastleObj(Element *obj, unsigned int param_2, unsigned int param_3, T
         }
         walk = walk->next;
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_00610a18);
+    RenderBlokeList((struct RenderItemNode **)&DAT_00610a18);
     if (CastleMatteSprite != NULL) {
         pos = GetScreenCoordsForObject(tile, r);
         off = GetRenderOffsetForLayer(r->layer, 2);
@@ -7897,12 +7890,12 @@ void FUN_004292f0(struct FVec3 *pos, struct FVec3 *basis) {
     identity[6] = 0.0f;
     identity[7] = 0.0f;
     identity[8] = 1.0f;
-    FUN_00420e90((struct LmsFile *)DAT_004b6150, (struct LmsRec *)DAT_00615f70, zero_pos, identity, 1);
+    FUN_00420e90(&DAT_004b6150, (struct LmsRec *)DAT_00615f70, zero_pos, identity, 1);
 }
 
 // FUNCTION: LEGOLAND 0x00429490
 void FUN_00429490(struct FVec3 *param_1, struct FVec3 *param_2) {
-    FUN_00420e90((struct LmsFile *)DAT_004b6300, (struct LmsRec *)DAT_004b62f0, param_1, param_2, 1);
+    FUN_00420e90(&DAT_004b6300, (struct LmsRec *)DAT_004b62f0, param_1, param_2, 1);
 }
 
 // FUNCTION: LEGOLAND 0x004294b0

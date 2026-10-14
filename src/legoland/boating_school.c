@@ -894,7 +894,7 @@ void BoatingSchoolUpdate(void) {
                     bloke->param_action++;
                     source.type = 1;
                     source.bloke = bloke;
-                    sample = PlayInstanceOfSample(*(void **)(PTR_s_Boat_Noise_wav + 8), 1, 1, &source);
+                    sample = PlayInstanceOfSample(PTR_s_Boat_Noise_wav[0].sample, 1, 1, &source);
                     AdjustPSampleFreq(sample, 10);
                 }
             }
@@ -1262,7 +1262,7 @@ void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords) {
     source.x = coords[0];
     source.type = 2;
     source.y = coords[1];
-    PlayInstanceOfSample(*(void **)(PTR_s_Boat_Noise_wav + 0x14), 1, 1, &source);
+    PlayInstanceOfSample(PTR_s_Boat_Noise_wav[1].sample, 1, 1, &source);
 }
 
 // FUNCTION: LEGOLAND 0x0041b4c0

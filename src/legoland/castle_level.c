@@ -52,7 +52,7 @@ void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3,
             AddBlokeToRenderList(&DAT_004c10e8, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004c10e8);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004c10e8);
     if (CastleLevelMatteSprite != NULL) {
         pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
         offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)ride->layer, 2);

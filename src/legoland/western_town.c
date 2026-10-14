@@ -545,8 +545,8 @@ void JailCellLoad(struct MapObject *obj) {
     // STRING: LEGOLAND 0x004b74d0
     JailCellMaskSprite = LoadSprite("JailCellMask.LLS", 1);
     HideLayer(DAT_0062fd40, 1);
-    StopLayerPlaying((unsigned int)DAT_0062fd40, 1);
-    LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), 9);
+    StopLayerPlaying((struct Sprite *)DAT_0062fd40, 1);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), 9);
 }
 
 // FUNCTION: LEGOLAND 0x004380f0
@@ -596,7 +596,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->frame);
+        LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
         offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
         AdjustOffsetForViewMode(&offset);
         PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
@@ -635,7 +635,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
         }
         return;
     }
-    LLSSetFrame((struct LLS *)GetLLSForLayer((unsigned int)DAT_0062fd40, 1), (char)cell->frame);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
     offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
     AdjustOffsetForViewMode(&offset);
     PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);

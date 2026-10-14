@@ -39,7 +39,7 @@ struct PlaneRideNode {
 
 struct PlaneRideObject {
     unsigned char pad_0[0xc];
-    unsigned int ride;
+    struct Ride *ride;
 };
 
 #include "image_sprite.h"
@@ -53,7 +53,7 @@ void FUN_0043d880(void *param_1) {
     }
     memset(node, 0, 0x24);
     *(unsigned short *)node = *(unsigned short *)param_1;
-    ((unsigned int *)node)[8] = (unsigned int)PlaneRideNodeList;
+    ((struct PlaneRideNode *)node)->next = PlaneRideNodeList;
     PlaneRideNodeList = node;
     FUN_0043d9f0(node);
 }
@@ -95,13 +95,13 @@ void RemoveAllPlaneRideNodes(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d960
-unsigned int FindPlaneRideNode(TileId *arg) {
+struct PlaneRideNode *FindPlaneRideNode(TileId *arg) {
     struct PlaneRideNode *cur = PlaneRideNodeList;
 
     if (cur != NULL) {
         do {
             if (memcmp(&cur->b0, arg, 2) == 0) {
-                return (unsigned int)cur;
+                return cur;
             }
             cur = cur->next;
         } while (cur != NULL);
@@ -122,7 +122,7 @@ void FUN_0043d990(struct PlaneRideNode *node) {
     node->f10 = 0;
     cfg[2] = node->b0;
     cfg[3] = node->b1;
-    PlayInstanceOfSample(*(void **)(DAT_004b79d0 + 8), 1, 1, cfg);
+    PlayInstanceOfSample(DAT_004b79d0[0].sample, 1, 1, cfg);
 }
 
 // FUNCTION: LEGOLAND 0x0043d9f0
@@ -159,7 +159,7 @@ void RenderPlaneRide(struct Element *element, unsigned int param_2, unsigned int
     ride = element->ride;
     r = ride->riders;
     n = 0;
-    node = (struct PlaneRideNode *)FindPlaneRideNode(tile);
+    node = FindPlaneRideNode(tile);
     if (node == NULL) {
         return;
     }
@@ -261,7 +261,7 @@ void PlaneRideLoad(Element *input) {
 
 // FUNCTION: LEGOLAND 0x0043dee0
 void PlaneRideUnload(struct PlaneRideObject *input) {
-    PlaneRide = (struct Ride *)input->ride;
+    PlaneRide = input->ride;
     if (ZoomerSprite) {
         KillSprite(ZoomerSprite);
     }
@@ -288,9 +288,9 @@ void PlaneRideSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x0043df90
 void PlaneRideRemoveObject(struct PlaneRideObject *a1, TileId a2, struct PlaneRideObject *a3) {
-    unsigned int temp = FindPlaneRideNode(&a2);
+    struct PlaneRideNode *temp = FindPlaneRideNode(&a2);
     if (temp != 0) {
-        RemovePlaneRideNode((void *)temp);
+        RemovePlaneRideNode(temp);
     }
     StandardRemoveObject(a1, a2, a3);
     RemoveAllBlokesFromRide(a1->ride, a2);
@@ -403,7 +403,7 @@ LEGO_EXPORT int LoadZoomer(struct Element *arg) {
         }
         {
             struct TileSampleSource params = {2, ((unsigned char *)node)[0], ((unsigned char *)node)[1]};
-            PauseSingleSample(PlayInstanceOfSample(*(void **)(DAT_004b79d0 + 8), 1, 1, &params));
+            PauseSingleSample(PlayInstanceOfSample(DAT_004b79d0[0].sample, 1, 1, &params));
         }
         prev = node;
         if (!SaveGameRead(&marker, 4)) {
@@ -533,7 +533,7 @@ void PlaneRideUpdate(struct Element *elem) {
         next = rn->next;
         bloke = rn->rider;
         pos = &rn->tile;
-        node = (struct PlaneRideNode *)FindPlaneRideNode(pos);
+        node = FindPlaneRideNode(pos);
         if (!node) {
             return;
         }

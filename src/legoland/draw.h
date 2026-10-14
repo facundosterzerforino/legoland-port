@@ -14,8 +14,8 @@ struct VideoArg {
     /* 0x04 */ int width;
     /* 0x08 */ int height;
     /* 0x0c */ void *bits;
-    /* 0x10 */ int field_10;
-    /* 0x14 */ int field_14;
+    /* 0x10 */ struct IDirectDrawSurface *surface; /* GetSprite: the locked sprite surface */
+    /* 0x14 */ int format; /* 1: 8-bit, 2: 16-bit */
 };
 struct Sprite;
 struct DrawLLS;

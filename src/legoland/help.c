@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "globals.h"
 #include "legoland.h"
+#include "obj_instance.h"
 
 #include "challenge.h"
 #include "help.h"
@@ -127,7 +128,7 @@ void FUN_0046cff0(void) {
         HTBubbleHelp(&rect, icon->string, 2);
         icon = (struct IconNode *)FocussedIconPtr;
         if ((icon->flags & 0x1000) != 0) {
-            FUN_0046d2f0(**(unsigned int **)((char *)icon->field_8 + 0xc4));
+            FUN_0046d2f0((UINT_PTR)((struct Ride *)icon->field_8)->element->name);
         } else {
             FUN_0046d230(icon->string_id);
         }
@@ -152,7 +153,7 @@ LEGO_EXPORT void ProcessFrontEndHelp(void) {
             HTBubbleHelp(&rect, icon->string, 2);
             icon = (struct IconNode *)FocussedIconPtr;
             if ((icon->flags & 0x1000) != 0) {
-                FUN_0046d340(*(unsigned int *)icon->field_8);
+                FUN_0046d340(*(const char **)icon->field_8);
             } else {
                 FUN_0046d230(icon->string_id);
             }
@@ -191,15 +192,15 @@ void UpdateSpeechPlayback(void) {
                 switch (DAT_006687a4) {
                 case 0:
                     // STRING: LEGOLAND 0x004ba858
-                    sprintf(buf, "Text%04d.wav", DAT_004b9f8c);
+                    sprintf(buf, "Text%04d.wav", (int)DAT_004b9f8c);
                     break;
                 case 1:
                     // STRING: LEGOLAND 0x004ba868
-                    sprintf(buf, "%s.wav", DAT_004b9f8c);
+                    sprintf(buf, "%s.wav", (const char *)DAT_004b9f8c);
                     break;
                 case 2:
                     // STRING: LEGOLAND 0x004ba870
-                    sprintf(buf, "%sz.wav", DAT_004b9f8c);
+                    sprintf(buf, "%sz.wav", (const char *)DAT_004b9f8c);
                     break;
                 }
                 SpeechLoadWavFile(buf);
@@ -245,7 +246,7 @@ unsigned int PlaySpeech(unsigned int a1) {
 }
 
 // FUNCTION: LEGOLAND 0x0046d2f0
-void FUN_0046d2f0(unsigned int a1) {
+void FUN_0046d2f0(UINT_PTR a1) {
     if (SpeechIsPlaying() != 0) {
         DAT_006687a8 = 1;
         return;

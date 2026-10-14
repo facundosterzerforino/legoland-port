@@ -148,7 +148,7 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
             AddBlokeToRenderList(&DAT_004cbf84, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbf84);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbf84);
 }
 
 // FUNCTION: LEGOLAND 0x00417130

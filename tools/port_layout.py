@@ -157,6 +157,19 @@ def anon_offset(rec, f):
     return 0
 
 
+def ptr_offsets(t, base):
+    """the original offsets of the pointer slots in tree t placed at base"""
+    k = t["k"]
+    if k in ("P", "Q"):
+        yield base
+    elif k == "R":
+        for d, sub in t["f"]:
+            yield from ptr_offsets(sub, base + sub["o"])
+    elif k == "A":
+        for i in range(t["n"]):
+            yield from ptr_offsets(t["e"], base + i * t["s"])
+
+
 def main():
     names = sys.stdin.read().split() if "--stdin" in sys.argv else [a for a in sys.argv[1:] if not a.startswith("--")]
     slots = set()
@@ -177,7 +190,7 @@ def main():
     for c in tu.cursor.get_children():
         if c.kind == ci.CursorKind.VAR_DECL and c.spelling in want and c.spelling not in out["globals"]:
             t = tree(c.type, slots, want[c.spelling])
-            out["globals"][c.spelling] = {"size": c.type.get_size(), "t": t}
+            out["globals"][c.spelling] = {"size": c.type.get_size(), "t": t, "ptrs": sorted(set(ptr_offsets(t, 0)))}
     json.dump(out, sys.stdout)
 
 

@@ -267,6 +267,7 @@ for i, a in enumerate(gaddrs):
 # 8 bytes there, and its fields move): tools/port_layout.py gives its original layout, and PortLoadData fills
 # it field by field, resolving each pointer slot through the fixups.
 layouts = {}
+not_pointers = []  # (slot, global, offset): words the global's type says are not pointers
 if "--no-typed" not in sys.argv:
     import json
     import os
@@ -285,7 +286,23 @@ if "--no-typed" not in sys.argv:
         if lay["errors"]:
             print("warning: port_layout.py: %d parse errors (first: %s)" % (len(lay["errors"]), lay["errors"][0]),
                   file=sys.stderr)
-        layouts = {n: v for n, v in lay["globals"].items() if v["t"]["k"] != "B"}
+        all_layouts = lay["globals"]
+        layouts = {n: v for n, v in all_layouts.items() if v["t"]["k"] != "B"}
+        # a word that looks like a pointer inside a filled global whose type holds no pointer there is not one
+        # (path-tile masks, colour patterns): don't patch it
+        where = {}
+        for a, name, gap in fill:
+            if name in all_layouts:
+                for o in range(0, min(gap, all_layouts[name]["size"]), 4):
+                    where[a - DATA_LO + o] = (name, o)
+        kept = []
+        for fx in fixups:
+            w = where.get(fx[0])
+            if w is not None and w[1] not in set(all_layouts[w[0]]["ptrs"]):
+                not_pointers.append((DATA_LO + fx[0], w[0], w[1]))
+                continue
+            kept.append(fx)
+        fixups[:] = kept
     except Exception as e:
         print("warning: no layouts (%s): every global is filled with its original bytes" % e, file=sys.stderr)
     finally:
@@ -335,10 +352,13 @@ print("globals filled: %d (%d by their original bytes, %d field by field), skipp
       % (len(fill) + len(typed), len(fill), len(typed), len(skipped)))
 print("pointer slots patched: %d (globals %d, functions %d, into the copy %d), left unchanged: %d"
       % (len(fixups), kinds.get("G", 0), kinds.get("F", 0), kinds.get("I", 0), len(unresolved)))
+print("words like pointers that their global's type says are not (left unpatched): %d" % len(not_pointers))
 print("words skipped as text: %s" % ", ".join("%d (%s)" % (n, k) for k, n in sorted(text_skipped.items())))
 if "--report" in sys.argv:
     for a, n, why in skipped:
         print("  skipped 0x%08x %-28s %s" % (a, n, why))
+    for slot, name, o in not_pointers:
+        print("  not a pointer by type at 0x%08x: %s+0x%x" % (slot, name, o))
     for slot, v, where in unresolved:
         g = global_containing(slot)
         print("  unchanged at 0x%08x (in %s): 0x%08x -> %s" % (slot, globals_[g]["name"] if g else "unnamed data", v, where))

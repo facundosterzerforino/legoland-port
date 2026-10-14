@@ -207,7 +207,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
             AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
     if (GoldMaskSprite != NULL) {
         struct Point off;
         frame = 0;
@@ -233,7 +233,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
             AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
     if (GoldWashMatte2Sprite != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(GoldRushLayer, 1);
@@ -247,7 +247,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
             AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
     if (GoldWashMatte1Sprite != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(GoldRushLayer, 1);
@@ -261,7 +261,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
             AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&GoldRushBlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
     if (GoldRushLayer != NULL) {
         struct Point off;
         off = GetRenderOffsetForLayer(GoldRushLayer, 3);

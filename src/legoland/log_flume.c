@@ -75,7 +75,7 @@ struct ResB {
 
 struct WalkNode {
     struct WalkNode *var_0;
-    unsigned int var_4;
+    struct FlumeSlot *var_4;
     struct WalkNode *var_8;
 };
 
@@ -1964,8 +1964,8 @@ int FUN_0040b210(struct FlumeWeighted *self, struct FlumeWeighted *other) {
 }
 
 // FUNCTION: LEGOLAND 0x0040b270
-int FUN_0040b270(unsigned int *param_1, unsigned int param_2) {
-    return param_1[5] == param_2;
+int FUN_0040b270(struct FlumeSlot *param_1, void *param_2) {
+    return (void *)param_1->owner == param_2;
 }
 
 // FUNCTION: LEGOLAND 0x0040b290
@@ -2091,7 +2091,7 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
             AddBlokeToRenderList(&DAT_004cbe70, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbe70);
 
     RenderItems_New();
     DAT_004cbe70 = NULL;
@@ -2100,7 +2100,7 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
             AddBlokeToRenderList(&DAT_004cbe70, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbe70);
     if (LogFlumeEntrance3Sprite != NULL) {
         struct Point off;
         int frame;
@@ -2132,7 +2132,7 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
             }
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbe70);
     if (LogFlumeEntrance1Sprite != NULL) {
         struct Point off;
         int frame;
@@ -2161,7 +2161,7 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
             AddBlokeToRenderList(&DAT_004cbe70, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbe70);
     if (LogFlumeEntrance2Sprite != NULL) {
         struct Point off;
         int frame;
@@ -2193,7 +2193,7 @@ void RenderLogFlumeEntrance(Element *elem, unsigned int param_2, unsigned int pa
             }
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbe70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbe70);
     if (LogFlumeSignSprite != NULL) {
         struct Point off;
         int frame;
@@ -2593,12 +2593,12 @@ int FUN_0040c250(struct FlumeEntry *entry) {
     for (i = 0; i < set->count; i++) {
         node = entry->sub2;
         if (node == NULL) {
-            if (!FUN_0040b270((unsigned int *)&set->slots[i], (unsigned int)entry)) {
+            if (!FUN_0040b270(&set->slots[i], entry)) {
                 continue;
             }
         } else {
             do {
-                if (FUN_0040b270((unsigned int *)&set->slots[i], (unsigned int)node)) {
+                if (FUN_0040b270(&set->slots[i], node)) {
                     break;
                 }
                 node = node->next;
@@ -2901,12 +2901,12 @@ struct RideSpriteInfo *GetLogFlumeTrackSpriteInfo(struct Element *unused, TileId
 }
 
 // FUNCTION: LEGOLAND 0x0040ca30
-void FUN_0040ca30(void *a1, int a2) {
+void FUN_0040ca30(void *a1, struct FlumeEntry *a2) {
     struct WalkNode *node = *(struct WalkNode **)a1;
     if (node != NULL) {
         do {
             if (node->var_4 != 0) {
-                DrawLogFlumeBarrel((struct FlumeSlot *)node->var_4, (struct FlumeEntry *)a2, 1);
+                DrawLogFlumeBarrel(node->var_4, a2, 1);
             }
             node = node->var_8;
         } while (node != NULL);
@@ -2947,9 +2947,9 @@ int RenderLogFlumeCorner(struct FlumeEntry *entry, int arg) {
                 }
             }
             if (w <= DOUBLE_004ab398) {
-                RenderItem2_AddItem(&DAT_004c8d74, (unsigned int)slot, 0);
+                RenderItem2_AddItem(&DAT_004c8d74, slot, 0);
             } else {
-                RenderItem2_AddItem(&DAT_004ca5ac, (unsigned int)slot, 0);
+                RenderItem2_AddItem(&DAT_004ca5ac, slot, 0);
             }
             count++;
         }
@@ -2964,30 +2964,30 @@ int RenderLogFlumeCorner(struct FlumeEntry *entry, int arg) {
         thisX = entry->tile.pos.x;
         if (entry->submode == 0) {
             if (next->tile.pos.x != thisX) {
-                FUN_0040ca30(&DAT_004c8d74, (int)entry);
+                FUN_0040ca30(&DAT_004c8d74, entry);
                 if (spr != NULL) {
                     PrintSprite(spr, pos.x, pos.y, arg, 0);
                 }
-                FUN_0040ca30(&DAT_004ca5ac, (int)entry);
+                FUN_0040ca30(&DAT_004ca5ac, entry);
             } else {
-                FUN_0040ca30(&DAT_004ca5ac, (int)entry);
+                FUN_0040ca30(&DAT_004ca5ac, entry);
                 if (spr != NULL) {
                     PrintSprite(spr, pos.x, pos.y, 0, 0);
                 }
-                FUN_0040ca30(&DAT_004c8d74, (int)entry);
+                FUN_0040ca30(&DAT_004c8d74, entry);
             }
         } else if (next->tile.pos.x != thisX) {
-            FUN_0040ca30(&DAT_004ca5ac, (int)entry);
+            FUN_0040ca30(&DAT_004ca5ac, entry);
             if (spr != NULL) {
                 PrintSprite(spr, pos.x, pos.y, 0, 0);
             }
-            FUN_0040ca30(&DAT_004c8d74, (int)entry);
+            FUN_0040ca30(&DAT_004c8d74, entry);
         } else {
-            FUN_0040ca30(&DAT_004c8d74, (int)entry);
+            FUN_0040ca30(&DAT_004c8d74, entry);
             if (spr != NULL) {
                 PrintSprite(spr, pos.x, pos.y, 0, 0);
             }
-            FUN_0040ca30(&DAT_004ca5ac, (int)entry);
+            FUN_0040ca30(&DAT_004ca5ac, entry);
         }
         idx = FUN_0040ad50((struct StateNode *)entry);
         pos = FUN_0040cfd0(entry);

@@ -56,7 +56,7 @@ void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsi
             AddBlokeToRenderList(&DAT_004cbf70, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&DAT_004cbf70);
+    RenderBlokeList((struct RenderItemNode **)&DAT_004cbf70);
     pos = GetScreenCoordsForObject((unsigned char *)coords, ride);
     offset = GetRenderOffsetForLayer(TempleLayer, 0);
     AdjustOffsetForViewMode(&offset);

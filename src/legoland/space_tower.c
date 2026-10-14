@@ -57,16 +57,6 @@ struct AnimStep {
     /* 0x0c */ int dy;
 };
 
-struct AnimEntry {
-    /* 0x00 */ int count;
-    /* 0x04 */ struct AnimStep *steps;
-};
-
-struct AnimLayout {
-    /* 0x00 */ int count;
-    /* 0x04 */ struct AnimEntry **entries;
-};
-
 struct SpaceTowerRideNode {
     /* 0x00 */ struct SpaceTowerRideNode *next;
     /* 0x04 */ unsigned char pad_4[4];

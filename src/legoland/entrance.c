@@ -24,7 +24,7 @@ void FUN_0042d970(TileId *tile, unsigned int arg) {
 
     config.field_0 = 1;
     config.field_4 = arg;
-    PlayInstanceOfSample(*(void **)(ENTRANCE_SFX + 8), 0, 1, &config);
+    PlayInstanceOfSample(ENTRANCE_SFX[0].sample, 0, 1, &config);
     if (MapStats.entrance_fee != 0) {
         PlayMoneySFX(tile, 1, 0);
     }
@@ -54,7 +54,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
 
     off1 = GetRenderOffsetForLayer(ride->layer, 1);
     AdjustOffsetForViewMode(&off1);
@@ -72,7 +72,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
     if (EntranceMatte4Sprite != NULL) {
         PrintSprite(EntranceMatte4Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
@@ -84,7 +84,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
     if (EntranceMatte3Sprite != NULL) {
         PrintSprite(EntranceMatte3Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
@@ -96,7 +96,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
     if (EntranceMatte2Sprite != NULL) {
         PrintSprite(EntranceMatte2Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
@@ -108,7 +108,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
     if (EntranceMatte1Sprite != NULL) {
         PrintSprite(EntranceMatte1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }
@@ -123,7 +123,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
             }
         }
     }
-    RenderBlokeList((struct BlokeListHead *)&BlokeRenderList);
+    RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
     if (Booth1Sprite != NULL) {
         PrintSprite(Booth1Sprite, pos.x + off.x, pos.y + off.y, 0, 0);
     }

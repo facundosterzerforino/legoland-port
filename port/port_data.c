@@ -4616,10 +4616,6 @@ static const struct PortFixup port_fixups[] = {
     {0xe538, 'G', (void *)&DAT_004b9610, sizeof(DAT_004b9610), 0x18, 0xe628u},
     {0xe540, 'G', (void *)&DAT_004b9610, sizeof(DAT_004b9610), 0x4, 0xe614u},
     {0xe548, 'G', (void *)&DAT_004d8bb0, sizeof(DAT_004d8bb0), 0x0, ~0u},
-    {0xe560, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x37d98, ~0u},
-    {0xe5d0, 'G', (void *)&DAT_0080ff80, sizeof(DAT_0080ff80), 0x0, ~0u},
-    {0xe5d8, 'G', (void *)&DAT_0080ff80, sizeof(DAT_0080ff80), 0x0, ~0u},
-    {0xe5e0, 'G', (void *)&MapRenderOrderList, sizeof(MapRenderOrderList), 0x19f, ~0u},
     {0xe5f0, 'G', (void *)&DAT_00801420, sizeof(DAT_00801420), 0x0, ~0u},
     {0xeca4, 'F', (void *)FlipFrame, 0, 0, ~0u},
     {0xed4c, 'F', (void *)ScriptEventGive, 0, 0, ~0u},
@@ -5685,18 +5681,14 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b4034, sizeof(DAT_004b4034), 0x9034, 0x70},
     {(void *)&DAT_004b40a4, sizeof(DAT_004b40a4), 0x90a4, 0x10},
     {(void *)&DAT_004b40b4, sizeof(DAT_004b40b4), 0x90b4, 0x14},
-    {(void *)&Catapult_SFX, sizeof(Catapult_SFX), 0x90c8, 0x78},
-    {(void *)&Helicopter_SFX, sizeof(Helicopter_SFX), 0x9140, 0x30},
     {(void *)&DAT_004b42a0, sizeof(DAT_004b42a0), 0x92a0, 0xc},
     {(void *)&DAT_004b42ac, sizeof(DAT_004b42ac), 0x92ac, 0xc},
     {(void *)&DAT_004b42b8, sizeof(DAT_004b42b8), 0x92b8, 0xc},
     {(void *)&DAT_004b42c4, sizeof(DAT_004b42c4), 0x92c4, 0x134},
-    {(void *)&DRIVING_SCHOOL_SFX, sizeof(DRIVING_SCHOOL_SFX), 0x93f8, 0x48},
     {(void *)&DAT_004b4440, sizeof(DAT_004b4440), 0x9440, 0x18},
     {(void *)&DAT_004b4458, sizeof(DAT_004b4458), 0x9458, 0x18},
     {(void *)&DAT_004b4470, sizeof(DAT_004b4470), 0x9470, 0x110},
     {(void *)&DAT_004b4580, sizeof(DAT_004b4580), 0x9580, 0x30},
-    {(void *)&JOUST_SFX, sizeof(JOUST_SFX), 0x9688, 0xa0},
     {(void *)&LogFlumeFootprint, sizeof(LogFlumeFootprint), 0x9728, 0x14},
     {(void *)&DAT_004b473c, sizeof(DAT_004b473c), 0x973c, 0x10},
     {(void *)&DAT_004b474c, sizeof(DAT_004b474c), 0x974c, 0x8},
@@ -5713,7 +5705,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0x9e20, 0xe8},
     {(void *)&DAT_004b4f18, sizeof(DAT_004b4f18), 0x9f18, 0x4},
     {(void *)&DAT_004b4f1c, sizeof(DAT_004b4f1c), 0x9f1c, 0x8c},
-    {(void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x9fa8, 0x170},
     {(void *)&BoatingSchoolDirSteps, sizeof(BoatingSchoolDirSteps), 0xa118, 0x40},
     {(void *)&DAT_004b5158, sizeof(DAT_004b5158), 0xa158, 0x40},
     {(void *)&DAT_004b5198, sizeof(DAT_004b5198), 0xa198, 0x40},
@@ -5721,7 +5712,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5260, sizeof(DAT_004b5260), 0xa260, 0x18},
     {(void *)&DAT_004b5278, sizeof(DAT_004b5278), 0xa278, 0x18},
     {(void *)&DAT_004b5290, sizeof(DAT_004b5290), 0xa290, 0x30},
-    {(void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xa2c0, 0x100},
     {(void *)&DAT_004b53c0, sizeof(DAT_004b53c0), 0xa3c0, 0x14},
     {(void *)&DAT_004b53d4, sizeof(DAT_004b53d4), 0xa3d4, 0x19c},
     {(void *)&DAT_004b5584, sizeof(DAT_004b5584), 0xa584, 0x18},
@@ -5767,10 +5757,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5ef4, sizeof(DAT_004b5ef4), 0xaef4, 0x20},
     {(void *)&DAT_004b5f14, sizeof(DAT_004b5f14), 0xaf14, 0x3c},
     {(void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0xaf80, 0x1d0},
-    {(void *)&DAT_004b6150, sizeof(DAT_004b6150), 0xb150, 0x90},
     {(void *)&DAT_004b61e0, sizeof(DAT_004b61e0), 0xb1e0, 0x110},
     {(void *)&DAT_004b62f0, sizeof(DAT_004b62f0), 0xb2f0, 0x10},
-    {(void *)&DAT_004b6300, sizeof(DAT_004b6300), 0xb300, 0x98},
     {(void *)&DAT_004b6398, sizeof(DAT_004b6398), 0xb398, 0x30},
     {(void *)&DAT_004b63c8, sizeof(DAT_004b63c8), 0xb3c8, 0x34},
     {(void *)&DAT_004b6408, sizeof(DAT_004b6408), 0xb408, 0xc4},
@@ -5779,13 +5767,10 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b6638, sizeof(DAT_004b6638), 0xb638, 0x1c},
     {(void *)&ENTRANCE_DEST_RIGHT, sizeof(ENTRANCE_DEST_RIGHT), 0xb654, 0x8},
     {(void *)&ENTRANCE_DEST_LEFT, sizeof(ENTRANCE_DEST_LEFT), 0xb65c, 0xc},
-    {(void *)&ENTRANCE_SFX, sizeof(ENTRANCE_SFX), 0xb668, 0x80},
-    {(void *)&RESTAURANT_SFX, sizeof(RESTAURANT_SFX), 0xb6e8, 0xc},
     {(void *)&DAT_004b66f4, sizeof(DAT_004b66f4), 0xb6f4, 0x168},
     {(void *)&DAT_004b685c, sizeof(DAT_004b685c), 0xb85c, 0x4},
     {(void *)&DAT_004b6860, sizeof(DAT_004b6860), 0xb860, 0x80},
     {(void *)&DAT_004b68e0, sizeof(DAT_004b68e0), 0xb8e0, 0x88},
-    {(void *)&OCTOPUS_SFX, sizeof(OCTOPUS_SFX), 0xb968, 0x28},
     {(void *)&DAT_004b6990, sizeof(DAT_004b6990), 0xb990, 0xa4},
     {(void *)&DAT_004b6a34, sizeof(DAT_004b6a34), 0xba34, 0x10},
     {(void *)&DAT_004b6a44, sizeof(DAT_004b6a44), 0xba44, 0x34},
@@ -5803,11 +5788,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7290, sizeof(DAT_004b7290), 0xc290, 0x54},
     {(void *)&DAT_004b72e4, sizeof(DAT_004b72e4), 0xc2e4, 0x194},
     {(void *)&DAT_004b7478, sizeof(DAT_004b7478), 0xc478, 0x1a0},
-    {(void *)&DAT_004b76b8, sizeof(DAT_004b76b8), 0xc6b8, 0x98},
-    {(void *)&DAT_004b7750, sizeof(DAT_004b7750), 0xc750, 0x8},
     {(void *)&DAT_004b7798, sizeof(DAT_004b7798), 0xc798, 0x50},
     {(void *)&DAT_004b77e8, sizeof(DAT_004b77e8), 0xc7e8, 0xcc},
-    {(void *)&DAT_004b79d0, sizeof(DAT_004b79d0), 0xc9d0, 0xec},
     {(void *)&DAT_004b7abc, sizeof(DAT_004b7abc), 0xcabc, 0x4},
     {(void *)&BlokeColours, sizeof(BlokeColours), 0xcac0, 0x20},
     {(void *)&DAT_004b7ae0, sizeof(DAT_004b7ae0), 0xcae0, 0xc},
@@ -5824,8 +5806,6 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b8328, sizeof(DAT_004b8328), 0xd328, 0xc},
     {(void *)&DAT_004b8334, sizeof(DAT_004b8334), 0xd334, 0x10},
     {(void *)&DAT_004b8344, sizeof(DAT_004b8344), 0xd344, 0x4},
-    {(void *)&FountainSFX, sizeof(FountainSFX), 0xd710, 0x40},
-    {(void *)&PowerStationSFX, sizeof(PowerStationSFX), 0xd750, 0x18},
     {(void *)&DAT_004b8a88, sizeof(DAT_004b8a88), 0xda88, 0x4},
     {(void *)&DAT_004b8a8c, sizeof(DAT_004b8a8c), 0xda8c, 0x4},
     {(void *)&DAT_004b8a90, sizeof(DAT_004b8a90), 0xda90, 0x12c},
@@ -5859,6 +5839,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&ScriptEventCategories, sizeof(ScriptEventCategories), 0xee5c, 0x11c},
     {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
     {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
+    {(void *)&DAT_004b9f8c, sizeof(DAT_004b9f8c), 0xef8c, 0x8f0},
     {(void *)&DAT_004ba884, sizeof(DAT_004ba884), 0xf884, 0x5c},
     {(void *)&DAT_004ba8e0, sizeof(DAT_004ba8e0), 0xf8e0, 0xcc},
     {(void *)&DAT_004ba9ac, sizeof(DAT_004ba9ac), 0xf9ac, 0x3a8},
@@ -5986,6 +5967,50 @@ static void PortCheckPtr(void *dst, unsigned int src, unsigned int lim) {
 static void PortCheckPtrInt(void *dst, unsigned int src, unsigned int lim) {
     PortCheckPtr(dst, src, lim);
 }
+static void PortLoad_Catapult_SFX(void) {
+    unsigned int lim = 0x90f8u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortLoadPtr(&Catapult_SFX[i0].name, 0x90c8u + i0 * 0xc, lim);
+        PortLoadBytes(&Catapult_SFX[i0].pad_4, 0x90c8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&Catapult_SFX[i0].sample, 0x90c8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_Helicopter_SFX(void) {
+    unsigned int lim = 0x9170u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortLoadPtr(&Helicopter_SFX[i0].name, 0x9140u + i0 * 0xc, lim);
+        PortLoadBytes(&Helicopter_SFX[i0].pad_4, 0x9140u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&Helicopter_SFX[i0].sample, 0x9140u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_DRIVING_SCHOOL_SFX(void) {
+    unsigned int lim = 0x9440u;
+    int i0;
+
+    for (i0 = 0; i0 < 6; i0++) {
+        PortLoadPtr(&DRIVING_SCHOOL_SFX[i0].name, 0x93f8u + i0 * 0xc, lim);
+        PortLoadBytes(&DRIVING_SCHOOL_SFX[i0].pad_4, 0x93f8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&DRIVING_SCHOOL_SFX[i0].sample, 0x93f8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_JOUST_SFX(void) {
+    unsigned int lim = 0x9694u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&JOUST_SFX[i0].name, 0x9688u + i0 * 0xc, lim);
+        PortLoadBytes(&JOUST_SFX[i0].pad_4, 0x9688u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&JOUST_SFX[i0].sample, 0x9688u + i0 * 0xc + 0x8, lim);
+    }
+}
+
 static void PortLoad_FlumeStages_004b47f0(void) {
     unsigned int lim = 0x9808u;
     int i0;
@@ -6065,6 +6090,28 @@ static void PortLoad_DAT_004b4f08(void) {
 
     for (i0 = 0; i0 < 4; i0++) {
         PortLoadPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+    }
+}
+
+static void PortLoad_WATERWORKS_SFX(void) {
+    unsigned int lim = 0x9fccu;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortLoadPtr(&WATERWORKS_SFX[i0].name, 0x9fa8u + i0 * 0xc, lim);
+        PortLoadBytes(&WATERWORKS_SFX[i0].pad_4, 0x9fa8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&WATERWORKS_SFX[i0].sample, 0x9fa8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_PTR_s_Boat_Noise_wav(void) {
+    unsigned int lim = 0xa2d8u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&PTR_s_Boat_Noise_wav[i0].name, 0xa2c0u + i0 * 0xc, lim);
+        PortLoadBytes(&PTR_s_Boat_Noise_wav[i0].pad_4, 0xa2c0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&PTR_s_Boat_Noise_wav[i0].sample, 0xa2c0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -6249,6 +6296,36 @@ static void PortLoad_DAT_004b5f60(void) {
     PortLoadPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
 }
 
+static void PortLoad_DAT_004b6150(void) {
+    unsigned int lim = 0xb1e0u;
+    PortLoadBytes(&DAT_004b6150.pad_0, 0xb150u, 0xcu, lim);
+    PortLoadPtr(&DAT_004b6150.field_c, 0xb150u + 0xc, lim);
+    PortLoadPtr(&DAT_004b6150.field_10, 0xb150u + 0x10, lim);
+    PortLoadPtr(&DAT_004b6150.field_14, 0xb150u + 0x14, lim);
+    PortLoadPtr(&DAT_004b6150.field_18, 0xb150u + 0x18, lim);
+    PortLoadBytes(&DAT_004b6150.field_1c, 0xb150u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&DAT_004b6150.field_20, 0xb150u + 0x20, lim);
+    PortLoadBytes(&DAT_004b6150.field_24, 0xb150u + 0x24, 0x4u, lim);
+    PortLoadPtr(&DAT_004b6150.field_28, 0xb150u + 0x28, lim);
+    PortLoadBytes(&DAT_004b6150.field_2c, 0xb150u + 0x2c, 0x4u, lim);
+    PortLoadBytes(&DAT_004b6150.box, 0xb150u + 0x30, 0x60u, lim);
+}
+
+static void PortLoad_DAT_004b6300(void) {
+    unsigned int lim = 0xb390u;
+    PortLoadBytes(&DAT_004b6300.pad_0, 0xb300u, 0xcu, lim);
+    PortLoadPtr(&DAT_004b6300.field_c, 0xb300u + 0xc, lim);
+    PortLoadPtr(&DAT_004b6300.field_10, 0xb300u + 0x10, lim);
+    PortLoadPtr(&DAT_004b6300.field_14, 0xb300u + 0x14, lim);
+    PortLoadPtr(&DAT_004b6300.field_18, 0xb300u + 0x18, lim);
+    PortLoadBytes(&DAT_004b6300.field_1c, 0xb300u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&DAT_004b6300.field_20, 0xb300u + 0x20, lim);
+    PortLoadBytes(&DAT_004b6300.field_24, 0xb300u + 0x24, 0x4u, lim);
+    PortLoadPtr(&DAT_004b6300.field_28, 0xb300u + 0x28, lim);
+    PortLoadBytes(&DAT_004b6300.field_2c, 0xb300u + 0x2c, 0x4u, lim);
+    PortLoadBytes(&DAT_004b6300.box, 0xb300u + 0x30, 0x60u, lim);
+}
+
 static void PortLoad_DAT_004b63fc(void) {
     unsigned int lim = 0xb400u;
     PortLoadPtr(&DAT_004b63fc, 0xb3fcu, lim);
@@ -6265,6 +6342,39 @@ static void PortLoad_CAROUSSEL_SFX(void) {
     }
 }
 
+static void PortLoad_ENTRANCE_SFX(void) {
+    unsigned int lim = 0xb674u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&ENTRANCE_SFX[i0].name, 0xb668u + i0 * 0xc, lim);
+        PortLoadBytes(&ENTRANCE_SFX[i0].pad_4, 0xb668u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&ENTRANCE_SFX[i0].sample, 0xb668u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_RESTAURANT_SFX(void) {
+    unsigned int lim = 0xb6f4u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortLoadPtr(&RESTAURANT_SFX[i0].name, 0xb6e8u + i0 * 0xc, lim);
+        PortLoadBytes(&RESTAURANT_SFX[i0].pad_4, 0xb6e8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&RESTAURANT_SFX[i0].sample, 0xb6e8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_OCTOPUS_SFX(void) {
+    unsigned int lim = 0xb98cu;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortLoadPtr(&OCTOPUS_SFX[i0].name, 0xb968u + i0 * 0xc, lim);
+        PortLoadBytes(&OCTOPUS_SFX[i0].pad_4, 0xb968u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&OCTOPUS_SFX[i0].sample, 0xb968u + i0 * 0xc + 0x8, lim);
+    }
+}
+
 static void PortLoad_SPACE_TOWER_SFX(void) {
     unsigned int lim = 0xc624u;
     int i0;
@@ -6276,6 +6386,18 @@ static void PortLoad_SPACE_TOWER_SFX(void) {
     }
 }
 
+static void PortLoad_DAT_004b76b8(void) {
+    unsigned int lim = 0xc6c0u;
+    PortLoadBytes(&DAT_004b76b8.count, 0xc6b8u, 0x4u, lim);
+    PortLoadPtr(&DAT_004b76b8.entries, 0xc6b8u + 0x4, lim);
+}
+
+static void PortLoad_DAT_004b7750(void) {
+    unsigned int lim = 0xc758u;
+    PortLoadBytes(&DAT_004b7750.count, 0xc750u, 0x4u, lim);
+    PortLoadPtr(&DAT_004b7750.entries, 0xc750u + 0x4, lim);
+}
+
 static void PortLoad_DAT_004b7758(void) {
     unsigned int lim = 0xc798u;
     int i0;
@@ -6284,6 +6406,17 @@ static void PortLoad_DAT_004b7758(void) {
         PortLoadBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
         PortLoadBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
         PortLoadPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortLoad_DAT_004b79d0(void) {
+    unsigned int lim = 0xc9e8u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&DAT_004b79d0[i0].name, 0xc9d0u + i0 * 0xc, lim);
+        PortLoadBytes(&DAT_004b79d0[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&DAT_004b79d0[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -6352,6 +6485,28 @@ static void PortLoad_PTR_Bloke_DoNothing_004b8368(void) {
 static void PortLoad_DAT_004b85c4(void) {
     unsigned int lim = 0xd5c8u;
     PortLoadPtr(&DAT_004b85c4, 0xd5c4u, lim);
+}
+
+static void PortLoad_FountainSFX(void) {
+    unsigned int lim = 0xd74cu;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortLoadPtr(&FountainSFX[i0].name, 0xd710u + i0 * 0xc, lim);
+        PortLoadBytes(&FountainSFX[i0].pad_4, 0xd710u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&FountainSFX[i0].sample, 0xd710u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortLoad_PowerStationSFX(void) {
+    unsigned int lim = 0xd768u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortLoadPtr(&PowerStationSFX[i0].name, 0xd750u + i0 * 0xc, lim);
+        PortLoadBytes(&PowerStationSFX[i0].pad_4, 0xd750u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&PowerStationSFX[i0].sample, 0xd750u + i0 * 0xc + 0x8, lim);
+    }
 }
 
 static void PortLoad_DINO_SFX(void) {
@@ -6914,6 +7069,50 @@ static void PortLoad_DAT_004c1260(void) {
     PortLoadBytes(&DAT_004c1260.field_1830, 0x16260u + 0x1830, 0x4u, lim);
 }
 
+static void PortCheck_Catapult_SFX(void) {
+    unsigned int lim = 0x90f8u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortCheckPtr(&Catapult_SFX[i0].name, 0x90c8u + i0 * 0xc, lim);
+        PortCheckBytes(&Catapult_SFX[i0].pad_4, 0x90c8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&Catapult_SFX[i0].sample, 0x90c8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_Helicopter_SFX(void) {
+    unsigned int lim = 0x9170u;
+    int i0;
+
+    for (i0 = 0; i0 < 4; i0++) {
+        PortCheckPtr(&Helicopter_SFX[i0].name, 0x9140u + i0 * 0xc, lim);
+        PortCheckBytes(&Helicopter_SFX[i0].pad_4, 0x9140u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&Helicopter_SFX[i0].sample, 0x9140u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_DRIVING_SCHOOL_SFX(void) {
+    unsigned int lim = 0x9440u;
+    int i0;
+
+    for (i0 = 0; i0 < 6; i0++) {
+        PortCheckPtr(&DRIVING_SCHOOL_SFX[i0].name, 0x93f8u + i0 * 0xc, lim);
+        PortCheckBytes(&DRIVING_SCHOOL_SFX[i0].pad_4, 0x93f8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&DRIVING_SCHOOL_SFX[i0].sample, 0x93f8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_JOUST_SFX(void) {
+    unsigned int lim = 0x9694u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&JOUST_SFX[i0].name, 0x9688u + i0 * 0xc, lim);
+        PortCheckBytes(&JOUST_SFX[i0].pad_4, 0x9688u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&JOUST_SFX[i0].sample, 0x9688u + i0 * 0xc + 0x8, lim);
+    }
+}
+
 static void PortCheck_FlumeStages_004b47f0(void) {
     unsigned int lim = 0x9808u;
     int i0;
@@ -6993,6 +7192,28 @@ static void PortCheck_DAT_004b4f08(void) {
 
     for (i0 = 0; i0 < 4; i0++) {
         PortCheckPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+    }
+}
+
+static void PortCheck_WATERWORKS_SFX(void) {
+    unsigned int lim = 0x9fccu;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortCheckPtr(&WATERWORKS_SFX[i0].name, 0x9fa8u + i0 * 0xc, lim);
+        PortCheckBytes(&WATERWORKS_SFX[i0].pad_4, 0x9fa8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&WATERWORKS_SFX[i0].sample, 0x9fa8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_PTR_s_Boat_Noise_wav(void) {
+    unsigned int lim = 0xa2d8u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&PTR_s_Boat_Noise_wav[i0].name, 0xa2c0u + i0 * 0xc, lim);
+        PortCheckBytes(&PTR_s_Boat_Noise_wav[i0].pad_4, 0xa2c0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&PTR_s_Boat_Noise_wav[i0].sample, 0xa2c0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -7177,6 +7398,36 @@ static void PortCheck_DAT_004b5f60(void) {
     PortCheckPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
 }
 
+static void PortCheck_DAT_004b6150(void) {
+    unsigned int lim = 0xb1e0u;
+    PortCheckBytes(&DAT_004b6150.pad_0, 0xb150u, 0xcu, lim);
+    PortCheckPtr(&DAT_004b6150.field_c, 0xb150u + 0xc, lim);
+    PortCheckPtr(&DAT_004b6150.field_10, 0xb150u + 0x10, lim);
+    PortCheckPtr(&DAT_004b6150.field_14, 0xb150u + 0x14, lim);
+    PortCheckPtr(&DAT_004b6150.field_18, 0xb150u + 0x18, lim);
+    PortCheckBytes(&DAT_004b6150.field_1c, 0xb150u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&DAT_004b6150.field_20, 0xb150u + 0x20, lim);
+    PortCheckBytes(&DAT_004b6150.field_24, 0xb150u + 0x24, 0x4u, lim);
+    PortCheckPtr(&DAT_004b6150.field_28, 0xb150u + 0x28, lim);
+    PortCheckBytes(&DAT_004b6150.field_2c, 0xb150u + 0x2c, 0x4u, lim);
+    PortCheckBytes(&DAT_004b6150.box, 0xb150u + 0x30, 0x60u, lim);
+}
+
+static void PortCheck_DAT_004b6300(void) {
+    unsigned int lim = 0xb390u;
+    PortCheckBytes(&DAT_004b6300.pad_0, 0xb300u, 0xcu, lim);
+    PortCheckPtr(&DAT_004b6300.field_c, 0xb300u + 0xc, lim);
+    PortCheckPtr(&DAT_004b6300.field_10, 0xb300u + 0x10, lim);
+    PortCheckPtr(&DAT_004b6300.field_14, 0xb300u + 0x14, lim);
+    PortCheckPtr(&DAT_004b6300.field_18, 0xb300u + 0x18, lim);
+    PortCheckBytes(&DAT_004b6300.field_1c, 0xb300u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&DAT_004b6300.field_20, 0xb300u + 0x20, lim);
+    PortCheckBytes(&DAT_004b6300.field_24, 0xb300u + 0x24, 0x4u, lim);
+    PortCheckPtr(&DAT_004b6300.field_28, 0xb300u + 0x28, lim);
+    PortCheckBytes(&DAT_004b6300.field_2c, 0xb300u + 0x2c, 0x4u, lim);
+    PortCheckBytes(&DAT_004b6300.box, 0xb300u + 0x30, 0x60u, lim);
+}
+
 static void PortCheck_DAT_004b63fc(void) {
     unsigned int lim = 0xb400u;
     PortCheckPtr(&DAT_004b63fc, 0xb3fcu, lim);
@@ -7193,6 +7444,39 @@ static void PortCheck_CAROUSSEL_SFX(void) {
     }
 }
 
+static void PortCheck_ENTRANCE_SFX(void) {
+    unsigned int lim = 0xb674u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&ENTRANCE_SFX[i0].name, 0xb668u + i0 * 0xc, lim);
+        PortCheckBytes(&ENTRANCE_SFX[i0].pad_4, 0xb668u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&ENTRANCE_SFX[i0].sample, 0xb668u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_RESTAURANT_SFX(void) {
+    unsigned int lim = 0xb6f4u;
+    int i0;
+
+    for (i0 = 0; i0 < 1; i0++) {
+        PortCheckPtr(&RESTAURANT_SFX[i0].name, 0xb6e8u + i0 * 0xc, lim);
+        PortCheckBytes(&RESTAURANT_SFX[i0].pad_4, 0xb6e8u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&RESTAURANT_SFX[i0].sample, 0xb6e8u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_OCTOPUS_SFX(void) {
+    unsigned int lim = 0xb98cu;
+    int i0;
+
+    for (i0 = 0; i0 < 3; i0++) {
+        PortCheckPtr(&OCTOPUS_SFX[i0].name, 0xb968u + i0 * 0xc, lim);
+        PortCheckBytes(&OCTOPUS_SFX[i0].pad_4, 0xb968u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&OCTOPUS_SFX[i0].sample, 0xb968u + i0 * 0xc + 0x8, lim);
+    }
+}
+
 static void PortCheck_SPACE_TOWER_SFX(void) {
     unsigned int lim = 0xc624u;
     int i0;
@@ -7204,6 +7488,18 @@ static void PortCheck_SPACE_TOWER_SFX(void) {
     }
 }
 
+static void PortCheck_DAT_004b76b8(void) {
+    unsigned int lim = 0xc6c0u;
+    PortCheckBytes(&DAT_004b76b8.count, 0xc6b8u, 0x4u, lim);
+    PortCheckPtr(&DAT_004b76b8.entries, 0xc6b8u + 0x4, lim);
+}
+
+static void PortCheck_DAT_004b7750(void) {
+    unsigned int lim = 0xc758u;
+    PortCheckBytes(&DAT_004b7750.count, 0xc750u, 0x4u, lim);
+    PortCheckPtr(&DAT_004b7750.entries, 0xc750u + 0x4, lim);
+}
+
 static void PortCheck_DAT_004b7758(void) {
     unsigned int lim = 0xc798u;
     int i0;
@@ -7212,6 +7508,17 @@ static void PortCheck_DAT_004b7758(void) {
         PortCheckBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
         PortCheckBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
         PortCheckPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+    }
+}
+
+static void PortCheck_DAT_004b79d0(void) {
+    unsigned int lim = 0xc9e8u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&DAT_004b79d0[i0].name, 0xc9d0u + i0 * 0xc, lim);
+        PortCheckBytes(&DAT_004b79d0[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&DAT_004b79d0[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -7280,6 +7587,28 @@ static void PortCheck_PTR_Bloke_DoNothing_004b8368(void) {
 static void PortCheck_DAT_004b85c4(void) {
     unsigned int lim = 0xd5c8u;
     PortCheckPtr(&DAT_004b85c4, 0xd5c4u, lim);
+}
+
+static void PortCheck_FountainSFX(void) {
+    unsigned int lim = 0xd74cu;
+    int i0;
+
+    for (i0 = 0; i0 < 5; i0++) {
+        PortCheckPtr(&FountainSFX[i0].name, 0xd710u + i0 * 0xc, lim);
+        PortCheckBytes(&FountainSFX[i0].pad_4, 0xd710u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&FountainSFX[i0].sample, 0xd710u + i0 * 0xc + 0x8, lim);
+    }
+}
+
+static void PortCheck_PowerStationSFX(void) {
+    unsigned int lim = 0xd768u;
+    int i0;
+
+    for (i0 = 0; i0 < 2; i0++) {
+        PortCheckPtr(&PowerStationSFX[i0].name, 0xd750u + i0 * 0xc, lim);
+        PortCheckBytes(&PowerStationSFX[i0].pad_4, 0xd750u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&PowerStationSFX[i0].sample, 0xd750u + i0 * 0xc + 0x8, lim);
+    }
 }
 
 static void PortCheck_DINO_SFX(void) {
@@ -7843,6 +8172,10 @@ static void PortCheck_DAT_004c1260(void) {
 }
 
 static void (*const port_typed_loads[])(void) = {
+    PortLoad_Catapult_SFX,
+    PortLoad_Helicopter_SFX,
+    PortLoad_DRIVING_SCHOOL_SFX,
+    PortLoad_JOUST_SFX,
     PortLoad_FlumeStages_004b47f0,
     PortLoad_DAT_004b4808,
     PortLoad_FlumeStages_004b4810,
@@ -7852,6 +8185,8 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_SAFARI_SFX,
     PortLoad_SpiderRide_SFX,
     PortLoad_DAT_004b4f08,
+    PortLoad_WATERWORKS_SFX,
+    PortLoad_PTR_s_Boat_Noise_wav,
     PortLoad_DAT_004b5570,
     PortLoad_DAT_004b55fc,
     PortLoad_DAT_004b5600,
@@ -7869,10 +8204,18 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_DAT_004b5dc8,
     PortLoad_DAT_004b5f50,
     PortLoad_DAT_004b5f60,
+    PortLoad_DAT_004b6150,
+    PortLoad_DAT_004b6300,
     PortLoad_DAT_004b63fc,
     PortLoad_CAROUSSEL_SFX,
+    PortLoad_ENTRANCE_SFX,
+    PortLoad_RESTAURANT_SFX,
+    PortLoad_OCTOPUS_SFX,
     PortLoad_SPACE_TOWER_SFX,
+    PortLoad_DAT_004b76b8,
+    PortLoad_DAT_004b7750,
     PortLoad_DAT_004b7758,
+    PortLoad_DAT_004b79d0,
     PortLoad_DAT_004b7e9c,
     PortLoad_GraphicsPath,
     PortLoad_GraphicsPathPrefix,
@@ -7884,6 +8227,8 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_PTR_DAT_004b8348,
     PortLoad_PTR_Bloke_DoNothing_004b8368,
     PortLoad_DAT_004b85c4,
+    PortLoad_FountainSFX,
+    PortLoad_PowerStationSFX,
     PortLoad_DINO_SFX,
     PortLoad_MONEY_SFX,
     PortLoad_GameFX,
@@ -7968,6 +8313,10 @@ static void (*const port_typed_loads[])(void) = {
 };
 
 static void (*const port_typed_checks[])(void) = {
+    PortCheck_Catapult_SFX,
+    PortCheck_Helicopter_SFX,
+    PortCheck_DRIVING_SCHOOL_SFX,
+    PortCheck_JOUST_SFX,
     PortCheck_FlumeStages_004b47f0,
     PortCheck_DAT_004b4808,
     PortCheck_FlumeStages_004b4810,
@@ -7977,6 +8326,8 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_SAFARI_SFX,
     PortCheck_SpiderRide_SFX,
     PortCheck_DAT_004b4f08,
+    PortCheck_WATERWORKS_SFX,
+    PortCheck_PTR_s_Boat_Noise_wav,
     PortCheck_DAT_004b5570,
     PortCheck_DAT_004b55fc,
     PortCheck_DAT_004b5600,
@@ -7994,10 +8345,18 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_DAT_004b5dc8,
     PortCheck_DAT_004b5f50,
     PortCheck_DAT_004b5f60,
+    PortCheck_DAT_004b6150,
+    PortCheck_DAT_004b6300,
     PortCheck_DAT_004b63fc,
     PortCheck_CAROUSSEL_SFX,
+    PortCheck_ENTRANCE_SFX,
+    PortCheck_RESTAURANT_SFX,
+    PortCheck_OCTOPUS_SFX,
     PortCheck_SPACE_TOWER_SFX,
+    PortCheck_DAT_004b76b8,
+    PortCheck_DAT_004b7750,
     PortCheck_DAT_004b7758,
+    PortCheck_DAT_004b79d0,
     PortCheck_DAT_004b7e9c,
     PortCheck_GraphicsPath,
     PortCheck_GraphicsPathPrefix,
@@ -8009,6 +8368,8 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_PTR_DAT_004b8348,
     PortCheck_PTR_Bloke_DoNothing_004b8368,
     PortCheck_DAT_004b85c4,
+    PortCheck_FountainSFX,
+    PortCheck_PowerStationSFX,
     PortCheck_DINO_SFX,
     PortCheck_MONEY_SFX,
     PortCheck_GameFX,

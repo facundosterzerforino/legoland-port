@@ -511,7 +511,7 @@ void JoustUpdate(struct Element *elem) {
                 play.kind = 2;
                 play.x = jn->id.pos.x;
                 play.y = jn->id.pos.y;
-                jn->sample = PlayInstanceOfSample(*(void **)(JOUST_SFX + 8), 1, 0, &play);
+                jn->sample = PlayInstanceOfSample(JOUST_SFX[0].sample, 1, 0, &play);
                 FUN_00496d10(jn->sample);
             }
             step++;

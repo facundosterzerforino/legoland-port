@@ -251,9 +251,9 @@ void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, void
 
 // FUNCTION: LEGOLAND 0x00415e80
 void SpiderRideLoad(struct CarNode *param_1) {
-    DAT_004cbf20 = ((unsigned int *)param_1)[3];
-    ((unsigned int *)DAT_004cbf20)[7] |= 0x420;
-    SpiderRideLayer = (struct Sprite *)((unsigned int *)DAT_004cbf20)[25];
+    DAT_004cbf20 = ((struct Element *)param_1)->ride;
+    DAT_004cbf20->flags |= 0x420;
+    SpiderRideLayer = DAT_004cbf20->layer;
     SpiderRideLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b4ea0
     SpiderRunBinV = LoadBinV("Zbuffers\\spiderrun.bnv");
@@ -284,7 +284,7 @@ void SpiderRideLoad(struct CarNode *param_1) {
 
 // FUNCTION: LEGOLAND 0x00415fd0
 void SpiderRideUnload(struct CarNode *param_1) {
-    DAT_004cbf20 = ((unsigned int *)param_1)[3];
+    DAT_004cbf20 = ((struct Element *)param_1)->ride;
 
     if (ZSpiderSprite != NULL) {
         KillSprite(ZSpiderSprite);
@@ -366,7 +366,7 @@ void SpiderRide(struct ClassNode *name_ptr, struct Ride *obj) {
 // FUNCTION: LEGOLAND 0x004161f0
 void FUN_004161f0(struct SpiderNode *node) {
     struct SpiderState *s = (struct SpiderState *)node;
-    struct RideNode *r = ((struct Ride *)DAT_004cbf20)->riders;
+    struct RideNode *r = DAT_004cbf20->riders;
     unsigned int flags = s->field_8;
 
     if (flags & 1) {
@@ -468,7 +468,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct SlotOwner *)elem, (struct SlotArray *)state, ((struct Ride *)DAT_004cbf20)->seats));
+                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct SlotOwner *)elem, (struct SlotArray *)state, DAT_004cbf20->seats));
                 bloke->path = NewBNVPath(DAT_004cbf30[1], 1, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->field_58 = 0;
@@ -500,7 +500,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->param_action++;
                 state->field_2++;
-                if ((short)(char)state->field_2 == ((struct Ride *)DAT_004cbf20)->seats) {
+                if ((short)(char)state->field_2 == DAT_004cbf20->seats) {
                     FUN_00415a60(state);
                 }
                 break;

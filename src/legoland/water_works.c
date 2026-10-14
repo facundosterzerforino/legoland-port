@@ -96,7 +96,7 @@ void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
     params.field_0 = 2;
     params.x = src[0];
     params.y = src[1];
-    PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 8 + index * 0xc), looping, 1, &params);
+    PlayInstanceOfSample(WATERWORKS_SFX[index].sample, looping, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00417b40
@@ -166,7 +166,7 @@ void WaterWorksEntranceAddObject(struct EditObject *editObj, int *coords) {
     params.x = coords[0];
     params.field_0 = 2;
     params.y = coords[1];
-    PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 0x14), 1, 1, &params);
+    PlayInstanceOfSample(WATERWORKS_SFX[1].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00417c70
@@ -777,7 +777,7 @@ void CrocodileFountainAddObject(struct EditObject *editObj, int *coords) {
     params.x = coords[0];
     params.field_0 = 2;
     params.y = coords[1];
-    PlayInstanceOfSample(*(void **)(WATERWORKS_SFX + 0x20), 1, 1, &params);
+    PlayInstanceOfSample(WATERWORKS_SFX[2].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x00418a10

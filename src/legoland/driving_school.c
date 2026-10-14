@@ -156,7 +156,7 @@ void FUN_00405310(TileId tile) {
 
 // FUNCTION: LEGOLAND 0x00405370
 void LoadDrivingSchoolResources(struct Element *param_1) {
-    unsigned int lls;
+    struct LLS *lls;
 
     DrivingSchoolRide = param_1->ride;
     if (LLIDB_FindElement("DSCHOOL MAPPING", (struct Element **)&param_1, 0) == 0) {
@@ -170,11 +170,11 @@ void LoadDrivingSchoolResources(struct Element *param_1) {
     // STRING: LEGOLAND 0x004b4524
     DSchoolMatteSprite = LoadSprite("DSchool Matte.lls", 1);
     // STRING: LEGOLAND 0x004b4510
-    DSchoolBluePalette = LoadPalette((unsigned int)".\\3ddata\\blu.col");
+    DSchoolBluePalette = LoadPalette(".\\3ddata\\blu.col");
     // STRING: LEGOLAND 0x004b44fc
-    DSchoolYellowPalette = LoadPalette((unsigned int)".\\3ddata\\yel.col");
+    DSchoolYellowPalette = LoadPalette(".\\3ddata\\yel.col");
     // STRING: LEGOLAND 0x004b44e8
-    DSchoolRedPalette = LoadPalette((unsigned int)".\\3ddata\\red.col");
+    DSchoolRedPalette = LoadPalette(".\\3ddata\\red.col");
     // STRING: LEGOLAND 0x004b44d8
     DSCarSprite = LoadSprite("ds_car&m.lls", 1);
     if (DSCarSprite != NULL) {
@@ -511,13 +511,13 @@ void DrivingSchoolUpdate(Element *obj) {
                     tile_id = node->tile.id;
                     count = FUN_00401c40(tile_id);
                     if (5 * count < (int)FUN_00413970(node->tile.id)) {
-                        res = FUN_00401ae0(node->tile.id, (int)bloke);
+                        res = FUN_00401ae0(node->tile.id, bloke);
                         if (0 == res) {
                             source.type = 1;
                             source.bloke = bloke;
-                            PlayInstanceOfSample(*(void **)(DRIVING_SCHOOL_SFX + 8), 0, 1, &source);
+                            PlayInstanceOfSample(DRIVING_SCHOOL_SFX[0].sample, 0, 1, &source);
                             r = rand() % 4 + 1;
-                            sample = PlayInstanceOfSample(((void **)(DRIVING_SCHOOL_SFX + 8))[r * 3], 1, 1, &source);
+                            sample = PlayInstanceOfSample(DRIVING_SCHOOL_SFX[r].sample, 1, 1, &source);
                             AdjustPSampleFreq(sample, 10);
                             BlokeSitAnim(bloke);
                             BlokeSetFrame(bloke, 0);
