@@ -36,10 +36,8 @@ def main():
     dirty = git('status', '--porcelain', '--untracked-files=no')
     if dirty:
         print('warning: uncommitted changes; the release says commit %s but has them' % commit)
-    newest = max(os.path.getmtime(os.path.join(ROOT, f)) for f in git('ls-files', 'src', 'port', 'miniwin',
-                                                                       'extensions', 'CMakeLists.txt').split('
-')
-                 if os.path.exists(os.path.join(ROOT, f)))
+    sources = git('ls-files', 'src', 'port', 'miniwin', 'extensions', 'CMakeLists.txt').splitlines()
+    newest = max(os.path.getmtime(os.path.join(ROOT, f)) for f in sources if os.path.exists(os.path.join(ROOT, f)))
     if os.path.getmtime(exe) < newest:
         print('warning: a source file is newer than the exe: rebuild first')
     version = '%s-%s' % (datetime.date.today().isoformat(), commit)
