@@ -202,9 +202,9 @@ struct Element *FUN_0043eee0(char *title, struct Sprite *bg, RECT *box, unsigned
             c++;
         }
     }
-    names = malloc(c * 4 + 4);
-    list = malloc(c * 4);
-    icons = malloc(c * 4);
+    names = malloc(c * sizeof(*names) + sizeof(*names));
+    list = malloc(c * sizeof(*list));
+    icons = malloc(c * sizeof(*icons));
     n = 0;
     for (k = 0; k < count; k++) {
         LLIDB_GetElement(k, &e);
@@ -311,9 +311,9 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
         } while (_findnext(h, &fd) != -1);
         _findclose(h);
         tail->next = 0;
-        names = malloc(count * 4 + 4);
-        icons = malloc(count * 4);
-        nodes = malloc(count * 4);
+        names = malloc(count * sizeof(*names) + sizeof(*names));
+        icons = malloc(count * sizeof(*icons));
+        nodes = malloc(count * sizeof(*nodes));
         names[count] = 0;
         node = head;
         for (i = 0; i < count; i++) {

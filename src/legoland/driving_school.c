@@ -675,7 +675,7 @@ int DrivingSchool_Load(struct Element *element) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (countPrev == NULL) {
-            DrivingSchoolCountList = (struct CountNode *)malloc(0xc);
+            DrivingSchoolCountList = (struct CountNode *)malloc(sizeof(struct CountNode));
             countPrev = DrivingSchoolCountList;
         } else {
             countNode = (struct CountNode *)malloc(sizeof(struct CountNode));
@@ -703,7 +703,7 @@ int DrivingSchool_Load(struct Element *element) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (pumpPrev == NULL) {
-            PumpList = (struct PumpNode *)malloc(0x10);
+            PumpList = (struct PumpNode *)malloc(sizeof(struct PumpNode));
             pumpPrev = PumpList;
         } else {
             pumpNode = (struct PumpNode *)malloc(sizeof(struct PumpNode));

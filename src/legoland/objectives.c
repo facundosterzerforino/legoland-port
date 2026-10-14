@@ -146,7 +146,7 @@ void FUN_004688f0(int index, unsigned char param_2) {
 struct ObjectiveEvent *AllocObjectiveEvent(unsigned int type, int sort_key) {
     struct ObjectiveEvent *event;
 
-    event = (struct ObjectiveEvent *)calloc(1, 0x44);
+    event = (struct ObjectiveEvent *)calloc(1, sizeof(struct ObjectiveEvent));
     if (event != NULL) {
         event->next = NULL;
         event->field_8 = 0;

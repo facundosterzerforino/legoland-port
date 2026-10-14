@@ -176,7 +176,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         if (SavedElementTable != 0) {
             free(SavedElementTable);
         }
-        SavedElementTable = malloc(SavedElementCount * 4);
+        SavedElementTable = malloc(SavedElementCount * sizeof(*SavedElementTable));
         k = 0;
         for (i = 0; i < n_elems; i++) {
             DrawWatchSprite();
@@ -772,7 +772,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         free(SavedElementTable);
         SavedElementTable = 0;
     }
-    SavedElementTable = malloc(SavedElementCount * 4);
+    SavedElementTable = malloc(SavedElementCount * sizeof(*SavedElementTable));
     for (i = 0; i < SavedElementCount; i++) {
         DrawWatchSprite();
         if (SaveGameRead(&len, 4) == 0) {

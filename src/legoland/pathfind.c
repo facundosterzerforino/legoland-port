@@ -682,7 +682,7 @@ void FUN_004829c0(struct BestNode *node) {
     FUN_004819a0((int *)&node->x_min);
     count = DAT_00669254;
     if (count) {
-        copy = (struct BestNode **)malloc(count * 4);
+        copy = (struct BestNode **)malloc(count * sizeof(struct BestNode *));
         if (copy != NULL) {
             memcpy(copy, DAT_0066a45c, count * 4);
             p = copy;

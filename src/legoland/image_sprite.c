@@ -72,9 +72,9 @@ struct Image **GetFreeDetailImageSlot(void) {
 
     if (detail_images_count == detail_images_capacity) {
         if (detail_images == NULL) {
-            new_array = (struct Image **)calloc(0x80, 4);
+            new_array = (struct Image **)calloc(0x80, sizeof(struct Image *));
         } else {
-            new_array = (struct Image **)realloc(detail_images, detail_images_capacity * 4 + 0x200);
+            new_array = (struct Image **)realloc(detail_images, detail_images_capacity * sizeof(struct Image *) + 0x80 * sizeof(struct Image *));
             if (new_array == NULL) {
                 return NULL;
             }

@@ -49,7 +49,7 @@ LEGO_EXPORT struct MidiFile *LoadMIDIFile(const char *filename) {
     ReadBigEndianU16(file, &midi->trackCount);
     ReadBigEndianU16(file, &division);
     midi->field_0 = division * 5 * 5 * 5 * 5 * 32;
-    midi->trackArray = (void **)malloc(midi->trackCount * 4);
+    midi->trackArray = (void **)malloc(midi->trackCount * sizeof(void *));
     for (i = 0; i < midi->trackCount; ++i) {
         midi->trackArray[i] = ReadMidiTrack(file);
         ((struct MidiTrack *)midi->trackArray[i])->parent = midi;

@@ -93,7 +93,7 @@ LEGO_EXPORT int LLIDB_LoadICM(void) {
     }
     _read(fd, &LLIDB_ElementCount, 4);
     LLIDB_Capacity = (LLIDB_ElementCount + 0xff) & 0xffffff00;
-    LLIDB_Pages = malloc((LLIDB_Capacity >> 8) * 4);
+    LLIDB_Pages = malloc((LLIDB_Capacity >> 8) * sizeof(*LLIDB_Pages));
     for (page = 0; page < (LLIDB_Capacity >> 8); page++) {
         LLIDB_Pages[page] = malloc(0x100 * sizeof(struct Element));
     }
@@ -296,8 +296,8 @@ unsigned int FUN_0047b5a0(void) {
     if (((LLIDB_Capacity ^ LLIDB_ElementCount) & 0xffffff00) == 0) {
         capacity = (LLIDB_ElementCount + 0x100) & 0xffffff00;
         LLIDB_Capacity = capacity;
-        LLIDB_Pages = (struct Element **)realloc(LLIDB_Pages, (capacity >> 8) * 4);
-        LLIDB_Pages[(LLIDB_Capacity >> 8) - 1] = (struct Element *)malloc(0x1400);
+        LLIDB_Pages = (struct Element **)realloc(LLIDB_Pages, (capacity >> 8) * sizeof(struct Element *));
+        LLIDB_Pages[(LLIDB_Capacity >> 8) - 1] = (struct Element *)malloc(0x100 * sizeof(struct Element));
     }
     return LLIDB_ElementCount;
 }
@@ -1272,7 +1272,7 @@ LEGO_EXPORT void *LLIDB_LoadILFData(struct LLIDBHead *head) {
     if (table != NULL) {
         table->data_c = (int *)malloc(count * 4);
         table->data_10 = (int *)malloc(count * 4);
-        table->sprites = (struct Sprite **)malloc(count * 4);
+        table->sprites = (struct Sprite **)malloc(count * sizeof(struct Sprite *));
         table->count = count;
         if (table->data_c != NULL && table->data_10 != NULL && table->sprites != NULL) {
             RES_ReadFile(file, &len, 4);
@@ -1336,7 +1336,7 @@ LEGO_EXPORT void *LLIDB_LoadCSPData(struct LLIDBHead *head) {
         RES_ReadFile(file, &unused, 2);
         table->data_c = (int *)malloc(count * 4);
         table->data_10 = (int *)malloc(count * 4);
-        table->sprites = (struct Sprite **)malloc(count * 4);
+        table->sprites = (struct Sprite **)malloc(count * sizeof(struct Sprite *));
         table->count = count;
         if (table->data_c != NULL && table->data_10 != NULL && table->sprites != NULL) {
             RES_ReadFile(file, &len, 4);

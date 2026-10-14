@@ -473,7 +473,7 @@ void FUN_0041d440(struct PathSeg *obj, struct SprEnt *ent) {
 
 // FUNCTION: LEGOLAND 0x0041d5b0
 struct PathSeg *FUN_0041d5b0(struct Ride *ride, struct PieceClass *cls, struct Int16Pair *pos, struct SprEnt *ent) {
-    struct PathSeg *obj = FUN_004775b0(0xa4, 0, 0, 0);
+    struct PathSeg *obj = FUN_004775b0(sizeof(struct PathSeg), 0, 0, 0);
 
     if (obj == NULL) {
         return 0;
@@ -493,7 +493,7 @@ struct PathSeg *FUN_0041d5b0(struct Ride *ride, struct PieceClass *cls, struct I
 
 // FUNCTION: LEGOLAND 0x0041d630
 struct PathSeg *FUN_0041d630(struct Ride *ride, struct PieceClass *cls, struct Int16Pair *pos, struct SprEnt *ent) {
-    struct PathSeg *obj = FUN_004775b0(0xa4, 0, 0, 0);
+    struct PathSeg *obj = FUN_004775b0(sizeof(struct PathSeg), 0, 0, 0);
 
     if (obj == NULL) {
         return 0;
@@ -1131,7 +1131,7 @@ void FUN_0041e500(struct Train *obj) {
 
 // FUNCTION: LEGOLAND 0x0041e570
 struct Train *FUN_0041e570(struct CastleState *arg) {
-    struct Train *self = FUN_004775b0(0x15c, 0, 0, 0);
+    struct Train *self = FUN_004775b0(sizeof(struct Train), 0, 0, 0);
     if (self == NULL) {
         return NULL;
     }
@@ -1387,7 +1387,7 @@ unsigned int FUN_0041eaf0(struct TrainCar *a, struct PathSeg *b) {
 
 // FUNCTION: LEGOLAND 0x0041eb30
 struct TrainCar *FUN_0041eb30(unsigned int arg) {
-    struct TrainCar *obj = FUN_004775b0(0xec, 0, 0, 0);
+    struct TrainCar *obj = FUN_004775b0(sizeof(struct TrainCar), 0, 0, 0);
     if (obj == NULL) {
         return NULL;
     }
@@ -1844,7 +1844,8 @@ float **FUN_0041f650(double (*fn)(float), int n, float a, float b) {
     int j;
     int k;
 
-    t = (float **)FUN_004775b0((((cnt + 1) * cnt >> 1) + cnt) * 4, 0, 0, 0);
+    /* the rows' pointers, then the triangle of cnt * (cnt + 1) / 2 floats */
+    t = (float **)FUN_004775b0(((cnt + 1) * cnt >> 1) * sizeof(float) + cnt * sizeof(float *), 0, 0, 0);
     if (t == NULL) {
         return NULL;
     }
@@ -2985,7 +2986,7 @@ void FUN_004215b0(struct CastleVisitor *param_1) {
 
 // FUNCTION: LEGOLAND 0x004215d0
 struct CastleVisitor *FUN_004215d0(struct BlokeInfo *a1) {
-    struct CastleVisitor *self = FUN_004775b0(0x28, 0, 0, 0);
+    struct CastleVisitor *self = FUN_004775b0(sizeof(struct CastleVisitor), 0, 0, 0);
     if (self == NULL) {
         return NULL;
     }

@@ -2334,7 +2334,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
             col++;
         }
     }
-    DAT_00801a68 = malloc(DAT_00801b28 * 4);
+    DAT_00801a68 = malloc(DAT_00801b28 * sizeof(*DAT_00801a68));
     for (i = 0; i < DAT_00801b28; i++) {
         DrawWatchSprite();
         RES_ReadFile(file, &len, 4);
@@ -2363,7 +2363,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
     }
     RES_ReadFile(file, &curx, 4);
     DAT_00801a74 = curx;
-    DAT_00801a70 = malloc(4 * curx);
+    DAT_00801a70 = malloc(sizeof(*DAT_00801a70) * curx);
     for (i = 0; i < curx; i++) {
         DrawWatchSprite();
         RES_ReadFile(file, &len, 4);
