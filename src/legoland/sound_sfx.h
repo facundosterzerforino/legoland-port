@@ -11,15 +11,15 @@ struct SampleBuffer;
  * through method_0x20..0x48; sound_music.c reuses the same vtable slot at 0x3c
  * (Apply) to push the sample's source config. One object, one vtable. */
 struct SampleBufferVtbl {
-    unsigned char pad_0[0x18];
+    void *pad_0[6];
     int(__stdcall *method_0x18)(struct SampleBuffer *self, int *out);
-    unsigned char pad_1c[0x20 - 0x1c];
+    void *pad_1c[1];
     int(__stdcall *method_0x20)(struct SampleBuffer *self, DWORD *out); /* GetFrequency */
     int(__stdcall *method_0x24)(struct SampleBuffer *self, unsigned int *out);
-    unsigned char pad_28[0x30 - 0x28];
+    void *pad_28[2];
     int(__stdcall *method_0x30)(struct SampleBuffer *self, int arg1, int arg2, int arg3);
     int(__stdcall *method_0x34)(struct SampleBuffer *self, int arg1);
-    unsigned char pad_38[0x3c - 0x38];
+    void *pad_38[1];
     int(__stdcall *method_0x3c)(struct SampleBuffer *self, int arg1);
     int(__stdcall *method_0x40)(struct SampleBuffer *self, int arg1);
     int(__stdcall *method_0x44)(struct SampleBuffer *self, int arg1);
@@ -124,9 +124,9 @@ struct DirectMusicPortVtbl {
     void *QueryInterface;
     void *AddRef;
     unsigned int(__stdcall *Release)(struct DirectMusicPort *self);
-    unsigned char pad_c[0x3c - 0xc];
+    void *pad_c[12];
     HRESULT(__stdcall *Activate)(struct DirectMusicPort *self, BOOL active);
-    unsigned char pad_40[0x48 - 0x40];
+    void *pad_40[2];
     HRESULT(__stdcall *SetDirectSound)(struct DirectMusicPort *self, void *dsound, void *buffer);
     HRESULT(__stdcall *GetFormat)(struct DirectMusicPort *self, WAVEFORMATEX *format, unsigned int *formatSize, unsigned int *bufferSize);
 };
@@ -139,9 +139,9 @@ struct DirectMusicSegmentVtbl {
     void *QueryInterface;
     void *AddRef;
     unsigned int(__stdcall *Release)(struct DirectMusicSegment *self);
-    unsigned char pad_c[0x18 - 0xc];
+    void *pad_c[3];
     HRESULT(__stdcall *SetRepeats)(struct DirectMusicSegment *self, unsigned int repeats);
-    unsigned char pad_1c[0x4c - 0x1c];
+    void *pad_1c[12];
     HRESULT(__stdcall *SetParam)(struct DirectMusicSegment *self, const GUID *type, unsigned int groupBits, unsigned int index, int time, void *param);
 };
 
@@ -175,9 +175,9 @@ struct DirectMusicPerformanceVtbl {
     HRESULT(__stdcall *Init)(struct DirectMusicPerformance *self, struct DirectMusic **music, void *dsound, HWND hwnd);
     HRESULT(__stdcall *PlaySegment)(struct DirectMusicPerformance *self, struct DirectMusicSegment *segment, unsigned int flags, __int64 startTime, void **segmentState);
     HRESULT(__stdcall *Stop)(struct DirectMusicPerformance *self, struct DirectMusicSegment *segment, void *segmentState, int time, unsigned int flags);
-    unsigned char pad_18[0x44 - 0x18];
+    void *pad_18[11];
     HRESULT(__stdcall *FreePMsg)(struct DirectMusicPerformance *self, struct DirectMusicNotification *msg);
-    unsigned char pad_48[0x50 - 0x48];
+    void *pad_48[2];
     HRESULT(__stdcall *SetNotificationHandle)(struct DirectMusicPerformance *self, HANDLE event, __int64 minimum);
     HRESULT(__stdcall *GetNotificationPMsg)(struct DirectMusicPerformance *self, struct DirectMusicNotification **msg);
     HRESULT(__stdcall *AddNotificationType)(struct DirectMusicPerformance *self, const GUID *type);
@@ -185,9 +185,9 @@ struct DirectMusicPerformanceVtbl {
     HRESULT(__stdcall *AddPort)(struct DirectMusicPerformance *self, struct DirectMusicPort *port);
     void *RemovePort;
     HRESULT(__stdcall *AssignPChannelBlock)(struct DirectMusicPerformance *self, unsigned int block, struct DirectMusicPort *port, unsigned int group);
-    unsigned char pad_6c[0x88 - 0x6c];
+    void *pad_6c[7];
     HRESULT(__stdcall *SetGlobalParam)(struct DirectMusicPerformance *self, const GUID *type, void *data, unsigned int size);
-    unsigned char pad_8c[0x98 - 0x8c];
+    void *pad_8c[3];
     HRESULT(__stdcall *CloseDown)(struct DirectMusicPerformance *self);
 };
 

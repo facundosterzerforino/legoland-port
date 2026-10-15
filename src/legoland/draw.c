@@ -1091,7 +1091,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
     int y;
 
     if (sprite->flags & 0x20) {
-        GetSprite((unsigned int *)&lock, sprite);
+        GetSprite(&lock, sprite);
         fake.data = lock.bits;
         fake.width = (short)((short)lock.pitch / 2);
         fake.height = (short)lock.height;
@@ -1560,7 +1560,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
     int y;
 
     if (sprite->flags & 0x20) {
-        GetSprite((unsigned int *)&lock, sprite);
+        GetSprite(&lock, sprite);
         fake.data = lock.bits;
         fake.width = (short)((short)lock.pitch / 2);
         fake.height = (short)lock.height;

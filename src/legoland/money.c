@@ -6,16 +6,6 @@
 #include "obj_instance.h"
 #include "sound_music.h"
 
-struct ShopItem {
-    unsigned char pad_0[0x28];
-    short field_28;
-};
-
-struct BuyItemArg {
-    unsigned char pad_0[0xc];
-    struct ShopItem *field_c;
-};
-
 // FUNCTION: LEGOLAND 0x00453900
 LEGO_EXPORT void LoadMoneySFX(void) {
     if (MoneySFXLoadCount++ == 0) {
@@ -52,8 +42,8 @@ LEGO_EXPORT void StopMoneySFX(unsigned char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004539e0
-LEGO_EXPORT void BuyItem(struct BuyItemArg *item, TileId *tile, int sfx) {
-    int val = item->field_c->field_28;
+LEGO_EXPORT void BuyItem(struct Element *item, TileId *tile, int sfx) {
+    int val = item->ride->field_28;
 
     if (val != 0) {
         if (sfx >= 0) {

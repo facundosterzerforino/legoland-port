@@ -32,14 +32,8 @@
 
 #pragma intrinsic(strcpy, strlen)
 
-struct PlaceObject {
-    int field_0;
-    unsigned char pad_4[0xc - 0x4];
-    struct Ride *cls;
-};
-
 struct SweepInstance {
-    struct PlaceObject *object;
+    struct Element *object;
     unsigned char tile_x;
     unsigned char tile_y;
     unsigned char pad_6[0xc - 0x6];
@@ -736,18 +730,18 @@ void PostPendingObjectiveHints(void) {
             case 1:
                 // STRING: LEGOLAND 0x004ba6bc
                 PostObjectiveMessage("You need to build %d more of object %s", node->field_1c,
-                    ((struct PlaceObject *)node->element)->cls->name);
+                    ((struct Element *)node->element)->ride->name);
                 break;
             case 0xc:
                 // STRING: LEGOLAND 0x004ba69c
-                PostObjectiveMessage("You need to research object %s", ((struct PlaceObject *)node->element)->cls->name);
+                PostObjectiveMessage("You need to research object %s", ((struct Element *)node->element)->ride->name);
                 break;
             case 2:
                 if (node->field_1c == 0) {
                     if (node->field_4 != 0) {
                         // STRING: LEGOLAND 0x004ba674
                         PostObjectiveMessage("You need to connect your %s to a path",
-                            ((struct PlaceObject *)node->element)->cls->name);
+                            ((struct Element *)node->element)->ride->name);
                     } else {
                         // STRING: LEGOLAND 0x004ba648
                         PostObjectiveMessage("You need to connect all objects to a path");
@@ -756,7 +750,7 @@ void PostPendingObjectiveHints(void) {
                     if (node->field_4 != 0) {
                         // STRING: LEGOLAND 0x004ba60c
                         PostObjectiveMessage("You need to link the path from your %s to the park entrance",
-                            ((struct PlaceObject *)node->element)->cls->name);
+                            ((struct Element *)node->element)->ride->name);
                     } else {
                         // STRING: LEGOLAND 0x004ba5c8
                         PostObjectiveMessage("You need to link the paths from all objects to the park entrance.");
@@ -792,7 +786,7 @@ void PostPendingObjectiveHints(void) {
             case 6:
                 // STRING: LEGOLAND 0x004ba48c
                 PostObjectiveMessage("You need to delete %d of object %s", node->field_1c,
-                    ((struct PlaceObject *)node->element)->cls->name);
+                    ((struct Element *)node->element)->ride->name);
                 break;
             case 7:
                 // STRING: LEGOLAND 0x004ba45c
@@ -875,17 +869,17 @@ void PostPendingObjectiveHints(void) {
             case 0x11:
                 // STRING: LEGOLAND 0x004ba0e4
                 PostObjectiveMessage("You need to get %d more people on the %s", node->field_1c,
-                    ((struct PlaceObject *)node->element)->cls->name);
+                    ((struct Element *)node->element)->ride->name);
                 break;
             case 0x12:
                 if (node->field_14 != 0) {
                     // STRING: LEGOLAND 0x004ba0b4
                     PostObjectiveMessage("You need to add %d different parts to the %s", node->field_14,
-                        ((struct PlaceObject *)node->element)->cls->name);
+                        ((struct Element *)node->element)->ride->name);
                 } else {
                     // STRING: LEGOLAND 0x004ba08c
                     PostObjectiveMessage("You need to add %d more parts to the %s", node->field_1c,
-                        ((struct PlaceObject *)node->element)->cls->name);
+                        ((struct Element *)node->element)->ride->name);
                 }
                 break;
             case 0x13:
@@ -1108,21 +1102,21 @@ int ScriptEventClear(struct ObjectiveEvent *arg) {
                 next = current;
                 do {
                     next = (struct SweepInstance *)GetNextRenderObject((MapElement *)next);
-                } while (next != NULL && (cls = next->object->cls, power = FindObjectsPower(cls), cls->parent_element != NULL) &&
+                } while (next != NULL && (cls = next->object->ride, power = FindObjectsPower(cls), cls->parent_element != NULL) &&
                     (0x10 & (unsigned char)cls->parent_element->flags) != 0 && power <= 0);
                 break;
             case 1:
                 next = current;
                 do {
                     next = (struct SweepInstance *)GetNextRenderObject((MapElement *)next);
-                } while (next != NULL && FindObjectsPower(next->object->cls) <= 0);
+                } while (next != NULL && FindObjectsPower(next->object->ride) <= 0);
                 break;
             case 2:
                 next = (struct SweepInstance *)GetNextRenderObject((MapElement *)current);
                 break;
             }
             if (current->flags_c & 0x80) {
-                cls = current->object->cls;
+                cls = current->object->ride;
                 tile_y = current->tile_y;
                 rect.top = cls->footprint.v[1];
                 tile_x = current->tile_x;

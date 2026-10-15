@@ -31,7 +31,7 @@ struct MusicLoaderVtbl;
 struct ObjectDesc;
 
 struct MusicLoaderVtbl {
-    unsigned char pad_0[0xc];
+    void *pad_0[3];
     int(__stdcall *GetObject)(struct MusicLoader *self, struct ObjectDesc *desc, const GUID *iid, void **out);
 };
 
@@ -41,9 +41,9 @@ struct MusicLoader {
 
 struct MusicContainer;
 struct MusicContainerVtbl {
-    unsigned char pad_0[0xc];
+    void *pad_0[3];
     int(__stdcall *GetObject)(struct MusicContainer *self, const unsigned short *name, void **out);
-    unsigned char pad_10[0x28 - 0x10];
+    void *pad_10[6];
     int(__stdcall *EnumObject)(struct MusicContainer *self, const unsigned short *name, void **out);
 };
 
@@ -53,9 +53,9 @@ struct MusicContainer {
 
 struct MusicSegment;
 struct MusicSegmentVtbl {
-    unsigned char pad_0[8];
+    void *pad_0[2];
     int(__stdcall *Release)(struct MusicSegment *self);
-    unsigned char pad_c[0x18 - 0xc];
+    void *pad_c[3];
     int(__stdcall *SetRepeats)(struct MusicSegment *self, unsigned int repeats);
 };
 
@@ -65,10 +65,10 @@ struct MusicSegment {
 
 struct MusicComposer;
 struct MusicComposerVtbl {
-    unsigned char pad_0[0xc];
+    void *pad_0[3];
     int(__stdcall *ComposeSegmentFromTemplate)(struct MusicComposer *self, void *style, unsigned int templateMode, unsigned int activity, void *chordMap, struct MusicSegment **out);
     int(__stdcall *ComposeSegmentFromShape)(struct MusicComposer *self, unsigned int numMeasures, unsigned int shape, unsigned int activity, int intro, int end, void *style, void *chordMap, struct MusicSegment **out);
-    unsigned char pad_14[0x18 - 0x14];
+    void *pad_14[1];
     int(__stdcall *AutoTransition)(struct MusicComposer *self, struct MusicPerformance *perf, struct MusicSegment *to_segment, unsigned int command, unsigned int flags, void *chordMap, struct MusicSegment **out, void *seg_state_to, void *seg_state_transition);
 };
 
@@ -97,11 +97,11 @@ struct ObjectDesc {
 };
 
 struct MusicPerformanceVtbl {
-    unsigned char pad_0[8];
+    void *pad_0[2];
     int(__stdcall *Release)(struct MusicPerformance *self);
-    unsigned char pad_c[0x10 - 0xc];
+    void *pad_c[1];
     void(__stdcall *PlayMotif)(struct MusicPerformance *self, void *segment, unsigned int flags, int a3, int a4, int a5); /* PlaySegment */
-    unsigned char pad_14[0x88 - 0x14];
+    void *pad_14[29];
     void(__stdcall *SetGlobalParam)(struct MusicPerformance *self, const GUID *type, void *data, unsigned int size);
 };
 
@@ -110,11 +110,11 @@ struct MusicPerformance {
 };
 
 struct AVISoundBufferVtbl {
-    unsigned char pad_0[8];
+    void *pad_0[2];
     int(__stdcall *Destroy)(struct AVISoundBuffer *self);
-    unsigned char pad_c[0x3c - 0xc];
+    void *pad_c[12];
     int(__stdcall *SetVolume)(struct AVISoundBuffer *self, int volume);
-    unsigned char pad_40[0x48 - 0x40];
+    void *pad_40[2];
     void(__stdcall *Stop)(struct AVISoundBuffer *self);
 };
 
@@ -123,7 +123,7 @@ struct AVISoundBuffer {
 };
 
 struct BandVtbl {
-    unsigned char pad_0[0xc];
+    void *pad_0[3];
     int(__stdcall *Create)(struct BandObj *self, void *arg);
 };
 

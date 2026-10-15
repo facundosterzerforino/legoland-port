@@ -106,7 +106,7 @@ void ChuckWagonUpdate(Element *obj) {
             case 3:
                 if (bloke->field_58 == 0) {
                     bloke->param_action++;
-                    BuyItem((struct BuyItemArg *)obj, tile, 0);
+                    BuyItem((struct Element *)obj, tile, 0);
                 }
                 bloke->field_58--;
                 break;
@@ -227,7 +227,7 @@ void SharkCafeUpdate(Element *obj) {
             case 2:
                 if (bloke->field_58 == 0) {
                     bloke->param_action++;
-                    BuyItem((struct BuyItemArg *)obj, tile, 1);
+                    BuyItem((struct Element *)obj, tile, 1);
                 }
                 bloke->field_58--;
                 break;
@@ -489,7 +489,7 @@ void FoodcartDrinkUpdate(Element *obj) {
             case 2:
                 if (bloke->field_58 == 0) {
                     bloke->param_action++;
-                    BuyItem((struct BuyItemArg *)obj, tile, 1);
+                    BuyItem((struct Element *)obj, tile, 1);
                 }
                 bloke->field_58--;
                 break;
@@ -550,7 +550,7 @@ void FoodcartFoodUpdate(Element *obj) {
             case 2:
                 if (bloke->field_58 == 0) {
                     bloke->param_action++;
-                    BuyItem((struct BuyItemArg *)obj, tile, 1);
+                    BuyItem((struct Element *)obj, tile, 1);
                 }
                 bloke->field_58--;
                 break;
@@ -752,7 +752,7 @@ void Restaurant1Update(Element *obj) {
                 }
                 break;
             case 1:
-                BuyItem((struct BuyItemArg *)obj, tile, 1);
+                BuyItem((struct Element *)obj, tile, 1);
                 if (bloke->field_46 == 4) {
                     bloke->param_action = 8;
                 } else {
@@ -1228,7 +1228,7 @@ void Restaurant2Update(Element *obj) {
                 if (bloke->field_5c-- < 0) {
                     bloke->param_action++;
                 } else if (bloke->field_5c == 250) {
-                    BuyItem((struct BuyItemArg *)obj, tile, 1);
+                    BuyItem((struct Element *)obj, tile, 1);
                 }
                 break;
             case 11:
@@ -1726,7 +1726,7 @@ void FoodcartIcecreamUpdate(Element *obj) {
             case 2:
                 if (bloke->field_58 == 0) {
                     bloke->param_action++;
-                    BuyItem((struct BuyItemArg *)obj, tile, 1);
+                    BuyItem((struct Element *)obj, tile, 1);
                 }
                 bloke->field_58--;
                 break;
@@ -1943,7 +1943,7 @@ void OctopusCafeUpdate(Element *obj) {
             /* fall through */
         case 3:
         case 4:
-            BuyItem((struct BuyItemArg *)obj, tile, 1);
+            BuyItem((struct Element *)obj, tile, 1);
             idx = DAT_004b6a34[bloke->param_action + (bloke->field_36 >> 1) * 4];
             if (idx == -1) {
                 bloke->param_action++;

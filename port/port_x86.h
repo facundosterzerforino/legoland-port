@@ -47,7 +47,7 @@ extern const unsigned int port_x86_type_count;
 #define PORT_X86_OFF_Ride_field_24 0x24u
 #define PORT_X86_OFF_Ride_field_25 0x25u
 #define PORT_X86_OFF_Ride_cost 0x26u
-#define PORT_X86_OFF_Ride_pad_28 0x28u
+#define PORT_X86_OFF_Ride_field_28 0x28u
 #define PORT_X86_OFF_Ride_range 0x2au
 #define PORT_X86_OFF_Ride_durability 0x2cu
 #define PORT_X86_OFF_Ride_pad_2d 0x2du

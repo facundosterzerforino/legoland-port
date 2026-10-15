@@ -31,11 +31,6 @@
 #include "timer.h"
 #include "worker.h"
 
-struct Obj0c {
-    unsigned char pad_0[12];
-    void *field_c;
-};
-
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
    map_object views the same memory through its own struct MapElement layout. */
 #define MapTileGrid ((struct MapElement **)GameMap)
@@ -246,7 +241,7 @@ void FUN_0045e300(Element *editObj, struct Point *pos) {
     struct LegoConfig *cfg;
     struct Footprint *rect;
     struct MapElement *tile;
-    struct Obj0c *gtile;
+    struct Element *gtile;
     int coord[2];
     int center[2];
     int x;
@@ -275,7 +270,7 @@ void FUN_0045e300(Element *editObj, struct Point *pos) {
                                         coord[1] < cfg->height &&
                                         (tile = &GameMap[coord[1]][coord[0]]) != 0 &&
                                         (tile->flags & 8) != 0 &&
-                                        (gtile = (struct Obj0c *)tile->field_0)->field_c == PathControlObject) {
+                                        (gtile = (struct Element *)tile->field_0)->data == PathControlObject) {
                                         RemovePathSquare((struct Point *)coord);
                                         tile->flags &= 0xffe7;
                                         tile->field_10 &= 0xfe;

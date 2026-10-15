@@ -892,10 +892,10 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
 
     w = sprite->width;
     h = sprite->height;
-    if (!GetSprite((unsigned int *)&screen, NULL)) {
+    if (!GetSprite(&screen, NULL)) {
         return 0;
     }
-    if (!GetSprite((unsigned int *)&image, sprite)) {
+    if (!GetSprite(&image, sprite)) {
         return 0;
     }
     switch (DisplayPixelFormat) {

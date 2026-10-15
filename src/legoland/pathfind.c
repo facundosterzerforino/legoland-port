@@ -26,17 +26,6 @@ struct PathLink {
     int y;
 };
 
-struct ElemInfo {
-    unsigned char pad_0[0xc];
-    struct Ride *obj;
-};
-
-struct MatchResult {
-    unsigned char pad_0[4];
-    unsigned char anchor_x;
-    unsigned char anchor_y;
-};
-
 // FUNCTION: LEGOLAND 0x00481c50
 LEGO_EXPORT void AddPathSquare(struct Point *pos) {
     struct BestNode *node;
@@ -707,7 +696,7 @@ void FUN_00482a80(void) {
 
 // FUNCTION: LEGOLAND 0x00482a90
 void InitEntrance1Point(void) {
-    struct MatchResult *match;
+    struct MapElement *match;
     struct Ride *obj;
 
     if (Entrance1Point.x != 0) {
@@ -718,12 +707,12 @@ void InitEntrance1Point(void) {
         Entrance1Elem = ElemID("ENTRANCE 1");
     }
 
-    match = (struct MatchResult *)GetFirstObjectMatching(
+    match = (struct MapElement *)GetFirstObjectMatching(
         (Element *)Entrance1Elem);
-    obj = ((struct ElemInfo *)Entrance1Elem)->obj;
+    obj = ((struct Element *)Entrance1Elem)->obj;
 
-    Entrance1Point.x = match->anchor_x + obj->footprint.x0 - 1;
-    Entrance1Point.y = ((obj->footprint.y1 + obj->footprint.y0) / 2) + match->anchor_y;
+    Entrance1Point.x = match->field_4 + obj->footprint.x0 - 1;
+    Entrance1Point.y = ((obj->footprint.y1 + obj->footprint.y0) / 2) + match->field_5;
 }
 
 // FUNCTION: LEGOLAND 0x00482b00

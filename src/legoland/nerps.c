@@ -292,7 +292,7 @@ unsigned int ScriptEventNeed(struct ObjectiveEvent *arg) {
 
     /* TODO: fold into NerpsArg — field_4 is used both as a class_id (unsigned int)
        and, here, as the ObjCountWrap* that ObjCount() dereferences */
-    count = ObjCount((struct ObjCountWrap *)arg->element);
+    count = ObjCount((struct Element *)arg->element);
 #ifdef LEGOLAND_PORT
     {
         /* [port] log NEED objectives' progress, to debug objectives that don't complete */
@@ -524,7 +524,7 @@ unsigned int ScriptEventClearArea(struct ObjectiveEvent *arg) {
 unsigned int ScriptEventRemove(struct ObjectiveEvent *arg) {
     int count;
 
-    count = ObjCount((struct ObjCountWrap *)arg->element);
+    count = ObjCount((struct Element *)arg->element);
     if (count > (int)arg->field_1c) {
         QueueDeleteObjectsHint(arg, arg->field_4, count - arg->field_1c);
         return 0;
@@ -570,7 +570,7 @@ unsigned int ScriptEventComposite(struct ObjectiveEvent *arg) {
     int sum;
 
     node = ObjectClassList;
-    if ((int)ObjCount((struct ObjCountWrap *)arg->element) < 1) {
+    if ((int)ObjCount((struct Element *)arg->element) < 1) {
         QueueBuildMoreObjectsHint(arg, arg->field_4, 1);
         return 0;
     }
@@ -627,27 +627,13 @@ unsigned int ScriptEventParkVisitors(struct ObjectiveEvent *arg) {
     return 1;
 }
 
-struct ListLinkNode {
-    struct ListLinkNode *next;
-};
-
-struct BuildingWithList {
-    unsigned char pad_0[0xcc];
-    struct ListLinkNode *list;
-};
-
-struct BuildingHolder {
-    unsigned char pad_0[0xc];
-    struct BuildingWithList *building;
-};
-
 // FUNCTION: LEGOLAND 0x0046ac00
 unsigned int ScriptEventRiders(struct ObjectiveEvent *arg) {
-    struct ListLinkNode *node;
+    struct RideNode *node;
     int count;
 
     count = 0;
-    node = ((struct BuildingHolder *)arg->element)->building->list;
+    node = ((struct Element *)arg->element)->ride->riders;
     while (node != NULL) {
         count++;
         if (count >= (int)arg->field_1c) {

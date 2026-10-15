@@ -2,13 +2,12 @@
 
 #include "legoland.h"
 
-struct ObjCountWrap;
+struct Element;
 struct Ride;
 struct ObjInstance;
 struct BestNode;
 struct Point;
 struct Bloke;
-struct Element;
 
 LEGO_EXPORT void *LoadObjectClass(struct Element *cls);
 
@@ -31,7 +30,7 @@ LEGO_EXPORT int GetObjCost(struct Ride *ride);
 LEGO_EXPORT int GetObjRepairCost(struct Ride *ride, unsigned int level);
 LEGO_EXPORT void BasicObjectDCalcCursor(struct Element *param_1, struct Point *param_2);
 LEGO_EXPORT void ClearObjectCounters(void);
-LEGO_EXPORT unsigned int ObjCount(struct ObjCountWrap *wrap);
+LEGO_EXPORT unsigned int ObjCount(struct Element *wrap);
 LEGO_EXPORT void FreeBlokeCounters(void);
 LEGO_EXPORT void ClearBlokeCounters(unsigned int index);
 LEGO_EXPORT void IncrementBlokeCounter(struct Ride *cls, unsigned int index);

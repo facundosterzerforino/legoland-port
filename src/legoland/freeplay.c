@@ -36,29 +36,6 @@ struct PanelNode {
     int key;
 };
 
-struct FreePlayGroup {
-    short group;
-    unsigned char pad_2[2];
-    unsigned int field_4;
-    struct IconNode *icon;
-    int content_left;
-    int content_top;
-    int field_14;
-    int content_bottom;
-    int clip_left;
-    int clip_top;
-    int clip_right;
-    int clip_bottom;
-};
-
-struct GameListNode {
-    struct GameListNode *next;
-    unsigned char pad_4[0x14];
-    unsigned char field_18;
-    unsigned char pad_19[3];
-    char *field_1c; /* the icon's object name */
-};
-
 // LLIDB element fields read by InitFreePlayScreen (real Element is opaque).
 
 #include "image_sprite.h"
@@ -155,9 +132,9 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
 
 // FUNCTION: LEGOLAND 0x0048ab60
 void FUN_0048ab60(void) {
-    struct GameListNode *node;
+    struct IconNode *node;
 
-    node = (struct GameListNode *)IconListHead;
+    node = (struct IconNode *)IconListHead;
     if (node == 0) {
         return;
     }
@@ -443,7 +420,7 @@ LEGO_EXPORT void Add2FreePlayPanelLists(struct Sprite *a, char **name, char *nam
 
 // FUNCTION: LEGOLAND 0x0048b2a0
 LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
-    register struct FreePlayGroup *group;
+    register struct InterfacePanel *group;
     struct IconNode *icon;
     struct PanelNode *list;
     struct Sprite *sprite2;
@@ -451,7 +428,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     unsigned int y;
 
     unsigned int icon_y;
-    group = (struct FreePlayGroup *)malloc(sizeof(struct FreePlayGroup));
+    group = (struct InterfacePanel *)malloc(sizeof(struct InterfacePanel));
     if (group == NULL) {
         return 0;
     }

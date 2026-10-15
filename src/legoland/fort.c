@@ -229,7 +229,7 @@ void FortSetEditMode(void) {
     EditMode.unk8 = FortRide;
     EditMode.unk0 = 1;
     DefaultCursor(&EditCursor);
-    SetEditCursorFootPrint(&((struct EditCursorData *)EditMode.unk8)->footprint);
+    SetEditCursorFootPrint(&((struct Ride *)EditMode.unk8)->footprint);
 }
 
 // FUNCTION: LEGOLAND 0x00406860

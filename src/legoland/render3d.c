@@ -999,29 +999,20 @@ LEGO_EXPORT void RenderBlokeList(struct RenderItemNode **list) {
     }
 }
 
-struct MapCellElement {
-    struct RenderObjectVtable3 *vtable;
-};
-
-struct RenderObjectVtable3 {
-    unsigned char pad_0[0xc];
-    struct ObjClassNode *class_node;
-};
-
 // FUNCTION: LEGOLAND 0x00442fa0
 LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
-    struct MapCellElement *cell;
+    struct MapElement *cell;
     struct ObjInstance *instance;
     unsigned char *coords = param_1;
     int x = coords[0];
     int y = coords[1];
 
     if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-        cell = (struct MapCellElement *)&GameMap[y][x];
+        cell = &GameMap[y][x];
     } else {
         cell = 0;
     }
-    instance = (struct ObjInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
+    instance = (struct ObjInstance *)GetInstanceOfClass(cell->field_0->ride, (const TileId *)param_1);
     if (instance != 0) {
         *(unsigned char *)&instance->flags |= 2;
     }
@@ -1029,18 +1020,18 @@ LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
 
 // FUNCTION: LEGOLAND 0x00443000
 LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
-    struct MapCellElement *cell;
+    struct MapElement *cell;
     struct ObjInstance *instance;
     unsigned char *coords = param_1;
     int x = coords[0];
     int y = coords[1];
 
     if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-        cell = (struct MapCellElement *)&GameMap[y][x];
+        cell = &GameMap[y][x];
     } else {
         cell = 0;
     }
-    instance = (struct ObjInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
+    instance = (struct ObjInstance *)GetInstanceOfClass(cell->field_0->ride, (const TileId *)param_1);
     if (instance != 0) {
         instance->flags &= 0xfffd;
     }

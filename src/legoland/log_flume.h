@@ -77,7 +77,7 @@ struct FlumeEntry {
     /* 0x24 */ union {
         struct FlumeSlotSet *slotset;
         struct FlumeEntry *parent;
-        struct FlumeMover *field_24;
+        struct FlumeSlot *field_24;
         int ticks; /* slot sets */
     };
     /* 0x28 */ union {
@@ -117,9 +117,8 @@ struct LinkList;
 void FUN_004113d0(void);
 struct FlumeSlot;
 int FUN_00411650(struct FlumeSlot *slot);
-struct FlumeMover;
-int AdvanceFlumeMover(struct FlumeMover *mover);
-void FUN_00411810(struct FlumeMover *m);
+int AdvanceFlumeMover(struct FlumeSlot *mover);
+void FUN_00411810(struct FlumeSlot *m);
 void FUN_0040d090(struct FlumeEntry *entry, struct Footprint **out, TileId *tile);
 
 struct FlumeDims FUN_004112c0(void);

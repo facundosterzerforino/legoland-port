@@ -4,7 +4,7 @@
 
 struct Sprite;
 struct InfoSource;
-struct ScrollRegion;
+struct InterfacePanel;
 struct Point;
 
 struct IconNode {
@@ -72,12 +72,12 @@ LEGO_EXPORT void MoveIcons(unsigned short mask, unsigned short id, short dx, sho
 LEGO_EXPORT struct IconNode *FindIcon(unsigned short id);
 LEGO_EXPORT void SetNewGroup_Callbacks(void *param_1, void *param_2, void *param_3);
 LEGO_EXPORT struct IconNode *AddFullScreenIcon(int icon);
-LEGO_EXPORT struct IconNode *SetupInterfacePanelIcons(void *param_1, int param_2, int param_3, int param_4, int param_5, int param_6);
+LEGO_EXPORT struct IconNode *SetupInterfacePanelIcons(struct InterfacePanel *param_1, int param_2, int param_3, int param_4, int param_5, int param_6);
 LEGO_EXPORT int RenderFreePlayIcons(struct IconNode *node);
 LEGO_EXPORT struct IconNode *AddFreePlayIcon(void *param_1, struct InfoSource *src, int a3, int a4, int a5, short a6, void *a7);
 LEGO_EXPORT struct IconNode *AddGBarClassIcon(void *param_1, struct InfoSource *src, int a3, int a4, int a5, short a6);
 LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node);
-void ScrollIconRegion(struct ScrollRegion *r, int param_2, int param_3);
+void ScrollIconRegion(struct InterfacePanel *r, int param_2, int param_3);
 unsigned char FUN_0046d980(struct IconNode *icon, unsigned char buttons, int a3, int a4);
 unsigned char FUN_0046da20(struct IconNode *icon, unsigned char buttons, int a3, int a4);
 int FUN_0046dd10(unsigned short param_1, short param_2, short param_3, unsigned short param_4, int param_5);
@@ -88,7 +88,7 @@ LEGO_EXPORT int RenderGBarSpriteIcon(struct IconNode *node);
 LEGO_EXPORT int RenderEnergyBar(struct IconNode *node);
 LEGO_EXPORT int RenderMoneyBar(struct IconNode *node);
 int FUN_0046e040(struct IconNode *node);
-LEGO_EXPORT struct IconNode *AddGBarIcons(void *param_1, unsigned int param_2, int param_3, int param_4, int param_5, int param_6);
+LEGO_EXPORT struct IconNode *AddGBarIcons(struct InterfacePanel *param_1, unsigned int param_2, int param_3, int param_4, int param_5, int param_6);
 unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons);
 LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *param_2);
 void FUN_0046f100(short param_1);

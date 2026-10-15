@@ -118,7 +118,7 @@ const struct PortX86Field port_x86_Ride[] = {
     {0x24, offsetof(struct Ride, field_24), 1, 'B'},
     {0x25, offsetof(struct Ride, field_25), 1, 'B'},
     {0x26, offsetof(struct Ride, cost), 2, 'B'},
-    {0x28, offsetof(struct Ride, pad_28), 2, 'B'},
+    {0x28, offsetof(struct Ride, field_28), 2, 'B'},
     {0x2a, offsetof(struct Ride, range), 2, 'B'},
     {0x2c, offsetof(struct Ride, durability), 1, 'B'},
     {0x2d, offsetof(struct Ride, pad_2d), 1, 'B'},

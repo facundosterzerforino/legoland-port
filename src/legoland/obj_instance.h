@@ -58,7 +58,7 @@ struct Ride {
     /* 0x24 */ char field_24;
     /* 0x25 */ char field_25;
     /* 0x26 */ short cost; /* bricks to build */
-    /* 0x28 */ unsigned char pad_28[0x2a - 0x28];
+    /* 0x28 */ short field_28; /* shops: the price of an item */
     /* 0x2a */ short range;
     /* 0x2c */ unsigned char durability; /* repair levels (MapElement.field_11 when new) */
     /* 0x2d */ unsigned char pad_2d;

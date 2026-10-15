@@ -62,11 +62,6 @@ struct AviStreamInfo {
     unsigned char pad_44[0x8c - 0x44];
 };
 
-struct PathControlElem {
-    unsigned char pad_0[0xc];
-    /* 0x0c */ struct Ride *obj;
-};
-
 #include "image_sprite.h"
 #include "imports.h"
 #include "mapscreen.h"
@@ -370,7 +365,7 @@ void FUN_00474990(void) {
 
 // FUNCTION: LEGOLAND 0x004749d0
 LEGO_EXPORT int InitGameInterface(int a) {
-    struct PathControlElem *element;
+    struct Element *element;
     struct Ride *obj;
     struct IconNode *icon;
     struct IconNode *bar;
