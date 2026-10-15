@@ -180,3 +180,6 @@ LEGO_EXPORT void SetPersonPosition(struct Person *person, unsigned int x, unsign
 LEGO_EXPORT void InitMan(void);
 LEGO_EXPORT void UnInitMan(void);
 LEGO_EXPORT struct Anim3D *GetBlokeAnim3DFromPerson(struct Person *person);
+#ifdef LEGOLAND_PORT
+int PortMeshDump(void *dump, const char *name, const char *dir); /* [port] -port-selftest */
+#endif

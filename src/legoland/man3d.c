@@ -263,14 +263,7 @@ void ClampMeshUVs(float *param_1, int param_2) {
     }
 }
 
-/* One triangle of a mesh file (0x24 bytes). */
-struct MeshFace {
-    /* 0x00 */ unsigned int flags; /* bit 13 (0x2000): solid colour, otherwise textured */
-    /* 0x04 */ unsigned char rgb[3];
-    /* 0x07 */ unsigned char pad_7;
-    /* 0x08 */ unsigned int texture; /* colour-cache id, or the texture id plus the caller's ctx */
-    /* 0x0c */ float uv[6]; /* three (u, v) pairs */
-};
+#define PORT_PERSON_FACE_FILE_SIZE 0x24 /* [port] a face in the mesh file (32-bit layout) */
 
 // FUNCTION: LEGOLAND 0x0043fa80
 void *Load3DMesh(const char *name, const char *dir, unsigned int ctx) {
@@ -282,7 +275,7 @@ void *Load3DMesh(const char *name, const char *dir, unsigned int ctx) {
     struct Mesh *mesh;
     struct MeshShared *shared;
     struct MeshElem *elem;
-    struct MeshFace *faces;
+    struct PersonFace *faces;
     float *v;
     int *iv;
     int count;
@@ -342,16 +335,29 @@ void *Load3DMesh(const char *name, const char *dir, unsigned int ctx) {
         shared->count = count;
         shared->field_8 = malloc(count * 12);
         RES_ReadFile(file, shared->field_8, count * 12);
-        mesh->field_8 = malloc(count * sizeof(struct MeshFace));
-        RES_ReadFile(file, mesh->field_8, count * sizeof(struct MeshFace));
+        mesh->field_8 = malloc(count * sizeof(struct PersonFace));
+        /* [port] each face is 0x24 bytes in the file (32-bit layout): flags, colour, texture id, uv */
+        faces = (struct PersonFace *)mesh->field_8;
+        for (i = 0; i < count; i++) {
+            unsigned char raw[PORT_PERSON_FACE_FILE_SIZE];
+            unsigned int texture;
+
+            RES_ReadFile(file, raw, sizeof(raw));
+            memcpy(&faces[i].flags, raw, 4);
+            memcpy(&faces[i].field_4, raw + 4, 4);
+            memcpy(&texture, raw + 8, 4);
+            faces[i].ramp = NULL;
+            faces[i].texture = texture;
+            memcpy(faces[i].uv, raw + 0xc, sizeof(faces[i].uv));
+        }
         RES_CloseFile(file);
-        faces = (struct MeshFace *)mesh->field_8;
+        faces = (struct PersonFace *)mesh->field_8;
         for (i = 0; i < count; i++) {
             if (faces[i].flags & 0x2000) {
                 rgb[0] = faces[i].rgb[0];
                 rgb[1] = faces[i].rgb[1];
                 rgb[2] = faces[i].rgb[2];
-                faces[i].texture = FUN_00486280(0x40, rgb);
+                faces[i].ramp = FUN_00486280(0x40, rgb);
             } else {
                 faces[i].texture += ctx;
             }
@@ -1029,7 +1035,7 @@ void FUN_00440a30(struct Person *person) {
     struct MeshShared *shared;
     const int *tris;
     const int *norms;
-    const struct MeshFace *face;
+    const struct PersonFace *face;
     struct PersonVertex rec[3];
     int light_dir[3];
     int mt[9];
@@ -1061,7 +1067,7 @@ void FUN_00440a30(struct Person *person) {
 
     anim = GetBlokeAnim3DFromPerson(person);
     elem = &anim->elems[person->frame];
-    face = (const struct MeshFace *)person->field_50;
+    face = (const struct PersonFace *)person->field_50;
     shared = elem->shared;
     tri_count = shared->count;
     smooth_count = shared->field_4;
@@ -1188,7 +1194,7 @@ void FUN_00440a30(struct Person *person) {
                 rec[k].shade = PortLightLevel(&norms[i * 9 + k * 3], light_dir);
             }
             if (face[i].flags & 0x2000) {
-                FUN_004864e0(face[i].texture);
+                FUN_004864e0(face[i].ramp);
                 FUN_00486590(&rec[0], &rec[1], &rec[2]);
             } else {
                 for (k = 0; k < 3; k++) {
@@ -1212,7 +1218,7 @@ void FUN_00440a30(struct Person *person) {
         if (cross < 0) {
             rec[0].shade = PortLightLevel(&norms[i * 3], light_dir);
             if (face[i].flags & 0x2000) {
-                FUN_004864e0(face[i].texture);
+                FUN_004864e0(face[i].ramp);
                 FUN_004877b0(&rec[0], &rec[1], &rec[2]);
             } else {
                 for (k = 0; k < 3; k++) {
@@ -1225,3 +1231,60 @@ void FUN_00440a30(struct Person *person) {
         }
     }
 }
+
+#ifdef LEGOLAND_PORT
+/* [port] -port-selftest: one person mesh through Load3DMesh, written to dump in a form that doesn't depend on
+   the build (elements, hashes of their vertices and normals, every face). Returns 0 if it didn't load. */
+int PortMeshDump(void *dump, const char *name, const char *dir) {
+    FILE *f = (FILE *)dump;
+    struct Mesh *mesh = (struct Mesh *)Load3DMesh(name, dir, 0);
+    struct PersonFace *faces;
+    int e;
+    int i;
+
+    if (mesh == NULL) {
+        return 0;
+    }
+    fprintf(f, "%s\\%s: %d elements\n", dir, name, mesh->count);
+    for (e = 0; e < mesh->count; e++) {
+        struct MeshElem *elem = &mesh->elems[e];
+        unsigned int h = 2166136261u;
+        const unsigned char *b;
+        int j;
+
+        b = (const unsigned char *)elem->verts;
+        for (j = 0; j < elem->vert_count * 12; j++) {
+            h = (h ^ b[j]) * 16777619u;
+        }
+        b = (const unsigned char *)elem->norms;
+        for (j = 0; j < elem->norm_count * 12; j++) {
+            h = (h ^ b[j]) * 16777619u;
+        }
+        fprintf(f, " elem %d: %d verts %d norms bounds %d,%d,%d..%d,%d,%d %08x\n", e, elem->vert_count, elem->norm_count,
+                elem->min_x, elem->min_y, elem->min_z, elem->max_x, elem->max_y, elem->max_z, h);
+    }
+    faces = (struct PersonFace *)mesh->field_8;
+    if (mesh->count > 0) {
+        struct MeshShared *shared = mesh->elems[0].shared;
+
+        fprintf(f, " %d faces\n", shared->count);
+        for (i = 0; i < shared->count; i++) {
+            unsigned int h = 2166136261u;
+            const unsigned char *b = (const unsigned char *)faces[i].uv;
+            int j;
+
+            for (j = 0; j < (int)sizeof(faces[i].uv); j++) {
+                h = (h ^ b[j]) * 16777619u;
+            }
+            if (faces[i].flags & 0x2000) {
+                fprintf(f, "  %x %08x ramp=%s %08x\n", faces[i].flags, (unsigned int)faces[i].field_4,
+                        faces[i].ramp != NULL ? "yes" : "no", h);
+            } else {
+                fprintf(f, "  %x %08x tex=%u %08x\n", faces[i].flags, (unsigned int)faces[i].field_4, faces[i].texture, h);
+            }
+        }
+    }
+    FreeMesh(mesh);
+    return 1;
+}
+#endif

@@ -227,6 +227,45 @@ static int PortResCheckLms(FILE *dump) {
     return files;
 }
 
+struct PortResMeshCtx {
+    FILE *dump;
+    const char *dir;
+    int files;
+};
+
+static void PortResCheckMesh(const char *name, void *ctx) {
+    struct PortResMeshCtx *c = (struct PortResMeshCtx *)ctx;
+    size_t n = strlen(name);
+
+    if (n < 3 || _stricmp(name + n - 3, ".3d") != 0) {
+        return;
+    }
+    if (PortMeshDump(c->dump, name, c->dir)) {
+        c->files++;
+    } else {
+        fprintf(PortResReport, "mesh %s\\%s: not loaded\n", c->dir, name);
+        PortResProblems++;
+    }
+}
+
+/* The 3D people's meshes (3DData\New\{visitor,geoff,tracy}\*.3d) through Load3DMesh, to dump. Returns the files
+   read. */
+static int PortResCheckMeshes(FILE *dump) {
+    static const char *const dirs[] = {"visitor", "geoff", "tracy"};
+    struct PortResMeshCtx c;
+    char path[64];
+    int i;
+
+    c.dump = dump;
+    c.files = 0;
+    for (i = 0; i < 3; i++) {
+        c.dir = dirs[i];
+        sprintf(path, "3DData\\New\\%s\\", dirs[i]);
+        PortResForEachFile(path, PortResCheckMesh, &c);
+    }
+    return c.files;
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -276,6 +315,14 @@ int PortResSelfTest(const char *path) {
         if (lms != NULL) {
             fprintf(PortResReport, "lms: %d files read (port-selftest-lms.txt)\n", PortResCheckLms(lms));
             fclose(lms);
+        }
+    }
+    {
+        FILE *mesh = fopen("port-selftest-mesh.txt", "w");
+
+        if (mesh != NULL) {
+            fprintf(PortResReport, "meshes: %d files read (port-selftest-mesh.txt)\n", PortResCheckMeshes(mesh));
+            fclose(mesh);
         }
     }
     if (PortResDump != NULL) {
