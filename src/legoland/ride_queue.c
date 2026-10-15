@@ -10,14 +10,9 @@
 #include "ride_queue.h"
 #include "tilemap.h"
 
-struct QueueItemMid {
-    unsigned char pad_0[0x8];
-    struct Bloke *rider;
-};
-
 struct QueueNode {
     struct QueueNode *next;
-    struct QueueItemMid *field_4;
+    struct RideNode *field_4;
 };
 
 struct QueueStep {
@@ -29,21 +24,6 @@ struct QueueStep {
 struct QueueTable {
     int count;
     struct QueueStep *steps;
-};
-
-struct RideSlotArg {
-    unsigned short field_0;
-};
-
-struct RideSlot {
-    unsigned char pad_0[0x34];
-    unsigned char field_34;
-    unsigned char pad_35[0x3];
-    unsigned short field_38;
-    unsigned char pad_3a[0x16];
-    struct RideSlotArg *field_50;
-    unsigned char pad_54[0xc];
-    unsigned char field_60;
 };
 
 struct RQObjClass {
@@ -127,7 +107,7 @@ void QueueUnlinkHead(struct Queue *queue) {
 }
 
 // FUNCTION: LEGOLAND 0x00411f20
-void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
+void FUN_00411f20(struct Queue *queue, struct RideNode *mid) {
     struct QueueNode *node = (struct QueueNode *)malloc(sizeof(struct QueueNode));
     if (node != NULL) {
         memset(node, 0, sizeof(*node));
@@ -182,7 +162,7 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct Bloke *i
 }
 
 // FUNCTION: LEGOLAND 0x00412060
-void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
+void FUN_00412060(struct Queue *queue, struct RideNode **out) {
     struct QueueNode *node = queue->head;
     if (node != NULL) {
         struct Bloke *inner = node->field_4->rider;
@@ -270,24 +250,24 @@ void FreeIfNotNull(void *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004122a0
-void FUN_004122a0(struct RideSlotArg *param_1, struct RideSlot *slot) {
-    slot->field_50 = param_1;
-    slot->field_38 = param_1->field_0 - 1;
+void FUN_004122a0(struct QueueTable *param_1, struct Bloke *slot) {
+    slot->queue = param_1;
+    slot->field_38 = param_1->count - 1;
     slot->field_34 = 0xff;
-    slot->field_60++;
+    slot->param_action++;
 }
 
 // FUNCTION: LEGOLAND 0x004122d0
-void FUN_004122d0(struct RideSlotArg *param_1, struct RideSlot *slot) {
-    slot->field_50 = param_1;
+void FUN_004122d0(struct QueueTable *param_1, struct Bloke *slot) {
+    slot->queue = param_1;
     slot->field_38 = 0;
     slot->field_34 = 1;
-    slot->field_60++;
+    slot->param_action++;
 }
 
 // FUNCTION: LEGOLAND 0x004122f0
-struct RideSlotArg *FUN_004122f0(struct RideSlot *slot) {
-    return slot->field_50;
+struct QueueTable *FUN_004122f0(struct Bloke *slot) {
+    return slot->queue;
 }
 
 // FUNCTION: LEGOLAND 0x00412300
@@ -386,7 +366,7 @@ void FUN_00412490(struct QueueNode *start, struct Queue *queue) {
         }
         queue->tail->next = NULL;
         SaveGameRead(&idx, 4);
-        queue->tail->field_4 = (struct QueueItemMid *)GetNthNextQueueNode(start, idx);
+        queue->tail->field_4 = (struct RideNode *)GetNthNextQueueNode(start, idx);
     }
 }
 

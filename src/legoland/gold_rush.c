@@ -388,7 +388,7 @@ void GoldRushUpdate(struct Element *elem) {
                 b->flags |= 8;
                 FUN_00406ec0((struct RideNode *)node, t);
                 FUN_00406f30(t);
-                FUN_004122d0((struct RideSlotArg *)DAT_004c11e4, (struct RideSlot *)b);
+                FUN_004122d0((struct QueueTable *)DAT_004c11e4, (struct Bloke *)b);
                 break;
             case 1:
                 FUN_00412300((struct QueueTable *)DAT_004c11e4, x, y, b);
@@ -434,7 +434,7 @@ void GoldRushUpdate(struct Element *elem) {
                 b->param_action++;
                 break;
             case 10:
-                FUN_004122a0((struct RideSlotArg *)DAT_004c11e4, (struct RideSlot *)b);
+                FUN_004122a0((struct QueueTable *)DAT_004c11e4, (struct Bloke *)b);
                 break;
             case 11:
                 FUN_00412300((struct QueueTable *)DAT_004c11e4, x, y, b);

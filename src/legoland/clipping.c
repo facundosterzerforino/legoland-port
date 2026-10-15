@@ -4,22 +4,12 @@
 
 #include "clipping.h"
 #include "globals.h"
+#include "llidb.h"
+#include "obj_instance.h"
 #include "profile_io.h"
-
-struct ClippedObject {
-    char *name;
-    unsigned char pad_4[4];
-    unsigned char flags;
-};
 
 // GLOBAL: LEGOLAND 0x004bdeb8
 struct ClipQueryResult DAT_004bdeb8[0x86];
-
-struct ObjectClassNode {
-    struct ObjectClassNode *next;
-    unsigned char pad_4[0xc0];
-    struct ClippedObject *object;
-};
 
 typedef void (*ClipNodeMethod)(struct ClipNode *node, int a1, int a2, int a3);
 
@@ -71,7 +61,7 @@ LEGO_EXPORT int ClipThisRect(RECT *lpRect) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a6e0
-void FUN_0048a6e0(struct ClippedObject *object) {
+void FUN_0048a6e0(struct Element *object) {
     struct ClipQueryResult *entry;
 
     for (entry = DAT_004bdeb8; strlen(entry->name) != 0; entry++) {
@@ -87,9 +77,9 @@ void FUN_0048a6e0(struct ClippedObject *object) {
 
 // FUNCTION: LEGOLAND 0x0048a750
 void FUN_0048a750(void) {
-    struct ObjectClassNode *current = (struct ObjectClassNode *)ObjectClassList;
+    struct Ride *current = (struct Ride *)ObjectClassList;
     while (current != NULL) {
-        struct ClippedObject *object = current->object;
+        struct Element *object = current->element;
         if ((object->flags & 0x2) == 0) {
             FUN_0048a6e0(object);
         }

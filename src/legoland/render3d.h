@@ -35,7 +35,6 @@ struct RinData;
 struct Matrix3x3;
 struct tagRECT;
 struct Person;
-struct RinRender;
 struct RideNode;
 
 struct RenderItemNode {
@@ -55,7 +54,7 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct Ride *param_1, unsigned char *param_2,
 /* obj: the ride's node for the tile, read only as the tile key it starts with */
 LEGO_EXPORT void Put3DBlokesOnRide2(struct Ride *ride, void *obj);
 LEGO_EXPORT void RenderBlokesNotInSeats(struct Ride *a1, TileId *a2);
-LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct Ride *param_3, unsigned char *param_4);
+LEGO_EXPORT void RenderUsingRin(struct RinData *param_1, int param_2, struct Ride *param_3, unsigned char *param_4);
 LEGO_EXPORT struct RinData *LoadRin(const char *path, const char *dir);
 LEGO_EXPORT void UnLoadRin(struct RinData *rin);
 LEGO_EXPORT unsigned short *LoadPalette(const char *path);

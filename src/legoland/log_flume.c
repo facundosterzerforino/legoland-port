@@ -2245,7 +2245,7 @@ void FUN_0040be00(struct FlumeEntry *set) {
                     if (QueueHasNodes(&set->queue)) {
                         if (FUN_00411ea0(&set->queue)) {
                             set->flags |= 1;
-                            FUN_00412060(&set->queue, (struct QueueItemMid **)&item);
+                            FUN_00412060(&set->queue, (struct RideNode **)&item);
                             slot->busy = item;
                         }
                     }
@@ -2303,7 +2303,7 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->flags |= 8;
                 entry = FindFlumeEntryByTile(tile);
                 if (entry != NULL) {
-                    FUN_00411f20(&entry->queue, (struct QueueItemMid *)elem);
+                    FUN_00411f20(&entry->queue, (struct RideNode *)elem);
                     if (FUN_00411e60(&entry->queue)) {
                         Ride_SetFlagToNotLetAnyoneOn(&entry->tile);
                     }
@@ -2373,7 +2373,7 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 8:
-                FUN_004122a0((struct RideSlotArg *)DAT_004c2af8, (struct RideSlot *)bloke);
+                FUN_004122a0((struct QueueTable *)DAT_004c2af8, (struct Bloke *)bloke);
                 break;
             case 9:
                 FUN_00412300((struct QueueTable *)DAT_004c2af8, x, y, bloke);

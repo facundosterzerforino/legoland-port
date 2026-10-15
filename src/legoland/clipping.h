@@ -15,9 +15,9 @@ struct ClipQueryResult {
 };
 extern struct ClipQueryResult DAT_004bdeb8[0x86];
 
-struct ClippedObject;
+struct Element;
 
-void FUN_0048a6e0(struct ClippedObject *object);
+void FUN_0048a6e0(struct Element *object);
 LEGO_EXPORT void SetClipping(RECT *rect);
 LEGO_EXPORT void GetClipping(RECT *dest);
 LEGO_EXPORT void StoreClipping(void);

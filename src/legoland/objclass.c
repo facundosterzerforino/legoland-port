@@ -16,23 +16,6 @@
 #include "obj_instance.h"
 #include "objclass.h"
 
-struct ObjClassNames {
-    char *name;
-    unsigned char pad_4[0xc - 0x4];
-    void *ride;
-};
-
-struct ObjectInfo {
-    unsigned char pad_0[0xc];
-    unsigned int field_c;
-    unsigned int field_10;
-    unsigned char pad_14[0x24 - 0x14];
-    unsigned char field_24;
-    unsigned char field_25;
-    unsigned char pad_26[0x2e - 0x26];
-    unsigned short field_2e;
-};
-
 struct ObjCountWrap {
     unsigned char pad_0[0xc];
     struct Ride *inner;
@@ -163,28 +146,28 @@ void LoadObjectClassAliasElements(struct Element *cls) {
 }
 
 // FUNCTION: LEGOLAND 0x00480aa0
-void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info) {
+void FUN_00480aa0(struct Element *names, struct Ride *info) {
     // STRING: LEGOLAND 0x004bce90
     if (_stricmp(names->name, "Water Works Shower") == 0) {
-        info->field_c = 1;
-        info->field_10 = 0;
+        info->x = 1;
+        info->y = 0;
         info->field_24 = 1;
         info->field_25 = 0;
         return;
     }
     // STRING: LEGOLAND 0x004b9828
     if (_stricmp(names->name, "Water Works Water Block") == 0) {
-        info->field_c = 1;
-        info->field_10 = 0;
+        info->x = 1;
+        info->y = 0;
         info->field_24 = 1;
         info->field_25 = 0;
-        info->field_2e = 10;
+        info->seats = 10;
         return;
     }
     // STRING: LEGOLAND 0x004b9840
     if (_stricmp(names->name, "Water Works Elephant Fountain") == 0) {
-        info->field_c = 6;
-        info->field_10 = 2;
+        info->x = 6;
+        info->y = 2;
         info->field_24 = 6;
         info->field_25 = 2;
     }
@@ -203,7 +186,7 @@ LEGO_EXPORT void *LoadObjectClass(struct Element *cls) {
 }
 
 // FUNCTION: LEGOLAND 0x00480b70
-void FUN_00480b70(struct ObjClassNames *param) {
+void FUN_00480b70(struct Element *param) {
     void *value;
 
     value = param->ride;

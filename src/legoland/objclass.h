@@ -8,8 +8,6 @@ struct ObjInstance;
 struct BestNode;
 struct Point;
 struct Bloke;
-struct ObjClassNames;
-struct ObjectInfo;
 struct Element;
 
 LEGO_EXPORT void *LoadObjectClass(struct Element *cls);
@@ -48,7 +46,7 @@ LEGO_EXPORT int Calc_Item_Attractiveness(struct Ride *item, struct Bloke *bloke,
 LEGO_EXPORT void UnLoadObjectLibrary(void *library);
 LEGO_EXPORT void SetStandardCallbacks(struct Ride *table);
 LEGO_EXPORT int LoadObjectLibrary(void *obj, const char *name);
-void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info);
+void FUN_00480aa0(struct Element *names, struct Ride *info);
 void FUN_00481170(void);
 void *GetBestNodeList(void);
 LEGO_EXPORT void SetEditObject(struct Ride *obj);

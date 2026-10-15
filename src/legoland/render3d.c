@@ -202,7 +202,10 @@ LEGO_EXPORT void RenderBlokesNotInSeats(struct Ride *a1, TileId *a2) {
 }
 
 struct RinData {
-    unsigned char pad_0[0x10];
+    int x; /* RenderUsingRin: x, y and the remap/data tables (zero for the .rin files LoadRin reads) */
+    int y;
+    int *remap_table;
+    int *data_table;
     int sprite_count;
     int data_count;
     struct Sprite **sprites;
@@ -280,19 +283,8 @@ LEGO_EXPORT void UnLoadRin(struct RinData *rin) {
     free(rin);
 }
 
-struct RinRender {
-    int x;
-    int y;
-    int *remap_table;
-    int *data_table;
-    int loop_count;
-    int modulo;
-    int **index_array;
-    int **frame_array;
-};
-
 // FUNCTION: LEGOLAND 0x00441d60
-LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct Ride *param_3, unsigned char *param_4) {
+LEGO_EXPORT void RenderUsingRin(struct RinData *param_1, int param_2, struct Ride *param_3, unsigned char *param_4) {
     struct Point coords;
     int idx;
     void *base;
@@ -303,11 +295,11 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct R
     int remap;
     coords = GetScreenCoordsForObject(param_4, param_3);
     idx = param_2;
-    if (param_2 >= param_1->modulo) {
-        idx = param_2 % param_1->modulo;
+    if (param_2 >= param_1->data_count) {
+        idx = param_2 % param_1->data_count;
     }
-    base = param_1->frame_array[idx];
-    for (i = param_1->loop_count - 1; i >= 0; i--) {
+    base = param_1->datas[idx];
+    for (i = param_1->sprite_count - 1; i >= 0; i--) {
         int sprite_id = ((int *)base)[i];
         struct RideNode *node;
         int *frame;
@@ -320,7 +312,7 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct R
         if (node != NULL && (node->rider->flags & 0x80) != 0) {
             IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
         }
-        frame = (int *)param_1->index_array[sprite_id];
+        frame = (int *)param_1->sprites[sprite_id];
         if (frame != NULL) {
             LLSSetFrame(GetLLSForSprite((struct Sprite *)frame), param_2);
         }
@@ -328,7 +320,7 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct R
         y = param_1->y;
         offset.y = y;
         AdjustOffsetForViewMode(&offset);
-        frame = (int *)param_1->index_array[sprite_id];
+        frame = (int *)param_1->sprites[sprite_id];
         if (frame != NULL) {
             PrintSprite((struct Sprite *)frame, coords.x + offset.x, coords.y + offset.y, 0, 0);
         }

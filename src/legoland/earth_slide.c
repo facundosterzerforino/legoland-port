@@ -188,7 +188,7 @@ void RenderEarthSlide(struct EarthRideObj *param_1, unsigned int param_2, unsign
     if (node != NULL) {
         cv = node->field_b;
         if (cv <= 0xa || 0xf <= cv) {
-            RenderUsingRin((struct RinRender *)EarthSlideRin, (int)cv, (struct Ride *)ride, param_4);
+            RenderUsingRin((struct RinData *)EarthSlideRin, (int)cv, (struct Ride *)ride, param_4);
         }
         RenderBlokesNotInSeats(ride, (TileId *)param_4);
         if (node->field_4 != 0) {

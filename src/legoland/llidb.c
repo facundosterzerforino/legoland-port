@@ -850,7 +850,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct Element *head) {
     if (obj->range < 1) {
         obj->range = 1;
     }
-    FUN_00480aa0((struct ObjClassNames *)head, (struct ObjectInfo *)obj);
+    FUN_00480aa0((struct Element *)head, (struct Ride *)obj);
     return obj;
 }
 

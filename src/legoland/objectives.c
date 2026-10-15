@@ -929,7 +929,7 @@ void GiveRewardObject(struct Element *object, unsigned int a, unsigned int b) {
         if ((flags & 1) != 0) {
             if ((flags & 0x10002) != 2) {
                 obj->flags = (flags & 0xfffeffff) | 2;
-                FUN_0048a6e0((struct ClippedObject *)obj);
+                FUN_0048a6e0((struct Element *)obj);
                 if (a != 0) {
                     AddNewObjectIcon(obj->data);
                 }

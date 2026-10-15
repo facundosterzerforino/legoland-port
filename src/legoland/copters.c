@@ -780,11 +780,11 @@ void CoptersUpdate(struct Element *elem) {
                     spr = CopterQueueTables[4];
                     break;
                 }
-                FUN_004122d0((struct RideSlotArg *)spr, (struct RideSlot *)b);
+                FUN_004122d0((struct QueueTable *)spr, (struct Bloke *)b);
                 CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 2:
-                qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
+                qi = (int)(INT_PTR)FUN_004122f0((struct Bloke *)b); /* the queue index */
                 FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 3:
@@ -828,11 +828,11 @@ void CoptersUpdate(struct Element *elem) {
                     spr2 = CopterQueueTables[4];
                     break;
                 }
-                FUN_004122a0((struct RideSlotArg *)spr2, (struct RideSlot *)b);
+                FUN_004122a0((struct QueueTable *)spr2, (struct Bloke *)b);
                 CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 9:
-                qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
+                qi = (int)(INT_PTR)FUN_004122f0((struct Bloke *)b); /* the queue index */
                 FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 10:
