@@ -199,7 +199,7 @@ void WriteModuleList(HANDLE file) {
     DWORD pagesize;
     DWORD limit;
     DWORD i = 0;
-    DWORD prev = 0;
+    UINT_PTR prev = 0;
 
     // STRING: LEGOLAND 0x004b8c90
     WriteFileFormatted(file, "\r\n\tModule list: names, addresses, sizes, time stamps and file times:\r\n");
@@ -207,10 +207,10 @@ void WriteModuleList(HANDLE file) {
     pagesize = si.dwPageSize;
     limit = (0x40000000 / pagesize) << 2;
     while (i < limit) {
-        if (VirtualQuery((LPCVOID)(pagesize * i), &mbi, sizeof(mbi)) && mbi.RegionSize > 0) {
+        if (VirtualQuery((LPCVOID)((UINT_PTR)pagesize * i), &mbi, sizeof(mbi)) && mbi.RegionSize > 0) {
             i += mbi.RegionSize / pagesize;
-            if (mbi.State == MEM_COMMIT && (DWORD)mbi.AllocationBase > prev) {
-                prev = (DWORD)mbi.AllocationBase;
+            if (mbi.State == MEM_COMMIT && (UINT_PTR)mbi.AllocationBase > prev) {
+                prev = (UINT_PTR)mbi.AllocationBase;
                 WriteModuleInfo(file, prev);
             }
         } else {
@@ -220,7 +220,7 @@ void WriteModuleList(HANDLE file) {
 }
 
 // FUNCTION: LEGOLAND 0x00454380
-void WriteModuleInfo(HANDLE file, DWORD base) {
+void WriteModuleInfo(HANDLE file, UINT_PTR base) {
     char path[MAX_PATH];
 
     __try {

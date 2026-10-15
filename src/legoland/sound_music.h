@@ -11,7 +11,7 @@ struct AVISoundBuffer;
 
 struct SampleParams {
     /* 0x00 */ int field_0;
-    /* 0x04 */ unsigned int field_4;
+    /* 0x04 */ void *field_4; /* the source: a bloke, ... */
     /* 0x08 */ int x;
     /* 0x0c */ int y;
 };

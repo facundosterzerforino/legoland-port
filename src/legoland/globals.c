@@ -3558,7 +3558,7 @@ struct Sprite *DAT_00701e64;
 unsigned short DAT_00701e68[0x4b000];
 
 // GLOBAL: LEGOLAND 0x00797e68
-unsigned int DAT_00797e68;
+unsigned char *DAT_00797e68;
 
 // GLOBAL: LEGOLAND 0x00797e6c
 void *DAT_00797e6c;
@@ -4116,7 +4116,7 @@ char DAT_007cb340[0x20];
 struct IconNode *DeleteIcon;
 
 // GLOBAL: LEGOLAND 0x007cb380
-unsigned int DAT_007cb380[5];
+struct IconNode *DAT_007cb380[5];
 
 // GLOBAL: LEGOLAND 0x007cb394
 unsigned int DAT_007cb394;

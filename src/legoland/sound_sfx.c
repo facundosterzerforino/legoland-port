@@ -525,7 +525,7 @@ LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1) {
     }
     do {
         next = current->next;
-        if (param_1 == 0 || (UINT_PTR)current->active == param_1) {
+        if (param_1 == 0 || current->active == param_1) {
             if (previous != 0) {
                 previous->next = next;
             } else {

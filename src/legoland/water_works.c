@@ -522,14 +522,14 @@ void WaterWorksShowerUpdate(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00418450
-void RenderShower(struct Ride *render, unsigned int p2, unsigned int p3, unsigned char *coords, void *p5, unsigned int p6) {
+void RenderShower(struct Element *render, unsigned int p2, unsigned int p3, unsigned char *coords, void *p5, unsigned int p6) {
     struct WaterNode *node;
-    void *ctx;
+    struct Ride *ctx;
     struct AdjustOffset offset;
     struct Point sc;
     struct LLS *lls;
 
-    ctx = render->x;
+    ctx = render->ride;
     node = FUN_004182c0((unsigned short *)coords);
     if (node != NULL && node->field_8 == 2) {
         offset.x = -8;

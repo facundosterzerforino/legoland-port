@@ -103,7 +103,7 @@ struct MusicPerformanceVtbl {
     unsigned char pad_0[8];
     int(__stdcall *Release)(struct MusicPerformance *self);
     unsigned char pad_c[0x10 - 0xc];
-    void(__stdcall *PlayMotif)(struct MusicPerformance *self, unsigned int motif, unsigned int flags, int a3, int a4, int a5);
+    void(__stdcall *PlayMotif)(struct MusicPerformance *self, void *segment, unsigned int flags, int a3, int a4, int a5); /* PlaySegment */
     unsigned char pad_14[0x88 - 0x14];
     void(__stdcall *SetGlobalParam)(struct MusicPerformance *self, const GUID *type, void *data, unsigned int size);
 };
@@ -331,7 +331,7 @@ LEGO_EXPORT unsigned int PlaySegmentFromTemplate(void *style, unsigned int templ
     }
     ((struct MusicComposer *)DMusicComposer)->vtable->ComposeSegmentFromTemplate((struct MusicComposer *)DMusicComposer, style, templateMode, 0, chordMap, &segment);
     segment->vtable->SetRepeats(segment, 999);
-    ((struct MusicPerformance *)DMusicPerformance)->vtable->PlayMotif((struct MusicPerformance *)DMusicPerformance, (unsigned int)segment, 0x2000, 0, 0, 0);
+    ((struct MusicPerformance *)DMusicPerformance)->vtable->PlayMotif((struct MusicPerformance *)DMusicPerformance, segment, 0x2000, 0, 0, 0);
     segment->vtable->Release(segment);
     return 1;
 }
@@ -348,13 +348,13 @@ LEGO_EXPORT unsigned int PlaySegment(unsigned int numMeasures, void *chordMap) {
     }
     ((struct MusicComposer *)DMusicComposer)->vtable->ComposeSegmentFromShape((struct MusicComposer *)DMusicComposer, numMeasures, 0xa, 2, 3, 0, 0, chordMap, &segment);
     segment->vtable->SetRepeats(segment, 999);
-    ((struct MusicPerformance *)DMusicPerformance)->vtable->PlayMotif((struct MusicPerformance *)DMusicPerformance, (unsigned int)segment, 0x2000, 0, 0, 0);
+    ((struct MusicPerformance *)DMusicPerformance)->vtable->PlayMotif((struct MusicPerformance *)DMusicPerformance, segment, 0x2000, 0, 0, 0);
     segment->vtable->Release(segment);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00496250
-LEGO_EXPORT unsigned int SetBand(unsigned int band) {
+LEGO_EXPORT unsigned int SetBand(void *band) {
     if (MusicEnabled == 0) {
         return 0;
     }
@@ -366,7 +366,7 @@ LEGO_EXPORT unsigned int SetBand(unsigned int band) {
 }
 
 // FUNCTION: LEGOLAND 0x00496290
-LEGO_EXPORT unsigned int PlayMotif(unsigned int motif) {
+LEGO_EXPORT unsigned int PlayMotif(void *motif) {
     if (MusicEnabled == 0) {
         return 0;
     }

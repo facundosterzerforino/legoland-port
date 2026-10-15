@@ -569,7 +569,7 @@ void FUN_00485f20(void *ptr) {
 }
 
 // FUNCTION: LEGOLAND 0x00485f30
-void FUN_00485f30(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
+void FUN_00485f30(unsigned char *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     DAT_00797e68 = param_1;
     DAT_00701e58 = param_2;
     DAT_00701e60 = param_3;

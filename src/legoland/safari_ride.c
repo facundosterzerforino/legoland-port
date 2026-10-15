@@ -231,13 +231,8 @@ void SafariSetEditMode(void) {
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
 
-struct SafariEditObj {
-    unsigned char pad_0[0xc];
-    unsigned int ride;
-};
-
 // FUNCTION: LEGOLAND 0x00414f40
-void SafariRemoveObject(struct SafariEditObj *obj, TileId key, struct Cursor *coords, unsigned int cursor) {
+void SafariRemoveObject(struct Element *obj, TileId key, struct Cursor *coords, unsigned int cursor) {
     void *node = FUN_00414a80(&key);
     struct SampleSource src;
 
@@ -246,7 +241,7 @@ void SafariRemoveObject(struct SafariEditObj *obj, TileId key, struct Cursor *co
     }
     RemoveSafariNode((struct SafariNode *)node);
     StandardRemoveObject(obj, key, (struct Cursor *)coords);
-    RemoveAllBlokesFromRide((struct Ride *)obj->ride, key);
+    RemoveAllBlokesFromRide(obj->ride, key);
 
     src.type = 2;
     src.x = key.pos.x;

@@ -233,7 +233,7 @@ void FUN_0048bd70(void) {
 // FUNCTION: LEGOLAND 0x0048bde0
 void FUN_0048bde0(void) {
     struct IconNode *icon;
-    unsigned int *mapping;
+    struct IconNode **mapping;
     struct ProgressEntry *entry;
     int i;
 
@@ -278,7 +278,7 @@ void FUN_0048bde0(void) {
         } else {
             icon = 0;
         }
-        *mapping = (unsigned int)icon;
+        *mapping = icon;
         if (icon) {
             icon->string = GetString(0x276);
             icon->string_id = entry->id;
@@ -356,7 +356,7 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
 // FUNCTION: LEGOLAND 0x0048c100
 void FUN_0048c100(void) {
     RECT rc;
-    unsigned int *mapping;
+    struct IconNode **mapping;
     int *entry;
     int i;
     char *text;

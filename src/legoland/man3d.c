@@ -411,7 +411,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
     if (IntersectRect(&clip, &bounds, &clip) != 0) {
         OffsetRect(&clip, -person->screen.x, -person->screen.y);
         if (GetVideoSurface(&vid) != 0) {
-            FUN_00485f30((unsigned int)vid.bits + person->screen.y * vid.pitch + person->screen.x * 2, vid.pitch,
+            FUN_00485f30((unsigned char *)vid.bits + person->screen.y * vid.pitch + person->screen.x * 2, vid.pitch,
                 vid.width, vid.height);
             FUN_00488700((unsigned char *)vid.bits, (struct RenderViewport *)&MousePos);
             Render_SetViewport(&clip);

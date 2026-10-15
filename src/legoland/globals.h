@@ -2860,7 +2860,7 @@ extern struct Sprite *DAT_00701e64;
 // 0x00701e68
 extern unsigned short DAT_00701e68[0x4b000];
 // 0x00797e68
-extern unsigned int DAT_00797e68;
+extern unsigned char *DAT_00797e68;
 // 0x00797e6c
 extern void *DAT_00797e6c;
 // 0x00797e70
@@ -3248,7 +3248,7 @@ extern char DAT_007cb340[0x20];
 // 0x007cb360
 extern struct IconNode *DeleteIcon;
 // 0x007cb380
-extern unsigned int DAT_007cb380[5];
+extern struct IconNode *DAT_007cb380[5];
 // 0x007cb394
 extern unsigned int DAT_007cb394;
 // 0x007cb398

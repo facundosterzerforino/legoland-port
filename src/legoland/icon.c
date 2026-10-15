@@ -97,7 +97,7 @@ struct InfoSource {
     /* 0x04 */ void *field_4;
     /* 0x08 */ void *field_8;
     /* 0x0c */ unsigned char pad_c[0x10 - 0xc];
-    /* 0x10 */ unsigned int field_10;
+    /* 0x10 */ char *field_10; /* the icon string */
     /* 0x14 */ struct Sprite *field_14;
     /* 0x18 */ unsigned char pad_18[0x68 - 0x18];
     /* 0x68 */ struct Sprite *field_68;
@@ -1530,7 +1530,7 @@ LEGO_EXPORT struct IconNode *AddFreePlayIcon(void *param_1, struct InfoSource *s
         }
         flags = icon->flags;
         icon->render_func = (void *)RenderGBarSpriteIcon;
-        icon->string = (char *)src->field_10;
+        icon->string = src->field_10;
         icon->string_id = 0xffffffff;
         icon->flags = flags | 0x3008;
         icon->field_16 = a6;
