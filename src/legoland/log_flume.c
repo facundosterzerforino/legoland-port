@@ -350,9 +350,10 @@ struct FlumeEntry *FUN_00408f90(int x, int y) {
 
 // FUNCTION: LEGOLAND 0x00409010
 void *FUN_00409010(void) {
-    void *block = malloc(0x38);
+    /* a track node: FlumeEntry callers use only the FlumeNode head */
+    void *block = malloc(sizeof(struct FlumeNode));
     if (block != NULL) {
-        memset(block, 0, 0x38);
+        memset(block, 0, sizeof(struct FlumeNode));
     }
     return block;
 }

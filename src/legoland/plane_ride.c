@@ -23,11 +23,11 @@
 
 // FUNCTION: LEGOLAND 0x0043d880
 void FUN_0043d880(void *param_1) {
-    void *node = malloc(0x24);
+    void *node = malloc(sizeof(struct PlaneRideNode));
     if (node == NULL) {
         return;
     }
-    memset(node, 0, 0x24);
+    memset(node, 0, sizeof(struct PlaneRideNode));
     *(unsigned short *)node = *(unsigned short *)param_1;
     ((struct PlaneRideNode *)node)->next = PlaneRideNodeList;
     PlaneRideNodeList = node;
