@@ -329,7 +329,7 @@ extern const struct PortX86Field port_x86_RideQueueEntry[];
 extern const unsigned int port_x86_RideQueueEntry_count;
 extern const struct PortX86Type port_x86_type_RideQueueEntry;
 
-/* struct SafariNode: 9 fields, 0x28 bytes in the original */
+/* struct SafariNode: 11 fields, 0x28 bytes in the original */
 #define PORT_X86_SIZE_SafariNode 0x28u
 struct SafariNode;
 extern const struct PortX86Field port_x86_SafariNode[];

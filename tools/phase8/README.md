@@ -78,3 +78,11 @@ embedded structs (`struct PieceHead;`, MS extension, MSVC6 and clang accept it) 
 The data loader (`tools/gen_data.py` with `tools/port_layout.py`) loads every global that holds pointers field by
 field, so the 64-bit exe's `-port-selftest` passes; `gen_data.py --report` lists words that only look like
 pointers (left unpatched) and pointer slots outside the filled globals.
+
+64-bit hazards the compiler doesn't warn about (libclang scans of the port tree, i686 against x86_64; run with
+`uv run --no-project --with libclang==18.1.1 python tools/phase8/<scan>.py`):
+- `allocscan.py`: allocations sized with a literal (or `n * literal`) smaller than the type on 64 bits.
+- `offscan.py`: `(T *)p + k` / `((T *)p)[k]` into a struct whose field at x86 offset k moves on 64 bits.
+- `castscan.py`: casts between struct pointer types whose fields only line up on 32 bits (views). Some hits are
+  generic pointers (Hover.ptr declared as a Bloke and holding an Element): those casts are fine.
+- `tools/audit_save.py` (ptest runs it): saved-game calls the save layer (port/port_save.c) can't convert.

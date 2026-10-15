@@ -873,8 +873,8 @@ LEGO_EXPORT unsigned int RenderBlock(int x, int y, int w, int h, unsigned int co
  * loop register); this is the C equivalent: same effect, but it cannot byte-match without __asm. */
 // FUNCTION: LEGOLAND 0x00489190
 LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
-    struct SpriteLock screen;
-    struct SpriteLock image;
+    struct VideoArg screen;
+    struct VideoArg image;
     RECT dst;
     RECT off;
     unsigned short w;
@@ -938,8 +938,8 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
         }
         result = 0;
         if (dst.left < dst.right && dst.top < dst.bottom) {
-            d = screen.bits + screen.pitch * dst.top + dst.left * 2;
-            s = (unsigned char *)((UINT_PTR)(image.bits + image.pitch * off.top + off.left * 2) & ~(UINT_PTR)3);
+            d = (unsigned char *)screen.bits + screen.pitch * dst.top + dst.left * 2;
+            s = (unsigned char *)((UINT_PTR)((unsigned char *)image.bits + image.pitch * off.top + off.left * 2) & ~(UINT_PTR)3);
             rows = off.bottom - off.top - 1;
             cols = off.right - off.left - 2;
             do {
@@ -965,8 +965,8 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
         }
         break;
     }
-    ReleaseSprite((struct Sprite *)&image);
-    ReleaseSprite((struct Sprite *)&screen);
+    ReleaseSprite(&image);
+    ReleaseSprite(&screen);
     return result;
 }
 

@@ -864,7 +864,7 @@ static void RunCommand(char *line) {
                     continue;
                 }
                 given += (elem->flags & 0x10002) != 2;
-                GiveRewardObject((struct NerpsArg *)elem, 0, 1);
+                GiveRewardObject(elem, 0, 1);
             }
             if (DAT_007fdd70[0] != NULL) {
                 FUN_00476180();

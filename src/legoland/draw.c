@@ -1151,7 +1151,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
         }
     }
     if (sprite->flags & 0x20) {
-        ReleaseSprite((struct Sprite *)&lock);
+        ReleaseSprite(&lock);
     }
 }
 
@@ -1643,7 +1643,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
         }
     }
     if (sprite->flags & 0x20) {
-        ReleaseSprite((struct Sprite *)&lock);
+        ReleaseSprite(&lock);
     }
 }
 
