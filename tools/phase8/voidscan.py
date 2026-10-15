@@ -77,7 +77,7 @@ def leaves(t, base=0, path=''):
     out = []
     if t.kind == ci.TypeKind.RECORD:
         for f in t.get_fields():
-            o = t.get_offset(f.spelling)
+            o = f.get_field_offsetof()
             if o < 0:
                 continue
             out += leaves(f.type, base + o // 8, path + '.' + (f.spelling or '(anon)'))

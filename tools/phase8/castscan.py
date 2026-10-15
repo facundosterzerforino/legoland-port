@@ -3,7 +3,7 @@
 For each `(struct A *)e` where e has type `struct B *` (A != B, both complete), every scalar field of A is matched
 with B's scalar field at the same i686 offset; if B has one there and its x86_64 offset differs from A's, the cast
 is a 64-bit hazard (a view that only lines up on 32 bits). One line per (file, A, B) with the first such field.
-A struct defined in one .c and converted to in another (where it is incomplete) is checked against its definition
+Pointers to pointers count too (struct A ** from struct B **). A struct defined in one .c and converted to in another (where it is incomplete) is checked against its definition
 once every file is scanned."""
 import os
 import sys
@@ -32,7 +32,7 @@ def leaves(t, base=0, path=''):
     out = []
     if t.kind == ci.TypeKind.RECORD:
         for f in t.get_fields():
-            o = t.get_offset(f.spelling)
+            o = f.get_field_offsetof()
             if o < 0:
                 continue
             out += leaves(f.type, base + o // 8, path + '.' + (f.spelling or '(anon)'))
@@ -72,6 +72,10 @@ def scan(path, target):
             if to.kind == ci.TypeKind.POINTER and st.kind == ci.TypeKind.POINTER:
                 a = to.get_pointee().get_canonical()
                 b = st.get_pointee().get_canonical()
+                # T ** from U **: the pointer the callee fills in or reads is the same view
+                while a.kind == ci.TypeKind.POINTER and b.kind == ci.TypeKind.POINTER:
+                    a = a.get_pointee().get_canonical()
+                    b = b.get_pointee().get_canonical()
                 if a.kind == ci.TypeKind.RECORD and b.kind == ci.TypeKind.RECORD and a.spelling != b.spelling:
                     if a.get_size() > 0 and b.get_size() > 0:
                         out.setdefault((a.spelling, b.spelling), (c.location.line, leaves(a), leaves(b)))

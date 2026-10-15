@@ -15,3 +15,10 @@ ride_queue.c struct QueueStep struct QueueTable
 worker.c struct WorkOrder struct RepairOrder
 # LogFlumeTrackRemoveObject reuses its Cursor parameter to hold the neighbour list (the original does).
 log_flume.c struct LinkList struct Cursor
+# the carousel's port fix-up reads the saved index from a pair of globals (the ride, then its z-sprite).
+carousel.c struct Sprite struct Ride
+# FUN_0040d090 fills its reused Element parameter with a Footprint pointer (the original does).
+log_flume.c struct Footprint struct Element
+# a render block's sprite slot holds a Person when flags & 0x2000 (drawn by Render3DPerson).
+print_sprite.c struct Person struct Sprite
+print_sprite.c struct Sprite struct Person

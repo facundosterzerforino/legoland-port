@@ -50,7 +50,7 @@ def leaf_at(t, off):
     if t.kind == ci.TypeKind.RECORD:
         best = None
         for f in t.get_fields():
-            o = t.get_offset(f.spelling)
+            o = f.get_field_offsetof()
             if o < 0:
                 continue
             o //= 8
@@ -85,7 +85,7 @@ def offset_of(t, path):
             continue
         for f in t.get_fields():
             if (f.spelling or '(anon)') == part:
-                off += t.get_offset(f.spelling) // 8
+                off += f.get_field_offsetof() // 8
                 t = f.type.get_canonical()
                 break
         else:
