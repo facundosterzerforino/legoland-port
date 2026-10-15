@@ -1295,7 +1295,7 @@ struct Sprite *LogFlumeHup1M2Sprite;
 struct Footprint DAT_004c2aa8;
 
 // GLOBAL: LEGOLAND 0x004c2aa0
-struct CursorSource *DAT_004c2aa0;
+struct Ride *DAT_004c2aa0;
 
 // GLOBAL: LEGOLAND 0x004c2abc
 struct Sprite *LogFlumeTrackSprites[10];
@@ -1322,7 +1322,7 @@ struct QueueTable *DAT_004c2af8;
 struct Element *LogFlumeImageListId;
 
 // GLOBAL: LEGOLAND 0x004c2b0c
-struct CursorSource *DAT_004c2b0c;
+struct Ride *DAT_004c2b0c;
 
 // GLOBAL: LEGOLAND 0x004c2b10
 struct Element *LogFlumeTrackEndyListId;
@@ -1331,7 +1331,7 @@ struct Element *LogFlumeTrackEndyListId;
 struct Element *DAT_004c2b50;
 
 // GLOBAL: LEGOLAND 0x004c2b60
-struct CursorSource *DAT_004c2b60;
+struct Ride *DAT_004c2b60;
 
 // GLOBAL: LEGOLAND 0x004c2b64
 struct Sprite *LogFlumeSplashSprite;
@@ -1358,10 +1358,10 @@ struct Cursor DAT_004c2c18;
 struct Element *DAT_004c2ba0;
 
 // GLOBAL: LEGOLAND 0x004c2bf0
-struct CursorSource *DAT_004c2bf0;
+struct Ride *DAT_004c2bf0;
 
 // GLOBAL: LEGOLAND 0x004c445c
-struct CursorSource *DAT_004c445c;
+struct Ride *DAT_004c445c;
 
 // GLOBAL: LEGOLAND 0x004c4460
 struct Element *DAT_004c4460;
@@ -1379,7 +1379,7 @@ struct Element *DAT_004c74f4;
 struct Cursor LogFlumeCursor;
 
 // GLOBAL: LEGOLAND 0x004c74d4
-struct CursorSource *DAT_004c74d4;
+struct Ride *DAT_004c74d4;
 
 // GLOBAL: LEGOLAND 0x004c74d8
 struct RideSpriteInfo DAT_004c74d8;
@@ -1406,7 +1406,7 @@ struct Cursor DAT_004c8d78;
 struct Sprite *LogFlumeFc3M3Sprite;
 
 // GLOBAL: LEGOLAND 0x004c8d6c
-struct CursorSource *DAT_004c8d6c;
+struct Ride *DAT_004c8d6c;
 
 // GLOBAL: LEGOLAND 0x004c8d70
 struct Sprite *LogFlumeFc4MSprite;
@@ -1433,7 +1433,7 @@ struct Element *DAT_004cbe10;
 struct Sprite *LogFlumeCsaw2MSprite;
 
 // GLOBAL: LEGOLAND 0x004cbe18
-struct CursorSource *DAT_004cbe18;
+struct Ride *DAT_004cbe18;
 
 // GLOBAL: LEGOLAND 0x004cbe1c
 struct Sprite *LogFlumeFc1M3Sprite;
