@@ -43,8 +43,13 @@ struct Ride {
     /* 0x00 */ struct Ride *next; /* ObjectClassList */
     /* 0x04 */ struct ObjInstance *instances;
     /* 0x08 */ unsigned int field_8;
-    /* 0x0c */ unsigned int x;
-    /* 0x10 */ unsigned int y;
+    /* 0x0c */ union {
+        struct {
+            unsigned int x;
+            unsigned int y;
+        };
+        struct Point pos;
+    };
     /* 0x14 */ int field_14;
     /* 0x18 */ int field_18;
     /* 0x1c */ unsigned int flags;

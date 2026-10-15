@@ -56,10 +56,11 @@ struct Indicator {
     unsigned int field_c;
     unsigned int field_10;
     struct IconNode *field_14;
-    unsigned int field_18;
-    void (*field_1c)(struct Indicator *);
+    void (*field_18)(struct Indicator *); /* the check function */
+    void (*field_1c)(struct Indicator *); /* the click function */
     unsigned char pad_20[0x22 - 0x20];
     unsigned char field_22;
+    unsigned char pad_23[0x28 - 0x23];
 };
 
 struct MenuGroup {
@@ -110,25 +111,6 @@ struct ScrollRegion {
     /* 0x14 */ int content_right;
     /* 0x18 */ int content_bottom;
     /* 0x1c */ RECT clip;
-};
-
-struct IndicatorFuncs {
-    unsigned char pad_0[4];
-    unsigned int field_4;
-    unsigned char pad_8[0x18 - 0x8];
-    unsigned int check_func;
-    unsigned int click_func;
-};
-
-struct TimedIndicator {
-    struct Indicator *next;
-    unsigned int field_4;
-    unsigned int start_time;
-    unsigned int duration;
-    unsigned int field_10;
-    struct IconNode *icon;
-    unsigned int check_func;
-    unsigned int click_func;
 };
 
 #include "bricks.h"
@@ -1697,79 +1679,79 @@ unsigned char FUN_0046fbc0(struct IconNode *icon, unsigned char flag) {
 }
 
 // FUNCTION: LEGOLAND 0x0046fbf0
-LEGO_EXPORT struct TimedIndicator *AllocateTimedIndicator(struct Sprite *sprite, unsigned int a2, unsigned int a3) {
-    struct TimedIndicator *ind;
+LEGO_EXPORT struct Indicator *AllocateTimedIndicator(struct Sprite *sprite, unsigned int a2, unsigned int a3) {
+    struct Indicator *ind;
     struct IconNode *icon;
 
-    ind = malloc(40);
+    ind = malloc(sizeof(struct Indicator));
     ind->next = DAT_006688d4;
     ind->field_4 = 0;
-    ind->start_time = GetGameTimer();
-    ind->duration = a2;
+    ind->field_8 = GetGameTimer();
+    ind->field_c = a2;
     ind->field_10 = a3;
 
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
-    ind->icon = icon;
+    ind->field_14 = icon;
     icon->render_func = (void *)FUN_0046eaa0;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->event_handler = (void *)FUN_0046fbc0;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->flags = icon->flags | 0x40a;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->field_30 = ind;
 
-    ind->check_func = 0;
-    ind->click_func = 0;
+    ind->field_18 = 0;
+    ind->field_1c = 0;
 
     DAT_006688d4 = (struct Indicator *)ind;
     return ind;
 }
 
 // FUNCTION: LEGOLAND 0x0046fc80
-LEGO_EXPORT struct TimedIndicator *AllocatePermanentIndicator(struct Sprite *sprite, unsigned int param_2) {
-    struct TimedIndicator *ind;
+LEGO_EXPORT struct Indicator *AllocatePermanentIndicator(struct Sprite *sprite, unsigned int param_2) {
+    struct Indicator *ind;
     struct IconNode *icon;
 
-    ind = malloc(40);
+    ind = malloc(sizeof(struct Indicator));
     ind->next = DAT_006688d4;
     ind->field_4 = 1;
-    ind->start_time = GetGameTimer();
+    ind->field_8 = GetGameTimer();
     ind->field_10 = param_2;
 
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
-    ind->icon = icon;
+    ind->field_14 = icon;
     icon->render_func = (void *)FUN_0046eaa0;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->event_handler = (void *)FUN_0046fbc0;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->flags = icon->flags | 0x40a;
 
-    icon = ind->icon;
+    icon = ind->field_14;
     icon->field_30 = ind;
 
-    ind->check_func = 0;
-    ind->click_func = 0;
+    ind->field_18 = 0;
+    ind->field_1c = 0;
 
     DAT_006688d4 = (struct Indicator *)ind;
     return ind;
 }
 
 // FUNCTION: LEGOLAND 0x0046fd00
-LEGO_EXPORT void SetCheckFunc(struct IndicatorFuncs *ind, unsigned int func) {
-    ind->check_func = func;
+LEGO_EXPORT void SetCheckFunc(struct Indicator *ind, void (*func)(struct Indicator *)) {
+    ind->field_18 = func;
     ind->field_4 |= 0x4;
 }
 
 // FUNCTION: LEGOLAND 0x0046fd20
-LEGO_EXPORT void SetClickFunc(struct IndicatorFuncs *ind, unsigned int func) {
-    ind->click_func = func;
+LEGO_EXPORT void SetClickFunc(struct Indicator *ind, void (*func)(struct Indicator *)) {
+    ind->field_1c = func;
     ind->field_4 |= 0x4;
 }
 

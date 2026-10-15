@@ -1350,7 +1350,7 @@ unsigned int BoatingSchoolMermaidDCalcCursor(struct Element *param_1, struct Poi
 
 // FUNCTION: LEGOLAND 0x0041b6f0
 void BoatingSchoolMermaidRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) {
-    struct Cursor *cursor = *(struct Cursor **)((char *)param_1 + 0xc);
+    struct Ride *ride = ((struct Element *)param_1)->ride;
     struct MermaidNode *node = MermaidList;
     struct MermaidNode *prev = NULL;
     int x;
@@ -1366,8 +1366,8 @@ void BoatingSchoolMermaidRemoveObject(void *param_1, TileId tile, struct Cursor 
         DBPrintf("Can't find samples for mermaid\n");
     }
     UnSourceAndFadeAllSamplesFromSource(&source, -400);
-    for (y = cursor->field_3c.v[1]; y <= cursor->field_3c.v[3]; y++) {
-        for (x = cursor->field_3c.v[0]; x <= cursor->field_3c.v[2]; x++) {
+    for (y = ride->footprint.v[1]; y <= ride->footprint.v[3]; y++) {
+        for (x = ride->footprint.v[0]; x <= ride->footprint.v[2]; x++) {
             RestoreBaseMap(x + param_3->tile_x, y + param_3->tile_y);
         }
     }

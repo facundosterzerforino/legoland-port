@@ -75,19 +75,11 @@ struct TileMap {
 // this 0x1834-byte structure. Only the fields actually touched are named; the
 // gaps are explicit padding so the layout matches the original byte-for-byte.
 struct Cursor {
-    /* 0x000 */ unsigned char pad_0[0x14];
-    /* 0x014 */ unsigned int field_14;
-    /* 0x018 */ unsigned int field_18;
-    /* 0x01c */ unsigned int field_1c;
-    /* 0x020 */ unsigned char pad_20[0x3c - 0x20];
-    /* 0x03c */ struct Footprint field_3c;
-    /* 0x050 */ unsigned char pad_50[0x64 - 0x50];
-    /* 0x064 */ unsigned int field_64;
-    /* 0x068 */ unsigned char pad_68[0xc4 - 0x68];
-    /* 0x0c4 */ unsigned int field_c4;
-    /* 0x0c8 */ unsigned char pad_c8[0xcc - 0xc8];
-    /* 0x0cc */ void *field_cc;
-    /* 0x0d0 */ unsigned char pad_d0[0x1404 - 0xd0];
+    /* 0x0000 */ unsigned short count; /* the footprint's points */
+    /* 0x0002 */ unsigned short xpts[0x400];
+    /* 0x0802 */ unsigned short ypts[0x400];
+    /* 0x1002 */ unsigned char fpts[0x400];
+    /* 0x1402 */ unsigned char pad_1402[0x1404 - 0x1402];
     int tile_x;
     int tile_y;
     int field_140c;

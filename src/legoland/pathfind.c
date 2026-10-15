@@ -12,16 +12,6 @@ struct PathQuery {
     int y;
 };
 
-struct PathBox {
-    unsigned char pad_0[8];
-    int x_min;
-    int y_min;
-    int x_max;
-    int y_max;
-    unsigned char pad_18[4];
-    int dist_sq;
-};
-
 struct DirNode {
     struct DirNode *next;
     void *parent;
@@ -113,7 +103,7 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00481e60
-void FUN_00481e60(struct PathQuery *query, struct PathBox *box) {
+void FUN_00481e60(struct PathQuery *query, struct BestNode *box) {
     int px = query->x;
     int lower_x = (box->x_min << 8) + 128;
     int upper_x = (box->x_max << 8) + 128;
@@ -144,7 +134,7 @@ void FUN_00481e60(struct PathQuery *query, struct PathBox *box) {
 
     dx = clamped_x - px;
     dy = clamped_y - query->y;
-    box->dist_sq = (dx * dx) + (dy * dy);
+    box->field_1c = (dx * dx) + (dy * dy);
 }
 
 // FUNCTION: LEGOLAND 0x00481ee0
@@ -239,7 +229,7 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
     if (!FUN_00481f00(start, end, &prev)) {
         return -1;
     }
-    FUN_00481e60((struct PathQuery *)pos, (struct PathBox *)prev);
+    FUN_00481e60((struct PathQuery *)pos, (struct BestNode *)prev);
     lo_x = prev->x_min << 8;
     hi_x = prev->x_max << 8;
     lo_y = prev->y_min << 8;

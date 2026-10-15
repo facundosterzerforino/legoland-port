@@ -9,7 +9,6 @@
 // owns struct MapTile etc.; struct Cursor lives in gamemap.h.
 
 struct Cursor;
-struct ObjNode;
 struct CursorObj;
 struct Point;
 struct ObjInstance;
@@ -41,7 +40,7 @@ void FUN_0045e4a0(Element *editObj, struct Point *pos);
 LEGO_EXPORT unsigned int AddBasicObject(Element *editObj, int *coords);
 LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3);
 LEGO_EXPORT void RemoveObjectFromMap(TileId coords);
-void FUN_0045e850(struct ObjNode *node, int *offset);
+void FUN_0045e850(struct Element *node, int *offset);
 LEGO_EXPORT void *GetObjectClassAndInstance(int *coords, unsigned short *out);
 void SetBridgeParamsByName(const char *param_1);
 LEGO_EXPORT void StandardRemoveObject(Element *editObj, TileId coords, struct Cursor *cursor);

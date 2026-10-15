@@ -1,9 +1,7 @@
 #pragma once
 
-struct EventNode;
 struct GameMainNode;
 struct Point;
-struct QueryNode;
 struct ResFile;
 
 /* A level script command line: the command name and its arguments. */
@@ -15,13 +13,13 @@ struct CommandArgs {
 };
 
 int IsInMapBounds(int a, int b);
-void FUN_004776c0(struct QueryNode *node);
-void InsertOpenListSorted(struct EventNode *node);
+void FUN_004776c0(struct GameMainNode *node);
+void InsertOpenListSorted(struct GameMainNode *node);
 struct GameMainNode *FUN_00477730(struct Point *ctx);
 struct GameMainNode *FUN_004777c0(struct Point *arg);
 struct GameMainNode *FUN_004777f0(struct Point *pos, int *result);
-void RemoveQueryNode(struct QueryNode *ctx);
-void RemoveFromOpenList(struct EventNode *param_1);
+void RemoveQueryNode(struct GameMainNode *ctx);
+void RemoveFromOpenList(struct GameMainNode *param_1);
 
 void FUN_004779d0(struct Point *p);
 void FindMapPathAStar(int x, int y, int a, int b);

@@ -38,19 +38,6 @@ struct GameMainNode {
     int field_24;
 };
 
-struct EventNode {
-    struct EventNode *next;
-    unsigned char pad_4[0x1c - 0x4];
-    int sort_key;
-};
-
-struct QueryNode {
-    struct QueryNode *next;
-    unsigned char pad_4[0x8 - 0x4];
-    unsigned int field_8;
-    unsigned int field_c;
-};
-
 // FUNCTION: LEGOLAND 0x00477680
 int IsInMapBounds(int a, int b) {
     unsigned short limit;
@@ -69,15 +56,15 @@ int IsInMapBounds(int a, int b) {
 }
 
 // FUNCTION: LEGOLAND 0x004776c0
-void FUN_004776c0(struct QueryNode *node) {
-    node->next = (struct QueryNode *)DAT_00668fc4;
+void FUN_004776c0(struct GameMainNode *node) {
+    node->next = (struct GameMainNode *)DAT_00668fc4;
     DAT_00668fc4 = (struct InterfaceQueryNode *)node;
 }
 
 // FUNCTION: LEGOLAND 0x004776e0
-void InsertOpenListSorted(struct EventNode *node) {
-    struct EventNode *current;
-    struct EventNode *previous;
+void InsertOpenListSorted(struct GameMainNode *node) {
+    struct GameMainNode *current;
+    struct GameMainNode *previous;
 
     if (DAT_00668fc0 == NULL) {
         DAT_00668fc0 = node;
@@ -86,7 +73,7 @@ void InsertOpenListSorted(struct EventNode *node) {
         current = DAT_00668fc0;
         previous = NULL;
         while (current != NULL) {
-            if (current->sort_key >= node->sort_key) {
+            if (current->field_1c >= node->field_1c) {
                 break;
             }
             previous = current;
@@ -120,12 +107,12 @@ struct GameMainNode *FUN_00477730(struct Point *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477760
-void RemoveQueryNode(struct QueryNode *ctx) {
-    struct QueryNode *prev;
-    struct QueryNode *node;
+void RemoveQueryNode(struct GameMainNode *ctx) {
+    struct GameMainNode *prev;
+    struct GameMainNode *node;
 
     prev = NULL;
-    node = (struct QueryNode *)DAT_00668fc4;
+    node = (struct GameMainNode *)DAT_00668fc4;
     while (node != NULL) {
         if (node == ctx) {
             break;
@@ -141,9 +128,9 @@ void RemoveQueryNode(struct QueryNode *ctx) {
 }
 
 // FUNCTION: LEGOLAND 0x00477790
-void RemoveFromOpenList(struct EventNode *param_1) {
-    struct EventNode *prev;
-    struct EventNode *node;
+void RemoveFromOpenList(struct GameMainNode *param_1) {
+    struct GameMainNode *prev;
+    struct GameMainNode *node;
 
     prev = NULL;
     node = DAT_00668fc0;
@@ -305,7 +292,7 @@ void FUN_004779d0(struct Point *p) {
         if (tile->flags & 0x20) {
             if (QueryClass->flags & 0x200000) {
                 RemoveObjectFromBuildList(t);
-                FUN_0045e850((struct ObjNode *)elem, &pos.x);
+                FUN_0045e850((struct Element *)elem, &pos.x);
                 IncrementObjectCount((struct ObjectCount *)QueryClass);
                 RemoveObjectFromMap(t);
             }
@@ -319,7 +306,7 @@ void FUN_004779d0(struct Point *p) {
     if (tile->flags & 0x800) {
         order = GetGardenerWorkOrderAt(p->x, p->y);
         if (NULL != order) {
-            FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
+            FUN_0045e850((struct Element *)order->element, &order->pos.x);
             ptmp63 = order->element->data;
             ClearPathUnderFootprint((struct PathFootprint *)ptmp63, &order->pos.x);
             EraseGardenerOrder(order);
@@ -330,7 +317,7 @@ void FUN_004779d0(struct Point *p) {
         order = GetMechanicWorkOrderAt(ptmp62, ptmp184);
         if (order != NULL) {
             ptmp12 = order->element;
-            FUN_0045e850((struct ObjNode *)ptmp12, &order->pos.x);
+            FUN_0045e850((struct Element *)ptmp12, &order->pos.x);
             ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
             EraseMechanicOrder(order);
             return;
@@ -365,7 +352,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
     DAT_004bb5a4 = b;
     nb = FUN_004777f0(&DAT_004bb598, &result);
     nb->path_cost = 0;
-    InsertOpenListSorted((struct EventNode *)nb);
+    InsertOpenListSorted((struct GameMainNode *)nb);
     while ((cur = DAT_00668fc0) != NULL) {
         DAT_00668fc0 = cur->next;
 
@@ -385,7 +372,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct QueryNode *)nb);
+                            FUN_004776c0((struct GameMainNode *)nb);
                         } else {
                             cur_x2 = cur->x;
                             nb->field_24 = FUN_004779a0(cur_x2, cur->y, nb->x, nb->y);
@@ -393,12 +380,12 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                RemoveQueryNode((struct QueryNode *)nb);
+                                RemoveQueryNode((struct GameMainNode *)nb);
                             }
                             if (result == 1) {
-                                RemoveFromOpenList((struct EventNode *)nb);
+                                RemoveFromOpenList((struct GameMainNode *)nb);
                             }
-                            InsertOpenListSorted((struct EventNode *)nb);
+                            InsertOpenListSorted((struct GameMainNode *)nb);
                         }
                     }
                 }
@@ -417,19 +404,19 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct QueryNode *)nb);
+                            FUN_004776c0((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                RemoveQueryNode((struct QueryNode *)nb);
+                                RemoveQueryNode((struct GameMainNode *)nb);
                             }
                             if (result == 1) {
-                                RemoveFromOpenList((struct EventNode *)nb);
+                                RemoveFromOpenList((struct GameMainNode *)nb);
                             }
-                            InsertOpenListSorted((struct EventNode *)nb);
+                            InsertOpenListSorted((struct GameMainNode *)nb);
                         }
                     }
                 }
@@ -448,19 +435,19 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct QueryNode *)nb);
+                            FUN_004776c0((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
                             if (result == 2) {
-                                RemoveQueryNode((struct QueryNode *)nb);
+                                RemoveQueryNode((struct GameMainNode *)nb);
                             }
                             if (result == 1) {
-                                RemoveFromOpenList((struct EventNode *)nb);
+                                RemoveFromOpenList((struct GameMainNode *)nb);
                             }
-                            InsertOpenListSorted((struct EventNode *)nb);
+                            InsertOpenListSorted((struct GameMainNode *)nb);
                         }
                     }
                 }
@@ -478,25 +465,25 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (best != NULL && cost > best->path_cost) {
-                            FUN_004776c0((struct QueryNode *)nb);
+                            FUN_004776c0((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
                             nb->path_cost = cost;
                             nb->field_1c = nb->heuristic + cost;
                             if (2 == result) {
-                                RemoveQueryNode((struct QueryNode *)nb);
+                                RemoveQueryNode((struct GameMainNode *)nb);
                             }
                             if (result == 1) {
-                                RemoveFromOpenList((struct EventNode *)nb);
+                                RemoveFromOpenList((struct GameMainNode *)nb);
                             }
-                            InsertOpenListSorted((struct EventNode *)nb);
+                            InsertOpenListSorted((struct GameMainNode *)nb);
                         }
                     }
                 }
             }
         }
-        FUN_004776c0((struct QueryNode *)cur);
+        FUN_004776c0((struct GameMainNode *)cur);
     }
     // STRING: LEGOLAND 0x004b8a70
     id = ElemID("PATH CONTROL");
@@ -517,7 +504,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
         nb = nb->parent;
     }
     while (DAT_00668fc4 != NULL) {
-        RemoveQueryNode((struct QueryNode *)DAT_00668fc4);
+        RemoveQueryNode((struct GameMainNode *)DAT_00668fc4);
     }
 }
 
