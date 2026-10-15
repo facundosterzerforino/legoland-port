@@ -1,0 +1,22 @@
+# castscan.py: casts reviewed as fine on 64 bits (file, cast-to, cast-from). Reviewed 2026-10-15.
+# Hover.ptr / hit.ptr are generic: declared struct Bloke * (or a WorkOrder) and holding what the hover type says.
+bricks.c struct Bloke struct WorkOrder
+bricks.c struct Bloke struct Element
+bricks.c struct Element struct Bloke
+bricks.c struct WorkOrder struct Bloke
+carousel.c struct Bloke struct Element
+popupinfo.c struct Element struct Bloke
+# Put3DBlokesOnRide2's second argument is only read as the tile key it starts with.
+copters.c struct Element struct CopterNode
+safari_ride.c struct Element struct SafariNode
+safari_ride.c struct Element struct Ride
+earth_slide.c struct Element struct Ride
+# Sprite.image holds an image list (SpriteSet) for .ilf sprites: the pointer is stored and read back as such.
+image_sprite.c struct Image struct SpriteSet
+image_sprite.c struct SpriteSet struct Image
+# the queue table's steps follow it in the same allocation (table + 1).
+ride_queue.c struct QueueStep struct QueueTable
+# AddRepairOrderForObject returns a repair order only where the callers just test it.
+worker.c struct WorkOrder struct RepairOrder
+# LogFlumeTrackRemoveObject reuses its Cursor parameter to hold the neighbour list (the original does).
+log_flume.c struct LinkList struct Cursor
