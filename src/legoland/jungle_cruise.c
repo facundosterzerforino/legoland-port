@@ -709,7 +709,7 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, int *param_2, unsigned int p
 
     n = 0;
     ride = obj->ride;
-    memcpy(EditCursor.field_1414, &ride->footprint, 20);
+    memcpy(EditCursor.field_1414, &ride->footprint, sizeof(struct Footprint));
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;

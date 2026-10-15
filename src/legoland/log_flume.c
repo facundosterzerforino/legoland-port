@@ -1513,7 +1513,7 @@ void LogFlumeEntranceCalcCursor(Element *elem, int *param_2, unsigned int param_
     PathCursor.footprint.next = NULL;
     PathCursor.field_1828 = 0x1000;
     ResetCursorBuildable(&PathCursor);
-    memcpy(DAT_004c8d78.footprint.v, &LogFlumeFootprint, 20);
+    memcpy(DAT_004c8d78.footprint.v, &LogFlumeFootprint, sizeof(struct Footprint));
     DAT_004c8d78.footprint.x1 = LogFlumeFootprint.x1 - 1;
     DAT_004c8d78.footprint.y1 = DAT_004c8d78.footprint.y1 - 1;
     ResetCursorBuildable(&DAT_004c8d78);
@@ -1548,7 +1548,7 @@ void LogFlumeEntranceDCalcCursor(struct Element *param_1, struct Point *param_2)
                 if (param_1 == 0) {
                     continue;
                 }
-                memcpy(LogFlumeCursor.footprint.v, (void *)param_1, 20);
+                memcpy(LogFlumeCursor.footprint.v, (void *)param_1, sizeof(struct Footprint)); /* param_1 holds the footprint */
                 LogFlumeCursor.tile_x = cur->tile.pos.x;
                 LogFlumeCursor.tile_y = cur->tile.pos.y;
             }
@@ -1589,7 +1589,7 @@ void LogFlumeEntranceRemoveObject(Element *obj, TileId tile, struct Cursor *curs
                 LogFlumeTrackRide->footprint.y1--;
                 cursor.tile_x = cur->tile.pos.x + LogFlumeFootprint.x0;
                 cursor.tile_y = cur->tile.pos.y + LogFlumeFootprint.x1;
-                memcpy(cursor.footprint.v, &LogFlumeTrackRide->footprint, 20);
+                memcpy(cursor.footprint.v, &LogFlumeTrackRide->footprint, sizeof(struct Footprint));
                 StandardRemoveObject(LogFlumeTrackRide->element, cur->tile, &cursor);
                 if (cur->flags10 & 2) {
                     UseBricks(GetObjCost(LogFlumeTrackRide));

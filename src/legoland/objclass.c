@@ -236,19 +236,19 @@ LEGO_EXPORT void BasicObjectDCalcCursor(struct Element *param_1, struct Point *p
     struct LegoConfig *config;
     int x;
     int y;
-    unsigned int buf[5];
+    struct MapElement buf; /* a copy of the tile */
 
     map = GameMap;
     config = lpConfig;
     x = param_2->x;
     if (x < 0 || x >= (int)config->width || (y = param_2->y) < 0 || y >= (int)config->height) {
-        *(unsigned short *)&buf[3] = 0x40;
+        buf.flags = 0x40;
     } else {
-        memcpy(buf, &GameMap[y][x], 20);
+        memcpy(&buf, &GameMap[y][x], sizeof(buf));
     }
     memcpy(QueryCursor.field_1414, &QueryClass->footprint, sizeof(QueryClass->footprint));
     QueryCursor.field_1828 = 8;
-    if ((buf[3] & 0x8a0) != 0) {
+    if ((*(unsigned int *)&buf.flags & 0x8a0) != 0) {
         QueryCursor.field_1828 = 9;
         QueryCursor.tile_x = QueryObj.pos.x;
         QueryCursor.tile_y = QueryObj.pos.y;
@@ -258,11 +258,11 @@ LEGO_EXPORT void BasicObjectDCalcCursor(struct Element *param_1, struct Point *p
     }
     if ((int)QueryCursor.tile_x < 0 || (int)QueryCursor.tile_x >= (int)config->width ||
         (int)QueryCursor.tile_y < 0 || (int)QueryCursor.tile_y >= (int)config->height) {
-        *(unsigned short *)&buf[3] = 0x40;
+        buf.flags = 0x40;
     } else {
-        memcpy(buf, &map[QueryCursor.tile_y][QueryCursor.tile_x], 20);
+        memcpy(&buf, &map[QueryCursor.tile_y][QueryCursor.tile_x], sizeof(buf));
     }
-    if ((buf[3] & 0x40) != 0) {
+    if ((*(unsigned int *)&buf.flags & 0x40) != 0) {
         SetCursorBlocked(&QueryCursor, 1);
         return;
     }

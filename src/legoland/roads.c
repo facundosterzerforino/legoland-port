@@ -476,7 +476,7 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
     ride = ptmp236;
 
     ptmp237 = EditCursor.field_1414;
-    memcpy(ptmp237, &ride->footprint, 20);
+    memcpy(ptmp237, &ride->footprint, sizeof(struct Footprint));
     bits = 0;
     EditCursor.field_1830 = bits;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);

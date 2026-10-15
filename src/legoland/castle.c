@@ -4747,7 +4747,7 @@ void FUN_00424440(struct Element *param_1, struct Point *param_2) {
 
     FUN_00423e20();
     x = DAT_00829ae0.piece.x;
-    memcpy(QueryCursor.field_1414, &DAT_00829a80, 20);
+    memcpy(QueryCursor.field_1414, &DAT_00829a80, sizeof(struct Footprint));
     y = DAT_00829ae0.piece.y;
     QueryCursor.tile_x = x;
     QueryCursor.tile_y = y;
