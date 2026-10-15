@@ -47,18 +47,6 @@ struct FlumeOut {
     int f_20;
 };
 
-struct ResA {
-    unsigned char pad_0[0x1c];
-    unsigned int flags_1c;
-    unsigned char pad_20[0x64 - 0x20];
-    struct ResB *ptr_64;
-};
-
-struct ResB {
-    unsigned char pad_0[0x10];
-    unsigned int flags_10;
-};
-
 struct WalkNode {
     struct WalkNode *var_0;
     struct FlumeSlot *var_4;
@@ -83,25 +71,11 @@ struct SubBuf {
     unsigned char b1;
 };
 
-struct LinkNode {
-    unsigned int field_0;
-    unsigned int field_4;
-    struct Context *field_8;
-    struct Context *field_c;
-};
-
-struct Context {
-    unsigned char pad_0[0x2c];
-    unsigned int var_2c;
-    struct Context *var_30;
-    struct Context *var_34;
-};
-
 struct LinkList {
-    struct LinkNode *field_0;
-    struct LinkNode *field_4;
-    struct LinkNode *field_8;
-    struct LinkNode *field_c;
+    struct FlumeEntry *field_0;
+    struct FlumeEntry *field_4;
+    struct FlumeEntry *field_8;
+    struct FlumeEntry *field_c;
 };
 
 struct InputBuffer {
@@ -183,11 +157,6 @@ struct FlumeBytes {
     unsigned char b0;
     unsigned char pad_1[3];
     unsigned char b4;
-};
-
-struct FlumeQueueItem {
-    unsigned char pad_0[8];
-    struct FlumeSlot *slot;
 };
 
 struct FlumeRunNode {
@@ -2253,7 +2222,7 @@ void FUN_0040bd40(struct FlumeEntry *set, int index) {
 // FUNCTION: LEGOLAND 0x0040be00
 void FUN_0040be00(struct FlumeEntry *set) {
     struct FlumeSlot *slot;
-    struct FlumeQueueItem *item;
+    struct RideNode *item; /* the rider the queue hands over */
     int i;
 
     if (set->flags & 2) {
@@ -2277,7 +2246,7 @@ void FUN_0040be00(struct FlumeEntry *set) {
                         if (FUN_00411ea0(&set->queue)) {
                             set->flags |= 1;
                             FUN_00412060(&set->queue, (struct QueueItemMid **)&item);
-                            slot->busy = (struct RideNode *)item;
+                            slot->busy = item;
                         }
                     }
                 }
@@ -2725,7 +2694,7 @@ void LogFlumeTrackRemoveObject(Element *elem, TileId tile, struct Cursor *cursor
     FUN_004119a0((struct FlumeEntry *)entry->parent, -1);
     if (entry != NULL) {
         FUN_00409440(tile, (void **)&cursor);
-        FUN_0040da10((struct Context *)entry, (struct LinkList *)cursor);
+        FUN_0040da10((struct FlumeEntry *)entry, (struct LinkList *)cursor);
         FUN_0040a2a0(entry, (struct FlumeEntry **)cursor);
         FUN_00409270((struct FlumeEntry *)entry->parent, (struct FlumeEntry *)entry);
     }
@@ -3399,18 +3368,18 @@ void FUN_0040d900(unsigned int param_1, unsigned int *param_2, Element *param_3,
 }
 
 // FUNCTION: LEGOLAND 0x0040da10
-void FUN_0040da10(struct Context *a, struct LinkList *list) {
-    struct LinkNode *node;
+void FUN_0040da10(struct FlumeEntry *a, struct LinkList *list) {
+    struct FlumeEntry *node;
 
     if (list->field_0 != NULL) {
         node = list->field_0;
-        if (a->var_2c == 0) {
+        if (a->sub2 == 0) {
             if (node->field_8 != a && node->field_c != a) {
                 list->field_0 = NULL;
             }
         } else {
-            if (node->field_8 != a->var_30 && node->field_c != a->var_30 &&
-                node->field_8 != a->var_34 && node->field_c != a->var_34) {
+            if (node->field_8 != a->link30 && node->field_c != a->link30 &&
+                node->field_8 != a->link34 && node->field_c != a->link34) {
                 list->field_0 = NULL;
             }
         }
@@ -3418,13 +3387,13 @@ void FUN_0040da10(struct Context *a, struct LinkList *list) {
 
     if (list->field_4 != NULL) {
         node = list->field_4;
-        if (a->var_2c == 0) {
+        if (a->sub2 == 0) {
             if (node->field_8 != a && node->field_c != a) {
                 list->field_4 = NULL;
             }
         } else {
-            if (node->field_8 != a->var_30 && node->field_c != a->var_30 &&
-                node->field_8 != a->var_34 && node->field_c != a->var_34) {
+            if (node->field_8 != a->link30 && node->field_c != a->link30 &&
+                node->field_8 != a->link34 && node->field_c != a->link34) {
                 list->field_4 = NULL;
             }
         }
@@ -3432,13 +3401,13 @@ void FUN_0040da10(struct Context *a, struct LinkList *list) {
 
     if (list->field_c != NULL) {
         node = list->field_c;
-        if (a->var_2c == 0) {
+        if (a->sub2 == 0) {
             if (node->field_8 != a && node->field_c != a) {
                 list->field_c = NULL;
             }
         } else {
-            if (node->field_8 != a->var_30 && node->field_c != a->var_30 &&
-                node->field_8 != a->var_34 && node->field_c != a->var_34) {
+            if (node->field_8 != a->link30 && node->field_c != a->link30 &&
+                node->field_8 != a->link34 && node->field_c != a->link34) {
                 list->field_c = NULL;
             }
         }
@@ -3446,13 +3415,13 @@ void FUN_0040da10(struct Context *a, struct LinkList *list) {
 
     if (list->field_8 != NULL) {
         node = list->field_8;
-        if (a->var_2c == 0) {
+        if (a->sub2 == 0) {
             if (node->field_8 != a && node->field_c != a) {
                 list->field_8 = NULL;
             }
         } else {
-            if (node->field_8 != a->var_30 && node->field_c != a->var_30 &&
-                node->field_8 != a->var_34 && node->field_c != a->var_34) {
+            if (node->field_8 != a->link30 && node->field_c != a->link30 &&
+                node->field_8 != a->link34 && node->field_c != a->link34) {
                 list->field_8 = NULL;
             }
         }
@@ -3474,7 +3443,7 @@ void FUN_0040db00(struct Element *param_1, TileId param_2, struct Cursor *param_
         StandardRemoveObject(param_1, t, param_3);
         param_4(*(struct FlumeXY *)&t, (unsigned int *)&buf);
         FUN_0040cf10(&buf, &list);
-        FUN_0040da10((struct Context *)entry, (struct LinkList *)list);
+        FUN_0040da10((struct FlumeEntry *)entry, (struct LinkList *)list);
         FUN_0040a2a0(entry, (struct FlumeEntry **)list);
         FUN_00409270((struct FlumeEntry *)entry->parent, (struct FlumeEntry *)entry);
     }
@@ -4018,18 +3987,18 @@ void LogFlumeSpecialCorner4DCalcCursor(struct Element *param_1, struct Point *pa
 
 // FUNCTION: LEGOLAND 0x0040e8b0
 void LogFlumeSpecialCorner1LoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c445c = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c445c;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c445c;
+    resA->flags |= 0x400;
 
-    resA = (struct ResA *)DAT_004c445c;
+    resA = (struct Ride *)DAT_004c445c;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4046,18 +4015,18 @@ void LogFlumeSpecialCorner1LoadSprites(struct Element *obj_ptr) {
 
 // FUNCTION: LEGOLAND 0x0040e920
 void LogFlumeSpecialCorner2LoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c2aa0 = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c2aa0;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c2aa0;
+    resA->flags |= 0x400;
 
-    resA = (struct ResA *)DAT_004c2aa0;
+    resA = (struct Ride *)DAT_004c2aa0;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4068,18 +4037,18 @@ void LogFlumeSpecialCorner2LoadSprites(struct Element *obj_ptr) {
 
 // FUNCTION: LEGOLAND 0x0040e970
 void LogFlumeSpecialCorner3LoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c2b0c = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c2b0c;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c2b0c;
+    resA->flags |= 0x400;
 
-    resA = (struct ResA *)DAT_004c2b0c;
+    resA = (struct Ride *)DAT_004c2b0c;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4096,19 +4065,19 @@ void LogFlumeSpecialCorner3LoadSprites(struct Element *obj_ptr) {
 
 // FUNCTION: LEGOLAND 0x0040e9e0
 void LogFlumeSpecialCorner4LoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c74d4 = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c74d4;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c74d4;
+    resA->flags |= 0x400;
     DAT_004c2ba0 = obj_ptr;
 
-    resA = (struct ResA *)DAT_004c74d4;
+    resA = (struct Ride *)DAT_004c74d4;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4443,19 +4412,19 @@ void FUN_0040f360(struct FlumeXY p, unsigned int *result) {
 
 // FUNCTION: LEGOLAND 0x0040f3e0
 void LogFlumeTunnelLoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004cbe18 = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004cbe18;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004cbe18;
+    resA->flags |= 0x400;
     DAT_004cbe48 = obj_ptr;
 
-    resA = (struct ResA *)DAT_004cbe18;
+    resA = (struct Ride *)DAT_004cbe18;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4599,19 +4568,19 @@ void FUN_0040f830(struct FlumeXY p, unsigned int *result) {
 
 // FUNCTION: LEGOLAND 0x0040f8b0
 struct Sprite *FUN_0040f8b0(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c2bf0 = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c2bf0;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c2bf0;
+    resA->flags |= 0x400;
     DAT_004c4460 = obj_ptr;
 
-    resA = (struct ResA *)DAT_004c2bf0;
+    resA = (struct Ride *)DAT_004c2bf0;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4803,19 +4772,19 @@ void FUN_0040feb0(TileId pos, struct FlumeOut *out) {
 
 // FUNCTION: LEGOLAND 0x0040ff30
 void LogFlumeHoldUpLoadSprites(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c2b60 = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c2b60;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c2b60;
+    resA->flags |= 0x400;
 
-    resA = (struct ResA *)DAT_004c2b60;
+    resA = (struct Ride *)DAT_004c2b60;
     DAT_004c2b50 = obj_ptr;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 
@@ -4992,19 +4961,19 @@ void FUN_00410360(struct FlumeXY p, unsigned int *result) {
 
 // FUNCTION: LEGOLAND 0x004103e0
 struct Sprite *FUN_004103e0(struct Element *obj_ptr) {
-    struct ResA *resA;
-    struct ResB *resB;
+    struct Ride *resA;
+    struct Sprite *resB;
 
     DAT_004c8d6c = (struct Ride *)obj_ptr->data;
-    resA = (struct ResA *)DAT_004c8d6c;
-    resA->flags_1c |= 0x400;
+    resA = (struct Ride *)DAT_004c8d6c;
+    resA->flags |= 0x400;
 
-    resA = (struct ResA *)DAT_004c8d6c;
+    resA = (struct Ride *)DAT_004c8d6c;
     DAT_004c8d4c = obj_ptr;
     if (resA != NULL) {
-        resB = resA->ptr_64;
+        resB = resA->layer;
         if (resB != NULL) {
-            resB->flags_10 |= 0x2000;
+            resB->flags |= 0x2000;
         }
     }
 

@@ -389,10 +389,10 @@ unsigned int ScriptEventConnect(struct ObjectiveEvent *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046a730
-unsigned int FUN_0046a730(struct ObjectiveEvent *arg) {
+unsigned int FUN_0046a730(struct Ride *arg) {
     int value;
 
-    value = (short)arg->field_20;
+    value = arg->type;
     if (value == 1 || (value > 3 && value <= 5)) {
         return 1;
     }
@@ -440,7 +440,7 @@ unsigned int ScriptEventLink(struct ObjectiveEvent *arg) {
         }
         do {
             group = robj->field_0->ride;
-            if (FUN_0046a730((struct ObjectiveEvent *)group) != 0) {
+            if (FUN_0046a730(group) != 0) {
                 ox = robj->field_4;
                 oy = robj->field_5;
                 pt.x = group->x + ox;

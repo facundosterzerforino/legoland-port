@@ -113,7 +113,6 @@ struct ClassNode;
 struct FlumeEntry;
 struct ListNode;
 struct FlumeDims;
-struct Context;
 struct LinkList;
 
 void FUN_004113d0(void);
@@ -126,7 +125,7 @@ void FUN_0040d090(struct FlumeEntry *entry, struct Footprint **out, TileId *tile
 
 struct FlumeDims FUN_004112c0(void);
 
-void FUN_0040da10(struct Context *a, struct LinkList *list);
+void FUN_0040da10(struct FlumeEntry *a, struct LinkList *list);
 void FUN_004119a0(struct FlumeEntry *param_1, unsigned int param_2);
 
 struct FlumeEntry *FUN_0040d210(int x, int y);
