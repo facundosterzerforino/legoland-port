@@ -195,15 +195,14 @@ void MechanicsHutSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x0043d780
 struct RideSpriteInfo *GetMechanicsHutSpriteInfo(void *ptr, unsigned short arg2) {
-    unsigned int *p = (unsigned int *)((unsigned int *)ptr)[3];
+    struct Ride *ride = ((struct Element *)ptr)->ride;
 
-    DAT_0062fe30.sprite = p[25];
-    DAT_0062fe30.x = ((unsigned int *)p)[5];
-    DAT_0062fe30.y = ((unsigned int *)p)[6];
+    DAT_0062fe30.sprite = ride->layer;
+    DAT_0062fe30.x = ride->field_14;
+    DAT_0062fe30.y = ride->field_18;
     DAT_0062fe30.id = arg2;
 
-    p = p[25];
-    p[4] |= 0x2000;
+    ride->layer->flags |= 0x2000;
 
     return &DAT_0062fe30;
 }

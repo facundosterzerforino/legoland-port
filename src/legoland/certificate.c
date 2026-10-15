@@ -129,7 +129,7 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
         hInfo = GlobalAlloc(GHND, ncolors * 4 + 40);
         if (hInfo != NULL) {
             pInfo = (BITMAPINFO *)GlobalLock(hInfo);
-            if ((UINT_PTR)NULL == pInfo) {
+            if (NULL == pInfo) {
                 GlobalFree(hInfo);
             } else {
                 ptmp10 = bmih.biXPelsPerMeter;

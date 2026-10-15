@@ -26,11 +26,6 @@ struct CatapultKey {
     unsigned char field_1;
 };
 
-struct CatapultRemoveEdit {
-    unsigned char pad_0[0xc];
-    unsigned int ride;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004030f0
@@ -402,11 +397,11 @@ void CatapultAddObject(struct EditObject *edit2, struct CatapultEdit *edit) {
 }
 
 // FUNCTION: LEGOLAND 0x004039a0
-void CatapultRemoveObject(struct CatapultRemoveEdit *edit, TileId key, void *cursor, unsigned int param_4) {
+void CatapultRemoveObject(struct Element *edit, TileId key, void *cursor, unsigned int param_4) {
     struct CatapultNode *node;
 
     StandardRemoveObject(edit, key, cursor);
-    RemoveAllBlokesFromRide((struct Ride *)edit->ride, key);
+    RemoveAllBlokesFromRide(edit->ride, key);
     node = Catapult_FindNode(&key.id);
     if (node != NULL) {
         Catapult_RemoveNode(node);

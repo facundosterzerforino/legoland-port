@@ -237,7 +237,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
                 out = (unsigned short *)image->data + (image->height - 1) * image->width;
                 src = pixels;
                 for (i = 0; i < image->height; i++) {
-                    src = (unsigned char *)(((unsigned int)src + 3) & ~3);
+                    src = (unsigned char *)(((UINT_PTR)src + 3) & ~(UINT_PTR)3);
                     dst = out;
                     out -= image->width;
                     for (j = 0; j < image->width; j++, dst++, src += 3) {
@@ -250,7 +250,7 @@ LEGO_EXPORT int __BMPLoader(struct Image *image) {
                 out = (unsigned short *)image->data + (image->height - 1) * image->width;
                 src = pixels;
                 for (i = 0; i < image->height; i++) {
-                    src = (unsigned char *)(((unsigned int)src + 3) & ~3);
+                    src = (unsigned char *)(((UINT_PTR)src + 3) & ~(UINT_PTR)3);
                     dst = out;
                     out -= image->width;
                     for (j = 0; j < image->width; j++, dst++, src += 3) {
@@ -290,9 +290,9 @@ LEGO_EXPORT void LoadColourTable(void) {
     RES_ReadFile(file, ColourLookupTable, 0x8000);
 
     ddraw = DDRAWENV.ddraw2;
-    ddraw->lpVtbl->CreatePalette(ddraw, 0x44, entries, (LPDIRECTDRAWPALETTE *)&DDPalette, NULL);
+    ddraw->lpVtbl->CreatePalette(ddraw, 0x44, entries, &DDPalette, NULL);
     surface = (LPDIRECTDRAWSURFACE)PrimarySurface;
-    surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DDPalette);
+    surface->lpVtbl->SetPalette(surface, DDPalette);
     RES_CloseFile(file);
 }
 
@@ -300,7 +300,7 @@ LEGO_EXPORT void LoadColourTable(void) {
 LEGO_EXPORT void ResendPalette(void) {
     if (DisplayPixelFormat == 0) {
         LPDIRECTDRAWSURFACE surface = (LPDIRECTDRAWSURFACE)PrimarySurface;
-        surface->lpVtbl->SetPalette(surface, (LPDIRECTDRAWPALETTE)DDPalette);
+        surface->lpVtbl->SetPalette(surface, DDPalette);
     }
 }
 

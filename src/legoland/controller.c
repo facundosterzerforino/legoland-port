@@ -34,7 +34,7 @@ LEGO_EXPORT int SetupControllers(void) {
     MouseTileY = 4;
     FootprintWidth = 1;
     FootprintHeight = 1;
-    if ((UINT_PTR)NULL != CONTROLLERBUFFER) {
+    if (NULL != CONTROLLERBUFFER) {
         ControllersInitialized = 1;
         return 1;
     }

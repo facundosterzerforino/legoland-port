@@ -193,7 +193,7 @@ void *FUN_00486280(int param_1, void *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004864e0
-void FUN_004864e0(unsigned int param_1) {
+void FUN_004864e0(void *param_1) {
     DAT_0066b61c = param_1;
 }
 

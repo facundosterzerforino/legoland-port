@@ -12,23 +12,18 @@
 #include "ride_queue.h"
 #include "tilemap.h"
 
-struct PumpSource {
-    unsigned char pad_0[0xc];
-    unsigned int var_c;
-};
-
 // FUNCTION: LEGOLAND 0x00411a10
-void InitDrivingSchoolPumps(struct PumpSource *param_1) {
-    DrivingSchoolPumpsRide = param_1->var_c;
+void InitDrivingSchoolPumps(struct Element *param_1) {
+    DrivingSchoolPumpsRide = param_1->ride;
 }
 
 // FUNCTION: LEGOLAND 0x00411a20
 void DrivingSchoolPumpsSetEditMode(void) {
-    unsigned int eax_temp;
+    struct Ride *eax_temp;
 
     eax_temp = DrivingSchoolPumpsRide;
     EditMode.unk0 = 1;
-    EditMode.unk8 = (void *)eax_temp;
+    EditMode.unk8 = eax_temp;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(DAT_004b4bd0);
     EditCursor.field_1828 = EditCursor.field_1828 | 8;
@@ -82,7 +77,7 @@ void FUN_00411b20(struct PumpNode *node) {
     TileId tile;
     struct Ride *ride;
 
-    ride = (struct Ride *)DrivingSchoolPumpsRide;
+    ride = DrivingSchoolPumpsRide;
     cursor.footprint = ride->footprint;
     tile.pos.x = (unsigned char)node->var_4;
     tile.pos.y = (unsigned char)node->var_8;
@@ -127,18 +122,18 @@ void FUN_00411bd0(void) {
 
 // FUNCTION: LEGOLAND 0x00411bf0
 void DrivingSchoolPumpsAddObject(Element *obj, int *coords) {
-    struct PumpTile *info;
+    struct RideQueueEntry *info;
     struct PumpNode *node;
     TileId tile;
 
     tile.pos.x = (unsigned char)coords[0];
     tile.pos.y = (unsigned char)coords[1];
-    info = (struct PumpTile *)FindQueueEntryAtTile(coords[0] + 1, coords[1]);
+    info = FindQueueEntryAtTile(coords[0] + 1, coords[1]);
     if (info) {
         AddBasicObject(obj, coords);
         node = (struct PumpNode *)malloc(sizeof(struct PumpNode));
         node->id = tile.id;
-        node->var_2 = info->var_8;
+        node->var_2 = info->id;
         node->var_4 = tile.pos.x;
         node->var_8 = tile.pos.y;
         node->next = (struct PumpNode *)PumpList;
@@ -153,7 +148,7 @@ void DrivingSchoolPumpsRemoveObject(void *param_1, TileId tile, struct Cursor *c
     BGFullUpdate = 1;
     node = FUN_00411aa0(tile.pos.x, tile.pos.y);
     if (node) {
-        StandardRemoveObject(((struct Ride *)DrivingSchoolPumpsRide)->element, tile, cursor);
+        StandardRemoveObject((DrivingSchoolPumpsRide)->element, tile, cursor);
         FUN_00411ad0(node);
     }
 }
@@ -161,7 +156,7 @@ void DrivingSchoolPumpsRemoveObject(void *param_1, TileId tile, struct Cursor *c
 // FUNCTION: LEGOLAND 0x00411cd0
 void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_3) {
     struct Ride *ride;
-    struct PumpTile *tile;
+    struct RideQueueEntry *tile;
 
     ride = obj->ride;
     EditCursor.footprint = ride->footprint;
@@ -177,8 +172,8 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
         EditCursor.next = &DAT_0082f760;
         memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 0x14);
         DAT_0082f760.field_1830 = 0;
-        DAT_0082f760.tile_x = tile->var_c;
-        DAT_0082f760.tile_y = tile->var_10;
+        DAT_0082f760.tile_x = tile->x;
+        DAT_0082f760.tile_y = tile->y;
         DAT_0082f760.field_1828 = 0x2034;
         return;
     }
@@ -187,20 +182,20 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00411dc0
-struct PumpTile *FUN_00411dc0(struct Cursor *cursor) {
-    struct PumpTile *tile;
-    int y;
+struct RideQueueEntry *FUN_00411dc0(struct Cursor *cursor) {
+    struct RideQueueEntry *tile;
+    INT_PTR y; /* the original keeps the result in the same register */
 
-    tile = (struct PumpTile *)FindQueueEntryAtTile(cursor->tile_x + 1, cursor->tile_y);
-    if (tile != NULL && tile->var_14 != 0) {
+    tile = FindQueueEntryAtTile(cursor->tile_x + 1, cursor->tile_y);
+    if (tile != NULL && tile->field_14 != 0) {
         tile = NULL;
     }
     y = 0;
     if (tile != NULL) {
-        cursor->tile_x = tile->var_c - 1;
-        y = tile->var_10 - ((struct Ride *)DrivingSchoolPumpsRide)->footprint.y0;
+        cursor->tile_x = tile->x - 1;
+        y = tile->y - (DrivingSchoolPumpsRide)->footprint.y0;
         cursor->tile_y = y;
-        y = (int)tile;
+        y = (INT_PTR)tile;
     }
-    return (struct PumpTile *)y;
+    return (struct RideQueueEntry *)y;
 }

@@ -149,7 +149,7 @@ void FortWanderUpdate(RideNode *node, Bloke *bloke) {
 
 // FUNCTION: LEGOLAND 0x00406660
 void FortUpdate(Element *elem) {
-    volatile int ptmp785;
+    struct RideNode *volatile ptmp785;
     struct Ride *ride = elem->ride;
     struct Sprite *spr;
     RideNode *node;
@@ -161,7 +161,7 @@ void FortUpdate(Element *elem) {
     unsigned char dir;
 
     spr = GetSpriteForLayer(FortLayer, 2);
-    if (spr != (INT_PTR)NULL) {
+    if (spr != NULL) {
         lls = (short *)GetLLSForSprite((struct Sprite *)spr);
         if (lls) {
             if (++lls[0] >= lls[8]) {

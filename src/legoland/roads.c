@@ -466,8 +466,8 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
     struct NeighborResult r;
     unsigned short type;
     int ptmp553;
-    int ptmp236;
-    volatile int ptmp237;
+    struct Ride *ptmp236;
+    unsigned int *volatile ptmp237;
     register volatile unsigned int ptmp554;
     struct RideQueueEntry **q = (struct RideQueueEntry **)&r;
     int result;
@@ -514,7 +514,7 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
                     } else if (q[6] != NULL) {
                         type = q[6]->id;
                     } else {
-                        type = (unsigned short)(unsigned int)t;
+                        type = (unsigned short)(UINT_PTR)t;
                     }
                     FUN_004135d0(EditCursor.tile_x, EditCursor.tile_y, &r);
                     FUN_00413450(EditCursor.tile_x, EditCursor.tile_y, (struct RideQueueEntry **)&r);
@@ -851,7 +851,7 @@ void ZebraCrossingAddObject(struct Element *edit, struct RoadPlaceArg *place) {
     if (tile != NULL) {
         FUN_004135d0(place->x, place->y, &r);
         tile->field_14 |= 0x10;
-        UpdateQueuePathShape(*(short *)((char *)tile + 8), place->x, place->y);
+        UpdateQueuePathShape((short)tile->id, place->x, place->y);
         tile->field_1d = 0;
         tile->field_1c = 0;
         IncrementObjectCount((struct ObjectCount *)edit->data);

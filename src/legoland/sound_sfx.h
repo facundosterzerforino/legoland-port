@@ -26,7 +26,7 @@ struct SampleBufferVtbl {
     unsigned char pad_0[0x18];
     int(__stdcall *method_0x18)(struct SampleBuffer *self, int *out);
     unsigned char pad_1c[0x20 - 0x1c];
-    int(__stdcall *method_0x20)(struct SampleBuffer *self, struct Sample **out);
+    int(__stdcall *method_0x20)(struct SampleBuffer *self, DWORD *out); /* GetFrequency */
     int(__stdcall *method_0x24)(struct SampleBuffer *self, unsigned int *out);
     unsigned char pad_28[0x30 - 0x28];
     int(__stdcall *method_0x30)(struct SampleBuffer *self, int arg1, int arg2, int arg3);
@@ -211,7 +211,7 @@ LEGO_EXPORT int PlaySample(struct Sample *sample, unsigned int looping, unsigned
 LEGO_EXPORT int PauseSingleSample(struct Sample *sample);
 void PauseAllSamples(void);
 void ResumeAllSamples(void);
-LEGO_EXPORT void DeletePlayableSamples(unsigned int param_1);
+LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1);
 LEGO_EXPORT int UpdateSoundVols(void);
 LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample);
 void FUN_00492980(void);

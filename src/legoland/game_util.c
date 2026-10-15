@@ -618,7 +618,7 @@ int ScriptCmdRemove(struct CommandArgs *arg, int argc) {
         if (FUN_004786c0(arg, argc, 2, 2) == 0) {
             return 0;
         }
-        if (FUN_00478690((unsigned int)arg, argc, 2) == 0) {
+        if (FUN_00478690(arg, argc, 2) == 0) {
             return 0;
         }
         id = ElemID(arg->arg1);

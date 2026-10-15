@@ -1070,7 +1070,7 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
         built = IsCursorBuildable(cursor);
         flag = (built != 0) + 1;
         fbits = (flag - 1) * 4;
-        *(unsigned char *)((char *)cursor + 0x1428) = (unsigned char)fbits;
+        cursor->pad_1428[0] = (unsigned char)fbits;
         for (y = rect.y0; y <= rect.y1; y++) {
             if (rect.x0 <= rect.x1) {
                 x = rect.x0;
@@ -1461,7 +1461,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
                         }
                         if (tile == 0 || (tile->flags & 0x8f8)) {
                             PrintSprite(TileSpriteArray[(DAT_00805f48 & 0xff) + *(int *)DAT_00801a6c], screen[0], screen[1], 0xff0000, 0);
-                        } else if (*(unsigned char *)((char *)cursor + 0x1428) & 0xc) {
+                        } else if (cursor->pad_1428[0] & 0xc) {
                             PrintSprite(TileSpriteArray[(DAT_008003f8 & 0xff) + *(int *)DAT_00801a6c], screen[0], screen[1], 0, 0);
                         } else {
                             PrintSprite(TileSpriteArray[(DAT_00801b20 & 0xff) + *(int *)DAT_00801a6c], screen[0], screen[1], 0, 0);
@@ -1549,8 +1549,8 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         break;
     }
     if ((cursor->field_1828 & 0x800) != 0 && FUN_0045e690((struct ObjInfo *)EditMode.unk8) != 0) {
-        tilept.x = ((signed char *)EditMode.unk8)[0x24] + cursor->tile_x;
-        tilept.y = ((signed char *)EditMode.unk8)[0x25] + cursor->tile_y;
+        tilept.x = EditMode.unk8->field_24 + cursor->tile_x;
+        tilept.y = EditMode.unk8->field_25 + cursor->tile_y;
         GetTileBounds(&tilept, screen);
         code = FUN_0045e710((struct ObjBox *)EditMode.unk8);
         switch (code) {
@@ -2751,7 +2751,7 @@ unsigned int UnloadBaseMap(void) {
     if (0 < count) {
         do {
             LLIDB_GetElement(i, &elem);
-            if ((*(unsigned int *)((char *)elem + 8) & 0x10) != 0 && (*(unsigned int *)((char *)elem + 8) & 1) != 0) {
+            if ((elem->flags & 0x10) != 0 && (elem->flags & 1) != 0) {
                 LLIDB_UnLoadData(elem);
             }
             i = i + 1;
@@ -2762,7 +2762,7 @@ unsigned int UnloadBaseMap(void) {
     if (0 < DAT_00801a74) {
         do {
             LLIDB_FindElementFromDataPtr(DAT_00801a70[i], &elem2, 0);
-            *(unsigned int *)((char *)elem2 + 8) = *(unsigned int *)((char *)elem2 + 8) & 0xfffcfff1;
+            elem2->flags = elem2->flags & 0xfffcfff1;
             LLIDB_UnLoadData(elem2);
             i = i + 1;
         } while (i < DAT_00801a74);

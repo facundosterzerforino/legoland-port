@@ -380,7 +380,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 PrintSprite(node->sprite, node->x, node->y, node->clipped.mode, (int *)&node->hit);
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
-                    obj = (void *)node->hit.field_4;
+                    obj = node->hit.ptr;
                     ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, &node->clipped.clip, node->clipped.mode);
                 }
             }
@@ -398,7 +398,7 @@ LEGO_EXPORT void DrawAndClearPrintList(void) {
                 PrintSprite(node->sprite, node->x, node->y, node->plain.mode, (int *)&node->hit);
                 ClearSpriteOverrides();
                 if (node->hit.type == 0x103 && node->hit.field_4 != 0 && (((struct Sprite *)node->sprite)->flags & 0x2000) != 0) {
-                    obj = (void *)node->hit.field_4;
+                    obj = node->hit.ptr;
                     ((struct Element *)obj)->ride->cb_b0(obj, node->x, node->y, &node->hit.field_8, 0, node->plain.mode);
                 }
                 if ((node->flags & 4) != 0) {

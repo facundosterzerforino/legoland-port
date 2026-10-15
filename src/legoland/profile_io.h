@@ -15,8 +15,8 @@ LEGO_EXPORT char UpDateCurrentProfile(void);
 LEGO_EXPORT char SaveProfileToDisk(void);
 LEGO_EXPORT int RemoveProfile(unsigned char index);
 LEGO_EXPORT void DeleteProfileList(void);
-LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, int color_flag);
-int FUN_00491e40(char *text, int font, RECT rc, int color_flag);
+LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, INT_PTR color_flag);
+int FUN_00491e40(char *text, int font, RECT rc, INT_PTR color_flag);
 
 struct IconNode;
 LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite);

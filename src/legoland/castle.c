@@ -2330,7 +2330,7 @@ void *LoadCreatedDataFile(const char *fileName, unsigned int *sizeOut) {
     }
 
     fileSize = GetFileSize(hFile, 0);
-    buffer = FUN_004775b0(fileSize, 0, (unsigned int)DAT_004d8bb0, 0);
+    buffer = FUN_004775b0(fileSize, 0, (unsigned int)(UINT_PTR)DAT_004d8bb0, 0);
     if (buffer == 0) {
         CloseHandle(hFile);
         SetCurrentDirectoryIfNotNull("..\\..\\..");
@@ -3699,7 +3699,7 @@ void *ReadFileToBuffer(const char *fileName, unsigned int *bytesReadPtr) {
     }
 
     fileSize = GetFileSize(hFile, 0);
-    buffer = FUN_004775b0(fileSize, 0, (unsigned int)DAT_004d8bb0, 0);
+    buffer = FUN_004775b0(fileSize, 0, (unsigned int)(UINT_PTR)DAT_004d8bb0, 0);
     if (buffer == 0) {
         CloseHandle(hFile);
         return 0;
@@ -6674,7 +6674,7 @@ void *LoadRollerCoasterFile(void) {
         return 0;
     }
     fileSize = GetFileSize(hFile, 0);
-    buffer = FUN_004775b0(fileSize, 0, (unsigned int)DAT_004d8bb0, 0);
+    buffer = FUN_004775b0(fileSize, 0, (unsigned int)(UINT_PTR)DAT_004d8bb0, 0);
     if (buffer == 0) {
         CloseHandle(hFile);
         return 0;

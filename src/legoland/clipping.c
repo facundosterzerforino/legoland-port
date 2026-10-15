@@ -28,7 +28,7 @@ struct ClipNode {
     unsigned char pad_4[0x10];
     unsigned short field_14;
     unsigned char pad_16[6];
-    unsigned int field_1c;
+    const char *field_1c;
     unsigned char pad_20[0xc];
     ClipNodeMethod field_2c;
 };
@@ -110,7 +110,7 @@ void FUN_0048a790(void) {
         unsigned short type = node->field_14;
         if (type == 0xc8 || type == 0x1f4 || type == 0x190 || type == 0x12c) {
             struct ClipQueryResult *result;
-            FUN_0048a840((const char *)node->field_1c, &result);
+            FUN_0048a840(node->field_1c, &result);
             if (result->field_c) {
                 node->field_2c(node, 2, 0, 0);
             }

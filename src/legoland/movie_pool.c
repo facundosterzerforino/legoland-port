@@ -33,7 +33,7 @@ void FUN_00477410(void) {
 
 // FUNCTION: LEGOLAND 0x00477440
 struct MoviePoolElem *FUN_00477440(void) {
-    int var6;
+    INT_PTR var6; /* how far realloc moved the pool */
     struct MoviePoolElem *var5;
     struct MoviePool *var4;
     struct MoviePoolElem *var3;
@@ -48,11 +48,11 @@ struct MoviePoolElem *FUN_00477440(void) {
         if (var4 == NULL) {
             return NULL;
         }
-        var6 = (int)var4 - (int)DAT_00668fb8;
-        var4->free_elem = (struct MoviePoolElem *)((int)var4->free_elem + var6);
+        var6 = (INT_PTR)var4 - (INT_PTR)DAT_00668fb8;
+        var4->free_elem = (struct MoviePoolElem *)((INT_PTR)var4->free_elem + var6);
         var5 = var4->free_elem;
         while (var5->next != NULL) {
-            var5->next = (struct MoviePoolElem *)((int)var5->next + var6);
+            var5->next = (struct MoviePoolElem *)((INT_PTR)var5->next + var6);
             var5 = var5->next;
         }
         DAT_00668fb8 = var4;

@@ -1501,7 +1501,7 @@ LEGO_EXPORT unsigned short *AdjustPathTile(struct Point *p, unsigned short a) {
     }
     flags = (unsigned short *)(INT_PTR)IsPathTile(&tile);
     if (flags != NULL) {
-        flags = (unsigned short *)((char *)GameMap[p->y] + 0xc + p->x * 0x14);
+        flags = (unsigned short *)&GameMap[p->y][p->x].flags;
         *flags = *flags & 0xfffc;
     }
     return flags;
@@ -1551,9 +1551,9 @@ void AdjustPathTileAndNeighbours(struct Point *param) {
 LEGO_EXPORT void AddPathTileGFX(struct Point *p, unsigned short param1) {
     unsigned short *pb;
 
-    pb = (unsigned short *)((char *)GameMap[p->y] + 0xc + p->x * 0x14);
+    pb = (unsigned short *)&GameMap[p->y][p->x].flags;
     *pb |= 0x10;
-    *(unsigned short *)((char *)GameMap[p->y] + 8 + p->x * 0x14) = param1;
+    *(unsigned short *)&GameMap[p->y][p->x].field_8 = param1;
     AdjustPathTileAndNeighbours(p);
     if (MapStats.field_184 != 0) {
         PavePathSquareAt((int *)p);
@@ -1805,9 +1805,9 @@ LEGO_EXPORT void RemovePathTile(int *param_1, unsigned short param_2) {
     struct Point local_8;
 
     RestoreBaseMap(*param_1, param_1[1]);
-    flags = (unsigned short *)((char *)GameMap[param_1[1]] + 0xc + *param_1 * 0x14);
+    flags = (unsigned short *)&GameMap[param_1[1]][*param_1].flags;
     *flags = *flags & 0xffe4;
-    *(unsigned char *)((char *)GameMap[param_1[1]] + 0x10 + *param_1 * 0x14) = 0;
+    *(unsigned char *)&GameMap[param_1[1]][*param_1].field_10 = 0;
     local_8.x = *param_1;
     local_8.y = param_1[1] + -1;
     AdjustPathTile(&local_8, param_2);

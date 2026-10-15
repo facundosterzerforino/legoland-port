@@ -742,8 +742,8 @@ LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node) {
     unsigned int *objsub;
 
     if (EditMode.unk0 == 1 && EditMode.unk8 != 0) {
-        objsub = *(unsigned int **)((char *)node->field_8 + 0xc4);
-        if (*(unsigned int **)((char *)EditMode.unk8 + 0xc4) == objsub) {
+        objsub = (unsigned int *)((struct Ride *)node->field_8)->element;
+        if ((unsigned int *)EditMode.unk8->element == objsub) {
             objsub[2] = objsub[2] & 0xfffdffff;
         }
     }
@@ -773,8 +773,8 @@ LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node) {
             }
             if (EditMode.unk0 == 1 && EditMode.unk8 != 0) {
                 // STRING: LEGOLAND 0x004ba888
-                if (strcmp("Path", *(char **)((char *)EditMode.unk8 + 0x78)) != 0 &&
-                    *(unsigned int **)((char *)EditMode.unk8 + 0xc4) == *(unsigned int **)((char *)node->field_8 + 0xc4)) {
+                if (strcmp("Path", EditMode.unk8->name) != 0 &&
+                    EditMode.unk8->element == ((struct Ride *)node->field_8)->element) {
                     struct Sprite *s = AttractHighlightOnSprite;
                     if (GetBlink() != 0) {
                         s = AttractHighlightOffSprite;
@@ -1199,7 +1199,7 @@ void FUN_0046ee00(void) {
         switch (EditMode.unk0) {
         case 1:
             if (EditMode.unk8 != 0) {
-                if (strcmp("Path", *(char **)((char *)EditMode.unk8 + 0x78)) == 0) {
+                if (strcmp("Path", EditMode.unk8->name) == 0) {
                     mode = 1;
                     break;
                 }

@@ -93,8 +93,8 @@ void FUN_0042bc90(struct CarouselNode *node) {
     node->flags = node->flags & 0xffffbfff | 1;
     node->seated_count = 0;
     node->frame_ticks = 0;
-    params.x = *(unsigned char *)((char *)node + 4);
-    params.y = *(unsigned char *)((char *)node + 5);
+    params.x = ((TileId *)&node->id)->pos.x;
+    params.y = ((TileId *)&node->id)->pos.y;
     node->frame = 1;
     PlayInstanceOfSample(CAROUSSEL_SFX[0].sample, 1, 1, &params);
 }
@@ -112,8 +112,8 @@ void FUN_0042c210(struct CarouselNode *node) {
     node->seated_count = 0;
     node->flags = node->flags & 0xffffbffe;
     params.field_0 = 2;
-    params.x = *(unsigned char *)((char *)node + 4);
-    params.y = *(unsigned char *)((char *)node + 5);
+    params.x = ((TileId *)&node->id)->pos.x;
+    params.y = ((TileId *)&node->id)->pos.y;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 
@@ -207,8 +207,8 @@ struct RideSpriteInfo *GetCarouselSpriteInfo(struct Element *param1, unsigned sh
     struct Ride *ride = param1->ride;
 
     DAT_006160a0.sprite = ride->layer;
-    DAT_006160a0.x = *(unsigned int *)((char *)ride + 0x14);
-    DAT_006160a0.y = *(unsigned int *)((char *)ride + 0x18);
+    DAT_006160a0.x = ride->field_14;
+    DAT_006160a0.y = ride->field_18;
     DAT_006160a0.id = param2;
     ride->layer->flags |= 0x2000;
     return &DAT_006160a0;
@@ -275,9 +275,9 @@ int Carousel_Load(struct Element *param_1) {
             elem->person->field_30 = 0;
         }
         {
-            unsigned int *h = *(unsigned int **)((char *)elem->rider + 0x54);
+            struct BNVRef *h = elem->rider->bnv;
             if (h != NULL) {
-                *h = ((unsigned int *)DAT_00616090)[h[1]];
+                h->file = ((struct BinVFile **)DAT_00616090)[h->index];
             }
         }
     }
@@ -327,9 +327,9 @@ void FUN_0042c6d0(struct CarouselNode *node) {
         }
     }
     for (; elem != NULL; elem = elem->next) {
-        if (node->id == elem->tile.id && *(char *)((char *)elem->rider + 0x35) == '\x01') {
+        if (node->id == elem->tile.id && elem->rider->field_35 == 1) {
             // STRING: LEGOLAND 0x004b4704
-            sprintf(CarouselBlokeBoxName + 8, "%02d", *(unsigned char *)((char *)elem->rider + 0x36));
+            sprintf(CarouselBlokeBoxName + 8, "%02d", elem->rider->field_36);
             SetBlokePositionFromBNV(CarouselBinV, elem->rider, CarouselBlokeBoxName, (int)(char)node->frame, -1617853.25f, -1618109.0f, 0);
         }
     }
@@ -623,6 +623,6 @@ int FUN_0042cd20(struct RideNode *elem, struct CarouselNode *node, signed char d
     }
 
     slots[0x20 + index] = 1;
-    *(char *)((char *)elem->rider + 0x36) = (char)(index + 1);
+    elem->rider->field_36 = (unsigned char)(index + 1);
     return index + 1;
 }

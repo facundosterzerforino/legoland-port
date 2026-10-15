@@ -417,7 +417,7 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
 }
 
 // FUNCTION: LEGOLAND 0x00491d60
-LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, int color_flag) {
+LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, INT_PTR color_flag) {
     HRGN region = CreateRectRgn(SPRITE_ClipRect.left, SPRITE_ClipRect.top, SPRITE_ClipRect.right, SPRITE_ClipRect.bottom);
     HDC hdc;
     HGDIOBJ old_region;
@@ -429,7 +429,7 @@ LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, int color_flag) {
         SetTextColor(hdc, 0xffffff);
     }
     old_region = SelectObject(hdc, region);
-    color_flag = (int)SelectFont(hdc, font);
+    color_flag = (INT_PTR)SelectFont(hdc, font); /* the old font */
     DrawTextA(hdc, text, strlen(text), &rc, 0x25);
     SelectObject(hdc, (HGDIOBJ)color_flag);
     SelectObject(hdc, old_region);
@@ -439,7 +439,7 @@ LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, int color_flag) {
 }
 
 // FUNCTION: LEGOLAND 0x00491e40
-int FUN_00491e40(char *text, int font, RECT rc, int color_flag) {
+int FUN_00491e40(char *text, int font, RECT rc, INT_PTR color_flag) {
     RECT measured;
     HRGN region;
     HDC hdc;
@@ -454,7 +454,7 @@ int FUN_00491e40(char *text, int font, RECT rc, int color_flag) {
         SetTextColor(hdc, 0xffffff);
     }
     old_region = SelectObject(hdc, region);
-    color_flag = (int)SelectFont(hdc, font);
+    color_flag = (INT_PTR)SelectFont(hdc, font); /* the old font */
     DrawTextA(hdc, text, strlen(text), &measured, 0x425);
     DrawTextA(hdc, text, strlen(text), &rc, 0x25);
     SelectObject(hdc, (HGDIOBJ)color_flag);

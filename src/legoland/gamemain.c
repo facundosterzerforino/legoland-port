@@ -278,10 +278,10 @@ void FUN_004779d0(struct Point *p) {
     struct Point pos;
     WorkOrder *order;
 
-    int ptmp12;
+    struct Element *ptmp12;
     register int ptmp60;
     int ptmp62;
-    int ptmp63;
+    void *ptmp63;
     int ptmp184;
     if (p->x >= 0 && p->x < (unsigned int)lpConfig->width && p->y >= 0 && (unsigned int)p->y < lpConfig->height) {
         tile = &GameMap[p->y][p->x];
@@ -318,7 +318,7 @@ void FUN_004779d0(struct Point *p) {
     }
     if (tile->flags & 0x800) {
         order = GetGardenerWorkOrderAt(p->x, p->y);
-        if (NULL != (unsigned)order) {
+        if (NULL != order) {
             FUN_0045e850((struct ObjNode *)order->element, &order->pos.x);
             ptmp63 = order->element->data;
             ClearPathUnderFootprint((struct PathFootprint *)ptmp63, &order->pos.x);

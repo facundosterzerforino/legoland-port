@@ -1471,7 +1471,7 @@ extern struct Sprite *LogFlumeEntrance3Sprite;
 // 0x004cbe98
 extern struct Sprite *LogFlumeEntrance1Sprite;
 // 0x004cbe9c
-extern unsigned int DrivingSchoolPumpsRide;
+extern struct Ride *DrivingSchoolPumpsRide;
 // 0x004cbea4
 extern struct PumpNode *PumpList;
 // 0x004cbeac
@@ -1593,7 +1593,7 @@ extern unsigned int DAT_004cbf8c;
 // 0x004cbf98
 extern struct RideSpriteInfo DAT_004cbf98;
 // 0x004cbfb8
-extern unsigned int DAT_004cbfb8[3];
+extern struct BinVFile *DAT_004cbfb8[3];
 // 0x004cbfc4
 extern void *TempSlideBinV;
 // 0x004cbfc8
@@ -2395,7 +2395,7 @@ extern LPDIRECTDRAWSURFACE renderEngine;
 // 0x00668080
 extern LPDIRECTDRAWCLIPPER DDrawClipper;
 // 0x00668084
-extern unsigned int DDPalette;
+extern LPDIRECTDRAWPALETTE DDPalette;
 // 0x00668088
 extern unsigned int DisplayPixelFormat;
 // 0x0066808c
@@ -2832,7 +2832,7 @@ extern unsigned int DAT_0066b5ac;
 // 0x0066b5b0
 extern DDSURFACEDESC DAT_0066b5b0;
 // 0x0066b61c
-extern unsigned int DAT_0066b61c;
+extern void *DAT_0066b61c;
 // 0x0066b620
 extern RECT DAT_0066b620;
 // 0x0066b630
@@ -3302,7 +3302,7 @@ extern unsigned int MidiTimerId;
 // 0x007fd634
 extern void *CurrentMidiFile;
 // 0x007fd638
-extern unsigned int MidiOutHandle;
+extern HMIDIOUT MidiOutHandle;
 // 0x007fd640
 extern struct ResVolume *ResourceVolumes[4];
 // 0x007fd660

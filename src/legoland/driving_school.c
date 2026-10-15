@@ -280,7 +280,7 @@ void DrivingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int
     unsigned int mapx;
     unsigned int mapy;
 
-    memcpy(EditCursor.field_1414, (char *)src + 0x3c, 20);
+    memcpy(EditCursor.field_1414, &src->footprint, sizeof(EditCursor.field_1414));
     EditCursor.field_1830 = 0;
     EditCursor.field_1828 = 0x4408;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);

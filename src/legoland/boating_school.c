@@ -556,7 +556,7 @@ void LoadBoatingSchoolResources(Element *obj) {
     }
     for (i = 0; i < BoatingSchoolBoats->count; i++) {
         sprite = BoatingSchoolBoats->sprites[i & 0xff];
-        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(void **)((char *)sprite + 8));
+        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), ((struct Sprite *)sprite)->image);
     }
     // STRING: LEGOLAND 0x004b530c
     BoatingSchoolHullMaskSprite = LoadSprite("bs_hullmask.lls", 1);

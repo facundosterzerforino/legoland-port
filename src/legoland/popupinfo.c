@@ -560,7 +560,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     DAT_007fdec0.data.value = t.data.value;
     switch (t.type) {
     case 0x307:
-        if (*(short *)((char *)t.ptr + 0xc) != 5) {
+        if ((short)t.ptr->action != 5) {
             PlayInstanceOfSample(GameFX[FX_GARDENER_LIFT].sample, 0, 1, 0);
             PickUpWorker(0x307, t.ptr);
         }
@@ -898,7 +898,7 @@ int FUN_004723f0(void) {
     memcpy(&local_cursor, &QueryCursor, sizeof(struct Cursor));
     local_8[0] = v & 0xff;
     local_8[1] = v >> 8;
-    cls = *(struct Ride **)((char *)DAT_007fdec0.ptr + 0xc);
+    cls = ((struct Element *)DAT_007fdec0.ptr)->ride;
     QueryCursor.tile_y = v >> 8;
     QueryClass = cls;
     QueryCursor.tile_x = v & 0xff;
@@ -1294,7 +1294,7 @@ unsigned char PopUpOkEventHandler(void *param_1, unsigned char flags) {
         memcpy(&local_cursor, &QueryCursor, sizeof(struct Cursor));
         local_8[0] = v & 0xff;
         local_8[1] = v >> 8;
-        cls = *(struct Ride **)((char *)DAT_007fdec0.ptr + 0xc);
+        cls = ((struct Element *)DAT_007fdec0.ptr)->ride;
         QueryCursor.tile_y = local_8[1];
         QueryObj.pos.y = (unsigned char)local_8[1];
         QueryClass = cls;
@@ -1454,7 +1454,7 @@ void UpdateAdvicePriority(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00473680
-void FUN_00473680(int param_1, int param_2, char *param_3, unsigned int param_4, unsigned int param_5) {
+void FUN_00473680(int param_1, int param_2, char *param_3, void *param_4, void *param_5) {
     strcpy(DAT_00668968, param_3);
     DAT_007fe010 = param_1;
     DAT_007fe014 = param_2;

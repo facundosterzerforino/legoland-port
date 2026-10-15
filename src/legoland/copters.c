@@ -600,7 +600,7 @@ void CoptersAnimateLayer(struct CopterNode *node, int index) {
 }
 
 // FUNCTION: LEGOLAND 0x004048a0
-unsigned int CoptersResumeSample(unsigned int param) {
+unsigned int CoptersResumeSample(void *param) {
     ResumeSinglyPausedSample((struct Sample *)param);
     return 0;
 }
@@ -795,7 +795,7 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 2:
-                qi = (int)FUN_004122f0((struct RideSlot *)b);
+                qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
                 FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 3:
@@ -843,7 +843,7 @@ void CoptersUpdate(struct Element *elem) {
                 CoptersQueueTableToIndex((struct CopterItem *)link);
                 break;
             case 9:
-                qi = (int)FUN_004122f0((struct RideSlot *)b);
+                qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
                 FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 10:

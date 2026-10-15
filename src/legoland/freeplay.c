@@ -271,7 +271,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
             continue;
         }
         idx = 0;
-        for (entry = DAT_004bdeb8; (INT_PTR)entry < (int)&DAT_004bdeb8[0x86]; entry++, idx++) {
+        for (entry = DAT_004bdeb8; (INT_PTR)entry < (INT_PTR)&DAT_004bdeb8[0x86]; entry++, idx++) {
             if (entry->id == i && LLIDB_FindElement(entry->name, &t1, 0) == 0) {
                 break;
             }

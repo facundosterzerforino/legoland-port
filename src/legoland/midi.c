@@ -143,7 +143,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
                 track->pos++;
                 ev |= track->data[track->pos] << 16;
                 track->pos++;
-                midiOutShortMsg((HMIDIOUT)MidiOutHandle, ev);
+                midiOutShortMsg(MidiOutHandle, ev);
                 break;
             case 0xa0:
                 track->pos += 2;
@@ -151,7 +151,7 @@ unsigned int FUN_00480330(struct MidiTrack *track) {
             case 0xc0:
                 ev |= track->data[track->pos] << 8;
                 track->pos++;
-                midiOutShortMsg((HMIDIOUT)MidiOutHandle, ev);
+                midiOutShortMsg(MidiOutHandle, ev);
                 break;
             case 0xd0:
                 track->pos++;
@@ -207,7 +207,7 @@ LEGO_EXPORT void PlayMIDI(struct MidiFile *midi) {
 LEGO_EXPORT int InitMIDIManager(void) {
     CurrentMidiFile = 0;
     MidiTimerId = timeSetEvent(0x14, 0xa, (LPTIMECALLBACK)MidiTimerCallback, 0, 1);
-    midiOutOpen((LPHMIDIOUT)&MidiOutHandle, (UINT)-1, 0, 0, 0);
+    midiOutOpen(&MidiOutHandle, (UINT)-1, 0, 0, 0);
     return 1;
 }
 
@@ -215,5 +215,5 @@ LEGO_EXPORT int InitMIDIManager(void) {
 LEGO_EXPORT void KillMIDIManager(void) {
     CurrentMidiFile = 0;
     timeKillEvent(MidiTimerId);
-    midiOutClose((HMIDIOUT)MidiOutHandle);
+    midiOutClose(MidiOutHandle);
 }

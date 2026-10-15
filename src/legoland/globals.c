@@ -1499,7 +1499,7 @@ struct Sprite *LogFlumeEntrance3Sprite;
 struct Sprite *LogFlumeEntrance1Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbe9c
-unsigned int DrivingSchoolPumpsRide;
+struct Ride *DrivingSchoolPumpsRide;
 
 // GLOBAL: LEGOLAND 0x004cbea4
 struct PumpNode *PumpList;
@@ -1682,7 +1682,7 @@ unsigned int DAT_004cbf8c;
 struct RideSpriteInfo DAT_004cbf98;
 
 // GLOBAL: LEGOLAND 0x004cbfb8
-unsigned int DAT_004cbfb8[3];
+struct BinVFile *DAT_004cbfb8[3];
 
 // GLOBAL: LEGOLAND 0x004cbfc4
 void *TempSlideBinV;
@@ -2865,7 +2865,7 @@ LPDIRECTDRAWSURFACE renderEngine;
 LPDIRECTDRAWCLIPPER DDrawClipper;
 
 // GLOBAL: LEGOLAND 0x00668084
-unsigned int DDPalette;
+LPDIRECTDRAWPALETTE DDPalette;
 
 // GLOBAL: LEGOLAND 0x00668088
 unsigned int DisplayPixelFormat;
@@ -3516,7 +3516,7 @@ unsigned int DAT_0066b5ac;
 DDSURFACEDESC DAT_0066b5b0;
 
 // GLOBAL: LEGOLAND 0x0066b61c
-unsigned int DAT_0066b61c;
+void *DAT_0066b61c;
 
 // GLOBAL: LEGOLAND 0x0066b620
 RECT DAT_0066b620;
@@ -4197,7 +4197,7 @@ unsigned int MidiTimerId;
 void *CurrentMidiFile;
 
 // GLOBAL: LEGOLAND 0x007fd638
-unsigned int MidiOutHandle;
+HMIDIOUT MidiOutHandle;
 
 // GLOBAL: LEGOLAND 0x007fd640
 struct ResVolume *ResourceVolumes[4];

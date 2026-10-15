@@ -24,22 +24,6 @@ struct TempleRide {
     unsigned int var_c;
 };
 
-struct BlokeRender {
-    unsigned char pad_0[0x2c];
-    unsigned int field_2c;
-    unsigned int field_30;
-};
-
-struct SlidePath {
-    unsigned int field_0;
-    unsigned int field_4;
-};
-
-struct BlokeData {
-    unsigned char pad_0[0x54];
-    struct SlidePath *path;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00416ec0
@@ -137,7 +121,7 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
             person->screen.x = bloke->screen_x + off1.x + off2.x + pos.x;
             person->screen.y = bloke->screen_y + off1.y + off2.y + pos.y;
             AdjustBlokePosition(&person->screen);
-            AddBlokeToRenderList(&DAT_004cbf84, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004cbf84, (struct PersonSrc *)node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004cbf84);
@@ -169,7 +153,7 @@ void TempleSlideLoad(struct Element *arg) {
     TempSlideMatteSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f50
         "tempslide_matte.lls", 1);
-    DAT_004cbfb8[0] = (unsigned int)TempSlideBinV;
+    DAT_004cbfb8[0] = TempSlideBinV;
 }
 
 // FUNCTION: LEGOLAND 0x00417200
@@ -376,7 +360,7 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617664.875f, -1617913.0f);
                 bloke->field_35 = 0;
-                bloke->path = NewBNVPath((struct BinVFile *)DAT_004cbfb8[0], 0, DAT_004b4f08[bloke->field_36], -1617664.875f, -1617913.0f, off);
+                bloke->path = NewBNVPath(DAT_004cbfb8[0], 0, DAT_004b4f08[bloke->field_36], -1617664.875f, -1617913.0f, off);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -501,23 +485,23 @@ LEGO_EXPORT int LoadTempleSlide(struct Element *obj) {
     }
 
     for (node = ride->riders; node != NULL; node = node->next) {
-        struct BlokeRender *render = node->person;
-        struct BlokeData *bloke;
-        struct SlidePath *path;
+        struct Person *render = node->person;
+        struct Bloke *bloke;
+        struct BNVRef *path;
 
         if (render->field_30 != 0) {
             /* [port] the original reads DAT_004cbfcc[field_30]; field_30 is 1 here, the global after it (an int and
              * a sprite pointer, so they can't be one array) */
-            render->field_2c = render->field_30 == 1 ? (unsigned int)ZTempSlideSprite : (unsigned int)DAT_004cbfcc[render->field_30];
+            render->sprite = render->field_30 == 1 ? ZTempSlideSprite : (struct Sprite *)(INT_PTR)DAT_004cbfcc[render->field_30];
         } else {
             render->field_2c = 0;
             node->person->field_30 = 0;
         }
 
         bloke = node->rider;
-        path = bloke->path;
+        path = bloke->bnv;
         if (path != NULL) {
-            path->field_0 = DAT_004cbfb8[path->field_4];
+            path->file = DAT_004cbfb8[path->index];
         }
     }
 

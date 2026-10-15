@@ -439,8 +439,9 @@ LEGO_EXPORT int SetSampleFrequency(struct Sample *sample, int frequency) {
 }
 
 // FUNCTION: LEGOLAND 0x00492a60
-struct Sample *GetSampleFrequency(struct Sample *sample) {
+unsigned int GetSampleFrequency(struct Sample *sample) {
     struct SampleBuffer *buffer;
+    DWORD frequency;
 
     if (SoundAvailable == 0) {
         return 0;
@@ -453,7 +454,7 @@ struct Sample *GetSampleFrequency(struct Sample *sample) {
     }
 
     buffer = sample->buffer;
-    return buffer->vtable->method_0x20(buffer, &sample) == 0 ? sample : 0;
+    return buffer->vtable->method_0x20(buffer, &frequency) == 0 ? frequency : 0;
 }
 
 // FUNCTION: LEGOLAND 0x00492aa0
@@ -512,7 +513,7 @@ LEGO_EXPORT void KillPlayableSample(struct Sample *sample) {
 }
 
 // FUNCTION: LEGOLAND 0x00492b90
-LEGO_EXPORT void DeletePlayableSamples(unsigned int param_1) {
+LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1) {
     struct Sample *current;
     struct Sample *previous;
     struct Sample *next;
@@ -544,7 +545,7 @@ LEGO_EXPORT void DeleteSampleDef(struct SampleDef *def) {
     if (def == 0) {
         return;
     }
-    DeletePlayableSamples((unsigned int)def);
+    DeletePlayableSamples(def);
     free(def->block_30);
     free(def->block_34);
     ((struct SampleDefVtbl *)def->buffer->vtable)->func_8(def->buffer);

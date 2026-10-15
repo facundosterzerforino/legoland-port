@@ -883,7 +883,7 @@ void MonkeyFishAddObject(struct EditObject *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00434330
-void JungleCruiseMonkeyFishCalcCursor(Element *obj, int *param_2, int *param_3) {
+void JungleCruiseMonkeyFishCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
     struct Ride *ride;
     TileId owners[2];
     struct Footprint fp;
@@ -1102,7 +1102,7 @@ void LoadJungleCruiseResources(Element *obj) {
     }
     for (i = 0; i < JungleCruiseBoats->count; i++) {
         sprite = JungleCruiseBoats->sprites[(unsigned char)i];
-        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), *(void **)((char *)sprite + 8));
+        LLSPlay(GetLLSForSprite((struct Sprite *)sprite), ((struct Sprite *)sprite)->image);
     }
     // STRING: LEGOLAND 0x004b72b8
     JungMaskSprite = LoadSprite("jungmask.lls", 1);
@@ -1568,7 +1568,7 @@ void RenderJungleCruise(struct Element *param_1, unsigned int param_2, unsigned 
 
     DrawJungleCruiseBoats(1);
     for (; node != NULL; node = node->next) {
-        if (*param_4 == *(short *)&node->tile && *((char *)node->rider + 0x60) != '\x02') {
+        if (*param_4 == *(short *)&node->tile && node->rider->param_action != 2) {
             IP_RenderBlokeIn3DNow(node->rider);
         }
     }

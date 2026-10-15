@@ -58,7 +58,7 @@ struct TrackElemPair {
    the thing itself and its tile.  Passed by value to PopUpInfoSetUp. */
 struct HoverInfo {
     int type;
-    struct Bloke *ptr;
+    struct Bloke *ptr; /* or, for an object, its struct Element */
     union {
         unsigned int value;
         TileId tile;

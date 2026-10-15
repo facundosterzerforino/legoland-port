@@ -1149,7 +1149,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
                 do {
                     next = (struct SweepInstance *)GetNextRenderObject((MapElement *)next);
                 } while (next != NULL && (cls = next->object->cls, power = FindObjectsPower(cls), cls->parent_element != NULL) &&
-                    (0x10 & ((unsigned char *)cls->parent_element)[8]) != 0 && power <= 0);
+                    (0x10 & (unsigned char)cls->parent_element->flags) != 0 && power <= 0);
                 break;
             case 1:
                 next = current;

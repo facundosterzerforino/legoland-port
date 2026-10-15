@@ -539,7 +539,7 @@ int FUN_00415760(struct RideNode *node, unsigned short *key) {
     for (cur = SafariRide->riders; cur != NULL; cur = cur->next) {
         if (memcmp(&cur->tile, key, 2) == 0) {
             if (cur == node) {
-                *((unsigned char *)node->rider + 0x36) = (unsigned char)n;
+                node->rider->field_36 = (unsigned char)n;
                 return n;
             }
             n++;

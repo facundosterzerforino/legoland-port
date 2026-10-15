@@ -19,7 +19,7 @@
 #include "render3d.h"
 
 // FUNCTION: LEGOLAND 0x0042d970
-void FUN_0042d970(TileId *tile, unsigned int arg) {
+void FUN_0042d970(TileId *tile, struct Bloke *arg) {
     struct SampleParams config;
 
     config.field_0 = 1;
@@ -234,7 +234,7 @@ void Entrance1Update(Element *elem) {
         case 1:
             if (bloke->field_36 == 1) {
                 AddBricks(MapStats.entrance_fee);
-                FUN_0042d970(&node->tile, (unsigned int)bloke);
+                FUN_0042d970(&node->tile, bloke);
                 table = ENTRANCE_DEST_RIGHT;
                 bloke->dest.x = (x0 << 8) - 0x80;
             } else {
