@@ -58,13 +58,6 @@ struct EdgeSet {
     struct EdgePair *pairs;
 };
 
-struct FlagNode {
-    unsigned char pad_0[0x10];
-    int kind;
-    unsigned int pad_14;
-    struct FlagNode *next;
-};
-
 #include "../../port/port_asm.h"
 #include "image_sprite.h"
 // FUNCTION: LEGOLAND 0x0041cc50
@@ -3231,8 +3224,8 @@ struct Obj421ab0 {
     unsigned int field_44;
     float field_48;
     void **field_4c;
-    unsigned int field_50;
-    unsigned int field_54;
+    struct SegBlob *field_50; /* next */
+    struct SegBlob *field_54; /* prev */
 };
 
 // FUNCTION: LEGOLAND 0x00421ab0
@@ -3252,8 +3245,8 @@ void FUN_00421ab0(struct Obj421ab0 *obj, float *a, float *b, struct Words3 *c) {
     obj->field_4c = &DAT_004dd5e0[8];
     obj->field_44 = 0;
     obj->field_48 = 1.0f;
-    obj->field_50 = 0;
-    obj->field_54 = 0;
+    obj->field_50 = NULL;
+    obj->field_54 = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00421b40
@@ -3338,8 +3331,8 @@ struct Obj421ce0 {
     unsigned int field_44;
     float field_48;
     void **field_4c;
-    unsigned int field_50;
-    unsigned int field_54;
+    struct SegBlob *field_50; /* next */
+    struct SegBlob *field_54; /* prev */
 };
 
 // FUNCTION: LEGOLAND 0x00421ce0
@@ -3352,8 +3345,8 @@ void FUN_00421ce0(struct Words3 *a, struct Words3 *b, struct Words3 *c, struct O
     obj->field_28 = e;
     obj->field_44 = 0;
     obj->field_48 = 1.5707950592041016f;
-    obj->field_50 = 0;
-    obj->field_54 = 0;
+    obj->field_50 = NULL;
+    obj->field_54 = NULL;
 }
 
 struct Struct1d60 {
@@ -4076,7 +4069,7 @@ struct RecBuf {
 void FUN_00423140(int param_1) {
     /* Port [library:asm]: the original is inline asm. It flushes the queued draw records, timing itself with rdtsc. */
     unsigned int start = PortTimestamp();
-    struct FlagNode *node;
+    struct ListLink *node;
     struct RecBuf *rec;
     struct RecBuf *next;
 
@@ -4086,7 +4079,7 @@ void FUN_00423140(int param_1) {
         DAT_0060f914[0].fp.v[0] = 10;
     } else {
         /* clear the dirty rectangles, then replay the records queued since the last flush */
-        for (node = (struct FlagNode *)DAT_00829a3c.var_18; node != (struct FlagNode *)&DAT_00829a3c; node = node->next) {
+        for (node = DAT_00829a3c.var_18; node != &DAT_00829a3c; node = node->var_18) {
             if (node->kind != 0) {
                 FUN_00423480((struct ClearRect *)node);
             }
@@ -5130,23 +5123,13 @@ void FUN_00424d80(struct CastleState *list) {
     }
 }
 
-struct DcLink {
-    unsigned char pad_0[0x60];
-    unsigned char field_60;
-};
-
-struct DcNode {
-    unsigned char pad_0[0xc];
-    struct DcLink *field_c;
-};
-
 // FUNCTION: LEGOLAND 0x00424dc0
 void FUN_00424dc0(struct CastleState *arg) {
-    struct DcNode *current = FUN_00424b90(arg);
+    struct CastleVisitor *current = FUN_00424b90(arg);
     if (current != NULL) {
         while (current != NULL) {
-            struct DcLink *next = current->field_c;
-            next->field_60 = 33;
+            struct Bloke *next = current->bloke;
+            next->param_action = 33;
             FUN_00421980((struct CastleVisitor *)current);
             current = FUN_00424b90(arg);
         }
@@ -5812,7 +5795,7 @@ unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int st
      * added when the point lies inside a dirty rectangle whose mask accepts it. */
     float (*mat)[4] = (float (*)[4])m;
     int *rec = (int *)out;
-    struct FlagNode *node;
+    struct ListLink *node;
     struct ClearRect *r;
     int i;
     int k;
@@ -5822,7 +5805,7 @@ unsigned int FUN_00426250(float in[][3], int out[][4], float *m, unsigned int st
             rec[k] = PortRound(FLOAT_004ab390 + in[i][0] * mat[k][0] + in[i][1] * mat[k][1] + in[i][2] * mat[k][2] + mat[k][3]);
         }
         rec[3] = PortOutCode(rec[0], rec[1], DAT_008299ac[0], DAT_008299ac[1], DAT_008299ac[2], DAT_008299ac[3]);
-        for (node = (struct FlagNode *)DAT_00829a3c.var_18; node != (struct FlagNode *)&DAT_00829a3c; node = node->next) {
+        for (node = DAT_00829a3c.var_18; node != &DAT_00829a3c; node = node->var_18) {
             r = (struct ClearRect *)node;
             if ((node->kind & PortOutCode(rec[0], rec[1], r->left, r->top, r->right, r->bottom)) == 0xf) {
                 rec[3] |= 0xf0;
@@ -5962,13 +5945,13 @@ int FUN_004265d0(struct RectI *a, struct RectI *b) {
 
 // FUNCTION: LEGOLAND 0x00426650
 unsigned int FUN_00426650(void) {
-    struct FlagNode *n = (struct FlagNode *)DAT_00829a3c.var_18;
+    struct ListLink *n = (struct ListLink *)DAT_00829a3c.var_18;
 
-    while (n != (struct FlagNode *)&DAT_00829a3c) {
+    while (n != (struct ListLink *)&DAT_00829a3c) {
         if (n->kind == 0xf) {
             return 1;
         }
-        n = n->next;
+        n = n->var_18;
     }
     return 0;
 }
