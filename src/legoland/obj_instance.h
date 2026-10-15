@@ -17,7 +17,10 @@ struct ObjInstance {
     /* 0x04 */ struct ObjInstance *prev;
     /* 0x08 */ struct Ride *ride; /* the instance's class */
     /* 0x0c */ unsigned short flags;
-    /* 0x0e */ unsigned short uid; /* anchor tile id */
+    /* 0x0e */ union {
+        unsigned short uid; /* anchor tile id */
+        TileId anchor;
+    };
     /* 0x10 */ unsigned int field_10;
 };
 typedef struct ObjInstance ObjInstance;

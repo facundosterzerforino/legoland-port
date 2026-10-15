@@ -44,7 +44,7 @@ struct MoviePoolElem *FUN_00477440(void) {
         return NULL;
     }
     if (DAT_00668fb8->array == NULL) {
-        var4 = (struct MoviePool *)realloc(DAT_00668fb8, (DAT_00668fb8->count + 0x400) * 0x8c + 0xc);
+        var4 = (struct MoviePool *)realloc(DAT_00668fb8, (DAT_00668fb8->count + 0x400) * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
         if (var4 == NULL) {
             return NULL;
         }
@@ -56,8 +56,8 @@ struct MoviePoolElem *FUN_00477440(void) {
             var5 = var5->next;
         }
         DAT_00668fb8 = var4;
-        var2 = (struct MoviePoolElem *)((char *)DAT_00668fb8 + DAT_00668fb8->count * 0x8c + 0xc);
-        memset(var2, 0, 0x400 * 0x8c);
+        var2 = (struct MoviePoolElem *)((char *)DAT_00668fb8 + DAT_00668fb8->count * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
+        memset(var2, 0, 0x400 * sizeof(struct MoviePoolElem));
         DAT_00668fb8->array = var2;
         for (var1 = 0; var1 < 0x3ff; var1++) {
             DAT_00668fb8->array[var1].next = &DAT_00668fb8->array[var1 + 1];

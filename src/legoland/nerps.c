@@ -30,24 +30,6 @@
 
 #pragma intrinsic(strcpy, strlen)
 
-struct LoopArg {
-    unsigned char pad_0[0x4];
-    struct LoopObject *field_4;
-    unsigned char pad_8[0x1c - 0x8];
-    int field_1c;
-};
-
-struct LoopVtable {
-    unsigned char pad_0[0xc0];
-    int (*eval)(struct LoopObject *object, int param_2);
-};
-
-struct LoopObject {
-    const char *name;
-    unsigned char pad_4[0xc - 0x4];
-    struct LoopVtable *vtable;
-};
-
 // FUNCTION: LEGOLAND 0x0046a040
 void SetScriptFeature(unsigned int param_1, unsigned int param_2) {
     switch (param_1) {
@@ -167,51 +149,29 @@ unsigned int ScriptEventWorkers(struct ObjectiveEvent *arg) {
     return 1;
 }
 
-struct TileNode {
-    struct TileNode *next;
-    unsigned char pad_4[0xe - 0x4];
-    unsigned char x;
-    unsigned char y;
-};
-
-struct TileGroup {
-    unsigned char pad_0[0x4];
-    struct TileNode *list;
-    int count;
-    int x;
-    int y;
-    unsigned char pad_14[0x2c - 0x14];
-    unsigned char durability;
-};
-
-struct TileGroupHolder {
-    unsigned char pad_0[0xc];
-    struct TileGroup *group;
-};
-
 // FUNCTION: LEGOLAND 0x0046a230
 unsigned int ScriptEventDegrade(struct ObjectiveEvent *arg) {
-    struct TileGroup *group;
-    struct TileNode *node;
+    struct Ride *group;
+    struct ObjInstance *node;
     struct MapElement *tile;
     int value;
     int limit;
     unsigned char threshold;
     struct Point pt;
 
-    group = ((struct TileGroupHolder *)arg->element)->group;
-    node = group->list;
+    group = ((struct Element *)arg->element)->ride;
+    node = group->instances;
     value = (unsigned int)group->durability * arg->field_14;
     threshold = (char)(value / 100);
     limit = arg->field_1c;
-    if (limit > group->count || limit == 0) {
-        limit = group->count;
+    if (limit > (int)group->field_8 || limit == 0) {
+        limit = group->field_8;
     }
     while (node != NULL && limit != 0) {
-        pt.x = node->x;
-        pt.y = node->y;
+        pt.x = node->anchor.pos.x;
+        pt.y = node->anchor.pos.y;
         if (pt.x >= 0 && pt.x < lpConfig->width && pt.y >= 0 && pt.y < lpConfig->height) {
-            tile = (struct MapElement *)((char *)GameMap[pt.y] + pt.x * 0x14);
+            tile = &GameMap[pt.y][pt.x];
         } else {
             tile = NULL;
         }
@@ -365,7 +325,7 @@ unsigned int ScriptEventNeedAt(struct ObjectiveEvent *arg) {
         y >= (int)(unsigned int)lpConfig->height) {
         tile = NULL;
     } else {
-        tile = (struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = &GameMap[y][x];
     }
     if ((tile->flags & 0x80) != 0 && tile->field_0 == arg->element) {
         return 1;
@@ -404,16 +364,16 @@ unsigned int ScriptEventNeedIn(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046a690
 unsigned int ScriptEventConnect(struct ObjectiveEvent *arg) {
-    struct TileGroup *group;
-    struct TileNode *node;
+    struct Ride *group;
+    struct ObjInstance *node;
     struct MapElement *tile;
     int x;
     int y;
 
-    group = ((struct TileGroupHolder *)arg->element)->group;
-    for (node = group->list; node != NULL; node = node->next) {
-        x = node->x + group->x;
-        y = node->y + group->y;
+    group = ((struct Element *)arg->element)->ride;
+    for (node = group->instances; node != NULL; node = node->next) {
+        x = node->anchor.pos.x + group->x;
+        y = node->anchor.pos.y + group->y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
             tile = &GameMap[y][x];
         } else {
@@ -439,21 +399,11 @@ unsigned int FUN_0046a730(struct ObjectiveEvent *arg) {
     return 0;
 }
 
-struct RenderObj {
-    struct TileGroupHolder *field_0;
-    unsigned char field_4;
-    unsigned char field_5;
-    unsigned char pad_6[0xc - 0x6];
-    unsigned char field_c;
-    unsigned char pad_d[0x11 - 0xd];
-    unsigned char field_11;
-};
-
 // FUNCTION: LEGOLAND 0x0046a750
 unsigned int ScriptEventLink(struct ObjectiveEvent *arg) {
-    struct RenderObj *robj;
-    struct TileGroup *group;
-    struct TileNode *node;
+    struct MapElement *robj;
+    struct Ride *group;
+    struct ObjInstance *node;
     struct MapElement *tile;
     int total;
     int blocked;
@@ -464,14 +414,14 @@ unsigned int ScriptEventLink(struct ObjectiveEvent *arg) {
     total = 0;
     blocked = 0;
     if (arg->field_4 != 0) {
-        group = ((struct TileGroupHolder *)arg->element)->group;
-        node = group->list;
+        group = ((struct Element *)arg->element)->ride;
+        node = group->instances;
         if (node == NULL) {
             goto ok;
         }
         do {
-            ox = node->x;
-            oy = node->y;
+            ox = node->anchor.pos.x;
+            oy = node->anchor.pos.y;
             pt.x = group->x + ox;
             pt.y = group->y + oy;
             tile = GetTileAtPoint(&pt);
@@ -484,12 +434,12 @@ unsigned int ScriptEventLink(struct ObjectiveEvent *arg) {
             node = node->next;
         } while (node != NULL);
     } else {
-        robj = (struct RenderObj *)GetFirstRenderObject();
+        robj = (struct MapElement *)GetFirstRenderObject();
         if (robj == NULL) {
             goto ok;
         }
         do {
-            group = robj->field_0->group;
+            group = robj->field_0->ride;
             if (FUN_0046a730((struct ObjectiveEvent *)group) != 0) {
                 ox = robj->field_4;
                 oy = robj->field_5;
@@ -503,7 +453,7 @@ unsigned int ScriptEventLink(struct ObjectiveEvent *arg) {
                     total++;
                 }
             }
-            robj = (struct RenderObj *)GetNextRenderObject((MapElement *)robj);
+            robj = (struct MapElement *)GetNextRenderObject((MapElement *)robj);
         } while (robj != NULL);
     }
     if (blocked != 0) {
@@ -643,14 +593,14 @@ unsigned int ScriptEventComposite(struct ObjectiveEvent *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046ab70
-unsigned int ScriptEventLoopComposite(struct LoopArg *arg) {
-    struct LoopObject *object;
-    struct LoopVtable *vtable;
+unsigned int ScriptEventLoopComposite(struct ObjectiveEvent *arg) {
+    struct Element *object;
+    struct Ride *vtable;
 
-    object = arg->field_4;
-    vtable = object->vtable;
-    if (vtable->eval != NULL) {
-        if (vtable->eval(object, 1) < arg->field_1c) {
+    object = arg->element;
+    vtable = object->ride;
+    if (vtable->cb_c0 != NULL) {
+        if (vtable->cb_c0(object, 1) < (int)arg->field_1c) {
             /* TODO: fold LoopArg/NerpsArg — same objective object, two struct views */
             QueueCustomObjectiveHintIfDue((struct ObjectiveEvent *)arg);
             return 0;
@@ -718,16 +668,16 @@ struct ClassListNode {
 // FUNCTION: LEGOLAND 0x0046ac50
 unsigned int ScriptEventRideVisitors(struct ObjectiveEvent *arg) {
     struct ClassListNode *node;
-    struct RenderObj *robj;
+    struct MapElement *robj;
     int count;
     unsigned int value;
     struct Point pt;
 
     count = 0;
-    node = (struct ClassListNode *)((struct TileGroupHolder *)arg->element)->group->list;
+    node = (struct ClassListNode *)((struct Element *)arg->element)->ride->instances;
     while (node != NULL) {
         if (_stricmp(*(char **)node->iface->element, *(char **)arg->element) == 0 &&
-            (robj = (struct RenderObj *)GetFirstObjectMatching((Element *)node->iface->element)) != NULL) {
+            (robj = (struct MapElement *)GetFirstObjectMatching((Element *)node->iface->element)) != NULL) {
             pt.x = robj->field_4;
             pt.y = robj->field_5;
             value = FUN_00489fd0(&pt) & 0xffff;
@@ -915,22 +865,22 @@ unsigned int ScriptEventHunger(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046afe0
 unsigned int ScriptEventFixRides(struct ObjectiveEvent *arg) {
-    struct RenderObj *robj;
+    struct MapElement *robj;
     int count;
-    struct TileGroup *group;
+    struct Ride *group;
     int pct;
 
     count = 0;
-    for (robj = (struct RenderObj *)GetFirstRenderObject(); robj != NULL;
-        robj = (struct RenderObj *)GetNextRenderObject((MapElement *)robj)) {
-        if (robj->field_11 != 0) {
-            group = robj->field_0->group;
+    for (robj = (struct MapElement *)GetFirstRenderObject(); robj != NULL;
+        robj = (struct MapElement *)GetNextRenderObject((MapElement *)robj)) {
+        if (robj->durability_level != 0) {
+            group = robj->field_0->ride;
             if (group->durability != 0) {
-                pct = robj->field_11 * 100 / group->durability;
+                pct = robj->durability_level * 100 / group->durability;
             } else {
                 pct = 100;
             }
-            if (arg->field_14 == 0x19 && (robj->field_c & 4) != 0) {
+            if (arg->field_14 == 0x19 && (robj->flags & 4) != 0) {
                 pct = 100;
             }
             if (pct < (int)arg->field_14) {

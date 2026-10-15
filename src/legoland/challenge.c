@@ -1167,22 +1167,9 @@ struct GslImage {
     /* 0x78 */ char *name;
 };
 
-struct RenderObjVtbl {
-    /* 0x00 */ unsigned char pad_0[0xc];
-    /* 0x0c */ struct GslImage *img;
-};
-
-struct RenderObj {
-    /* 0x00 */ struct RenderObjVtbl *vtbl;
-    /* 0x04 */ unsigned char field_4;
-    /* 0x05 */ unsigned char field_5;
-    /* 0x06 */ unsigned char pad_6[0xc - 0x6];
-    /* 0x0c */ unsigned char flags;
-};
-
 // FUNCTION: LEGOLAND 0x00444df0
 int GetLinkedObjectPercent(void) {
-    struct RenderObj *obj;
+    struct MapElement *obj;
     struct GslImage *img;
     short type;
     int ix;
@@ -1191,14 +1178,14 @@ int GetLinkedObjectPercent(void) {
     int total;
     struct Point coord;
 
-    obj = (struct RenderObj *)GetFirstRenderObject();
+    obj = (struct MapElement *)GetFirstRenderObject();
     linked = 0;
     total = 0;
     UpdatePathLinks(1);
     if (obj != NULL) {
         do {
             if ((obj->flags & 0x80) != 0) {
-                img = obj->vtbl->img;
+                img = obj->field_0->data;
                 type = img->type;
                 if (type == 1 || type == 4 || type == 5) {
                     ix = img->field_c;
@@ -1214,7 +1201,7 @@ int GetLinkedObjectPercent(void) {
                     }
                 }
             }
-            obj = (struct RenderObj *)GetNextRenderObject((MapElement *)obj);
+            obj = (struct MapElement *)GetNextRenderObject((MapElement *)obj);
         } while (obj != NULL);
         if (total != 0) {
             return (linked * 100) / total;

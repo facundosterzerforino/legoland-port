@@ -547,7 +547,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     if ((x < 0) || (x >= lpConfig->width) || (y < 0) || (y >= lpConfig->height)) {
         iVar4 = NULL;
     } else {
-        iVar4 = (unsigned char *)GameMap[y] + x * 0x14;
+        iVar4 = (unsigned char *)&GameMap[y][x];
     }
     ResetInfoStruct();
     DAT_007fdfa0 = 1;

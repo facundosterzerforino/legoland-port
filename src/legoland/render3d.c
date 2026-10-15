@@ -1048,7 +1048,7 @@ LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
     int y = coords[1];
 
     if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-        cell = (struct MapCellElement *)((char *)GameMap[y] + x * 0x14);
+        cell = (struct MapCellElement *)&GameMap[y][x];
     } else {
         cell = 0;
     }
@@ -1067,7 +1067,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
     int y = coords[1];
 
     if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-        cell = (struct MapCellElement *)((char *)GameMap[y] + x * 0x14);
+        cell = (struct MapCellElement *)&GameMap[y][x];
     } else {
         cell = 0;
     }

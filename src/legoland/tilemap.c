@@ -886,7 +886,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)pos] + x * 0x14);
+        tile = *&GameMap[(INT_PTR)pos][x];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = '\x01';
@@ -897,7 +897,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + x * 0x14);
+        tile = *&GameMap[yp1][x];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -908,7 +908,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + xp1 * 0x14);
+        tile = *&GameMap[y][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -919,7 +919,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + xm1 * 0x14);
+        tile = *&GameMap[y][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -929,7 +929,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)pos] + xp1 * 0x14);
+        tile = *&GameMap[(INT_PTR)pos][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = '\x01';
@@ -939,7 +939,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + xp1 * 0x14);
+        tile = *&GameMap[yp1][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -949,7 +949,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + xm1 * 0x14);
+        tile = *&GameMap[yp1][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -959,7 +959,7 @@ LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, 
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)pos] + xm1 * 0x14);
+        tile = *&GameMap[(INT_PTR)pos][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -996,7 +996,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)param_1] + x * 0x14);
+        tile = *&GameMap[(INT_PTR)param_1][x];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = '\x01';
@@ -1007,7 +1007,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + x * 0x14);
+        tile = *&GameMap[yp1][x];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -1018,7 +1018,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + xp1 * 0x14);
+        tile = *&GameMap[y][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -1029,7 +1029,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + xm1 * 0x14);
+        tile = *&GameMap[y][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_16 = local_16 + '\x01';
@@ -1039,7 +1039,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)param_1] + xp1 * 0x14);
+        tile = *&GameMap[(INT_PTR)param_1][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = '\x01';
@@ -1049,7 +1049,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + xp1 * 0x14);
+        tile = *&GameMap[yp1][xp1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -1059,7 +1059,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[yp1] + xm1 * 0x14);
+        tile = *&GameMap[yp1][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -1069,7 +1069,7 @@ unsigned char GetPathNeighbours8(int *param_1, char *param_2, char *param_3) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[(INT_PTR)param_1] + xm1 * 0x14);
+        tile = *&GameMap[(INT_PTR)param_1][xm1];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         local_15 = local_15 + '\x01';
@@ -1110,7 +1110,7 @@ LEGO_EXPORT void AdjustTileRFFlags(int *param_1) {
     char local_1;
     char dir;
 
-    tile = (struct MapElement *)((char *)GameMap[param_1[1]] + *param_1 * 0x14);
+    tile = &GameMap[param_1[1]][*param_1];
     tile->field_10 = tile->field_10 & 0xc3;
     flags = GetPathNeighbours8(param_1, &dir, &local_1);
     if (dir == '\0') {
@@ -1238,7 +1238,7 @@ void UnpavePathTile(struct Point *param) {
 
     tile = (struct MapElement *)GameMap[param->y];
     value = *(unsigned short *)PathSprite;
-    *(unsigned short *)((unsigned char *)tile + param->x * 0x14 + 8) = value;
+    tile[param->x].field_8 = value;
 }
 
 // FUNCTION: LEGOLAND 0x0045cbc0
@@ -1357,9 +1357,9 @@ int IsPavedPathTile(int *param_1) {
     x = *param_1;
     if (x >= 0 && x < (int)lpConfig->width && (y = param_1[1], y >= 0) &&
         y < (int)lpConfig->height &&
-        (tile = (struct MapElement *)((char *)GameMap[y] + x * 0x14), tile != NULL)) {
+        (tile = &GameMap[y][x], tile != NULL)) {
         if (IsPathTile(tile) != 0) {
-            tile = (struct MapElement *)((char *)GameMap[param_1[1]] + *param_1 * 0x14);
+            tile = &GameMap[param_1[1]][*param_1];
             return tile->field_8 != *(unsigned int *)PathSprite;
         }
     }
@@ -1381,7 +1381,7 @@ unsigned char GetPathNeighbourMask(int *coords) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = *&GameMap[y][x];
     }
     if (IsPathTile(&tile) != 0) {
         local_15 = 1;
@@ -1393,7 +1393,7 @@ unsigned char GetPathNeighbourMask(int *coords) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = *&GameMap[y][x];
     }
     if (IsPathTile(&tile) != 0) {
         local_15 = local_15 | 2;
@@ -1405,7 +1405,7 @@ unsigned char GetPathNeighbourMask(int *coords) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = *&GameMap[y][x];
     }
     if (IsPathTile(&tile) != 0) {
         local_15 = local_15 | 4;
@@ -1417,7 +1417,7 @@ unsigned char GetPathNeighbourMask(int *coords) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = *&GameMap[y][x];
     }
     if (IsPathTile(&tile) != 0) {
         local_15 = local_15 | 8;
@@ -1479,7 +1479,7 @@ LEGO_EXPORT unsigned short *AdjustPathTile(struct Point *p, unsigned short a) {
         tile.flags = 0x40;
         tile.field_10 = 0;
     } else {
-        tile = *(struct MapElement *)((char *)GameMap[y] + x * 0x14);
+        tile = *&GameMap[y][x];
     }
     if ((tile.field_10 & 1) != 0 || ((tile.flags & 0x10) != 0 && (tile.field_10 & 2) == 0)) {
         AdjustTileRFFlags((int *)p);
@@ -1776,7 +1776,7 @@ void FUN_0045d770(struct Cursor *param_1) {
 
 // FUNCTION: LEGOLAND 0x0045da60
 LEGO_EXPORT void RestoreBaseMap(int tile_x, int row_y) {
-    struct MapElement *tile = (struct MapElement *)((char *)GameMap[row_y] + tile_x * 0x14);
+    struct MapElement *tile = &GameMap[row_y][tile_x];
     unsigned short id = tile->field_a;
     unsigned short flags = *(volatile unsigned short *)&TileSpriteInfo[id].sprite;
 

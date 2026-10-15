@@ -1564,7 +1564,7 @@ unsigned int FUN_0041ee40(short *pos, struct AreaNode *b) {
             for (y = node->y + pos[1]; y < node->h + pos[1]; y++) {
                 for (x = node->x + pos[0]; x < node->w + pos[0]; x++) {
                     if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                        elem = (struct MapElement *)((char *)GameMap[y] + x * 0x14);
+                        elem = &GameMap[y][x];
                     } else {
                         elem = NULL;
                     }

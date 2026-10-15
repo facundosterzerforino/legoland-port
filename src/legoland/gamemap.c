@@ -103,7 +103,7 @@ void FUN_004598d0(struct Point *coord, int *param_2, int *param_3) {
     if (coord->x < 0 || coord->x >= (int)lpConfig->width || coord->y < 0 || coord->y >= (int)lpConfig->height) {
         cell = NULL;
     } else {
-        cell = (struct MapCell *)((char *)GameMap[coord->y] + coord->x * 0x14);
+        cell = (struct MapCell *)&GameMap[coord->y][coord->x];
     }
     if (cell == NULL) {
         *param_2 = *param_2 + -1;
@@ -217,7 +217,7 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct P
         if (pos->x < 0 || pos->x >= (int)lpConfig->width || pos->y < 0 || pos->y >= (int)lpConfig->height) {
             cell = NULL;
         } else {
-            cell = (struct MapCell *)((char *)GameMap[pos->y] + pos->x * 0x14);
+            cell = (struct MapCell *)&GameMap[pos->y][pos->x];
         }
         DAT_004b8320.x = (cell->src.b.byte_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
         DAT_004b8320.y = ((unsigned int)(entrance->footprint.v[3] - entrance->footprint.v[1]) >> 1) * 0x100 +
@@ -280,7 +280,7 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId
     x = tile.pos.x;
     y = tile.pos.y;
     if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-        cell = (struct MapCell *)((char *)GameMap[y] + x * 0x14);
+        cell = (struct MapCell *)&GameMap[y][x];
     } else {
         cell = NULL;
     }
@@ -296,11 +296,11 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId
                     blk.f4 <= (int)(query->tile_y + query->field_1414[3]); blk.f4 = blk.f4 + 1) {
                     for (blk.f0 = query->tile_x + query->field_1414[0];
                         blk.f0 <= (int)(query->tile_x + query->field_1414[2]); blk.f0 = blk.f0 + 1) {
-                        cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
+                        cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];
                         cell->flags.word = cell->flags.word & 0xffe7;
-                        cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
+                        cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];
                         cell->byte_10 = 0;
-                        cell = (struct MapCell *)((char *)GameMap[blk.f4] + blk.f0 * 0x14);
+                        cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];
                         cell->word_8 = cell->word_a;
                         AdjustPathTileAndNeighbours((struct Point *)&blk);
                         RemovePathSquare((struct Point *)&blk);
@@ -467,7 +467,7 @@ LEGO_EXPORT void AddObjectsPowerStats(struct Element *classid, struct Point *pos
         if (pos->x < 0 || pos->x >= (int)lpConfig->width || pos->y < 0 || pos->y >= (int)lpConfig->height) {
             cell = NULL;
         } else {
-            cell = (struct MapCell *)((char *)GameMap[pos->y] + pos->x * 0x14);
+            cell = (struct MapCell *)&GameMap[pos->y][pos->x];
         }
         amount = abs(power);
         MapStats.power_demand = MapStats.power_demand + amount;
@@ -500,7 +500,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
             x = coords.pos.x;
             y = coords.pos.y;
             if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-                cell = (struct MapCell *)((char *)GameMap[y] + x * 0x14);
+                cell = (struct MapCell *)&GameMap[y][x];
             } else {
                 cell = NULL;
             }
@@ -517,7 +517,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
                 x = coords.pos.x;
                 y = coords.pos.y;
                 if (x >= 0 && x < (int)lpConfig->width && y >= 0 && y < (int)lpConfig->height) {
-                    cell = (struct MapCell *)((char *)GameMap[y] + x * 0x14);
+                    cell = (struct MapCell *)&GameMap[y][x];
                 } else {
                     cell = NULL;
                 }
