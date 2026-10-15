@@ -968,7 +968,7 @@ void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_
     struct Point offset;
 
     FUN_00418fe0(1);
-    pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
+    pos = GetScreenCoordsForObject((TileId *)tile, ride);
     offset = GetRenderOffsetForLayer((struct Sprite *)BoatingSchoolRide->layer, 3);
     AdjustOffsetForViewMode(&offset);
     lls = (short *)GetLLSForSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)BoatingSchoolRide->layer, 3));
@@ -1628,7 +1628,7 @@ void BoatingSchoolWaterDCalcCursor(struct Element *param_1, int *coords) {
     }
     ride = BoatRideList;
     memcpy(&QueryClass->footprint, &DAT_004b53c0, sizeof(DAT_004b53c0));
-    BasicObjectDCalcCursor(param_1, coords);
+    BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->tile_x && tile.pos.y == ride->tile_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
             SetCursorBlocked(&QueryCursor, 1);

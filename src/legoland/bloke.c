@@ -823,7 +823,7 @@ void FUN_00483ef0(Bloke *bloke) {
             unsigned char dirs;
             coords[0] = d.x >> 8;
             coords[1] = d.y >> 8;
-            dirs = Get_Path_Directions(coords, 0, 0);
+            dirs = Get_Path_Directions((struct Point *)coords, 0, 0);
             dirs = ExcludeIsolatedDiags(dirs);
             dirs = dirs & ~Dir_To_Bit(bloke->dir + 4);
             dirs = Bit_To_Dir(dirs);

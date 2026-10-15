@@ -1064,7 +1064,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
             box.top = rect->y0 + cursor->tile_y;
             box.bottom = y1 + cursor->tile_y;
             if (IntersectRect(&inter, &box, &bounds) != 0) {
-                people = CheckForPeople(&inter);
+                people = CheckForPeople((struct MapRect *)&inter);
                 switch (people) {
                 case -1:
                     SetCursorBlocked(cursor, 4);
@@ -1503,7 +1503,7 @@ void FUN_00460560(int index) {
         if (ov->field_10 >> 8 == index + 1) {
             sc[0] = (lpConfig->view_x - (ScrollX >> 8)) + ov->x;
             sc[1] = (lpConfig->view_y - (ScrollY >> 8)) + ov->y;
-            ScreenToMapRef(sc, &pt, 0);
+            ScreenToMapRef(sc, &pt.x, 0);
             if ((char)ov->field_10 == 0) {
                 pt.x += 0xf;
                 for (outer = 10; outer != 0; outer--) {

@@ -122,7 +122,7 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct Ride *param_1, unsigned char *param_2,
     struct Point coords;
     int i;
 
-    coords = GetScreenCoordsForObject(param_2, param_1);
+    coords = GetScreenCoordsForObject((TileId *)param_2, param_1);
     i = 0;
     if (param_4->count > 0) {
         do {
@@ -282,7 +282,7 @@ LEGO_EXPORT void RenderUsingRin(struct RinData *param_1, int param_2, struct Rid
 
     int y;
     int remap;
-    coords = GetScreenCoordsForObject(param_4, param_3);
+    coords = GetScreenCoordsForObject((TileId *)param_4, param_3);
     idx = param_2;
     if (param_2 >= param_1->data_count) {
         idx = param_2 % param_1->data_count;

@@ -1203,7 +1203,7 @@ LEGO_EXPORT void EraseMechanicOrder(WorkOrder *order) {
         }
     }
     if (order->type == 1) {
-        FUN_0045e4a0(order->element, &order->pos.x);
+        FUN_0045e4a0(order->element, &order->pos);
     }
     FreeMechanicWorkOrder(order);
 }
@@ -1214,7 +1214,7 @@ LEGO_EXPORT void EraseGardenerOrder(WorkOrder *order) {
         NewLongTermAction(order->worker, 0x10);
     }
     if (order->type == 1) {
-        FUN_0045e4a0(order->element, &order->pos.x);
+        FUN_0045e4a0(order->element, &order->pos);
     }
     FreeGardenerWorkOrder(order);
 }

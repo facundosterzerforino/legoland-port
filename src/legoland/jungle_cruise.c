@@ -1912,7 +1912,7 @@ void JungleCruiseWaterDCalcCursor(struct Element *param_1, int *coords) {
     }
     ride = JungleRideList;
     memcpy(&QueryClass->footprint, &DAT_004b7478, sizeof(DAT_004b7478));
-    BasicObjectDCalcCursor(param_1, coords);
+    BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->cur_x && tile.pos.y == ride->cur_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
             SetCursorBlocked(&QueryCursor, 1);

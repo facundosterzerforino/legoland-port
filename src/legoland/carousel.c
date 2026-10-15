@@ -198,7 +198,7 @@ void CarouselAddObject(struct Element *param_1, unsigned char *param_2) {
 
     pair[0] = param_2[0];
     pair[1] = param_2[4];
-    AddBasicObject(param_1, param_2);
+    AddBasicObject(param_1, (int *)param_2);
     AddCarouselNode((unsigned short *)pair);
 }
 
@@ -467,7 +467,7 @@ void CarouselUpdate(struct Element *param_1) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen.x, &bloke->pos.x, 0);
                 bloke->person->field_34 = 0;
                 y = (y << 8) + 0x80;
                 bloke->pos.x <<= 8;

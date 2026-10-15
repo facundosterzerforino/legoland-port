@@ -171,7 +171,7 @@ void RenderMechanicsHut(Element *obj, unsigned int param_2, unsigned int param_3
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    pos = GetScreenCoordsForObject((unsigned char *)tile, hut);
+    pos = GetScreenCoordsForObject((TileId *)tile, hut);
     PrintSprite(MechHutMaskSprite, pos.x, pos.y, 0, 0);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 102) {

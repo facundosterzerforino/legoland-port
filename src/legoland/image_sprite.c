@@ -54,7 +54,7 @@ unsigned int detail_images_count;
 
 // FUNCTION: LEGOLAND 0x00496f20
 LEGO_EXPORT void **GetVRAMAddress(struct Sprite *sprite) {
-    return &sprite->surface;
+    return (void **)&sprite->surface;
 }
 
 // FUNCTION: LEGOLAND 0x00496f30
@@ -182,7 +182,7 @@ LEGO_EXPORT void ReloadAllDetailDependentImagesAndBuildSprites(void) {
     node = sprite_list;
     while (node != NULL) {
         if ((node->flags & 0x400) == 0) {
-            struct LayerHost *host = node->surface;
+            struct LayerHost *host = (struct LayerHost *)node->surface;
             if (host != NULL) {
                 host->vtable->func_8(host);
             }
@@ -572,7 +572,7 @@ LEGO_EXPORT int RecreatePartialSprite(struct Sprite *sprite, struct Image *image
 
     ReferenceImage(image);
     KillImage(sprite->image);
-    host = sprite->surface;
+    host = (struct LayerHost *)sprite->surface;
     if (host != NULL) {
         host->vtable->func_8(host);
         had_host = 1;
@@ -720,7 +720,7 @@ LEGO_EXPORT int KillSprite(struct Sprite *sprite) {
     if (sprite != NULL) {
         sprite->refcount--;
         if (sprite->refcount == 0) {
-            host = sprite->surface;
+            host = (struct LayerHost *)sprite->surface;
             if (host != NULL) {
                 host->vtable->func_8(host);
             }

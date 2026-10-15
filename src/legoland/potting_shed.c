@@ -123,7 +123,7 @@ void RenderPottingShed(Element *obj, unsigned int param_2, unsigned int param_3,
             IP_RenderBlokeIn3DNow(blokes[i]);
         }
     }
-    pos = GetScreenCoordsForObject((unsigned char *)tile, shed);
+    pos = GetScreenCoordsForObject((TileId *)tile, shed);
     PrintSprite(GShedMatteSprite, pos.x, pos.y, 0, 0);
 }
 

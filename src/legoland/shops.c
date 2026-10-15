@@ -137,7 +137,7 @@ void RenderLegoShop1(struct Element *obj, unsigned int param2, unsigned int para
     }
 
     if (count != 0) {
-        struct Point q = GetScreenCoordsForObject((unsigned char *)ride, building);
+        struct Point q = GetScreenCoordsForObject((TileId *)ride, building);
         struct Coords *coords = (struct Coords *)&q;
         PrintSprite(LegoShop1MatteSprite, coords->x, coords->y, param1, (int *)node);
     }
@@ -310,7 +310,7 @@ void RenderLegoShop2(Element *obj, unsigned int param_2, unsigned int param_3, u
         }
     }
     off = GetRenderOffsetForLayer(shop->layer, 0);
-    pos = GetScreenCoordsForObject((unsigned char *)tile, shop);
+    pos = GetScreenCoordsForObject((TileId *)tile, shop);
     AdjustOffsetForViewMode(&off);
     PrintSprite(LegoShop2MatteSprite, pos.x + off.x, pos.y + off.y, param_6, 0);
     for (i = 0; i < count; i++) {
@@ -526,7 +526,7 @@ void RenderLegoMediaShop(struct Element *obj, unsigned int param2, unsigned int 
     if (count == 0) {
         return;
     }
-    pos = GetScreenCoordsForObject((unsigned char *)ride, building);
+    pos = GetScreenCoordsForObject((TileId *)ride, building);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 2) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -711,7 +711,7 @@ void RenderExplorersInstitute(struct Element *obj, unsigned int param2, unsigned
     }
 
     if (count != 0) {
-        struct Point q = GetScreenCoordsForObject((unsigned char *)ride, building);
+        struct Point q = GetScreenCoordsForObject((TileId *)ride, building);
         struct Coords *coords = (struct Coords *)&q;
         PrintSprite(ExplorersInstituteMatteSprite, coords->x, coords->y, param1, (int *)node);
     }

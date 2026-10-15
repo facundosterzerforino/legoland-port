@@ -391,7 +391,7 @@ void CatapultAddObject(struct Element *edit2, struct CatapultEdit *edit) {
 
     key.field_0 = edit->field_0;
     key.field_1 = edit->field_4;
-    AddBasicObject(edit2, edit);
+    AddBasicObject(edit2, (int *)edit);
     Catapult_AddNode((const unsigned short *)&key);
 }
 

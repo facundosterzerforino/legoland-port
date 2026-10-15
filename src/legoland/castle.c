@@ -2307,7 +2307,7 @@ void *LoadCreatedDataFile(const char *fileName, unsigned int *sizeOut) {
     HANDLE hFile;
     unsigned int fileSize;
     void *buffer;
-    unsigned int bytesRead;
+    DWORD bytesRead;
 
     if (fileName == 0) {
         return 0;
@@ -3680,7 +3680,7 @@ void *ReadFileToBuffer(const char *fileName, unsigned int *bytesReadPtr) {
     HANDLE hFile;
     unsigned int fileSize;
     void *buffer;
-    unsigned int bytesRead;
+    DWORD bytesRead;
 
     if (fileName == 0) {
         return 0;
@@ -6610,7 +6610,7 @@ struct SaveRec *ReadSaveRec(void) {
 // FUNCTION: LEGOLAND 0x004272a0
 int SaveRollerCoasterFile(unsigned int *data) {
     unsigned int size = *data;
-    unsigned int written;
+    DWORD written;
     HANDLE hFile;
 
     if (RollerCoasterSavePath && data) {
@@ -6630,7 +6630,7 @@ int SaveRollerCoasterFile(unsigned int *data) {
 
 // FUNCTION: LEGOLAND 0x00427310
 void *LoadRollerCoasterFile(void) {
-    unsigned int bytesRead;
+    DWORD bytesRead;
     HANDLE hFile;
     unsigned int fileSize;
     void *buffer;
@@ -6862,7 +6862,7 @@ void FUN_00427970(Element *obj, const struct Struct427970Src *src) {
     struct Int16Pair pair;
     struct PathSeg *node;
 
-    BasicObjectDCalcCursor(obj, src);
+    BasicObjectDCalcCursor(obj, (struct Point *)src);
     pair.x = src->field_0;
     pair.y = src->field_4;
     node = FUN_0041d100((struct CastleState *)&DAT_00829ae0, key, (short *)&pair);
@@ -7687,7 +7687,7 @@ struct TexMesh *FUN_00428cb0(struct SegBlob *obj, const struct FVec3 *offset, in
 // FUNCTION: LEGOLAND 0x00428e70
 void FUN_00428e70(struct SegBlob *p, const struct FVec3 *a, unsigned int b) {
     unsigned int handle = FPUSetSinglePrecision();
-    unsigned int result = ((unsigned int (**)(void *, const char *))p->vt)[6](p, DAT_00612178);
+    unsigned int result = ((unsigned int (**)(void *, const char *))p->vt)[6](p, (const char *)DAT_00612178);
     DAT_00615f6c = result;
     FUN_00428cb0(p, (const struct FVec3 *)a, b, result, DAT_00612178);
     FUN_004234e0(&DAT_004b5f60);
@@ -7958,7 +7958,7 @@ void FUN_00429560(struct PathSeg *seg, struct PathSeg *end, int count, float h, 
     FUN_00425cb0(&end->pos, h + dh, &b);
     b.x += DAT_004b6398[dout][0];
     b.y += DAT_004b6398[dout][1];
-    FUN_00422180(&a, &b, DAT_004b63c8[di], &blob);
+    FUN_00422180(&a.x, &b.x, (struct Words3 *)DAT_004b63c8[di], (struct Obj421ab0 *)&blob);
     for (i = 0; i < count; i++) {
         seg->flags |= 1;
         seg->blob = blob;
@@ -8545,7 +8545,7 @@ void FUN_0042a680(struct TrainBogie *p) {
         D[0][0] = (float)sin(o->ang[i]);
         D[2][0] = -(D[0][2] = (float)cos(o->ang[i]));
         D[2][2] = (float)sin(o->ang[i]);
-        Mat4Multiply(B, D, E);
+        Mat4Multiply((float (*)[4])B, D, E);
         FUN_00426460(G, E);
         FUN_00420e90(CoasterTrainWheelLms, CoasterTrainWheelLfm, C, G, 0);
     }

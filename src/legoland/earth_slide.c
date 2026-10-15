@@ -192,10 +192,10 @@ void RenderEarthSlide(struct Element *param_1, unsigned int param_2, unsigned in
         }
         RenderBlokesNotInSeats(ride, (TileId *)param_4);
         if (node->field_4 != 0) {
-            coords = GetScreenCoordsForObject(param_4, ride);
+            coords = GetScreenCoordsForObject((TileId *)param_4, ride);
             PrintSprite(EarthSlideEntranceMatteSprite, coords.x, coords.y, param_6, 0);
         }
-        coords = GetScreenCoordsForObject(param_4, ride);
+        coords = GetScreenCoordsForObject((TileId *)param_4, ride);
         PrintSprite(EarthSlideEntranceMatte2Sprite, coords.x, coords.y, param_6, 0);
     }
 }
@@ -267,7 +267,7 @@ void EarthSlideAddObject(struct Element *param_1, unsigned char *param_2) {
 
     buffer[0] = param_2[0];
     buffer[1] = param_2[4];
-    AddBasicObject(param_1, param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042cd70((unsigned short *)buffer);
 }
 

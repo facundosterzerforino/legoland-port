@@ -892,7 +892,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
     // STRING: LEGOLAND 0x004bf87c
     DBPrintf("Entering IMT Control\n");
     for (;;) {
-        WaitForMultipleObjects(2, events, FALSE, INFINITE);
+        WaitForMultipleObjects(2, (const HANDLE *)events, FALSE, INFINITE);
         if (WaitForSingleObject(MusicCommandEvent, 0) == WAIT_OBJECT_0) {
             ResetEvent(MusicCommandEvent);
             if (MusicCommand != 0) {

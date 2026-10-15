@@ -516,7 +516,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen.x, &bloke->pos.x, 0);
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;

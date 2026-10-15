@@ -308,7 +308,7 @@ LEGO_EXPORT void ReadGameButtons(void) {
                     GamePad = GamePad | 8;
                     DAT_00813ae0 = GetTicks();
                 }
-                ScreenToMapRef(&MousePos, &mp, 0);
+                ScreenToMapRef(&MousePos.x, &mp.x, 0);
                 if (MouseTileX != mp.x || MouseTileY != mp.y) {
                     MouseTileY = mp.y;
                     MouseTileX = mp.x;

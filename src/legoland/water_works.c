@@ -393,7 +393,7 @@ void WaterBlockAddObject(struct Element *editObj, unsigned char *coords) {
 
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
-    AddBasicObject(editObj, coords);
+    AddBasicObject(editObj, (int *)coords);
     FUN_00417cb0(key);
     node = FUN_00417d10(&key);
     if (node != NULL) {
@@ -521,7 +521,7 @@ void RenderShower(struct Element *render, unsigned int p2, unsigned int p3, unsi
         offset.x = -8;
         offset.y = 0x14;
         AdjustOffsetForViewMode((struct Point *)&offset);
-        sc = GetScreenCoordsForObject(coords, ctx);
+        sc = GetScreenCoordsForObject((TileId *)coords, ctx);
         lls = GetLLSForSprite((struct Sprite *)ShowerSprite);
         LLSSetFrame(lls, node->frame);
         PrintSprite(ShowerSprite, sc.x + offset.x, sc.y + offset.y, p6, 0);
@@ -534,7 +534,7 @@ void ShowerAddObject(struct Element *editObj, unsigned char *coords) {
 
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
-    AddBasicObject(editObj, coords);
+    AddBasicObject(editObj, (int *)coords);
     FUN_00418260(key);
 }
 
@@ -687,7 +687,7 @@ void WaterWorksElephantFountainUpdate(void) {
                 offset.x = -0x75;
                 offset.y = 0x8a;
                 AdjustOffsetForViewMode((struct Point *)&offset);
-                sc = GetScreenCoordsForObject((unsigned char *)&node->key, ElephantFountainRide);
+                sc = GetScreenCoordsForObject((TileId *)&node->key, ElephantFountainRide);
                 SetOverrideFrame(node->frame);
                 y = sc.y + offset.y;
                 SortSprite(WwElsquirtSprite, sc.x + offset.x, y, y + 0x20, 0, 0);
@@ -706,7 +706,7 @@ void ElephantFountainAddObject(struct Element *editObj, unsigned char *coords) {
 
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
-    AddBasicObject(editObj, coords);
+    AddBasicObject(editObj, (int *)coords);
     FUN_00418630(key);
     FUN_00417af0((unsigned char *)&key, 2, 1);
 }

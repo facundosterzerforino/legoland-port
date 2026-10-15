@@ -1401,12 +1401,12 @@ unsigned char DeleteWorkOrderEventHandler(void *param_1, unsigned char param_2) 
     SetIconSprite(param_1, PuDeleteObjectOnSprite);
     if ((param_2 & 2) != 0) {
         if (DAT_007fdf9c == 0x10b) {
-            SetObjRectFlags(DAT_007fdf80->field_4, &DAT_007fdf80->field_8, 0);
+            SetObjRectFlags(DAT_007fdf80->field_4, (struct Point *)&DAT_007fdf80->field_8, 0);
             RemoveGardenersWorkOrderAt(DAT_007fdf80->field_8, DAT_007fdf80->field_c);
             ResetInfoStruct();
             return 1;
         }
-        SetObjRectFlags(DAT_007fdf80->field_4, &DAT_007fdf80->field_8, 0);
+        SetObjRectFlags(DAT_007fdf80->field_4, (struct Point *)&DAT_007fdf80->field_8, 0);
         RemoveMechanicsWorkOrderAt(DAT_007fdf80->field_8, DAT_007fdf80->field_c);
         ResetInfoStruct();
     }

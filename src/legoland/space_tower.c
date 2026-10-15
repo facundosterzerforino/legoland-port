@@ -349,7 +349,7 @@ void FUN_0043ad90(struct SpaceTowerCar *param_1, int param_2, unsigned int param
     struct Point off;
     struct Point pos;
 
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
+    coords = GetScreenCoordsForObject((TileId *)param_1, SpaceTowerRideObj);
     if (SpaceTowerSeatMatteSprites[param_2] != NULL) {
         off = DAT_0062fd88[param_2];
         off.y -= param_1->seats[param_2].pos;
@@ -366,7 +366,7 @@ void FUN_0043ae20(struct SpaceTowerCar *param_1, int param_2, unsigned int param
     struct Point off;
     int id;
 
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
+    coords = GetScreenCoordsForObject((TileId *)param_1, SpaceTowerRideObj);
     off = DAT_0062fd88[param_2];
     off.y -= param_1->seats[param_2].pos;
     AdjustOffsetForViewMode(&off);
@@ -418,7 +418,7 @@ void RenderSpaceTower(struct Element *param_1, unsigned int param_2, unsigned in
     if (car == NULL) {
         return;
     }
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+    coords = GetScreenCoordsForObject((TileId *)param_4, ride);
     off1 = GetRenderOffsetForLayer(SpaceTowerLayers, 1);
     AdjustOffsetForViewMode(&off1);
     if (node != NULL) {
@@ -693,7 +693,7 @@ void FUN_0043b810(struct SpaceTowerCar *param_1) {
     param_1->seats[2].rider_slot1 = NULL;
     param_1->seats[3].rider_slot0 = NULL;
     param_1->seats[3].rider_slot1 = NULL;
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, SpaceTowerRideObj);
+    coords = GetScreenCoordsForObject((TileId *)param_1, SpaceTowerRideObj);
     for (; node != NULL; node = node->next) {
         if (memcmp(&node->tile.id, &param_1->var_0, 2) == 0 && (node->rider->flags & 0x80) != 0) {
             slot = node->rider->field_36;
@@ -775,7 +775,7 @@ void FUN_0043b990(struct SpaceTowerCar *esi) {
 void FUN_0043baa0(void) {
     struct ListNode *node;
 
-    node = SpaceTowerCarList;
+    node = (struct ListNode *)SpaceTowerCarList;
     if (node != NULL) {
         do {
             FUN_0043b990((struct SpaceTowerCar *)node);

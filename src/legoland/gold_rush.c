@@ -477,7 +477,7 @@ void GoldRushAddObject(struct Element *editObj, struct Point *pos) {
     id.pos.x = (unsigned char)pos->x;
     id.pos.y = (unsigned char)pos->y;
     ride = editObj->ride;
-    AddBasicObject(editObj, pos);
+    AddBasicObject(editObj, &pos->x);
     AddGoldWashNode((struct GoldNode *)&id);
 
     p.x = pos->x + ride->x - 1;

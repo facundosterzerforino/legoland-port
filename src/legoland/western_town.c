@@ -63,7 +63,7 @@ void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3
     if (count == 0) {
         return;
     }
-    pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
+    pos = GetScreenCoordsForObject((TileId *)tile, ride);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 4) {
             IP_RenderBlokeIn3DNow(blokes[i]);
@@ -305,7 +305,7 @@ void RenderSheriff(struct Element *param_1, unsigned int param_2, unsigned int p
             elem = elem->next;
         } while (elem != NULL);
         if (count != 0) {
-            coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+            coords = GetScreenCoordsForObject((TileId *)param_4, ride);
             PrintSprite(SherifshutMatteSprite, coords.x, coords.y, param_6, NULL);
         }
     }
@@ -532,7 +532,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
     struct Point offset;
     struct JailCell *cell;
 
-    pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
+    pos = GetScreenCoordsForObject((TileId *)tile, ride);
     cell = FUN_00437f90(tile);
     if (cell == NULL) {
         return;
@@ -833,7 +833,7 @@ void RenderBank(struct Element *param_1, unsigned int param_2, unsigned int para
             elem = elem->next;
         } while (elem != NULL);
         if (count != 0) {
-            coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+            coords = GetScreenCoordsForObject((TileId *)param_4, ride);
             PrintSprite(BankMatteSprite, coords.x, coords.y, param_6, NULL);
         }
     }
@@ -997,7 +997,7 @@ void RenderSaloon(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     if (count == 0) {
         return;
     }
-    pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
+    pos = GetScreenCoordsForObject((TileId *)tile, ride);
     for (i = 0; i < count; i++) {
         if (blokes[i]->param_action == 4) {
             IP_RenderBlokeIn3DNow(blokes[i]);

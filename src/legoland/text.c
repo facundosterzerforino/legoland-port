@@ -32,7 +32,7 @@ LEGO_EXPORT void LoadBubbleHelpGFX(void) {
     }
 
     // STRING: LEGOLAND 0x004b9064
-    if (LLIDB_FindElement("SPEECH BUBBLE", &element, 0) == 0) {
+    if (LLIDB_FindElement("SPEECH BUBBLE", (struct Element **)&element, 0) == 0) {
         SpeechBubbleData = LLIDB_LoadData(element);
     }
 

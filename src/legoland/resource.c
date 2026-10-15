@@ -192,7 +192,7 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
     struct ResVolume *cur;
     unsigned int file_size;
     unsigned int dir_offset;
-    unsigned int bytes_read;
+    DWORD bytes_read;
     void *dir_data;
     int i;
     int name_len;
@@ -434,7 +434,7 @@ LEGO_EXPORT unsigned int RES_GetFileSize(struct ResFile *file) {
 // FUNCTION: LEGOLAND 0x00489cf0
 LEGO_EXPORT int RES_ReadFile(struct ResFile *file, void *buffer, int count) {
     int remaining;
-    int bytes_read;
+    DWORD bytes_read;
     struct ResVolume *volume;
 
     if (file == 0) {

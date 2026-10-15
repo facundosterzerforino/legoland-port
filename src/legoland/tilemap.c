@@ -68,7 +68,7 @@ int CollectTileSpriteLists(struct FXSpriteList **out) {
     struct FXSpriteList *src;
     struct FXSpriteList **dst = out;
     struct TileSpriteEntry *info = TileSpriteInfo;
-    void **slot = TileSpriteArray;
+    void **slot = (void **)TileSpriteArray;
 
     do {
         if (*slot != (void *)-1) {

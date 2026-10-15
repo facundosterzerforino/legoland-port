@@ -57,7 +57,7 @@ void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsi
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004cbf70);
-    pos = GetScreenCoordsForObject((unsigned char *)coords, ride);
+    pos = GetScreenCoordsForObject((TileId *)coords, ride);
     offset = GetRenderOffsetForLayer(TempleLayer, 0);
     AdjustOffsetForViewMode(&offset);
     PrintSprite(TempleMatte1Sprite, offset.x + pos.x, offset.y + pos.y, clip, 0);

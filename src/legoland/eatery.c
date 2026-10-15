@@ -53,7 +53,7 @@ void RenderChuckWagon(struct Element *arg, unsigned int param2, unsigned int par
         while (node != NULL) {
             if (*value == node->tile.id) {
                 IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
-                GetScreenCoordsForObject((unsigned char *)value, owner);
+                GetScreenCoordsForObject((TileId *)value, owner);
                 break;
             }
             node = node->next;
@@ -592,7 +592,7 @@ void Restaurant1AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042eec0((unsigned short *)id);
 }
 
@@ -843,7 +843,7 @@ void RenderRestaurant1(struct Element *param_1, unsigned int param_2, unsigned i
         *p = NULL;
     }
     count = 0;
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+    coords = GetScreenCoordsForObject((TileId *)param_4, ride);
     if (node != NULL) {
         short v = *param_4;
         p = blokes;
@@ -976,7 +976,7 @@ void Restaurant2AddObject(struct Element *param_1, unsigned char *param_2) {
     unsigned char id[2];
     id[0] = param_2[0];
     id[1] = param_2[4];
-    AddBasicObject(param_1, param_2);
+    AddBasicObject(param_1, (int *)param_2);
     FUN_0042f920((unsigned short *)id);
 }
 
@@ -1459,7 +1459,7 @@ void RenderEateryBaseLayers(unsigned short *param_1, struct Ride *param_2, unsig
     if (state == NULL) {
         return;
     }
-    coords = GetScreenCoordsForObject((unsigned char *)param_1, param_2);
+    coords = GetScreenCoordsForObject((TileId *)param_1, param_2);
     sx = coords.x;
     c9 = state->field_9;
     coord_y = coords.y;
@@ -1582,7 +1582,7 @@ void RenderRestaurant2(struct Element *param_1, unsigned int param_2, unsigned i
     f38 = state->field_38;
     f3c = state->field_3c;
     RenderEateryBaseLayers((unsigned short *)param_4, ride, param_6);
-    coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
+    coords = GetScreenCoordsForObject((TileId *)param_4, ride);
     if (node == NULL) {
         return;
     }
@@ -1818,7 +1818,7 @@ void LoadOctopusCafeResources(struct Element *obj) {
 
 // FUNCTION: LEGOLAND 0x004314f0
 void OctopusCafeAddObject(struct Element *param_1, struct UserFlagsArg *param_2) {
-    AddBasicObject(param_1, param_2);
+    AddBasicObject(param_1, (int *)param_2);
     Set_UserFlags(param_2->var_0, param_2->var_4, 0);
 }
 

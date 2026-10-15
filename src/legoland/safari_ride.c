@@ -219,7 +219,7 @@ void SafariSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00414f40
 void SafariRemoveObject(struct Element *obj, TileId key, struct Cursor *coords, unsigned int cursor) {
-    void *node = FUN_00414a80(&key);
+    void *node = FUN_00414a80((struct SafariKey *)&key);
     struct SampleSource src;
 
     if (node == 0) {
@@ -247,7 +247,7 @@ void SafariAddObject(struct Element *uid, struct SafariBasicObject *a1) {
 
     *(unsigned char *)&local = a1->field_0;
     *((unsigned char *)&local + 1) = a1->field_4;
-    AddBasicObject(uid, a1);
+    AddBasicObject(uid, (int *)a1);
     FUN_004149c0((struct SafariNode *)&local);
 }
 
@@ -467,7 +467,7 @@ void SafariRideUpdate(Element *obj) {
                 bloke->person->sprite = NULL;
                 bloke->person->field_30 = 0;
                 UnAdjustBlokePosition(&bloke->person->screen);
-                ScreenToMapRef(&bloke->person->screen, &bloke->pos, 0);
+                ScreenToMapRef(&bloke->person->screen.x, &bloke->pos.x, 0);
                 bloke->person->field_34 = 0;
                 bloke->pos.x <<= 8;
                 bloke->pos.y <<= 8;
