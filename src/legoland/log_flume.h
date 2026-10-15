@@ -12,10 +12,16 @@ struct FlumeNode {
     struct FlumeNode *prev;
     struct FlumeNode *field_8;
     struct FlumeNode *field_c;
-    unsigned int flags;
+    union {
+        unsigned int flags;
+        struct FlumeEntry *sub; /* as FlumeEntry has it */
+    };
     TileId tile;
     unsigned char pad_16[2];
-    int mode;
+    union {
+        int mode;
+        struct FlumeEntry *link;
+    };
     int submode;
     struct Ride *ride;
     struct FlumeEntry *owner;
@@ -28,13 +34,16 @@ struct FlumeNode {
 struct FlumeSlot {
     int timer;
     unsigned int flags;
-    struct FlumeStatHolder *busy;
+    struct RideNode *busy; /* the rider in the slot */
     int x;
     int y;
-    struct FlumeWeighted *owner;
+    union {
+        struct FlumeEntry *owner; /* the track piece the slot is on */
+        struct Element *element; /* particle pieces */
+    };
     float weight;
     int field_1c;
-    unsigned char pad_20[4];
+    float field_20;
 };
 
 struct FlumeEntry {
@@ -47,9 +56,10 @@ struct FlumeEntry {
         struct FlumeEntry *parent8;
         void *field_8;
     };
-    /* 0x0c */ void *field_c;
+    /* 0x0c */ struct FlumeEntry *field_c;
     /* 0x10 */ union {
         struct FlumeEntry *sub;
+        struct ListNode *list_head; /* list pieces */
         unsigned char flags10;
         unsigned int flags10d;
     };
@@ -60,11 +70,15 @@ struct FlumeEntry {
         struct FlumeEntry *link;
     };
     /* 0x1c */ int submode;
-    /* 0x20 */ struct Ride *ride;
+    /* 0x20 */ union {
+        struct Ride *ride;
+        int timer; /* slot sets */
+    };
     /* 0x24 */ union {
         struct FlumeSlotSet *slotset;
         struct FlumeEntry *parent;
         struct FlumeMover *field_24;
+        int ticks; /* slot sets */
     };
     /* 0x28 */ union {
         int field_28;
@@ -72,19 +86,24 @@ struct FlumeEntry {
     };
     /* 0x2c */ union {
         struct {
-            struct FlumeEntry *sub2;
+            union {
+                struct FlumeEntry *sub2;
+                struct ListNode *list_tail; /* list pieces */
+            };
             union {
                 struct FlumeRunNode *first;
                 struct FlumeEntry *link30;
+                int a_30; /* edges */
             };
             union {
                 struct FlumeRunNode *last;
                 struct FlumeEntry *link34;
+                int b_34;
             };
         };
         struct Queue queue;
     };
-    /* 0x38 */ void *target;
+    /* 0x38 */ struct FlumeSlot *target; /* one of its slots */
     /* 0x3c */ int count;
     /* 0x40 */ struct FlumeSlot slots[4];
     /* 0xd0 */ int field_d0;
@@ -92,6 +111,7 @@ struct FlumeEntry {
 
 struct ClassNode;
 struct FlumeEntry;
+struct ListNode;
 struct FlumeDims;
 struct ParticleEmitter;
 struct Context;
