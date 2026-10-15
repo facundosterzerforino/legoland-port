@@ -361,22 +361,22 @@ void RenderCastleBBQ(struct Element *param_1, unsigned int param_2, unsigned int
 
 // FUNCTION: LEGOLAND 0x0042e9c0
 void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2) {
-    struct SampleParams params;
+    struct SampleSource params;
     AddBasicObject(param_1, param_2);
     params.x = *param_2;
     params.y = param_2[1];
-    params.field_0 = 2;
+    params.type = 2;
     PlayInstanceOfSample(RESTAURANT_SFX[0].sample, 1, 1, &params);
 }
 
 // FUNCTION: LEGOLAND 0x0042ea10
 void CastleBBQRemoveObject(struct Element *param_1, unsigned int param_2, struct Cursor *param_3) {
     unsigned char *b = (unsigned char *)&param_2;
-    struct SampleParams params;
+    struct SampleSource params;
     StandardRemoveObject(param_1, *(TileId *)&param_2, param_3);
     params.x = b[0];
     params.y = b[1];
-    params.field_0 = 2;
+    params.type = 2;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 
@@ -637,7 +637,7 @@ void FUN_0042ef70(struct BrollyNode *node) {
 
 // FUNCTION: LEGOLAND 0x0042efb0
 void Restaurant1RemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3) {
-    struct SampleParams params;
+    struct SampleSource params;
     struct BrollyNode *node = FUN_0042ef40(&tile.id);
     if (node != NULL) {
         FUN_0042ef70(node);
@@ -646,7 +646,7 @@ void Restaurant1RemoveObject(struct Element *param_1, TileId tile, struct Cursor
     RemoveAllBlokesFromRide(((struct Element *)param_1)->ride, tile);
     params.x = tile.pos.x;
     params.y = tile.pos.y;
-    params.field_0 = 2;
+    params.type = 2;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 
@@ -1048,10 +1048,10 @@ void FUN_0042fa90(struct RideNode *node, int dir, int idx) {
 // FUNCTION: LEGOLAND 0x0042fb00
 void FUN_0042fb00(unsigned short param_1) {
     unsigned char *b = (unsigned char *)&param_1;
-    struct SampleParams params;
+    struct SampleSource params;
     params.x = b[0];
     params.y = b[1];
-    params.field_0 = 2;
+    params.type = 2;
     PlayInstanceOfSample(OCTOPUS_SFX[0].sample, 0, 1, &params);
     PlayInstanceOfSample(OCTOPUS_SFX[1].sample, 1, 1, &params);
 }
@@ -1059,8 +1059,8 @@ void FUN_0042fb00(unsigned short param_1) {
 // FUNCTION: LEGOLAND 0x0042fb60
 void FUN_0042fb60(unsigned short param_1) {
     unsigned char *b = (unsigned char *)&param_1;
-    struct SampleParams params;
-    params.field_0 = 2;
+    struct SampleSource params;
+    params.type = 2;
     params.x = b[0];
     params.y = b[1];
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);

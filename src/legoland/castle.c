@@ -4854,7 +4854,7 @@ void RenderCastleDummy(struct Element *a1, unsigned int a2, unsigned int a3, uns
             break;
         }
     }
-    FUN_00424a20((struct CastleOuter *)&DAT_00829ae0.piece.flags);
+    FUN_00424a20((struct PieceHead *)&DAT_00829ae0.piece.flags);
 }
 
 // FUNCTION: LEGOLAND 0x00424800
@@ -4946,14 +4946,9 @@ void FUN_00424a00(struct CastleState *param_1) {
     FUN_0041e5d0(&param_1->field_d8);
 }
 
-struct CastleOuter {
-    unsigned char pad_0[0x10];
-    struct CastleState *field_10;
-};
-
 // FUNCTION: LEGOLAND 0x00424a20
-void FUN_00424a20(struct CastleOuter *param_1) {
-    struct Train *obj = param_1->field_10->field_d8;
+void FUN_00424a20(struct PieceHead *param_1) {
+    struct Train *obj = param_1->owner->field_d8;
     if (FUN_00426650() != 0) {
         FUN_0041e3e0(obj, (struct PathSeg *)param_1);
     }
@@ -6896,11 +6891,11 @@ void FUN_004279f0(void) {
 
 // FUNCTION: LEGOLAND 0x00427a00
 void RenderSquareTrack(struct Element *unused0, unsigned int unused1, unsigned int unused2, const unsigned char *src) {
-    struct CastleOuter *node;
+    struct PieceHead *node;
     struct Int16Pair tile;
     tile.x = src[0];
     tile.y = src[1];
-    node = (struct CastleOuter *)FUN_0041d060((struct CastleState *)&DAT_00829ae0, (unsigned int *)&tile);
+    node = (struct PieceHead *)FUN_0041d060((struct CastleState *)&DAT_00829ae0, (unsigned int *)&tile);
     FUN_00428700(node);
     FUN_00424a20(node);
 }

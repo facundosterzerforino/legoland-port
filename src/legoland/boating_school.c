@@ -676,7 +676,7 @@ void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
 
 // FUNCTION: LEGOLAND 0x0041a2f0
 void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3) {
-    struct Cursor *cursor = (struct Cursor *)param_1->data;
+    struct Ride *cursor = (struct Ride *)param_1->data; /* the class (as the original names it) */
 
     BoatingSchoolFootprint.next = &BoatingSchoolStartFootprint;
     BoatingSchoolStartFootprint.next = &DAT_004cc048;

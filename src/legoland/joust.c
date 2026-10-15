@@ -17,13 +17,6 @@
 #include "render3d.h"
 #include "sound_music.h"
 
-struct JoustSource {
-    unsigned int kind;
-    unsigned int pad;
-    unsigned int x;
-    unsigned int y;
-};
-
 struct JoustObject {
     unsigned char pad_0[0xc];
     unsigned int field_c;
@@ -463,9 +456,9 @@ void JoustUpdate(struct Element *elem) {
                     break;
                 }
                 if (jn->sample != 0) {
-                    struct JoustSource stop;
+                    struct SampleSource stop;
 
-                    stop.kind = 2;
+                    stop.type = 2;
                     stop.x = jn->id.pos.x;
                     stop.y = jn->id.pos.y;
                     UnSourceAndFadeAllSamplesFromSource(&stop, -1000);
@@ -474,9 +467,9 @@ void JoustUpdate(struct Element *elem) {
                 continue;
             }
             if (jn->sample == 0) {
-                struct JoustSource play;
+                struct SampleSource play;
 
-                play.kind = 2;
+                play.type = 2;
                 play.x = jn->id.pos.x;
                 play.y = jn->id.pos.y;
                 jn->sample = PlayInstanceOfSample(JOUST_SFX[0].sample, 1, 0, &play);

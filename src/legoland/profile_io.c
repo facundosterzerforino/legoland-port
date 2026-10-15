@@ -17,6 +17,7 @@
 #include "profile.h"
 #include "profile_io.h"
 #include "savegame_ui.h"
+#include "sound_sfx.h"
 #include "text.h"
 #include "timer.h"
 #include "title.h"
@@ -29,24 +30,6 @@
 struct RideState {
     unsigned char pad_0[0x18];
     unsigned char var_18;
-};
-
-struct ProfileObj {
-    struct ProfileObj *next;
-    unsigned int var_4;
-    unsigned int var_8;
-    unsigned int var_c;
-    unsigned int var_10;
-    unsigned int var_14;
-    unsigned int var_18;
-    unsigned short var_1c;
-    unsigned char pad_1e[2];
-    unsigned int var_20;
-    unsigned int var_24;
-    unsigned int var_28;
-    unsigned int var_2c;
-    unsigned int var_30;
-    unsigned int var_34;
 };
 
 // FUNCTION: LEGOLAND 0x004912e0
@@ -504,26 +487,26 @@ char FUN_004920a0(unsigned int param1, unsigned char flags) {
 }
 
 // FUNCTION: LEGOLAND 0x004920e0
-struct ProfileObj *FUN_004920e0(void) {
-    struct ProfileObj *v = (struct ProfileObj *)malloc(sizeof(struct ProfileObj));
+struct Sample *FUN_004920e0(void) {
+    struct Sample *v = (struct Sample *)malloc(sizeof(struct Sample));
     v->next = 0;
-    v->var_4 = 0;
-    v->var_c = 0;
-    v->var_28 = 0;
-    v->var_2c = 0;
-    v->var_30 = 0;
-    v->var_34 = 0;
-    v->var_8 = 0;
-    v->var_1c = 0;
-    v->var_24 = 0;
-    v->var_20 = 0;
+    v->refcount = 0;
+    v->source_type = 0;
+    v->active = 0;
+    v->buffer = 0;
+    v->field_30 = 0;
+    v->field_34 = 0;
+    v->fade = 0;
+    v->flags = 0;
+    v->callback = 0;
+    v->timeout = 0;
     return v;
 }
 
 // FUNCTION: LEGOLAND 0x00492110
 void *FUN_00492110(void) {
-    struct ProfileObj *obj = FUN_004920e0();
-    obj->next = (struct ProfileObj *)SampleListHead;
+    struct Sample *obj = FUN_004920e0();
+    obj->next = (struct Sample *)SampleListHead;
     SampleListHead = obj;
     return obj;
 }

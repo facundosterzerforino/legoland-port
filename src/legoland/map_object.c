@@ -653,8 +653,8 @@ LEGO_EXPORT void ObjectIsBuilt(struct Ride *obj, TileId coords) {
     pos.x = coords.pos.x;
     pos.y = coords.pos.y;
     {
-        struct SampleParams source;
-        source.field_0 = 2;
+        struct SampleSource source;
+        source.type = 2;
         source.x = pos.x;
         source.y = pos.y;
         UnSourceAndFadeAllSamplesFromSource(&source, -200);
@@ -724,7 +724,7 @@ LEGO_EXPORT void ObjectIsBuilding(struct Ride *obj, TileId coords) {
         buf.two = 2;
         buf.x2 = buf.x;
         buf.y2 = buf.y;
-        if (CountSamplesFromSource((struct SampleParams *)&buf.two) == 0) {
+        if (CountSamplesFromSource((struct SampleSource *)&buf.two) == 0) {
             PlayAppropriateBuildEffect(obj, (int *)&buf.x);
         }
     }

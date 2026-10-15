@@ -1098,7 +1098,7 @@ int ScriptEventClear(struct ObjectiveEvent *arg) {
     int right;
     sample = PlayInstanceOfSample(GameFX[FX_INVENTORY_OUT].sample, 1, 1, 0);
     FUN_00496d10(sample);
-    AddSFX_Callback((struct CallbackEntry *)sample, 3000, (unsigned int (*)(struct CallbackEntry *))FadeOutSampleCallback);
+    AddSFX_Callback(sample, 3000, (unsigned int (*)(struct Sample *))FadeOutSampleCallback);
     for (phase = 0; phase < 3; phase++) {
         current = (struct SweepInstance *)GetFirstRenderObject();
         while (current != NULL) {

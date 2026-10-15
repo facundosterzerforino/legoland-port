@@ -305,9 +305,11 @@ struct TextCell {
 /* A tile set: sprites plus per-tile-type callbacks. */
 struct FXSpriteList {
     /* 0x00 */ int base;
-    /* 0x04 */ unsigned char pad_4[0xc - 0x4];
+    /* 0x04 */ int count;
+    /* 0x08 */ struct Sprite **sprites;
     /* 0x0c */ int *sprite_ids;
-    /* 0x10 */ unsigned char pad_10[0x18 - 0x10];
+    /* 0x10 */ int *data_10;
+    /* 0x14 */ struct Element *data_14;
     /* 0x18 */ unsigned char (*get_rf_flags)(int x, int y);
     /* 0x1c */ void (*on_enter)(struct Point pos);
     /* 0x20 */ void (*on_leave)(int x, int y);

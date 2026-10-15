@@ -20,10 +20,10 @@
 
 // FUNCTION: LEGOLAND 0x0042d970
 void FUN_0042d970(TileId *tile, struct Bloke *arg) {
-    struct SampleParams config;
+    struct SampleSource config;
 
-    config.field_0 = 1;
-    config.field_4 = arg;
+    config.type = 1;
+    config.bloke = arg;
     PlayInstanceOfSample(ENTRANCE_SFX[0].sample, 0, 1, &config);
     if (MapStats.entrance_fee != 0) {
         PlayMoneySFX(tile, 1, 0);

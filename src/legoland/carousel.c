@@ -86,9 +86,9 @@ struct CarouselNode *FindCarouselNode(unsigned short *param_1) {
 
 // FUNCTION: LEGOLAND 0x0042bc90
 void FUN_0042bc90(struct CarouselNode *node) {
-    struct SampleParams params;
+    struct SampleSource params;
 
-    params.field_0 = 2;
+    params.type = 2;
     node->leaving_count = node->seated_count;
     node->flags = node->flags & 0xffffbfff | 1;
     node->seated_count = 0;
@@ -102,7 +102,7 @@ void FUN_0042bc90(struct CarouselNode *node) {
 // FUNCTION: LEGOLAND 0x0042c210
 void FUN_0042c210(struct CarouselNode *node) {
     int r;
-    struct SampleParams params;
+    struct SampleSource params;
 
     node->frame_ticks = 0;
     node->frame = 0;
@@ -111,7 +111,7 @@ void FUN_0042c210(struct CarouselNode *node) {
     node->cycles_left = (char)r + '\x03';
     node->seated_count = 0;
     node->flags = node->flags & 0xffffbffe;
-    params.field_0 = 2;
+    params.type = 2;
     params.x = ((TileId *)&node->id)->pos.x;
     params.y = ((TileId *)&node->id)->pos.y;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
@@ -178,7 +178,7 @@ void CarouselSetEditMode(void) {
 // FUNCTION: LEGOLAND 0x0042c4a0
 void CarouselRemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3) {
     struct CarouselNode *node;
-    struct SampleParams params;
+    struct SampleSource params;
 
     node = FindCarouselNode(&tile.id);
     if (node != NULL) {
@@ -188,7 +188,7 @@ void CarouselRemoveObject(struct Element *param_1, TileId tile, struct Cursor *p
     RemoveAllBlokesFromRide(param_1->ride, tile);
     params.x = tile.pos.x;
     params.y = tile.pos.y;
-    params.field_0 = 2;
+    params.type = 2;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 

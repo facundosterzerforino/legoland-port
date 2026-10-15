@@ -6,6 +6,7 @@
 
 struct Bloke;
 struct Element;
+struct FXSpriteList;
 struct Sprite;
 struct Person;
 
@@ -36,7 +37,6 @@ struct RideNode {
 typedef struct RideNode RideNode;
 
 /* A placed ride/attraction (the object behind Element.ride). */
-struct SpriteManager;
 struct LibraryNode;
 struct RideSpriteInfo;
 struct Ride {
@@ -81,7 +81,7 @@ struct Ride {
     /* 0x6c */ struct Sprite *anim; /* build-animation sprite */
     /* 0x70 */ struct Element *handle; /* the element of its TSF sprites */
     /* 0x74 */ union {
-        struct SpriteManager *sprites; /* ODF objects: the TSF's sprites */
+        struct FXSpriteList *sprites; /* ODF objects: the TSF's sprites */
         unsigned short *tiles; /* basic objects: their tile ids */
     };
     /* 0x78 */ char *name;

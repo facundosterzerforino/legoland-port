@@ -159,7 +159,7 @@ void RenderCatapult(struct Element *obj, int unused, int unused2, TileId *tile, 
 
 // FUNCTION: LEGOLAND 0x00403430
 void FUN_00403430(struct CatapultNode *node) {
-    struct SampleParams params;
+    struct SampleSource params;
 
     if (node->field_8 != 0) {
         return;
@@ -167,7 +167,7 @@ void FUN_00403430(struct CatapultNode *node) {
 
     node->field_8 = 1;
     node->field_d = 0;
-    params.field_0 = 2;
+    params.type = 2;
     params.x = node->field_0;
     params.y = node->field_1;
     PlayInstanceOfSample(Catapult_SFX[3].sample, 0, 1, &params);
@@ -186,7 +186,7 @@ void FUN_00403480(struct CatapultNode *item) {
 
 // FUNCTION: LEGOLAND 0x004034c0
 void FUN_004034c0(struct CatapultNode *node, unsigned int index) {
-    struct SampleParams params;
+    struct SampleSource params;
     struct FXItem *fx = Catapult_SFX;
 
     if (node->active[index] != 0) {
@@ -195,7 +195,7 @@ void FUN_004034c0(struct CatapultNode *node, unsigned int index) {
 
     node->active[index] = 1;
     node->frame[index] = 0;
-    params.field_0 = 2;
+    params.type = 2;
     params.x = node->field_0;
     params.y = node->field_1;
     {

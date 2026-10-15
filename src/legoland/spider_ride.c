@@ -19,13 +19,6 @@
 #include "spider_ride.h"
 #include "tilemap.h"
 
-struct FadeParams {
-    unsigned int field_0;
-    unsigned char pad_4[4];
-    unsigned int field_8;
-    unsigned int field_c;
-};
-
 struct SpiderState {
     unsigned short id;
     unsigned char field_2;
@@ -111,8 +104,8 @@ struct SpiderNode *FindSpiderNode(TileId *key) {
 
 // FUNCTION: LEGOLAND 0x004159e0
 void FUN_004159e0(const unsigned char *arg0) {
-    struct SampleParams params;
-    params.field_0 = 0x2;
+    struct SampleSource params;
+    params.type = 0x2;
     params.x = arg0[0];
     params.y = arg0[1];
     PlayInstanceOfSample(SpiderRide_SFX[0].sample, 1, 1, &params);
@@ -120,10 +113,10 @@ void FUN_004159e0(const unsigned char *arg0) {
 
 // FUNCTION: LEGOLAND 0x00415a20
 void FUN_00415a20(TileId *tile) {
-    struct FadeParams params;
-    params.field_0 = 2;
-    params.field_8 = tile->pos.x;
-    params.field_c = tile->pos.y;
+    struct SampleSource params;
+    params.type = 2;
+    params.x = tile->pos.x;
+    params.y = tile->pos.y;
     UnSourceAndFadeAllSamplesFromSource(&params, 0xffffff38);
 }
 

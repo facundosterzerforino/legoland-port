@@ -19,13 +19,6 @@
 #include "tilemap.h"
 #include "water_works.h"
 
-struct FxSource {
-    unsigned int field_0;
-    unsigned char pad_4[4];
-    unsigned int field_8;
-    unsigned int field_c;
-};
-
 struct WaterPoint {
     struct WaterPoint *next;
     unsigned char pad_4[0x68 - 0x4];
@@ -75,9 +68,9 @@ void thunk_FUN_00417ac0(void) { ReleaseWaterWorksSfx(); }
 
 // FUNCTION: LEGOLAND 0x00417af0
 void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
-    struct SampleParams params;
+    struct SampleSource params;
 
-    params.field_0 = 2;
+    params.type = 2;
     params.x = src[0];
     params.y = src[1];
     PlayInstanceOfSample(WATERWORKS_SFX[index].sample, looping, 1, &params);
@@ -85,11 +78,11 @@ void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
 
 // FUNCTION: LEGOLAND 0x00417b40
 void FUN_00417b40(unsigned char *src) {
-    struct FxSource source;
+    struct SampleSource source;
 
-    source.field_0 = 2;
-    source.field_8 = src[0];
-    source.field_c = src[1];
+    source.type = 2;
+    source.x = src[0];
+    source.y = src[1];
     UnSourceAndFadeAllSamplesFromSource(&source, -400);
 }
 
@@ -144,11 +137,11 @@ unsigned int WaterWorksEntranceLoad(struct Element *arg) {
 
 // FUNCTION: LEGOLAND 0x00417c20
 void WaterWorksEntranceAddObject(struct EditObject *editObj, int *coords) {
-    struct SampleParams params;
+    struct SampleSource params;
 
     AddBasicObject(editObj, coords);
     params.x = coords[0];
-    params.field_0 = 2;
+    params.type = 2;
     params.y = coords[1];
     PlayInstanceOfSample(WATERWORKS_SFX[1].sample, 1, 1, &params);
 }
@@ -755,11 +748,11 @@ void WaterWorksElephantFountainCalcCursor(struct Element *arg, int *a, unsigned 
 
 // FUNCTION: LEGOLAND 0x004189c0
 void CrocodileFountainAddObject(struct EditObject *editObj, int *coords) {
-    struct SampleParams params;
+    struct SampleSource params;
 
     AddBasicObject(editObj, coords);
     params.x = coords[0];
-    params.field_0 = 2;
+    params.type = 2;
     params.y = coords[1];
     PlayInstanceOfSample(WATERWORKS_SFX[2].sample, 1, 1, &params);
 }

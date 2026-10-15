@@ -32,10 +32,10 @@ LEGO_EXPORT void KillMoneySFX(void) {
 
 // FUNCTION: LEGOLAND 0x00453950
 LEGO_EXPORT void PlayMoneySFX(TileId *tile, int sfx, int a2) {
-    struct SampleParams config;
+    struct SampleSource config;
     void *def;
 
-    config.field_0 = 2;
+    config.type = 2;
     config.x = tile->pos.x;
     config.y = tile->pos.y;
     def = MONEY_SFX[sfx].sample;
@@ -44,8 +44,8 @@ LEGO_EXPORT void PlayMoneySFX(TileId *tile, int sfx, int a2) {
 
 // FUNCTION: LEGOLAND 0x004539a0
 LEGO_EXPORT void StopMoneySFX(unsigned char *param_1) {
-    struct SampleParams params;
-    params.field_0 = 2;
+    struct SampleSource params;
+    params.type = 2;
     params.x = param_1[0];
     params.y = param_1[1];
     UnSourceAndFadeAllSamplesFromSource(&params, -400);

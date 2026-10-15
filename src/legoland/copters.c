@@ -598,7 +598,7 @@ unsigned int CoptersResumeSample(void *param) {
 // FUNCTION: LEGOLAND 0x004048b0
 void FUN_004048b0(struct CopterSfxNode *node) {
     struct FXItem *fx = Helicopter_SFX;
-    struct SampleParams params;
+    struct SampleSource params;
     struct Sample *sample;
 
     if (node->layer[1].rider != 0) node->layer[1].flags |= 1;
@@ -624,19 +624,18 @@ void FUN_004048b0(struct CopterSfxNode *node) {
 
     params.x = node->tile_x;
     params.y = node->tile_y;
-    params.field_0 = 2;
+    params.type = 2;
 
     PlayInstanceOfSample(fx[0].sample, 0, 1, &params);
     sample = PlayInstanceOfSample(fx[1].sample, 1, 1, &params);
     PauseSingleSample(sample);
-    AddSFX_Callback((struct CallbackEntry *)sample, 0xb54,
-        (unsigned int (*)(struct CallbackEntry *))CoptersResumeSample);
+    AddSFX_Callback(sample, 0xb54, (unsigned int (*)(struct Sample *))CoptersResumeSample);
 }
 
 // FUNCTION: LEGOLAND 0x004049a0
 void FUN_004049a0(struct CopterNode *node, int param) {
     struct FXItem *fx = Helicopter_SFX;
-    struct SampleParams params;
+    struct SampleSource params;
     struct CopterSfxNode *n = (struct CopterSfxNode *)node;
 
     n->layer[1].flags &= ~1u;
@@ -660,7 +659,7 @@ void FUN_004049a0(struct CopterNode *node, int param) {
     n->field_8 &= ~0x4001u;
     if (param == 0) {
         params.x = n->tile_x;
-        params.field_0 = 2;
+        params.type = 2;
         params.y = n->tile_y;
         UnSourceAndFadeAllSamplesFromSource(&params, -200);
         PlayInstanceOfSample(fx[2].sample, 0, 1, &params);

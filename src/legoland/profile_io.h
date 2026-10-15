@@ -1,5 +1,7 @@
 #pragma once
 
+struct Sample;
+
 #include "globals.h"
 #include "legoland.h"
 
@@ -34,4 +36,4 @@ char FUN_004920a0(unsigned int param1, unsigned char flags);
 int InitDirectSound(void *hwnd);
 LEGO_EXPORT void ResetTempProfile(void);
 void *FUN_00492110(void);
-struct ProfileObj *FUN_004920e0(void);
+struct Sample *FUN_004920e0(void);

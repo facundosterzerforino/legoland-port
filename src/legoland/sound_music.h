@@ -6,15 +6,7 @@
 
 struct Sample;
 struct FXItem;
-struct CallbackEntry;
 struct AVISoundBuffer;
-
-struct SampleParams {
-    /* 0x00 */ int field_0;
-    /* 0x04 */ void *field_4; /* the source: a bloke, ... */
-    /* 0x08 */ int x;
-    /* 0x0c */ int y;
-};
 
 struct SampleSource {
     /* 0x00 */ unsigned int type;
@@ -43,8 +35,8 @@ LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count);
 void UpdateSound(void);
 void FUN_00496e60(int param_1, int param_2);
 void FUN_00496d10(struct Sample *sample);
-LEGO_EXPORT void AddSFX_Callback(struct CallbackEntry *entry, unsigned int delay, unsigned int (*callback)(struct CallbackEntry *self));
-LEGO_EXPORT int CountSamplesFromSource(struct SampleParams *source);
+LEGO_EXPORT void AddSFX_Callback(struct Sample *entry, unsigned int delay, unsigned int (*callback)(struct Sample *self));
+LEGO_EXPORT int CountSamplesFromSource(struct SampleSource *source);
 LEGO_EXPORT LPDIRECTSOUNDBUFFER KLIBAUDIO_CreateAVISoundBuffer(LPWAVEFORMATEX format, unsigned int bytes);
 LEGO_EXPORT void KLIBAUDIO_PlayAVISoundBuffer(LPDIRECTSOUNDBUFFER buffer, unsigned int position);
 LEGO_EXPORT void KLIBAUDIO_SetAVIVolume(struct AVISoundBuffer *buffer, int volume);

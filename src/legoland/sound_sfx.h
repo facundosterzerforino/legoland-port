@@ -55,9 +55,13 @@ struct Sample {
     unsigned int source_x;
     unsigned int source_y;
     unsigned short flags;
-    unsigned char pad_1e[0x28 - 0x1e];
+    unsigned char pad_1e[0x20 - 0x1e];
+    unsigned int timeout; /* AddSFX_Callback */
+    unsigned int (*callback)(struct Sample *self);
     struct SampleDef *active;
     struct SampleBuffer *buffer;
+    unsigned int field_30;
+    unsigned int field_34;
 };
 
 /* DirectMusic (DirectX 6) objects used by the interactive music thread (IMT, MusicThreadProc).

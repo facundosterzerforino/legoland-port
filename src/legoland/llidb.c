@@ -31,18 +31,6 @@
 #define LLIDB_SLOT(id) ((id) & 0xff)
 #define LLIDB_ELEM(id) (&LLIDB_Pages[LLIDB_PAGE(id)][LLIDB_SLOT(id)])
 
-struct SpriteManager {
-    unsigned int var_0;
-    int count;
-    struct Sprite **sprites;
-    int *data_c;
-    int *data_10;
-    struct Element *data_14;
-    void *data_18;
-    void *data_1c;
-    void *data_20;
-};
-
 struct LLSImage {
     unsigned char pad_0[0xc];
     unsigned int format;
@@ -1070,7 +1058,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     struct Element *element;
     unsigned int tile_base;
     struct ResFile *file;
-    struct SpriteManager *si;
+    struct FXSpriteList *si;
     struct Image *anim;
     int i;
 
@@ -1081,21 +1069,21 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
         return NULL;
     }
 
-    si = (struct SpriteManager *)malloc(sizeof(struct SpriteManager));
+    si = (struct FXSpriteList *)malloc(sizeof(struct FXSpriteList));
     RES_ReadFile(file, &count, 4);
-    si->data_c = (int *)malloc(count * 4);
+    si->sprite_ids = (int *)malloc(count * 4);
     si->data_10 = (int *)malloc(count * 4);
     si->count = count;
-    si->data_18 = NULL;
-    si->data_1c = NULL;
-    si->data_20 = NULL;
+    si->get_rf_flags = NULL;
+    si->on_enter = NULL;
+    si->on_leave = NULL;
     RES_ReadFile(file, &len, 4);
     RES_ReadFile(file, name, len);
 
     i = 0;
     if ((int)count > 0) {
         do {
-            data_c = (char *)si->data_c;
+            data_c = (char *)si->sprite_ids;
             RES_ReadFile(file, data_c + i * 4, 4);
             RES_ReadFile(file, (char *)si->data_10 + i * 4, 4);
             i++;
@@ -1103,7 +1091,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     }
 
     si->sprites = (struct Sprite **)AllocTileSpace(si, count, &tile_base);
-    si->var_0 = tile_base & 0xffff;
+    si->base = tile_base & 0xffff;
 
     i = 0;
     if (0 < (int)count) {
@@ -1143,10 +1131,10 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
 
 // FUNCTION: LEGOLAND 0x0047cdd0
 void LLIDB_UnLoadTSF(struct Element *param_1) {
-    struct SpriteManager *si = (struct SpriteManager *)param_1->data;
+    struct FXSpriteList *si = (struct FXSpriteList *)param_1->data;
     int i;
 
-    free(si->data_c);
+    free(si->sprite_ids);
     free(si->data_10);
 
     i = 0;
@@ -1157,7 +1145,7 @@ void LLIDB_UnLoadTSF(struct Element *param_1) {
         } while (i < si->count);
     }
 
-    FreeTileSpace(si->var_0, si->count);
+    FreeTileSpace(si->base, si->count);
     if (si->data_14 != 0) {
         LLIDB_UnLoadData(si->data_14);
     }

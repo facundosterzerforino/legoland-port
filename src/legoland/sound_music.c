@@ -25,10 +25,8 @@ struct MusicPerformance;
 struct MusicPerformanceVtbl;
 struct BandObj;
 struct BandVtbl;
-struct CallbackEntry;
 struct SampleDef;
 struct FXList;
-struct SampleConfig;
 struct MusicLoader;
 struct MusicLoaderVtbl;
 struct ObjectDesc;
@@ -132,23 +130,6 @@ struct BandVtbl {
 
 struct BandObj {
     struct BandVtbl *vtable;
-};
-
-struct CallbackEntry {
-    struct CallbackEntry *next;
-    unsigned char pad_4[0x1c - 0x4];
-    unsigned short flags;
-    unsigned char pad_1e[0x20 - 0x1e];
-    unsigned int timeout;
-    unsigned int (*callback)(struct CallbackEntry *self);
-    unsigned int active;
-};
-
-struct SampleConfig {
-    unsigned int source_type;
-    unsigned int bloke;
-    unsigned int source_x;
-    unsigned int source_y;
 };
 
 // FUNCTION: LEGOLAND 0x00495b90
@@ -657,14 +638,14 @@ void UpdateSampleFades(void) {
 // FUNCTION: LEGOLAND 0x004968d0
 void UpdateSfxCallbacks(void) {
     unsigned int now;
-    struct CallbackEntry *entry;
+    struct Sample *entry;
     unsigned int next;
 
     now = GetTicks();
     if (SoundAvailable == 0) {
         return;
     }
-    for (entry = (struct CallbackEntry *)SampleListHead; entry != 0; entry = entry->next) {
+    for (entry = (struct Sample *)SampleListHead; entry != 0; entry = entry->next) {
         if (entry->active != 0 && (entry->flags & 0x10) != 0 && (int)now >= (int)entry->timeout) {
             next = entry->callback(entry);
             if (next != 0) {
@@ -787,7 +768,7 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToLevelXY(struct Sample *sample, un
 }
 
 // FUNCTION: LEGOLAND 0x00496b10
-LEGO_EXPORT int CountSamplesFromSource(struct SampleParams *source) {
+LEGO_EXPORT int CountSamplesFromSource(struct SampleSource *source) {
     int count;
     struct Sample *sample;
 
@@ -795,13 +776,13 @@ LEGO_EXPORT int CountSamplesFromSource(struct SampleParams *source) {
     if (SampleListHead != 0) {
         sample = (struct Sample *)SampleListHead;
         do {
-            if (sample->source_type == source->field_0) {
-                switch (source->field_0) {
+            if (sample->source_type == source->type) {
+                switch (source->type) {
                 case 0:
                     count = count + 1;
                     break;
                 case 1:
-                    if (sample->bloke == source->field_4) {
+                    if (sample->bloke == source->bloke) {
                         count = count + 1;
                     }
                     break;
@@ -934,7 +915,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
         return 0;
     }
     if (config != 0) {
-        memcpy(&sample->source_type, &((struct SampleConfig *)config)->source_type, 16);
+        memcpy(&sample->source_type, &((struct SampleSource *)config)->type, 16);
         FUN_004966a0(sample);
     } else {
         FUN_00496660(sample);
@@ -976,7 +957,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
 }
 
 // FUNCTION: LEGOLAND 0x00496db0
-LEGO_EXPORT void AddSFX_Callback(struct CallbackEntry *entry, unsigned int delay, unsigned int (*callback)(struct CallbackEntry *self)) {
+LEGO_EXPORT void AddSFX_Callback(struct Sample *entry, unsigned int delay, unsigned int (*callback)(struct Sample *self)) {
     unsigned int now;
 
     if (entry == 0) {
