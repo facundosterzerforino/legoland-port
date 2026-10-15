@@ -28,11 +28,6 @@
 #include "ext_movie.h"
 #endif
 
-struct ProfileObj {
-    unsigned char pad_0[0x34];
-    unsigned int flags;
-};
-
 struct MovieHandle {
     /* 0x00 */ unsigned int frame_count;
     /* 0x04 */ unsigned int frame_rate;
@@ -346,7 +341,7 @@ int FUN_00474920(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (((struct ProfileObj *)DAT_007fdd70[i])->flags & 0x400) {
+        if (((struct IconNode *)DAT_007fdd70[i])->flags & 0x400) {
             DAT_00668e20[i] = 0;
         } else {
             DAT_00668e20[i] = 1;
@@ -366,9 +361,9 @@ void FUN_00474990(void) {
 
     for (i = 0; i < 4; i++) {
         if (DAT_00668e20[i] != 0) {
-            ((struct ProfileObj *)DAT_007fdd70[i])->flags &= 0xfffffbff;
+            ((struct IconNode *)DAT_007fdd70[i])->flags &= 0xfffffbff;
         } else {
-            ((struct ProfileObj *)DAT_007fdd70[i])->flags |= 0x400;
+            ((struct IconNode *)DAT_007fdd70[i])->flags |= 0x400;
         }
     }
 }
@@ -435,7 +430,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->string = GetString(0x5e);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004751a0;
-        DAT_007fdd70[0] = (struct InterfaceProfileObj *)icon;
+        DAT_007fdd70[0] = (struct IconNode *)icon;
 
         icon = InsertIcon((short)DAT_004bb04c[2], (short)DAT_004bb04c[3], 0x9a, WesternThemeOffSprite);
         DAT_00668e3c = icon;
@@ -443,21 +438,21 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->string = GetString(0x5f);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004754b0;
-        DAT_007fdd70[1] = (struct InterfaceProfileObj *)icon;
+        DAT_007fdd70[1] = (struct IconNode *)icon;
 
         icon = InsertIcon((short)DAT_004bb04c[4], (short)DAT_004bb04c[5], 0x9a, CastleThemeOffSprite);
         icon->string_id = 0x60;
         icon->string = GetString(0x60);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004753a0;
-        DAT_007fdd70[2] = (struct InterfaceProfileObj *)icon;
+        DAT_007fdd70[2] = (struct IconNode *)icon;
 
         icon = InsertIcon((short)DAT_004bb04c[6], (short)DAT_004bb04c[7], 0x9a, AdventurersThemeOffSprite);
         icon->string_id = 0x61;
         icon->string = GetString(0x61);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)FUN_004752a0;
-        DAT_007fdd70[3] = (struct InterfaceProfileObj *)icon;
+        DAT_007fdd70[3] = (struct IconNode *)icon;
 
         // STRING: LEGOLAND 0x004bb48c
         bar = LoadSpriteIcon("Bar_Energy.lls", 4, 0x180, 6, 0x9a);
@@ -1349,9 +1344,9 @@ void DrawFlashingButtons(void) {
 
 // FUNCTION: LEGOLAND 0x00476140
 void FUN_00476140(int index, int value) {
-    struct ProfileObj *obj;
+    struct IconNode *obj;
 
-    obj = (struct ProfileObj *)DAT_007fdd70[index];
+    obj = (struct IconNode *)DAT_007fdd70[index];
     if (obj != NULL) {
         if (value != 0) {
             obj->flags &= 0xfffffbff;
@@ -1366,11 +1361,11 @@ void FUN_00476140(int index, int value) {
 // FUNCTION: LEGOLAND 0x00476180
 void FUN_00476180(void) {
     unsigned char *flags;
-    struct ProfileObj **items;
+    struct IconNode **items;
     unsigned int counter;
 
     flags = CurrentProfile.flags;
-    items = (struct ProfileObj **)DAT_007fdd70;
+    items = (struct IconNode **)DAT_007fdd70;
     counter = 4;
     while (counter != 0) {
         if (*flags != 0) {

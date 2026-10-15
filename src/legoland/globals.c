@@ -1753,7 +1753,6 @@ struct WaterNode *ElephantFountainList;
 // field_1414[5], field_1830) — see struct Cursor in gamemap.h.
 
 struct InterfaceIconNode;
-struct InterfaceProfileObj;
 struct InterfaceListNode;
 struct InterfaceQueryNode;
 struct InterfaceEventNode;
@@ -4284,7 +4283,7 @@ struct Sprite *IfMapiconSprite;
 struct Sprite *IfOptionsIconSprite;
 
 // GLOBAL: LEGOLAND 0x007fdd70
-struct InterfaceProfileObj *DAT_007fdd70[4];
+struct IconNode *DAT_007fdd70[4];
 
 // GLOBAL: LEGOLAND 0x007fdd80
 unsigned char DAT_007fdd80;

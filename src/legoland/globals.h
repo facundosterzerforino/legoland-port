@@ -131,7 +131,6 @@ struct EarthNode;
 struct JoustNode;
 struct InterfaceIconNode;
 struct IconNode;
-struct InterfaceProfileObj;
 struct InterfaceListNode;
 struct MoviePool;
 struct PanelNode;
@@ -3362,7 +3361,7 @@ extern struct Sprite *IfMapiconSprite;
 // 0x007fdd60
 extern struct Sprite *IfOptionsIconSprite;
 // 0x007fdd70
-extern struct InterfaceProfileObj *DAT_007fdd70[4];
+extern struct IconNode *DAT_007fdd70[4];
 // 0x007fdd80
 extern unsigned char DAT_007fdd80;
 // 0x007fdd84
