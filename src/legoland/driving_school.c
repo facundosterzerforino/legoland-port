@@ -27,13 +27,6 @@ struct Node8 {
     void *next;
 };
 
-struct DSRoadElem {
-    /* 0x00 */ unsigned char pad_0[0x8];
-    /* 0x08 */ unsigned char flags;
-    /* 0x09 */ unsigned char pad_9[0xc - 0x9];
-    /* 0x0c */ void *obj;
-};
-
 struct DSSampleConfig {
     /* 0x00 */ int field_0;
     /* 0x04 */ int field_4;
@@ -239,7 +232,7 @@ void DrivingSchoolAddObject(struct Element *param_1, int *coords) {
     struct Cursor *cursor;
     int x;
     int y;
-    struct DSRoadElem *elem;
+    struct Element *elem;
 
     tile.pos.x = coords[0];
     tile.pos.y = coords[1];
@@ -260,7 +253,7 @@ void DrivingSchoolAddObject(struct Element *param_1, int *coords) {
     FUN_004132a0(tile, x + 5, y + 4, 0, 0);
 
     // STRING: LEGOLAND 0x004b455c
-    elem = (struct DSRoadElem *)ElemID("Driving School Roads");
+    elem = (struct Element *)ElemID("Driving School Roads");
     if (elem != NULL && (elem->flags & 4) != 0) {
         IncrementObjectCount(elem->obj);
         IncrementObjectCount(elem->obj);

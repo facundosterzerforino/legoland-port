@@ -26,4 +26,4 @@ struct ClassNode;
 void SpiderRide(struct ClassNode *head, struct Ride *iface);
 struct SlotOwner;
 struct SlotArray;
-int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char count);
+int FUN_00416830(struct RideNode *owner, struct SlotArray *arr, signed char count);

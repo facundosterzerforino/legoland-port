@@ -41,16 +41,6 @@ struct SpiderState {
     int field_18;
 };
 
-struct SlotBloke {
-    unsigned char pad_0[0x36];
-    unsigned char field_36;
-};
-
-struct SlotOwner {
-    unsigned char pad_0[8];
-    struct SlotBloke *rider;
-};
-
 struct SlotArray {
     unsigned char pad_0[0x1c];
     unsigned char slots[1];
@@ -458,7 +448,7 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct SlotOwner *)elem, (struct SlotArray *)state, DAT_004cbf20->seats));
+                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct RideNode *)elem, (struct SlotArray *)state, DAT_004cbf20->seats));
                 bloke->path = NewBNVPath(DAT_004cbf30[1], 1, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->field_58 = 0;
@@ -560,7 +550,7 @@ void SpiderRideUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00416830
-int FUN_00416830(struct SlotOwner *owner, struct SlotArray *arr, signed char count) {
+int FUN_00416830(struct RideNode *owner, struct SlotArray *arr, signed char count) {
     int n = count;
     int i = rand() % n;
 

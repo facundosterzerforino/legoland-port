@@ -42,12 +42,6 @@ struct InterfaceObj {
     unsigned int string_id;
 };
 
-struct LLDBElem {
-    unsigned char pad_0[0x8];
-    /* 0x08 */ unsigned int flags;
-    /* 0x0c */ struct Ride *obj;
-};
-
 struct MovieHandle {
     /* 0x00 */ unsigned int frame_count;
     /* 0x04 */ unsigned int frame_rate;
@@ -921,7 +915,7 @@ LEGO_EXPORT unsigned int ObjectLinkedList(unsigned int *entry) {
     struct Element *theme_elem;
     struct Element *param_elem;
     struct Element *menu_elem;
-    struct LLDBElem *elem;
+    struct Element *elem;
     struct Ride *obj;
     char *menu_name;
     int count;
@@ -1135,7 +1129,7 @@ char FUN_00475c90(struct IconNode *param_1, unsigned char param_2) {
 
 // FUNCTION: LEGOLAND 0x00475cd0
 LEGO_EXPORT int RAndDLinkedList(unsigned int *entry) {
-    struct LLDBElem *elem;
+    struct Element *elem;
     struct Element *build_elem;
     struct Element *param_elem;
     struct Element *menu_elem;
@@ -1471,7 +1465,7 @@ void LoadResearchList(void) {
         SaveGameRead(&len, 4);
         SaveGameRead(buf, len);
         buf[len] = 0;
-        obj = ((struct LLDBElem *)ElemID(buf))->obj;
+        obj = ((struct Element *)ElemID(buf))->obj;
         node->data = obj;
         obj->flags &= 0xfbffffff;
         ((struct Ride *)node->data)->flags |= 0x8000000;

@@ -185,7 +185,7 @@ struct MapElement {
     /* 0x08 */ unsigned short field_8;
     /* 0x0a */ unsigned short field_a;
     /* 0x0c */ unsigned short flags;
-    /* 0x0e */ unsigned char pad_e[0x10 - 0xe];
+    /* 0x0e */ unsigned short user_flags;
     /* 0x10 */ unsigned char field_10;
     /* 0x11 */ unsigned char durability_level;
     /* 0x12 */ unsigned short field_12;

@@ -2,11 +2,6 @@
 
 struct CommandArgs;
 
-struct GameObject {
-    /* 0x00 */ unsigned char pad_0[8];
-    /* 0x08 */ unsigned int flags;
-};
-
 int FUN_00478b20(char *arg);
 unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, unsigned int param_3);
 int ScriptCmdGive(struct CommandArgs *arg, int argc);

@@ -191,7 +191,7 @@ int ScriptCmdMap(struct CommandArgs *param_1, unsigned int param_2) {
 
 // FUNCTION: LEGOLAND 0x00478b20
 int FUN_00478b20(char *arg) {
-    struct GameObject *obj = (struct GameObject *)ElemID(arg);
+    struct Element *obj = (struct Element *)ElemID(arg);
 
     if (obj != NULL) {
         if ((obj->flags & 4) == 0) {

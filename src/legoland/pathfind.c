@@ -3,6 +3,7 @@
 
 #include "globals.h"
 #include "llidb.h"
+#include "obj_instance.h"
 #include "objclass.h"
 #include "pathfind.h"
 
@@ -35,17 +36,9 @@ struct PathLink {
     int y;
 };
 
-struct ObjData {
-    unsigned char pad_0[0x3c];
-    int field_3c;
-    int field_40;
-    unsigned char pad_44[4];
-    int field_48;
-};
-
 struct ElemInfo {
     unsigned char pad_0[0xc];
-    struct ObjData *obj;
+    struct Ride *obj;
 };
 
 struct MatchResult {
@@ -725,7 +718,7 @@ void FUN_00482a80(void) {
 // FUNCTION: LEGOLAND 0x00482a90
 void InitEntrance1Point(void) {
     struct MatchResult *match;
-    struct ObjData *obj;
+    struct Ride *obj;
 
     if (Entrance1Point.x != 0) {
         return;
@@ -739,8 +732,8 @@ void InitEntrance1Point(void) {
         (Element *)Entrance1Elem);
     obj = ((struct ElemInfo *)Entrance1Elem)->obj;
 
-    Entrance1Point.x = match->anchor_x + obj->field_3c - 1;
-    Entrance1Point.y = ((obj->field_48 + obj->field_40) / 2) + match->anchor_y;
+    Entrance1Point.x = match->anchor_x + obj->footprint.x0 - 1;
+    Entrance1Point.y = ((obj->footprint.y1 + obj->footprint.y0) / 2) + match->anchor_y;
 }
 
 // FUNCTION: LEGOLAND 0x00482b00

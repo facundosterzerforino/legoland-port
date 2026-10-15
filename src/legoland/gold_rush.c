@@ -22,49 +22,6 @@ struct GoldArray {
     unsigned int field_14[6];
 };
 
-struct GoldItem {
-    /* 0x00 */ unsigned char pad_0[8];
-    /* 0x08 */ struct GoldSub *rider;
-    /* 0x0c */ unsigned char tile;
-};
-
-struct GoldSub {
-    unsigned char pad_0[0x36];
-    unsigned char field_36;
-};
-
-struct GoldRandSub {
-    unsigned char pad_0[0x58];
-    unsigned int field_58;
-};
-
-struct GoldRandItem {
-    unsigned char pad_0[8];
-    struct GoldRandSub *rider;
-};
-
-struct GoldBloke {
-    unsigned char pad_0[0x58];
-    int counter;
-    unsigned char pad_5c[4];
-    unsigned char var_60;
-    unsigned char pad_61;
-    unsigned short var_62;
-    unsigned char pad_64[0xe];
-    unsigned char var_72;
-};
-
-struct GoldBlokeRef {
-    unsigned char pad_0[8];
-    struct GoldBloke *bloke;
-    unsigned char field_c;
-};
-
-struct GoldWalkItem {
-    unsigned char pad_0[8];
-    struct Bloke *bloke;
-};
-
 struct GoldSlot {
     int index;
     float weight;
@@ -280,7 +237,7 @@ unsigned int FUN_00406e90(void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00406ec0
-void FUN_00406ec0(struct GoldItem *item, void *param2) {
+void FUN_00406ec0(struct RideNode *item, void *param2) {
     struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(param2);
     unsigned int i;
 
@@ -297,9 +254,9 @@ void FUN_00406ec0(struct GoldItem *item, void *param2) {
 }
 
 // FUNCTION: LEGOLAND 0x00406f00
-struct GoldArray *FUN_00406f00(struct GoldItem *item) {
+struct GoldArray *FUN_00406f00(struct RideNode *item) {
     unsigned int idx = item->rider->field_36;
-    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->tile);
+    struct GoldArray *a = (struct GoldArray *)FindGoldWashNode(&item->tile.pos.x);
 
     if (a != NULL) {
         a->field_14[idx] = 0;
@@ -317,8 +274,8 @@ void FUN_00406f30(void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00406f60
-void FUN_00406f60(struct GoldWalkItem *item, unsigned char *p) {
-    struct Bloke *b = item->bloke;
+void FUN_00406f60(struct RideNode *item, unsigned char *p) {
+    struct Bloke *b = item->rider;
     int slot = Gold_Slots[b->field_36].index;
 
     b->dest.x = Gold_Points[slot].x;
@@ -333,8 +290,8 @@ void FUN_00406f60(struct GoldWalkItem *item, unsigned char *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00407000
-void FUN_00407000(struct GoldWalkItem *item, unsigned char *p) {
-    struct Bloke *b = item->bloke;
+void FUN_00407000(struct RideNode *item, unsigned char *p) {
+    struct Bloke *b = item->rider;
     struct GoldSlot *s = &Gold_Slots[b->field_36];
     int slot = s->index;
     float w = s->weight;
@@ -350,8 +307,8 @@ void FUN_00407000(struct GoldWalkItem *item, unsigned char *p) {
 }
 
 // FUNCTION: LEGOLAND 0x004070b0
-void FUN_004070b0(struct GoldWalkItem *item, unsigned char *p) {
-    struct Bloke *b = item->bloke;
+void FUN_004070b0(struct RideNode *item, unsigned char *p) {
+    struct Bloke *b = item->rider;
     struct GoldSlot *s = &Gold_Slots[b->field_36];
     int slot = s->index;
     float w = s->weight;
@@ -368,8 +325,8 @@ void FUN_004070b0(struct GoldWalkItem *item, unsigned char *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00407170
-void FUN_00407170(struct GoldWalkItem *item, unsigned char *p) {
-    struct Bloke *b = item->bloke;
+void FUN_00407170(struct RideNode *item, unsigned char *p) {
+    struct Bloke *b = item->rider;
     struct GoldSlot *s = &Gold_Slots[b->field_36];
     int slot = s->index;
     float w = s->weight * 512.0f;
@@ -386,26 +343,26 @@ void FUN_00407170(struct GoldWalkItem *item, unsigned char *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00407230
-void FUN_00407230(struct GoldRandItem *param) {
+void FUN_00407230(struct RideNode *param) {
     int value = rand() % 31;
     param->rider->field_58 = value + 15;
 }
 
 // FUNCTION: LEGOLAND 0x00407250
-void FUN_00407250(struct GoldBlokeRef *ref) {
-    struct GoldBloke *b = ref->bloke;
+void FUN_00407250(struct RideNode *ref) {
+    struct Bloke *b = ref->rider;
 
-    b->var_62 |= 0x100;
+    b->flags |= 0x100;
     BlokePanWithPan((struct Bloke *)b);
     BlokeAnimNextFrame((struct Bloke *)b);
-    b->var_72 = 1;
-    b->counter = b->counter - 1;
-    if (b->counter <= 0) {
-        b->var_62 &= 0xfeff;
+    b->dir = 1;
+    b->field_58 = b->field_58 - 1;
+    if (b->field_58 <= 0) {
+        b->flags &= 0xfeff;
         BlokeWalkWithPan((struct Bloke *)b);
-        FUN_00406f00((struct GoldItem *)ref);
-        FUN_00406f30(&ref->field_c);
-        b->var_60++;
+        FUN_00406f00((struct RideNode *)ref);
+        FUN_00406f30(&ref->tile.pos.x);
+        b->param_action++;
     }
 }
 
@@ -429,7 +386,7 @@ void GoldRushUpdate(struct Element *elem) {
             switch (b->param_action) {
             case 0:
                 b->flags |= 8;
-                FUN_00406ec0((struct GoldItem *)node, t);
+                FUN_00406ec0((struct RideNode *)node, t);
                 FUN_00406f30(t);
                 FUN_004122d0((struct RideSlotArg *)DAT_004c11e4, (struct RideSlot *)b);
                 break;
@@ -449,23 +406,23 @@ void GoldRushUpdate(struct Element *elem) {
                 break;
             case 3:
             case 8:
-                FUN_00406f60((struct GoldWalkItem *)node, t);
+                FUN_00406f60((struct RideNode *)node, t);
                 b->param_action++;
                 break;
             case 4:
-                FUN_00407000((struct GoldWalkItem *)node, t);
+                FUN_00407000((struct RideNode *)node, t);
                 b->param_action++;
                 break;
             case 5:
-                FUN_004070b0((struct GoldWalkItem *)node, t);
-                FUN_00407230((struct GoldRandItem *)node);
+                FUN_004070b0((struct RideNode *)node, t);
+                FUN_00407230((struct RideNode *)node);
                 b->param_action++;
                 break;
             case 6:
-                FUN_00407250((struct GoldBlokeRef *)node);
+                FUN_00407250((struct RideNode *)node);
                 break;
             case 7:
-                FUN_00407170((struct GoldWalkItem *)node, t);
+                FUN_00407170((struct RideNode *)node, t);
                 b->param_action++;
                 break;
             case 9:

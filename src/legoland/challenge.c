@@ -37,8 +37,6 @@
 #include "timer.h"
 
 struct AnimHandle;
-struct RideElem;
-struct RideObj;
 struct ObjectClass;
 
 struct AnimHandle {
@@ -52,19 +50,6 @@ struct AnimHandle {
     /* 0x1c */ void *stream;
     /* 0x20 */ void (*open_cb)(struct AnimHandle *handle);
     /* 0x24 */ void *(*callback)(void);
-};
-
-struct RideObj {
-    unsigned char pad_0[0xc0];
-    unsigned int (*func)(unsigned int, unsigned int);
-    unsigned int arg;
-};
-
-struct RideElem {
-    unsigned char pad_0[8];
-    unsigned char flags;
-    unsigned char pad_9[0xc - 0x9];
-    struct RideObj *obj;
 };
 
 struct ObjectClass {
@@ -680,55 +665,55 @@ unsigned int LoadReport(void) {
 
 // FUNCTION: LEGOLAND 0x004442c0
 int GetDrivingSchoolScore(void) {
-    struct RideElem *elem;
+    struct Element *elem;
 
-    elem = (struct RideElem *)ElemID("DRIVING SCHOOL"); /* TODO: fold — ElemID handle (uint) viewed as RideElem* */
+    elem = (struct Element *)ElemID("DRIVING SCHOOL"); /* TODO: fold — ElemID handle (uint) viewed as RideElem* */
     if ((elem->flags & 1) != 0) {
-        return elem->obj->func(elem->obj->arg, 0);
+        return elem->obj->cb_c0(elem->obj->element, 0);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x004442f0
 int GetBoatingSchoolScore(void) {
-    struct RideElem *elem;
+    struct Element *elem;
 
-    elem = (struct RideElem *)ElemID("BOATING SCHOOL");
+    elem = (struct Element *)ElemID("BOATING SCHOOL");
     if ((elem->flags & 1) != 0) {
-        return elem->obj->func(elem->obj->arg, 0);
+        return elem->obj->cb_c0(elem->obj->element, 0);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444320
 int GetCastleScore(void) {
-    struct RideElem *elem;
+    struct Element *elem;
 
-    elem = (struct RideElem *)ElemID("CASTLE OBJ");
+    elem = (struct Element *)ElemID("CASTLE OBJ");
     if ((elem->flags & 1) != 0) {
-        return elem->obj->func(elem->obj->arg, 0);
+        return elem->obj->cb_c0(elem->obj->element, 0);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444350
 int GetLogFlumeScore(void) {
-    struct RideElem *elem;
+    struct Element *elem;
 
-    elem = (struct RideElem *)ElemID("LOG FLUME ENTRANCE");
+    elem = (struct Element *)ElemID("LOG FLUME ENTRANCE");
     if ((elem->flags & 1) != 0) {
-        return elem->obj->func(elem->obj->arg, 0);
+        return elem->obj->cb_c0(elem->obj->element, 0);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444380
 int GetJungleCruiseScore(void) {
-    struct RideElem *elem;
+    struct Element *elem;
 
-    elem = (struct RideElem *)ElemID("JUNGLE CRUISE");
+    elem = (struct Element *)ElemID("JUNGLE CRUISE");
     if ((elem->flags & 1) != 0) {
-        return elem->obj->func(elem->obj->arg, 0);
+        return elem->obj->cb_c0(elem->obj->element, 0);
     }
     return 0;
 }

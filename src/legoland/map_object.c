@@ -31,23 +31,9 @@
 #include "timer.h"
 #include "worker.h"
 
-struct ObjInfo {
-    unsigned char pad_c[12];
-    int x;
-    int y;
-    unsigned char pad_14[16];
-    signed char field_24;
-    signed char field_25;
-};
-
 struct Obj0c {
     unsigned char pad_0[12];
     void *field_c;
-};
-
-struct ObjFlags {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
 };
 
 struct ObjState {
@@ -58,21 +44,6 @@ struct ObjState {
 struct CursorObj {
     unsigned char pad_0[12];
     void *field_c;
-};
-
-struct TileSprite {
-    unsigned char pad_0[0x16];
-    short size;
-};
-
-struct MapTile {
-    unsigned char pad_0[8];
-    unsigned short tile;
-    unsigned char pad_a[2];
-    unsigned short flags;
-    unsigned short user_flags;
-    unsigned char rf_flags[2];
-    unsigned short obj_region;
 };
 
 struct ObjRect {
@@ -96,21 +67,9 @@ struct ObjNode {
     struct ObjBox *obj;
 };
 
-struct ObjDef {
-    unsigned char pad_0[8];
-    unsigned char field_8;
-};
-
-struct ObjData {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
-    unsigned char pad_20[0x58 - 0x20];
-    struct ObjDef *field_58;
-};
-
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
-   map_object views the same memory through its own struct MapTile layout. */
-#define MapTileGrid ((struct MapTile **)GameMap)
+   map_object views the same memory through its own struct MapElement layout. */
+#define MapTileGrid ((struct MapElement **)GameMap)
 
 // FUNCTION: LEGOLAND 0x0045dd80
 LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3) {
@@ -440,7 +399,7 @@ int FUN_0045e620(struct ObjBox *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e690
-int FUN_0045e690(struct ObjInfo *obj) {
+int FUN_0045e690(struct Ride *obj) {
     if (((int)obj->field_24 != obj->x) || ((int)obj->field_25 != obj->y)) {
         return 1;
     }
@@ -480,7 +439,7 @@ int FUN_0045e710(struct ObjBox *obj) {
 // FUNCTION: LEGOLAND 0x0045e770
 void FUN_0045e770(struct ObjNode *node, int *offset) {
     struct ObjBox *obj;
-    struct MapTile *tile;
+    struct MapElement *tile;
     int x;
     int y;
 
@@ -489,18 +448,18 @@ void FUN_0045e770(struct ObjNode *node, int *offset) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0) {
-                tile->obj_region |= (unsigned short)FUN_0045e6b0(obj);
+                tile->field_12 |= (unsigned short)FUN_0045e6b0(obj);
             }
         }
-        if (FUN_0045e690((struct ObjInfo *)obj) != 0) {
+        if (FUN_0045e690((struct Ride *)obj) != 0) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0) {
-                    tile->obj_region |= (unsigned short)FUN_0045e710(obj);
+                    tile->field_12 |= (unsigned short)FUN_0045e710(obj);
                 }
             }
         }
@@ -510,7 +469,7 @@ void FUN_0045e770(struct ObjNode *node, int *offset) {
 // FUNCTION: LEGOLAND 0x0045e850
 void FUN_0045e850(struct ObjNode *node, int *offset) {
     struct ObjBox *obj;
-    struct MapTile *tile;
+    struct MapElement *tile;
     int x;
     int y;
 
@@ -519,18 +478,18 @@ void FUN_0045e850(struct ObjNode *node, int *offset) {
         x = obj->pos.x + offset[0];
         y = obj->pos.y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0) {
-                tile->obj_region &= ~(unsigned short)FUN_0045e6b0(obj);
+                tile->field_12 &= ~(unsigned short)FUN_0045e6b0(obj);
             }
         }
-        if (FUN_0045e690((struct ObjInfo *)obj) != 0) {
+        if (FUN_0045e690((struct Ride *)obj) != 0) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0) {
-                    tile->obj_region &= ~(unsigned short)FUN_0045e710(obj);
+                    tile->field_12 &= ~(unsigned short)FUN_0045e710(obj);
                 }
             }
         }
@@ -556,7 +515,7 @@ int FUN_0045e930(struct MapElement *obj) {
 // FUNCTION: LEGOLAND 0x0045e960
 int FUN_0045e960(struct ObjNode *node, int *offset) {
     struct ObjBox *obj;
-    struct MapTile *tile;
+    struct MapElement *tile;
     int x;
     int y;
 
@@ -565,16 +524,16 @@ int FUN_0045e960(struct ObjNode *node, int *offset) {
         x = offset[0] + obj->pos.x;
         y = offset[1] + obj->pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+            tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
             if (tile != 0 && FUN_0045e930(tile) == 0) {
                 return 0;
             }
         }
-        if (FUN_0045e690((struct ObjInfo *)obj) != 0) {
+        if (FUN_0045e690((struct Ride *)obj) != 0) {
             x = offset[0] + obj->pos.x;
             y = offset[1] + obj->pos.y;
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-                tile = (struct MapTile *)((char *)MapTileGrid[y] + x * 0x14);
+                tile = (struct MapElement *)((char *)MapTileGrid[y] + x * 0x14);
                 if (tile != 0 && FUN_0045e930(tile) == 0) {
                     return 0;
                 }
@@ -598,7 +557,7 @@ void FUN_0045ea40(struct ObjBox *obj, struct Point *out) {
 }
 
 // FUNCTION: LEGOLAND 0x0045eab0
-unsigned int FUN_0045eab0(struct ObjFlags *obj) {
+unsigned int FUN_0045eab0(struct Ride *obj) {
     if (obj != 0) {
         return (~obj->flags >> 21) & 1;
     }
@@ -614,11 +573,11 @@ int FUN_0045ead0(struct ObjState *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045eaf0
-int FUN_0045eaf0(struct ObjData *obj) {
+int FUN_0045eaf0(struct Ride *obj) {
     if (FUN_0045ead0((struct ObjState *)obj) != 0) {
         return 1;
     }
-    if (obj != 0 && obj->field_58 != 0 && (obj->field_58->field_8 & 0x10) != 0 &&
+    if (obj != 0 && obj->parent_element != 0 && (obj->parent_element->flags & 0x10) != 0 &&
         (obj->flags & 0x600000) == 0) {
         return 1;
     }
@@ -653,7 +612,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
             return 0;
         }
         UseBricks(GetObjCost(obj));
-        if (FUN_0045eab0((struct ObjFlags *)obj) != 0 || FUN_0045eaf0((struct ObjData *)obj) != 0) {
+        if (FUN_0045eab0((struct Ride *)obj) != 0 || FUN_0045eaf0((struct Ride *)obj) != 0) {
             FUN_0045e080(editObj, (struct Point *)coords, 0x20);
         } else {
             SetObjRectFlags(editObj, (struct Point *)coords, 0x20);
@@ -672,7 +631,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         }
     } else {
         UseBricks(GetObjCost(obj));
-        if (FUN_0045eab0((struct ObjFlags *)obj) != 0 || FUN_0045eaf0((struct ObjData *)obj) != 0) {
+        if (FUN_0045eab0((struct Ride *)obj) != 0 || FUN_0045eaf0((struct Ride *)obj) != 0) {
             FUN_0045e080(editObj, (struct Point *)coords, 0);
         }
         FUN_0045ea40((struct ObjBox *)obj, &out);
@@ -1041,7 +1000,7 @@ struct CursorPts {
 // FUNCTION: LEGOLAND 0x0045f5f0
 LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int param_3) {
     struct CursorPts *pts;
-    struct TileSprite *sprite;
+    struct Sprite *sprite;
     short size;
     int fbits;
     unsigned short flag;
@@ -1057,8 +1016,8 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
         if (param_3 != 0) {
             FUN_0045f540(cursor);
         }
-        sprite = (struct TileSprite *)TileSpriteArray[DAT_00667ca4];
-        size = sprite->size;
+        sprite = (struct Sprite *)TileSpriteArray[DAT_00667ca4];
+        size = sprite->height;
         pts = (struct CursorPts *)cursor;
         pts->count = 0;
         built = IsCursorBuildable(cursor);
@@ -1180,7 +1139,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
                     }
                     if (obj != 0 && (obj->flags & 0x200000) == 0) {
                         SetCursorBlocked(cursor, 10);
-                    } else if (FUN_0045eab0((struct ObjFlags *)param) == 0) {
+                    } else if (FUN_0045eab0((struct Ride *)param) == 0) {
                         if (obj != 0) {
                             SetCursorBlocked(cursor, 6);
                         }
@@ -1188,7 +1147,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
                             SetCursorBlocked(cursor, 5);
                         }
                     }
-                    if (FUN_0045eaf0((struct ObjData *)param) != 0) {
+                    if (FUN_0045eaf0((struct Ride *)param) != 0) {
                         if ((tile->flags & 0x10) && (tile->field_10 & 1) == 0) {
                             SetCursorBlocked(cursor, 9);
                         }
@@ -1470,7 +1429,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         return;
     }
     pts = (struct CursorPts *)cursor;
-    size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
+    size = ((struct Sprite *)TileSpriteArray[DAT_00667ca4])->height;
     for (i = 0; i < (int)pts->count; i++) {
         GetTileBounds((struct Point *)&cursor->tile_x, screen);
         bx = (short)pts->xpts[i] + screen[0];
@@ -1542,7 +1501,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         PrintSprite(Arrow01Sprite, screen[0], screen[1], 0, 0);
         break;
     }
-    if ((cursor->field_1828 & 0x800) != 0 && FUN_0045e690((struct ObjInfo *)EditMode.unk8) != 0) {
+    if ((cursor->field_1828 & 0x800) != 0 && FUN_0045e690((struct Ride *)EditMode.unk8) != 0) {
         tilept.x = EditMode.unk8->field_24 + cursor->tile_x;
         tilept.y = EditMode.unk8->field_25 + cursor->tile_y;
         GetTileBounds(&tilept, screen);
@@ -1566,11 +1525,11 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
 
 // FUNCTION: LEGOLAND 0x00460540
 LEGO_EXPORT void GetTileDimensions(int *width, int *height) {
-    struct TileSprite *sprite;
+    struct Sprite *sprite;
     int size;
 
     sprite = TileSpriteArray[DAT_00667ca4];
-    size = sprite->size;
+    size = (short)sprite->height;
     *height = size;
     *width = size * 2;
 }
@@ -1664,9 +1623,9 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
     dx = pos->x - clip->left;
     dy = pos->y - clip->top;
     SetClipping(clip);
-    dbl = (short)(((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size * 2);
+    dbl = (short)(((struct Sprite *)TileSpriteArray[DAT_00667ca4])->height * 2);
     half_x = (dbl + 1) >> 1;
-    size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
+    size = ((struct Sprite *)TileSpriteArray[DAT_00667ca4])->height;
     sx = pos->x / dbl;
     half_y = (size + 1) >> 1;
     mx = pos->x % dbl;
@@ -1727,7 +1686,7 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
                     }
                 } else {
                     PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], col, draw_y);
-                    if (IsPathTile((struct MapTile *)tile) != 0) {
+                    if (IsPathTile((struct MapElement *)tile) != 0) {
                         DrawPathTile(cell, col, draw_y, 0);
                     }
                 }
@@ -1754,7 +1713,7 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
                 } else {
                     x2 = col + half_x;
                     PrintSpriteSimple((struct Sprite *)TileSpriteArray[tile->field_8], x2, draw_y + half_y);
-                    if (IsPathTile((struct MapTile *)tile) != 0) {
+                    if (IsPathTile((struct MapElement *)tile) != 0) {
                         DrawPathTile(cell, x2, draw_y + half_y, 0);
                     }
                 }
@@ -1883,13 +1842,13 @@ void DrawDeferredSprites(void) {
 
 // FUNCTION: LEGOLAND 0x00461080
 void FUN_00461080(int *coord, unsigned int param2, unsigned int param3, unsigned int param4) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     if (coord[0] >= 0 && coord[0] < lpConfig->width &&
         coord[1] >= 0 && coord[1] < lpConfig->height) {
         tile = MapTileGrid[coord[1]];
         tile = tile + coord[0];
-        if (tile != 0 && IsPathTile(tile) != 0 && tile->tile != 0) {
+        if (tile != 0 && IsPathTile(tile) != 0 && tile->field_8 != 0) {
             DrawPathTileEx(coord, param2, param3, param4);
         }
     }
@@ -1908,7 +1867,7 @@ void FUN_004610f0(struct Point *param_1, int *param_2) {
     int ix;
     int iy;
 
-    size = ((struct TileSprite *)TileSpriteArray[DAT_00667ca4])->size;
+    size = ((struct Sprite *)TileSpriteArray[DAT_00667ca4])->height;
     dbl = (short)(size * 2);
     half_x = (dbl + 1) >> 1;
     half_y = (size + 1) >> 1;
@@ -2083,15 +2042,15 @@ LEGO_EXPORT int Get_YScroll(void) {
 
 // FUNCTION: LEGOLAND 0x00461610
 LEGO_EXPORT unsigned char Get_RFFlags(int x, int y) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     tile = MapTileGrid[y >> 8];
-    return tile[x >> 8].rf_flags[0];
+    return tile[x >> 8].field_10;
 }
 
 // FUNCTION: LEGOLAND 0x00461630
 LEGO_EXPORT unsigned char GetCurrentRFFlags(int x, int y) {
-    struct MapTile *tile;
+    struct MapElement *tile;
     unsigned char rf;
     unsigned char (*callback)(int x, int y);
     int tx;
@@ -2113,9 +2072,9 @@ LEGO_EXPORT unsigned char GetCurrentRFFlags(int x, int y) {
     if (tx < 0 || tx >= (int)lpConfig->width || ty < 0 || ty >= (int)lpConfig->height) {
         tile = 0;
     } else {
-        tile = (struct MapTile *)((char *)MapTileGrid[ty] + tx * 0x14);
+        tile = (struct MapElement *)((char *)MapTileGrid[ty] + tx * 0x14);
     }
-    callback = TileSpriteInfo[tile->tile].src->get_rf_flags;
+    callback = TileSpriteInfo[tile->field_8].src->get_rf_flags;
     if (callback != 0) {
         return callback(x, y);
     }
@@ -2124,15 +2083,15 @@ LEGO_EXPORT unsigned char GetCurrentRFFlags(int x, int y) {
 
 // FUNCTION: LEGOLAND 0x004616e0
 LEGO_EXPORT void Set_RFFlags(int x, int y, unsigned char value) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     tile = MapTileGrid[y >> 8];
-    tile[x >> 8].rf_flags[0] = value;
+    tile[x >> 8].field_10 = value;
 }
 
 // FUNCTION: LEGOLAND 0x00461710
 LEGO_EXPORT unsigned short Get_UserFlags(int x, int y) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     tile = MapTileGrid[y >> 8];
     return tile[x >> 8].user_flags;
@@ -2140,7 +2099,7 @@ LEGO_EXPORT unsigned short Get_UserFlags(int x, int y) {
 
 // FUNCTION: LEGOLAND 0x00461730
 LEGO_EXPORT void Set_UserFlags(int x, int y, unsigned short value) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     tile = MapTileGrid[y >> 8];
     tile[x >> 8].user_flags = value;
@@ -2148,7 +2107,7 @@ LEGO_EXPORT void Set_UserFlags(int x, int y, unsigned short value) {
 
 // FUNCTION: LEGOLAND 0x00461760
 LEGO_EXPORT unsigned short Get_MapFlags(int x, int y) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     tile = MapTileGrid[y >> 8];
     return tile[x >> 8].flags;
@@ -2168,12 +2127,12 @@ LEGO_EXPORT void SetMapTile(int x, int y, unsigned short value) {
     if (y > (int)lpConfig->height) {
         return;
     }
-    MapTileGrid[y][x].tile = value;
+    MapTileGrid[y][x].field_8 = value;
 }
 
 // FUNCTION: LEGOLAND 0x004617d0
 LEGO_EXPORT unsigned short GetMapFlags(int x, int y) {
-    struct MapTile *tile;
+    struct MapElement *tile;
 
     if (x < 0 || x > 0x100 || y < 0 || y > 0x100) {
         return 0x40;

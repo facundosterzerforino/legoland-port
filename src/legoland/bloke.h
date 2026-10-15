@@ -45,6 +45,8 @@ struct BNVPath {
 };
 typedef struct BNVPath BNVPath;
 
+struct QueueTable;
+
 struct Bloke {
     struct Bloke *next;
     union {
@@ -86,6 +88,7 @@ struct Bloke {
     union {
         int field_50;
         struct WorkOrder *order; /* gardeners and mechanics */
+        struct QueueTable *queue; /* copter riders: their queue table (its index in a save) */
     };
     union {
         unsigned int field_54;

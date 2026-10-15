@@ -10,30 +10,9 @@
 #include "ride_queue.h"
 #include "tilemap.h"
 
-struct QueueItemInner {
-    unsigned char pad_0[0xe];
-    unsigned short low_level_action;
-    unsigned char pad_10[0x24 - 0x10];
-    int dest_x;
-    int dest_y;
-    unsigned char pad_2c[0x38 - 0x2c];
-    short field_38;
-    unsigned char pad_3a[0x60 - 0x3a];
-    unsigned char param_action;
-    unsigned char pad_61;
-    unsigned short flags;
-    unsigned char pad_64[0x68 - 0x64];
-    int pos_x;
-    int pos_y;
-    unsigned char pad_70[0x73 - 0x70];
-    unsigned char field_73;
-    unsigned char pad_74[0x98 - 0x74];
-    struct Navigator nav;
-};
-
 struct QueueItemMid {
     unsigned char pad_0[0x8];
-    struct QueueItemInner *rider;
+    struct Bloke *rider;
 };
 
 struct QueueNode {
@@ -161,7 +140,7 @@ void FUN_00411f20(struct Queue *queue, struct QueueItemMid *mid) {
 }
 
 // FUNCTION: LEGOLAND 0x00411f70
-int FUN_00411f70(struct Queue *queue, struct QueueItemInner *inner) {
+int FUN_00411f70(struct Queue *queue, struct Bloke *inner) {
     struct QueueNode *head = queue->head;
     if (head != NULL && head->field_4->rider == inner) {
         return 1;
@@ -170,7 +149,7 @@ int FUN_00411f70(struct Queue *queue, struct QueueItemInner *inner) {
 }
 
 // FUNCTION: LEGOLAND 0x00411fa0
-void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueItemInner *inner) {
+void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct Bloke *inner) {
     struct QueueTable *table = queue->count;
     struct QueueStep *step = &table->steps[inner->field_38];
     short cur;
@@ -181,9 +160,9 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
 
     x = (step->dx + param_2) << 8;
     y = (step->dy + param_3) << 8;
-    inner->dest_y = y;
-    inner->dest_x = x;
-    dir = CalcMoveLine(*(struct Point *)&inner->pos_x, *(struct Point *)&inner->dest_x, &inner->nav);
+    inner->dest.y = y;
+    inner->dest.x = x;
+    dir = CalcMoveLine(*(struct Point *)&inner->pos.x, *(struct Point *)&inner->dest.x, &inner->nav);
     inner->low_level_action = 7;
     inner->field_73 = dir + 0x10;
     NewDirForAction((Bloke *)inner, (unsigned char)(inner->field_73 >> 5) + 3);
@@ -194,7 +173,7 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
         return;
     }
     for (node = queue->head; node != NULL; node = node->next) {
-        struct QueueItemInner *other = node->field_4->rider;
+        struct Bloke *other = node->field_4->rider;
         if (other->field_38 == cur && other != inner) {
             inner->field_38 = cur - 1;
             return;
@@ -206,7 +185,7 @@ void FUN_00411fa0(struct Queue *queue, int param_2, int param_3, struct QueueIte
 void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
     struct QueueNode *node = queue->head;
     if (node != NULL) {
-        struct QueueItemInner *inner = node->field_4->rider;
+        struct Bloke *inner = node->field_4->rider;
         inner->flags &= ~0x40;
         inner->param_action++;
         *out = node->field_4;
@@ -219,7 +198,7 @@ void FUN_00412060(struct Queue *queue, struct QueueItemMid **out) {
 void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_3) {
     struct QueueNode *node = queue->head;
     while (node != NULL) {
-        struct QueueItemInner *inner = node->field_4->rider;
+        struct Bloke *inner = node->field_4->rider;
         if (inner->low_level_action == 0) {
             FUN_00411fa0(queue, param_2, param_3, inner);
         }

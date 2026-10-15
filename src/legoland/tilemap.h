@@ -19,7 +19,7 @@ LEGO_EXPORT unsigned int *AllocTileSpace(void *manager, int count, unsigned int 
 LEGO_EXPORT void PointToIsoPlane(int *param_1, int *out);
 LEGO_EXPORT unsigned int ScreenToMapRef(int *param_1, int *out, unsigned int param_3);
 LEGO_EXPORT unsigned int ScreenToMapRef2(struct Point *screen, struct Point *out);
-int IsPathTile(struct MapTile *tile);
+int IsPathTile(struct MapElement *tile);
 int IsPavedPathTile(int *param_1);
 unsigned char GetPathNeighbourMask(int *coords);
 unsigned char GetPathDiagonalGaps(unsigned char flags, int *coords);

@@ -19,20 +19,6 @@
 
 #include "image_sprite.h"
 
-struct SafariSample {
-    unsigned char tile_x;
-    unsigned char tile_y;
-    unsigned char pad_2[2];
-    unsigned int seated_count;
-    unsigned int field_8;
-    unsigned int frame;
-    unsigned char pad_10[4];
-    unsigned int field_14;
-    unsigned int loops_left;
-    unsigned int frame_ticks;
-    unsigned int boarding_count;
-};
-
 // FUNCTION: LEGOLAND 0x004149c0
 void FUN_004149c0(struct SafariNode *param) {
     struct SafariNode *s = (struct SafariNode *)malloc(sizeof(struct SafariNode));
@@ -97,13 +83,13 @@ void *FUN_00414a80(struct SafariKey *key) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ab0
-void FUN_00414ab0(struct SafariSample *a1) {
+void FUN_00414ab0(struct SafariNode *a1) {
     struct SampleSource src;
 
     src.type = 2;
-    a1->field_8 = a1->seated_count;
+    a1->field_8 = a1->field_4;
     a1->field_14 = (a1->field_14 & 0xFFFFBFFF) | 1;
-    a1->seated_count = 0;
+    a1->field_4 = 0;
     a1->frame = 0;
     a1->frame_ticks = 0;
     src.x = a1->tile_x;
@@ -113,14 +99,14 @@ void FUN_00414ab0(struct SafariSample *a1) {
 
 // FUNCTION: LEGOLAND 0x00414b10
 void FUN_00414b10(struct SafariNode *node) {
-    struct SafariSample *a1 = (struct SafariSample *)node;
+    struct SafariNode *a1 = (struct SafariNode *)node;
     struct SampleSource src;
 
     a1->frame_ticks = 0;
     a1->frame = 0;
     a1->loops_left = rand() % 2 + 3;
-    a1->boarding_count = 0;
-    a1->seated_count = 0;
+    a1->field_20 = 0;
+    a1->field_4 = 0;
     src.type = 2;
     a1->field_14 &= 0xFFFFBFFE;
     src.x = a1->tile_x;
@@ -293,31 +279,17 @@ void SafariRideGetInterfaces(struct ClassNode *name, struct Ride *interfaces) {
     }
 }
 
-struct SafariState {
-    unsigned short id;
-    unsigned char pad_2[2];
-    int seated_count;
-    unsigned char pad_8[4];
-    int frame;
-    unsigned char pad_10[4];
-    unsigned int flags;
-    int loops_left;
-    int frame_ticks;
-    int boarding_count;
-    int board_timer;
-};
-
 // FUNCTION: LEGOLAND 0x004150c0
 void FUN_004150c0(struct SafariNode *node) {
-    struct SafariState *s = (struct SafariState *)node;
+    struct SafariNode *s = (struct SafariNode *)node;
     struct RideNode *r = ((struct Ride *)SafariRide)->riders;
-    unsigned int flags = s->flags;
+    unsigned int flags = s->field_14;
 
     if (flags & 1) {
         int v = ++s->frame_ticks;
         int n = s->loops_left;
         if (n == 0) {
-            if (GetAllBlokesOffRide((struct Ride *)SafariRide, s->id) == 0) {
+            if (GetAllBlokesOffRide((struct Ride *)SafariRide, s->tile_id) == 0) {
                 return;
             }
             FUN_00414b10(node);
@@ -332,25 +304,25 @@ void FUN_004150c0(struct SafariNode *node) {
             }
         }
     } else {
-        int cur = s->seated_count;
+        int cur = s->field_4;
         if (flags & 0x4000) {
-            if (cur == s->boarding_count) {
-                s->flags = flags & 0xffffbfff;
-                FUN_00414ab0((struct SafariSample *)s);
+            if (cur == s->field_20) {
+                s->field_14 = flags & 0xffffbfff;
+                FUN_00414ab0((struct SafariNode *)s);
                 return;
             }
         } else if (cur != 0) {
-            int k = s->board_timer;
+            int k = s->field_24;
             if (k == 0) {
-                s->flags = flags | 0x4000;
+                s->field_14 = flags | 0x4000;
                 Ride_SetFlagToNotLetAnyoneOn(s);
             } else {
-                s->board_timer = k - 1;
+                s->field_24 = k - 1;
             }
         }
     }
     for (; r != NULL; r = r->next) {
-        if (s->id == r->tile.id && r->rider->field_35 == 1) {
+        if (s->tile_id == r->tile.id && r->rider->field_35 == 1) {
             // STRING: LEGOLAND 0x004b4704
             sprintf(DAT_004b4cac + 6, "%02d", r->rider->field_36 + 1);
             SetBlokePositionFromBNV(SafariRunBNV, r->rider, DAT_004b4cac, s->frame, -1617787.0f, -1618006.0f, 0);
@@ -456,7 +428,7 @@ void SafariRideUpdate(Element *obj) {
                 bloke->param_action++;
                 s->field_4++;
                 if (s->field_4 == ((struct Ride *)SafariRide)->seats) {
-                    FUN_00414ab0((struct SafariSample *)s);
+                    FUN_00414ab0((struct SafariNode *)s);
                 }
                 break;
             case 7:

@@ -6,15 +6,23 @@
 struct SafariListEntry;
 
 struct SafariNode {
-    unsigned short tile_id;
+    union {
+        unsigned short tile_id;
+        struct {
+            unsigned char tile_x;
+            unsigned char tile_y;
+        };
+    };
     unsigned char pad_2[2];
-    int field_4;
+    int field_4; /* riders seated */
     int field_8;
     int frame;
     struct SafariNode *next;
-    unsigned char pad_14[0xc];
-    int field_20;
-    int field_24;
+    unsigned int field_14; /* flags */
+    int loops_left;
+    int frame_ticks;
+    int field_20; /* riders boarding */
+    int field_24; /* boarding timer */
 };
 
 struct SafariKey;
@@ -28,6 +36,6 @@ struct Element;
 void SafariRideUpdate(struct Element *obj);
 int FUN_00415760(struct RideNode *node, unsigned short *key);
 struct SafariSample;
-void FUN_00414ab0(struct SafariSample *a1);
+void FUN_00414ab0(struct SafariNode *a1);
 LEGO_EXPORT int SaveSafariRide(struct Element *element);
 LEGO_EXPORT int LoadSafariRide(struct Element *arg);

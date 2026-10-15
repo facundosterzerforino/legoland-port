@@ -12,11 +12,6 @@
 #include "text.h"
 #include "title.h"
 
-struct ProfileFlags {
-    unsigned char pad_0[0x34];
-    unsigned int var_34;
-};
-
 struct Profile {
     unsigned char pad_0[0x1c];
     unsigned char var_1c;
@@ -535,7 +530,7 @@ void FUN_0048d230(void) {
 
 // FUNCTION: LEGOLAND 0x0048d300
 unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
-    if (DeletePopUpShown == 0 && (arg_0 & 0x2) != 0 && ((((struct ProfileFlags *)AcceptIcon)->var_34 >> 8) & 0x4) == 0 && CurrentProfile.profile_slot != 0) {
+    if (DeletePopUpShown == 0 && (arg_0 & 0x2) != 0 && ((((struct IconNode *)AcceptIcon)->flags >> 8) & 0x4) == 0 && CurrentProfile.profile_slot != 0) {
         if (NewProfilePopUpShown != 0) {
             SaveProfileToDisk();
             DeleteProfileList();

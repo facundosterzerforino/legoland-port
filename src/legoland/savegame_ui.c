@@ -375,7 +375,7 @@ LEGO_EXPORT void PrintSavedGameDetails(void) {
                         node->y = (short)(node->field_1cb * 0x26 + 0x54);
                         by = node->y;
                         rc.top = by + 0x22;
-                        EnterSaveGameDetails((struct EditSprite *)node);
+                        EnterSaveGameDetails((struct IconNode *)node);
                         draw = 0;
                         if (CurrentProfile.field_45 == 1) {
                             PrintSprite(SaveTypeNormalSprite, node->x + 7, by + 0x21, 0, 0);
@@ -604,14 +604,8 @@ unsigned char FUN_0048e4f0(struct SaveIcon *icon, unsigned int a2, unsigned int 
     return 1;
 }
 
-struct EditSprite {
-    unsigned char pad_0[0xc];
-    short field_c;
-    short field_e;
-};
-
 // FUNCTION: LEGOLAND 0x0048e550
-LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
+LEGO_EXPORT void EnterSaveGameDetails(struct IconNode *sprite) {
     char cursor_str[2];
     unsigned char count;
     char input;
@@ -625,7 +619,7 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
     int center_x;
     int top;
     register char *blink;
-    struct EditSprite *focus;
+    struct IconNode *focus;
     int fx;
     int fy;
     int ptmp192;
@@ -657,9 +651,9 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
             }
         }
     }
-    ptmp192 = sprite->field_e;
+    ptmp192 = sprite->y;
     top = 0x24 + ptmp192;
-    left = 0x28 + sprite->field_c;
+    left = 0x28 + sprite->x;
     bottom = top + 0x11;
     right = left + 0xd7;
     if (count != zero) {
@@ -674,7 +668,7 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
         center_x = (right + left) >> 1;
     }
     DAT_00798738 = (center_x - ((right + left) >> 1)) * 2;
-    sprite_y = sprite->field_e;
+    sprite_y = sprite->y;
     field_e = sprite_y;
     top = field_e + 0x20;
     blink = "|";
@@ -691,9 +685,9 @@ LEGO_EXPORT void EnterSaveGameDetails(struct EditSprite *sprite) {
         FUN_00490fa0(cursor_str, 2, rc, 1);
     }
     TempProfile.name_len = count;
-    focus = (struct EditSprite *)PopUpOkIcon;
-    fy = focus->field_e;
-    fx = focus->field_c;
+    focus = (struct IconNode *)PopUpOkIcon;
+    fy = focus->y;
+    fx = focus->x;
     if (fx + 0x48 < (int)MousePos.x || (int)MousePos.x < fx) {
         ResetPopUpIconSprites();
     }

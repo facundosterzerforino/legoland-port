@@ -22,16 +22,6 @@ struct CopterSource {
     unsigned short field_0;
 };
 
-struct CopterItem {
-    unsigned char pad_0[8];
-    struct CopterSub *field_8;
-};
-
-struct CopterSub {
-    unsigned char pad_0[0x50];
-    struct QueueTable *field_50; /* the queue table; its index in a save */
-};
-
 // Same object as CopterNode, viewed with the two id bytes split apart.
 struct CopterSfxNode {
     /* 0x00 */ unsigned char tile_x;
@@ -145,13 +135,13 @@ struct CopterNode *CoptersFindNode(struct CopterSource *src) {
 }
 
 // FUNCTION: LEGOLAND 0x00403d30
-int CoptersQueueTableToIndex(struct CopterItem *item) {
-    struct CopterSub *sub = item->field_8;
+int CoptersQueueTableToIndex(struct RideNode *item) {
+    struct Bloke *sub = item->rider;
     struct QueueTable **ptr = &CopterQueueTables[0];
     int index = 0;
 
     while (1) {
-        if (sub->field_50 == *ptr) {
+        if (sub->queue == *ptr) {
             break;
         }
         ptr++;
@@ -163,19 +153,19 @@ int CoptersQueueTableToIndex(struct CopterItem *item) {
         break;
     }
 
-    sub->field_50 = (struct QueueTable *)(INT_PTR)index;
+    sub->queue = (struct QueueTable *)(INT_PTR)index;
     return index;
 }
 
 // FUNCTION: LEGOLAND 0x00403d60
-void CoptersIndexToQueueTable(struct CopterItem *item) {
-    struct CopterSub *sub = item->field_8;
-    int index = (int)(INT_PTR)sub->field_50;
+void CoptersIndexToQueueTable(struct RideNode *item) {
+    struct Bloke *sub = item->rider;
+    int index = (int)(INT_PTR)sub->queue;
 
     if (index < 0 || index >= 6) {
-        sub->field_50 = NULL;
+        sub->queue = NULL;
     } else {
-        sub->field_50 = CopterQueueTables[index];
+        sub->queue = CopterQueueTables[index];
     }
 }
 
@@ -792,7 +782,7 @@ void CoptersUpdate(struct Element *elem) {
                     break;
                 }
                 FUN_004122d0((struct RideSlotArg *)spr, (struct RideSlot *)b);
-                CoptersQueueTableToIndex((struct CopterItem *)link);
+                CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 2:
                 qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
@@ -840,7 +830,7 @@ void CoptersUpdate(struct Element *elem) {
                     break;
                 }
                 FUN_004122a0((struct RideSlotArg *)spr2, (struct RideSlot *)b);
-                CoptersQueueTableToIndex((struct CopterItem *)link);
+                CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 9:
                 qi = (int)(INT_PTR)FUN_004122f0((struct RideSlot *)b); /* the queue index */
