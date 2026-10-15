@@ -37,7 +37,6 @@
 #include "timer.h"
 
 struct AnimHandle;
-struct ObjectClass;
 
 struct AnimHandle {
     /* 0x00 */ int length;
@@ -50,14 +49,6 @@ struct AnimHandle {
     /* 0x1c */ void *stream;
     /* 0x20 */ void (*open_cb)(struct AnimHandle *handle);
     /* 0x24 */ void *(*callback)(void);
-};
-
-struct ObjectClass {
-    struct ObjectClass *next;
-    unsigned char pad_4[0x8 - 0x4];
-    unsigned int count;
-    unsigned char pad_c[0x20 - 0xc];
-    unsigned short type;
 };
 
 #include "image_sprite.h"
@@ -1061,7 +1052,7 @@ void DrawAppraisalMark(unsigned int param_1, unsigned int param_2, int param_3, 
 
 // FUNCTION: LEGOLAND 0x00444bf0
 void CountClassesOfType1Or3(int *param_1, int *param_2) {
-    struct ObjectClass *node;
+    struct Ride *node;
 
     node = ObjectClassList;
     *param_1 = 0;
@@ -1070,8 +1061,8 @@ void CountClassesOfType1Or3(int *param_1, int *param_2) {
         return;
     }
     do {
-        if (node->count != 0 && (node->type == 1 || node->type == 3)) {
-            *param_1 += node->count;
+        if (node->field_8 != 0 && (node->type == 1 || node->type == 3)) {
+            *param_1 += node->field_8;
             *param_2 += 1;
         }
         node = node->next;
@@ -1079,13 +1070,13 @@ void CountClassesOfType1Or3(int *param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00444c40
-int IsRidePartClass(struct ObjectClass *node) {
+int IsRidePartClass(struct Ride *node) {
     return FindStringNoCase(((struct Ride *)node)->element->name, &DAT_004b7e9c, 0x16) >= 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444c70
 void CountType2ClassesExceptRideParts(int *param_1, int *param_2) {
-    struct ObjectClass *node;
+    struct Ride *node;
 
     node = ObjectClassList;
     *param_1 = 0;
@@ -1094,8 +1085,8 @@ void CountType2ClassesExceptRideParts(int *param_1, int *param_2) {
         return;
     }
     do {
-        if (node->count != 0 && node->type == 2 && IsRidePartClass(node) == 0) {
-            *param_1 += node->count;
+        if (node->field_8 != 0 && node->type == 2 && IsRidePartClass(node) == 0) {
+            *param_1 += node->field_8;
             *param_2 += 1;
         }
         node = node->next;
@@ -1104,7 +1095,7 @@ void CountType2ClassesExceptRideParts(int *param_1, int *param_2) {
 
 // FUNCTION: LEGOLAND 0x00444cd0
 void CountClassesOfType4(int *param_1, int *param_2) {
-    struct ObjectClass *node;
+    struct Ride *node;
 
     node = ObjectClassList;
     *param_1 = 0;
@@ -1113,8 +1104,8 @@ void CountClassesOfType4(int *param_1, int *param_2) {
         return;
     }
     do {
-        if (node->count != 0 && node->type == 4) {
-            *param_1 += node->count;
+        if (node->field_8 != 0 && node->type == 4) {
+            *param_1 += node->field_8;
             *param_2 += 1;
         }
         node = node->next;
@@ -1123,7 +1114,7 @@ void CountClassesOfType4(int *param_1, int *param_2) {
 
 // FUNCTION: LEGOLAND 0x00444d20
 void CountFoodStallClasses(int *param_1, int *param_2) {
-    struct ObjectClass *node;
+    struct Ride *node;
 
     node = ObjectClassList;
     *param_1 = 0;
@@ -1132,8 +1123,8 @@ void CountFoodStallClasses(int *param_1, int *param_2) {
         return;
     }
     do {
-        if (node->count != 0 && node->type == 5) {
-            *param_1 += node->count;
+        if (node->field_8 != 0 && node->type == 5) {
+            *param_1 += node->field_8;
             *param_2 += 1;
         }
         node = node->next;

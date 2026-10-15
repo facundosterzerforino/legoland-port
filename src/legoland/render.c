@@ -865,14 +865,6 @@ LEGO_EXPORT unsigned int RenderBlock(int x, int y, int w, int h, unsigned int co
 }
 
 /* Lock info filled by GetSprite (NULL locks the screen) and released by ReleaseSprite. */
-struct SpriteLock {
-    int pitch;
-    int width;
-    int height;
-    unsigned char *bits;
-    void *surface;
-    int depth;
-};
 
 /* Draws `sprite` at (x, y) blended 50% over the screen, 16-bit modes only: each pair of 5:6:5 pixels is
  * averaged with the mask 0xf7def7de, transparent (zero) pairs are skipped, and every second source row is

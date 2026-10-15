@@ -30,15 +30,6 @@
 
 #pragma intrinsic(strcpy, strlen)
 
-struct ObjectClass {
-    struct ObjectClass *next;
-    unsigned char pad_4[0x8 - 0x4];
-    unsigned int count;
-    unsigned char pad_c[0x58 - 0xc];
-    unsigned int class_id_58;
-    unsigned int class_id_5c;
-};
-
 struct LoopArg {
     unsigned char pad_0[0x4];
     struct LoopObject *field_4;
@@ -529,7 +520,7 @@ ok:
 
 // FUNCTION: LEGOLAND 0x0046a900
 unsigned int ScriptEventRange(struct ObjectiveEvent *arg) {
-    struct ObjectClass *node;
+    struct Ride *node;
     int count;
     int sum;
 
@@ -538,8 +529,8 @@ unsigned int ScriptEventRange(struct ObjectiveEvent *arg) {
     sum = 0;
     if (node != NULL) {
         do {
-            if (node->class_id_5c == arg->field_4 && node->count != 0) {
-                sum += node->count;
+            if (node->theme_element == arg->element && node->field_8 != 0) {
+                sum += node->field_8;
                 count++;
             }
             node = node->next;
@@ -593,7 +584,7 @@ unsigned int ScriptEventRemove(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046aa70
 unsigned int ScriptEventRemoveRange(struct ObjectiveEvent *arg) {
-    struct ObjectClass *node;
+    struct Ride *node;
     int count;
     int sum;
 
@@ -602,8 +593,8 @@ unsigned int ScriptEventRemoveRange(struct ObjectiveEvent *arg) {
     sum = 0;
     if (node != NULL) {
         do {
-            if (node->class_id_5c == arg->field_4 && node->count != 0) {
-                sum += node->count;
+            if (node->theme_element == arg->element && node->field_8 != 0) {
+                sum += node->field_8;
                 count++;
             }
             node = node->next;
@@ -624,7 +615,7 @@ unsigned int ScriptEventRemoveRange(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046aae0
 unsigned int ScriptEventComposite(struct ObjectiveEvent *arg) {
-    struct ObjectClass *node;
+    struct Ride *node;
     int count;
     int sum;
 
@@ -637,8 +628,8 @@ unsigned int ScriptEventComposite(struct ObjectiveEvent *arg) {
     sum = 0;
     if (node != NULL) {
         do {
-            if (node->class_id_58 == arg->field_4 && node->count != 0) {
-                sum += node->count;
+            if (node->parent_element == arg->element && node->field_8 != 0) {
+                sum += node->field_8;
                 count++;
             }
             node = node->next;

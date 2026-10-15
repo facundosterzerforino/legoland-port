@@ -27,17 +27,11 @@ LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport) {
     ViewportBottom = viewport->bottom;
 }
 
-struct RenderListNode {
-    struct RenderListNode *next;
-    unsigned char pad_4[8];
-    short id;
-};
-
 // FUNCTION: LEGOLAND 0x00441830
-struct RenderListNode *FUN_00441830(void *param_1, short *param_2) {
-    struct RenderListNode *node = (struct RenderListNode *)DAT_0081c8cc;
+struct RideNode *FUN_00441830(void *param_1, short *param_2) {
+    struct RideNode *node = (struct RideNode *)DAT_0081c8cc;
     while (node != NULL) {
-        if (memcmp(&node->id, param_2, sizeof(node->id)) == 0) {
+        if (memcmp(&node->tile.id, param_2, sizeof(node->tile.id)) == 0) {
             DAT_0081c8cc = node;
             return node;
         }
@@ -55,14 +49,14 @@ struct ViewportEntry {
 };
 
 // FUNCTION: LEGOLAND 0x00441870
-struct RenderListNode *FUN_00441870(struct ViewportEntry *param_1, short *param_2) {
+struct RideNode *FUN_00441870(struct ViewportEntry *param_1, short *param_2) {
     DAT_0081c8cc = param_1->riders;
     return FUN_00441830(param_1, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00441890
-struct RenderListNode *FUN_00441890(void *param_1, short *param_2) {
-    struct RenderListNode *node = (struct RenderListNode *)DAT_0081c8cc;
+struct RideNode *FUN_00441890(void *param_1, short *param_2) {
+    struct RideNode *node = (struct RideNode *)DAT_0081c8cc;
     if (node != NULL) {
         DAT_0081c8cc = node->next;
         return FUN_00441830(param_1, param_2);
@@ -71,8 +65,8 @@ struct RenderListNode *FUN_00441890(void *param_1, short *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004418c0
-struct RenderListNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, short *param_3) {
-    struct RenderListNode *node = FUN_00441870(param_2, param_3);
+struct RideNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, short *param_3) {
+    struct RideNode *node = FUN_00441870(param_2, param_3);
     int i = 0;
     if (node != NULL) {
         for (; i < param_2->seats; i++) {

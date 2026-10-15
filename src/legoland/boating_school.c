@@ -154,8 +154,9 @@ void FUN_00418fe0(int param_1) {
     }
 }
 
+/* reads the id its argument starts with */
 // FUNCTION: LEGOLAND 0x004192d0
-unsigned int FUN_004192d0(struct BoatRide *param_1) {
+unsigned int FUN_004192d0(void *param_1) {
     unsigned short *id = (unsigned short *)param_1;
     struct BoatRide *node = BoatRideList;
     unsigned int count = 0;
@@ -885,7 +886,7 @@ void BoatingSchoolUpdate(void) {
             break;
         case 1:
             if (bloke == score->blokes[0] && score->connected != 0) {
-                if ((int)score->value >= (int)FUN_004192d0((struct BoatRide *)score) * 6 && FUN_00418e60(tile, bloke) != 0) {
+                if ((int)score->value >= (int)FUN_004192d0(score) * 6 && FUN_00418e60(tile, bloke) != 0) {
                     BlokeSitAnim(bloke);
                     BlokeSetFrame(bloke, 0);
                     score->blokes[0] = 0;

@@ -101,11 +101,11 @@ void EarthNodeAppendQueueEntry(struct EarthNode *p, struct EarthQueue *value) {
 }
 
 // FUNCTION: LEGOLAND 0x0042cec0
-void FUN_0042cec0(struct Cursor *param_1, unsigned char *param_2, int *param_3) {
+void FUN_0042cec0(struct Ride *param_1, unsigned char *param_2, int *param_3) {
     struct EarthNode *node = FUN_0042ce20((unsigned short *)param_2);
     struct EarthQueue *q = node->queue_head;
-    int x = *(int *)((char *)param_1 + 0xc) + param_2[0];
-    int y = param_2[1] + *(int *)((char *)param_1 + 0x10);
+    int x = param_1->x + param_2[0];
+    int y = param_2[1] + param_1->y;
     int i;
 
     if (q == NULL) {
@@ -450,7 +450,7 @@ void EarthSlideRideUpdate(Element *obj) {
             case 0:
                 /* walk to the boarding spot */
                 bloke->flags |= 8;
-                FUN_0042cec0((struct Cursor *)ride, &tile->pos.x, &target.x);
+                FUN_0042cec0(ride, &tile->pos.x, &target.x);
                 FUN_0042ce50(node, (struct EarthBlokeElem *)elem);
                 bloke->dest.x = target.x;
                 bloke->dest.y = target.y;
