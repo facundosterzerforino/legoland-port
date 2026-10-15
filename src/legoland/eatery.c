@@ -26,11 +26,6 @@ struct BrollyData {
     /* 0x10 */ int *table_10;
 };
 
-struct EditArg {
-    unsigned char pad_0[0xc];
-    struct Ride *var_c;
-};
-
 struct UserFlagsArg {
     int var_0;
     int var_4;
@@ -331,8 +326,8 @@ void UnloadCastleBBQResources(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e8d0
-void EaterySetEditMode(struct EditArg *arg) {
-    struct Ride *temp = arg->var_c;
+void EaterySetEditMode(struct Element *arg) {
+    struct Ride *temp = arg->ride;
     EditMode.unk0 = 1;
     EditMode.unk8 = (void *)temp;
     DefaultCursor(&EditCursor);

@@ -201,17 +201,6 @@ LEGO_EXPORT void RenderBlokesNotInSeats(struct Ride *a1, TileId *a2) {
     }
 }
 
-struct RinData {
-    int x; /* RenderUsingRin: x, y and the remap/data tables (zero for the .rin files LoadRin reads) */
-    int y;
-    int *remap_table;
-    int *data_table;
-    int sprite_count;
-    int data_count;
-    struct Sprite **sprites;
-    void **datas;
-};
-
 #pragma intrinsic(memset)
 
 // FUNCTION: LEGOLAND 0x00441ba0

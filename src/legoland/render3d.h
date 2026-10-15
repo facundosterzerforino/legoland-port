@@ -4,6 +4,17 @@
 #include "llidb.h"
 #include "math.h"
 
+struct RinData {
+    int x; /* RenderUsingRin: x, y and the remap/data tables (zero for the .rin files LoadRin reads) */
+    int y;
+    int *remap_table;
+    int *data_table;
+    int sprite_count;
+    int data_count;
+    struct Sprite **sprites;
+    void **datas;
+};
+
 /* One face of a 3D person's mesh (0x24 bytes in the mesh file): a solid colour (flags & 0x2000) with the colour
    ramp the loader looks up for it, or a texture cell; then the corners' texture coordinates. */
 struct PersonFace {

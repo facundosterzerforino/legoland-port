@@ -11,11 +11,6 @@ struct PathSpriteHeader {
     unsigned short id;
 };
 
-struct PathCursor {
-    unsigned char pad_0[0x1404];
-    int coords[2];
-};
-
 // FUNCTION: LEGOLAND 0x0045dbe0
 LEGO_EXPORT void AddBasicPath(struct Element *editObj, int *coords) {
     struct MapElement *cell;
@@ -45,10 +40,10 @@ LEGO_EXPORT void AddRollerCoasterPath(int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x0045dc90
-LEGO_EXPORT void RemoveBasicPath(struct Element *editObj, int dummy, struct PathCursor *cursor) {
+LEGO_EXPORT void RemoveBasicPath(struct Element *editObj, int dummy, struct Cursor *cursor) {
     struct Ride *obj_val = editObj->ride;
     AddBricks(GetObjSalvageValue(obj_val, 0));
-    RemovePathTile(cursor->coords, ((struct PathSpriteHeader *)PathSprite)->id);
+    RemovePathTile(&cursor->tile_x, ((struct PathSpriteHeader *)PathSprite)->id);
 }
 
 // FUNCTION: LEGOLAND 0x0045dcd0

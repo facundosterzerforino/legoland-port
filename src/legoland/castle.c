@@ -4326,27 +4326,18 @@ unsigned int FUN_00423930(void) {
     return DAT_00610a04;
 }
 
-struct Struct3940 {
-    unsigned char pad_0[0x14];
-    unsigned int field_14;
-    float field_18;
-    unsigned char pad_1c[4];
-    unsigned int field_20;
-    float field_24;
-};
-
 // FUNCTION: LEGOLAND 0x00423940
-void FUN_00423940(struct Struct3940 *arg1) {
-    arg1->field_14 = 2;
-    arg1->field_18 = (float)DAT_004b5b48.f8;
-    arg1->field_20 = 8;
-    arg1->field_24 = (float)DAT_004b5b48.f4;
+void FUN_00423940(struct PathSeg *arg1) {
+    arg1->dir_a = 2;
+    arg1->f18 = (float)DAT_004b5b48.f8;
+    arg1->dir_b = 8;
+    arg1->f24 = (float)DAT_004b5b48.f4;
 }
 
 // FUNCTION: LEGOLAND 0x00423970
-void FUN_00423970(unsigned char *param_1) {
-    *(float *)(param_1 + 0x18) = (float)DAT_004b5b48.f8;
-    *(float *)(param_1 + 0x24) = (float)DAT_004b5b48.f4;
+void FUN_00423970(struct PathSeg *param_1) {
+    param_1->f18 = (float)DAT_004b5b48.f8;
+    param_1->f24 = (float)DAT_004b5b48.f4;
 }
 
 // FUNCTION: LEGOLAND 0x00423990

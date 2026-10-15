@@ -756,12 +756,12 @@ LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node) {
                     PrintSprite(s, node->x, node->y, 0, 0);
                 }
             }
-            if ((*(unsigned int **)((char *)node->field_8 + 0xc4))[2] & 0x20000) {
+            if (((struct Ride *)node->field_8)->element->flags & 0x20000) {
                 PrintSprite(GetBlink() != 0 ? AttractNewOffSprite : AttractNewOnSprite, node->x, node->y, 0, 0);
             }
         } while (0);
     }
-    if ((*(unsigned int **)((char *)node->field_8 + 0xc4))[2] & 0x20000) {
+    if (((struct Ride *)node->field_8)->element->flags & 0x20000) {
         if (node->y < 0x3e) {
             DAT_006688b8 = DAT_006688b8 | 1;
             return 0;
@@ -1576,7 +1576,7 @@ void UnloadGBarSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046f9a0
-int FUN_0046f9a0(int id, int kind, int param_3, int param_4, unsigned int flags, int param_6) {
+int FUN_0046f9a0(int id, struct Element *kind, int param_3, int param_4, unsigned int flags, int param_6) {
     int found;
     int i;
     int total;
@@ -1603,7 +1603,7 @@ int FUN_0046f9a0(int id, int kind, int param_3, int param_4, unsigned int flags,
     total = LLIDB_GetCount();
     for (i = 0; i < total; i++) {
         LLIDB_GetElement(i, &elem);
-        if ((elem->flags & 0x10) && ((int *)elem->data)[0x16] == kind) {
+        if ((elem->flags & 0x10) && elem->ride->parent_element == kind) {
             found++;
             AddGBarClassIcon(group, elem->data, x, y, id, (short)i);
             /* bit 0: vertical bar */
@@ -1913,7 +1913,7 @@ LEGO_EXPORT void ControlIndicators(void) {
 // FUNCTION: LEGOLAND 0x00470000
 unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons) {
     int cost;
-    unsigned int *sub;
+    struct Element *sub;
     unsigned int flags;
 
     if ((buttons & 2) != 0) {
@@ -1923,10 +1923,10 @@ unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons) {
                 if ((node->flags & 0x1000) != 0) {
                     SetEditObject(node->field_8);
                 }
-                sub = *(unsigned int **)((char *)node->field_8 + 0xc4);
-                flags = sub[2];
+                sub = ((struct Ride *)node->field_8)->element;
+                flags = sub->flags;
                 if ((flags & 0x20000) != 0) {
-                    sub[2] = flags & 0xfffdffff;
+                    sub->flags = flags & 0xfffdffff;
                     RemoveNewObject(node->field_8);
                 }
                 PlayInstanceOfSample(GameFX[FX_CLICK1].sample, 0, 1, 0);

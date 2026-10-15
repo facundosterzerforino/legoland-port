@@ -41,7 +41,7 @@ LEGO_EXPORT int InitGameInterface(int a);
 void FUN_00474ed0(void);
 unsigned char FUN_00474f40(void *context, unsigned int flags, const char *a, const char *b);
 unsigned char FUN_00474fa0(unsigned int a, unsigned char flags);
-unsigned char FUN_00474fc0(void *a, unsigned int flags);
+unsigned char FUN_00474fc0(struct IconNode *a, unsigned int flags);
 unsigned char FUN_00474f80(unsigned int a, unsigned int flags);
 unsigned char FUN_00475000(unsigned int a, unsigned int flags);
 unsigned char FUN_00475040(unsigned int a, unsigned int flags);

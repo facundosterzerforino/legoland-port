@@ -384,7 +384,7 @@ void FUN_0043ae20(struct SpaceTowerCar *param_1, int param_2, unsigned int param
         id = 2;
         break;
     }
-    PrintSprite(GetSpriteForLayer((struct Sprite *)SpaceTowerLayers, id), coords.x + off.x, coords.y + off.y, param_3, 0);
+    PrintSprite(GetSpriteForLayer(SpaceTowerLayers, id), coords.x + off.x, coords.y + off.y, param_3, 0);
 }
 
 // FUNCTION: LEGOLAND 0x0043aee0
@@ -419,7 +419,7 @@ void RenderSpaceTower(struct Element *param_1, unsigned int param_2, unsigned in
         return;
     }
     coords = GetScreenCoordsForObject((unsigned char *)param_4, ride);
-    off1 = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 1);
+    off1 = GetRenderOffsetForLayer(SpaceTowerLayers, 1);
     AdjustOffsetForViewMode(&off1);
     if (node != NULL) {
         for (; node != NULL; node = node->next) {
@@ -446,13 +446,13 @@ void RenderSpaceTower(struct Element *param_1, unsigned int param_2, unsigned in
         }
         PrintSprite(SpaceTowerMatte1Sprite, coords.x + off1.x, coords.y + off1.y, param_6, 0);
         LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), (char)car->var_ad);
-        off2 = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 5);
+        off2 = GetRenderOffsetForLayer(SpaceTowerLayers, 5);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct Sprite *)SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
         LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), (char)car->var_ac);
-        off2 = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 3);
+        off2 = GetRenderOffsetForLayer(SpaceTowerLayers, 3);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct Sprite *)SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
     } else {
         RenderSpaceTowerSeat(car, 1, param_6);
         RenderSpaceTowerSeat(car, 2, param_6);
@@ -460,13 +460,13 @@ void RenderSpaceTower(struct Element *param_1, unsigned int param_2, unsigned in
         RenderSpaceTowerSeat(car, 0, param_6);
         RenderSpaceTowerSeat(car, 3, param_6);
         LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), (char)car->var_ad);
-        off2 = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 5);
+        off2 = GetRenderOffsetForLayer(SpaceTowerLayers, 5);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct Sprite *)SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(SpaceTowerLayers, 5), off2.x + coords.x, off2.y + coords.y, param_6, 0);
         LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), (char)car->var_ac);
-        off2 = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 3);
+        off2 = GetRenderOffsetForLayer(SpaceTowerLayers, 3);
         AdjustOffsetForViewMode(&off2);
-        PrintSprite(GetSpriteForLayer((struct Sprite *)SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
+        PrintSprite(GetSpriteForLayer(SpaceTowerLayers, 3), off2.x + coords.x, off2.y + coords.y, param_6, 0);
     }
 }
 
@@ -475,17 +475,17 @@ void SpaceTowerRideLoad(struct Element *param_1) {
     SpaceTowerRideObj = param_1->ride;
     SpaceTowerRideObj->flags |= 0x420;
     SpaceTowerLayers = SpaceTowerRideObj->layer;
-    *(unsigned int *)((char *)SpaceTowerLayers + 0x10) = *(unsigned int *)((char *)SpaceTowerLayers + 0x10) | 0x2000;
+    SpaceTowerLayers->flags |= 0x2000;
     HideLayer(SpaceTowerLayers, 5);
     StopLayerPlaying(SpaceTowerLayers, 5);
     LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 5), 0);
     HideLayer(SpaceTowerLayers, 3);
     StopLayerPlaying(SpaceTowerLayers, 3);
     LLSSetFrame(GetLLSForLayer(SpaceTowerLayers, 3), 0);
-    DAT_0062fd88[0] = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 6);
-    DAT_0062fd88[1] = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 4);
-    DAT_0062fd88[2] = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 0);
-    DAT_0062fd88[3] = GetRenderOffsetForLayer((struct Sprite *)SpaceTowerLayers, 2);
+    DAT_0062fd88[0] = GetRenderOffsetForLayer(SpaceTowerLayers, 6);
+    DAT_0062fd88[1] = GetRenderOffsetForLayer(SpaceTowerLayers, 4);
+    DAT_0062fd88[2] = GetRenderOffsetForLayer(SpaceTowerLayers, 0);
+    DAT_0062fd88[3] = GetRenderOffsetForLayer(SpaceTowerLayers, 2);
     SpaceTowerSeatMatteSprites[0] = NULL;
     // STRING: LEGOLAND 0x004b7880
     SpaceTowerSeatMatteSprites[1] = LoadSprite("SpaceTower Seat2 Matte.lls", 1);

@@ -20,9 +20,9 @@ struct AppraisalRow {
 };
 
 struct LocFile;
-struct AdvisorObject;
+struct IconNode;
 
-unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1);
+unsigned int RenderAdvisorIcon(struct IconNode *param_1);
 void UpdateAppraisalPageButtons(void);
 struct TextureNode;
 struct Image;

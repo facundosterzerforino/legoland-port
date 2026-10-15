@@ -4,7 +4,6 @@
 
 struct IconNode;
 struct Sprite;
-struct Profile;
 
 LEGO_EXPORT void CloseFontEndCheckBox(void);
 LEGO_EXPORT void InitListProfiles(void);
@@ -17,8 +16,8 @@ struct Sprite *GetProfileOffSprite(signed char param_1);
 void FUN_0048c860(struct IconNode *param_1);
 unsigned char FUN_0048cc30(void *param_1, unsigned int param_2);
 unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0);
-unsigned char FUN_0048d390(struct Profile *profile, unsigned char param_2);
-unsigned char SelectEmptyProfileSlotClick(struct Profile *profile, unsigned int param_2);
+unsigned char FUN_0048d390(struct IconNode *profile, unsigned char param_2);
+unsigned char SelectEmptyProfileSlotClick(struct IconNode *profile, unsigned int param_2);
 unsigned char ConfirmDeleteProfileClick(unsigned int arg0, unsigned int arg1);
 unsigned char FUN_0048d450(unsigned int param_1, unsigned int param_2);
 void FUN_0048d470(void);

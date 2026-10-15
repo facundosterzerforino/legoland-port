@@ -153,7 +153,7 @@ void KillTitleScreenBkSpriteAndRemoveIconGroup7(void) {
 unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        FUN_0048f9f0(DAT_007cb30c, DAT_007cb300, DAT_007cb2f0);
+        FUN_0048f9f0(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
         EditMode.unk4 = 2;
         DAT_0080ff80.unk4 = 0xffffffff;
         DAT_0080ff80.unk8 = 9;
@@ -167,7 +167,7 @@ unsigned char FUN_00490050(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         KillTitleScreenBkSpriteAndRemoveIconGroup7();
-        FUN_0048fa40(DAT_007cb30c, DAT_007cb300, DAT_007cb2f0);
+        FUN_0048fa40(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
     }
     return 1;
 }
@@ -817,8 +817,8 @@ unsigned int FUN_00491240(const char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00491290
-LEGO_EXPORT void InitNewProfilePoPUp(struct Profile *profile) {
-    struct IconNode *icon = (struct IconNode *)profile;
+LEGO_EXPORT void InitNewProfilePoPUp(struct IconNode *profile) {
+    struct IconNode *icon = profile;
     struct IconNode *popup;
 
     // STRING: LEGOLAND 0x004bf6e4

@@ -571,13 +571,13 @@ unsigned char FUN_00474fa0(unsigned int a, unsigned char flags) {
 }
 
 // FUNCTION: LEGOLAND 0x00474fc0
-unsigned char FUN_00474fc0(void *a, unsigned int flags) {
+unsigned char FUN_00474fc0(struct IconNode *a, unsigned int flags) {
     if (EditMode.unk4 == 1) {
         return 1;
     }
     if (flags & 2) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        SetEditObject(*(struct Ride **)((char *)a + 8));
+        SetEditObject(a->field_8);
     }
     return 1;
 }

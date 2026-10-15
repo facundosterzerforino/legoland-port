@@ -119,38 +119,13 @@ struct FlumeXY {
 
 typedef void (*FlumeCallback)(struct FlumeXY tile, unsigned int *res);
 typedef void (*FlumeEdgeFn)(struct FlumeEntry *, int *);
-typedef int (*FlumeCheckFn)(unsigned int *);
-
-struct FlumePos {
-    unsigned char pad_0[0x30];
-    unsigned int var_30;
-    unsigned int var_34;
-};
+typedef int (*FlumeCheckFn)(struct FlumeEntry **);
 
 struct FlumeRect {
     unsigned int var_0;
     unsigned int var_4;
     unsigned int var_8;
     unsigned int var_c;
-};
-
-struct FlumeSlot0 {
-    unsigned int field_0;
-    unsigned char pad_4[4];
-    unsigned int var_8;
-};
-
-struct FlumeSlot1 {
-    unsigned int field_0;
-    unsigned char pad_4[4];
-    unsigned int field_8;
-    unsigned int var_c;
-};
-
-struct FlumeInput {
-    struct FlumeSlot0 *var_0;
-    unsigned char pad_4[4];
-    struct FlumeSlot1 *var_8;
 };
 
 struct FlumeBytes {
@@ -560,20 +535,20 @@ void FUN_00409360(TileId tile) {
 
     buf.b0 = tile.pos.x;
     buf.b1 = tile.pos.y - h;
-    DAT_004cbe20 = FUN_00408f30(&buf);
+    DAT_004cbe20[0] = FUN_00408f30(&buf);
     buf.b0 = tile.pos.x + w;
     buf.b1 = tile.pos.y;
-    DAT_004cbe24 = FUN_00408f30(&buf);
+    DAT_004cbe20[1] = FUN_00408f30(&buf);
     buf.b0 = tile.pos.x;
     buf.b1 = tile.pos.y + h;
-    DAT_004cbe28 = FUN_00408f30(&buf);
+    DAT_004cbe20[2] = FUN_00408f30(&buf);
     buf.b0 = tile.pos.x - w;
     buf.b1 = tile.pos.y;
-    DAT_004cbe2c = FUN_00408f30(&buf);
+    DAT_004cbe20[3] = FUN_00408f30(&buf);
 }
 
 // FUNCTION: LEGOLAND 0x00409410
-int FUN_00409410(unsigned int *ctx) {
+int FUN_00409410(struct FlumeEntry **ctx) {
     int result = 0;
     if (ctx[0] != 0) {
         result = 1;
@@ -592,27 +567,27 @@ int FUN_00409410(unsigned int *ctx) {
 
 // FUNCTION: LEGOLAND 0x00409440
 void FUN_00409440(TileId param_1, void **param_2) {
-    DAT_004cbe20 = 0;
-    DAT_004cbe24 = 0;
-    DAT_004cbe28 = 0;
-    DAT_004cbe2c = 0;
+    DAT_004cbe20[0] = 0;
+    DAT_004cbe20[1] = 0;
+    DAT_004cbe20[2] = 0;
+    DAT_004cbe20[3] = 0;
     FUN_00409360(param_1);
-    *param_2 = &DAT_004cbe20;
+    *param_2 = DAT_004cbe20;
 }
 
 // FUNCTION: LEGOLAND 0x00409470
 unsigned int FUN_00409470(unsigned int *list) {
     unsigned int result = 0;
-    if (DAT_004cbe20 != 0) {
+    if (DAT_004cbe20[0] != 0) {
         result = 1;
     }
-    if (DAT_004cbe24 != 0) {
+    if (DAT_004cbe20[1] != 0) {
         result++;
     }
-    if (DAT_004cbe28 != 0) {
+    if (DAT_004cbe20[2] != 0) {
         result++;
     }
-    if (DAT_004cbe2c != 0) {
+    if (DAT_004cbe20[3] != 0) {
         result++;
     }
     return result;
@@ -773,7 +748,7 @@ void FUN_00409740(struct FlumeEntry *node) {
 
 // FUNCTION: LEGOLAND 0x004097a0
 void FUN_004097a0(struct FlumeEntry *entry, struct StateSlots *slots) {
-    int mask = FUN_00409410((unsigned int *)slots);
+    int mask = FUN_00409410(&slots->slot0);
     struct FlumeEntry *sub;
 
     if (entry != NULL) {
@@ -886,7 +861,7 @@ void FUN_00409a50(struct ModeNode *node) {
 
 // FUNCTION: LEGOLAND 0x00409a90
 void FUN_00409a90(void *edi_ptr[4], struct FlumeEntry *esi_ptr[4]) {
-    int flags = FUN_00409410((unsigned int *)esi_ptr);
+    int flags = FUN_00409410(esi_ptr);
     if (flags & 0x1) {
         FUN_00409a50(edi_ptr[0]);
         FUN_00409620(esi_ptr[0]);
@@ -950,9 +925,9 @@ void JoinOppositeFlumeNodes(int i, int j, struct FlumeEntry **nodes, struct Flum
 }
 
 // FUNCTION: LEGOLAND 0x00409c20
-void FUN_00409c20(struct FlumeEntry *entry, unsigned int *list) {
-    struct FlumeEntry *insert = (struct FlumeEntry *)entry;
-    struct FlumeEntry **nodes = (struct FlumeEntry **)list;
+void FUN_00409c20(struct FlumeEntry *entry, struct FlumeEntry **list) {
+    struct FlumeEntry *insert = entry;
+    struct FlumeEntry **nodes = list;
     struct FlumeEntry *a;
 
     switch (FUN_00409410(list)) {
@@ -1078,7 +1053,7 @@ void FUN_0040a010(struct FlumeEntry *a, struct FlumeEntry *b) {
 
 // FUNCTION: LEGOLAND 0x0040a080
 void FUN_0040a080(struct FlumeEntry **b, struct FlumeEntry **a) {
-    int flags = FUN_00409410((unsigned int *)a);
+    int flags = FUN_00409410(a);
 
     if (flags & 1) {
         FUN_0040a010(a[0], b[0]);
@@ -1191,7 +1166,7 @@ void FUN_0040a230(struct FlumeEntry *node) {
 
 // FUNCTION: LEGOLAND 0x0040a2a0
 void FUN_0040a2a0(void *other, struct FlumeEntry **ctx) {
-    FUN_00409410((unsigned int *)ctx);
+    FUN_00409410(ctx);
     if (other != NULL) {
         FUN_0040a0f0(ctx[0]);
         FUN_0040a160(ctx[1]);
@@ -2596,7 +2571,7 @@ void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) 
                 }
             }
             FUN_004094b0(key, list);
-            code = FUN_00409410((unsigned int *)list);
+            code = FUN_00409410(list);
             if (FUN_00409580(code, (struct StateSlots *)list)) {
                 FUN_0040d520((struct FlumeEntry **)list, &EditCursor);
                 ResetCursorBuildable(&EditCursor);
@@ -2677,7 +2652,7 @@ void LogFlumeTrackAddObject(struct Element *unused, struct Point *pt) {
             LogFlumeTrackRide->footprint.x1--;
             LogFlumeTrackRide->footprint.y1--;
             AddBasicObject(DAT_004c74f4, coords);
-            FUN_00409c20(entry, (unsigned int *)list);
+            FUN_00409c20(entry, list);
             FUN_004097a0(entry, (struct StateSlots *)list);
         }
     }
@@ -2950,37 +2925,37 @@ void FUN_0040ce20(struct InputBuffer *esi) {
 
     ebx = ebx - edx;
 
-    DAT_004cbe20 = 0;
-    DAT_004cbe24 = 0;
-    DAT_004cbe28 = 0;
-    DAT_004cbe2c = 0;
+    DAT_004cbe20[0] = 0;
+    DAT_004cbe20[1] = 0;
+    DAT_004cbe20[2] = 0;
+    DAT_004cbe20[3] = 0;
 
     if (esi->flags & 1) {
         buf.b0 = esi->var_4;
         buf.b1 = esi->var_8 - (unsigned char)ebx;
-        DAT_004cbe20 = FUN_00408f30(&buf);
+        DAT_004cbe20[0] = FUN_00408f30(&buf);
     }
     if (esi->flags & 2) {
         buf.b0 = esi->var_c + (unsigned char)local_8;
         buf.b1 = esi->var_10;
-        DAT_004cbe24 = FUN_00408f30(&buf);
+        DAT_004cbe20[1] = FUN_00408f30(&buf);
     }
     if (esi->flags & 4) {
         buf.b0 = esi->var_14;
         buf.b1 = esi->var_18 + (unsigned char)ebx;
-        DAT_004cbe28 = FUN_00408f30(&buf);
+        DAT_004cbe20[2] = FUN_00408f30(&buf);
     }
     if (esi->flags & 8) {
         buf.b0 = esi->var_1c - (unsigned char)local_8;
         buf.b1 = esi->var_20;
-        DAT_004cbe2c = FUN_00408f30(&buf);
+        DAT_004cbe20[3] = FUN_00408f30(&buf);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040cf10
 void FUN_0040cf10(struct InputBuffer *param_1, struct FlumeEntry ***param_2) {
     FUN_0040ce20(param_1);
-    *param_2 = &DAT_004cbe20;
+    *param_2 = DAT_004cbe20;
 }
 
 // FUNCTION: LEGOLAND 0x0040cf30
@@ -3216,7 +3191,7 @@ void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first) {
     int i;
 
     cur = NULL;
-    flags = FUN_00409410((unsigned int *)list);
+    flags = FUN_00409410(list);
     DAT_004ca5b0.next = NULL;
     DAT_004c1260.next = NULL;
     first->next = &DAT_004ca5b0;
@@ -3308,7 +3283,7 @@ unsigned int FUN_0040d6f0(struct Ride *param_1, int *param_2, unsigned int param
             FUN_0040cf50(key, (struct FlumeEntry **)u.list);
             if (FUN_0040cf30(u.list) == 0) {
                 SetCursorBlocked(&EditCursor, 0xe);
-            } else if (param_6((unsigned int *)u.list)) {
+            } else if (param_6(u.list)) {
                 ResetCursorBuildable(&EditCursor);
                 FUN_0040d520((struct FlumeEntry **)u.list, EditCursor.next->next);
             } else {
@@ -3816,7 +3791,7 @@ void FUN_0040e340(struct FlumeEntry *node, int *out) {
 }
 
 // FUNCTION: LEGOLAND 0x0040e3b0
-int FUN_0040e3b0(unsigned int *ctx) {
+int FUN_0040e3b0(struct FlumeEntry **ctx) {
     int flags = FUN_00409410(ctx);
 
     switch (DAT_004c2af4) {
@@ -4380,17 +4355,17 @@ void FUN_0040f050(struct FlumeNode *parent) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f300
-void FUN_0040f300(struct FlumePos *src, struct FlumeRect *dst) {
+void FUN_0040f300(struct FlumeEntry *src, struct FlumeRect *dst) {
     dst->var_0 = 0;
     dst->var_4 = 0;
     dst->var_8 = 0;
     dst->var_c = 0;
-    dst->var_0 = src->var_30;
-    dst->var_8 = src->var_34;
+    dst->var_0 = src->a_30;
+    dst->var_8 = src->b_34;
 }
 
 // FUNCTION: LEGOLAND 0x0040f330
-int FUN_0040f330(unsigned int *param_1) {
+int FUN_0040f330(struct FlumeEntry **param_1) {
     int flags = FUN_00409410(param_1);
     if (flags == 0x11 || flags == 0x1 || flags == 0x10) {
         return 1;
@@ -4536,17 +4511,17 @@ void FUN_0040f5b0(struct FlumeNode *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0040f7d0
-void FUN_0040f7d0(struct FlumePos *src, struct FlumeRect *dst) {
+void FUN_0040f7d0(struct FlumeEntry *src, struct FlumeRect *dst) {
     dst->var_0 = 0;
     dst->var_4 = 0;
     dst->var_8 = 0;
     dst->var_c = 0;
-    dst->var_c = src->var_30;
-    dst->var_4 = src->var_34;
+    dst->var_c = src->a_30;
+    dst->var_4 = src->b_34;
 }
 
 // FUNCTION: LEGOLAND 0x0040f800
-unsigned int FUN_0040f800(unsigned int *param_1) {
+unsigned int FUN_0040f800(struct FlumeEntry **param_1) {
     int flags = FUN_00409410(param_1);
     if (flags == 0x44 || flags == 0x4 || flags == 0x40) {
         return 1;
@@ -4733,17 +4708,17 @@ void FUN_0040fad0(struct FlumeNode *parent) {
 }
 
 // FUNCTION: LEGOLAND 0x0040fe50
-void FUN_0040fe50(struct FlumePos *src, struct FlumeRect *dst) {
+void FUN_0040fe50(struct FlumeEntry *src, struct FlumeRect *dst) {
     dst->var_0 = 0;
     dst->var_4 = 0;
     dst->var_8 = 0;
     dst->var_c = 0;
-    dst->var_c = src->var_30;
-    dst->var_4 = src->var_34;
+    dst->var_c = src->a_30;
+    dst->var_4 = src->b_34;
 }
 
 // FUNCTION: LEGOLAND 0x0040fe80
-unsigned int FUN_0040fe80(unsigned int *param_1) {
+unsigned int FUN_0040fe80(struct FlumeEntry **param_1) {
     int flags = FUN_00409410(param_1);
     if (flags == 0x44 || flags == 0x4 || flags == 0x40) {
         return 1;
@@ -4919,28 +4894,28 @@ void FUN_00410180(struct FlumeNode *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004102e0
-void FUN_004102e0(struct FlumePos *src, struct FlumeRect *dst) {
+void FUN_004102e0(struct FlumeEntry *src, struct FlumeRect *dst) {
     dst->var_0 = 0;
     dst->var_4 = 0;
     dst->var_8 = 0;
     dst->var_c = 0;
-    dst->var_0 = src->var_30;
-    dst->var_8 = src->var_34;
+    dst->var_0 = src->a_30;
+    dst->var_8 = src->b_34;
 }
 
 // FUNCTION: LEGOLAND 0x00410310
-int FUN_00410310(struct FlumeInput *param) {
-    int result = FUN_00409410((unsigned int *)param);
+int FUN_00410310(struct FlumeEntry **param) {
+    int result = FUN_00409410(param);
     if (result != 0x11 && result != 0x1 && result != 0x10) {
         return 0;
     }
     if (result & 0x1) {
-        if (param->var_0->var_8 != 0) {
+        if (param[0]->field_8 != 0) {
             return 0;
         }
     }
     if (result & 0x10) {
-        if (param->var_8->var_c != 0) {
+        if (param[2]->field_c != 0) {
             return 0;
         }
     }

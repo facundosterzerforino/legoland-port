@@ -16,16 +16,11 @@
 #include "render3d.h"
 #include "western_town.h"
 
-struct MapObject {
-    unsigned char pad_0[0xc];
-    struct Ride *building;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004375d0
-void LoadGStoreMatteSpritesAndMoneySFX(struct MapObject *obj) {
-    struct Ride *building = obj->building;
+void LoadGStoreMatteSpritesAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     GeneralStoreBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74a4
@@ -134,8 +129,8 @@ void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3
 }
 
 // FUNCTION: LEGOLAND 0x004378e0
-void GeneralStoreUpdate(struct MapObject *param_1) {
-    struct Ride *ride = param_1->building;
+void GeneralStoreUpdate(struct Element *param_1) {
+    struct Ride *ride = param_1->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
     struct Bloke *bloke;
@@ -272,8 +267,8 @@ void GeneralStoreUpdate(struct MapObject *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00437ba0
-void LoadSherifshutMatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Ride *building = obj->building;
+void LoadSherifshutMatteSpriteAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     SheriffBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74b8
@@ -296,8 +291,8 @@ void SheriffSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00437c30
-void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
-    struct Ride *ride = param_1->building;
+void RenderSheriff(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
+    struct Ride *ride = param_1->ride;
     struct RideNode *elem = ride->riders;
     int count = 0;
     struct Point coords;
@@ -317,8 +312,8 @@ void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int
 }
 
 // FUNCTION: LEGOLAND 0x00437c90
-void SheriffUpdate(struct MapObject *param_1) {
-    struct Ride *ride = param_1->building;
+void SheriffUpdate(struct Element *param_1) {
+    struct Ride *ride = param_1->ride;
     struct RideNode *node = ride->riders;
     struct RideNode *next;
     struct Bloke *bloke;
@@ -489,18 +484,18 @@ void FUN_00438000(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438020
-void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Cursor *cursor) {
+void JailCellRemoveObject(struct Element *editObj, TileId coords, struct Cursor *cursor) {
     struct JailCell *cell = FUN_00437f90(&coords.id);
     if (cell != NULL) {
         FUN_00437fc0(cell);
     }
     StandardRemoveObject(editObj, coords, cursor);
-    RemoveAllBlokesFromRide((struct Ride *)editObj->building, coords);
+    RemoveAllBlokesFromRide((struct Ride *)editObj->ride, coords);
 }
 
 // FUNCTION: LEGOLAND 0x00438070
-void JailCellLoad(struct MapObject *obj) {
-    struct Ride *building = obj->building;
+void JailCellLoad(struct Element *obj) {
+    struct Ride *building = obj->ride;
     DAT_0081cb10 = building;
     building->flags |= 0x420;
     DAT_0062fd40 = DAT_0081cb10->layer;
@@ -800,8 +795,8 @@ LEGO_EXPORT int LoadJailCells(struct Element *element) {
 }
 
 // FUNCTION: LEGOLAND 0x00438870
-void LoadBankMatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Ride *building = obj->building;
+void LoadBankMatteSpriteAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     BankBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74e4
@@ -824,8 +819,8 @@ void BankSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00438900
-void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
-    struct Ride *ride = param_1->building;
+void RenderBank(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
+    struct Ride *ride = param_1->ride;
     struct RideNode *elem = ride->riders;
     int count = 0;
     struct Point coords;
@@ -958,8 +953,8 @@ void BankUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00438c60
-void LoadSaloonMatteSpritesAndMoneySFX(struct MapObject *obj) {
-    struct Ride *building = obj->building;
+void LoadSaloonMatteSpritesAndMoneySFX(struct Element *obj) {
+    struct Ride *building = obj->ride;
     SaloonBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7508

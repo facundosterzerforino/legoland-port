@@ -1,5 +1,7 @@
 #pragma once
 
+struct KLIBAUDIO_Object;
+
 struct KLIBAUDIO_Vtbl {
     unsigned char pad_0[0x30];
     void(__stdcall *func_30)(void *self, int a1, int a2, int a3);

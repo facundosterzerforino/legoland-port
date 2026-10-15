@@ -1428,22 +1428,20 @@ unsigned char GetPathNeighbourMask(int *coords) {
 // FUNCTION: LEGOLAND 0x0045d080
 unsigned char GetPathDiagonalGaps(unsigned char flags, int *coords) {
     unsigned char result = 0;
-    unsigned int tile_data[5];
-    unsigned int *map_row;
+    struct MapElement tile_data; /* a copy of the tile */
     int x, y;
 
     if ((flags & 0xc) == 0xc) {
         x = coords[0] - 1;
         y = coords[1] + 1;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            map_row = (unsigned int *)GameMap[y];
-            memcpy(tile_data, map_row + x * 5, sizeof(tile_data));
+            memcpy(&tile_data, &GameMap[y][x], sizeof(tile_data));
         } else {
-            *(unsigned short *)((unsigned char *)tile_data + 0x8) = 0;
-            *(unsigned short *)((unsigned char *)tile_data + 0xc) = 0x40;
-            *(unsigned char *)((unsigned char *)tile_data + 0x10) = 0;
+            tile_data.field_8 = 0;
+            tile_data.flags = 0x40;
+            tile_data.field_10 = 0;
         }
-        if (!IsPathTile((struct MapElement *)tile_data)) {
+        if (!IsPathTile(&tile_data)) {
             result = 1;
         }
     }
@@ -1451,14 +1449,13 @@ unsigned char GetPathDiagonalGaps(unsigned char flags, int *coords) {
         x = coords[0] + 1;
         y = coords[1] - 1;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
-            map_row = (unsigned int *)GameMap[y];
-            memcpy(tile_data, map_row + x * 5, sizeof(tile_data));
+            memcpy(&tile_data, &GameMap[y][x], sizeof(tile_data));
         } else {
-            *(unsigned short *)((unsigned char *)tile_data + 0x8) = 0;
-            *(unsigned short *)((unsigned char *)tile_data + 0xc) = 0x40;
-            *(unsigned char *)((unsigned char *)tile_data + 0x10) = 0;
+            tile_data.field_8 = 0;
+            tile_data.flags = 0x40;
+            tile_data.field_10 = 0;
         }
-        if (!IsPathTile((struct MapElement *)tile_data)) {
+        if (!IsPathTile(&tile_data)) {
             result |= 2;
         }
     }

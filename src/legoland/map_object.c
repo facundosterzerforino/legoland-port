@@ -36,11 +36,6 @@ struct Obj0c {
     void *field_c;
 };
 
-struct CursorObj {
-    unsigned char pad_0[12];
-    void *field_c;
-};
-
 /* globals.h owns MapTileGrid as the canonical struct MapElement** map grid;
    map_object views the same memory through its own struct MapElement layout. */
 #define MapTileGrid ((struct MapElement **)GameMap)
@@ -1129,14 +1124,14 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0045fa80
-LEGO_EXPORT void CalcBasicObjectCursor(struct CursorObj *obj, int *a2, unsigned int a3) {
+LEGO_EXPORT void CalcBasicObjectCursor(struct Element *obj, int *a2, unsigned int a3) {
     struct Ride *v1;
 
-    v1 = obj->field_c;
+    v1 = obj->data;
     DefaultCursor(&EditCursor);
     ScreenToMapRef(a2, &EditCursor.tile_x, a3);
     memcpy(EditCursor.field_1414, &v1->footprint, sizeof(struct Footprint));
-    ValidateCursor(&EditCursor, obj->field_c);
+    ValidateCursor(&EditCursor, obj->data);
 }
 
 // FUNCTION: LEGOLAND 0x0045fad0

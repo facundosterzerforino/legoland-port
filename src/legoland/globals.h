@@ -1428,13 +1428,7 @@ extern struct Ride *DAT_004cbe18;
 // 0x004cbe1c
 extern struct Sprite *LogFlumeFc1M3Sprite;
 // 0x004cbe20
-extern struct FlumeEntry *DAT_004cbe20;
-// 0x004cbe24
-extern struct FlumeEntry *DAT_004cbe24;
-// 0x004cbe28
-extern struct FlumeEntry *DAT_004cbe28;
-// 0x004cbe2c
-extern struct FlumeEntry *DAT_004cbe2c;
+extern struct FlumeEntry *DAT_004cbe20[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
 // 0x004cbe30
 extern struct Ride *LogFlumeTrackRide;
 // 0x004cbe48
@@ -1969,7 +1963,7 @@ extern void *DAT_0062fd40;
 // 0x0062fd48
 extern struct RideSpriteInfo DAT_0062fd48; /* the space tower's sprite to draw */
 // 0x0062fd60
-extern void *SpaceTowerLayers;
+extern struct Sprite *SpaceTowerLayers;
 // 0x0062fd64
 extern struct Sprite *SpaceTowerSeatMatteSprites[4];
 // 0x0062fd74
@@ -3219,11 +3213,11 @@ extern struct IconNode *DAT_007cb2e0;
 // 0x007cb2e4
 extern struct IconNode *DAT_007cb2e4;
 // 0x007cb2f0
-extern char DAT_007cb2f0[0x10];
+extern struct EditState DAT_007cb2f0; /* EditMode saved by FUN_0048f9f0 */
 // 0x007cb300
-extern char DAT_007cb300[0xc];
+extern struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
 // 0x007cb30c
-extern char DAT_007cb30c[4];
+extern unsigned int DAT_007cb30c; /* DAT_00668e38 saved */
 // 0x007cb310
 extern unsigned int DAT_007cb310;
 // 0x007cb314

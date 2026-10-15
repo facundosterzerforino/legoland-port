@@ -68,6 +68,7 @@ LEGO_EXPORT void LLS555To565(struct LLSImage *param_1);
 
 void LLIDB_UnLoadODF(struct Element *head);
 
+struct SpriteSet;
 LEGO_EXPORT void LLIDB_FreeILFTable(struct SpriteSet *table);
 
 LEGO_EXPORT unsigned int LLIDB_GetCount(void);

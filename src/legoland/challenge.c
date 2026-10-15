@@ -407,16 +407,8 @@ void SetAdvisorVidAnim(struct AnimHandle *handle) {
     }
 }
 
-struct AdvisorObject {
-    /* 0x00 */ unsigned char pad_0[4];
-    /* 0x04 */ struct Sprite *sprite;
-    /* 0x08 */ unsigned char pad_8[0xc - 0x8];
-    /* 0x0c */ short x;
-    /* 0x0e */ short y;
-};
-
 // FUNCTION: LEGOLAND 0x00443e30
-unsigned int RenderAdvisorIcon(struct AdvisorObject *param_1) {
+unsigned int RenderAdvisorIcon(struct IconNode *param_1) {
     struct AnimHandle *anim;
     struct AviFrame *frame;
     struct HitInfo state;

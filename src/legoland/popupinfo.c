@@ -612,8 +612,8 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
             if (((t.ptr->action == 0x13) && (t.ptr->param_action >= 0x6b)) ||
                 ((t.ptr->action == 0x16) && (t.ptr->param_action >= 0x6b))) {
                 iVar4 = (unsigned char *)t.ptr->order;
-                iVar5 = *(int *)(iVar4 + 8);
-                if ((iVar5 < 0) || (iVar5 >= (int)(unsigned int)lpConfig->width || (iVar2 = *(int *)(iVar4 + 0xc), iVar2 < 0)) ||
+                iVar5 = ((WorkOrder *)iVar4)->pos.x;
+                if ((iVar5 < 0) || (iVar5 >= (int)(unsigned int)lpConfig->width || (iVar2 = ((WorkOrder *)iVar4)->pos.y, iVar2 < 0)) ||
                     (iVar2 >= (int)(unsigned int)lpConfig->height)) {
                     iVar5 = 0;
                 } else {

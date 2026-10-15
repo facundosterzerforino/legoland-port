@@ -568,17 +568,11 @@ unsigned char FUN_0048e450(unsigned int a1, unsigned int a2) {
     return 1;
 }
 
-struct SaveIcon {
-    unsigned char pad_0[0x18];
-    const char *field_18;
-    unsigned char field_1c;
-};
-
 // FUNCTION: LEGOLAND 0x0048e4a0
-unsigned char FUN_0048e4a0(struct SaveIcon *icon, unsigned int flags, unsigned int a3, unsigned int a4) {
+unsigned char FUN_0048e4a0(struct IconNode *icon, unsigned int flags, unsigned int a3, unsigned int a4) {
     if (DAT_004bef9c != 0 && (flags & 2)) {
         if (LoadMode != 0) {
-            CurrentProfile.save_slot = icon->field_1c;
+            CurrentProfile.save_slot = icon->field_1cb;
         } else {
             return FUN_0048e4f0(icon, flags, a3, a4);
         }
@@ -587,16 +581,16 @@ unsigned char FUN_0048e4a0(struct SaveIcon *icon, unsigned int flags, unsigned i
 }
 
 // FUNCTION: LEGOLAND 0x0048e4f0
-unsigned char FUN_0048e4f0(struct SaveIcon *icon, unsigned int a2, unsigned int a3, unsigned int a4) {
+unsigned char FUN_0048e4f0(struct IconNode *icon, unsigned int a2, unsigned int a3, unsigned int a4) {
     if (DAT_004bef9c != 0) {
         if ((a2 & 2) == 0 || LoadMode != 0) {
             return 1;
         }
         ResetTempProfile();
-        CurrentProfile.save_slot = icon->field_1c;
+        CurrentProfile.save_slot = icon->field_1cb;
         InitNewSaveGamePOPUP(icon);
-        if (icon->field_18 != "EMPTY") {
-            FUN_0048e3d0(icon->field_18);
+        if (icon->field_18p != "EMPTY") {
+            FUN_0048e3d0(icon->field_18p);
         }
         DAT_00798700 = 1;
         DAT_004bef9c = 0;

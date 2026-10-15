@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-struct Profile;
+struct IconNode;
 
 LEGO_EXPORT void InitTitleScreen(void);
 unsigned char FUN_0048fe20(unsigned int param_1, unsigned char param_2);
@@ -25,4 +25,4 @@ void FUN_00490880(void);
 void FUN_00490fa0(char *text, int font, RECT rc, INT_PTR color_flag);
 unsigned int FUN_004911c0(const char *a, const char *b);
 unsigned int FUN_00491240(const char *param_1);
-LEGO_EXPORT void InitNewProfilePoPUp(struct Profile *profile);
+LEGO_EXPORT void InitNewProfilePoPUp(struct IconNode *profile);

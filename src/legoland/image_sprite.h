@@ -73,6 +73,7 @@ LEGO_EXPORT struct Sprite *LoadSprite(const char *name, int flags);
 LEGO_EXPORT unsigned int MakeSprite(struct Sprite *sprite);
 LEGO_EXPORT short ReferenceSprite(struct Sprite *sprite);
 LEGO_EXPORT int KillSprite(struct Sprite *sprite);
+struct VideoArg;
 LEGO_EXPORT int GetSprite(struct VideoArg *param_1, struct Sprite *param_2);
 LEGO_EXPORT void ReleaseSprite(struct VideoArg *sprite);
 

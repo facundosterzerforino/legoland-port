@@ -1439,16 +1439,7 @@ struct Ride *DAT_004cbe18;
 struct Sprite *LogFlumeFc1M3Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbe20
-struct FlumeEntry *DAT_004cbe20;
-
-// GLOBAL: LEGOLAND 0x004cbe24
-struct FlumeEntry *DAT_004cbe24;
-
-// GLOBAL: LEGOLAND 0x004cbe28
-struct FlumeEntry *DAT_004cbe28;
-
-// GLOBAL: LEGOLAND 0x004cbe2c
-struct FlumeEntry *DAT_004cbe2c;
+struct FlumeEntry *DAT_004cbe20[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
 
 // GLOBAL: LEGOLAND 0x004cbe30
 struct Ride *LogFlumeTrackRide;
@@ -2242,7 +2233,7 @@ void *DAT_0062fd40;
 struct RideSpriteInfo DAT_0062fd48;
 
 // GLOBAL: LEGOLAND 0x0062fd60
-void *SpaceTowerLayers;
+struct Sprite *SpaceTowerLayers;
 
 // GLOBAL: LEGOLAND 0x0062fd64
 struct Sprite *SpaceTowerSeatMatteSprites[4];
@@ -4075,13 +4066,13 @@ struct IconNode *DAT_007cb2e0;
 struct IconNode *DAT_007cb2e4;
 
 // GLOBAL: LEGOLAND 0x007cb2f0
-char DAT_007cb2f0[0x10];
+struct EditState DAT_007cb2f0; /* EditMode saved by FUN_0048f9f0 */
 
 // GLOBAL: LEGOLAND 0x007cb300
-char DAT_007cb300[0xc];
+struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
 
 // GLOBAL: LEGOLAND 0x007cb30c
-char DAT_007cb30c[4];
+unsigned int DAT_007cb30c; /* DAT_00668e38 saved */
 
 // GLOBAL: LEGOLAND 0x007cb310
 unsigned int DAT_007cb310;

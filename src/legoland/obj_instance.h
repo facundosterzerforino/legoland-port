@@ -110,7 +110,6 @@ struct Ride {
 typedef struct Ride Ride;
 
 /* Map object of a placed ride; the parameter of the per-class ride callbacks. */
-struct MapObject;
 struct ObjInstance;
 struct Point;
 struct ResFile;

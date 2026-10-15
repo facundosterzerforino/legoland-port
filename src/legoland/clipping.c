@@ -11,6 +11,8 @@
 // GLOBAL: LEGOLAND 0x004bdeb8
 struct ClipQueryResult DAT_004bdeb8[0x86];
 
+struct ClipNode;
+
 typedef void (*ClipNodeMethod)(struct ClipNode *node, int a1, int a2, int a3);
 
 struct ClipNode {

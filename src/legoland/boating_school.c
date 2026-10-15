@@ -944,9 +944,9 @@ void BoatingSchoolUpdate(void) {
     }
     for (score = BoatRideNodeList; score != NULL; score = score->next) {
         frame = ++score->field_c;
-        if (frame <= *(short *)((char *)lls + 0x10)) {
+        if (frame <= lls->frame_count) {
             if (score->field_10 == 0) {
-                LLSSetFrame(lls, *(short *)((char *)lls + 0x10) - frame);
+                LLSSetFrame(lls, lls->frame_count - frame);
             } else {
                 LLSSetFrame(lls, frame);
             }

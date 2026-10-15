@@ -40,7 +40,6 @@ struct SaveBlock {
 
 struct RideNode;
 struct Element;
-struct EditArg;
 struct UserFlagsArg;
 
 struct SaveBlock;
@@ -67,7 +66,7 @@ void UnloadFoodcartFoodResources();
 void FUN_0042e830(struct Element *arg, unsigned int param2, unsigned int param3, unsigned short *value);
 void LoadCastleBBQResources(struct Element *obj);
 void UnloadCastleBBQResources();
-void EaterySetEditMode(struct EditArg *arg);
+void EaterySetEditMode(struct Element *arg);
 void RenderCastleBBQ(struct Element *param_1, unsigned int param_2, unsigned int param_3, short *param_4, void *param_5, unsigned int param_6);
 void CastleBBQAddObject(struct Element *param_1, unsigned int *param_2);
 struct Cursor;

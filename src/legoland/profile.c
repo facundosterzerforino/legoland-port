@@ -12,11 +12,6 @@
 #include "text.h"
 #include "title.h"
 
-struct Profile {
-    unsigned char pad_0[0x1c];
-    unsigned char var_1c;
-};
-
 #include "image_sprite.h"
 #include "stream.h"
 
@@ -548,19 +543,19 @@ unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
 }
 
 // FUNCTION: LEGOLAND 0x0048d390
-unsigned char FUN_0048d390(struct Profile *profile, unsigned char param_2) {
+unsigned char FUN_0048d390(struct IconNode *profile, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 0x2) != 0) {
-        CurrentProfile.profile_slot = profile->var_1c;
+        CurrentProfile.profile_slot = profile->field_1cb;
         FUN_0048a800();
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0048d3c0
-unsigned char SelectEmptyProfileSlotClick(struct Profile *profile, unsigned int param_2) {
+unsigned char SelectEmptyProfileSlotClick(struct IconNode *profile, unsigned int param_2) {
     if (DAT_004bef9c != 0) {
         if (param_2 & 0x2) {
-            CurrentProfile.profile_slot = profile->var_1c;
+            CurrentProfile.profile_slot = profile->field_1cb;
             NewProfilePopUpShown = 1;
             InitNewProfilePoPUp(profile);
             DAT_004bef9c = 0;

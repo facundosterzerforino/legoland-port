@@ -3,7 +3,7 @@
 #include "legoland.h"
 
 struct Sprite;
-struct SaveIcon;
+struct IconNode;
 struct EditSprite;
 
 LEGO_EXPORT int LoadDateIntoTempProfile(int a1, int a2);
@@ -20,9 +20,8 @@ unsigned char FUN_0048db10(int param1, unsigned char flags);
 unsigned char FUN_0048da50(unsigned int a1, unsigned int flags, unsigned int a3, unsigned int a4);
 unsigned char FUN_0048d970(unsigned int a1, unsigned char flags);
 unsigned char FUN_0048e450(unsigned int a1, unsigned int a2);
-unsigned char FUN_0048e4a0(struct SaveIcon *icon, unsigned int flags, unsigned int a3, unsigned int a4);
-unsigned char FUN_0048e4f0(struct SaveIcon *icon, unsigned int a2, unsigned int a3, unsigned int a4);
-struct IconNode;
+unsigned char FUN_0048e4a0(struct IconNode *icon, unsigned int flags, unsigned int a3, unsigned int a4);
+unsigned char FUN_0048e4f0(struct IconNode *icon, unsigned int a2, unsigned int a3, unsigned int a4);
 unsigned char FUN_0048e720(struct IconNode *icon, unsigned int a2, unsigned int a3, unsigned int a4);
 unsigned char FUN_0048e810(struct IconNode *icon, unsigned char flags);
 int FUN_0048eac0(int param);

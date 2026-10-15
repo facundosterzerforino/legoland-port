@@ -9,7 +9,7 @@
 // owns struct MapTile etc.; struct Cursor lives in gamemap.h.
 
 struct Cursor;
-struct CursorObj;
+struct Element;
 struct Point;
 struct ObjInstance;
 
@@ -55,7 +55,7 @@ void FUN_0045fad0(struct VideoArg *surface, int dir, int px, int py, unsigned ch
 void FUN_0045fca0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count);
 LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int param_3);
 LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param);
-LEGO_EXPORT void CalcBasicObjectCursor(struct CursorObj *obj, int *a2, unsigned int a3);
+LEGO_EXPORT void CalcBasicObjectCursor(struct Element *obj, int *a2, unsigned int a3);
 LEGO_EXPORT void GetTileDimensions(int *width, int *height);
 LEGO_EXPORT int Get_XScroll(void);
 LEGO_EXPORT int Get_YScroll(void);

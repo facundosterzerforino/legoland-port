@@ -215,10 +215,9 @@ void FUN_00403530(struct CatapultNode *node, unsigned int index) {
 }
 
 // FUNCTION: LEGOLAND 0x00403580
-void FUN_00403580(void *arg, unsigned int index) {
-    unsigned char *p = (unsigned char *)arg + index * 4;
-    *(unsigned int *)(p + 0x28) = 0;
-    *(unsigned int *)(p + 0x10) = 0;
+void FUN_00403580(struct CatapultNode *arg, unsigned int index) {
+    arg->flags[index] = 0;
+    arg->slots[index] = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004035a0

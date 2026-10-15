@@ -181,20 +181,20 @@ LEGO_EXPORT void GetSpriteSize(struct Sprite *sprite, unsigned short *pWidth, un
 }
 
 // FUNCTION: LEGOLAND 0x004015e0
-void FUN_004015e0(unsigned char *param_1) {
+void FUN_004015e0(struct NewBloke *param_1) {
     struct Point local;
     unsigned int frame;
 
-    local.x = *(int *)(param_1 + 0x20);
-    local.y = *(int *)(param_1 + 0x24);
-    frame = *(unsigned char *)(param_1 + 0xbb);
-    MovePointInDirection(&local, &local, *(unsigned char *)(param_1 + 0xba));
-    MovePointInDirection(&local, &local, *(unsigned char *)(param_1 + 0xba));
-    *(int *)(param_1 + 0x20) = local.x;
-    *(int *)(param_1 + 0x24) = local.y;
-    *(int *)(param_1 + 0x30 + frame * 8) = local.x << 16;
-    *(int *)(param_1 + 0x34 + frame * 8) = local.y << 16;
-    *(unsigned char *)(param_1 + 0xbb) = frame + 1;
+    local.x = param_1->tx;
+    local.y = param_1->ty;
+    frame = param_1->f_bb;
+    MovePointInDirection(&local, &local, param_1->f_ba);
+    MovePointInDirection(&local, &local, param_1->f_ba);
+    param_1->tx = local.x;
+    param_1->ty = local.y;
+    param_1->wp[frame].x = local.x << 16;
+    param_1->wp[frame].y = local.y << 16;
+    param_1->f_bb = frame + 1;
 }
 
 // FUNCTION: LEGOLAND 0x00401660
@@ -731,21 +731,20 @@ int FUN_00402340(int a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00402390
-int FUN_00402390(unsigned char *param_1) {
-    void *iVar1;
+int FUN_00402390(struct NewBloke *param_1) {
+    struct RideQueueEntry *iVar1;
     struct Point local;
 
-    iVar1 = FindQueueEntryAtTile(*(unsigned int *)(param_1 + 0x20), *(unsigned int *)(param_1 + 0x24));
+    iVar1 = FindQueueEntryAtTile(param_1->tx, param_1->ty);
     if (iVar1 == 0) {
         return 0;
     }
-    local.x = *(int *)((char *)iVar1 + 0xc);
-    local.y = *(int *)((char *)iVar1 + 0x10);
-    StepPointByDirection((int *)&local, (int *)&local,
-        DAT_004b4034[(unsigned int)*(unsigned char *)(param_1 + 0xb8)]);
+    local.x = iVar1->x;
+    local.y = iVar1->y;
+    StepPointByDirection((int *)&local, (int *)&local, DAT_004b4034[(unsigned int)param_1->f_b8]);
     iVar1 = FUN_004125a0(local.x, local.y);
-    if ((iVar1 != 0) && ((*(unsigned char *)((char *)iVar1 + 0x14) & 0xf) == 5)) {
-        return FUN_00402340(DAT_004b4034[(unsigned int)*(unsigned char *)(param_1 + 0xb8)]);
+    if ((iVar1 != 0) && ((iVar1->field_14 & 0xf) == 5)) {
+        return FUN_00402340(DAT_004b4034[(unsigned int)param_1->f_b8]);
     }
     return 1;
 }
@@ -980,19 +979,19 @@ void FUN_00402780(struct NewBloke *b) {
     }
     switch (b->f_c4) {
     case 1:
-        if (FUN_00402390((unsigned char *)b) != 0) {
+        if (FUN_00402390(b) != 0) {
             FUN_00401320(b);
             b->f_c4 = 0;
         }
         break;
     case 2:
-        if (FUN_00402390((unsigned char *)b) != 0) {
+        if (FUN_00402390(b) != 0) {
             b->f_c4 = 0;
-            FUN_004015e0((unsigned char *)b);
+            FUN_004015e0(b);
         }
         break;
     case 3:
-        if (FUN_00402390((unsigned char *)b) != 0) {
+        if (FUN_00402390(b) != 0) {
             b->f_c4 = 0;
             FUN_00401080(b);
         }
@@ -1003,7 +1002,7 @@ void FUN_00402780(struct NewBloke *b) {
         break;
     case 5:
         FUN_00401320(b);
-        FUN_004015e0((unsigned char *)b);
+        FUN_004015e0(b);
         b->f_c4 = 0;
         break;
     }
