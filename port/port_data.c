@@ -5871,6 +5871,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&MusicEnabled, sizeof(MusicEnabled), 0x14774, 0x4},
     {(void *)&MusicState, sizeof(MusicState), 0x14778, 0x7b0},
     {(void *)&DAT_004c11c0, sizeof(DAT_004c11c0), 0x161c0, 0x4},
+    {(void *)&DAT_004c1260, sizeof(DAT_004c1260), 0x16260, 0xda0},
 };
 
 unsigned int PortDataOutsideTargets = 0; /* 'G' targets past the end of the port's (smaller) global */
@@ -7043,32 +7044,6 @@ static void PortLoad_LogFlumeTunelMSprite(void) {
     PortLoadPtr(&LogFlumeTunelMSprite, 0x16258u, lim);
 }
 
-static void PortLoad_DAT_004c1260(void) {
-    unsigned int lim = 0x17000u;
-    PortLoadBytes(&DAT_004c1260.pad_0, 0x16260u, 0x14u, lim);
-    PortLoadBytes(&DAT_004c1260.field_14, 0x16260u + 0x14, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_18, 0x16260u + 0x18, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_1c, 0x16260u + 0x1c, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_20, 0x16260u + 0x20, 0x1cu, lim);
-    PortLoadBytes(&DAT_004c1260.field_3c, 0x16260u + 0x3c, 0x14u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_50, 0x16260u + 0x50, 0x14u, lim);
-    PortLoadBytes(&DAT_004c1260.field_64, 0x16260u + 0x64, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_68, 0x16260u + 0x68, 0x5cu, lim);
-    PortLoadBytes(&DAT_004c1260.field_c4, 0x16260u + 0xc4, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_c8, 0x16260u + 0xc8, 0x4u, lim);
-    PortLoadPtr(&DAT_004c1260.field_cc, 0x16260u + 0xcc, lim);
-    PortLoadBytes(&DAT_004c1260.pad_d0, 0x16260u + 0xd0, 0x1334u, lim);
-    PortLoadBytes(&DAT_004c1260.tile_x, 0x16260u + 0x1404, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.tile_y, 0x16260u + 0x1408, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_140c, 0x16260u + 0x140c, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_1410, 0x16260u + 0x1410, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_1414, 0x16260u + 0x1414, 0x14u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_1428, 0x16260u + 0x1428, 0x400u, lim);
-    PortLoadBytes(&DAT_004c1260.field_1828, 0x16260u + 0x1828, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.pad_182c, 0x16260u + 0x182c, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1260.field_1830, 0x16260u + 0x1830, 0x4u, lim);
-}
-
 static void PortCheck_Catapult_SFX(void) {
     unsigned int lim = 0x90f8u;
     int i0;
@@ -8145,32 +8120,6 @@ static void PortCheck_LogFlumeTunelMSprite(void) {
     PortCheckPtr(&LogFlumeTunelMSprite, 0x16258u, lim);
 }
 
-static void PortCheck_DAT_004c1260(void) {
-    unsigned int lim = 0x17000u;
-    PortCheckBytes(&DAT_004c1260.pad_0, 0x16260u, 0x14u, lim);
-    PortCheckBytes(&DAT_004c1260.field_14, 0x16260u + 0x14, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_18, 0x16260u + 0x18, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_1c, 0x16260u + 0x1c, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_20, 0x16260u + 0x20, 0x1cu, lim);
-    PortCheckBytes(&DAT_004c1260.field_3c, 0x16260u + 0x3c, 0x14u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_50, 0x16260u + 0x50, 0x14u, lim);
-    PortCheckBytes(&DAT_004c1260.field_64, 0x16260u + 0x64, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_68, 0x16260u + 0x68, 0x5cu, lim);
-    PortCheckBytes(&DAT_004c1260.field_c4, 0x16260u + 0xc4, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_c8, 0x16260u + 0xc8, 0x4u, lim);
-    PortCheckPtr(&DAT_004c1260.field_cc, 0x16260u + 0xcc, lim);
-    PortCheckBytes(&DAT_004c1260.pad_d0, 0x16260u + 0xd0, 0x1334u, lim);
-    PortCheckBytes(&DAT_004c1260.tile_x, 0x16260u + 0x1404, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.tile_y, 0x16260u + 0x1408, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_140c, 0x16260u + 0x140c, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_1410, 0x16260u + 0x1410, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_1414, 0x16260u + 0x1414, 0x14u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_1428, 0x16260u + 0x1428, 0x400u, lim);
-    PortCheckBytes(&DAT_004c1260.field_1828, 0x16260u + 0x1828, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.pad_182c, 0x16260u + 0x182c, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1260.field_1830, 0x16260u + 0x1830, 0x4u, lim);
-}
-
 static void (*const port_typed_loads[])(void) = {
     PortLoad_Catapult_SFX,
     PortLoad_Helicopter_SFX,
@@ -8308,7 +8257,6 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_JoustSpecLMSprite,
     PortLoad_JoustNodeList,
     PortLoad_LogFlumeTunelMSprite,
-    PortLoad_DAT_004c1260,
     NULL
 };
 
@@ -8449,7 +8397,6 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_JoustSpecLMSprite,
     PortCheck_JoustNodeList,
     PortCheck_LogFlumeTunelMSprite,
-    PortCheck_DAT_004c1260,
     NULL
 };
 

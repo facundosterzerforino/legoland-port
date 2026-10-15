@@ -33,13 +33,12 @@ void PortToX86(unsigned char *dst, const void *src, const struct PortX86Type *ty
 extern const struct PortX86Type *const port_x86_types[];
 extern const unsigned int port_x86_type_count;
 
-/* struct Ride: 62 fields, 0xd0 bytes in the original */
+/* struct Ride: 61 fields, 0xd0 bytes in the original */
 #define PORT_X86_SIZE_Ride 0xd0u
 #define PORT_X86_OFF_Ride_next 0x0u
 #define PORT_X86_OFF_Ride_instances 0x4u
 #define PORT_X86_OFF_Ride_field_8 0x8u
 #define PORT_X86_OFF_Ride_x 0xcu
-#define PORT_X86_OFF_Ride_y 0x10u
 #define PORT_X86_OFF_Ride_field_14 0x14u
 #define PORT_X86_OFF_Ride_field_18 0x18u
 #define PORT_X86_OFF_Ride_flags 0x1cu
