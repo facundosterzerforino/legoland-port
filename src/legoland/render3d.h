@@ -4,12 +4,25 @@
 #include "llidb.h"
 #include "math.h"
 
-/* One textured face for RemapTexCoordsToCell: 0x24 bytes. */
-struct TexFace {
-    unsigned int flags; /* 0x2000: skip */
-    int field_4;
-    int cell; /* texture cell index */
-    float uv[6]; /* u0 v0 u1 v1 u2 v2 */
+/* One face of a 3D person's mesh (0x24 bytes in the mesh file): a solid colour (flags & 0x2000) with the colour
+   ramp the loader looks up for it, or a texture cell; then the corners' texture coordinates. */
+struct PersonFace {
+    /* 0x00 */ unsigned int flags; /* 0x2000: solid colour */
+    /* 0x04 */ union {
+        struct {
+            unsigned char b0;
+            unsigned char b1;
+            unsigned char b2;
+        };
+        unsigned char rgb[3];
+        int field_4;
+    };
+    /* 0x08 */ union {
+        int cell; /* texture cell index */
+        unsigned int texture; /* the texture id */
+        void *ramp; /* solid colour: FUN_00486280's colour ramp */
+    };
+    /* 0x0c */ float uv[6]; /* u0 v0 u1 v1 u2 v2 */
 };
 
 struct LocFile;
@@ -74,7 +87,7 @@ LEGO_EXPORT void RenderItems_New(void);
 LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key);
 LEGO_EXPORT void RenderBlokeList(struct RenderItemNode **list);
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport);
-void *FUN_00442580(struct Person *person, struct LocFile *context, unsigned int arg3, unsigned int arg4, unsigned int arg5);
+void *FUN_00442580(struct Person *person, struct LocFile *context, struct PersonFace *arg3, unsigned int arg4, unsigned int arg5);
 void FUN_00442980(const char *param_1, const char *param_2, const char *param_3, int param_4, unsigned int param_5);
 LEGO_EXPORT void TransformVectorsL(const int *src, int *dst, const int *m, int count);
 struct Vec3;

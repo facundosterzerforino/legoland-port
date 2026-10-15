@@ -443,7 +443,7 @@ struct CellEntry {
 };
 
 // FUNCTION: LEGOLAND 0x00442040
-void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, struct TexFace *faces, int count) {
+void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, struct PersonFace *faces, int count) {
     struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->cells + param_2 * 6);
     struct CellEntry *entry2 = (struct CellEntry *)((char *)param_1->cells + param_3 * 6);
     int idx1 = entry1->field_0 + param_1->texture_base;
@@ -452,7 +452,7 @@ void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, str
     int hi_x = entry1->field_4 + entry1->x + 1;
     int lo_y = entry1->y;
     int hi_y = entry1->field_5 + entry1->y + 1;
-    struct TexFace *face;
+    struct PersonFace *face;
     int i;
 
     if (count > 0) {
@@ -521,24 +521,15 @@ struct ColourRef {
     unsigned char b2;
 };
 
-struct TexEntry {
-    unsigned int flags;
-    unsigned char b0;
-    unsigned char b1;
-    unsigned char b2;
-    unsigned char pad_7[1];
-    unsigned int field_8;
-    unsigned char pad_c[0x24 - 0xc];
-};
-
 // FUNCTION: LEGOLAND 0x004424e0
-void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct ColourRef *param_3, struct ColourRef *param_4, int param_5, int param_6) {
+void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct ColourRef *param_3, struct ColourRef *param_4, struct PersonFace *param_5, int param_6) {
     int i = 0;
     int count;
-    struct TexEntry *entry;
+    struct PersonFace *entry;
+    int rgb;
 
     if (param_6 > 0) {
-        entry = (struct TexEntry *)param_5;
+        entry = param_5;
         count = param_6;
         do {
             if ((entry->flags & 0x2000) != 0 && entry->b2 == param_1->b2 &&
@@ -547,24 +538,24 @@ void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct C
                     entry->b2 = param_2->b2;
                     entry->b1 = param_2->b1;
                     entry->b0 = param_2->b0;
-                    param_5 = *(int *)param_2;
+                    rgb = *(int *)param_2;
                 } else {
                     entry->b2 = param_4->b2;
                     entry->b1 = param_4->b1;
                     entry->b0 = param_4->b0;
-                    param_5 = *(int *)param_4;
+                    rgb = *(int *)param_4;
                 }
-                entry->field_8 = (unsigned int)(UINT_PTR)FUN_00486280(0x40, &param_5); /* 32-bit slot of the mesh file data */
+                entry->ramp = FUN_00486280(0x40, &rgb);
                 count = param_6;
             }
-            entry = (struct TexEntry *)((char *)entry + 0x24);
+            entry++;
             i = i + 1;
         } while (i < count);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00442580
-void *FUN_00442580(struct Person *person, struct LocFile *context, unsigned int src, unsigned int count, unsigned int flag) {
+void *FUN_00442580(struct Person *person, struct LocFile *context, struct PersonFace *src, unsigned int count, unsigned int flag) {
     int *arrA;
     int idxI;
     int valC;
@@ -648,15 +639,15 @@ void *FUN_00442580(struct Person *person, struct LocFile *context, unsigned int 
     z2.b2 = BlokeColours[b * 3];
     z2.b1 = BlokeColours[b * 3 + 1];
     z2.b0 = BlokeColours[b * 3 + 2];
-    size = count * 36;
+    size = count * sizeof(struct PersonFace);
     mem = malloc(size);
     if (mem != 0) {
-        memcpy(mem, (void *)src, size);
+        memcpy(mem, src, size);
         if ((int)person->character < 2) {
-            RemapTexCoordsToCell(context, valC, arrA[idxI], (struct TexFace *)mem, count);
-            RemapTexCoordsToCell(context, valE, arrD[idxJ], (struct TexFace *)mem, count);
+            RemapTexCoordsToCell(context, valC, arrA[idxI], (struct PersonFace *)mem, count);
+            RemapTexCoordsToCell(context, valE, arrD[idxJ], (struct PersonFace *)mem, count);
         }
-        FUN_004424e0(&z0, &z1, &z3, &z2, (int)mem, count);
+        FUN_004424e0(&z0, &z1, &z3, &z2, mem, count);
     }
     return mem;
 }

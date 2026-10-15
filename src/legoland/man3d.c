@@ -786,7 +786,7 @@ LEGO_EXPORT void BlokeSetAnim(struct Bloke *bloke, int anim) {
         }
         {
             struct MeshElem *e = mesh->elems;
-            unsigned int f8 = (unsigned int)mesh->field_8;
+            struct PersonFace *f8 = mesh->field_8;
             person->field_50 = FUN_00442580(person, context, f8, e->shared->count, person->random);
         }
     }

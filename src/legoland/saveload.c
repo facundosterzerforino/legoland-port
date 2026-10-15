@@ -984,7 +984,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         bloke->person->field_2c = 0;
         bloke->person->field_30 = BlokeSaveBuffer.field_30;
         anim = GetBlokeAnim3DFromPerson(bloke->person);
-        bloke->person->field_50 = FUN_00442580(bloke->person, VisitorLocData, (unsigned int)anim->field_8, anim->elems->shared->count, bloke->person->random);
+        bloke->person->field_50 = FUN_00442580(bloke->person, VisitorLocData, anim->field_8, anim->elems->shared->count, bloke->person->random);
     }
     if (SkipSaveGameDword() == 0) {
         goto fail;
