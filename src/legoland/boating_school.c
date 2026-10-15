@@ -625,7 +625,7 @@ void FUN_0041a000(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a040
-void BoatingSchoolAddObject(struct EditObject *obj, int *coords) {
+void BoatingSchoolAddObject(struct Ride *obj, int *coords) {
     TileId tile;
     struct BoatRideNode *score;
     int x;
@@ -1219,7 +1219,7 @@ void BoatingSchoolMermaidSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b2a0
-void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords) {
+void BoatingSchoolMermaidAddObject(struct Ride *obj, int *coords) {
     struct Ride *ride = ((Element *)obj)->ride;
     TileId tile;
     struct MermaidNode *node;

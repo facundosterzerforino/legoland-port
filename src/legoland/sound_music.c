@@ -25,7 +25,6 @@ struct MusicPerformance;
 struct MusicPerformanceVtbl;
 struct BandObj;
 struct BandVtbl;
-struct SampleDef;
 struct FXList;
 struct MusicLoader;
 struct MusicLoaderVtbl;
@@ -617,7 +616,7 @@ void UpdateSampleFades(void) {
             sample->buffer->vtable->method_0x18(sample->buffer, &vol) == 0) {
             vol = vol + sample->fade;
             // STRING: LEGOLAND 0x004bfddc
-            DBPrintf("Fading Sample (%s) (%x) to Vol %d\n", ((struct SampleDef *)sample->active)->name, sample, vol);
+            DBPrintf("Fading Sample (%s) (%x) to Vol %d\n", ((struct Sample *)sample->active)->name, sample, vol);
             if (vol >= 0) {
                 vol = 0;
                 sample->fade = 0;
@@ -627,7 +626,7 @@ void UpdateSampleFades(void) {
                 if ((sample->flags & 8) != 0) {
                     sample->buffer->vtable->method_0x48(sample->buffer);
                     // STRING: LEGOLAND 0x004bfdb4
-                    DBPrintf("\tStopping Sample for the kill %s (%x)\n", ((struct SampleDef *)sample->active)->name, sample);
+                    DBPrintf("\tStopping Sample for the kill %s (%x)\n", ((struct Sample *)sample->active)->name, sample);
                 }
             }
             sample->buffer->vtable->method_0x3c(sample->buffer, vol);
@@ -671,7 +670,7 @@ void AutoKillFinishedSamples(void) {
         if ((sample->flags & 8) != 0 && (sample->flags & 2) == 0 &&
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0 && ((status == 0) & 1)) {
             // STRING: LEGOLAND 0x004bfe14
-            DBPrintf("Autokilling Sample %s (%x)\n", ((struct SampleDef *)sample->active)->name, sample);
+            DBPrintf("Autokilling Sample %s (%x)\n", ((struct Sample *)sample->active)->name, sample);
             if (sample->active == JOUST_SFX[0].sample) {
                 // STRING: LEGOLAND 0x004bfe00
                 DBPrintf("Killing Joust FX\n");
@@ -845,7 +844,7 @@ LEGO_EXPORT void UnSourceAndFadeSample(struct Sample *sample, unsigned int fade)
     sample->source_type = 0;
     sample->buffer->vtable->method_0x18(sample->buffer, &vol);
     // STRING: LEGOLAND 0x004bfe58
-    DBPrintf("Fading out Sample %s (%x) [Current Vol = %d]\n", ((struct SampleDef *)sample->active)->name, sample, vol);
+    DBPrintf("Fading out Sample %s (%x) [Current Vol = %d]\n", ((struct Sample *)sample->active)->name, sample, vol);
     if ((sample->flags & 2) != 0) {
         sample->flags &= 0xfffd;
         // STRING: LEGOLAND 0x004bfe30
@@ -907,7 +906,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
         if (k == nreported && nreported < 64) {
             reported[nreported++] = caller;
             DebugTrace("PlayInstanceOfSample: no sample for %s (%s), called from rva %08lx",
-                def != 0 && ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?",
+                def != 0 && ((struct Sample *)def)->name ? (char *)((struct Sample *)def)->name : "?",
                 def == 0 ? "the sound was never loaded" : "DuplicateSoundBuffer failed or the sample pool is full",
                 caller);
         }
@@ -922,7 +921,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
     }
     if (PlaySample(sample, looping, oneshot) == 0) {
 #ifdef LEGOLAND_PORT
-        DebugTrace("PlayInstanceOfSample: playing %s failed", ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?");
+        DebugTrace("PlayInstanceOfSample: playing %s failed", ((struct Sample *)def)->name ? (char *)((struct Sample *)def)->name : "?");
 #endif
         KillPlayableSample(sample);
         return 0;
@@ -947,7 +946,7 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
             sample->buffer->vtable->method_0x18(sample->buffer, &vol);
             ((LPDIRECTSOUNDBUFFER)sample->buffer)->lpVtbl->GetPan((LPDIRECTSOUNDBUFFER)sample->buffer, (LONG *)&pan);
             DebugTrace("PlayInstanceOfSample: %s source %u (%d,%d) loop %u vol %d pan %d paused %u, called from rva %08lx",
-                ((struct SampleDef *)def)->name ? (char *)((struct SampleDef *)def)->name : "?", sample->source_type,
+                ((struct Sample *)def)->name ? (char *)((struct Sample *)def)->name : "?", sample->source_type,
                 (int)sample->source_x, (int)sample->source_y, looping, vol, pan, DAT_007988c8 != 0,
                 PortRva(PORT_CALLER()));
         }

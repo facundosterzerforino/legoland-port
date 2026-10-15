@@ -725,18 +725,12 @@ LEGO_EXPORT int SaveJoust(struct Element *element) {
     return 0;
 }
 
-struct JoustCar {
-    unsigned char pad_0[0x2c];
-    void *field_2c;
-    unsigned int field_30;
-};
-
 // FUNCTION: LEGOLAND 0x00408d00
 LEGO_EXPORT int LoadJoust(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct JoustNode *prev = NULL;
     struct RideNode *list;
-    struct JoustCar *car;
+    struct Person *car;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -764,9 +758,9 @@ LEGO_EXPORT int LoadJoust(struct Element *arg) {
     while (list != NULL) {
         car = list->person;
         if (car->field_30 != 0) {
-            car->field_2c = DAT_004c123c[car->field_30];
+            car->sprite = DAT_004c123c[car->field_30];
         } else {
-            car->field_2c = NULL;
+            car->sprite = NULL;
             list->person->field_30 = 0;
         }
         list = list->next;

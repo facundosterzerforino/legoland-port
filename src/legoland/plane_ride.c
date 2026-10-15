@@ -18,11 +18,6 @@
 #include "sound_sfx.h"
 #include "tilemap.h"
 
-struct PlaneRideObject {
-    unsigned char pad_0[0xc];
-    struct Ride *ride;
-};
-
 #include "image_sprite.h"
 #include "objclass.h"
 
@@ -241,7 +236,7 @@ void PlaneRideLoad(Element *input) {
 }
 
 // FUNCTION: LEGOLAND 0x0043dee0
-void PlaneRideUnload(struct PlaneRideObject *input) {
+void PlaneRideUnload(struct Element *input) {
     PlaneRide = input->ride;
     if (ZoomerSprite) {
         KillSprite(ZoomerSprite);
@@ -268,7 +263,7 @@ void PlaneRideSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043df90
-void PlaneRideRemoveObject(struct PlaneRideObject *a1, TileId a2, struct PlaneRideObject *a3) {
+void PlaneRideRemoveObject(struct Element *a1, TileId a2, struct Cursor *a3) {
     struct PlaneRideNode *temp = FindPlaneRideNode(&a2);
     if (temp != 0) {
         RemovePlaneRideNode(temp);
@@ -352,18 +347,12 @@ struct ZoomerData {
     struct ZoomerTypeC *field_54;
 };
 
-struct ZoomerCar {
-    unsigned char pad_0[0x2c];
-    void *field_2c;
-    unsigned int field_30;
-};
-
 // FUNCTION: LEGOLAND 0x0043e110
 LEGO_EXPORT int LoadZoomer(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct PlaneRideNode *prev = NULL;
     struct RideNode *list;
-    struct ZoomerCar *car;
+    struct Person *car;
     struct ZoomerData *data;
     struct ZoomerTypeC *tc;
     unsigned int marker;
@@ -397,9 +386,9 @@ LEGO_EXPORT int LoadZoomer(struct Element *arg) {
         car = list->person;
         if (car->field_30 != 0) {
             /* [port] the original reads (&Zoomer0nBinV)[field_30]; field_30 is 1 here, the global after it */
-            car->field_2c = car->field_30 == 1 ? (void *)DAT_0062fe98 : (&Zoomer0nBinV)[car->field_30];
+            car->sprite = car->field_30 == 1 ? (void *)DAT_0062fe98 : (&Zoomer0nBinV)[car->field_30];
         } else {
-            car->field_2c = NULL;
+            car->sprite = NULL;
             list->person->field_30 = 0;
         }
         data = list->rider;

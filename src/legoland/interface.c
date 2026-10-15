@@ -577,7 +577,7 @@ unsigned char FUN_00474fc0(void *a, unsigned int flags) {
     }
     if (flags & 2) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        SetEditObject(*(struct EditObject **)((char *)a + 8));
+        SetEditObject(*(struct Ride **)((char *)a + 8));
     }
     return 1;
 }

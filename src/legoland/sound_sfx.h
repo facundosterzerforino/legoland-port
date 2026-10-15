@@ -7,18 +7,6 @@
 
 struct SampleBuffer;
 
-struct SampleDef {
-    /* 0x00 */ unsigned char pad_0[4];
-    /* 0x04 */ int refcount;
-    /* 0x08 */ unsigned char pad_8[0x10 - 0x8];
-    /* 0x10 */ void *name;
-    /* 0x14 */ unsigned char pad_14[0x28 - 0x14];
-    /* 0x28 */ struct SampleDef *parent;
-    /* 0x2c */ struct SampleBuffer *buffer;
-    /* 0x30 */ void *block_30;
-    /* 0x34 */ void *block_34;
-};
-
 /* Sound-buffer object behind a playable sample. sound_sfx.c drives playback
  * through method_0x20..0x48; sound_music.c reuses the same vtable slot at 0x3c
  * (Apply) to push the sample's source config. One object, one vtable. */
@@ -51,17 +39,26 @@ struct Sample {
     int refcount;
     unsigned int fade;
     unsigned int source_type;
-    void *bloke;
+    union {
+        void *bloke;
+        char *name; /* a sample definition (CreateSampleFromWAV): its file name */
+    };
     unsigned int source_x;
     unsigned int source_y;
     unsigned short flags;
     unsigned char pad_1e[0x20 - 0x1e];
     unsigned int timeout; /* AddSFX_Callback */
     unsigned int (*callback)(struct Sample *self);
-    struct SampleDef *active;
+    struct Sample *active;
     struct SampleBuffer *buffer;
-    unsigned int field_30;
-    unsigned int field_34;
+    union {
+        unsigned int field_30;
+        void *format; /* a sample definition: its WAVEFORMATEX */
+    };
+    union {
+        unsigned int field_34;
+        void *data; /* a sample definition: its PCM data */
+    };
 };
 
 /* DirectMusic (DirectX 6) objects used by the interactive music thread (IMT, MusicThreadProc).
@@ -209,20 +206,20 @@ struct DirectMusicComposer {
 };
 
 void *ConvertWaveToPcm16(void *data, WAVEFORMATEX *has, unsigned int *size);
-LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path);
-LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def);
+LEGO_EXPORT struct Sample *CreateSampleFromWAV(const char *path);
+LEGO_EXPORT struct Sample *CreatePlayableSample(struct Sample *def);
 LEGO_EXPORT int PlaySample(struct Sample *sample, unsigned int looping, unsigned int oneshot);
 LEGO_EXPORT int PauseSingleSample(struct Sample *sample);
 void PauseAllSamples(void);
 void ResumeAllSamples(void);
-LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1);
+LEGO_EXPORT void DeletePlayableSamples(struct Sample *param_1);
 LEGO_EXPORT int UpdateSoundVols(void);
 LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample);
 void FUN_00492980(void);
 void FUN_00492990(void);
 LEGO_EXPORT int SetSampleFade(struct Sample *sample, unsigned int fade);
 LEGO_EXPORT void KillPlayableSample(struct Sample *sample);
-LEGO_EXPORT void DeleteSampleDef(struct SampleDef *def);
+LEGO_EXPORT void DeleteSampleDef(struct Sample *def);
 LEGO_EXPORT int KillSoundSampleSystem(void);
 void FreeSample(struct Sample *sample);
 void SetInteractiveMusicTheme(int param_1);

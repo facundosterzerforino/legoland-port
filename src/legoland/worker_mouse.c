@@ -13,21 +13,6 @@
 #include "tilemap.h"
 #include "worker.h"
 
-struct WorkerInner {
-    unsigned char pad_0[0x1c];
-    struct Point pos;
-};
-
-struct WorkerOuter {
-    unsigned char pad_0[4];
-    struct WorkerInner *inner;
-    unsigned char pad_8[6];
-    unsigned short var_e;
-    unsigned char pad_10[0x58];
-    unsigned int var_68;
-    unsigned int var_6c;
-};
-
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004700c0
@@ -76,26 +61,26 @@ void PickUpWorker(unsigned int type, Bloke *worker) {
 
 // FUNCTION: LEGOLAND 0x004701f0
 LEGO_EXPORT void SetWorkersPositionAtMouse(void) {
-    struct WorkerOuter *worker;
-    struct WorkerInner *inner;
+    struct Bloke *worker;
+    struct Person *inner;
     unsigned int pt[2];
 
     worker = WorkerOnMouse;
-    worker->var_e = 13;
+    worker->low_level_action = 13;
     worker = WorkerOnMouse;
-    inner = worker->inner;
-    inner->pos.x = MousePos.x;
+    inner = worker->person;
+    inner->screen.x = MousePos.x;
     worker = WorkerOnMouse;
-    inner = worker->inner;
-    inner->pos.y = MousePos.y;
+    inner = worker->person;
+    inner->screen.y = MousePos.y;
     worker = WorkerOnMouse;
-    inner = worker->inner;
-    AdjustBlokePosition(&inner->pos);
+    inner = worker->person;
+    AdjustBlokePosition(&inner->screen);
     ScreenToMapRef(&MousePos, pt, 0);
     worker = WorkerOnMouse;
-    worker->var_68 = pt[0] << 8;
+    worker->pos.x = pt[0] << 8;
     worker = WorkerOnMouse;
-    worker->var_6c = pt[1] << 8;
+    worker->pos.y = pt[1] << 8;
 }
 
 // FUNCTION: LEGOLAND 0x00470270

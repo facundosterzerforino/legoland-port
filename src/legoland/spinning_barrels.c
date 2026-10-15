@@ -324,18 +324,12 @@ struct BarrelData {
     struct BarrelTypeC *field_54;
 };
 
-struct BarrelCar {
-    unsigned char pad_0[0x2c];
-    void *field_2c;
-    unsigned int field_30;
-};
-
 // FUNCTION: LEGOLAND 0x0043c690
 LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct BarrelNode *prev = NULL;
     struct RideNode *list;
-    struct BarrelCar *car;
+    struct Person *car;
     struct BarrelData *data;
     struct BarrelTypeC *tc;
     unsigned int marker;
@@ -364,9 +358,9 @@ LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
     while (list != NULL) {
         car = list->person;
         if (car->field_30 != 0) {
-            car->field_2c = DAT_0062fe00[car->field_30];
+            car->sprite = DAT_0062fe00[car->field_30];
         } else {
-            car->field_2c = NULL;
+            car->sprite = NULL;
             list->person->field_30 = 0;
         }
         data = list->rider;

@@ -5,7 +5,7 @@
 struct ObjCountWrap;
 struct ObjectCount;
 struct ObjInstance;
-struct EditObject;
+struct Ride;
 struct BestNode;
 struct Point;
 struct Bloke;
@@ -34,20 +34,15 @@ struct LibraryNode {
 
 LEGO_EXPORT void IncrementObjectCount(struct ObjectCount *count);
 LEGO_EXPORT void DecrementObjectCount(struct ObjectCount *count);
-struct Ride;
 LEGO_EXPORT unsigned int GetObjSalvageValue(struct Ride *ride, unsigned int level);
 LEGO_EXPORT struct ObjInstance *CreateObjectInstance(struct Ride *param_1, unsigned short *param_2);
 LEGO_EXPORT int GetObjCost(struct Ride *ride);
 LEGO_EXPORT int GetObjRepairCost(struct Ride *ride, unsigned int level);
-struct Point;
 LEGO_EXPORT void BasicObjectDCalcCursor(struct Element *param_1, struct Point *param_2);
 LEGO_EXPORT void ClearObjectCounters(void);
 LEGO_EXPORT unsigned int ObjCount(struct ObjCountWrap *wrap);
 LEGO_EXPORT void FreeBlokeCounters(void);
 LEGO_EXPORT void ClearBlokeCounters(unsigned int index);
-struct Ride;
-struct Bloke;
-struct Point;
 LEGO_EXPORT void IncrementBlokeCounter(struct Ride *cls, unsigned int index);
 LEGO_EXPORT int GetBlokeCounter(struct Ride *cls, int index);
 LEGO_EXPORT void BuildObjInfoList(void);
@@ -63,7 +58,7 @@ LEGO_EXPORT int LoadObjectLibrary(void *obj, const char *name);
 void FUN_00480aa0(struct ObjClassNames *names, struct ObjectInfo *info);
 void FUN_00481170(void);
 void *GetBestNodeList(void);
-LEGO_EXPORT void SetEditObject(struct EditObject *obj);
+LEGO_EXPORT void SetEditObject(struct Ride *obj);
 struct BestNode *AddBestNode(void);
 struct BestBox {
     int x_min;

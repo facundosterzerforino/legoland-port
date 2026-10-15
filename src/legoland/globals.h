@@ -35,12 +35,11 @@ struct CtrlBuffer;
 struct Sprite;
 struct NerpsListNode;
 struct ObjectiveEvent;
-struct SampleDef;
 /* One entry of the game's sound-effect list (GameFX), loaded by Load_FXList. */
 struct FXItem {
     /* 0x00 */ char *name; /* file name under .\sfx\ */
     /* 0x04 */ unsigned char pad_4[0x8 - 0x4];
-    /* 0x08 */ struct SampleDef *sample;
+    /* 0x08 */ struct Sample *sample;
 };
 /* Indices into GameFX, named after the .wav each entry loads. */
 enum GameFXIndex {

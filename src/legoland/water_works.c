@@ -19,13 +19,6 @@
 #include "tilemap.h"
 #include "water_works.h"
 
-struct WaterPoint {
-    struct WaterPoint *next;
-    unsigned char pad_4[0x68 - 0x4];
-    int x;
-    int y;
-};
-
 struct WaterRect {
     int x0;
     int y0;
@@ -136,7 +129,7 @@ unsigned int WaterWorksEntranceLoad(struct Element *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417c20
-void WaterWorksEntranceAddObject(struct EditObject *editObj, int *coords) {
+void WaterWorksEntranceAddObject(struct Ride *editObj, int *coords) {
     struct SampleSource params;
 
     AddBasicObject(editObj, coords);
@@ -227,13 +220,13 @@ void WaterBlockUnload(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00417e70
-int ListHasPointInRect(struct WaterPoint *list, struct WaterRect *rect) {
-    struct WaterPoint *current;
+int ListHasPointInRect(struct Bloke *list, struct WaterRect *rect) {
+    struct Bloke *current;
 
     current = list;
     while (current != NULL) {
-        if ((current->x >> 8) >= rect->x0 && (current->x >> 8) <= rect->x1) {
-            if ((current->y >> 8) >= rect->y0 && (current->y >> 8) <= rect->y1) {
+        if ((current->pos.x >> 8) >= rect->x0 && (current->pos.x >> 8) <= rect->x1) {
+            if ((current->pos.y >> 8) >= rect->y0 && (current->pos.y >> 8) <= rect->y1) {
                 return 1;
             }
         }
@@ -394,7 +387,7 @@ void RenderWaterBlock(struct Element *arg, int a, int b, unsigned short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004181e0
-void WaterBlockAddObject(struct EditObject *editObj, unsigned char *coords) {
+void WaterBlockAddObject(struct Ride *editObj, unsigned char *coords) {
     unsigned short key;
     struct WaterNode *node;
 
@@ -536,7 +529,7 @@ void RenderShower(struct Element *render, unsigned int p2, unsigned int p3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x004184e0
-void ShowerAddObject(struct EditObject *editObj, unsigned char *coords) {
+void ShowerAddObject(struct Ride *editObj, unsigned char *coords) {
     unsigned short key;
 
     *(unsigned char *)&key = coords[0];
@@ -708,7 +701,7 @@ void WaterWorksElephantFountainUpdate(void) {
 void RenderWaterWorksElephantFountain(void) {}
 
 // FUNCTION: LEGOLAND 0x004188d0
-void ElephantFountainAddObject(struct EditObject *editObj, unsigned char *coords) {
+void ElephantFountainAddObject(struct Ride *editObj, unsigned char *coords) {
     unsigned short key;
 
     *(unsigned char *)&key = coords[0];
@@ -747,7 +740,7 @@ void WaterWorksElephantFountainCalcCursor(struct Element *arg, int *a, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x004189c0
-void CrocodileFountainAddObject(struct EditObject *editObj, int *coords) {
+void CrocodileFountainAddObject(struct Ride *editObj, int *coords) {
     struct SampleSource params;
 
     AddBasicObject(editObj, coords);

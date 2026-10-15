@@ -5,7 +5,6 @@
 #include "obj_instance.h"
 
 /* [port] file-scope forward declarations (structs first named in a prototype) */
-struct EditObject;
 
 struct Cursor;
 
@@ -87,8 +86,8 @@ void BoatingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *cursor)
 void LoadBoatingSchoolResources(Element *obj);
 void UnloadBoatingSchoolResources();
 void FUN_0041a000();
-struct EditObject;
-void BoatingSchoolAddObject(struct EditObject *obj, int *coords);
+struct Ride;
+void BoatingSchoolAddObject(struct Ride *obj, int *coords);
 void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3);
 void BoatingSchoolUpdate();
 void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip);
@@ -97,7 +96,7 @@ int BoatingSchool_Load(struct Element *element);
 int FUN_0041b100(struct Element *dummy, int arg);
 void InitBoatingSchoolMermaid(Element *param_1);
 void BoatingSchoolMermaidSetEditMode();
-void BoatingSchoolMermaidAddObject(struct EditObject *obj, int *coords);
+void BoatingSchoolMermaidAddObject(struct Ride *obj, int *coords);
 void BoatingSchoolMermaidCalcCursor(Element *obj, int *param_2, unsigned int param_3);
 struct Element;
 unsigned int BoatingSchoolMermaidDCalcCursor(struct Element *param_1, struct Point *param_2);

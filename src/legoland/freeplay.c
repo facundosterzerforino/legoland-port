@@ -60,12 +60,6 @@ struct GameListNode {
 };
 
 // LLIDB element fields read by InitFreePlayScreen (real Element is opaque).
-struct FreePlayElement {
-    unsigned char pad_0[8];
-    unsigned int flags;
-    unsigned char pad_c[4];
-    unsigned int counter;
-};
 
 #include "image_sprite.h"
 
@@ -73,7 +67,7 @@ struct FreePlayElement {
 LEGO_EXPORT void InitFreePlayScreen(void) {
     struct IconNode *icon;
     struct IconNode *bar;
-    struct FreePlayElement *elem;
+    struct Element *elem;
     struct Element *path_idx;
     unsigned int count;
     unsigned int i;
@@ -138,9 +132,9 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
         if ((elem->flags & 0x10) == 0) continue;
         if ((elem->flags & 0x1) == 0) continue;
         if (path_idx == elem) continue;
-        if (elem->counter == 0) continue;
-        elem->counter--;
-        if (elem->counter != 0) continue;
+        if (elem->field_10 == 0) continue;
+        elem->field_10--;
+        if (elem->field_10 != 0) continue;
         if ((elem->flags & 0x1) == 0) continue;
         elem->flags &= 0xfffcfff0;
         if ((elem->flags & 0xfff0) == 0x10 || (elem->flags & 0xfff0) == 0x1010) {

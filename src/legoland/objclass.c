@@ -50,11 +50,6 @@ struct ObjCountWrap {
     struct ObjectCount *inner;
 };
 
-struct EditObject {
-    unsigned char pad_0[0x1c];
-    unsigned int flags;
-};
-
 struct ClassRideNode {
     struct ClassRideNode *next;
     void *ride;
@@ -782,7 +777,7 @@ LEGO_EXPORT struct ObjInstance *CreateObjectInstance(struct Ride *param_1, unsig
 }
 
 // FUNCTION: LEGOLAND 0x004816e0
-LEGO_EXPORT void SetEditObject(struct EditObject *obj) {
+LEGO_EXPORT void SetEditObject(struct Ride *obj) {
     EditMode.unk0 = 1;
     EditMode.unk8 = obj;
     if (obj == 0) {

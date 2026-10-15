@@ -17,7 +17,7 @@ struct PathCursor {
 };
 
 // FUNCTION: LEGOLAND 0x0045dbe0
-LEGO_EXPORT void AddBasicPath(struct EditObject *editObj, int *coords) {
+LEGO_EXPORT void AddBasicPath(struct Ride *editObj, int *coords) {
     struct MapElement *cell;
 
     if (coords[0] < 0 || coords[0] >= (int)lpConfig->width)

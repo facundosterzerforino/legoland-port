@@ -498,7 +498,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
         if (!(tile->flags & 0x10)) {
             if ((tile->field_10 & 3) != 3) {
                 FUN_004779d0(pp);
-                AddBasicPath((struct EditObject *)id, (int *)pp);
+                AddBasicPath((struct Ride *)id, (int *)pp);
             }
         }
         nb = nb->parent;

@@ -16,7 +16,7 @@ struct JailCell {
 };
 
 struct MapObject;
-struct EditObject;
+struct Ride;
 struct Cursor;
 
 /* Callback-table entry points for the western-town shops (General Store,
@@ -32,7 +32,7 @@ void KillSherifshutMatteSpriteAndMoneySFX(void);
 void SheriffSetEditMode(void);
 void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6);
 void SheriffUpdate(struct MapObject *param_1);
-void JailCellAddObject(struct EditObject *editObj, int *coords);
+void JailCellAddObject(struct Ride *editObj, int *coords);
 void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Cursor *cursor);
 void JailCellLoad(struct MapObject *obj);
 void JailCellUnload(void);

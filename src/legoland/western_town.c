@@ -432,7 +432,7 @@ void FUN_00437f10(unsigned short *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00437f60
-void JailCellAddObject(struct EditObject *editObj, int *coords) {
+void JailCellAddObject(struct Ride *editObj, int *coords) {
     unsigned char key[2];
     key[0] = (unsigned char)coords[0];
     key[1] = (unsigned char)coords[1];

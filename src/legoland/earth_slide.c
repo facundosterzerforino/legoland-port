@@ -188,7 +188,7 @@ void RenderEarthSlide(struct EarthRideObj *param_1, unsigned int param_2, unsign
     if (node != NULL) {
         cv = node->field_b;
         if (cv <= 0xa || 0xf <= cv) {
-            RenderUsingRin((struct RinRender *)EarthSlideRin, (int)cv, (struct ViewportEntry *)ride, param_4);
+            RenderUsingRin((struct RinRender *)EarthSlideRin, (int)cv, (struct Ride *)ride, param_4);
         }
         RenderBlokesNotInSeats(ride, (TileId *)param_4);
         if (node->field_4 != 0) {
@@ -401,7 +401,7 @@ void FUN_0042d560(unsigned short *param_1) {
                 return;
             }
         }
-        Put3DBlokesOnRide((struct ViewportEntry *)EarthSlideRide, (unsigned char *)param_1, (int)*(char *)((char *)param_1 + 0xb), EarthPos);
+        Put3DBlokesOnRide((struct Ride *)EarthSlideRide, (unsigned char *)param_1, (int)*(char *)((char *)param_1 + 0xb), EarthPos);
     }
     Put3DBlokesOnRide2((Element *)EarthSlideRide, (Element *)param_1);
 }
@@ -522,7 +522,7 @@ void EarthSlideRideUpdate(Element *obj) {
                 }
                 bloke->field_58 = 8;
                 bloke->param_action++;
-                Put3DBlokesOnRide((struct ViewportEntry *)EarthSlideRide, (unsigned char *)node, (char)node->field_b, EarthPos);
+                Put3DBlokesOnRide((struct Ride *)EarthSlideRide, (unsigned char *)node, (char)node->field_b, EarthPos);
                 break;
             case 8:
                 /* get off at the bottom */

@@ -508,7 +508,7 @@ void SpaceTowerSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043b460
-void SpaceTowerRemoveObject(struct EditObject *param_1, TileId tile, struct Cursor *param_3) {
+void SpaceTowerRemoveObject(struct Ride *param_1, TileId tile, struct Cursor *param_3) {
     struct SpaceTowerCar *node;
 
     node = FindSpaceTowerCar(&tile.id);
@@ -521,7 +521,7 @@ void SpaceTowerRemoveObject(struct EditObject *param_1, TileId tile, struct Curs
 }
 
 // FUNCTION: LEGOLAND 0x0043b4b0
-void SpaceTowerAddObject(struct EditObject *param_1, int *coords) {
+void SpaceTowerAddObject(struct Ride *param_1, int *coords) {
     TileId id;
 
     id.pos.x = (unsigned char)coords[0];

@@ -41,15 +41,8 @@ struct RideNode *FUN_00441830(void *param_1, short *param_2) {
     return NULL;
 }
 
-struct ViewportEntry {
-    unsigned char pad_0[0x2e];
-    short seats;
-    unsigned char pad_30[0xcc - 0x30];
-    void *riders;
-};
-
 // FUNCTION: LEGOLAND 0x00441870
-struct RideNode *FUN_00441870(struct ViewportEntry *param_1, short *param_2) {
+struct RideNode *FUN_00441870(struct Ride *param_1, short *param_2) {
     DAT_0081c8cc = param_1->riders;
     return FUN_00441830(param_1, param_2);
 }
@@ -65,7 +58,7 @@ struct RideNode *FUN_00441890(void *param_1, short *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x004418c0
-struct RideNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, short *param_3) {
+struct RideNode *FUN_004418c0(int param_1, struct Ride *param_2, short *param_3) {
     struct RideNode *node = FUN_00441870(param_2, param_3);
     int i = 0;
     if (node != NULL) {
@@ -125,7 +118,7 @@ void Put3DBlokeOnRide(struct Position *param_1, int param_2, int param_3, struct
 }
 
 // FUNCTION: LEGOLAND 0x00441a60
-LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char *param_2, int param_3, struct Position *param_4) {
+LEGO_EXPORT void Put3DBlokesOnRide(struct Ride *param_1, unsigned char *param_2, int param_3, struct Position *param_4) {
     struct Point coords;
     int i;
 
@@ -144,7 +137,7 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char 
 
 // FUNCTION: LEGOLAND 0x00441ad0
 LEGO_EXPORT void Put3DBlokesOnRide2(Element *ride, Element *obj) {
-    struct RideNode *node = (struct RideNode *)FUN_00441870((struct ViewportEntry *)ride, (short *)obj);
+    struct RideNode *node = (struct RideNode *)FUN_00441870((struct Ride *)ride, (short *)obj);
     if (node != NULL) {
         while ((node->rider->flags & 0x80) != 0) {
             node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
@@ -299,7 +292,7 @@ struct RinRender {
 };
 
 // FUNCTION: LEGOLAND 0x00441d60
-LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct ViewportEntry *param_3, unsigned char *param_4) {
+LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct Ride *param_3, unsigned char *param_4) {
     struct Point coords;
     int idx;
     void *base;

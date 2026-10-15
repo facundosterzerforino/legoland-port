@@ -94,7 +94,7 @@ struct WaveBufferDesc {
 };
 
 // FUNCTION: LEGOLAND 0x00492380
-LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
+LEGO_EXPORT struct Sample *CreateSampleFromWAV(const char *path) {
     LPDIRECTSOUNDBUFFER buffer = NULL;
     struct ResFile *file;
     unsigned int chunk;
@@ -105,7 +105,7 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
     void *locked;
     DWORD lockedSize;
     struct WaveBufferDesc desc;
-    struct SampleDef *sample;
+    struct Sample *sample;
 
     if (SoundAvailable == 0) {
         return NULL;
@@ -159,13 +159,13 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
                                     if (buffer->lpVtbl->Lock(buffer, 0, 0, &locked, &lockedSize, NULL, NULL, 2) == 0) {
                                         memcpy(locked, converted, lockedSize);
                                         buffer->lpVtbl->Unlock(buffer, locked, lockedSize, NULL, 0);
-                                        sample = (struct SampleDef *)FUN_004920e0();
+                                        sample = (struct Sample *)FUN_004920e0();
                                         if (sample != NULL) {
                                             sample->refcount++;
-                                            sample->parent = NULL;
+                                            sample->active = NULL;
                                             sample->buffer = (struct SampleBuffer *)buffer;
-                                            sample->block_30 = format;
-                                            sample->block_34 = converted;
+                                            sample->format = format;
+                                            sample->data = converted;
                                             RES_CloseFile(file);
                                             return sample;
                                         }
@@ -196,8 +196,8 @@ LEGO_EXPORT struct SampleDef *CreateSampleFromWAV(const char *path) {
 }
 
 // FUNCTION: LEGOLAND 0x00492690
-LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def) {
-    struct SampleDef *src = def;
+LEGO_EXPORT struct Sample *CreatePlayableSample(struct Sample *def) {
+    struct Sample *src = def;
     struct Sample *sample;
 
     if (SoundAvailable == 0) {
@@ -206,8 +206,8 @@ LEGO_EXPORT struct Sample *CreatePlayableSample(struct SampleDef *def) {
     if (src == 0) {
         return 0;
     }
-    while (src->parent != 0) {
-        src = src->parent;
+    while (src->active != 0) {
+        src = src->active;
     }
     for (;;) {
         if (((LPDIRECTSOUND)DSound)
@@ -513,7 +513,7 @@ LEGO_EXPORT void KillPlayableSample(struct Sample *sample) {
 }
 
 // FUNCTION: LEGOLAND 0x00492b90
-LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1) {
+LEGO_EXPORT void DeletePlayableSamples(struct Sample *param_1) {
     struct Sample *current;
     struct Sample *previous;
     struct Sample *next;
@@ -541,13 +541,13 @@ LEGO_EXPORT void DeletePlayableSamples(struct SampleDef *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00492be0
-LEGO_EXPORT void DeleteSampleDef(struct SampleDef *def) {
+LEGO_EXPORT void DeleteSampleDef(struct Sample *def) {
     if (def == 0) {
         return;
     }
     DeletePlayableSamples(def);
-    free(def->block_30);
-    free(def->block_34);
+    free(def->format);
+    free(def->data);
     ((struct SampleDefVtbl *)def->buffer->vtable)->func_8(def->buffer);
     free(def);
 }

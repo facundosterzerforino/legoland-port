@@ -547,18 +547,12 @@ struct SafariData {
     struct SafariTypeC *bnv;
 };
 
-struct SafariCar {
-    unsigned char pad_0[0x2c];
-    void *sprite;
-    unsigned int field_30;
-};
-
 // FUNCTION: LEGOLAND 0x00415820
 LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct SafariNode *prev = NULL;
     struct RideNode *list;
-    struct SafariCar *car;
+    struct Person *car;
     struct SafariData *data;
     struct SafariTypeC *tc;
     unsigned int marker;

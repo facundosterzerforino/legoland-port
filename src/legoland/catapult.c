@@ -387,7 +387,7 @@ void CatapultSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00403970
-void CatapultAddObject(struct EditObject *edit2, struct CatapultEdit *edit) {
+void CatapultAddObject(struct Ride *edit2, struct CatapultEdit *edit) {
     struct CatapultKey key;
 
     key.field_0 = edit->field_0;
