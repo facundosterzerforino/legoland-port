@@ -6,11 +6,6 @@ bricks.c struct Element struct Bloke
 bricks.c struct WorkOrder struct Bloke
 carousel.c struct Bloke struct Element
 popupinfo.c struct Element struct Bloke
-# Put3DBlokesOnRide2's second argument is only read as the tile key it starts with.
-copters.c struct Element struct CopterNode
-safari_ride.c struct Element struct SafariNode
-safari_ride.c struct Element struct Ride
-earth_slide.c struct Element struct Ride
 # Sprite.image holds an image list (SpriteSet) for .ilf sprites: the pointer is stored and read back as such.
 image_sprite.c struct Image struct SpriteSet
 image_sprite.c struct SpriteSet struct Image

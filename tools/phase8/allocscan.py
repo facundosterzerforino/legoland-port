@@ -91,7 +91,9 @@ def scan(path, target):
             idx = ALLOC[c.spelling]
             cand = []
             if idx is None:
-                cand = args[:2]
+                # calloc(count, size) in either order: a literal next to a non-literal (sizeof(T), n) is the count
+                cand = [x for x, y in ((args[0], args[1]), (args[1], args[0])) if lit(y) is not None or lit(x) is None] \
+                    if len(args) == 2 else args[:2]
             elif idx < len(args):
                 cand = [args[idx]]
             for a in cand:
