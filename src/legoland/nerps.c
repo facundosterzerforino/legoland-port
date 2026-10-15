@@ -2201,7 +2201,7 @@ unsigned int SaveGameWriteString(char *str) {
 // FUNCTION: LEGOLAND 0x0046c680
 void *FUN_0046c680(void) {
     int len;
-    void *buffer;
+    char *buffer; /* a string: len bytes, then the 0 added here */
 
     if (SaveGameRead(&len, 4) == 0) {
         ScriptLoadErrorCount++;
@@ -2216,7 +2216,7 @@ void *FUN_0046c680(void) {
         ScriptLoadErrorCount++;
         return NULL;
     }
-    ((char *)buffer)[len] = 0;
+    buffer[len] = 0;
     return buffer;
 }
 
