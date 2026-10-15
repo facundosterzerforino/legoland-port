@@ -7,11 +7,11 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.expanduser('~/wt/port/tools'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import clang.cindex as ci  # noqa: E402
 import port_layout as pl  # noqa: E402
 
-D = Path(os.path.expanduser('~/wt/port/src/legoland'))
+D = Path(__file__).resolve().parents[2] / 'src/legoland'
 ALL = '-a' in sys.argv
 files = [a for a in sys.argv[1:] if a.endswith('.c')] or sorted(p.name for p in D.glob('*.c')
                                                                  if p.name not in ('crt.c', 'imports.c', 'bootstrap.c'))

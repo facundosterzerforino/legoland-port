@@ -7,11 +7,11 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.expanduser('~/wt/port/tools'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import clang.cindex as ci  # noqa: E402
 import port_layout as pl  # noqa: E402
 
-D = Path(os.path.expanduser('~/wt/port/src/legoland'))
+D = Path(__file__).resolve().parents[2] / 'src/legoland'
 files = [a for a in sys.argv[1:] if a.endswith('.c')] or sorted(p.name for p in D.glob('*.c'))
 
 
@@ -70,7 +70,15 @@ def scan(path, target):
     return out
 
 
+OK = set()
+for line in open(Path(__file__).resolve().parent / 'castscan_ok.txt'):
+    line = line.strip()
+    if line and not line.startswith('#'):
+        f_, rest = line.split(' ', 1)
+        a_, b_ = rest.split(' struct ', 1) if rest.count('struct ') == 2 else (rest, '')
+        OK.add((f_, a_.strip(), 'struct ' + b_.strip()))
 total = 0
+reviewed = 0
 for f in files:
     p = D / f
     a32 = scan(p, 'i686-pc-windows-msvc')
@@ -91,8 +99,11 @@ for f in files:
             if ob64 != oa64:
                 bad = (pa, oa, oa64, lb32[match[0]][2], ob64)
                 break
+        if bad and (f, key[0], key[1]) in OK:
+            reviewed += 1
+            continue
         if bad:
             total += 1
             print('%s:%d (%s *) from %s *: %s at 0x%x, x64 0x%x; %s there is at x64 0x%x' % (
                 f, line, key[0], key[1], bad[0], bad[1], bad[2], bad[3], bad[4]))
-print(total, 'hazards')
+print(total, 'hazards,', reviewed, 'reviewed (castscan_ok.txt)')

@@ -6,11 +6,11 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.expanduser('~/wt/port/tools'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import clang.cindex as ci  # noqa: E402
 import port_layout as pl  # noqa: E402
 
-ROOT = Path(os.path.expanduser('~/wt/port'))
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'src/legoland'
 ALLOC = {'malloc': 0, 'calloc': None, 'realloc': 1, 'FUN_004775b0': 0}
 

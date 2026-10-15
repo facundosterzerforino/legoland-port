@@ -83,6 +83,8 @@ pointers (left unpatched) and pointer slots outside the filled globals.
 `uv run --no-project --with libclang==18.1.1 python tools/phase8/<scan>.py`):
 - `allocscan.py`: allocations sized with a literal (or `n * literal`) smaller than the type on 64 bits.
 - `offscan.py`: `(T *)p + k` / `((T *)p)[k]` into a struct whose field at x86 offset k moves on 64 bits.
-- `castscan.py`: casts between struct pointer types whose fields only line up on 32 bits (views). Some hits are
-  generic pointers (Hover.ptr declared as a Bloke and holding an Element): those casts are fine.
+- `castscan.py`: casts between struct pointer types whose fields only line up on 32 bits (views). The reviewed
+  false positives (generic pointers like Hover.ptr, a tile key read through a node) are in castscan_ok.txt.
+- `voidscan.py`: the same for views reached through void * (struct fields, globals, parameters): what is stored
+  in each slot against how it is cast back.
 - `tools/audit_save.py` (ptest runs it): saved-game calls the save layer (port/port_save.c) can't convert.
