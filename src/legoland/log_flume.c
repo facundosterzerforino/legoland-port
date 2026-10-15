@@ -1348,6 +1348,27 @@ void FUN_0040a580(struct FlumeEntry *param) {
     node = param->field_8;
     i = 0;
     if ((int)param->count > 0) {
+#ifdef LEGOLAND_PORT
+        /* [port] the original writes each particle through a view of the slots shifted 0xc bytes (x86 layout):
+           the same fields of each slot */
+        struct FlumeSlot *slot = param->slots;
+
+        (void)p;
+        do {
+            slot->element = node;
+            d = FUN_004112c0();
+            slot->x = d.field1;
+            slot->y = d.field2;
+            slot->field_1c = 0;
+            slot->weight = 1.0f;
+            slot->field_20 = 0.1f;
+            slot->timer = 0;
+            slot->flags = 0;
+            node = node->ride;
+            i++;
+            slot++;
+        } while (i < (int)param->count);
+#else
         /* the particles overlay the slots, 0xc bytes in (x86 layout) */
         p = (struct Particle *)((unsigned char *)param->slots + 0xc);
         do {
@@ -1364,6 +1385,7 @@ void FUN_0040a580(struct FlumeEntry *param) {
             i++;
             p++;
         } while (i < (int)param->count);
+#endif
     }
 }
 
