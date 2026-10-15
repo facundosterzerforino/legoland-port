@@ -87,4 +87,5 @@ pointers (left unpatched) and pointer slots outside the filled globals.
   false positives (generic pointers like Hover.ptr, a tile key read through a node) are in castscan_ok.txt.
 - `voidscan.py`: the same for views reached through void * (struct fields, globals, parameters): what is stored
   in each slot against how it is cast back.
+- `memscan.py`: memcpy/memset/memmove/memcmp with a literal size that is the x86 size of the struct they copy.
 - `tools/audit_save.py` (ptest runs it): saved-game calls the save layer (port/port_save.c) can't convert.
