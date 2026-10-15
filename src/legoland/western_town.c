@@ -16,41 +16,16 @@
 #include "render3d.h"
 #include "western_town.h"
 
-struct RideListElem {
-    struct RideListElem *next;
-    unsigned char pad_4[0x8 - 0x4];
-    struct Bloke *bloke;
-    union {
-        unsigned short id;
-        struct {
-            unsigned char x;
-            unsigned char y;
-        } pos;
-    };
-};
-
-struct Building {
-    unsigned char pad_0[0xc];
-    int x;
-    int y;
-    unsigned char pad_14[0x1c - 0x14];
-    unsigned int flags;
-    unsigned char pad_20[0x64 - 0x20];
-    void *layer;
-    unsigned char pad_68[0xcc - 0x68];
-    struct RideListElem *list;
-};
-
 struct MapObject {
     unsigned char pad_0[0xc];
-    struct Building *building;
+    struct Ride *building;
 };
 
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004375d0
 void LoadGStoreMatteSpritesAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+    struct Ride *building = obj->building;
     GeneralStoreBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74a4
@@ -160,9 +135,9 @@ void RenderGeneralStore(Element *obj, unsigned int param_2, unsigned int param_3
 
 // FUNCTION: LEGOLAND 0x004378e0
 void GeneralStoreUpdate(struct MapObject *param_1) {
-    struct Building *ride = param_1->building;
-    struct RideListElem *node = ride->list;
-    struct RideListElem *next;
+    struct Ride *ride = param_1->building;
+    struct RideNode *node = ride->riders;
+    struct RideNode *next;
     struct Bloke *bloke;
     unsigned char *pos;
     int x;
@@ -172,8 +147,8 @@ void GeneralStoreUpdate(struct MapObject *param_1) {
 
     while (node != NULL) {
         next = node->next;
-        bloke = node->bloke;
-        pos = (unsigned char *)&node->pos;
+        bloke = node->rider;
+        pos = (unsigned char *)&node->tile;
         x = pos[0] + ride->x;
         y = pos[1] + ride->y;
         if (bloke->low_level_action == 0) {
@@ -254,7 +229,7 @@ void GeneralStoreUpdate(struct MapObject *param_1) {
                 bloke->param_action++;
                 break;
             case 7:
-                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->pos, 1);
+                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
                 break;
             case 8:
                 bloke->dest.x = x * 0x100 + 0x80;
@@ -298,7 +273,7 @@ void GeneralStoreUpdate(struct MapObject *param_1) {
 
 // FUNCTION: LEGOLAND 0x00437ba0
 void LoadSherifshutMatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+    struct Ride *building = obj->building;
     SheriffBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74b8
@@ -322,14 +297,14 @@ void SheriffSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00437c30
 void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
-    struct Building *ride = param_1->building;
-    struct RideListElem *elem = ride->list;
+    struct Ride *ride = param_1->building;
+    struct RideNode *elem = ride->riders;
     int count = 0;
     struct Point coords;
     if (elem != NULL) {
         do {
-            if (*param_4 == elem->id) {
-                RenderBlokeIn3D(elem->bloke);
+            if (*param_4 == elem->tile.id) {
+                RenderBlokeIn3D(elem->rider);
                 count++;
             }
             elem = elem->next;
@@ -343,9 +318,9 @@ void RenderSheriff(struct MapObject *param_1, unsigned int param_2, unsigned int
 
 // FUNCTION: LEGOLAND 0x00437c90
 void SheriffUpdate(struct MapObject *param_1) {
-    struct Building *ride = param_1->building;
-    struct RideListElem *node = ride->list;
-    struct RideListElem *next;
+    struct Ride *ride = param_1->building;
+    struct RideNode *node = ride->riders;
+    struct RideNode *next;
     struct Bloke *bloke;
     unsigned char *pos;
     int x;
@@ -354,8 +329,8 @@ void SheriffUpdate(struct MapObject *param_1) {
 
     while (node != NULL) {
         next = node->next;
-        bloke = node->bloke;
-        pos = (unsigned char *)&node->pos;
+        bloke = node->rider;
+        pos = (unsigned char *)&node->tile;
         x = pos[0] + ride->x;
         y = pos[1] + ride->y;
         if (bloke->low_level_action == 0) {
@@ -397,7 +372,7 @@ void SheriffUpdate(struct MapObject *param_1) {
                 bloke->dir = 8;
                 break;
             case 3:
-                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->pos, 1);
+                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
                 break;
             case 4:
                 bloke->dest.x = (x - 3) * 0x100;
@@ -525,7 +500,7 @@ void JailCellRemoveObject(struct MapObject *editObj, TileId coords, struct Curso
 
 // FUNCTION: LEGOLAND 0x00438070
 void JailCellLoad(struct MapObject *obj) {
-    struct Building *building = obj->building;
+    struct Ride *building = obj->building;
     DAT_0081cb10 = building;
     building->flags |= 0x420;
     DAT_0062fd40 = DAT_0081cb10->layer;
@@ -826,7 +801,7 @@ LEGO_EXPORT int LoadJailCells(struct Element *element) {
 
 // FUNCTION: LEGOLAND 0x00438870
 void LoadBankMatteSpriteAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+    struct Ride *building = obj->building;
     BankBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b74e4
@@ -850,14 +825,14 @@ void BankSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00438900
 void RenderBank(struct MapObject *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6) {
-    struct Building *ride = param_1->building;
-    struct RideListElem *elem = ride->list;
+    struct Ride *ride = param_1->building;
+    struct RideNode *elem = ride->riders;
     int count = 0;
     struct Point coords;
     if (elem != NULL) {
         do {
-            if (*param_4 == elem->id) {
-                RenderBlokeIn3D(elem->bloke);
+            if (*param_4 == elem->tile.id) {
+                RenderBlokeIn3D(elem->rider);
                 count++;
             }
             elem = elem->next;
@@ -984,7 +959,7 @@ void BankUpdate(Element *obj) {
 
 // FUNCTION: LEGOLAND 0x00438c60
 void LoadSaloonMatteSpritesAndMoneySFX(struct MapObject *obj) {
-    struct Building *building = obj->building;
+    struct Ride *building = obj->building;
     SaloonBuilding = building;
     building->flags |= 0x420;
     // STRING: LEGOLAND 0x004b7508

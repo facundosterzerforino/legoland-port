@@ -97,7 +97,6 @@ struct IconNode;
 struct Point;
 struct DirNode;
 struct CursorSource;
-struct Building;
 struct JailCell;
 struct FXSpriteList;
 struct ResVolume;
@@ -3835,13 +3834,13 @@ extern struct Sprite *GStoreMatteSprite;
 // 0x0081cb0c
 extern struct Sprite *JailCellMaskSprite;
 // 0x0081cb10
-extern struct Building *DAT_0081cb10;
+extern struct Ride *DAT_0081cb10;
 // 0x0081cb14
-extern struct Building *SheriffBuilding;
+extern struct Ride *SheriffBuilding;
 // 0x0081cb18
 extern struct Sprite *LegoShop1MatteSprite;
 // 0x0081cb1c
-extern struct Building *SaloonBuilding;
+extern struct Ride *SaloonBuilding;
 // 0x0081cb20
 extern struct Sprite *LegoShop2MatteSprite;
 // 0x0081cb24
@@ -3849,23 +3848,23 @@ extern struct Sprite *GStoreMatte2Sprite;
 // 0x0081cb28
 extern struct Sprite *ExplorersInstituteMatteSprite;
 // 0x0081cb2c
-extern struct Building *BankBuilding;
+extern struct Ride *BankBuilding;
 // 0x0081cb30
-extern struct Building *GeneralStoreBuilding;
+extern struct Ride *GeneralStoreBuilding;
 // 0x0081cb34
 extern struct Sprite *BankMatteSprite;
 // 0x0081cb38
 extern struct Sprite *SherifshutMatteSprite;
 // 0x0081cb3c
-extern struct Building *LegoShop1Building;
+extern struct Ride *LegoShop1Building;
 // 0x0081cb40
-extern struct Building *LegoMediaShopBuilding;
+extern struct Ride *LegoMediaShopBuilding;
 // 0x0081cb44
-extern struct Building *ExplorersInstituteBuilding;
+extern struct Ride *ExplorersInstituteBuilding;
 // 0x0081cb48
 extern struct Sprite *LegMediaShopMask1Sprite;
 // 0x0081cb4c
-extern struct Building *LegoShop2Building;
+extern struct Ride *LegoShop2Building;
 // 0x0081cb50
 extern struct Sprite *LegMediaShopMask2Sprite;
 // 0x0081cb54

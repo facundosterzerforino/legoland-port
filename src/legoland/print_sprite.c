@@ -205,7 +205,7 @@ void FUN_004855d0(struct Sprite *sprite, int *out) {
     out[1] = 0x7fffffff;
     out[2] = -0x80000000;
     out[3] = -0x80000000;
-    group = (struct SpriteGroup *)sprite->image;
+    group = sprite->group;
     if (0 < group->count) {
         do {
             xoff = group->xoffs[i];
@@ -235,7 +235,7 @@ void FUN_004855d0(struct Sprite *sprite, int *out) {
             if (bottom > out[3]) {
                 out[3] = bottom;
             }
-            group = (struct SpriteGroup *)sprite->image;
+            group = sprite->group;
             i = i + 1;
         } while (i < group->count);
     }
@@ -276,7 +276,7 @@ LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
         return 0;
     }
     mask = arg->mask;
-    group = (struct SpriteGroup *)sprite->image;
+    group = sprite->group;
     if (group->count <= 0) {
         return result;
     }
@@ -313,7 +313,7 @@ LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
                 }
             }
         }
-        group = (struct SpriteGroup *)sprite->image;
+        group = sprite->group;
         i++;
         mask >>= 1;
     } while (i < group->count);

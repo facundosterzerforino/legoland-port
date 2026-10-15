@@ -4995,16 +4995,16 @@ struct Sprite *GStoreMatteSprite;
 struct Sprite *JailCellMaskSprite;
 
 // GLOBAL: LEGOLAND 0x0081cb10
-struct Building *DAT_0081cb10;
+struct Ride *DAT_0081cb10;
 
 // GLOBAL: LEGOLAND 0x0081cb14
-struct Building *SheriffBuilding;
+struct Ride *SheriffBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb18
 struct Sprite *LegoShop1MatteSprite;
 
 // GLOBAL: LEGOLAND 0x0081cb1c
-struct Building *SaloonBuilding;
+struct Ride *SaloonBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb20
 struct Sprite *LegoShop2MatteSprite;
@@ -5016,10 +5016,10 @@ struct Sprite *GStoreMatte2Sprite;
 struct Sprite *ExplorersInstituteMatteSprite;
 
 // GLOBAL: LEGOLAND 0x0081cb2c
-struct Building *BankBuilding;
+struct Ride *BankBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb30
-struct Building *GeneralStoreBuilding;
+struct Ride *GeneralStoreBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb34
 struct Sprite *BankMatteSprite;
@@ -5028,19 +5028,19 @@ struct Sprite *BankMatteSprite;
 struct Sprite *SherifshutMatteSprite;
 
 // GLOBAL: LEGOLAND 0x0081cb3c
-struct Building *LegoShop1Building;
+struct Ride *LegoShop1Building;
 
 // GLOBAL: LEGOLAND 0x0081cb40
-struct Building *LegoMediaShopBuilding;
+struct Ride *LegoMediaShopBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb44
-struct Building *ExplorersInstituteBuilding;
+struct Ride *ExplorersInstituteBuilding;
 
 // GLOBAL: LEGOLAND 0x0081cb48
 struct Sprite *LegMediaShopMask1Sprite;
 
 // GLOBAL: LEGOLAND 0x0081cb4c
-struct Building *LegoShop2Building;
+struct Ride *LegoShop2Building;
 
 // GLOBAL: LEGOLAND 0x0081cb50
 struct Sprite *LegMediaShopMask2Sprite;

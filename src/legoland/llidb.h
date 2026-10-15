@@ -63,14 +63,13 @@ typedef struct Element Element;
 #define LLIDB_ERR_CANCELED (-6)
 
 struct LLSImage;
-struct ILFTable;
 struct LLIDBHead;
 
 LEGO_EXPORT void LLS555To565(struct LLSImage *param_1);
 
 void LLIDB_UnLoadODF(struct LLIDBHead *head);
 
-LEGO_EXPORT void LLIDB_FreeILFTable(struct ILFTable *table);
+LEGO_EXPORT void LLIDB_FreeILFTable(struct SpriteSet *table);
 
 LEGO_EXPORT unsigned int LLIDB_GetCount(void);
 LEGO_EXPORT int LLIDB_GetElement(unsigned int index, struct Element **output);

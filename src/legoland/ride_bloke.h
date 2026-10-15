@@ -34,7 +34,16 @@ struct NewBloke {
     };
     int velX;
     int velY;
-    struct Point wp[17];
+    union {
+        struct Point wp[17]; /* the path's waypoints */
+        unsigned int timers[34];
+        struct {
+            struct Point dest; /* wp[0] */
+            struct Point pad_wp[15];
+            float dirX; /* wp[16]: the heading */
+            float dirY;
+        };
+    };
     unsigned char f_b8;
     unsigned char f_b9;
     unsigned char f_ba;

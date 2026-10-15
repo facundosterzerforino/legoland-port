@@ -16,11 +16,6 @@
 #include "timer.h"
 #include "tooltip.h"
 
-struct HelpAdvisor {
-    unsigned char pad_0[0xc];
-    unsigned int field_c;
-};
-
 #include "image_sprite.h"
 #include "stream.h"
 
@@ -58,7 +53,7 @@ unsigned int FUN_0046cee0(void) {
         return 1;
     }
     if (DAT_00668724 != NULL) {
-        if (((struct HelpAdvisor *)DAT_00668724)->field_c == 0) {
+        if (((struct ObjectiveEvent *)DAT_00668724)->type == 0) {
             if (DAT_00668618 == 0) {
                 return 0;
             }
@@ -76,7 +71,7 @@ unsigned int FUN_0046cee0(void) {
 unsigned int FUN_0046cf20(void) {
     int diff = (int)(GetGameTimer() - AdvisorHelpStartTime);
 
-    if (diff > 0x7530 || (DAT_007fe044 != 0 && DAT_00668724 != NULL && ((struct HelpAdvisor *)DAT_00668724)->field_c != 0)) {
+    if (diff > 0x7530 || (DAT_007fe044 != 0 && DAT_00668724 != NULL && ((struct ObjectiveEvent *)DAT_00668724)->type != 0)) {
         return 1;
     }
     return 0;

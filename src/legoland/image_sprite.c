@@ -43,14 +43,6 @@ struct LayerOwner {
     unsigned int flags;
 };
 
-struct ILFTable {
-    unsigned char pad_0[4];
-    int count;
-    struct Sprite **sprites;
-    int *xoffs;
-    int *yoffs;
-};
-
 // GLOBAL: LEGOLAND 0x0079a7c0
 struct Sprite *sprite_list;
 // GLOBAL: LEGOLAND 0x0079a7c4
@@ -607,7 +599,7 @@ LEGO_EXPORT int RecreatePartialSprite(struct Sprite *sprite, struct Image *image
 
 // FUNCTION: LEGOLAND 0x004978b0
 int LoadCompSprite(struct Sprite *sprite, const char *name, unsigned int flags) {
-    struct ILFTable *table;
+    struct SpriteSet *table;
     struct ResFile *file;
     struct Image *image;
     struct Sprite *element;
@@ -628,20 +620,20 @@ int LoadCompSprite(struct Sprite *sprite, const char *name, unsigned int flags) 
     if (file == NULL) {
         return 0;
     }
-    table = (struct ILFTable *)malloc(0x24);
+    table = (struct SpriteSet *)malloc(sizeof(struct SpriteSet));
     if (table != NULL) {
         RES_ReadFile(file, &count, 2);
         RES_ReadFile(file, tag, 2);
-        table->xoffs = (int *)malloc(count * sizeof(int));
-        table->yoffs = (int *)malloc(count * sizeof(int));
+        table->offset_x = (int *)malloc(count * sizeof(int));
+        table->offset_y = (int *)malloc(count * sizeof(int));
         table->sprites = (struct Sprite **)malloc(count * sizeof(struct Sprite *));
         table->count = count;
-        if (table->xoffs != NULL && table->yoffs != NULL && table->sprites != NULL) {
+        if (table->offset_x != NULL && table->offset_y != NULL && table->sprites != NULL) {
             RES_ReadFile(file, &length, 4);
             RES_ReadFile(file, element_name, length);
             for (i = 0; i < count; i++) {
-                RES_ReadFile(file, &table->xoffs[i], 4);
-                RES_ReadFile(file, &table->yoffs[i], 4);
+                RES_ReadFile(file, &table->offset_x[i], 4);
+                RES_ReadFile(file, &table->offset_y[i], 4);
             }
             for (i = 0; i < count; i++) {
                 RES_ReadFile(file, &length, 4);
@@ -657,12 +649,12 @@ int LoadCompSprite(struct Sprite *sprite, const char *name, unsigned int flags) 
                 }
             }
             RES_CloseFile(file);
-            sprite->image = (struct Image *)table;
+            sprite->image = (struct Image *)table; /* an image list (.ilf) sprite */
             sprite->flags |= 0x8000;
             return 1;
         }
     }
-    LLIDB_FreeILFTable((struct ILFTable *)table);
+    LLIDB_FreeILFTable((struct SpriteSet *)table);
     RES_CloseFile(file);
     return 0;
 }
@@ -734,7 +726,7 @@ LEGO_EXPORT int KillSprite(struct Sprite *sprite) {
             }
             if ((sprite->flags & 0x20) == 0) {
                 if ((sprite->flags & 0x8000) != 0) {
-                    LLIDB_FreeILFTable((struct ILFTable *)sprite->image);
+                    LLIDB_FreeILFTable((struct SpriteSet *)sprite->image);
                 } else if (sprite->image != NULL) {
                     KillImage(sprite->image);
                 }

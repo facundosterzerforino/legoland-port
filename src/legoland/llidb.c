@@ -31,15 +31,6 @@
 #define LLIDB_SLOT(id) ((id) & 0xff)
 #define LLIDB_ELEM(id) (&LLIDB_Pages[LLIDB_PAGE(id)][LLIDB_SLOT(id)])
 
-struct ILFTable {
-    unsigned char pad_0[4];
-    int count;
-    struct Sprite **sprites;
-    int *data_c;
-    int *data_10;
-    void *data_14;
-};
-
 struct SpriteManager {
     unsigned int var_0;
     int count;
@@ -596,16 +587,16 @@ LEGO_EXPORT int LLIDB_CloseICM(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0047bef0
-LEGO_EXPORT void LLIDB_FreeILFTable(struct ILFTable *table) {
+LEGO_EXPORT void LLIDB_FreeILFTable(struct SpriteSet *table) {
     if (table == NULL) {
         return;
     }
 
-    if (table->data_c != NULL) {
-        free(table->data_c);
+    if (table->offset_x != NULL) {
+        free(table->offset_x);
     }
-    if (table->data_10 != NULL) {
-        free(table->data_10);
+    if (table->offset_y != NULL) {
+        free(table->offset_y);
     }
 
     if (table->sprites != NULL) {
@@ -787,9 +778,10 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct LLIDBHead *head) {
         obj->anim = (struct Sprite *)sprite;
         if (sprite != 0 && (sprite->flags & 0x8000) != 0) {
             for (j = 0; j < (int)(INT_PTR)((struct Sprite *)obj->anim)->image->aux; j++) {
+                struct LLS *lls;
                 sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->anim, j);
-                if (sprite != 0 && (sprite = (struct Sprite *)GetLLSForSprite((struct Sprite *)sprite)) != 0) {
-                    LLSStop((struct LLS *)sprite);
+                if (sprite != 0 && (lls = GetLLSForSprite((struct Sprite *)sprite)) != 0) {
+                    LLSStop(lls);
                 }
             }
         }
@@ -1255,7 +1247,7 @@ LEGO_EXPORT void *LLIDB_LoadILFData(struct LLIDBHead *head) {
     short unused;
     int len;
     struct ResFile *file;
-    struct ILFTable *table;
+    struct SpriteSet *table;
     int i;
 
     count = 0;
@@ -1266,24 +1258,24 @@ LEGO_EXPORT void *LLIDB_LoadILFData(struct LLIDBHead *head) {
         return NULL;
     }
 
-    table = (struct ILFTable *)malloc(0x24);
+    table = (struct SpriteSet *)malloc(sizeof(struct SpriteSet));
     RES_ReadFile(file, &count, 2);
     RES_ReadFile(file, &unused, 2);
     if (table != NULL) {
-        table->data_c = (int *)malloc(count * 4);
-        table->data_10 = (int *)malloc(count * 4);
+        table->offset_x = (int *)malloc(count * 4);
+        table->offset_y = (int *)malloc(count * 4);
         table->sprites = (struct Sprite **)malloc(count * sizeof(struct Sprite *));
         table->count = count;
-        if (table->data_c != NULL && table->data_10 != NULL && table->sprites != NULL) {
+        if (table->offset_x != NULL && table->offset_y != NULL && table->sprites != NULL) {
             RES_ReadFile(file, &len, 4);
             RES_ReadFile(file, name, len);
             i = 0;
             if (count > 0) {
                 do {
-                    RES_ReadFile(file, (char *)table->data_c + i * 4, 4);
-                    RES_ReadFile(file, (char *)table->data_10 + i * 4, 4);
-                    table->data_c[i] = table->data_c[i] << 1;
-                    table->data_10[i] = table->data_10[i] << 1;
+                    RES_ReadFile(file, (char *)table->offset_x + i * 4, 4);
+                    RES_ReadFile(file, (char *)table->offset_y + i * 4, 4);
+                    table->offset_x[i] = table->offset_x[i] << 1;
+                    table->offset_y[i] = table->offset_y[i] << 1;
                     i++;
                 } while (i < count);
             }
@@ -1319,7 +1311,7 @@ LEGO_EXPORT void *LLIDB_LoadCSPData(struct LLIDBHead *head) {
     short unused;
     int len;
     struct ResFile *file;
-    struct ILFTable *table;
+    struct SpriteSet *table;
     int i;
 
     count = 0;
@@ -1330,24 +1322,24 @@ LEGO_EXPORT void *LLIDB_LoadCSPData(struct LLIDBHead *head) {
         return NULL;
     }
 
-    table = (struct ILFTable *)malloc(0x24);
+    table = (struct SpriteSet *)malloc(sizeof(struct SpriteSet));
     if (table != NULL) {
         RES_ReadFile(file, &count, 2);
         RES_ReadFile(file, &unused, 2);
-        table->data_c = (int *)malloc(count * 4);
-        table->data_10 = (int *)malloc(count * 4);
+        table->offset_x = (int *)malloc(count * 4);
+        table->offset_y = (int *)malloc(count * 4);
         table->sprites = (struct Sprite **)malloc(count * sizeof(struct Sprite *));
         table->count = count;
-        if (table->data_c != NULL && table->data_10 != NULL && table->sprites != NULL) {
+        if (table->offset_x != NULL && table->offset_y != NULL && table->sprites != NULL) {
             RES_ReadFile(file, &len, 4);
             RES_ReadFile(file, name, len);
             i = 0;
             if (count > 0) {
                 do {
-                    RES_ReadFile(file, (char *)table->data_c + i * 4, 4);
-                    RES_ReadFile(file, (char *)table->data_10 + i * 4, 4);
-                    table->data_c[i] = table->data_c[i] << 1;
-                    table->data_10[i] = table->data_10[i] << 1;
+                    RES_ReadFile(file, (char *)table->offset_x + i * 4, 4);
+                    RES_ReadFile(file, (char *)table->offset_y + i * 4, 4);
+                    table->offset_x[i] = table->offset_x[i] << 1;
+                    table->offset_y[i] = table->offset_y[i] << 1;
                     i++;
                 } while (i < count);
             }
@@ -1451,7 +1443,7 @@ LEGO_EXPORT void LLIDB_UnLoadData(struct Element *handle) {
         LLIDB_UnLoadTSF((struct SpriteManager *)head);
         break;
     case LLIDB_TYPE_ILF:
-        LLIDB_FreeILFTable((struct ILFTable *)head->data);
+        LLIDB_FreeILFTable((struct SpriteSet *)head->data);
         break;
     }
 }

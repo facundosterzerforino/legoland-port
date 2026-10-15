@@ -32,46 +32,6 @@
 
 #pragma intrinsic(strcpy, strlen)
 
-struct ThemeQueryArg {
-    unsigned char pad_0[0xc];
-    struct ThemeData *theme;
-};
-
-struct ThemeData {
-    unsigned char pad_0[0x5c];
-    struct Element *theme_id;
-};
-
-struct RewardArg {
-    unsigned char pad_0[0x8];
-    const char *field_8;
-    int reward_type;
-    unsigned char pad_10[0x1c - 0x10];
-    int field_1c;
-};
-
-struct MapRectArg {
-    unsigned char pad_0[0x28];
-    int x0;
-    int y0;
-    int x1;
-    int y1;
-};
-
-struct NerpsTarget {
-    unsigned char pad_0[0x10];
-    unsigned char flags_10;
-    unsigned char pad_11[0x40 - 0x11];
-    unsigned int field_40;
-};
-
-struct RewardObject {
-    unsigned int id;
-    unsigned char pad_4[0x8 - 0x4];
-    unsigned int flags;
-    struct NewObjInfo *info;
-};
-
 struct PlaceObject {
     int field_0;
     unsigned char pad_4[0xc - 0x4];
@@ -362,9 +322,9 @@ int IsObjectiveHintDue(void) {
 // FUNCTION: LEGOLAND 0x00468d30
 int QueueCustomObjectiveHint(struct ObjectiveEvent *object) {
     struct ObjectiveEvent *event;
-    struct NerpsTarget *target;
+    struct ObjectiveEvent *target;
 
-    target = (struct NerpsTarget *)object;
+    target = (struct ObjectiveEvent *)object;
     if (target->field_40 != 0 && ScriptStringTable[target->field_40] != 0) {
         if (target->flags_10 & 4) {
             event = AllocTimestampedObjectiveEvent(0, 0);
@@ -959,11 +919,11 @@ void PostPendingObjectiveHints(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00469900
-void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned int b) {
-    struct RewardObject *obj;
+void GiveRewardObject(struct Element *object, unsigned int a, unsigned int b) {
+    struct Element *obj;
     unsigned int flags;
 
-    obj = (struct RewardObject *)object;
+    obj = (struct Element *)object;
     if (obj != NULL) {
         flags = obj->flags;
         if ((flags & 1) != 0) {
@@ -971,11 +931,11 @@ void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned in
                 obj->flags = (flags & 0xfffeffff) | 2;
                 FUN_0048a6e0((struct ClippedObject *)obj);
                 if (a != 0) {
-                    AddNewObjectIcon(obj->info);
+                    AddNewObjectIcon(obj->data);
                 }
             } else {
                 // STRING: LEGOLAND 0x004ba6e4
-                DBPrintf("Not giving %d.. Already got it\n", obj->id);
+                DBPrintf("Not giving %d.. Already got it\n", obj->name);
             }
         }
     }
@@ -983,100 +943,100 @@ void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned in
 }
 
 // FUNCTION: LEGOLAND 0x00469980
-void CountObjectTheme(struct ThemeQueryArg *arg) {
-    struct ThemeData *theme;
+void CountObjectTheme(struct Element *arg) {
+    struct Ride *theme;
     struct Element *id;
 
-    theme = arg->theme;
+    theme = arg->ride;
     // STRING: LEGOLAND 0x004ba748
     if (LLIDB_FindElement("LEGOLAND THEME", &id, 0) == 0) {
-        if (theme->theme_id == id) {
+        if (theme->theme_element == id) {
             LegolandCommonThemeCount++;
             return;
         }
         // STRING: LEGOLAND 0x004ba738
-        if (LLIDB_FindElement("COMMON THEME", &id, 0) == 0 && theme->theme_id == id) {
+        if (LLIDB_FindElement("COMMON THEME", &id, 0) == 0 && theme->theme_element == id) {
             LegolandCommonThemeCount++;
             return;
         }
     }
     // STRING: LEGOLAND 0x004ba728
-    if (LLIDB_FindElement("WESTERN THEME", &id, 0) == 0 && theme->theme_id == id) {
+    if (LLIDB_FindElement("WESTERN THEME", &id, 0) == 0 && theme->theme_element == id) {
         WesternThemeCount++;
         return;
     }
     // STRING: LEGOLAND 0x004ba718
-    if (LLIDB_FindElement("CASTLE THEME", &id, 0) == 0 && theme->theme_id == id) {
+    if (LLIDB_FindElement("CASTLE THEME", &id, 0) == 0 && theme->theme_element == id) {
         CastleThemeCount++;
         return;
     }
     // STRING: LEGOLAND 0x004ba704
-    if (LLIDB_FindElement("ADVENTURERS THEME", &id, 0) == 0 && theme->theme_id == id) {
+    if (LLIDB_FindElement("ADVENTURERS THEME", &id, 0) == 0 && theme->theme_element == id) {
         AdventurersThemeCount++;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00469a80
-void FUN_00469a80(struct ObjectiveEvent *object) {
+void FUN_00469a80(struct Element *object) {
     unsigned int flags;
 
     if (object != NULL) {
-        flags = ((struct ObjectiveEvent *)object)->field_8;
+        flags = object->flags;
         if (flags & 1) {
-            ((struct ObjectiveEvent *)object)->field_8 = (flags & 0xfffffffd) | 0x10000;
-            CountObjectTheme((struct ThemeQueryArg *)object);
+            object->flags = (flags & 0xfffffffd) | 0x10000;
+            CountObjectTheme(object);
         }
     }
     DAT_0066871c = 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469ab0
-void TakeRewardObject(struct ObjectiveEvent *object) {
+void TakeRewardObject(struct Element *object) {
     unsigned int flags;
 
     if (object != NULL) {
-        flags = ((struct ObjectiveEvent *)object)->field_8;
+        flags = object->flags;
         if (flags & 1) {
-            ((struct ObjectiveEvent *)object)->field_8 = flags & 0xfffefffd;
+            object->flags = flags & 0xfffefffd;
         }
     }
     DAT_0066871c = 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469ae0
-int ProcessUnimplementedReward(struct RewardArg *arg) {
+int ProcessUnimplementedReward(struct ObjectiveEvent *arg) {
     // STRING: LEGOLAND 0x004ba758
-    DBPrintf("Processing unimplemented reward [ Type = %d ]\n", arg->reward_type);
+    DBPrintf("Processing unimplemented reward [ Type = %d ]\n", arg->type);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b00
-int ProcessUnimplementedObjective(struct RewardArg *arg) {
+int ProcessUnimplementedObjective(struct ObjectiveEvent *arg) {
     // STRING: LEGOLAND 0x004ba788
-    DBPrintf("Processing unimplemented objective [ Type = %d ]\n", arg->reward_type);
+    DBPrintf("Processing unimplemented objective [ Type = %d ]\n", arg->type);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b20
 int ScriptEventGive(struct ObjectiveEvent *event) {
-    struct ObjectiveEvent *object;
+    struct Element *object;
 
-    object = (struct ObjectiveEvent *)event->element;
+    object = event->element;
     GiveRewardObject(object, event->field_14, 0);
-    object = (struct ObjectiveEvent *)event->element;
-    ((struct ObjectiveEvent *)object)->field_8 |= 0x20000;
+    object = event->element;
+    object->flags |= 0x20000;
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b50
 int FUN_00469b50(struct ObjectiveEvent *event) {
-    FUN_00469a80((struct ObjectiveEvent *)event->element);
+    FUN_00469a80(event->element);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00469b70
 int ScriptEventTake(struct ObjectiveEvent *event) {
-    TakeRewardObject((struct ObjectiveEvent *)event->element);
+    TakeRewardObject(event->element);
     return 1;
 }
 
@@ -1121,7 +1081,7 @@ int FadeOutSampleCallback(struct Sample *handle) {
 }
 
 // FUNCTION: LEGOLAND 0x00469c80
-int ScriptEventClear(struct MapRectArg *arg) {
+int ScriptEventClear(struct ObjectiveEvent *arg) {
     struct SweepInstance *next;
     RECT rect;
     short tile_x;
@@ -1173,7 +1133,7 @@ int ScriptEventClear(struct MapRectArg *arg) {
                 rect.right += tile_x;
                 rect.bottom += tile_y;
                 rect.left = cls->footprint.v[0] + tile_x;
-                if (rect.left <= arg->x1 && rect.right >= arg->x0 && rect.top <= arg->y1 && rect.bottom >= arg->y0) {
+                if (rect.left <= arg->field_30 && rect.right >= arg->field_28 && rect.top <= arg->field_34 && rect.bottom >= arg->field_2c) {
                     point.y = tile_y;
                     saved_class = QueryClass;
                     memcpy(&saved, &QueryCursor, sizeof(struct Cursor));
@@ -1202,14 +1162,14 @@ int ScriptEventClear(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469ed0
-int ScriptEventUnglue(struct MapRectArg *arg) {
+int ScriptEventUnglue(struct ObjectiveEvent *arg) {
     int y;
     int x;
 
-    y = arg->y0;
-    while (y <= arg->y1) {
-        x = arg->x0;
-        while (x <= arg->x1) {
+    y = arg->field_2c;
+    while (y <= arg->field_34) {
+        x = arg->field_28;
+        while (x <= arg->field_30) {
             GameMap[y][x].flags &= 0xffbf;
             x++;
         }
@@ -1219,14 +1179,14 @@ int ScriptEventUnglue(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469f20
-int ScriptEventGlue(struct MapRectArg *arg) {
+int ScriptEventGlue(struct ObjectiveEvent *arg) {
     int y;
     int x;
 
-    y = arg->y0;
-    while (y <= arg->y1) {
-        x = arg->x0;
-        while (x <= arg->x1) {
+    y = arg->field_2c;
+    while (y <= arg->field_34) {
+        x = arg->field_28;
+        while (x <= arg->field_30) {
             GameMap[y][x].flags |= 0x40;
             x++;
         }
@@ -1236,16 +1196,16 @@ int ScriptEventGlue(struct MapRectArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469f70
-int ScriptEventExtendPark(struct RewardArg *arg) {
+int ScriptEventExtendPark(struct ObjectiveEvent *arg) {
     return ProcessUnimplementedReward(arg);
 }
 
 // FUNCTION: LEGOLAND 0x00469f80
-int ScriptEventFmv(struct RewardArg *arg) {
+int ScriptEventFmv(struct ObjectiveEvent *arg) {
     PauseGameTimer();
     SetPointer(0);
     FUN_00496e60(1, 0xf);
-    PlayMovie(arg->field_8, 1, 1);
+    PlayMovie(arg->text, 1, 1);
     ResumeGameTimer();
     ClearAdvisorHelp();
     FUN_0046b760();
@@ -1253,11 +1213,11 @@ int ScriptEventFmv(struct RewardArg *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00469fc0
-int ScriptEventInterval(struct RewardArg *arg) {
+int ScriptEventInterval(struct ObjectiveEvent *arg) {
     int retries;
 
     FUN_00490600(0);
-    if (FUN_004907a0(arg->field_8) != 0) {
+    if (FUN_004907a0(arg->text) != 0) {
         EditMode.unk4 = 2;
         DAT_00668e38 = 1;
         DAT_0080ff80.unk4 = 0xffffffff;
@@ -1270,11 +1230,11 @@ int ScriptEventInterval(struct RewardArg *arg) {
         return 0;
     }
     // STRING: LEGOLAND 0x004ba7bc
-    DBPrintf("Giving up trying to load Interval %s\n", arg->field_8);
+    DBPrintf("Giving up trying to load Interval %s\n", arg->text);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0046a030
-int ScriptEventMessage(struct RewardArg *arg) {
+int ScriptEventMessage(struct ObjectiveEvent *arg) {
     return ProcessUnimplementedReward(arg);
 }

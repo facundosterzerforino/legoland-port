@@ -36,11 +36,6 @@ struct Obj0c {
     void *field_c;
 };
 
-struct ObjState {
-    unsigned char pad_0[0x20];
-    unsigned short state;
-};
-
 struct CursorObj {
     unsigned char pad_0[12];
     void *field_c;
@@ -565,8 +560,8 @@ unsigned int FUN_0045eab0(struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045ead0
-int FUN_0045ead0(struct ObjState *obj) {
-    if (obj == 0 || obj->state == 0 || obj->state == 2) {
+int FUN_0045ead0(struct Ride *obj) {
+    if (obj == 0 || obj->type == 0 || obj->type == 2) {
         return 0;
     }
     return 1;
@@ -574,7 +569,7 @@ int FUN_0045ead0(struct ObjState *obj) {
 
 // FUNCTION: LEGOLAND 0x0045eaf0
 int FUN_0045eaf0(struct Ride *obj) {
-    if (FUN_0045ead0((struct ObjState *)obj) != 0) {
+    if (FUN_0045ead0((struct Ride *)obj) != 0) {
         return 1;
     }
     if (obj != 0 && obj->parent_element != 0 && (obj->parent_element->flags & 0x10) != 0 &&
@@ -1083,7 +1078,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
     int y1;
     int x1;
     first = cursor;
-    if (FUN_0045ead0((struct ObjState *)param) != 0 && (cursor->field_1828 & 0x4000) == 0) {
+    if (FUN_0045ead0((struct Ride *)param) != 0 && (cursor->field_1828 & 0x4000) == 0) {
         FUN_0045f540(cursor);
     }
     ResetCursorBuildable(cursor);

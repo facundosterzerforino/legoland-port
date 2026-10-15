@@ -1,7 +1,6 @@
 #pragma once
 
-struct RewardArg;
-struct MapRectArg;
+struct Element;
 
 struct Vec4 {
     unsigned int x;
@@ -96,14 +95,14 @@ int FUN_00469b50(struct ObjectiveEvent *event);
 int ScriptEventTake(struct ObjectiveEvent *event);
 int ObjectiveEventAddBricks(struct ObjectiveEvent *event);
 int ObjectiveEventSetBricks(struct ObjectiveEvent *event);
-int ScriptEventClear(struct MapRectArg *arg);
-int ScriptEventUnglue(struct MapRectArg *arg);
-int ScriptEventGlue(struct MapRectArg *arg);
-int ScriptEventExtendPark(struct RewardArg *arg);
-int ScriptEventFmv(struct RewardArg *arg);
-int ScriptEventInterval(struct RewardArg *arg);
-int ScriptEventMessage(struct RewardArg *arg);
-void TakeRewardObject(struct ObjectiveEvent *object);
-int ProcessUnimplementedReward(struct RewardArg *arg);
-int ProcessUnimplementedObjective(struct RewardArg *arg);
-void GiveRewardObject(struct ObjectiveEvent *object, unsigned int a, unsigned int b);
+int ScriptEventClear(struct ObjectiveEvent *arg);
+int ScriptEventUnglue(struct ObjectiveEvent *arg);
+int ScriptEventGlue(struct ObjectiveEvent *arg);
+int ScriptEventExtendPark(struct ObjectiveEvent *arg);
+int ScriptEventFmv(struct ObjectiveEvent *arg);
+int ScriptEventInterval(struct ObjectiveEvent *arg);
+int ScriptEventMessage(struct ObjectiveEvent *arg);
+void TakeRewardObject(struct Element *object);
+int ProcessUnimplementedReward(struct ObjectiveEvent *arg);
+int ProcessUnimplementedObjective(struct ObjectiveEvent *arg);
+void GiveRewardObject(struct Element *object, unsigned int a, unsigned int b);

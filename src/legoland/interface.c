@@ -33,15 +33,6 @@ struct ProfileObj {
     unsigned int flags;
 };
 
-struct InterfaceObj {
-    unsigned char pad_0[0x2c];
-    void *event_handler;
-    unsigned char pad_30[0x34 - 0x30];
-    unsigned int flags;
-    char *string;
-    unsigned int string_id;
-};
-
 struct MovieHandle {
     /* 0x00 */ unsigned int frame_count;
     /* 0x04 */ unsigned int frame_rate;
@@ -338,16 +329,16 @@ void FUN_004748a0(void *a) {
     }
     if (IsScriptStopped() == 0) {
         if (a != NULL) {
-            ((struct InterfaceObj *)ScriptEndIcon)->flags |= 0x2002;
+            ((struct IconNode *)ScriptEndIcon)->flags |= 0x2002;
         } else {
-            ((struct InterfaceObj *)ScriptEndIcon)->flags &= 0xffffdffd;
+            ((struct IconNode *)ScriptEndIcon)->flags &= 0xffffdffd;
         }
         return;
     }
-    ((struct InterfaceObj *)ScriptEndIcon)->flags |= 0x2002;
-    ((struct InterfaceObj *)ScriptEndIcon)->event_handler = (void *)FUN_00474f80;
-    ((struct InterfaceObj *)ScriptEndIcon)->string_id = 0x8fc;
-    ((struct InterfaceObj *)ScriptEndIcon)->string = GetString(0x8fc);
+    ((struct IconNode *)ScriptEndIcon)->flags |= 0x2002;
+    ((struct IconNode *)ScriptEndIcon)->event_handler = (void *)FUN_00474f80;
+    ((struct IconNode *)ScriptEndIcon)->string_id = 0x8fc;
+    ((struct IconNode *)ScriptEndIcon)->string = GetString(0x8fc);
 }
 
 // FUNCTION: LEGOLAND 0x00474920

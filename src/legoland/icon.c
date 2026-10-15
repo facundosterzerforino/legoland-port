@@ -30,14 +30,6 @@ struct IconSprite {
     /* 0x08 */ struct IconAnim *anim;
 };
 
-struct Rect16 {
-    unsigned char pad_0[0xc];
-    short x;
-    short y;
-    short width;
-    short height;
-};
-
 struct Rect32 {
     int left;
     int top;
@@ -639,7 +631,7 @@ int FUN_0046dd10(unsigned short param_1, short param_2, short param_3, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x0046de50
-void FUN_0046de50(struct Rect16 *src, struct Rect32 *dst) {
+void FUN_0046de50(struct IconNode *src, struct Rect32 *dst) {
     dst->left = src->x;
     dst->top = src->y;
     dst->right = src->width + src->x;
@@ -648,7 +640,7 @@ void FUN_0046de50(struct Rect16 *src, struct Rect32 *dst) {
 
 // FUNCTION: LEGOLAND 0x0046de90
 void FUN_0046de90(struct IconNode *icon, struct Bbox *bbox) {
-    FUN_0046de50((struct Rect16 *)icon, (struct Rect32 *)bbox);
+    FUN_0046de50((struct IconNode *)icon, (struct Rect32 *)bbox);
     if (icon->flags & 0x20) {
         bbox->min_x = bbox->min_x - 3;
         bbox->max_x = bbox->max_x + 3;
@@ -681,7 +673,7 @@ void FUN_0046de90(struct IconNode *icon, struct Bbox *bbox) {
 }
 
 // FUNCTION: LEGOLAND 0x0046df30
-int FUN_0046df30(struct Rect16 *src) {
+int FUN_0046df30(struct IconNode *src) {
     RECT rect;
     FUN_0046de50(src, (struct Rect32 *)&rect);
     SetClipping(&rect);
@@ -701,7 +693,7 @@ LEGO_EXPORT int RenderBoxIcon(struct IconNode *node) {
         node->width + border * 2, node->height + border * 2,
         border, node->box.box_color);
     if ((node->flags & 0x20) != 0) {
-        FUN_0046df30((struct Rect16 *)node);
+        FUN_0046df30((struct IconNode *)node);
     }
     return 0;
 }
@@ -1418,7 +1410,7 @@ LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *
                 }
             }
             if ((cur->flags & 0x20) != 0 && (cur->flags & 0x400) == 0) {
-                FUN_0046de50((struct Rect16 *)cur, (struct Rect32 *)&bbox);
+                FUN_0046de50((struct IconNode *)cur, (struct Rect32 *)&bbox);
                 if (x < bbox.min_x || x > bbox.max_x || y < bbox.min_y || y > bbox.max_y) {
                     doGeom = 0;
                 } else {

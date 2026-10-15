@@ -235,7 +235,7 @@ unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, 
     if (DAT_00669054 == 1) {
         name = FUN_004787a0(param_1, param_2);
         if (FUN_00478b20(name) != 0) {
-            GiveRewardObject((struct ObjectiveEvent *)ElemID(name), 0, 1);
+            GiveRewardObject(ElemID(name), 0, 1);
         }
         return 1;
     }

@@ -42,6 +42,10 @@ struct SpriteSet {
     /* 0x08 */ struct Sprite **sprites;
     /* 0x0c */ int *offset_x;
     /* 0x10 */ int *offset_y;
+    /* 0x14 */ void *data_14;
+    /* 0x18 */ unsigned int field_18;
+    /* 0x1c */ unsigned int field_1c;
+    /* 0x20 */ unsigned int field_20;
 };
 
 /* A tile object set a level map names: its element is the object placed for the set's tiles. */

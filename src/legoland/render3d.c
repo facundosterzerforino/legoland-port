@@ -1045,15 +1045,10 @@ struct RenderObjectVtable3 {
     struct ObjClassNode *class_node;
 };
 
-struct RideInstance {
-    unsigned char pad_0[0xc];
-    unsigned short flags;
-};
-
 // FUNCTION: LEGOLAND 0x00442fa0
 LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
     struct MapCellElement *cell;
-    struct RideInstance *instance;
+    struct ObjInstance *instance;
     unsigned char *coords = param_1;
     int x = coords[0];
     int y = coords[1];
@@ -1063,7 +1058,7 @@ LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
     } else {
         cell = 0;
     }
-    instance = (struct RideInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
+    instance = (struct ObjInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
     if (instance != 0) {
         *(unsigned char *)&instance->flags |= 2;
     }
@@ -1072,7 +1067,7 @@ LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1) {
 // FUNCTION: LEGOLAND 0x00443000
 LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
     struct MapCellElement *cell;
-    struct RideInstance *instance;
+    struct ObjInstance *instance;
     unsigned char *coords = param_1;
     int x = coords[0];
     int y = coords[1];
@@ -1082,7 +1077,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
     } else {
         cell = 0;
     }
-    instance = (struct RideInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
+    instance = (struct ObjInstance *)GetInstanceOfClass((struct Ride *)cell->vtable->class_node, (const TileId *)param_1);
     if (instance != 0) {
         instance->flags &= 0xfffd;
     }

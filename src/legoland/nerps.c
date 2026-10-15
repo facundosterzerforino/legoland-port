@@ -1032,18 +1032,11 @@ unsigned int ScriptEventForever(void) {
     return 0;
 }
 
-struct TimedEvent {
-    unsigned char pad_0[0xc];
-    unsigned int field_c;
-    unsigned char pad_10[0x3c - 0x10];
-    unsigned int field_3c;
-};
-
 // FUNCTION: LEGOLAND 0x0046b200
-unsigned int IsScriptEventDue(struct TimedEvent *event) {
+unsigned int IsScriptEventDue(struct ObjectiveEvent *event) {
     if (ScriptSectionStarted == 0) {
-        if ((ScriptEventCategories[event->field_c] & ScriptDirtyCategories) == 0) {
-            if ((int)(ScriptEvalTime - event->field_3c) <= 0x1388) {
+        if ((ScriptEventCategories[event->type] & ScriptDirtyCategories) == 0) {
+            if ((int)(ScriptEvalTime - event->timestamp) <= 0x1388) {
                 return 0;
             }
         }
@@ -1193,7 +1186,7 @@ void RunLevelScript(void) {
         while (node != NULL) {
             next = node->next;
             if (ScriptEventHandlers[node->type] != NULL) {
-                if (IsScriptEventDue((struct TimedEvent *)node) != 0) {
+                if (IsScriptEventDue((struct ObjectiveEvent *)node) != 0) {
                     node->timestamp = ScriptEvalTime;
                     if (ScriptEventHandlers[node->type](node) != 0) {
                         if ((node->flags_10 & 7) == 0) {
