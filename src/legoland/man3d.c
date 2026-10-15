@@ -49,11 +49,11 @@ LEGO_EXPORT struct Position *LoadPos(const char *path) {
     pos->field_18 = 0;
     RES_ReadFile(file, &pos->count_inner, 4);
     RES_ReadFile(file, &pos->count, 4);
-    pos->entries = (struct PosFrame **)malloc(pos->count << 2);
+    pos->entries = (struct PosFrame **)malloc(pos->count * sizeof(struct PosFrame *));
     i = 0;
     if (pos->count > 0) {
         do {
-            pos->entries[i] = (struct PosFrame *)malloc(pos->count_inner * 0x30);
+            pos->entries[i] = (struct PosFrame *)malloc(pos->count_inner * sizeof(struct PosFrame));
             j = 0;
             frames = pos->entries[i];
             f = frames;

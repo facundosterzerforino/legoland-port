@@ -322,19 +322,19 @@ int DAT_004b4764;
  * count, and reads the next template there as a huge count with no sprite; the extra sentinel element keeps that
  * (port_data only fills each array up to the next global). */
 // GLOBAL: LEGOLAND 0x004b47f0
-struct FlumeStage FlumeStages_004b47f0[3] = {{0}, {0}, {0, 0x7fffffff, NULL}};
+struct FlumeStage FlumeStages_004b47f0[3] = {{{0}}, {{0}}, {{0}, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4808
 struct FlumeTemplate DAT_004b4808;
 
 // GLOBAL: LEGOLAND 0x004b4810
-struct FlumeStage FlumeStages_004b4810[3] = {{0}, {0}, {0, 0x7fffffff, NULL}};
+struct FlumeStage FlumeStages_004b4810[3] = {{{0}}, {{0}}, {{0}, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4828
 struct FlumeTemplate DAT_004b4828;
 
 // GLOBAL: LEGOLAND 0x004b4830
-struct FlumeStage FlumeStages_004b4830[4] = {{0}, {0}, {0}, {0, 0x7fffffff, NULL}};
+struct FlumeStage FlumeStages_004b4830[4] = {{{0}}, {{0}}, {{0}}, {{0}, 0x7fffffff, NULL}};
 
 // GLOBAL: LEGOLAND 0x004b4858
 struct FlumeTemplate DAT_004b4858;

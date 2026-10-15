@@ -19,7 +19,8 @@ struct Position {
     float field_10;
     int field_14;
     int field_18;
-    unsigned char pad_1c[0x24 - 0x1c];
+    int x; /* the screen offset of the ride's origin */
+    int y;
     struct PosFrame **entries; /* one array of count_inner frames per track */
 };
 

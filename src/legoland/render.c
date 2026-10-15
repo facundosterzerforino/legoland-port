@@ -255,9 +255,9 @@ static void PortEdgeInit(struct PortEdge *e, const struct PortVert *from, const 
 }
 
 /* Draws scanlines from *py up to (not including) yend, advancing both edges. */
-static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, unsigned int *prow, int yend, int nv, PortPixelFn pixel, const void *ctx) {
+static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, unsigned char **prow, int yend, int nv, PortPixelFn pixel, const void *ctx) {
     int y = *py;
-    unsigned int row = *prow;
+    unsigned char *row = *prow;
     int n;
     int i;
 
@@ -279,9 +279,9 @@ static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, uns
         const struct PortEdge *hi;
         unsigned int s[PORT_NV];
         unsigned int ds[PORT_NV];
-        unsigned int rowaddr = row;
-        unsigned int p;
-        unsigned int plimit;
+        unsigned char *rowaddr = row;
+        unsigned char *p;
+        unsigned char *plimit;
         unsigned int *zp;
         int inv;
         int x;
@@ -315,7 +315,7 @@ static void PortScanLines(struct PortEdge *e1, struct PortEdge *e2, int *py, uns
             zp = (unsigned int *)(DAT_00701e5c + (y << 9) + x * 4);
             if (s[1] >= *zp) {
                 *zp = s[1];
-                DAT_007feb14 |= (p == DAT_007fe9a8);
+                DAT_007feb14 |= (p == (unsigned char *)DAT_007fe9a8);
                 *(unsigned short *)p = pixel(s, ctx);
             }
             x++;
@@ -344,7 +344,7 @@ static void PortRasterTriangle(struct PortVert *a, struct PortVert *b, struct Po
     int y;
     int i;
     int inv;
-    unsigned int row;
+    unsigned char *row;
 
     /* sort the vertices by y (a on top) */
     if (a->y > b->y) {
@@ -947,7 +947,7 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
         result = 0;
         if (dst.left < dst.right && dst.top < dst.bottom) {
             d = screen.bits + screen.pitch * dst.top + dst.left * 2;
-            s = (unsigned char *)((unsigned int)(image.bits + image.pitch * off.top + off.left * 2) & ~3u);
+            s = (unsigned char *)((UINT_PTR)(image.bits + image.pitch * off.top + off.left * 2) & ~(UINT_PTR)3);
             rows = off.bottom - off.top - 1;
             cols = off.right - off.left - 2;
             do {
@@ -969,7 +969,7 @@ LEGO_EXPORT int RenderTransSprite(struct Sprite *sprite, int x, int y) {
                 d += screen.pitch * 2;
                 rows -= 2;
             } while (rows >= 0);
-            result = (int)d;
+            result = (int)(INT_PTR)d; /* the original returns the end of the copy (non-zero) */
         }
         break;
     }

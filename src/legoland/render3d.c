@@ -86,7 +86,7 @@ struct RenderListNode *FUN_004418c0(int param_1, struct ViewportEntry *param_2, 
 }
 
 // FUNCTION: LEGOLAND 0x00441910
-void RidePointToScreen(int *param_1, float *param_2, int *param_3) {
+void RidePointToScreen(struct Position *param_1, float *param_2, int *param_3) {
     float v[3];
     v[0] = param_2[0];
     v[1] = param_2[1];
@@ -94,19 +94,19 @@ void RidePointToScreen(int *param_1, float *param_2, int *param_3) {
     v[1] -= DAT_004ab4bc;
     param_3[0] = (int)v[0] / 2;
     param_3[1] = (int)v[1] / 2;
-    param_3[0] += param_1[7];
-    param_3[1] += param_1[8];
+    param_3[0] += param_1->x;
+    param_3[1] += param_1->y;
 }
 
 // FUNCTION: LEGOLAND 0x00441980
-void Put3DBlokeOnRide(int *param_1, int param_2, int param_3, int param_4, int param_5, int param_6) {
+void Put3DBlokeOnRide(struct Position *param_1, int param_2, int param_3, struct Person *param_4, int param_5, int param_6) {
     /* Port [library:asm]: the original is inline asm (fistp). Poses person param_4 from frame param_3 of track param_2 of
      * animation param_1: the position from RidePointToScreen, offset by (param_5, param_6), and the 16.16 fixed-point
      * orientation from the frame's 3x3 float matrix, with axes 1 and 2 swapped and some signs flipped. */
     static const int src_col[3] = {0, 2, 1};
     static const int row_sign[3] = {1, -1, -1};
     static const int col_sign[3] = {-1, 1, 1};
-    struct Person *person = (struct Person *)param_4;
+    struct Person *person = param_4;
     float *frame_data;
     int pos[2];
     int frame = param_3;
@@ -116,11 +116,11 @@ void Put3DBlokeOnRide(int *param_1, int param_2, int param_3, int param_4, int p
     if (frame < 0) {
         frame = 0;
     }
-    if (frame >= param_1[0]) {
-        frame = param_1[0] - 1;
+    if (frame >= param_1->count_inner) {
+        frame = param_1->count_inner - 1;
     }
     /* each frame is 12 floats: the position, then the 3x3 matrix */
-    frame_data = (float *)((char *)((int **)param_1[9])[param_2] + frame * 48);
+    frame_data = param_1->entries[param_2][frame].pos;
     RidePointToScreen(param_1, frame_data, pos);
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
@@ -130,56 +130,44 @@ void Put3DBlokeOnRide(int *param_1, int param_2, int param_3, int param_4, int p
     SetPersonPosition(person, pos[0] + param_5, pos[1] + param_6);
 }
 
-struct BlokeRideInner {
-    unsigned char pad_0[0x62];
-    unsigned char flags;
-};
-
-struct BlokeRideNode {
-    unsigned char pad_0[8];
-    struct BlokeRideInner *inner;
-    unsigned char pad_c[4];
-    unsigned int field_10;
-};
-
 // FUNCTION: LEGOLAND 0x00441a60
-LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char *param_2, int param_3, int *param_4) {
+LEGO_EXPORT void Put3DBlokesOnRide(struct ViewportEntry *param_1, unsigned char *param_2, int param_3, struct Position *param_4) {
     struct Point coords;
     int i;
 
     coords = GetScreenCoordsForObject(param_2, param_1);
     i = 0;
-    if (param_4[1] > 0) {
+    if (param_4->count > 0) {
         do {
-            struct BlokeRideNode *node = (struct BlokeRideNode *)FUN_004418c0(i, param_1, (short *)param_2);
-            if (node != NULL && (node->inner->flags & 0x80) != 0) {
-                Put3DBlokeOnRide(param_4, i, param_3, node->field_10, coords.x, coords.y);
+            struct RideNode *node = (struct RideNode *)FUN_004418c0(i, param_1, (short *)param_2);
+            if (node != NULL && (node->rider->flags & 0x80) != 0) {
+                Put3DBlokeOnRide(param_4, i, param_3, node->person, coords.x, coords.y);
             }
             i = i + 1;
-        } while (i < param_4[1]);
+        } while (i < param_4->count);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00441ad0
 LEGO_EXPORT void Put3DBlokesOnRide2(Element *ride, Element *obj) {
-    struct BlokeRideNode *node = (struct BlokeRideNode *)FUN_00441870((struct ViewportEntry *)ride, (short *)obj);
+    struct RideNode *node = (struct RideNode *)FUN_00441870((struct ViewportEntry *)ride, (short *)obj);
     if (node != NULL) {
-        while ((node->inner->flags & 0x80) != 0) {
-            node = (struct BlokeRideNode *)FUN_00441890(ride, (short *)obj);
+        while ((node->rider->flags & 0x80) != 0) {
+            node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
             if (node == NULL) {
                 return;
             }
         }
         while (node != NULL) {
-            if (node->field_10 != 0) {
-                FUN_004401b0((struct Person *)node->field_10, (struct Bloke *)node->inner);
+            if (node->person != 0) {
+                FUN_004401b0((struct Person *)node->person, (struct Bloke *)node->rider);
             }
-            node = (struct BlokeRideNode *)FUN_00441890(ride, (short *)obj);
+            node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
             if (node == NULL) {
                 return;
             }
-            while ((node->inner->flags & 0x80) != 0) {
-                node = (struct BlokeRideNode *)FUN_00441890(ride, (short *)obj);
+            while ((node->rider->flags & 0x80) != 0) {
+                node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
                 if (node == NULL) {
                     return;
                 }
@@ -334,16 +322,16 @@ LEGO_EXPORT void RenderUsingRin(struct RinRender *param_1, int param_2, struct V
     base = param_1->frame_array[idx];
     for (i = param_1->loop_count - 1; i >= 0; i--) {
         int sprite_id = ((int *)base)[i];
-        struct BlokeRideNode *node;
+        struct RideNode *node;
         int *frame;
         if (param_1->data_table == NULL) {
-            node = (struct BlokeRideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
+            node = (struct RideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
         } else {
             remap = param_1->remap_table[sprite_id];
-            node = (struct BlokeRideNode *)FUN_004418c0(param_1->data_table[remap], param_3, (short *)param_4);
+            node = (struct RideNode *)FUN_004418c0(param_1->data_table[remap], param_3, (short *)param_4);
         }
-        if (node != NULL && (node->inner->flags & 0x80) != 0) {
-            IP_RenderBlokeIn3DNow((struct Bloke *)node->inner);
+        if (node != NULL && (node->rider->flags & 0x80) != 0) {
+            IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
         }
         frame = (int *)param_1->index_array[sprite_id];
         if (frame != NULL) {
@@ -733,7 +721,7 @@ unsigned char *Get3DDataListString(char *param_1, int param_2, volatile int para
             values = p + strlen(p) + 1 + 4;
         }
     } else {
-        names = (char *)param_3;
+        names = (char *)(INT_PTR)param_3; /* the original reads the third argument as the list */
     }
     switch (param_2) {
     case 1:

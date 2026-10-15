@@ -2415,7 +2415,7 @@ static void PortRepairScriptStrings(void) {
     int i;
 
     for (i = 1; i < (int)ScriptStringCount; i++) {
-        if (ScriptStringTable[i] != 0 && ((char *)ScriptStringTable[i])[0] == 0) {
+        if (ScriptStringTable[i] != 0 && ScriptStringTable[i][0] == 0) {
             empty++;
         }
     }
@@ -2485,9 +2485,9 @@ static void PortRepairScriptStrings(void) {
             empty, path, count, ScriptStringCount);
     } else {
         for (i = 1; i < (int)ScriptStringCount; i++) {
-            if (ScriptStringTable[i] != 0 && ((char *)ScriptStringTable[i])[0] == 0) {
-                free((void *)ScriptStringTable[i]);
-                ScriptStringTable[i] = (unsigned int)prompts[i - 1];
+            if (ScriptStringTable[i] != 0 && ScriptStringTable[i][0] == 0) {
+                free(ScriptStringTable[i]);
+                ScriptStringTable[i] = prompts[i - 1];
                 prompts[i - 1] = NULL;
                 repaired++;
             }

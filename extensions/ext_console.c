@@ -576,8 +576,8 @@ static void CmdObjectives(void) {
         }
         what[0] = 0;
         if (EventHasElement(node->type)) {
-            if (node->field_4 != 0 && *(const char **)node->field_4 != NULL) {
-                snprintf(what, sizeof(what), " \"%s\"", *(const char **)node->field_4);
+            if (node->element != NULL && node->element->name != NULL) {
+                snprintf(what, sizeof(what), " \"%s\"", node->element->name);
             } else if (node->type == 0x25) {
                 snprintf(what, sizeof(what), " ALL");
             }
@@ -854,7 +854,7 @@ static void RunCommand(char *line) {
             given = 0;
             for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
                 entry++) {
-                if (FUN_00478b20((unsigned int)entry->name) == 0) {
+                if (FUN_00478b20(entry->name) == 0) {
                     ConPrintf("  not given: %s (its class failed to load)", entry->name);
                     continue;
                 }

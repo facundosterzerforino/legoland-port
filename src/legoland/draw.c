@@ -1110,7 +1110,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
     rect->right += (short)sprite->src_x;
     rect->bottom += (short)sprite->src_y;
     pitch = CurrentSurfaceDesc.lPitch;
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
+    DAT_007fe9a8 = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
         FUN_00464480((struct DrawLLS *)image->data, rect, (struct Point *)off);
         return;
@@ -1579,7 +1579,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
     src->right += (short)sprite->src_x;
     src->bottom += (short)sprite->src_y;
     pitch = CurrentSurfaceDesc.lPitch;
-    DAT_007fe9a8 = (unsigned int)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
+    DAT_007fe9a8 = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
         FUN_00465240((struct DrawLLS *)image->data, src, (struct Point *)dst);
         return;
