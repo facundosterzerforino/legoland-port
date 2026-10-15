@@ -49,13 +49,13 @@ void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3,
     DAT_004c10e8 = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id) {
-            AddBlokeToRenderList(&DAT_004c10e8, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004c10e8, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004c10e8);
     if (CastleLevelMatteSprite != NULL) {
         pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
-        offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)ride->layer, 2);
+        offset = GetRenderOffsetForLayer((struct Sprite *)ride->layer, 2);
         AdjustOffsetForViewMode(&offset);
         PrintSprite(CastleLevelMatteSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
     }
@@ -181,7 +181,7 @@ void CastleLevelAddObject(struct Element *param1, int *param2) {
 }
 
 // FUNCTION: LEGOLAND 0x00403080
-void CastleLevel1_GetInterfaces(struct ClassNode *name, struct Ride *ci) {
+void CastleLevel1_GetInterfaces(struct Element *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b408c
     if (_stricmp("CASTLE LEVEL 1", name->name) == 0) {
         ci->cb_a4 = LoadCastleLevelMatteSprite;

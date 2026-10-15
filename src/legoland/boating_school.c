@@ -563,7 +563,7 @@ void LoadBoatingSchoolResources(Element *obj) {
     BoatingSchoolHullMaskSprite = LoadSprite("bs_hullmask.lls", 1);
     // STRING: LEGOLAND 0x004b52fc
     BoatingSchoolRailmSprite = LoadSprite("bs_railm.lls", 1);
-    lls = GetLLSForSprite((struct Sprite *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 5)));
+    lls = GetLLSForSprite((struct Sprite *)(DAT_0082ae00 = (void *)GetSpriteForLayer((struct Sprite *)BoatingSchoolRide->layer, 5)));
     LLSStop(lls);
     LLSSetFrame(lls, lls->frame_count);
     BoatingSchoolFootprint = BoatingSchoolRide->footprint;
@@ -625,7 +625,7 @@ void FUN_0041a000(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041a040
-void BoatingSchoolAddObject(struct Ride *obj, int *coords) {
+void BoatingSchoolAddObject(struct Element *obj, int *coords) {
     TileId tile;
     struct BoatRideNode *score;
     int x;
@@ -969,9 +969,9 @@ void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_
 
     FUN_00418fe0(1);
     pos = GetScreenCoordsForObject((unsigned char *)tile, ride);
-    offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)BoatingSchoolRide->layer, 3);
+    offset = GetRenderOffsetForLayer((struct Sprite *)BoatingSchoolRide->layer, 3);
     AdjustOffsetForViewMode(&offset);
-    lls = (short *)GetLLSForSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)BoatingSchoolRide->layer, 3));
+    lls = (short *)GetLLSForSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)BoatingSchoolRide->layer, 3));
     hull = GetLLSForSprite((struct Sprite *)BoatingSchoolHullMaskSprite);
     LLSSetFrame(hull, *lls);
     PrintSprite(BoatingSchoolHullMaskSprite, pos.x + offset.x, pos.y + offset.y, clip, 0);
@@ -980,7 +980,7 @@ void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_
             IP_RenderBlokeIn3DNow(node->rider);
         }
     }
-    offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)BoatingSchoolRide->layer, 3);
+    offset = GetRenderOffsetForLayer((struct Sprite *)BoatingSchoolRide->layer, 3);
     offset.x += 0x71;
     offset.y += 0xac;
     AdjustOffsetForViewMode(&offset);
@@ -1167,7 +1167,7 @@ int FUN_0041b100(struct Element *dummy, int arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b150
-LEGO_EXPORT void GetInterface(struct ClassNode *head, struct Ride *iface) {
+LEGO_EXPORT void GetInterface(struct Element *head, struct Ride *iface) {
     void **cb = (void **)iface;
     // STRING: LEGOLAND 0x004b537c
     if (_stricmp("BOATING SCHOOL WATER", head->name) == 0) {
@@ -1219,7 +1219,7 @@ void BoatingSchoolMermaidSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0041b2a0
-void BoatingSchoolMermaidAddObject(struct Ride *obj, int *coords) {
+void BoatingSchoolMermaidAddObject(struct Element *obj, int *coords) {
     struct Ride *ride = ((Element *)obj)->ride;
     TileId tile;
     struct MermaidNode *node;

@@ -53,7 +53,7 @@ void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     DAT_004cbf70 = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*coords == node->tile.id) {
-            AddBlokeToRenderList(&DAT_004cbf70, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004cbf70, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004cbf70);
@@ -204,7 +204,7 @@ void TempleRemoveObject(Element *a1, TileId tile, struct Cursor *a3) {
 }
 
 // FUNCTION: LEGOLAND 0x00416e50
-void Temple_GetInterfaces(struct ClassNode *str, struct Ride *obj) {
+void Temple_GetInterfaces(struct Element *str, struct Ride *obj) {
     // STRING: LEGOLAND 0x004b4ef0
     if (_stricmp("TEMPLE", str->name) == 0) {
         obj->cb_a4 = LoadTempleMatteSprites;

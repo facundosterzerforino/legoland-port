@@ -129,7 +129,7 @@ unsigned int WaterWorksEntranceLoad(struct Element *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417c20
-void WaterWorksEntranceAddObject(struct Ride *editObj, int *coords) {
+void WaterWorksEntranceAddObject(struct Element *editObj, int *coords) {
     struct SampleSource params;
 
     AddBasicObject(editObj, coords);
@@ -387,7 +387,7 @@ void RenderWaterBlock(struct Element *arg, int a, int b, unsigned short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004181e0
-void WaterBlockAddObject(struct Ride *editObj, unsigned char *coords) {
+void WaterBlockAddObject(struct Element *editObj, unsigned char *coords) {
     unsigned short key;
     struct WaterNode *node;
 
@@ -529,7 +529,7 @@ void RenderShower(struct Element *render, unsigned int p2, unsigned int p3, unsi
 }
 
 // FUNCTION: LEGOLAND 0x004184e0
-void ShowerAddObject(struct Ride *editObj, unsigned char *coords) {
+void ShowerAddObject(struct Element *editObj, unsigned char *coords) {
     unsigned short key;
 
     *(unsigned char *)&key = coords[0];
@@ -701,7 +701,7 @@ void WaterWorksElephantFountainUpdate(void) {
 void RenderWaterWorksElephantFountain(void) {}
 
 // FUNCTION: LEGOLAND 0x004188d0
-void ElephantFountainAddObject(struct Ride *editObj, unsigned char *coords) {
+void ElephantFountainAddObject(struct Element *editObj, unsigned char *coords) {
     unsigned short key;
 
     *(unsigned char *)&key = coords[0];
@@ -740,7 +740,7 @@ void WaterWorksElephantFountainCalcCursor(struct Element *arg, int *a, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x004189c0
-void CrocodileFountainAddObject(struct Ride *editObj, int *coords) {
+void CrocodileFountainAddObject(struct Element *editObj, int *coords) {
     struct SampleSource params;
 
     AddBasicObject(editObj, coords);
@@ -872,7 +872,7 @@ LEGO_EXPORT int Load_ElephantF(struct Element *element) {
 }
 
 // FUNCTION: LEGOLAND 0x00418c80
-void WaterWorksGetInterfaces(struct ClassNode *name, struct Ride *ci) {
+void WaterWorksGetInterfaces(struct Element *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b50f4
     if (_stricmp("WATER WORKS ENTRANCE", name->name) == 0) {
         ci->cb_a4 = (void (*)())WaterWorksEntranceLoad;

@@ -12,8 +12,7 @@ struct SlideNode {
 };
 
 struct Ride;
-struct ClassNode;
-LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *head, struct Ride *iface);
+LEGO_EXPORT void TempleSlide_GetInterfaces(struct Element *head, struct Ride *iface);
 
 struct TempleRide;
 void FUN_00417130(struct TempleRide *arg);

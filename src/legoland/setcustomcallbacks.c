@@ -36,8 +36,8 @@
 #include "water_works.h"
 
 // FUNCTION: LEGOLAND 0x00452c20
-LEGO_EXPORT void SetCustomCallbacks(struct ClassNode *head) {
-    struct Ride *iface = head->iface;
+LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
+    struct Ride *iface = head->ride;
 
     if (_stricmp(head->name, "PATH CONTROL") == 0) {
         iface->cb_98 = AddBasicPath;

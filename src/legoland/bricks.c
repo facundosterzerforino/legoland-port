@@ -263,10 +263,10 @@ void FUN_00457a70(void) {
             } else if (IsCursorBuildable(&QueryCursor)) {
                 if (Hover.type == 0x10c) {
                     FUN_0045e850((struct Element *)((WorkOrder *)Hover.ptr)->element, &((WorkOrder *)Hover.ptr)->pos.x);
-                    ClearPathUnderFootprint((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
+                    ClearPathUnderFootprint((struct Ride *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
                     EraseMechanicOrder((WorkOrder *)Hover.ptr);
                 } else if (Hover.type == 0x10b) {
-                    ClearPathUnderFootprint((struct PathFootprint *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
+                    ClearPathUnderFootprint((struct Ride *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
                     EraseGardenerOrder((WorkOrder *)Hover.ptr);
                 } else {
                     pt.x = *(unsigned int *)&QueryObj & 0xff;
@@ -278,7 +278,7 @@ void FUN_00457a70(void) {
                     }
                     QueryClass = (struct Ride *)tile->field_0->ride;
                     if (DAT_00810144 == 0) {
-                        ClearPathUnderFootprint((struct PathFootprint *)QueryClass, &pt.x);
+                        ClearPathUnderFootprint((struct Ride *)QueryClass, &pt.x);
                     }
                     RemObjFromMap(QueryClass, QueryClass->element, QueryObj, &QueryCursor);
                 }
@@ -312,7 +312,7 @@ void FUN_00457a70(void) {
         if (!(GamePad & 0x400) && EditMode.unk8 != NULL) {
             EditMode.unk8->cb_90(EditMode.unk8->element, &MousePos, 0x8f8);
         }
-        BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0((struct ObjState *)EditMode.unk8));
+        BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0(EditMode.unk8));
         if (DAT_00813ac4 & 0x11) {
             if (IsCursorBuildable(&EditCursor)) {
                 if (EditMode.unk8->flags & 0x2000000) {

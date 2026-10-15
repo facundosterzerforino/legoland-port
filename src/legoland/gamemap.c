@@ -213,7 +213,7 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct P
         AddObjectsPowerStats(classid, pos);
     }
     if (classid == ElemID("ENTRANCE 1")) {
-        entrance = (struct Ride *)((struct ClassNode *)ElemID("ENTRANCE 1"))->iface;
+        entrance = (struct Ride *)((struct Element *)ElemID("ENTRANCE 1"))->ride;
         if (pos->x < 0 || pos->x >= (int)lpConfig->width || pos->y < 0 || pos->y >= (int)lpConfig->height) {
             cell = NULL;
         } else {
@@ -455,7 +455,7 @@ LEGO_EXPORT void AddObjectsPowerStats(struct Element *classid, struct Point *pos
     struct MapCell *cell;
     int amount;
 
-    power = FindObjectsPower(((struct ClassNode *)classid)->iface);
+    power = FindObjectsPower(((struct Element *)classid)->ride);
     if (power != 0) {
         if (0 < power) {
             MapStats.power_supply = MapStats.power_supply + power;
@@ -494,7 +494,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
     int x;
     int y;
 
-    power = FindObjectsPower(((struct ClassNode *)classid)->iface);
+    power = FindObjectsPower(((struct Element *)classid)->ride);
     if (power != 0) {
         if (0 < power) {
             x = coords.pos.x;

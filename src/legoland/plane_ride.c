@@ -337,24 +337,14 @@ LEGO_EXPORT int SaveZoomer(struct Element *element) {
     return 0;
 }
 
-struct ZoomerTypeC {
-    void *field_0;
-    unsigned int field_4;
-};
-
-struct ZoomerData {
-    unsigned char pad_0[0x54];
-    struct ZoomerTypeC *field_54;
-};
-
 // FUNCTION: LEGOLAND 0x0043e110
 LEGO_EXPORT int LoadZoomer(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct PlaneRideNode *prev = NULL;
     struct RideNode *list;
     struct Person *car;
-    struct ZoomerData *data;
-    struct ZoomerTypeC *tc;
+    struct Bloke *data;
+    struct BNVRef *tc;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -392,9 +382,9 @@ LEGO_EXPORT int LoadZoomer(struct Element *arg) {
             list->person->field_30 = 0;
         }
         data = list->rider;
-        tc = data->field_54;
+        tc = data->bnv;
         if (tc != NULL) {
-            tc->field_0 = DAT_0062fe84[tc->field_4];
+            tc->file = DAT_0062fe84[tc->index];
         }
         list = list->next;
     }
@@ -402,7 +392,7 @@ LEGO_EXPORT int LoadZoomer(struct Element *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043e220
-void PlaneRide_GetInterfaces(struct ClassNode *name, struct Ride *iface) {
+void PlaneRide_GetInterfaces(struct Element *name, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b7a6c
     if (_stricmp("PLANE RIDE", name->name) == 0) {
         iface->cb_a4 = PlaneRideLoad;

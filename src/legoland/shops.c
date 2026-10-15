@@ -813,7 +813,7 @@ void RemoveObjectAndBlokes(struct Element *obj, TileId tile, void *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x0043a400
-void ShopsGetInterfaces(struct ClassNode *name, struct Ride *ci) {
+void ShopsGetInterfaces(struct Element *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b75fc
     if (_stricmp("GENERAL STORE", name->name) == 0) {
         ci->cb_a4 = LoadGStoreMatteSpritesAndMoneySFX;

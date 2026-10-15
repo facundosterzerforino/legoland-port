@@ -991,15 +991,10 @@ LEGO_EXPORT void RenderItem_Link(struct RenderItemNode **head, struct RenderItem
     }
 }
 
-struct BlokeRenderSrc {
-    unsigned char pad_0[8];
-    void *field_8;
-};
-
 // FUNCTION: LEGOLAND 0x00442f20
-LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key) {
+LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct RideNode *src, int key) {
     struct RenderItemNode *item = AllocRenderItem();
-    item->item = src->field_8;
+    item->item = src->rider;
     item->key = key;
     RenderItem_Link(head, (struct RenderItemNode *)item, key);
 }

@@ -58,7 +58,7 @@ LEGO_EXPORT void AddObjectToMap(Element *param_1, TileId param_2, int param_3) {
     if (obj->flags & 0x20000) {
         BGFullUpdate = 1;
     }
-    IncrementObjectCount((struct ObjectCount *)obj);
+    IncrementObjectCount((struct Ride *)obj);
     for (;;) {
         for (y = rect.y0; y <= rect.y1; y++) {
             for (x = rect.x0; x <= rect.x1; x++) {
@@ -770,7 +770,7 @@ LEGO_EXPORT unsigned int AddBasicObject(Element *editObj, int *coords) {
         if (obj->flags & 0x800000) {
             tile->flags |= 0x8000;
         }
-        IncrementObjectCount((struct ObjectCount *)obj);
+        IncrementObjectCount((struct Ride *)obj);
     } else {
         packed.pos.x = (unsigned char)coords[0];
         packed.pos.y = (unsigned char)coords[1];
@@ -809,7 +809,7 @@ LEGO_EXPORT void RemoveObjectFromMap(TileId coords) {
     if (obj->flags & 0x20000) {
         BGFullUpdate = 1;
     }
-    DecrementObjectCount((struct ObjectCount *)obj);
+    DecrementObjectCount((struct Ride *)obj);
     next = &obj->footprint;
     do {
         rect = *next;
@@ -854,7 +854,7 @@ LEGO_EXPORT void StandardRemoveObject(Element *editObj, TileId coords, struct Cu
         RemoveObjectFromMap(coords);
     } else {
         rect = *(struct Footprint *)cursor->field_1414;
-        DecrementObjectCount((struct ObjectCount *)obj);
+        DecrementObjectCount((struct Ride *)obj);
         for (;;) {
             for (y = rect.y0; y <= rect.y1; y++) {
                 for (x = rect.x0; x <= rect.x1; x++) {

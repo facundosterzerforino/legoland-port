@@ -5210,10 +5210,10 @@ void RenderCastleObj(Element *obj, unsigned int param_2, unsigned int param_3, T
         if (tile->id == walk->tile.id) {
             rider = walk->rider;
             if (rider->param_action < 0x10) {
-                AddBlokeToRenderList(&DAT_00610a18, (struct BlokeRenderSrc *)walk, walk->person->field_20);
+                AddBlokeToRenderList(&DAT_00610a18, walk, walk->person->field_20);
             }
             if (rider->param_action >= 0x21) {
-                AddBlokeToRenderList(&DAT_00610a18, (struct BlokeRenderSrc *)walk, walk->person->field_20);
+                AddBlokeToRenderList(&DAT_00610a18, walk, walk->person->field_20);
             }
         }
         walk = walk->next;
@@ -5321,7 +5321,7 @@ void CastleObjUpdate(Element *obj) {
 
 #pragma optimize("", off)
 // FUNCTION: LEGOLAND 0x004254d0
-void CastleGetInterfaces(struct ClassNode *head, struct Ride *obj) {
+void CastleGetInterfaces(struct Element *head, struct Ride *obj) {
     // STRING: LEGOLAND 0x004b5c0c
     if (_stricmp("CASTLE OBJ", head->name) == 0) {
         obj->cb_8c = CastleDispatchSetEditMode;

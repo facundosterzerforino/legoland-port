@@ -650,7 +650,7 @@ void DrivingSchoolRoadsAddObject(struct Element *edit, struct RoadPlaceArg *plac
     if (q[6] && q[6]->id == id.id && (q[6]->field_14 & 0xf) != 6) UpdateQueuePathShape(id.id, x - 4, y);
     if (q[7] && q[7]->id == id.id && (q[7]->field_14 & 0xf) != 6) UpdateQueuePathShape(id.id, x - 4, y - 4);
     FUN_00406020(id.id, 1);
-    IncrementObjectCount((struct ObjectCount *)edit->data);
+    IncrementObjectCount((struct Ride *)edit->data);
 }
 
 // FUNCTION: LEGOLAND 0x00414220
@@ -666,8 +666,8 @@ void FUN_00414220(Element *edit, TileId tile, struct Cursor *cursor) {
     entry = (struct RideQueueEntry *)FUN_004125a0(x, y);
     tile.id = entry->id;
     if (entry->field_14 & 0x10) {
-        IncrementObjectCount((struct ObjectCount *)edit->data);
-        DecrementObjectCount((struct ObjectCount *)ZebraCrossingRide);
+        IncrementObjectCount((struct Ride *)edit->data);
+        DecrementObjectCount((struct Ride *)ZebraCrossingRide);
         entry->field_14 &= 0xef;
         UpdateQueuePathShape(tile.id, x, y);
         AddBricks(GetObjCost((struct Ride *)ZebraCrossingRide));
@@ -854,6 +854,6 @@ void ZebraCrossingAddObject(struct Element *edit, struct RoadPlaceArg *place) {
         UpdateQueuePathShape((short)tile->id, place->x, place->y);
         tile->field_1d = 0;
         tile->field_1c = 0;
-        IncrementObjectCount((struct ObjectCount *)edit->data);
+        IncrementObjectCount((struct Ride *)edit->data);
     }
 }

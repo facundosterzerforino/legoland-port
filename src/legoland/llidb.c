@@ -759,7 +759,7 @@ LEGO_EXPORT void *LLIDB_LoadODFData(struct Element *head) {
         if (sprite != 0 && (sprite->flags & 0x8000) != 0) {
             for (j = 0; j < (int)(INT_PTR)((struct Sprite *)obj->anim)->image->aux; j++) {
                 struct LLS *lls;
-                sprite = (struct Sprite *)GetSpriteForLayer((struct LayerContainer *)obj->anim, j);
+                sprite = (struct Sprite *)GetSpriteForLayer((struct Sprite *)obj->anim, j);
                 if (sprite != 0 && (lls = GetLLSForSprite((struct Sprite *)sprite)) != 0) {
                     LLSStop(lls);
                 }

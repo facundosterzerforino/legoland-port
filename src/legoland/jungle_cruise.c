@@ -838,7 +838,7 @@ void MonkeyFishSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00434100
-void MonkeyFishAddObject(struct Ride *obj, int *coords) {
+void MonkeyFishAddObject(struct Element *obj, int *coords) {
     TileId tile;
     struct JungleFish *fish;
     unsigned short owner;
@@ -1167,7 +1167,7 @@ void JungleCruiseSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00434f90
-void JungleCruiseAddObject(struct Ride *obj, int *coords) {
+void JungleCruiseAddObject(struct Element *obj, int *coords) {
     TileId tile;
     struct JungleScore *score;
     int x;

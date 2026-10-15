@@ -320,7 +320,7 @@ struct RideSpriteInfo *GetSpiderRideSpriteInfo(struct Element *a1, unsigned shor
 }
 
 // FUNCTION: LEGOLAND 0x00416160
-void SpiderRide(struct ClassNode *name_ptr, struct Ride *obj) {
+void SpiderRide(struct Element *name_ptr, struct Ride *obj) {
     // STRING: LEGOLAND 0x004b4eb8
     if (_stricmp("SPIDER RIDE", name_ptr->name) == 0) {
         obj->cb_a4 = SpiderRideLoad;
@@ -579,24 +579,14 @@ LEGO_EXPORT int SaveSpider(struct Element *element) {
     return SaveGameWrite(&zero, 4) != 0;
 }
 
-struct SpiderTypeC {
-    void *file;
-    unsigned int index;
-};
-
-struct SpiderData {
-    unsigned char pad_0[0x54];
-    struct SpiderTypeC *field_54;
-};
-
 // FUNCTION: LEGOLAND 0x004168f0
 LEGO_EXPORT int LoadSpider(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct SpiderNode *prev = NULL;
     struct RideNode *list;
     struct Person *car;
-    struct SpiderData *data;
-    struct SpiderTypeC *tc;
+    struct Bloke *data;
+    struct BNVRef *tc;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -629,7 +619,7 @@ LEGO_EXPORT int LoadSpider(struct Element *arg) {
             list->person->field_30 = 0;
         }
         data = list->rider;
-        tc = data->field_54;
+        tc = data->bnv;
         if (tc != NULL) {
             tc->file = DAT_004cbf30[tc->index];
         }

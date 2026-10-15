@@ -6,7 +6,7 @@ struct MapTile;
 struct FXSpriteList;
 int CollectTileSpriteLists(struct FXSpriteList **out);
 struct Point;
-struct PathFootprint;
+struct Ride;
 struct Cursor;
 
 LEGO_EXPORT void RestoreBaseMap(int tile_x, int row_y);
@@ -25,7 +25,7 @@ unsigned char GetPathNeighbourMask(int *coords);
 unsigned char GetPathDiagonalGaps(unsigned char flags, int *coords);
 void AdjustPathTileAndNeighbours(struct Point *param);
 LEGO_EXPORT void RemovePathTile(int *param_1, unsigned short param_2);
-void ClearPathUnderFootprint(struct PathFootprint *param_1, int *param_2);
+void ClearPathUnderFootprint(struct Ride *param_1, int *param_2);
 LEGO_EXPORT unsigned char Bit_To_Dir(unsigned char bit);
 LEGO_EXPORT unsigned char Dir_To_Bit(unsigned char param);
 LEGO_EXPORT unsigned char Get_Path_Directions(struct Point *pos, char *param_2, char *param_3);

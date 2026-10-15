@@ -19,7 +19,6 @@ struct PlaneRideNode {
     struct PlaneRideNode *next;
 };
 
-struct ClassNode;
 struct Element;
 
 struct PlaneRideNode;
@@ -28,4 +27,4 @@ void FUN_0043d990(struct PlaneRideNode *node);
 void PlaneRideUpdate(struct Element *elem);
 
 struct Ride;
-void PlaneRide_GetInterfaces(struct ClassNode *name, struct Ride *iface);
+void PlaneRide_GetInterfaces(struct Element *name, struct Ride *iface);

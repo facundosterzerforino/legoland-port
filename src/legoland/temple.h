@@ -2,7 +2,5 @@
 
 #include "legoland.h"
 
-struct ClassNode;
-
 struct Ride;
-void Temple_GetInterfaces(struct ClassNode *str, struct Ride *obj);
+void Temple_GetInterfaces(struct Element *str, struct Ride *obj);

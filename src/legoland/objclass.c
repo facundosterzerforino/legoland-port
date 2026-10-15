@@ -33,21 +33,9 @@ struct ObjectInfo {
     unsigned short field_2e;
 };
 
-struct CountHolder {
-    unsigned char pad_0[0x10];
-    unsigned int count;
-};
-
-struct ObjectCount {
-    unsigned char pad_0[8];
-    unsigned int count;
-    unsigned char pad_c[0x5c - 0xc];
-    struct CountHolder *holder;
-};
-
 struct ObjCountWrap {
     unsigned char pad_0[0xc];
-    struct ObjectCount *inner;
+    struct Ride *inner;
 };
 
 struct ClassRideNode {
@@ -287,23 +275,23 @@ LEGO_EXPORT unsigned int ObjCount(struct ObjCountWrap *wrap) {
     if (wrap == 0) {
         return 0;
     }
-    return wrap->inner->count;
+    return wrap->inner->field_8;
 }
 
 // FUNCTION: LEGOLAND 0x00480d40
-LEGO_EXPORT void IncrementObjectCount(struct ObjectCount *count) {
-    count->count++;
-    count->holder->count++;
+LEGO_EXPORT void IncrementObjectCount(struct Ride *count) {
+    count->field_8++;
+    count->theme_element->field_10++;
 }
 
 // FUNCTION: LEGOLAND 0x00480d60
-LEGO_EXPORT void DecrementObjectCount(struct ObjectCount *count) {
+LEGO_EXPORT void DecrementObjectCount(struct Ride *count) {
 #ifdef LEGOLAND_PORT
     /* [port] log removals, to debug objectives that count objects */
-    DebugTrace("object count down: class %p now %u", (void *)count, count->count - 1);
+    DebugTrace("object count down: class %p now %u", (void *)count, count->field_8 - 1);
 #endif
-    count->count--;
-    count->holder->count--;
+    count->field_8--;
+    count->theme_element->field_10--;
 }
 
 // FUNCTION: LEGOLAND 0x00480d80

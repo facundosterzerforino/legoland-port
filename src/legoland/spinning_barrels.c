@@ -314,24 +314,14 @@ LEGO_EXPORT int SaveSBarrel(struct Element *element) {
     return SaveGameWrite(&terminator, 4) != 0;
 }
 
-struct BarrelTypeC {
-    void *field_0;
-    unsigned int field_4;
-};
-
-struct BarrelData {
-    unsigned char pad_0[0x54];
-    struct BarrelTypeC *field_54;
-};
-
 // FUNCTION: LEGOLAND 0x0043c690
 LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct BarrelNode *prev = NULL;
     struct RideNode *list;
     struct Person *car;
-    struct BarrelData *data;
-    struct BarrelTypeC *tc;
+    struct Bloke *data;
+    struct BNVRef *tc;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -364,9 +354,9 @@ LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
             list->person->field_30 = 0;
         }
         data = list->rider;
-        tc = data->field_54;
+        tc = data->bnv;
         if (tc != NULL) {
-            tc->field_0 = DAT_0062fdf0[tc->field_4];
+            tc->file = DAT_0062fdf0[tc->index];
         }
         list = list->next;
     }
@@ -374,7 +364,7 @@ LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c760
-void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct Ride *ride) {
+void SpinningBarrelsGetInterfaces(struct Element *str, struct Ride *ride) {
     // STRING: LEGOLAND 0x004b7978
     if (_stricmp("SPINNING BARRELS RIDE", str->name) == 0) {
         ride->cb_a4 = SpinningBarrelsRideLoad;

@@ -1553,25 +1553,15 @@ LEGO_EXPORT void AddPathTile(struct Point *p, unsigned short param1) {
     AddPathSquare((struct Point *)p);
 }
 
-struct PathFootprint {
-    /* 0x00 */ unsigned char pad_0[0x20];
-    /* 0x20 */ short type;
-    /* 0x22 */ unsigned char pad_22[0x3c - 0x22];
-    /* 0x3c */ int x_lo;
-    /* 0x40 */ int y_lo;
-    /* 0x44 */ int x_hi;
-    /* 0x48 */ int y_hi;
-};
-
 // FUNCTION: LEGOLAND 0x0045d3d0
-void ClearPathUnderFootprint(struct PathFootprint *param_1, int *param_2) {
+void ClearPathUnderFootprint(struct Ride *param_1, int *param_2) {
     int x;
     int y;
     struct Point pt;
 
     if (param_1->type != 0 && param_1->type != 2) {
-        for (y = param_2[1] + param_1->y_lo - 1; y <= param_2[1] + 1 + param_1->y_hi; y++) {
-            for (x = *param_2 + param_1->x_lo - 1; x <= *param_2 + param_1->x_hi + 1; x++) {
+        for (y = param_2[1] + param_1->footprint.y0 - 1; y <= param_2[1] + 1 + param_1->footprint.y1; y++) {
+            for (x = *param_2 + param_1->footprint.x0 - 1; x <= *param_2 + param_1->footprint.x1 + 1; x++) {
                 GameMap[y][x].flags &= 0xffe7;
                 GameMap[y][x].field_10 = 0;
                 GameMap[y][x].field_8 = GameMap[y][x].field_a;
@@ -1581,8 +1571,8 @@ void ClearPathUnderFootprint(struct PathFootprint *param_1, int *param_2) {
                 RemovePathSquare(&pt);
             }
         }
-        for (y = param_2[1] + param_1->y_lo; y <= param_2[1] + param_1->y_hi; y++) {
-            for (x = *param_2 + param_1->x_lo; x <= *param_2 + param_1->x_hi; x++) {
+        for (y = param_2[1] + param_1->footprint.y0; y <= param_2[1] + param_1->footprint.y1; y++) {
+            for (x = *param_2 + param_1->footprint.x0; x <= *param_2 + param_1->footprint.x1; x++) {
                 GameMap[y][x].flags &= 0xffe7;
                 GameMap[y][x].field_10 = 0;
                 GameMap[y][x].field_8 = GameMap[y][x].field_a;

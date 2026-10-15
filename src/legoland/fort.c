@@ -54,7 +54,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
     DAT_004c11e0 = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && (node->rider->pos.x >> 8) <= base - 4) {
-            AddBlokeToRenderList(&DAT_004c11e0, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004c11e0, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
@@ -75,7 +75,7 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
     DAT_004c11e0 = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && (node->rider->pos.x >> 8) > base - 4) {
-            AddBlokeToRenderList(&DAT_004c11e0, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004c11e0, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
@@ -244,7 +244,7 @@ void FortRemoveObject(Element *elem, TileId tile, struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x004068b0
-void FortGetInterfaces(struct ClassNode *name, struct Ride *ci) {
+void FortGetInterfaces(struct Element *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b45a0
     if (_stricmp("FORT", name->name) != 0) {
         return;

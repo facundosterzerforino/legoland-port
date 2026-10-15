@@ -32,13 +32,11 @@ struct LLS;
 struct Ride;
 
 struct RinData;
-struct LayerContainer;
-struct LayerOffsetHolder;
 struct Matrix3x3;
 struct tagRECT;
 struct Person;
 struct RinRender;
-struct BlokeRenderSrc;
+struct RideNode;
 
 struct RenderItemNode {
     /* 0x00 */ int key;
@@ -85,7 +83,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1);
 struct RenderItemNode *FUN_00443120(void);
 LEGO_EXPORT void AdjustOffsetForViewMode(struct Point *param_1);
 LEGO_EXPORT void RenderItems_New(void);
-LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct BlokeRenderSrc *src, int key);
+LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct RideNode *src, int key);
 LEGO_EXPORT void RenderBlokeList(struct RenderItemNode **list);
 LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport);
 void *FUN_00442580(struct Person *person, struct LocFile *context, struct PersonFace *arg3, unsigned int arg4, unsigned int arg5);

@@ -24,7 +24,5 @@ struct CatapultNode {
     /* 0x38 */ unsigned char pad_38[4];
 };
 
-struct ClassNode;
-
 struct Ride;
-void Catapult_GetInterfaces(struct ClassNode *name, struct Ride *ci);
+void Catapult_GetInterfaces(struct Element *name, struct Ride *ci);

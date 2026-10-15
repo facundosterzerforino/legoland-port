@@ -53,5 +53,4 @@ unsigned int FUN_0043acb0(struct RideNode *param_1, struct SpaceTowerCar *param_
 void SpaceTowerUpdate(struct Element *param_1);
 
 struct Ride;
-struct ClassNode;
-void SpaceTowerRide(struct ClassNode *head, struct Ride *iface);
+void SpaceTowerRide(struct Element *head, struct Ride *iface);

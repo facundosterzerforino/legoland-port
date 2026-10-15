@@ -432,7 +432,7 @@ void FUN_00437f10(unsigned short *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00437f60
-void JailCellAddObject(struct Ride *editObj, int *coords) {
+void JailCellAddObject(struct Element *editObj, int *coords) {
     unsigned char key[2];
     key[0] = (unsigned char)coords[0];
     key[1] = (unsigned char)coords[1];
@@ -560,9 +560,9 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
             }
         }
         LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
-        offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
+        offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 1);
         AdjustOffsetForViewMode(&offset);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 1) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
@@ -578,7 +578,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 0);
+        offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 0);
         AdjustOffsetForViewMode(&offset);
         PrintSprite(JailCellMaskSprite, pos.x + offset.x, pos.y + offset.y, param_6, NULL);
         for (i = 0; i < count; i++) {
@@ -599,9 +599,9 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
         return;
     }
     LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
-    offset = GetRenderOffsetForLayer((struct LayerOffsetHolder *)DAT_0062fd40, 1);
+    offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 1);
     AdjustOffsetForViewMode(&offset);
-    PrintSprite((struct Sprite *)GetSpriteForLayer((struct LayerContainer *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
+    PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
 }
 
 // FUNCTION: LEGOLAND 0x00438430

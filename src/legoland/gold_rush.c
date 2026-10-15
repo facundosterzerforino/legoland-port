@@ -154,7 +154,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
     GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x <= (((unsigned char *)tile)[0] << 8) + 0x780 && node->rider->pos.y <= (((unsigned char *)tile)[1] << 8) - 0x280) {
-            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
@@ -180,7 +180,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
     GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x <= (((unsigned char *)tile)[0] << 8) + 0x780 && node->rider->pos.y >= (((unsigned char *)tile)[1] << 8) - 0x280) {
-            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
@@ -194,7 +194,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
     GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && node->rider->pos.x > (((unsigned char *)tile)[0] << 8) + 0x780) {
-            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
@@ -208,7 +208,7 @@ void RenderGoldRush(Element *obj, unsigned int param_2, unsigned int param_3, un
     GoldRushBlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && (node->rider->pos.x >> 8) > ((unsigned char *)tile)[0] + 8) {
-            AddBlokeToRenderList(&GoldRushBlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&GoldRushBlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&GoldRushBlokeRenderList);
@@ -577,7 +577,7 @@ LEGO_EXPORT int LoadGoldWash(struct Element *element) {
 }
 
 // FUNCTION: LEGOLAND 0x004078f0
-void GoldRush_GetInterfaces(struct ClassNode *str, struct Ride *module) {
+void GoldRush_GetInterfaces(struct Element *str, struct Ride *module) {
     // STRING: LEGOLAND 0x004b4670
     if (_stricmp("GOLD RUSH", str->name) == 0) {
         module->cb_a4 = GoldRushLoad;

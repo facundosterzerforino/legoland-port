@@ -210,7 +210,7 @@ void CoptersInitNode(struct CopterNode *node) {
     node->layer[1].field_10 = 2;
     node->layer[1].field_14 = 7;
     node->layer[1].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 3);
+    handle = GetSpriteForLayer((struct Sprite *)CopterModelLayers, 3);
     if (handle != 0) {
         lls = GetLLSForSprite((struct Sprite *)handle);
         if (lls != NULL) {
@@ -224,7 +224,7 @@ void CoptersInitNode(struct CopterNode *node) {
     node->layer[0].field_10 = 0;
     node->layer[0].field_14 = 6;
     node->layer[0].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 1);
+    handle = GetSpriteForLayer((struct Sprite *)CopterModelLayers, 1);
     if (handle != 0) {
         lls = GetLLSForSprite((struct Sprite *)handle);
         if (lls != NULL) {
@@ -238,7 +238,7 @@ void CoptersInitNode(struct CopterNode *node) {
     node->layer[2].field_10 = 4;
     node->layer[2].field_14 = 8;
     node->layer[2].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 0xb);
+    handle = GetSpriteForLayer((struct Sprite *)CopterModelLayers, 0xb);
     if (handle != 0) {
         lls = GetLLSForSprite((struct Sprite *)handle);
         if (lls != NULL) {
@@ -252,7 +252,7 @@ void CoptersInitNode(struct CopterNode *node) {
     node->layer[3].field_10 = 3;
     node->layer[3].field_14 = 5;
     node->layer[3].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 6);
+    handle = GetSpriteForLayer((struct Sprite *)CopterModelLayers, 6);
     if (handle != 0) {
         lls = GetLLSForSprite((struct Sprite *)handle);
         if (lls != NULL) {
@@ -266,7 +266,7 @@ void CoptersInitNode(struct CopterNode *node) {
     node->layer[4].field_10 = 1;
     node->layer[4].field_14 = 9;
     node->layer[4].flags = 0;
-    handle = GetSpriteForLayer((struct LayerContainer *)CopterModelLayers, 7);
+    handle = GetSpriteForLayer((struct Sprite *)CopterModelLayers, 7);
     if (handle != 0) {
         lls = GetLLSForSprite((struct Sprite *)handle);
         if (lls != NULL) {
@@ -398,13 +398,13 @@ void CoptersRender(Element *obj, int unused, int unused2, TileId *tile, void *un
                 key = rn->person->field_20;
                 d = base.y - (rn->rider->pos.y >> 8);
                 if (d >= 5) {
-                    AddBlokeToRenderList(DAT_004c1190, (struct BlokeRenderSrc *)rn, key);
+                    AddBlokeToRenderList(DAT_004c1190, rn, key);
                 }
                 if (d >= 3 && d <= 4) {
-                    AddBlokeToRenderList(DAT_004c1168, (struct BlokeRenderSrc *)rn, key);
+                    AddBlokeToRenderList(DAT_004c1168, rn, key);
                 }
                 if (d >= 0 && d <= 2) {
-                    AddBlokeToRenderList(DAT_004c1194, (struct BlokeRenderSrc *)rn, key);
+                    AddBlokeToRenderList(DAT_004c1194, rn, key);
                 }
             }
         }
@@ -970,7 +970,7 @@ LEGO_EXPORT int Copters_Load(struct Element *element) {
 }
 
 // FUNCTION: LEGOLAND 0x00405110
-void CoptersRide(struct ClassNode *name, struct Ride *interfaces) {
+void CoptersRide(struct Element *name, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b43e4
     if (_stricmp("COPTERS", name->name) == 0) {
         interfaces->cb_a4 = CoptersLoad;

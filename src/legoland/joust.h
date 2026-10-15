@@ -36,5 +36,4 @@ struct JoustNode {
 #pragma pack(pop)
 
 struct Ride;
-struct ClassNode;
-LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct Ride *iface);
+LEGO_EXPORT void Joust_GetInterfaces(struct Element *head, struct Ride *iface);

@@ -769,7 +769,7 @@ LEGO_EXPORT int LoadJoust(struct Element *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00408db0
-LEGO_EXPORT void Joust_GetInterfaces(struct ClassNode *head, struct Ride *iface) {
+LEGO_EXPORT void Joust_GetInterfaces(struct Element *head, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b4718
     if (_stricmp("JOUST", head->name) == 0) {
         iface->cb_a4 = JoustLoadResources;

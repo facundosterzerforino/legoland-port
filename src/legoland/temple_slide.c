@@ -121,7 +121,7 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
             person->screen.x = bloke->screen_x + off1.x + off2.x + pos.x;
             person->screen.y = bloke->screen_y + off1.y + off2.y + pos.y;
             AdjustBlokePosition(&person->screen);
-            AddBlokeToRenderList(&DAT_004cbf84, (struct PersonSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&DAT_004cbf84, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&DAT_004cbf84);
@@ -509,7 +509,7 @@ LEGO_EXPORT int LoadTempleSlide(struct Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x00417a00
-LEGO_EXPORT void TempleSlide_GetInterfaces(struct ClassNode *ctx, struct Ride *interfaces) {
+LEGO_EXPORT void TempleSlide_GetInterfaces(struct Element *ctx, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b4f8c
     if (_stricmp("TEMPLE SLIDE", ctx->name) == 0) {
         interfaces->cb_a4 = TempleSlideLoad;

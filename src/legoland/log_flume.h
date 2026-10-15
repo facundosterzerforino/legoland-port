@@ -109,7 +109,6 @@ struct FlumeEntry {
     /* 0xd0 */ int field_d0;
 };
 
-struct ClassNode;
 struct FlumeEntry;
 struct ListNode;
 struct FlumeDims;
@@ -135,7 +134,7 @@ struct Point FUN_0040cfd0(struct FlumeEntry *entry);
 int FUN_004119c0(Element *obj, int filter);
 
 struct Ride;
-void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl);
+void LogFlume_GetInterfaces(struct Element *flume, struct Ride *vtbl);
 
 struct Cursor;
 void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first);

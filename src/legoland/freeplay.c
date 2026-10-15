@@ -138,7 +138,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
         if ((elem->flags & 0x1) == 0) continue;
         elem->flags &= 0xfffcfff0;
         if ((elem->flags & 0xfff0) == 0x10 || (elem->flags & 0xfff0) == 0x1010) {
-            LLIDB_UnLoadODF((struct LLIDBHead *)elem);
+            LLIDB_UnLoadODF(elem);
         }
     }
 

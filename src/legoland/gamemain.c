@@ -57,8 +57,8 @@ int IsInMapBounds(int a, int b) {
 
 // FUNCTION: LEGOLAND 0x004776c0
 void FUN_004776c0(struct GameMainNode *node) {
-    node->next = (struct GameMainNode *)DAT_00668fc4;
-    DAT_00668fc4 = (struct InterfaceQueryNode *)node;
+    node->next = DAT_00668fc4;
+    DAT_00668fc4 = node;
 }
 
 // FUNCTION: LEGOLAND 0x004776e0
@@ -93,7 +93,7 @@ void InsertOpenListSorted(struct GameMainNode *node) {
 struct GameMainNode *FUN_00477730(struct Point *ctx) {
     struct GameMainNode *node;
 
-    node = (struct GameMainNode *)DAT_00668fc4;
+    node = DAT_00668fc4;
     if (node == NULL) {
         return NULL;
     }
@@ -112,7 +112,7 @@ void RemoveQueryNode(struct GameMainNode *ctx) {
     struct GameMainNode *node;
 
     prev = NULL;
-    node = (struct GameMainNode *)DAT_00668fc4;
+    node = DAT_00668fc4;
     while (node != NULL) {
         if (node == ctx) {
             break;
@@ -123,7 +123,7 @@ void RemoveQueryNode(struct GameMainNode *ctx) {
     if (prev != NULL) {
         prev->next = node->next;
     } else {
-        DAT_00668fc4 = (struct InterfaceQueryNode *)node->next;
+        DAT_00668fc4 = node->next;
     }
 }
 
@@ -293,7 +293,7 @@ void FUN_004779d0(struct Point *p) {
             if (QueryClass->flags & 0x200000) {
                 RemoveObjectFromBuildList(t);
                 FUN_0045e850((struct Element *)elem, &pos.x);
-                IncrementObjectCount((struct ObjectCount *)QueryClass);
+                IncrementObjectCount((struct Ride *)QueryClass);
                 RemoveObjectFromMap(t);
             }
         } else {
@@ -308,7 +308,7 @@ void FUN_004779d0(struct Point *p) {
         if (NULL != order) {
             FUN_0045e850((struct Element *)order->element, &order->pos.x);
             ptmp63 = order->element->data;
-            ClearPathUnderFootprint((struct PathFootprint *)ptmp63, &order->pos.x);
+            ClearPathUnderFootprint((struct Ride *)ptmp63, &order->pos.x);
             EraseGardenerOrder(order);
             return;
         }
@@ -318,7 +318,7 @@ void FUN_004779d0(struct Point *p) {
         if (order != NULL) {
             ptmp12 = order->element;
             FUN_0045e850((struct Element *)ptmp12, &order->pos.x);
-            ClearPathUnderFootprint((struct PathFootprint *)order->element->data, &order->pos.x);
+            ClearPathUnderFootprint((struct Ride *)order->element->data, &order->pos.x);
             EraseMechanicOrder(order);
             return;
         }
@@ -498,13 +498,13 @@ void FindMapPathAStar(int x, int y, int a, int b) {
         if (!(tile->flags & 0x10)) {
             if ((tile->field_10 & 3) != 3) {
                 FUN_004779d0(pp);
-                AddBasicPath((struct Ride *)id, (int *)pp);
+                AddBasicPath((struct Element *)id, (int *)pp);
             }
         }
         nb = nb->parent;
     }
     while (DAT_00668fc4 != NULL) {
-        RemoveQueryNode((struct GameMainNode *)DAT_00668fc4);
+        RemoveQueryNode(DAT_00668fc4);
     }
 }
 

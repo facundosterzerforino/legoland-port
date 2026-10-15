@@ -192,7 +192,7 @@ struct RideSpriteInfo *GetFlowerSpriteInfo(struct Element *unused, TileId tile) 
 }
 
 // FUNCTION: LEGOLAND 0x004329c0
-void GardenGetInterfaces(struct ClassNode *head, struct Ride *iface) {
+void GardenGetInterfaces(struct Element *head, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b7138
     if (strcmp(head->name, "HEDGE") == 0) {
         iface->cb_a4 = LoadHedgeImages;

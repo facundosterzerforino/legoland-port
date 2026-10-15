@@ -9,7 +9,5 @@ struct GoldNode {
     unsigned char pad_10[0x1c];
 };
 
-struct ClassNode;
-
 struct Ride;
-void GoldRush_GetInterfaces(struct ClassNode *str, struct Ride *module);
+void GoldRush_GetInterfaces(struct Element *str, struct Ride *module);

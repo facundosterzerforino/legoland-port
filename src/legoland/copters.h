@@ -47,5 +47,4 @@ void FUN_004049a0(struct CopterNode *node, int param);
 void CoptersPlaceRider(struct CopterNode *node, int index);
 
 struct Ride;
-struct ClassNode;
-void CoptersRide(struct ClassNode *name, struct Ride *interfaces);
+void CoptersRide(struct Element *name, struct Ride *interfaces);

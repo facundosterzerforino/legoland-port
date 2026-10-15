@@ -1,6 +1,5 @@
 #pragma once
 
-struct ClassNode;
 struct Element;
 struct RideNode;
 
@@ -27,4 +26,4 @@ void SpinningBarrelsUpdate(struct Element *elem);
 unsigned int PickBarrelSeat(struct RideNode *rn, struct BarrelNode *node, signed char n);
 
 struct Ride;
-void SpinningBarrelsGetInterfaces(struct ClassNode *str, struct Ride *ride);
+void SpinningBarrelsGetInterfaces(struct Element *str, struct Ride *ride);

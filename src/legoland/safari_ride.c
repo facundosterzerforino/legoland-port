@@ -159,7 +159,7 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
                         person->screen.y = bloke->screen_y + (off2.y + off1.y) + pos.y;
                         AdjustBlokePosition(&person->screen);
                     }
-                    AddBlokeToRenderList(&DAT_004cbecc, (struct BlokeRenderSrc *)node, node->person->field_20);
+                    AddBlokeToRenderList(&DAT_004cbecc, node, node->person->field_20);
                 }
             }
         } else {
@@ -263,7 +263,7 @@ struct RideSpriteInfo *GetSafariRideSpriteInfo(struct Element *p1, unsigned shor
 }
 
 // FUNCTION: LEGOLAND 0x00415030
-void SafariRideGetInterfaces(struct ClassNode *name, struct Ride *interfaces) {
+void SafariRideGetInterfaces(struct Element *name, struct Ride *interfaces) {
     // STRING: LEGOLAND 0x004b4d74
     if (_stricmp("SAFARI RIDE", name->name) == 0) {
         interfaces->cb_a4 = SafariRideLoad;
@@ -537,24 +537,14 @@ LEGO_EXPORT int SaveSafariRide(struct Element *element) {
     return 1;
 }
 
-struct SafariTypeC {
-    void *field_0;
-    unsigned int field_4;
-};
-
-struct SafariData {
-    unsigned char pad_0[0x54];
-    struct SafariTypeC *bnv;
-};
-
 // FUNCTION: LEGOLAND 0x00415820
 LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
     struct Ride *obj = arg->ride;
     struct SafariNode *prev = NULL;
     struct RideNode *list;
     struct Person *car;
-    struct SafariData *data;
-    struct SafariTypeC *tc;
+    struct Bloke *data;
+    struct BNVRef *tc;
     unsigned int marker;
 
     if (!SaveGameRead(&marker, 4)) {
@@ -592,7 +582,7 @@ LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
         if (tc != NULL) {
             /* [port] the original reads (&DAT_004cbef8)[field_4], the three path BNVs laid out one after another */
             void **const bnvs[3] = {&DAT_004cbef8, &DAT_004cbefc, &DAT_004cbf00};
-            tc->field_0 = *bnvs[tc->field_4];
+            tc->file = *bnvs[tc->index];
         }
         list = list->next;
     }

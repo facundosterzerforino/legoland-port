@@ -51,7 +51,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
     BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x < lo) {
-            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
@@ -69,7 +69,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
     BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0x820 && node->rider->pos.y <= hi + 0x8d0) {
-            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
@@ -81,7 +81,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
     BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0x920 && node->rider->pos.y <= hi + 0x9d0) {
-            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
@@ -93,7 +93,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
     BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0xc20 && node->rider->pos.y <= hi + 0xcd0) {
-            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
@@ -105,7 +105,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
     BlokeRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && node->rider->pos.x >= lo && node->rider->pos.y >= hi + 0xd20 && node->rider->pos.y <= hi + 0xdd0) {
-            AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+            AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
         }
     }
     RenderBlokeList((struct RenderItemNode **)&BlokeRenderList);
@@ -119,7 +119,7 @@ void RenderEntrance(Element *obj, unsigned int param_2, unsigned int param_3, Ti
         if (tile->id == node->tile.id && node->rider->pos.x >= lo) {
             int y = node->rider->pos.y;
             if ((y < hi + 0x820 || y > hi + 0x8d0) && (y < hi + 0x920 || y > hi + 0x9d0) && (y < hi + 0xc20 || y > hi + 0xcd0) && (y < hi + 0xd20 || y > hi + 0xdd0)) {
-                AddBlokeToRenderList(&BlokeRenderList, (struct BlokeRenderSrc *)node, node->person->field_20);
+                AddBlokeToRenderList(&BlokeRenderList, node, node->person->field_20);
             }
         }
     }

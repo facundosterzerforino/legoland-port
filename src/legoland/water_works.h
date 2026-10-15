@@ -12,7 +12,5 @@ struct WaterNode {
     /* 0x0b */ unsigned char pad_b[1];
 };
 
-struct ClassNode;
-
 struct Ride;
-void WaterWorksGetInterfaces(struct ClassNode *name, struct Ride *ci);
+void WaterWorksGetInterfaces(struct Element *name, struct Ride *ci);

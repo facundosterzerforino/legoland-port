@@ -2,7 +2,5 @@
 
 #include "legoland.h"
 
-struct ClassNode;
-
 struct Ride;
-void FortGetInterfaces(struct ClassNode *name, struct Ride *ci);
+void FortGetInterfaces(struct Element *name, struct Ride *ci);
