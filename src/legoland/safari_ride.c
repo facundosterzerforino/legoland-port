@@ -329,7 +329,7 @@ void FUN_004150c0(struct SafariNode *node) {
         }
     }
     *(short *)*ZSafariSprite->lls = (short)s->frame;
-    Put3DBlokesOnRide2((Element *)SafariRide, (Element *)node);
+    Put3DBlokesOnRide2(SafariRide, node);
 }
 
 // FUNCTION: LEGOLAND 0x00415200

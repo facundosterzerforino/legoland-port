@@ -403,7 +403,7 @@ void FUN_0042d560(unsigned short *param_1) {
         }
         Put3DBlokesOnRide((struct Ride *)EarthSlideRide, (unsigned char *)param_1, (int)*(char *)((char *)param_1 + 0xb), EarthPos);
     }
-    Put3DBlokesOnRide2((Element *)EarthSlideRide, (Element *)param_1);
+    Put3DBlokesOnRide2(EarthSlideRide, param_1);
 }
 
 // FUNCTION: LEGOLAND 0x0042d5f0

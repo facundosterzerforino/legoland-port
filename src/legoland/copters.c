@@ -706,7 +706,7 @@ void CoptersUpdateNode(struct CopterNode *node) {
             }
         }
     }
-    Put3DBlokesOnRide2(ActiveCopterRide, (Element *)node);
+    Put3DBlokesOnRide2(ActiveCopterRide, node);
 }
 
 // FUNCTION: LEGOLAND 0x00404bc0
