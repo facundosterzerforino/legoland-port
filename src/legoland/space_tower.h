@@ -6,9 +6,7 @@ struct RideNode;
 #include "objclass.h"
 
 /* [port] declared at file scope so prototypes below refer to the same type */
-struct SpaceTowerCtx;
 
-struct SpaceTowerRideNode;
 struct SpaceTowerSeat {
     /* 0x00 */ unsigned int flags;
     /* 0x04 */ unsigned char pad_4[4];
@@ -51,8 +49,6 @@ struct AnimLayout {
     /* 0x04 */ struct AnimEntry **entries;
 };
 
-unsigned int FUN_0043acb0(struct SpaceTowerRideNode *param_1, struct SpaceTowerCar *param_2);
-void SpaceTowerUpdate(struct SpaceTowerCtx *param_1);
 unsigned int FUN_0043acb0(struct RideNode *param_1, struct SpaceTowerCar *param_2);
 void SpaceTowerUpdate(struct Element *param_1);
 

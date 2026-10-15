@@ -98,6 +98,13 @@ extern const struct PortX86Field port_x86_Ride[];
 extern const unsigned int port_x86_Ride_count;
 extern const struct PortX86Type port_x86_type_Ride;
 
+/* struct BNVPath: 14 fields, 0x48 bytes in the original */
+#define PORT_X86_SIZE_BNVPath 0x48u
+struct BNVPath;
+extern const struct PortX86Field port_x86_BNVPath[];
+extern const unsigned int port_x86_BNVPath_count;
+extern const struct PortX86Type port_x86_type_BNVPath;
+
 /* struct BalloonNode: 13 fields, 0x20 bytes in the original */
 #define PORT_X86_SIZE_BalloonNode 0x20u
 struct BalloonNode;
@@ -112,7 +119,7 @@ extern const struct PortX86Field port_x86_BarrelNode[];
 extern const unsigned int port_x86_BarrelNode_count;
 extern const struct PortX86Type port_x86_type_BarrelNode;
 
-/* struct BlokeSave: 58 fields, 0x124 bytes in the original */
+/* struct BlokeSave: 76 fields, 0x124 bytes in the original */
 #define PORT_X86_SIZE_BlokeSave 0x124u
 struct BlokeSave;
 extern const struct PortX86Field port_x86_BlokeSave[];
@@ -133,6 +140,13 @@ extern const struct PortX86Field port_x86_BoatRideNode[];
 extern const unsigned int port_x86_BoatRideNode_count;
 extern const struct PortX86Type port_x86_type_BoatRideNode;
 
+/* struct BrollyNode: 4 fields, 0xc bytes in the original */
+#define PORT_X86_SIZE_BrollyNode 0xcu
+struct BrollyNode;
+extern const struct PortX86Field port_x86_BrollyNode[];
+extern const unsigned int port_x86_BrollyNode_count;
+extern const struct PortX86Type port_x86_type_BrollyNode;
+
 /* struct BuildObj: 4 fields, 0xc bytes in the original */
 #define PORT_X86_SIZE_BuildObj 0xcu
 struct BuildObj;
@@ -147,12 +161,26 @@ extern const struct PortX86Field port_x86_CarouselNode[];
 extern const unsigned int port_x86_CarouselNode_count;
 extern const struct PortX86Type port_x86_type_CarouselNode;
 
+/* struct CatapultNode: 15 fields, 0x3c bytes in the original */
+#define PORT_X86_SIZE_CatapultNode 0x3cu
+struct CatapultNode;
+extern const struct PortX86Field port_x86_CatapultNode[];
+extern const unsigned int port_x86_CatapultNode_count;
+extern const struct PortX86Type port_x86_type_CatapultNode;
+
 /* struct CopterNode: 75 fields, 0xd8 bytes in the original */
 #define PORT_X86_SIZE_CopterNode 0xd8u
 struct CopterNode;
 extern const struct PortX86Field port_x86_CopterNode[];
 extern const unsigned int port_x86_CopterNode_count;
 extern const struct PortX86Type port_x86_type_CopterNode;
+
+/* struct CountNode: 4 fields, 0xc bytes in the original */
+#define PORT_X86_SIZE_CountNode 0xcu
+struct CountNode;
+extern const struct PortX86Field port_x86_CountNode[];
+extern const unsigned int port_x86_CountNode_count;
+extern const struct PortX86Type port_x86_type_CountNode;
 
 /* struct EarthNode: 14 fields, 0x24 bytes in the original */
 #define PORT_X86_SIZE_EarthNode 0x24u
@@ -168,12 +196,47 @@ extern const struct PortX86Field port_x86_EditState[];
 extern const unsigned int port_x86_EditState_count;
 extern const struct PortX86Type port_x86_type_EditState;
 
+/* struct FlumeEntry: 54 fields, 0xd4 bytes in the original */
+#define PORT_X86_SIZE_FlumeEntry 0xd4u
+struct FlumeEntry;
+extern const struct PortX86Field port_x86_FlumeEntry[];
+extern const unsigned int port_x86_FlumeEntry_count;
+extern const struct PortX86Type port_x86_type_FlumeEntry;
+
+/* struct FlumeNode: 15 fields, 0x38 bytes in the original */
+#define PORT_X86_SIZE_FlumeNode 0x38u
+struct FlumeNode;
+extern const struct PortX86Field port_x86_FlumeNode[];
+extern const unsigned int port_x86_FlumeNode_count;
+extern const struct PortX86Type port_x86_type_FlumeNode;
+
 /* struct Footprint: 5 fields, 0x14 bytes in the original */
 #define PORT_X86_SIZE_Footprint 0x14u
 struct Footprint;
 extern const struct PortX86Field port_x86_Footprint[];
 extern const unsigned int port_x86_Footprint_count;
 extern const struct PortX86Type port_x86_type_Footprint;
+
+/* struct GoldNode: 4 fields, 0x2c bytes in the original */
+#define PORT_X86_SIZE_GoldNode 0x2cu
+struct GoldNode;
+extern const struct PortX86Field port_x86_GoldNode[];
+extern const unsigned int port_x86_GoldNode_count;
+extern const struct PortX86Type port_x86_type_GoldNode;
+
+/* struct JailCell: 9 fields, 0x1c bytes in the original */
+#define PORT_X86_SIZE_JailCell 0x1cu
+struct JailCell;
+extern const struct PortX86Field port_x86_JailCell[];
+extern const unsigned int port_x86_JailCell_count;
+extern const struct PortX86Type port_x86_type_JailCell;
+
+/* struct JoustNode: 13 fields, 0x24 bytes in the original */
+#define PORT_X86_SIZE_JoustNode 0x24u
+struct JoustNode;
+extern const struct PortX86Field port_x86_JoustNode[];
+extern const unsigned int port_x86_JoustNode_count;
+extern const struct PortX86Type port_x86_type_JoustNode;
 
 /* struct JungleFish: 4 fields, 0xc bytes in the original */
 #define PORT_X86_SIZE_JungleFish 0xcu
@@ -224,6 +287,13 @@ extern const struct PortX86Field port_x86_MermaidNode[];
 extern const unsigned int port_x86_MermaidNode_count;
 extern const struct PortX86Type port_x86_type_MermaidNode;
 
+/* struct NewBloke: 26 fields, 0xd0 bytes in the original */
+#define PORT_X86_SIZE_NewBloke 0xd0u
+struct NewBloke;
+extern const struct PortX86Field port_x86_NewBloke[];
+extern const unsigned int port_x86_NewBloke_count;
+extern const struct PortX86Type port_x86_type_NewBloke;
+
 /* struct ObjectiveEvent: 15 fields, 0x44 bytes in the original */
 #define PORT_X86_SIZE_ObjectiveEvent 0x44u
 struct ObjectiveEvent;
@@ -238,6 +308,13 @@ extern const struct PortX86Field port_x86_PathNode[];
 extern const unsigned int port_x86_PathNode_count;
 extern const struct PortX86Type port_x86_type_PathNode;
 
+/* struct PlaneRideNode: 16 fields, 0x24 bytes in the original */
+#define PORT_X86_SIZE_PlaneRideNode 0x24u
+struct PlaneRideNode;
+extern const struct PortX86Field port_x86_PlaneRideNode[];
+extern const unsigned int port_x86_PlaneRideNode_count;
+extern const struct PortX86Type port_x86_type_PlaneRideNode;
+
 /* struct PumpNode: 5 fields, 0x10 bytes in the original */
 #define PORT_X86_SIZE_PumpNode 0x10u
 struct PumpNode;
@@ -245,8 +322,8 @@ extern const struct PortX86Field port_x86_PumpNode[];
 extern const unsigned int port_x86_PumpNode_count;
 extern const struct PortX86Type port_x86_type_PumpNode;
 
-/* struct RideQueueEntry: 10 fields, 0x1c bytes in the original */
-#define PORT_X86_SIZE_RideQueueEntry 0x1cu
+/* struct RideQueueEntry: 13 fields, 0x20 bytes in the original */
+#define PORT_X86_SIZE_RideQueueEntry 0x20u
 struct RideQueueEntry;
 extern const struct PortX86Field port_x86_RideQueueEntry[];
 extern const unsigned int port_x86_RideQueueEntry_count;
@@ -259,12 +336,40 @@ extern const struct PortX86Field port_x86_SafariNode[];
 extern const unsigned int port_x86_SafariNode_count;
 extern const struct PortX86Type port_x86_type_SafariNode;
 
+/* struct SaveBlock: 22 fields, 0x40 bytes in the original */
+#define PORT_X86_SIZE_SaveBlock 0x40u
+struct SaveBlock;
+extern const struct PortX86Field port_x86_SaveBlock[];
+extern const unsigned int port_x86_SaveBlock_count;
+extern const struct PortX86Type port_x86_type_SaveBlock;
+
+/* struct SlideNode: 5 fields, 0x20 bytes in the original */
+#define PORT_X86_SIZE_SlideNode 0x20u
+struct SlideNode;
+extern const struct PortX86Field port_x86_SlideNode[];
+extern const unsigned int port_x86_SlideNode_count;
+extern const struct PortX86Type port_x86_type_SlideNode;
+
+/* struct SpaceTowerCar: 53 fields, 0xb4 bytes in the original */
+#define PORT_X86_SIZE_SpaceTowerCar 0xb4u
+struct SpaceTowerCar;
+extern const struct PortX86Field port_x86_SpaceTowerCar[];
+extern const unsigned int port_x86_SpaceTowerCar_count;
+extern const struct PortX86Type port_x86_type_SpaceTowerCar;
+
 /* struct SpiderNode: 5 fields, 0x30 bytes in the original */
 #define PORT_X86_SIZE_SpiderNode 0x30u
 struct SpiderNode;
 extern const struct PortX86Field port_x86_SpiderNode[];
 extern const unsigned int port_x86_SpiderNode_count;
 extern const struct PortX86Type port_x86_type_SpiderNode;
+
+/* struct WaterNode: 7 fields, 0xc bytes in the original */
+#define PORT_X86_SIZE_WaterNode 0xcu
+struct WaterNode;
+extern const struct PortX86Field port_x86_WaterNode[];
+extern const unsigned int port_x86_WaterNode_count;
+extern const struct PortX86Type port_x86_type_WaterNode;
 
 /* struct WorkOrder: 16 fields, 0x3c bytes in the original */
 #define PORT_X86_SIZE_WorkOrder 0x3cu
@@ -273,21 +378,37 @@ extern const struct PortX86Field port_x86_WorkOrder[];
 extern const unsigned int port_x86_WorkOrder_count;
 extern const struct PortX86Type port_x86_type_WorkOrder;
 
+/* struct WorkerSave: 53 fields, 0xdc bytes in the original */
+#define PORT_X86_SIZE_WorkerSave 0xdcu
+struct WorkerSave;
+extern const struct PortX86Field port_x86_WorkerSave[];
+extern const unsigned int port_x86_WorkerSave_count;
+extern const struct PortX86Type port_x86_type_WorkerSave;
+
 /* The descriptor of the type p points to (an array decays to its first element), NULL for any other. */
 #define PORT_X86_TYPE(p) \
     _Generic((p), \
         struct Ride *: &port_x86_type_Ride, const struct Ride *: &port_x86_type_Ride, \
+        struct BNVPath *: &port_x86_type_BNVPath, const struct BNVPath *: &port_x86_type_BNVPath, \
         struct BalloonNode *: &port_x86_type_BalloonNode, const struct BalloonNode *: &port_x86_type_BalloonNode, \
         struct BarrelNode *: &port_x86_type_BarrelNode, const struct BarrelNode *: &port_x86_type_BarrelNode, \
         struct BlokeSave *: &port_x86_type_BlokeSave, const struct BlokeSave *: &port_x86_type_BlokeSave, \
         struct BoatRide *: &port_x86_type_BoatRide, const struct BoatRide *: &port_x86_type_BoatRide, \
         struct BoatRideNode *: &port_x86_type_BoatRideNode, const struct BoatRideNode *: &port_x86_type_BoatRideNode, \
+        struct BrollyNode *: &port_x86_type_BrollyNode, const struct BrollyNode *: &port_x86_type_BrollyNode, \
         struct BuildObj *: &port_x86_type_BuildObj, const struct BuildObj *: &port_x86_type_BuildObj, \
         struct CarouselNode *: &port_x86_type_CarouselNode, const struct CarouselNode *: &port_x86_type_CarouselNode, \
+        struct CatapultNode *: &port_x86_type_CatapultNode, const struct CatapultNode *: &port_x86_type_CatapultNode, \
         struct CopterNode *: &port_x86_type_CopterNode, const struct CopterNode *: &port_x86_type_CopterNode, \
+        struct CountNode *: &port_x86_type_CountNode, const struct CountNode *: &port_x86_type_CountNode, \
         struct EarthNode *: &port_x86_type_EarthNode, const struct EarthNode *: &port_x86_type_EarthNode, \
         struct EditState *: &port_x86_type_EditState, const struct EditState *: &port_x86_type_EditState, \
+        struct FlumeEntry *: &port_x86_type_FlumeEntry, const struct FlumeEntry *: &port_x86_type_FlumeEntry, \
+        struct FlumeNode *: &port_x86_type_FlumeNode, const struct FlumeNode *: &port_x86_type_FlumeNode, \
         struct Footprint *: &port_x86_type_Footprint, const struct Footprint *: &port_x86_type_Footprint, \
+        struct GoldNode *: &port_x86_type_GoldNode, const struct GoldNode *: &port_x86_type_GoldNode, \
+        struct JailCell *: &port_x86_type_JailCell, const struct JailCell *: &port_x86_type_JailCell, \
+        struct JoustNode *: &port_x86_type_JoustNode, const struct JoustNode *: &port_x86_type_JoustNode, \
         struct JungleFish *: &port_x86_type_JungleFish, const struct JungleFish *: &port_x86_type_JungleFish, \
         struct JungleObj *: &port_x86_type_JungleObj, const struct JungleObj *: &port_x86_type_JungleObj, \
         struct JunglePath *: &port_x86_type_JunglePath, const struct JunglePath *: &port_x86_type_JunglePath, \
@@ -295,13 +416,20 @@ extern const struct PortX86Type port_x86_type_WorkOrder;
         struct JungleScore *: &port_x86_type_JungleScore, const struct JungleScore *: &port_x86_type_JungleScore, \
         struct MapElement *: &port_x86_type_MapElement, const struct MapElement *: &port_x86_type_MapElement, \
         struct MermaidNode *: &port_x86_type_MermaidNode, const struct MermaidNode *: &port_x86_type_MermaidNode, \
+        struct NewBloke *: &port_x86_type_NewBloke, const struct NewBloke *: &port_x86_type_NewBloke, \
         struct ObjectiveEvent *: &port_x86_type_ObjectiveEvent, const struct ObjectiveEvent *: &port_x86_type_ObjectiveEvent, \
         struct PathNode *: &port_x86_type_PathNode, const struct PathNode *: &port_x86_type_PathNode, \
+        struct PlaneRideNode *: &port_x86_type_PlaneRideNode, const struct PlaneRideNode *: &port_x86_type_PlaneRideNode, \
         struct PumpNode *: &port_x86_type_PumpNode, const struct PumpNode *: &port_x86_type_PumpNode, \
         struct RideQueueEntry *: &port_x86_type_RideQueueEntry, const struct RideQueueEntry *: &port_x86_type_RideQueueEntry, \
         struct SafariNode *: &port_x86_type_SafariNode, const struct SafariNode *: &port_x86_type_SafariNode, \
+        struct SaveBlock *: &port_x86_type_SaveBlock, const struct SaveBlock *: &port_x86_type_SaveBlock, \
+        struct SlideNode *: &port_x86_type_SlideNode, const struct SlideNode *: &port_x86_type_SlideNode, \
+        struct SpaceTowerCar *: &port_x86_type_SpaceTowerCar, const struct SpaceTowerCar *: &port_x86_type_SpaceTowerCar, \
         struct SpiderNode *: &port_x86_type_SpiderNode, const struct SpiderNode *: &port_x86_type_SpiderNode, \
+        struct WaterNode *: &port_x86_type_WaterNode, const struct WaterNode *: &port_x86_type_WaterNode, \
         struct WorkOrder *: &port_x86_type_WorkOrder, const struct WorkOrder *: &port_x86_type_WorkOrder, \
+        struct WorkerSave *: &port_x86_type_WorkerSave, const struct WorkerSave *: &port_x86_type_WorkerSave, \
         default: (const struct PortX86Type *)0)
 
 #endif

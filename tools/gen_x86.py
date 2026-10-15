@@ -24,11 +24,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # struct Ride: the object classes' files. The others: what the saved games hold (tools/phase8/audit_save.py checks
 # that every SaveGameRead/SaveGameWrite of a struct whose layout differs on 64 bits is listed here).
 TYPES = ["struct Ride",
-         "struct BalloonNode", "struct BarrelNode", "struct BlokeSave", "struct BoatRide", "struct BoatRideNode",
-         "struct BuildObj", "struct CarouselNode", "struct CopterNode", "struct EarthNode", "struct EditState",
-         "struct Footprint", "struct JungleFish", "struct JungleObj", "struct JunglePath", "struct JungleRide",
-         "struct JungleScore", "struct MapElement", "struct MermaidNode", "struct ObjectiveEvent", "struct PathNode",
-         "struct PumpNode", "struct RideQueueEntry", "struct SafariNode", "struct SpiderNode", "struct WorkOrder"]
+        "struct BNVPath", "struct BalloonNode", "struct BarrelNode", "struct BlokeSave", "struct BoatRide",
+        "struct BoatRideNode", "struct BrollyNode", "struct BuildObj", "struct CarouselNode", "struct CatapultNode",
+        "struct CopterNode", "struct CountNode", "struct EarthNode", "struct EditState", "struct FlumeEntry",
+        "struct FlumeNode", "struct Footprint", "struct GoldNode", "struct JailCell", "struct JoustNode",
+        "struct JungleFish", "struct JungleObj", "struct JunglePath", "struct JungleRide", "struct JungleScore",
+        "struct MapElement", "struct MermaidNode", "struct NewBloke", "struct ObjectiveEvent", "struct PathNode",
+        "struct PlaneRideNode", "struct PumpNode", "struct RideQueueEntry", "struct SafariNode", "struct SaveBlock",
+        "struct SlideNode", "struct SpaceTowerCar", "struct SpiderNode", "struct WaterNode", "struct WorkOrder",
+        "struct WorkerSave"]
 
 
 def flatten(t, desig, off):

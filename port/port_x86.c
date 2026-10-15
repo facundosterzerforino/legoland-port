@@ -172,6 +172,25 @@ const struct PortX86Field port_x86_Ride[] = {
 const unsigned int port_x86_Ride_count = sizeof(port_x86_Ride) / sizeof(port_x86_Ride[0]);
 const struct PortX86Type port_x86_type_Ride = {port_x86_Ride, sizeof(port_x86_Ride) / sizeof(port_x86_Ride[0]), 0xd0, sizeof(struct Ride), "struct Ride"};
 
+const struct PortX86Field port_x86_BNVPath[] = {
+    {0x0, offsetof(struct BNVPath, file), 4, 'P'},
+    {0x4, offsetof(struct BNVPath, field_4), 4, 'B'},
+    {0x8, offsetof(struct BNVPath, name), 20, 'B'},
+    {0x1c, offsetof(struct BNVPath, z_scale), 4, 'B'},
+    {0x20, offsetof(struct BNVPath, z_origin), 4, 'B'},
+    {0x24, offsetof(struct BNVPath, x), 4, 'B'},
+    {0x28, offsetof(struct BNVPath, y), 4, 'B'},
+    {0x2c, offsetof(struct BNVPath, pad_2c), 4, 'B'},
+    {0x30, offsetof(struct BNVPath, dx), 4, 'B'},
+    {0x34, offsetof(struct BNVPath, dy), 4, 'B'},
+    {0x38, offsetof(struct BNVPath, pad_38), 4, 'B'},
+    {0x3c, offsetof(struct BNVPath, z_skew), 4, 'B'},
+    {0x40, offsetof(struct BNVPath, frame_index), 4, 'B'},
+    {0x44, offsetof(struct BNVPath, field_44), 4, 'B'},
+};
+const unsigned int port_x86_BNVPath_count = sizeof(port_x86_BNVPath) / sizeof(port_x86_BNVPath[0]);
+const struct PortX86Type port_x86_type_BNVPath = {port_x86_BNVPath, sizeof(port_x86_BNVPath) / sizeof(port_x86_BNVPath[0]), 0x48, sizeof(struct BNVPath), "struct BNVPath"};
+
 const struct PortX86Field port_x86_BalloonNode[] = {
     {0x0, offsetof(struct BalloonNode, next), 4, 'P'},
     {0x4, offsetof(struct BalloonNode, tile), 2, 'B'},
@@ -221,7 +240,25 @@ const struct PortX86Field port_x86_BlokeSave[] = {
     {0x14, offsetof(struct BlokeSave, field_20), 4, 'B'},
     {0x18, offsetof(struct BlokeSave, dest), 8, 'B'},
     {0x20, offsetof(struct BlokeSave, goal), 8, 'B'},
-    {0x28, offsetof(struct BlokeSave, block_34), 40, 'B'},
+    {0x28, offsetof(struct BlokeSave, block_34.field_34), 1, 'B'},
+    {0x29, offsetof(struct BlokeSave, block_34.field_35), 1, 'B'},
+    {0x2a, offsetof(struct BlokeSave, block_34.field_36), 1, 'B'},
+    {0x2b, offsetof(struct BlokeSave, block_34.field_37), 1, 'B'},
+    {0x2c, offsetof(struct BlokeSave, block_34.field_38), 2, 'B'},
+    {0x2e, offsetof(struct BlokeSave, block_34.field_3a), 2, 'B'},
+    {0x30, offsetof(struct BlokeSave, block_34.screen_x), 2, 'B'},
+    {0x32, offsetof(struct BlokeSave, block_34.screen_y), 2, 'B'},
+    {0x34, offsetof(struct BlokeSave, block_34.field_40), 2, 'B'},
+    {0x36, offsetof(struct BlokeSave, block_34.field_42), 2, 'B'},
+    {0x38, offsetof(struct BlokeSave, block_34.field_44), 2, 'B'},
+    {0x3a, offsetof(struct BlokeSave, block_34.field_46), 2, 'B'},
+    {0x3c, offsetof(struct BlokeSave, block_34.pad_48), 2, 'B'},
+    {0x3e, offsetof(struct BlokeSave, block_34.field_4a), 2, 'B'},
+    {0x40, offsetof(struct BlokeSave, block_34.field_4c), 2, 'B'},
+    {0x42, offsetof(struct BlokeSave, block_34.pad_4e), 2, 'B'},
+    {0x44, offsetof(struct BlokeSave, block_34.order), 4, 'P'},
+    {0x48, offsetof(struct BlokeSave, block_34.path), 4, 'P'},
+    {0x4c, offsetof(struct BlokeSave, block_34.field_58), 4, 'B'},
     {0x50, offsetof(struct BlokeSave, field_5c), 4, 'B'},
     {0x54, offsetof(struct BlokeSave, param_action), 1, 'B'},
     {0x55, offsetof(struct BlokeSave, pad_55), 1, 'B'},
@@ -314,6 +351,15 @@ const struct PortX86Field port_x86_BoatRideNode[] = {
 const unsigned int port_x86_BoatRideNode_count = sizeof(port_x86_BoatRideNode) / sizeof(port_x86_BoatRideNode[0]);
 const struct PortX86Type port_x86_type_BoatRideNode = {port_x86_BoatRideNode, sizeof(port_x86_BoatRideNode) / sizeof(port_x86_BoatRideNode[0]), 0x34, sizeof(struct BoatRideNode), "struct BoatRideNode"};
 
+const struct PortX86Field port_x86_BrollyNode[] = {
+    {0x0, offsetof(struct BrollyNode, next), 4, 'P'},
+    {0x4, offsetof(struct BrollyNode, value), 2, 'B'},
+    {0x6, offsetof(struct BrollyNode, seats), 3, 'B'},
+    {0x9, offsetof(struct BrollyNode, field_9), 1, 'B'},
+};
+const unsigned int port_x86_BrollyNode_count = sizeof(port_x86_BrollyNode) / sizeof(port_x86_BrollyNode[0]);
+const struct PortX86Type port_x86_type_BrollyNode = {port_x86_BrollyNode, sizeof(port_x86_BrollyNode) / sizeof(port_x86_BrollyNode[0]), 0xc, sizeof(struct BrollyNode), "struct BrollyNode"};
+
 const struct PortX86Field port_x86_BuildObj[] = {
     {0x0, offsetof(struct BuildObj, ride), 4, 'P'},
     {0x4, offsetof(struct BuildObj, coords), 2, 'B'},
@@ -341,6 +387,26 @@ const struct PortX86Field port_x86_CarouselNode[] = {
 };
 const unsigned int port_x86_CarouselNode_count = sizeof(port_x86_CarouselNode) / sizeof(port_x86_CarouselNode[0]);
 const struct PortX86Type port_x86_type_CarouselNode = {port_x86_CarouselNode, sizeof(port_x86_CarouselNode) / sizeof(port_x86_CarouselNode[0]), 0x2c, sizeof(struct CarouselNode), "struct CarouselNode"};
+
+const struct PortX86Field port_x86_CatapultNode[] = {
+    {0x0, offsetof(struct CatapultNode, tile_id), 2, 'B'},
+    {0x2, offsetof(struct CatapultNode, pad_2), 2, 'B'},
+    {0x4, offsetof(struct CatapultNode, next), 4, 'P'},
+    {0x8, offsetof(struct CatapultNode, field_8), 4, 'B'},
+    {0xc, offsetof(struct CatapultNode, mode), 1, 'B'},
+    {0xd, offsetof(struct CatapultNode, field_d), 1, 'B'},
+    {0xe, offsetof(struct CatapultNode, pad_e), 2, 'B'},
+    {0x10, offsetof(struct CatapultNode, slots[0]), 4, 'P'},
+    {0x14, offsetof(struct CatapultNode, slots[1]), 4, 'P'},
+    {0x18, offsetof(struct CatapultNode, slots[2]), 4, 'P'},
+    {0x1c, offsetof(struct CatapultNode, slots[3]), 4, 'P'},
+    {0x20, offsetof(struct CatapultNode, active), 4, 'B'},
+    {0x24, offsetof(struct CatapultNode, frame), 4, 'B'},
+    {0x28, offsetof(struct CatapultNode, flags), 16, 'B'},
+    {0x38, offsetof(struct CatapultNode, pad_38), 4, 'B'},
+};
+const unsigned int port_x86_CatapultNode_count = sizeof(port_x86_CatapultNode) / sizeof(port_x86_CatapultNode[0]);
+const struct PortX86Type port_x86_type_CatapultNode = {port_x86_CatapultNode, sizeof(port_x86_CatapultNode) / sizeof(port_x86_CatapultNode[0]), 0x3c, sizeof(struct CatapultNode), "struct CatapultNode"};
 
 const struct PortX86Field port_x86_CopterNode[] = {
     {0x0, offsetof(struct CopterNode, field_0), 2, 'B'},
@@ -422,6 +488,15 @@ const struct PortX86Field port_x86_CopterNode[] = {
 const unsigned int port_x86_CopterNode_count = sizeof(port_x86_CopterNode) / sizeof(port_x86_CopterNode[0]);
 const struct PortX86Type port_x86_type_CopterNode = {port_x86_CopterNode, sizeof(port_x86_CopterNode) / sizeof(port_x86_CopterNode[0]), 0xd8, sizeof(struct CopterNode), "struct CopterNode"};
 
+const struct PortX86Field port_x86_CountNode[] = {
+    {0x0, offsetof(struct CountNode, tile), 2, 'B'},
+    {0x2, offsetof(struct CountNode, pad_2), 2, 'B'},
+    {0x4, offsetof(struct CountNode, field_4), 4, 'B'},
+    {0x8, offsetof(struct CountNode, next), 4, 'P'},
+};
+const unsigned int port_x86_CountNode_count = sizeof(port_x86_CountNode) / sizeof(port_x86_CountNode[0]);
+const struct PortX86Type port_x86_type_CountNode = {port_x86_CountNode, sizeof(port_x86_CountNode) / sizeof(port_x86_CountNode[0]), 0xc, sizeof(struct CountNode), "struct CountNode"};
+
 const struct PortX86Field port_x86_EarthNode[] = {
     {0x0, offsetof(struct EarthNode, id), 2, 'B'},
     {0x2, offsetof(struct EarthNode, pad_2), 2, 'B'},
@@ -449,6 +524,85 @@ const struct PortX86Field port_x86_EditState[] = {
 const unsigned int port_x86_EditState_count = sizeof(port_x86_EditState) / sizeof(port_x86_EditState[0]);
 const struct PortX86Type port_x86_type_EditState = {port_x86_EditState, sizeof(port_x86_EditState) / sizeof(port_x86_EditState[0]), 0xc, sizeof(struct EditState), "struct EditState"};
 
+const struct PortX86Field port_x86_FlumeEntry[] = {
+    {0x0, offsetof(struct FlumeEntry, next), 4, 'P'},
+    {0x4, offsetof(struct FlumeEntry, alt), 4, 'P'},
+    {0x8, offsetof(struct FlumeEntry, parent8), 4, 'P'},
+    {0xc, offsetof(struct FlumeEntry, field_c), 4, 'P'},
+    {0x10, offsetof(struct FlumeEntry, sub), 4, 'P'},
+    {0x14, offsetof(struct FlumeEntry, tile), 2, 'B'},
+    {0x16, offsetof(struct FlumeEntry, pad_16), 2, 'B'},
+    {0x18, offsetof(struct FlumeEntry, link), 4, 'P'},
+    {0x1c, offsetof(struct FlumeEntry, submode), 4, 'B'},
+    {0x20, offsetof(struct FlumeEntry, ride), 4, 'P'},
+    {0x24, offsetof(struct FlumeEntry, slotset), 4, 'P'},
+    {0x28, offsetof(struct FlumeEntry, link28), 4, 'P'},
+    {0x2c, offsetof(struct FlumeEntry, sub2), 4, 'P'},
+    {0x30, offsetof(struct FlumeEntry, first), 4, 'P'},
+    {0x34, offsetof(struct FlumeEntry, last), 4, 'P'},
+    {0x38, offsetof(struct FlumeEntry, target), 4, 'P'},
+    {0x3c, offsetof(struct FlumeEntry, count), 4, 'B'},
+    {0x40, offsetof(struct FlumeEntry, slots[0].timer), 4, 'B'},
+    {0x44, offsetof(struct FlumeEntry, slots[0].flags), 4, 'B'},
+    {0x48, offsetof(struct FlumeEntry, slots[0].busy), 4, 'P'},
+    {0x4c, offsetof(struct FlumeEntry, slots[0].x), 4, 'B'},
+    {0x50, offsetof(struct FlumeEntry, slots[0].y), 4, 'B'},
+    {0x54, offsetof(struct FlumeEntry, slots[0].owner), 4, 'P'},
+    {0x58, offsetof(struct FlumeEntry, slots[0].weight), 4, 'B'},
+    {0x5c, offsetof(struct FlumeEntry, slots[0].field_1c), 4, 'B'},
+    {0x60, offsetof(struct FlumeEntry, slots[0].pad_20), 4, 'B'},
+    {0x64, offsetof(struct FlumeEntry, slots[1].timer), 4, 'B'},
+    {0x68, offsetof(struct FlumeEntry, slots[1].flags), 4, 'B'},
+    {0x6c, offsetof(struct FlumeEntry, slots[1].busy), 4, 'P'},
+    {0x70, offsetof(struct FlumeEntry, slots[1].x), 4, 'B'},
+    {0x74, offsetof(struct FlumeEntry, slots[1].y), 4, 'B'},
+    {0x78, offsetof(struct FlumeEntry, slots[1].owner), 4, 'P'},
+    {0x7c, offsetof(struct FlumeEntry, slots[1].weight), 4, 'B'},
+    {0x80, offsetof(struct FlumeEntry, slots[1].field_1c), 4, 'B'},
+    {0x84, offsetof(struct FlumeEntry, slots[1].pad_20), 4, 'B'},
+    {0x88, offsetof(struct FlumeEntry, slots[2].timer), 4, 'B'},
+    {0x8c, offsetof(struct FlumeEntry, slots[2].flags), 4, 'B'},
+    {0x90, offsetof(struct FlumeEntry, slots[2].busy), 4, 'P'},
+    {0x94, offsetof(struct FlumeEntry, slots[2].x), 4, 'B'},
+    {0x98, offsetof(struct FlumeEntry, slots[2].y), 4, 'B'},
+    {0x9c, offsetof(struct FlumeEntry, slots[2].owner), 4, 'P'},
+    {0xa0, offsetof(struct FlumeEntry, slots[2].weight), 4, 'B'},
+    {0xa4, offsetof(struct FlumeEntry, slots[2].field_1c), 4, 'B'},
+    {0xa8, offsetof(struct FlumeEntry, slots[2].pad_20), 4, 'B'},
+    {0xac, offsetof(struct FlumeEntry, slots[3].timer), 4, 'B'},
+    {0xb0, offsetof(struct FlumeEntry, slots[3].flags), 4, 'B'},
+    {0xb4, offsetof(struct FlumeEntry, slots[3].busy), 4, 'P'},
+    {0xb8, offsetof(struct FlumeEntry, slots[3].x), 4, 'B'},
+    {0xbc, offsetof(struct FlumeEntry, slots[3].y), 4, 'B'},
+    {0xc0, offsetof(struct FlumeEntry, slots[3].owner), 4, 'P'},
+    {0xc4, offsetof(struct FlumeEntry, slots[3].weight), 4, 'B'},
+    {0xc8, offsetof(struct FlumeEntry, slots[3].field_1c), 4, 'B'},
+    {0xcc, offsetof(struct FlumeEntry, slots[3].pad_20), 4, 'B'},
+    {0xd0, offsetof(struct FlumeEntry, field_d0), 4, 'B'},
+};
+const unsigned int port_x86_FlumeEntry_count = sizeof(port_x86_FlumeEntry) / sizeof(port_x86_FlumeEntry[0]);
+const struct PortX86Type port_x86_type_FlumeEntry = {port_x86_FlumeEntry, sizeof(port_x86_FlumeEntry) / sizeof(port_x86_FlumeEntry[0]), 0xd4, sizeof(struct FlumeEntry), "struct FlumeEntry"};
+
+const struct PortX86Field port_x86_FlumeNode[] = {
+    {0x0, offsetof(struct FlumeNode, next), 4, 'P'},
+    {0x4, offsetof(struct FlumeNode, prev), 4, 'P'},
+    {0x8, offsetof(struct FlumeNode, field_8), 4, 'P'},
+    {0xc, offsetof(struct FlumeNode, field_c), 4, 'P'},
+    {0x10, offsetof(struct FlumeNode, flags), 4, 'B'},
+    {0x14, offsetof(struct FlumeNode, tile), 2, 'B'},
+    {0x16, offsetof(struct FlumeNode, pad_16), 2, 'B'},
+    {0x18, offsetof(struct FlumeNode, mode), 4, 'B'},
+    {0x1c, offsetof(struct FlumeNode, submode), 4, 'B'},
+    {0x20, offsetof(struct FlumeNode, ride), 4, 'P'},
+    {0x24, offsetof(struct FlumeNode, owner), 4, 'P'},
+    {0x28, offsetof(struct FlumeNode, entry), 4, 'P'},
+    {0x2c, offsetof(struct FlumeNode, field_2c), 4, 'P'},
+    {0x30, offsetof(struct FlumeNode, field_30), 4, 'P'},
+    {0x34, offsetof(struct FlumeNode, field_34), 4, 'P'},
+};
+const unsigned int port_x86_FlumeNode_count = sizeof(port_x86_FlumeNode) / sizeof(port_x86_FlumeNode[0]);
+const struct PortX86Type port_x86_type_FlumeNode = {port_x86_FlumeNode, sizeof(port_x86_FlumeNode) / sizeof(port_x86_FlumeNode[0]), 0x38, sizeof(struct FlumeNode), "struct FlumeNode"};
+
 const struct PortX86Field port_x86_Footprint[] = {
     {0x0, offsetof(struct Footprint, x0), 4, 'B'},
     {0x4, offsetof(struct Footprint, y0), 4, 'B'},
@@ -458,6 +612,47 @@ const struct PortX86Field port_x86_Footprint[] = {
 };
 const unsigned int port_x86_Footprint_count = sizeof(port_x86_Footprint) / sizeof(port_x86_Footprint[0]);
 const struct PortX86Type port_x86_type_Footprint = {port_x86_Footprint, sizeof(port_x86_Footprint) / sizeof(port_x86_Footprint[0]), 0x14, sizeof(struct Footprint), "struct Footprint"};
+
+const struct PortX86Field port_x86_GoldNode[] = {
+    {0x0, offsetof(struct GoldNode, key), 2, 'B'},
+    {0x2, offsetof(struct GoldNode, pad_2), 10, 'B'},
+    {0xc, offsetof(struct GoldNode, next), 4, 'P'},
+    {0x10, offsetof(struct GoldNode, pad_10), 28, 'B'},
+};
+const unsigned int port_x86_GoldNode_count = sizeof(port_x86_GoldNode) / sizeof(port_x86_GoldNode[0]);
+const struct PortX86Type port_x86_type_GoldNode = {port_x86_GoldNode, sizeof(port_x86_GoldNode) / sizeof(port_x86_GoldNode[0]), 0x2c, sizeof(struct GoldNode), "struct GoldNode"};
+
+const struct PortX86Field port_x86_JailCell[] = {
+    {0x0, offsetof(struct JailCell, next), 4, 'P'},
+    {0x4, offsetof(struct JailCell, tile_id), 2, 'B'},
+    {0x6, offsetof(struct JailCell, frame), 1, 'B'},
+    {0x7, offsetof(struct JailCell, pad_7), 1, 'B'},
+    {0x8, offsetof(struct JailCell, field_8), 4, 'B'},
+    {0xc, offsetof(struct JailCell, field_c), 4, 'B'},
+    {0x10, offsetof(struct JailCell, field_10), 4, 'B'},
+    {0x14, offsetof(struct JailCell, field_14), 4, 'B'},
+    {0x18, offsetof(struct JailCell, field_18), 4, 'B'},
+};
+const unsigned int port_x86_JailCell_count = sizeof(port_x86_JailCell) / sizeof(port_x86_JailCell[0]);
+const struct PortX86Type port_x86_type_JailCell = {port_x86_JailCell, sizeof(port_x86_JailCell) / sizeof(port_x86_JailCell[0]), 0x1c, sizeof(struct JailCell), "struct JailCell"};
+
+const struct PortX86Field port_x86_JoustNode[] = {
+    {0x0, offsetof(struct JoustNode, id), 2, 'B'},
+    {0x2, offsetof(struct JoustNode, pad_2), 2, 'B'},
+    {0x4, offsetof(struct JoustNode, next), 4, 'P'},
+    {0x8, offsetof(struct JoustNode, sample), 4, 'P'},
+    {0xc, offsetof(struct JoustNode, busy), 4, 'B'},
+    {0x10, offsetof(struct JoustNode, x), 1, 'B'},
+    {0x11, offsetof(struct JoustNode, y), 1, 'B'},
+    {0x12, offsetof(struct JoustNode, sub12), 6, 'B'},
+    {0x18, offsetof(struct JoustNode, pair), 2, 'B'},
+    {0x1a, offsetof(struct JoustNode, phase), 1, 'B'},
+    {0x1b, offsetof(struct JoustNode, frame), 1, 'B'},
+    {0x1c, offsetof(struct JoustNode, field_1c), 4, 'B'},
+    {0x20, offsetof(struct JoustNode, field_20), 4, 'B'},
+};
+const unsigned int port_x86_JoustNode_count = sizeof(port_x86_JoustNode) / sizeof(port_x86_JoustNode[0]);
+const struct PortX86Type port_x86_type_JoustNode = {port_x86_JoustNode, sizeof(port_x86_JoustNode) / sizeof(port_x86_JoustNode[0]), 0x24, sizeof(struct JoustNode), "struct JoustNode"};
 
 const struct PortX86Field port_x86_JungleFish[] = {
     {0x0, offsetof(struct JungleFish, tile), 2, 'B'},
@@ -559,6 +754,37 @@ const struct PortX86Field port_x86_MermaidNode[] = {
 const unsigned int port_x86_MermaidNode_count = sizeof(port_x86_MermaidNode) / sizeof(port_x86_MermaidNode[0]);
 const struct PortX86Type port_x86_type_MermaidNode = {port_x86_MermaidNode, sizeof(port_x86_MermaidNode) / sizeof(port_x86_MermaidNode[0]), 0x8, sizeof(struct MermaidNode), "struct MermaidNode"};
 
+const struct PortX86Field port_x86_NewBloke[] = {
+    {0x0, offsetof(struct NewBloke, next), 4, 'P'},
+    {0x4, offsetof(struct NewBloke, id), 2, 'B'},
+    {0x6, offsetof(struct NewBloke, pad_6), 2, 'B'},
+    {0x8, offsetof(struct NewBloke, sx), 4, 'B'},
+    {0xc, offsetof(struct NewBloke, sy), 4, 'B'},
+    {0x10, offsetof(struct NewBloke, f), 8, 'B'},
+    {0x18, offsetof(struct NewBloke, p), 8, 'B'},
+    {0x20, offsetof(struct NewBloke, t), 8, 'B'},
+    {0x28, offsetof(struct NewBloke, velX), 4, 'B'},
+    {0x2c, offsetof(struct NewBloke, velY), 4, 'B'},
+    {0x30, offsetof(struct NewBloke, wp), 136, 'B'},
+    {0xb8, offsetof(struct NewBloke, f_b8), 1, 'B'},
+    {0xb9, offsetof(struct NewBloke, f_b9), 1, 'B'},
+    {0xba, offsetof(struct NewBloke, f_ba), 1, 'B'},
+    {0xbb, offsetof(struct NewBloke, f_bb), 1, 'B'},
+    {0xbc, offsetof(struct NewBloke, f_bc), 2, 'B'},
+    {0xbe, offsetof(struct NewBloke, f_be), 2, 'B'},
+    {0xc0, offsetof(struct NewBloke, f_c0), 2, 'B'},
+    {0xc2, offsetof(struct NewBloke, f_c2), 1, 'B'},
+    {0xc3, offsetof(struct NewBloke, f_c3), 1, 'B'},
+    {0xc4, offsetof(struct NewBloke, f_c4), 1, 'B'},
+    {0xc5, offsetof(struct NewBloke, pad_c5), 1, 'B'},
+    {0xc6, offsetof(struct NewBloke, f_c6), 2, 'B'},
+    {0xc8, offsetof(struct NewBloke, f_c8), 2, 'B'},
+    {0xca, offsetof(struct NewBloke, pad_ca), 2, 'B'},
+    {0xcc, offsetof(struct NewBloke, bloke), 4, 'P'},
+};
+const unsigned int port_x86_NewBloke_count = sizeof(port_x86_NewBloke) / sizeof(port_x86_NewBloke[0]);
+const struct PortX86Type port_x86_type_NewBloke = {port_x86_NewBloke, sizeof(port_x86_NewBloke) / sizeof(port_x86_NewBloke[0]), 0xd0, sizeof(struct NewBloke), "struct NewBloke"};
+
 const struct PortX86Field port_x86_ObjectiveEvent[] = {
     {0x0, offsetof(struct ObjectiveEvent, next), 4, 'P'},
     {0x4, offsetof(struct ObjectiveEvent, element), 4, 'P'},
@@ -592,6 +818,27 @@ const struct PortX86Field port_x86_PathNode[] = {
 const unsigned int port_x86_PathNode_count = sizeof(port_x86_PathNode) / sizeof(port_x86_PathNode[0]);
 const struct PortX86Type port_x86_type_PathNode = {port_x86_PathNode, sizeof(port_x86_PathNode) / sizeof(port_x86_PathNode[0]), 0x1c, sizeof(struct PathNode), "struct PathNode"};
 
+const struct PortX86Field port_x86_PlaneRideNode[] = {
+    {0x0, offsetof(struct PlaneRideNode, b0), 1, 'B'},
+    {0x1, offsetof(struct PlaneRideNode, b1), 1, 'B'},
+    {0x2, offsetof(struct PlaneRideNode, b2), 1, 'B'},
+    {0x3, offsetof(struct PlaneRideNode, b3), 1, 'B'},
+    {0x4, offsetof(struct PlaneRideNode, b4), 1, 'B'},
+    {0x5, offsetof(struct PlaneRideNode, b5), 1, 'B'},
+    {0x6, offsetof(struct PlaneRideNode, pad_6), 2, 'B'},
+    {0x8, offsetof(struct PlaneRideNode, flags), 4, 'B'},
+    {0xc, offsetof(struct PlaneRideNode, b12), 1, 'B'},
+    {0xd, offsetof(struct PlaneRideNode, pad_d), 3, 'B'},
+    {0x10, offsetof(struct PlaneRideNode, f10), 4, 'B'},
+    {0x14, offsetof(struct PlaneRideNode, b14), 1, 'B'},
+    {0x15, offsetof(struct PlaneRideNode, pad_15), 3, 'B'},
+    {0x18, offsetof(struct PlaneRideNode, f18), 4, 'B'},
+    {0x1c, offsetof(struct PlaneRideNode, slots), 4, 'B'},
+    {0x20, offsetof(struct PlaneRideNode, next), 4, 'P'},
+};
+const unsigned int port_x86_PlaneRideNode_count = sizeof(port_x86_PlaneRideNode) / sizeof(port_x86_PlaneRideNode[0]);
+const struct PortX86Type port_x86_type_PlaneRideNode = {port_x86_PlaneRideNode, sizeof(port_x86_PlaneRideNode) / sizeof(port_x86_PlaneRideNode[0]), 0x24, sizeof(struct PlaneRideNode), "struct PlaneRideNode"};
+
 const struct PortX86Field port_x86_PumpNode[] = {
     {0x0, offsetof(struct PumpNode, id), 2, 'B'},
     {0x2, offsetof(struct PumpNode, var_2), 2, 'B'},
@@ -613,9 +860,12 @@ const struct PortX86Field port_x86_RideQueueEntry[] = {
     {0x15, offsetof(struct RideQueueEntry, field_15), 1, 'B'},
     {0x16, offsetof(struct RideQueueEntry, pad_16), 2, 'B'},
     {0x18, offsetof(struct RideQueueEntry, field_18), 4, 'P'},
+    {0x1c, offsetof(struct RideQueueEntry, field_1c), 1, 'B'},
+    {0x1d, offsetof(struct RideQueueEntry, field_1d), 1, 'B'},
+    {0x1e, offsetof(struct RideQueueEntry, pad_1e), 2, 'B'},
 };
 const unsigned int port_x86_RideQueueEntry_count = sizeof(port_x86_RideQueueEntry) / sizeof(port_x86_RideQueueEntry[0]);
-const struct PortX86Type port_x86_type_RideQueueEntry = {port_x86_RideQueueEntry, sizeof(port_x86_RideQueueEntry) / sizeof(port_x86_RideQueueEntry[0]), 0x1c, sizeof(struct RideQueueEntry), "struct RideQueueEntry"};
+const struct PortX86Type port_x86_type_RideQueueEntry = {port_x86_RideQueueEntry, sizeof(port_x86_RideQueueEntry) / sizeof(port_x86_RideQueueEntry[0]), 0x20, sizeof(struct RideQueueEntry), "struct RideQueueEntry"};
 
 const struct PortX86Field port_x86_SafariNode[] = {
     {0x0, offsetof(struct SafariNode, tile_id), 2, 'B'},
@@ -631,6 +881,101 @@ const struct PortX86Field port_x86_SafariNode[] = {
 const unsigned int port_x86_SafariNode_count = sizeof(port_x86_SafariNode) / sizeof(port_x86_SafariNode[0]);
 const struct PortX86Type port_x86_type_SafariNode = {port_x86_SafariNode, sizeof(port_x86_SafariNode) / sizeof(port_x86_SafariNode[0]), 0x28, sizeof(struct SafariNode), "struct SafariNode"};
 
+const struct PortX86Field port_x86_SaveBlock[] = {
+    {0x0, offsetof(struct SaveBlock, next), 4, 'P'},
+    {0x4, offsetof(struct SaveBlock, value), 2, 'B'},
+    {0x6, offsetof(struct SaveBlock, field_6), 1, 'B'},
+    {0x7, offsetof(struct SaveBlock, field_7), 1, 'B'},
+    {0x8, offsetof(struct SaveBlock, field_8), 1, 'B'},
+    {0x9, offsetof(struct SaveBlock, field_9), 1, 'B'},
+    {0xa, offsetof(struct SaveBlock, pad_a), 2, 'B'},
+    {0xc, offsetof(struct SaveBlock, field_c), 4, 'B'},
+    {0x10, offsetof(struct SaveBlock, field_10), 1, 'B'},
+    {0x11, offsetof(struct SaveBlock, field_11), 1, 'B'},
+    {0x12, offsetof(struct SaveBlock, pad_12), 2, 'B'},
+    {0x14, offsetof(struct SaveBlock, field_14), 4, 'B'},
+    {0x18, offsetof(struct SaveBlock, field_18), 4, 'B'},
+    {0x1c, offsetof(struct SaveBlock, field_1c), 4, 'B'},
+    {0x20, offsetof(struct SaveBlock, field_20), 4, 'B'},
+    {0x24, offsetof(struct SaveBlock, field_24), 4, 'B'},
+    {0x28, offsetof(struct SaveBlock, field_28), 4, 'B'},
+    {0x2c, offsetof(struct SaveBlock, field_2c), 4, 'B'},
+    {0x30, offsetof(struct SaveBlock, field_30), 4, 'B'},
+    {0x34, offsetof(struct SaveBlock, field_34), 4, 'B'},
+    {0x38, offsetof(struct SaveBlock, field_38), 4, 'B'},
+    {0x3c, offsetof(struct SaveBlock, field_3c), 4, 'B'},
+};
+const unsigned int port_x86_SaveBlock_count = sizeof(port_x86_SaveBlock) / sizeof(port_x86_SaveBlock[0]);
+const struct PortX86Type port_x86_type_SaveBlock = {port_x86_SaveBlock, sizeof(port_x86_SaveBlock) / sizeof(port_x86_SaveBlock[0]), 0x40, sizeof(struct SaveBlock), "struct SaveBlock"};
+
+const struct PortX86Field port_x86_SlideNode[] = {
+    {0x0, offsetof(struct SlideNode, key), 2, 'B'},
+    {0x2, offsetof(struct SlideNode, pad_2), 6, 'B'},
+    {0x8, offsetof(struct SlideNode, next), 4, 'P'},
+    {0xc, offsetof(struct SlideNode, pad_c), 4, 'B'},
+    {0x10, offsetof(struct SlideNode, slots), 16, 'B'},
+};
+const unsigned int port_x86_SlideNode_count = sizeof(port_x86_SlideNode) / sizeof(port_x86_SlideNode[0]);
+const struct PortX86Type port_x86_type_SlideNode = {port_x86_SlideNode, sizeof(port_x86_SlideNode) / sizeof(port_x86_SlideNode[0]), 0x20, sizeof(struct SlideNode), "struct SlideNode"};
+
+const struct PortX86Field port_x86_SpaceTowerCar[] = {
+    {0x0, offsetof(struct SpaceTowerCar, var_0), 2, 'B'},
+    {0x2, offsetof(struct SpaceTowerCar, var_2), 1, 'B'},
+    {0x3, offsetof(struct SpaceTowerCar, var_3), 1, 'B'},
+    {0x4, offsetof(struct SpaceTowerCar, var_4), 1, 'B'},
+    {0x5, offsetof(struct SpaceTowerCar, pad_5), 3, 'B'},
+    {0x8, offsetof(struct SpaceTowerCar, next), 4, 'P'},
+    {0xc, offsetof(struct SpaceTowerCar, var_c), 4, 'B'},
+    {0x10, offsetof(struct SpaceTowerCar, var_10), 4, 'B'},
+    {0x14, offsetof(struct SpaceTowerCar, seats[0].flags), 4, 'B'},
+    {0x18, offsetof(struct SpaceTowerCar, seats[0].pad_4), 4, 'B'},
+    {0x1c, offsetof(struct SpaceTowerCar, seats[0].pos), 4, 'B'},
+    {0x20, offsetof(struct SpaceTowerCar, seats[0].state), 4, 'B'},
+    {0x24, offsetof(struct SpaceTowerCar, seats[0].field_10), 4, 'B'},
+    {0x28, offsetof(struct SpaceTowerCar, seats[0].descending), 4, 'B'},
+    {0x2c, offsetof(struct SpaceTowerCar, seats[0].rider_slot0), 4, 'P'},
+    {0x30, offsetof(struct SpaceTowerCar, seats[0].rider_slot1), 4, 'P'},
+    {0x34, offsetof(struct SpaceTowerCar, seats[0].delta), 1, 'B'},
+    {0x35, offsetof(struct SpaceTowerCar, seats[0].pad_21), 3, 'B'},
+    {0x38, offsetof(struct SpaceTowerCar, seats[1].flags), 4, 'B'},
+    {0x3c, offsetof(struct SpaceTowerCar, seats[1].pad_4), 4, 'B'},
+    {0x40, offsetof(struct SpaceTowerCar, seats[1].pos), 4, 'B'},
+    {0x44, offsetof(struct SpaceTowerCar, seats[1].state), 4, 'B'},
+    {0x48, offsetof(struct SpaceTowerCar, seats[1].field_10), 4, 'B'},
+    {0x4c, offsetof(struct SpaceTowerCar, seats[1].descending), 4, 'B'},
+    {0x50, offsetof(struct SpaceTowerCar, seats[1].rider_slot0), 4, 'P'},
+    {0x54, offsetof(struct SpaceTowerCar, seats[1].rider_slot1), 4, 'P'},
+    {0x58, offsetof(struct SpaceTowerCar, seats[1].delta), 1, 'B'},
+    {0x59, offsetof(struct SpaceTowerCar, seats[1].pad_21), 3, 'B'},
+    {0x5c, offsetof(struct SpaceTowerCar, seats[2].flags), 4, 'B'},
+    {0x60, offsetof(struct SpaceTowerCar, seats[2].pad_4), 4, 'B'},
+    {0x64, offsetof(struct SpaceTowerCar, seats[2].pos), 4, 'B'},
+    {0x68, offsetof(struct SpaceTowerCar, seats[2].state), 4, 'B'},
+    {0x6c, offsetof(struct SpaceTowerCar, seats[2].field_10), 4, 'B'},
+    {0x70, offsetof(struct SpaceTowerCar, seats[2].descending), 4, 'B'},
+    {0x74, offsetof(struct SpaceTowerCar, seats[2].rider_slot0), 4, 'P'},
+    {0x78, offsetof(struct SpaceTowerCar, seats[2].rider_slot1), 4, 'P'},
+    {0x7c, offsetof(struct SpaceTowerCar, seats[2].delta), 1, 'B'},
+    {0x7d, offsetof(struct SpaceTowerCar, seats[2].pad_21), 3, 'B'},
+    {0x80, offsetof(struct SpaceTowerCar, seats[3].flags), 4, 'B'},
+    {0x84, offsetof(struct SpaceTowerCar, seats[3].pad_4), 4, 'B'},
+    {0x88, offsetof(struct SpaceTowerCar, seats[3].pos), 4, 'B'},
+    {0x8c, offsetof(struct SpaceTowerCar, seats[3].state), 4, 'B'},
+    {0x90, offsetof(struct SpaceTowerCar, seats[3].field_10), 4, 'B'},
+    {0x94, offsetof(struct SpaceTowerCar, seats[3].descending), 4, 'B'},
+    {0x98, offsetof(struct SpaceTowerCar, seats[3].rider_slot0), 4, 'P'},
+    {0x9c, offsetof(struct SpaceTowerCar, seats[3].rider_slot1), 4, 'P'},
+    {0xa0, offsetof(struct SpaceTowerCar, seats[3].delta), 1, 'B'},
+    {0xa1, offsetof(struct SpaceTowerCar, seats[3].pad_21), 3, 'B'},
+    {0xa4, offsetof(struct SpaceTowerCar, flags_a4), 8, 'B'},
+    {0xac, offsetof(struct SpaceTowerCar, var_ac), 1, 'B'},
+    {0xad, offsetof(struct SpaceTowerCar, var_ad), 1, 'B'},
+    {0xae, offsetof(struct SpaceTowerCar, pad_ae), 2, 'B'},
+    {0xb0, offsetof(struct SpaceTowerCar, var_b0), 4, 'B'},
+};
+const unsigned int port_x86_SpaceTowerCar_count = sizeof(port_x86_SpaceTowerCar) / sizeof(port_x86_SpaceTowerCar[0]);
+const struct PortX86Type port_x86_type_SpaceTowerCar = {port_x86_SpaceTowerCar, sizeof(port_x86_SpaceTowerCar) / sizeof(port_x86_SpaceTowerCar[0]), 0xb4, sizeof(struct SpaceTowerCar), "struct SpaceTowerCar"};
+
 const struct PortX86Field port_x86_SpiderNode[] = {
     {0x0, offsetof(struct SpiderNode, tile_id), 2, 'B'},
     {0x2, offsetof(struct SpiderNode, pad_2), 2, 'B'},
@@ -640,6 +985,18 @@ const struct PortX86Field port_x86_SpiderNode[] = {
 };
 const unsigned int port_x86_SpiderNode_count = sizeof(port_x86_SpiderNode) / sizeof(port_x86_SpiderNode[0]);
 const struct PortX86Type port_x86_type_SpiderNode = {port_x86_SpiderNode, sizeof(port_x86_SpiderNode) / sizeof(port_x86_SpiderNode[0]), 0x30, sizeof(struct SpiderNode), "struct SpiderNode"};
+
+const struct PortX86Field port_x86_WaterNode[] = {
+    {0x0, offsetof(struct WaterNode, next), 4, 'P'},
+    {0x4, offsetof(struct WaterNode, key), 2, 'B'},
+    {0x6, offsetof(struct WaterNode, pad_6), 2, 'B'},
+    {0x8, offsetof(struct WaterNode, field_8), 1, 'B'},
+    {0x9, offsetof(struct WaterNode, frame), 1, 'B'},
+    {0xa, offsetof(struct WaterNode, block_index), 1, 'B'},
+    {0xb, offsetof(struct WaterNode, pad_b), 1, 'B'},
+};
+const unsigned int port_x86_WaterNode_count = sizeof(port_x86_WaterNode) / sizeof(port_x86_WaterNode[0]);
+const struct PortX86Type port_x86_type_WaterNode = {port_x86_WaterNode, sizeof(port_x86_WaterNode) / sizeof(port_x86_WaterNode[0]), 0xc, sizeof(struct WaterNode), "struct WaterNode"};
 
 const struct PortX86Field port_x86_WorkOrder[] = {
     {0x0, offsetof(struct WorkOrder, next), 4, 'P'},
@@ -662,19 +1019,86 @@ const struct PortX86Field port_x86_WorkOrder[] = {
 const unsigned int port_x86_WorkOrder_count = sizeof(port_x86_WorkOrder) / sizeof(port_x86_WorkOrder[0]);
 const struct PortX86Type port_x86_type_WorkOrder = {port_x86_WorkOrder, sizeof(port_x86_WorkOrder) / sizeof(port_x86_WorkOrder[0]), 0x3c, sizeof(struct WorkOrder), "struct WorkOrder"};
 
+const struct PortX86Field port_x86_WorkerSave[] = {
+    {0x0, offsetof(struct WorkerSave, action), 2, 'B'},
+    {0x2, offsetof(struct WorkerSave, low_level_action), 2, 'B'},
+    {0x4, offsetof(struct WorkerSave, pending_action), 2, 'B'},
+    {0x6, offsetof(struct WorkerSave, pad_6), 10, 'B'},
+    {0x10, offsetof(struct WorkerSave, field_1c), 4, 'B'},
+    {0x14, offsetof(struct WorkerSave, field_20), 4, 'B'},
+    {0x18, offsetof(struct WorkerSave, dest), 8, 'B'},
+    {0x20, offsetof(struct WorkerSave, goal), 8, 'B'},
+    {0x28, offsetof(struct WorkerSave, block_34.field_34), 1, 'B'},
+    {0x29, offsetof(struct WorkerSave, block_34.field_35), 1, 'B'},
+    {0x2a, offsetof(struct WorkerSave, block_34.field_36), 1, 'B'},
+    {0x2b, offsetof(struct WorkerSave, block_34.field_37), 1, 'B'},
+    {0x2c, offsetof(struct WorkerSave, block_34.field_38), 2, 'B'},
+    {0x2e, offsetof(struct WorkerSave, block_34.field_3a), 2, 'B'},
+    {0x30, offsetof(struct WorkerSave, block_34.screen_x), 2, 'B'},
+    {0x32, offsetof(struct WorkerSave, block_34.screen_y), 2, 'B'},
+    {0x34, offsetof(struct WorkerSave, block_34.field_40), 2, 'B'},
+    {0x36, offsetof(struct WorkerSave, block_34.field_42), 2, 'B'},
+    {0x38, offsetof(struct WorkerSave, block_34.field_44), 2, 'B'},
+    {0x3a, offsetof(struct WorkerSave, block_34.field_46), 2, 'B'},
+    {0x3c, offsetof(struct WorkerSave, block_34.pad_48), 2, 'B'},
+    {0x3e, offsetof(struct WorkerSave, block_34.field_4a), 2, 'B'},
+    {0x40, offsetof(struct WorkerSave, block_34.field_4c), 2, 'B'},
+    {0x42, offsetof(struct WorkerSave, block_34.pad_4e), 2, 'B'},
+    {0x44, offsetof(struct WorkerSave, block_34.order), 4, 'P'},
+    {0x48, offsetof(struct WorkerSave, block_34.path), 4, 'P'},
+    {0x4c, offsetof(struct WorkerSave, block_34.field_58), 4, 'B'},
+    {0x50, offsetof(struct WorkerSave, field_5c), 4, 'B'},
+    {0x54, offsetof(struct WorkerSave, param_action), 1, 'B'},
+    {0x55, offsetof(struct WorkerSave, pad_55), 1, 'B'},
+    {0x56, offsetof(struct WorkerSave, flags), 2, 'B'},
+    {0x58, offsetof(struct WorkerSave, field_64), 1, 'B'},
+    {0x59, offsetof(struct WorkerSave, speed), 1, 'B'},
+    {0x5a, offsetof(struct WorkerSave, field_82), 1, 'B'},
+    {0x5b, offsetof(struct WorkerSave, pad_5b), 1, 'B'},
+    {0x5c, offsetof(struct WorkerSave, pos), 8, 'B'},
+    {0x64, offsetof(struct WorkerSave, height), 2, 'B'},
+    {0x66, offsetof(struct WorkerSave, dir), 1, 'B'},
+    {0x67, offsetof(struct WorkerSave, field_73), 1, 'B'},
+    {0x68, offsetof(struct WorkerSave, frame), 1, 'B'},
+    {0x69, offsetof(struct WorkerSave, field_75), 1, 'B'},
+    {0x6a, offsetof(struct WorkerSave, pad_6a), 2, 'B'},
+    {0x6c, offsetof(struct WorkerSave, nav), 20, 'B'},
+    {0x80, offsetof(struct WorkerSave, person_8), 4, 'B'},
+    {0x84, offsetof(struct WorkerSave, scale), 12, 'B'},
+    {0x90, offsetof(struct WorkerSave, screen), 8, 'B'},
+    {0x98, offsetof(struct WorkerSave, rotation), 12, 'B'},
+    {0xa4, offsetof(struct WorkerSave, person_4c), 4, 'B'},
+    {0xa8, offsetof(struct WorkerSave, anim), 4, 'B'},
+    {0xac, offsetof(struct WorkerSave, sort_id), 4, 'B'},
+    {0xb0, offsetof(struct WorkerSave, m), 36, 'B'},
+    {0xd4, offsetof(struct WorkerSave, prev_param), 4, 'B'},
+    {0xd8, offsetof(struct WorkerSave, prev_action), 4, 'B'},
+};
+const unsigned int port_x86_WorkerSave_count = sizeof(port_x86_WorkerSave) / sizeof(port_x86_WorkerSave[0]);
+const struct PortX86Type port_x86_type_WorkerSave = {port_x86_WorkerSave, sizeof(port_x86_WorkerSave) / sizeof(port_x86_WorkerSave[0]), 0xdc, sizeof(struct WorkerSave), "struct WorkerSave"};
+
 const struct PortX86Type *const port_x86_types[] = {
     &port_x86_type_Ride,
+    &port_x86_type_BNVPath,
     &port_x86_type_BalloonNode,
     &port_x86_type_BarrelNode,
     &port_x86_type_BlokeSave,
     &port_x86_type_BoatRide,
     &port_x86_type_BoatRideNode,
+    &port_x86_type_BrollyNode,
     &port_x86_type_BuildObj,
     &port_x86_type_CarouselNode,
+    &port_x86_type_CatapultNode,
     &port_x86_type_CopterNode,
+    &port_x86_type_CountNode,
     &port_x86_type_EarthNode,
     &port_x86_type_EditState,
+    &port_x86_type_FlumeEntry,
+    &port_x86_type_FlumeNode,
     &port_x86_type_Footprint,
+    &port_x86_type_GoldNode,
+    &port_x86_type_JailCell,
+    &port_x86_type_JoustNode,
     &port_x86_type_JungleFish,
     &port_x86_type_JungleObj,
     &port_x86_type_JunglePath,
@@ -682,13 +1106,20 @@ const struct PortX86Type *const port_x86_types[] = {
     &port_x86_type_JungleScore,
     &port_x86_type_MapElement,
     &port_x86_type_MermaidNode,
+    &port_x86_type_NewBloke,
     &port_x86_type_ObjectiveEvent,
     &port_x86_type_PathNode,
+    &port_x86_type_PlaneRideNode,
     &port_x86_type_PumpNode,
     &port_x86_type_RideQueueEntry,
     &port_x86_type_SafariNode,
+    &port_x86_type_SaveBlock,
+    &port_x86_type_SlideNode,
+    &port_x86_type_SpaceTowerCar,
     &port_x86_type_SpiderNode,
+    &port_x86_type_WaterNode,
     &port_x86_type_WorkOrder,
+    &port_x86_type_WorkerSave,
 };
 const unsigned int port_x86_type_count = sizeof(port_x86_types) / sizeof(port_x86_types[0]);
 

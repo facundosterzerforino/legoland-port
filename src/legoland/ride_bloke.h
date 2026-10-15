@@ -1,7 +1,6 @@
 #pragma once
 
 /* [port] declared at file scope so prototypes below refer to the same type */
-struct RideBloke;
 #include "legoland.h"
 #include "ride_queue.h"
 
@@ -74,6 +73,5 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir);
 int GetQueueTurn(unsigned short id, struct PathPair *p, int dir);
 int FUN_00401ae0(unsigned short id, struct Bloke *bloke);
 unsigned int FUN_00401c40(unsigned short arg0);
-void FUN_00401c60(struct RideBloke *b);
 void FUN_00401c60(struct NewBloke *b);
 void FUN_00402c10(void);
