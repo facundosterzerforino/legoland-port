@@ -889,7 +889,7 @@ LEGO_EXPORT int Load_ElephantF(struct Element *element) {
 void WaterWorksGetInterfaces(struct ClassNode *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b50f4
     if (_stricmp("WATER WORKS ENTRANCE", name->name) == 0) {
-        ci->cb_a4 = WaterWorksEntranceLoad;
+        ci->cb_a4 = (void (*)())WaterWorksEntranceLoad;
         ci->cb_ac = thunk_FUN_00417ac0;
         ci->cb_98 = WaterWorksEntranceAddObject;
         ci->cb_9c = WaterWorksEntranceRemoveObject;

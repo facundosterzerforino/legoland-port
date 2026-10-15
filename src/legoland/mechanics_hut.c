@@ -194,8 +194,8 @@ void MechanicsHutSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043d780
-struct RideSpriteInfo *GetMechanicsHutSpriteInfo(void *ptr, unsigned short arg2) {
-    struct Ride *ride = ((struct Element *)ptr)->ride;
+struct RideSpriteInfo *GetMechanicsHutSpriteInfo(struct Element *ptr, unsigned short arg2) {
+    struct Ride *ride = ptr->ride;
 
     DAT_0062fe30.sprite = ride->layer;
     DAT_0062fe30.x = ride->field_14;

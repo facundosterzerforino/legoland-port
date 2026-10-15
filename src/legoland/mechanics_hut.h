@@ -15,5 +15,5 @@ void MechanicsHutUpdate(Element *obj);
 void RenderMechanicsHut(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile);
 void KillMechHutMaskSprite();
 void MechanicsHutSetEditMode();
-struct RideSpriteInfo *GetMechanicsHutSpriteInfo(void *ptr, unsigned short arg2);
+struct RideSpriteInfo *GetMechanicsHutSpriteInfo(struct Element *ptr, unsigned short arg2);
 void FUN_0043d7c0(struct Ride *hut, unsigned int tile, int flag);

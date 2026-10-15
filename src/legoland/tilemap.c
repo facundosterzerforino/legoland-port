@@ -596,7 +596,7 @@ LEGO_EXPORT void RenderView(void) {
             if (ride->cb_sprite == NULL) {
                 continue;
             }
-            info = ride->cb_sprite(ride->element, uid);
+            info = ride->cb_sprite(ride->element, uid.id);
             if (info == NULL) {
                 continue;
             }

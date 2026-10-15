@@ -310,7 +310,7 @@ void FUN_00457a70(void) {
             GamePad &= ~0x800;
         }
         if (!(GamePad & 0x400) && EditMode.unk8 != NULL) {
-            ((struct Ride *)EditMode.unk8)->cb_90((unsigned int)EditMode.unk8->element, &MousePos, 0x8f8);
+            EditMode.unk8->cb_90(EditMode.unk8->element, &MousePos, 0x8f8);
         }
         BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0((struct ObjState *)EditMode.unk8));
         if (DAT_00813ac4 & 0x11) {

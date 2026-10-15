@@ -171,7 +171,7 @@ void BrollyAddObject(struct Element *param_1, unsigned char *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042e560
-struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned int param_2) {
+struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned short param_2) {
     unsigned char *b = (unsigned char *)&param_2;
     int i = Get_UserFlags((unsigned int)b[0] << 8, (unsigned int)b[1] << 8) & 0xffff;
     RideSpriteInfoBuffer.sprite = BrollyImagesData->table_8[(unsigned char)i];

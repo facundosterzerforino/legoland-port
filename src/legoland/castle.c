@@ -5357,7 +5357,7 @@ void CastleGetInterfaces(struct ClassNode *head, struct Ride *obj) {
         obj->cb_b0 = RenderCastleObj;
         obj->save_hook = CastleObj_Save;
         obj->load_hook = CastleObj_Load;
-        obj->cb_c0 = FUN_004246e0;
+        obj->cb_c0 = (int (*)())FUN_004246e0;
         CastleDispatchTable[0].element = head;
         CastleDispatchTable[0].fn_4 = (void (*)())FUN_00424240;
         CastleDispatchTable[0].fn_8 = FUN_00424280;
@@ -5456,7 +5456,7 @@ void CastleGetInterfaces(struct ClassNode *head, struct Ride *obj) {
         obj->cb_94 = CastleDispatchDCalcCursor;
         obj->cb_98 = CastleDispatchAddObject;
         obj->cb_9c = CastleDispatchRemoveObject;
-        obj->cb_8c = CastleObj_Load;
+        obj->cb_8c = (void (*)())CastleObj_Load;
     }
     // STRING: LEGOLAND 0x004b5b8c
     else if (_stricmp("ROLLER_COASTER_SAVE", head->name) == 0) {
@@ -5465,7 +5465,7 @@ void CastleGetInterfaces(struct ClassNode *head, struct Ride *obj) {
         obj->cb_94 = CastleDispatchDCalcCursor;
         obj->cb_98 = CastleDispatchAddObject;
         obj->cb_9c = CastleDispatchRemoveObject;
-        obj->cb_8c = CastleObj_Save;
+        obj->cb_8c = (void (*)())CastleObj_Save;
     }
 }
 #pragma optimize("", on)

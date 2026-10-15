@@ -199,7 +199,7 @@ void GardenGetInterfaces(struct ClassNode *head, struct Ride *iface) {
         iface->cb_8c = FUN_004324d0;
         iface->cb_98 = HedgeAddObject;
         iface->cb_9c = HedgeRemoveObject;
-        iface->cb_sprite = GetHedgeSpriteInfo;
+        iface->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) GetHedgeSpriteInfo; /* takes the tile id as a TileId */
         iface->cb_ac = UnloadHedgeImages;
         return;
     }
@@ -208,7 +208,7 @@ void GardenGetInterfaces(struct ClassNode *head, struct Ride *iface) {
         iface->cb_a4 = LoadFlowerImages;
         iface->cb_8c = FlowersSetEditMode;
         iface->cb_98 = FlowersAddObject;
-        iface->cb_sprite = GetFlowerSpriteInfo;
+        iface->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) GetFlowerSpriteInfo; /* takes the tile id as a TileId */
         iface->cb_ac = UnloadFlowerImages;
     }
 }

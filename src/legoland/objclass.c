@@ -274,7 +274,7 @@ LEGO_EXPORT void SetStandardCallbacks(struct Ride *table) {
     table->cb_8c = FUN_00480b70;
     table->cb_90 = CalcBasicObjectCursor;
     table->cb_94 = BasicObjectDCalcCursor;
-    table->cb_98 = AddBasicObject;
+    table->cb_98 = (void (*)())AddBasicObject;
     table->cb_9c = StandardRemoveObject;
 }
 

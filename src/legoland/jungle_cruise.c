@@ -1000,7 +1000,7 @@ void MonkeyFishRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) 
 }
 
 // FUNCTION: LEGOLAND 0x00434740
-struct RideSpriteInfo *GetMonkeyFishSpriteInfo(Element *obj, short param_2) {
+struct RideSpriteInfo *GetMonkeyFishSpriteInfo(Element *obj, unsigned short param_2) {
     struct Ride *ride = obj->ride;
     struct JungleFish *node = JungleFishList;
     short *lls;

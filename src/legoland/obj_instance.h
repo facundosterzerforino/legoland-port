@@ -86,7 +86,7 @@ struct Ride {
     /* 0x94 */ void (*cb_94)();
     /* 0x98 */ void (*cb_98)();
     /* 0x9c */ void (*cb_9c)();
-    /* 0xa0 */ struct RideSpriteInfo *(*cb_sprite)(); /* sprite to draw for a placed object */
+    /* 0xa0 */ struct RideSpriteInfo *(*cb_sprite)(struct Element *element, unsigned short id); /* sprite to draw for a placed object */
     /* 0xa4 */ void (*cb_a4)();
     /* 0xa8 */ void (*cb_pre_render)();
     /* 0xac */ void (*cb_ac)();

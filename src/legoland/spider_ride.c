@@ -41,15 +41,6 @@ struct SpiderState {
     int field_18;
 };
 
-struct CarNode {
-    /* 0x00 */ unsigned char pad_0[0x10];
-    /* 0x10 */ unsigned int field_10;
-    /* 0x14 */ unsigned int field_14;
-    /* 0x18 */ unsigned int field_18;
-    /* 0x1c */ unsigned char pad_1c[0x48];
-    /* 0x64 */ struct CarNode *next;
-};
-
 struct SlotBloke {
     unsigned char pad_0[0x36];
     unsigned char field_36;
@@ -250,8 +241,8 @@ void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, void
 }
 
 // FUNCTION: LEGOLAND 0x00415e80
-void SpiderRideLoad(struct CarNode *param_1) {
-    DAT_004cbf20 = ((struct Element *)param_1)->ride;
+void SpiderRideLoad(struct Element *param_1) {
+    DAT_004cbf20 = param_1->ride;
     DAT_004cbf20->flags |= 0x420;
     SpiderRideLayer = DAT_004cbf20->layer;
     SpiderRideLayer->flags |= 0x2000;
@@ -283,8 +274,8 @@ void SpiderRideLoad(struct CarNode *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00415fd0
-void SpiderRideUnload(struct CarNode *param_1) {
-    DAT_004cbf20 = ((struct Element *)param_1)->ride;
+void SpiderRideUnload(struct Element *param_1) {
+    DAT_004cbf20 = param_1->ride;
 
     if (ZSpiderSprite != NULL) {
         KillSprite(ZSpiderSprite);
@@ -335,14 +326,13 @@ void SpiderAddObject(Element *editObj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x00416120
-struct RideSpriteInfo *GetSpiderRideSpriteInfo(unsigned int *a1, unsigned short a2) {
-    struct CarNode *car = *(struct CarNode **)((unsigned char *)a1 + 0xc);
-    DAT_004cbf40.sprite = car->next;
-    DAT_004cbf40.x = car->field_14;
-    DAT_004cbf40.y = car->field_18;
+struct RideSpriteInfo *GetSpiderRideSpriteInfo(struct Element *a1, unsigned short a2) {
+    struct Ride *ride = a1->ride;
+    DAT_004cbf40.sprite = ride->layer;
+    DAT_004cbf40.x = ride->field_14;
+    DAT_004cbf40.y = ride->field_18;
     DAT_004cbf40.id = a2;
-    car = car->next;
-    car->field_10 = car->field_10 | 0x2000;
+    ride->layer->flags = ride->layer->flags | 0x2000;
     return &DAT_004cbf40;
 }
 

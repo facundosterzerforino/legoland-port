@@ -255,5 +255,5 @@ void FortGetInterfaces(struct ClassNode *name, struct Ride *ci) {
     ci->cb_pre_render = FortUpdate;
     ci->cb_b0 = RenderFort;
     ci->cb_9c = FortRemoveObject;
-    ci->cb_98 = FortAddObject;
+    ci->cb_98 = (void (*)())FortAddObject;
 }

@@ -5435,8 +5435,8 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
         DAT_0082c688 = flume->iface;
         vtbl->cb_a4 = LogFlumeTrackLoad;
         vtbl->cb_8c = LogFlumeTrackSetEditMode;
-        vtbl->cb_sprite = GetLogFlumeTrackSpriteInfo;
-        vtbl->cb_b0 = RenderLogFlumeTrack;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) GetLogFlumeTrackSpriteInfo; /* takes the tile id as a TileId */
+        vtbl->cb_b0 = (void (*)())RenderLogFlumeTrack;
         vtbl->cb_90 = LogFlumeTrackCalcCursor;
         vtbl->cb_94 = LogFlumeTrackDCalcCursor;
         vtbl->cb_98 = LogFlumeTrackAddObject;
@@ -5448,7 +5448,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME SPECIAL CORNER 1", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeSpecialCorner1LoadSprites;
         vtbl->cb_8c = LogFlumeSpecialCorner1SetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner1;
         vtbl->cb_90 = LogFlumeSpecialCorner1CalcCursor;
         vtbl->cb_94 = LogFlumeSpecialCorner1DCalcCursor;
@@ -5461,7 +5461,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME SPECIAL CORNER 2", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeSpecialCorner2LoadSprites;
         vtbl->cb_8c = LogFlumeSpecialCorner2SetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner2;
         vtbl->cb_90 = LogFlumeSpecialCorner2CalcCursor;
         vtbl->cb_94 = LogFlumeSpecialCorner2DCalcCursor;
@@ -5474,7 +5474,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME SPECIAL CORNER 3", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeSpecialCorner3LoadSprites;
         vtbl->cb_8c = LogFlumeSpecialCorner3SetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner3;
         vtbl->cb_90 = LogFlumeSpecialCorner3CalcCursor;
         vtbl->cb_94 = LogFlumeSpecialCorner3DCalcCursor;
@@ -5487,7 +5487,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME SPECIAL CORNER 4", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeSpecialCorner4LoadSprites;
         vtbl->cb_8c = LogFlumeSpecialCorner4SetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeSpecialCorner4;
         vtbl->cb_90 = LogFlumeSpecialCorner4CalcCursor;
         vtbl->cb_94 = LogFlumeSpecialCorner4DCalcCursor;
@@ -5500,7 +5500,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME CSAW", flume->name) == 0) {
         vtbl->cb_a4 = (RideCallback)FUN_0040f8b0;
         vtbl->cb_8c = LogFlumeCsawSetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeCsaw;
         vtbl->cb_90 = LogFlumeCsawCalcCursor;
         vtbl->cb_94 = LogFlumeCsawDCalcCursor;
@@ -5513,7 +5513,7 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME TUNNEL", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeTunnelLoadSprites;
         vtbl->cb_8c = LogFlumeTunnelSetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeTunnel;
         vtbl->cb_90 = LogFlumeTunnelCalcCursor;
         vtbl->cb_94 = LogFlumeTunnelDCalcCursor;
@@ -5525,10 +5525,10 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     // STRING: LEGOLAND 0x004b4b00
     if (_stricmp("LOG FLUME DROP", flume->name) == 0) {
         vtbl->cb_a4 = (RideCallback)FUN_004103e0;
-        vtbl->cb_8c = LogFlumeDropSetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_8c = (void (*)())LogFlumeDropSetEditMode;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeDrop;
-        vtbl->cb_90 = LogFlumeDropCalcCursor;
+        vtbl->cb_90 = (void (*)())LogFlumeDropCalcCursor;
         vtbl->cb_94 = LogFlumeDropDCalcCursor;
         vtbl->cb_98 = LogFlumeDropAddObject;
         vtbl->cb_9c = LogFlumeDropRemoveObject;
@@ -5539,9 +5539,9 @@ void LogFlume_GetInterfaces(struct ClassNode *flume, struct Ride *vtbl) {
     if (_stricmp("LOG FLUME HOLD UP", flume->name) == 0) {
         vtbl->cb_a4 = LogFlumeHoldUpLoadSprites;
         vtbl->cb_8c = LogFlumeHoldUpSetEditMode;
-        vtbl->cb_sprite = FUN_0040ed50;
+        vtbl->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) FUN_0040ed50; /* takes the tile id as a TileId */
         vtbl->cb_b0 = RenderLogFlumeHoldUp;
-        vtbl->cb_90 = LogFlumeHoldUpCalcCursor;
+        vtbl->cb_90 = (void (*)())LogFlumeHoldUpCalcCursor;
         vtbl->cb_94 = LogFlumeHoldUpDCalcCursor;
         vtbl->cb_98 = LogFlumeHoldUpAddObject;
         vtbl->cb_9c = LogFlumeHoldUpRemoveObject;

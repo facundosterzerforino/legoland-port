@@ -54,7 +54,7 @@ void LoadBrollyImages(struct Element *obj);
 void UnloadBrollyImages();
 void BrollySetEditMode();
 void BrollyAddObject(struct Element *param_1, unsigned char *param_2);
-struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned int param_2);
+struct RideSpriteInfo *GetBrollySpriteInfo(struct Element *param_1, unsigned short param_2);
 void LoadSharkCafeResources(struct Element *obj);
 void UnloadSharkCafeResources();
 void SharkCafeUpdate(Element *obj);

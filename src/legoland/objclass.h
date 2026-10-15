@@ -17,7 +17,7 @@ LEGO_EXPORT void *LoadObjectClass(struct Element *cls);
 
 typedef void (*RideCallback)();
 typedef int (*RideIntCallback)();
-typedef struct RideSpriteInfo *(*RidePtrCallback)();
+typedef struct RideSpriteInfo *(*RidePtrCallback)(struct Element *element, unsigned short id);
 
 struct ClassNode {
     /* 0x00 */ char *name;

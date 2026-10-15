@@ -150,7 +150,7 @@ int FUN_00451280(HANDLE h, int drive) {
     buf[1] = 0;
     drv = drive & 0xff;
     regs.reg_EBX = drv;
-    regs.reg_EDX = (DWORD)buf;
+    regs.reg_EDX = (DWORD)(UINT_PTR)buf; /* VWIN32 (Windows 9x) registers are 32 bits */
     buf[0] = 2;
     regs.reg_EAX = 0x440d;
     regs.reg_ECX = 0x848;
@@ -167,7 +167,7 @@ int FUN_00451280(HANDLE h, int drive) {
     i = 0;
     while (buf[1] > 0) {
         regs.reg_EBX = drv;
-        regs.reg_EDX = (DWORD)buf;
+        regs.reg_EDX = (DWORD)(UINT_PTR)buf; /* VWIN32 (Windows 9x) registers are 32 bits */
         buf[0] = 1;
         regs.reg_EAX = 0x440d;
         regs.reg_ECX = 0x848;
@@ -196,7 +196,7 @@ int FUN_00451390(HANDLE h, int drive) {
     buf[0] = 0;
     regs.reg_EAX = 0x440d;
     regs.reg_ECX = 0x848;
-    regs.reg_EDX = (DWORD)buf;
+    regs.reg_EDX = (DWORD)(UINT_PTR)buf; /* VWIN32 (Windows 9x) registers are 32 bits */
     if (DeviceIoControl(h, 1, &regs, sizeof(regs), &regs, sizeof(regs), (LPDWORD)&drive, NULL) && !(regs.reg_Flags & 1)) {
         return 1;
     }
@@ -220,7 +220,7 @@ int FUN_00451410(HANDLE h, int drive) {
 int OpenVWin32Device(void) {
     // STRING: LEGOLAND 0x004b8634
     HANDLE result = CreateFileA("\\\\.\\vwin32", 0, 0, NULL, 0, 0x4000000, NULL);
-    return (int)result;
+    return (int)(INT_PTR)result;
 }
 
 // FUNCTION: LEGOLAND 0x004514a0

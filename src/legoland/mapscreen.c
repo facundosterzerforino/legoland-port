@@ -518,7 +518,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                 if (ride->cb_sprite == NULL) {
                     continue;
                 }
-                info = ride->cb_sprite(ride->element, uid);
+                info = ride->cb_sprite(ride->element, uid.id);
             } else {
                 loc.sprite = ride->layer;
                 loc.x = ride->field_14;
