@@ -10,7 +10,8 @@ Windows 10 too.
 Installing
 ----------
 1. Unzip this folder somewhere you can write to, such as Documents or the Desktop (not Program Files).
-2. Start LEGOLAND.exe.
+2. Start LEGOLAND-port.exe. (Don't rename it to LEGOLAND.exe: Windows would treat it as the 1999 game
+   and apply its old compatibility fixes, and it wouldn't start.)
 3. The first time, it asks for the game's files. Insert your LEGOLAND CD, or click "Choose ISO..." and pick
    your ISO image of it (no need to mount it), and click Install. You can also choose a folder: a copy of the
    CD, or an old LEGOLAND installation (its saved games come along).
@@ -46,7 +47,7 @@ Command-line switches (add them to a shortcut's target):
 
 Problems
 --------
-If the game stops with an error or freezes, it writes a report next to LEGOLAND.exe (crash-*.dmp, freeze-*.dmp,
+If the game stops with an error or freezes, it writes a report next to LEGOLAND-port.exe (crash-*.dmp, freeze-*.dmp,
 exceptlog.txt, legoland-port-trace.txt and legoland-port-trace-prev.txt).
 Please send them, with what you were doing, to: @REPO@/issues
 

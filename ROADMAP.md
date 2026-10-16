@@ -242,7 +242,7 @@ build after each.
   current folder or the exe's. `tools/test_miniwin/test_setup.exe` builds the folder from the maintainer's ISO
   of the CD (read directly, and as a folder) and from an install: identical to the maintainer's install, byte for
   byte (1613 files).
-- Step 4, the release: `tools/release/make_release.py` packs `LEGOLAND.exe`, a README for players and the licenses
+- Step 4, the release: `tools/release/make_release.py` packs `LEGOLAND-port.exe` (never `LEGOLAND.exe`: Windows' compatibility database matches that name beside the game's files and applies the 1999 game's fixes, which crash the port while it loads), a README for players and the licenses
   (2 MB); the PDB goes in a separate zip.
 - Step 2: `docs/checklist.md`, every screen and feature with phase 4's result and the current one.
 
