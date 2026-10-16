@@ -15,7 +15,7 @@ enum {
     PORT_SETUP_NONE = 0, /* none of these */
     PORT_SETUP_CD = 1, /* the CD: main.z, speech\, Legoland.res (beside it or in volumes\), the movies */
     PORT_SETUP_INSTALLED = 2, /* a complete install (volumes\Legoland.res, IMusic\, FMV\, speech\) */
-    PORT_SETUP_IMAGE = 3 /* an image file (.iso) of the CD */
+    PORT_SETUP_IMAGE = 3 /* an image file of the CD (.iso, or a raw .bin) */
 };
 int PortSetupKind(const char *path);
 

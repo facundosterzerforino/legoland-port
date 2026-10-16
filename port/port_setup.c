@@ -20,6 +20,7 @@
 
 typedef struct Source {
     SDL_IOStream *iso; /* NULL for a folder */
+    unsigned sector_size, data_offset; /* the image's sectors: 2048, 0 (.iso) or 2352, 16 or 24 (raw .bin) */
 } Source;
 
 /* a folder or a file of a source */
@@ -49,20 +50,55 @@ static int ReadAt(SDL_IOStream *io, unsigned long long offset, void *buf, size_t
     return SDL_SeekIO(io, (Sint64)offset, SDL_IO_SEEK_SET) == (Sint64)offset && SDL_ReadIO(io, buf, n) == n;
 }
 
-/* An ISO 9660 image: the Joliet descriptor when there is one (the names as Windows shows them), else the primary
- * one (8.3 upper-case names). Fills the root folder. */
+/* n bytes of the image's data at offset (counted in 2048-byte data sectors, whatever the image's sectors are) */
+static int ImageRead(Source *s, unsigned long long offset, void *buf, size_t n) {
+    unsigned char *out = (unsigned char *)buf;
+
+    if (s->sector_size == SECTOR) {
+        return ReadAt(s->iso, offset, buf, n);
+    }
+    while (n > 0) {
+        unsigned long long sector = offset / SECTOR;
+        size_t in = (size_t)(offset % SECTOR), part = SECTOR - in < n ? SECTOR - in : n;
+
+        if (!ReadAt(s->iso, sector * s->sector_size + s->data_offset + in, out, part)) {
+            return 0;
+        }
+        out += part;
+        offset += part;
+        n -= part;
+    }
+    return 1;
+}
+
+/* An ISO 9660 image (.iso, or a raw .bin with 2352-byte sectors): the Joliet descriptor when there is one (the
+ * names as Windows shows them), else the primary one (8.3 upper-case names). Fills the root folder. */
 static int OpenImage(Source *s, const char *path, Node *root) {
+    static const unsigned layouts[][2] = {{2048, 0}, {2352, 16}, {2352, 24}}; /* .iso; raw mode 1; raw mode 2 */
     unsigned char d[SECTOR];
     unsigned long long primary = 0, joliet = 0;
     unsigned long sector;
     const unsigned char *r;
+    unsigned i;
 
     s->iso = SDL_IOFromFile(path, "rb");
     if (s->iso == NULL) {
         return 0;
     }
+    for (i = 0; i < sizeof(layouts) / sizeof(layouts[0]); i++) {
+        if (ReadAt(s->iso, 16ull * layouts[i][0] + layouts[i][1], d, 6) && memcmp(d + 1, "CD001", 5) == 0) {
+            break;
+        }
+    }
+    if (i == sizeof(layouts) / sizeof(layouts[0])) {
+        SDL_CloseIO(s->iso);
+        s->iso = NULL;
+        return 0;
+    }
+    s->sector_size = layouts[i][0];
+    s->data_offset = layouts[i][1];
     for (sector = 16; sector < 64; sector++) {
-        if (!ReadAt(s->iso, (unsigned long long)sector * SECTOR, d, sizeof(d)) || memcmp(d + 1, "CD001", 5) != 0) {
+        if (!ImageRead(s, (unsigned long long)sector * SECTOR, d, sizeof(d)) || memcmp(d + 1, "CD001", 5) != 0) {
             break;
         }
         if (d[0] == 1 && primary == 0) {
@@ -73,7 +109,7 @@ static int OpenImage(Source *s, const char *path, Node *root) {
             break;
         }
     }
-    if (primary == 0 || !ReadAt(s->iso, joliet != 0 ? joliet : primary, d, sizeof(d))) {
+    if (primary == 0 || !ImageRead(s, joliet != 0 ? joliet : primary, d, sizeof(d))) {
         SDL_CloseIO(s->iso);
         s->iso = NULL;
         return 0;
@@ -147,7 +183,7 @@ static int ImageChildren(Source *s, const Node *dir, EachFn fn, void *ctx) {
         return 0;
     }
     buf = (unsigned char *)malloc((size_t)size);
-    if (buf == NULL || !ReadAt(s->iso, dir->offset, buf, (size_t)size)) {
+    if (buf == NULL || !ImageRead(s, dir->offset, buf, (size_t)size)) {
         free(buf);
         return 0;
     }
@@ -621,7 +657,7 @@ static int RunJob(Work *w, const Job *j, const char *target, const unsigned char
         while (ok && left > 0) {
             size_t n = left > sizeof(buf) ? sizeof(buf) : (size_t)left;
 
-            if (!ReadAt(w->src->iso, at, buf, n)) {
+            if (!ImageRead(w->src, at, buf, n)) {
                 ok = Fail(w, "Can't read the CD image (is it complete?)", j->target);
                 break;
             }
@@ -676,7 +712,7 @@ static unsigned char *LoadArchive(Source *s, const Node *z, size_t *size) {
         return (unsigned char *)SDL_LoadFile(z->path, size);
     }
     data = (unsigned char *)SDL_malloc((size_t)z->size + 1);
-    if (data != NULL && !ReadAt(s->iso, z->offset, data, (size_t)z->size)) {
+    if (data != NULL && !ImageRead(s, z->offset, data, (size_t)z->size)) {
         SDL_free(data);
         return NULL;
     }

@@ -116,7 +116,7 @@ static void ChooseIso(void) {
     memset(&ofn, 0, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = window;
-    ofn.lpstrFilter = "CD images (*.iso)\0*.iso\0All files (*.*)\0*.*\0";
+    ofn.lpstrFilter = "CD images (*.iso, *.bin)\0*.iso;*.bin\0All files (*.*)\0*.*\0";
     ofn.lpstrFile = path;
     ofn.nMaxFile = sizeof(path);
     ofn.lpstrTitle = "Choose the LEGOLAND CD's ISO image";
@@ -126,8 +126,8 @@ static void ChooseIso(void) {
     }
     if (PortSetupKind(path) != PORT_SETUP_IMAGE) {
         MessageBoxA(window,
-            "That isn't an image of the LEGOLAND CD.\n\nThe CD's image is an .iso file with main.z, Legoland.res "
-            "and the folder Speech in it.",
+            "That isn't an image of the LEGOLAND CD.\n\nThe CD's image is an .iso (or .bin) file with main.z, "
+            "Legoland.res and the folder Speech in it.",
             "LEGOLAND", MB_OK | MB_ICONWARNING);
     } else {
         strcpy(source, path);
