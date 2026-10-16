@@ -22,6 +22,15 @@
 #define __LONG32 int
 #endif
 
+/* The SDK's array sizes that depend on the target's pointer size (#ifdef _WIN64 there; the headers are generated
+ * from the 64-bit SDK, so tools/linux/gen_win32.py writes these by name): msacm.h's driver area in ACMSTREAMHEADER,
+ * whose size the ACM checks (the game's own copy, src/legoland/legoland.h, has 10 on 32-bit targets: wasm32). */
+#if defined(_WIN64) || defined(__LP64__)
+#define _DRVRESERVED 15
+#else
+#define _DRVRESERVED 10
+#endif
+
 /* the code's wide strings are Windows' 16-bit ones (-fshort-wchar); the C library's wide functions are 32-bit, so
  * the ones the code uses are here */
 static inline unsigned short *MiniwinWcscpy(unsigned short *to, const unsigned short *from) {

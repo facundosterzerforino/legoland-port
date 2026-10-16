@@ -20,27 +20,35 @@ typedef struct ima_adpcmwaveformat_tag IMAADPCMWAVEFORMAT;
 typedef struct wavefilter_tag * LPWAVEFILTER;
 typedef struct wavefilter_tag WAVEFILTER;
 
+#pragma pack(push, 1)
 struct adpcmcoef_tag {
     short iCoef1;
     short iCoef2;
 };
+#pragma pack(pop)
+#pragma pack(push, 1)
 struct adpcmwaveformat_tag {
     WAVEFORMATEX wfx;
     WORD wSamplesPerBlock;
     WORD wNumCoef;
     ADPCMCOEFSET aCoef[];
 };
+#pragma pack(pop)
 #define ICTYPE_VIDEO mmioFOURCC('v', 'i', 'd', 'c')
+#pragma pack(push, 1)
 struct ima_adpcmwaveformat_tag {
     WAVEFORMATEX wfx;
     WORD wSamplesPerBlock;
 };
+#pragma pack(pop)
+#pragma pack(push, 1)
 struct wavefilter_tag {
     DWORD cbStruct;
     DWORD dwFilterTag;
     DWORD fdwFilter;
     DWORD dwReserved[5];
 };
+#pragma pack(pop)
 #define WAVE_FORMAT_ADPCM 0x0002
 #define WAVE_FORMAT_DVI_ADPCM 0x0011
 #define WAVE_FORMAT_IMA_ADPCM (WAVE_FORMAT_DVI_ADPCM)

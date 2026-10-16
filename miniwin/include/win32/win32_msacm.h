@@ -23,6 +23,7 @@ typedef struct HACMSTREAM__ ** LPHACMSTREAM;
 #define ACMERR_BASE (512)
 #define ACMERR_NOTPOSSIBLE (ACMERR_BASE + 0)
 #define ACMERR_UNPREPARED (ACMERR_BASE + 2)
+#pragma pack(push, 1)
 struct tACMSTREAMHEADER {
     DWORD cbStruct;
     DWORD fdwStatus;
@@ -35,8 +36,9 @@ struct tACMSTREAMHEADER {
     DWORD cbDstLength;
     DWORD cbDstLengthUsed;
     DWORD_PTR dwDstUser;
-    DWORD dwReservedDriver[15];
+    DWORD dwReservedDriver[_DRVRESERVED];
 };
+#pragma pack(pop)
 #define ACMSTREAMHEADER_STATUSF_DONE 0x00010000
 #define ACMSTREAMHEADER_STATUSF_PREPARED 0x00020000
 #define ACM_STREAMCONVERTF_BLOCKALIGN 0x00000004
@@ -51,11 +53,15 @@ MMRESULT acmStreamOpen(LPHACMSTREAM phas, HACMDRIVER had, LPWAVEFORMATEX pwfxSrc
 MMRESULT acmStreamPrepareHeader(HACMSTREAM has, LPACMSTREAMHEADER pash, DWORD fdwPrepare);
 MMRESULT acmStreamSize(HACMSTREAM has, DWORD cbInput, LPDWORD pdwOutputBytes, DWORD fdwSize);
 MMRESULT acmStreamUnprepareHeader(HACMSTREAM has, LPACMSTREAMHEADER pash, DWORD fdwUnprepare);
+#pragma pack(push, 1)
 struct HACMDRIVER__ {
     int unused;
 };
+#pragma pack(pop)
+#pragma pack(push, 1)
 struct HACMSTREAM__ {
     int unused;
 };
+#pragma pack(pop)
 
 #endif

@@ -238,6 +238,7 @@ typedef uintptr_t DWORD_PTR;
 typedef unsigned char BYTE;
 typedef BYTE * LPBYTE;
 typedef unsigned short WORD;
+#pragma pack(push, 1)
 struct tWAVEFORMATEX {
     WORD wFormatTag;
     WORD nChannels;
@@ -247,6 +248,7 @@ struct tWAVEFORMATEX {
     WORD wBitsPerSample;
     WORD cbSize;
 };
+#pragma pack(pop)
 #define ANSI_VAR_FONT 12
 typedef WORD ATOM;
 #define FACILITY_ITF 4
@@ -295,6 +297,7 @@ struct tagBITMAP {
     WORD bmBitsPixel;
     LPVOID bmBits;
 };
+#pragma pack(push, 2)
 struct tagBITMAPFILEHEADER {
     WORD bfType;
     DWORD bfSize;
@@ -302,6 +305,7 @@ struct tagBITMAPFILEHEADER {
     WORD bfReserved2;
     DWORD bfOffBits;
 };
+#pragma pack(pop)
 struct tagBITMAPINFOHEADER {
     DWORD biSize;
     LONG biWidth;
@@ -926,6 +930,7 @@ struct _IMAGE_DATA_DIRECTORY {
     DWORD VirtualAddress;
     DWORD Size;
 };
+#pragma pack(push, 2)
 struct _IMAGE_DOS_HEADER {
     WORD e_magic;
     WORD e_cblp;
@@ -947,6 +952,7 @@ struct _IMAGE_DOS_HEADER {
     WORD e_res2[10];
     LONG e_lfanew;
 };
+#pragma pack(pop)
 #define IMAGE_DOS_SIGNATURE 0x5A4D
 struct _IMAGE_FILE_HEADER {
     WORD Machine;
@@ -957,6 +963,7 @@ struct _IMAGE_FILE_HEADER {
     WORD SizeOfOptionalHeader;
     WORD Characteristics;
 };
+#pragma pack(push, 4)
 struct _IMAGE_OPTIONAL_HEADER64 {
     WORD Magic;
     BYTE MajorLinkerVersion;
@@ -989,6 +996,7 @@ struct _IMAGE_OPTIONAL_HEADER64 {
     DWORD NumberOfRvaAndSizes;
     IMAGE_DATA_DIRECTORY DataDirectory[16];
 };
+#pragma pack(pop)
 struct _IMAGE_NT_HEADERS64 {
     DWORD Signature;
     IMAGE_FILE_HEADER FileHeader;
@@ -1156,7 +1164,9 @@ struct _MEMORY_BASIC_INFORMATION {
     PVOID BaseAddress;
     PVOID AllocationBase;
     DWORD AllocationProtect;
+#if defined(_WIN64) || defined(__LP64__)
     WORD PartitionId;
+#endif
     SIZE_T RegionSize;
     DWORD State;
     DWORD Protect;
@@ -1767,9 +1777,11 @@ struct HINSTANCE__ {
 struct HMENU__ {
     int unused;
 };
+#pragma pack(push, 1)
 struct HMIDIOUT__ {
     int unused;
 };
+#pragma pack(pop)
 struct HPALETTE__ {
     int unused;
 };

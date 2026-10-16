@@ -66,14 +66,18 @@ struct FolderItemVerbs {
 struct FolderItems {
     struct FolderItemsVtbl * lpVtbl;
 };
+#pragma pack(push, 1)
 struct IBanneredBar {
     struct IBanneredBarVtbl * lpVtbl;
 };
+#pragma pack(pop)
 #define INTERFACE IBanneredBar
+#pragma pack(push, 1)
 struct _SHITEMID {
     USHORT cb;
     BYTE abID[1];
 };
+#pragma pack(pop)
 struct _ITEMIDLIST {
     SHITEMID mkid;
 };
@@ -165,11 +169,13 @@ struct FolderVtbl {
     HRESULT (*CopyHere)(Folder *, VARIANT, VARIANT);
     HRESULT (*GetDetailsOf)(Folder *, VARIANT, int, BSTR *);
 };
+#pragma pack(push, 1)
 struct IBanneredBarVtbl {
     HRESULT (*SetIconSize)(IBanneredBar *, DWORD);
     HRESULT (*GetIconSize)(IBanneredBar *, DWORD *);
     HRESULT (*SetBitmap)(IBanneredBar *, HBITMAP);
     HRESULT (*GetBitmap)(IBanneredBar *, HBITMAP *);
 };
+#pragma pack(pop)
 
 #endif

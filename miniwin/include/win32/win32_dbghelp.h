@@ -50,23 +50,30 @@ typedef struct _SYMBOL_INFO * PSYMBOL_INFO;
 typedef struct _SYMBOL_INFO SYMBOL_INFO;
 
 typedef BOOL (*MINIDUMP_CALLBACK_ROUTINE)(PVOID, PMINIDUMP_CALLBACK_INPUT, PMINIDUMP_CALLBACK_OUTPUT);
+#pragma pack(push, 4)
 struct _MINIDUMP_EXCEPTION_INFORMATION {
     DWORD ThreadId;
     PEXCEPTION_POINTERS ExceptionPointers;
     BOOL ClientPointers;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_INCLUDE_MODULE_CALLBACK {
     ULONG64 BaseOfImage;
 };
+#pragma pack(pop)
 struct _MINIDUMP_INCLUDE_THREAD_CALLBACK {
     ULONG ThreadId;
 };
+#pragma pack(push, 4)
 struct _MINIDUMP_IO_CALLBACK {
     HANDLE Handle;
     ULONG64 Offset;
     PVOID Buffer;
     ULONG BufferBytes;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_MEMORY_INFO {
     ULONG64 BaseAddress;
     ULONG64 AllocationBase;
@@ -78,6 +85,8 @@ struct _MINIDUMP_MEMORY_INFO {
     ULONG32 Type;
     ULONG32 __alignment2;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_MODULE_CALLBACK {
     PWCHAR FullPath;
     ULONG64 BaseOfImage;
@@ -90,11 +99,14 @@ struct _MINIDUMP_MODULE_CALLBACK {
     PVOID MiscRecord;
     ULONG SizeOfMiscRecord;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_READ_MEMORY_FAILURE_CALLBACK {
     ULONG64 Offset;
     ULONG Bytes;
     HRESULT FailureStatus;
 };
+#pragma pack(pop)
 struct _MINIDUMP_THREAD_CALLBACK {
     ULONG ThreadId;
     HANDLE ThreadHandle;
@@ -115,6 +127,7 @@ struct _MINIDUMP_THREAD_EX_CALLBACK {
 };
 enum _MINIDUMP_TYPE { MiniDumpNormal = 0, MiniDumpWithDataSegs = 1, MiniDumpWithFullMemory = 2, MiniDumpWithHandleData = 4, MiniDumpFilterMemory = 8, MiniDumpScanMemory = 16, MiniDumpWithUnloadedModules = 32, MiniDumpWithIndirectlyReferencedMemory = 64, MiniDumpFilterModulePaths = 128, MiniDumpWithProcessThreadData = 256, MiniDumpWithPrivateReadWriteMemory = 512, MiniDumpWithoutOptionalData = 1024, MiniDumpWithFullMemoryInfo = 2048, MiniDumpWithThreadInfo = 4096, MiniDumpWithCodeSegs = 8192, MiniDumpWithoutAuxiliaryState = 16384, MiniDumpWithFullAuxiliaryState = 32768, MiniDumpWithPrivateWriteCopyMemory = 65536, MiniDumpIgnoreInaccessibleMemory = 131072, MiniDumpWithTokenInformation = 262144, MiniDumpWithModuleHeaders = 524288, MiniDumpFilterTriage = 1048576, MiniDumpWithAvxXStateContext = 2097152, MiniDumpWithIptTrace = 4194304, MiniDumpScanInaccessiblePartialPages = 8388608, MiniDumpFilterWriteCombinedMemory = 16777216, MiniDumpValidTypeFlags = 33554431, MiniDumpNoIgnoreInaccessibleMemory = 33554432, MiniDumpValidTypeFlagsEx = 67108863 };
 typedef enum _MINIDUMP_TYPE MINIDUMP_TYPE;
+#pragma pack(push, 4)
 struct _MINIDUMP_VM_POST_READ_CALLBACK {
     ULONG64 Offset;
     PVOID Buffer;
@@ -122,14 +135,19 @@ struct _MINIDUMP_VM_POST_READ_CALLBACK {
     ULONG Completed;
     HRESULT Status;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_VM_PRE_READ_CALLBACK {
     ULONG64 Offset;
     PVOID Buffer;
     ULONG Size;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_VM_QUERY_CALLBACK {
     ULONG64 Offset;
 };
+#pragma pack(pop)
 BOOL MiniDumpWriteDump(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 typedef DWORD RVA;
 struct _SYMBOL_INFO {
@@ -154,10 +172,12 @@ struct _SYMBOL_INFO {
 BOOL SymFromAddr(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
 BOOL SymInitialize(HANDLE hProcess, PCSTR UserSearchPath, BOOL fInvadeProcess);
 DWORD SymSetOptions(DWORD SymOptions);
+#pragma pack(push, 4)
 struct _MINIDUMP_CALLBACK_INFORMATION {
     MINIDUMP_CALLBACK_ROUTINE CallbackRoutine;
     PVOID CallbackParam;
 };
+#pragma pack(pop)
 struct _MINIDUMP_CALLBACK_INPUT {
     ULONG ProcessId;
     HANDLE ProcessHandle;
@@ -177,6 +197,7 @@ struct _MINIDUMP_CALLBACK_INPUT {
         MINIDUMP_VM_POST_READ_CALLBACK VmPostRead;
     };
 };
+#pragma pack(push, 4)
 struct _MINIDUMP_CALLBACK_OUTPUT {
     union {
         ULONG ModuleWriteFlags;
@@ -206,14 +227,19 @@ struct _MINIDUMP_CALLBACK_OUTPUT {
         HRESULT Status;
     };
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_USER_STREAM {
     ULONG32 Type;
     ULONG BufferSize;
     PVOID Buffer;
 };
+#pragma pack(pop)
+#pragma pack(push, 4)
 struct _MINIDUMP_USER_STREAM_INFORMATION {
     ULONG UserStreamCount;
     PMINIDUMP_USER_STREAM UserStreamArray;
 };
+#pragma pack(pop)
 
 #endif

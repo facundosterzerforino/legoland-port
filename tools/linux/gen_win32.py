@@ -1,6 +1,7 @@
 """tools/linux/gen_win32.py: generates miniwin/include/win32/, the Windows declarations the port's code uses, for
 non-Windows builds (ROADMAP.md phase 8, Linux). Run from the repo with libclang (uv run --with libclang==18.1.1)
-after tools/linux/sdkuse.py; needs the Windows SDK the x64 build uses (~/xwin).
+after tools/linux/sdkuse.py; needs the Windows SDK the x64 build uses (~/xwin). Then
+tools/linux/check_layouts.py compares every generated record's layout with the SDK's, on 64 and 32 bits.
 
 It parses that SDK with libclang, starts from what the code uses (tools/linux/sdkuse.json, and every identifier in
 the sources that the SDK declares) minus what the platform's own C library declares, follows the dependencies (field, parameter
@@ -36,7 +37,7 @@ WINBASEAPI WINUSERAPI WINGDIAPI WINMMAPI WINADVAPI WINSPOOLAPI SHSTDAPI SHFOLDER
 WINOLEAPI WINOLEAUTAPI DECLSPEC_GUID DECLSPEC_UUID EXTERN_C STDAPI STDAPI_ STDMETHOD STDMETHOD_ PURE THIS THIS_
 interface DECLARE_INTERFACE DECLARE_INTERFACE_ BEGIN_INTERFACE END_INTERFACE _Null_terminated_ __int64
 __declspec __stdcall __cdecl __fastcall __unaligned __w64 UNALIGNED POINTER_64 POINTER_32 POINTER_SIGNED
-POINTER_UNSIGNED FORCEINLINE NTAPI WINBOOL bool true false
+POINTER_UNSIGNED FORCEINLINE NTAPI WINBOOL bool true false _DRVRESERVED
 _byteswap_ushort _byteswap_ulong _byteswap_uint64 GetExceptionInformation GetExceptionCode'''.split())
 
 # Windows' integers the size of a pointer: the target's, whatever the SDK parsed was built for
@@ -264,6 +265,35 @@ def declarator(t, name):
     return ('%s %s' % (fix(t0.spelling), name)).strip()
 
 
+# Array sizes the SDK sets per target (#ifdef _WIN64): written by their macro's name, which win32_prelude.h defines
+# for the target; as numbers they would be the 64-bit SDK's. (Generating for 32-bit Windows and comparing found these;
+# the other differences, CONTEXT and IMAGE_NT_HEADERS, are x64's on every target on purpose: the crash report.)
+TARGET_SIZES = {'_DRVRESERVED'}
+# Members the SDK has on 64-bit Windows only (#if defined(_WIN64)): kept to 64-bit targets
+WIN64_FIELDS = {('_MEMORY_BASIC_INFORMATION', 'PartitionId')}
+
+
+def natural_align(c):
+    """the alignment the record's members would give it without #pragma pack"""
+    a = 1
+    for f in c.get_children():
+        if f.kind == ci.CursorKind.FIELD_DECL:
+            a = max(a, f.type.get_align())
+        elif f.kind in (ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL) and (
+                not f.spelling or '(' in f.spelling or f.spelling.startswith('(')):
+            a = max(a, natural_align(f))
+    return a
+
+
+def packed(c, text):
+    """The record's text, inside the SDK's #pragma pack when it was declared under one (WAVEFORMATEX: pack(1), 18 bytes
+    and not 20; BITMAPFILEHEADER: pack(2)): the record's alignment is then smaller than its members'."""
+    a = c.type.get_align()
+    if 0 < a < natural_align(c):
+        return '#pragma pack(push, %d)\n%s\n#pragma pack(pop)' % (a, text)
+    return text
+
+
 def record_body(c, indent='    '):
     lines = []
     for f in c.get_children():
@@ -276,7 +306,14 @@ def record_body(c, indent='    '):
                 lines.append('%s%s {\n%s%s} %s;' % (indent, kw, record_body(decl, indent + '    '), indent, f.spelling))
             else:
                 bits = ' : %d' % f.get_bitfield_width() if f.is_bitfield() else ''
-                lines.append('%s%s%s;' % (indent, declarator(f.type, f.spelling), bits))
+                size = next((t.spelling for t in f.get_tokens() if t.spelling in TARGET_SIZES), None)
+                if size is not None and ft.kind == ci.TypeKind.CONSTANTARRAY:
+                    lines.append('%s%s;' % (indent, declarator(ft.element_type, '%s[%s]' % (f.spelling, size))))
+                elif (c.spelling, f.spelling) in WIN64_FIELDS:
+                    lines.append('#if defined(_WIN64) || defined(__LP64__)\n%s%s%s;\n#endif' % (
+                        indent, declarator(f.type, f.spelling), bits))
+                else:
+                    lines.append('%s%s%s;' % (indent, declarator(f.type, f.spelling), bits))
         elif f.kind in (ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL) and (
                 not f.spelling or '(' in f.spelling or f.spelling.startswith('(')):
             # an anonymous member record (no field of its own): MS extension, members visible directly
@@ -441,13 +478,13 @@ def emit(n, enums_done):
                 vals = ', '.join('%s = %d' % (x.spelling, x.enum_value) for x in d.get_children())
                 return 'typedef enum { %s } %s;' % (vals, n)
             kw = 'struct' if d.kind == ci.CursorKind.STRUCT_DECL else 'union'
-            return 'typedef %s {\n%s} %s;' % (kw, record_body(d), n)
+            return packed(d, 'typedef %s {\n%s} %s;' % (kw, record_body(d), n))
         if us.kind == ci.TypeKind.FUNCTIONPROTO:
             return 'typedef %s %s(%s);' % (fix(us.get_result().spelling), n,
                                            ', '.join(fix(a.spelling) for a in us.argument_types()) or 'void')
         return 'typedef %s;' % declarator(u, n)
     if k in (ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL):
-        return '%s {\n%s};' % (n, record_body(c)) if c.is_definition() else None
+        return packed(c, '%s {\n%s};' % (n, record_body(c))) if c.is_definition() else None
     if k == ci.CursorKind.ENUM_DECL:
         if c.hash in enums_done:
             return None
