@@ -7,9 +7,9 @@
  * GNU Lesser General Public License, version 2.1 or later (see COPYING.LGPLv2.1).
  */
 
+#include "port_ffmpeg.h"
 #include "ffmpeg_compat.h"
 #include "ivi.h"
-#include "port_ffmpeg.h"
 
 int ff_indeo5_decode_init(AVCodecContext *avctx);
 
@@ -17,11 +17,76 @@ extern const int ff_indeo3_priv_data_size;
 int ff_indeo3_decode_init(AVCodecContext *avctx);
 int ff_indeo3_decode_frame(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *avpkt);
 int ff_indeo3_decode_close(AVCodecContext *avctx);
+extern const int ff_cinepak_priv_data_size;
+int ff_cinepak_decode_init(AVCodecContext *avctx);
+int ff_cinepak_decode_frame(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *avpkt);
+int ff_cinepak_decode_close(AVCodecContext *avctx);
 
 const uint8_t ff_zigzag_direct[64] = {
-    0,  1,  8,  16, 9,  2,  3,  10, 17, 24, 32, 25, 18, 11, 4,  5,  12, 19, 26, 33, 40, 48,
-    41, 34, 27, 20, 13, 6,  7,  14, 21, 28, 35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23,
-    30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63,
+    0,
+    1,
+    8,
+    16,
+    9,
+    2,
+    3,
+    10,
+    17,
+    24,
+    32,
+    25,
+    18,
+    11,
+    4,
+    5,
+    12,
+    19,
+    26,
+    33,
+    40,
+    48,
+    41,
+    34,
+    27,
+    20,
+    13,
+    6,
+    7,
+    14,
+    21,
+    28,
+    35,
+    42,
+    49,
+    56,
+    57,
+    50,
+    43,
+    36,
+    29,
+    22,
+    15,
+    23,
+    30,
+    37,
+    44,
+    51,
+    58,
+    59,
+    52,
+    45,
+    38,
+    31,
+    39,
+    46,
+    53,
+    60,
+    61,
+    54,
+    47,
+    55,
+    62,
+    63,
 };
 
 /* Builds a table indexed by the next nb_bits bits of the stream. With VLC_INIT_OUTPUT_LE (always the case
@@ -110,7 +175,7 @@ static unsigned int UpperFourcc(unsigned int fourcc) {
 
 #define FOURCC(a, b, c, d) ((unsigned int)(a) | (unsigned int)(b) << 8 | (unsigned int)(c) << 16 | (unsigned int)(d) << 24)
 
-PortVideoDecoder *PortVideoDecoder_Open(unsigned int fourcc, int width, int height) {
+PortVideoDecoder *PortVideoDecoder_Open(unsigned int fourcc, int width, int height, int bit_count) {
     PortVideoDecoder *decoder;
     int (*init)(AVCodecContext *avctx);
     size_t priv_size;
@@ -125,6 +190,10 @@ PortVideoDecoder *PortVideoDecoder_Open(unsigned int fourcc, int width, int heig
         codec_id = AV_CODEC_ID_INDEO3;
         priv_size = (size_t)ff_indeo3_priv_data_size;
         init = ff_indeo3_decode_init;
+    } else if (fourcc == FOURCC('C', 'V', 'I', 'D')) {
+        codec_id = AV_CODEC_ID_CINEPAK;
+        priv_size = (size_t)ff_cinepak_priv_data_size;
+        init = ff_cinepak_decode_init;
     } else {
         return NULL;
     }
@@ -140,9 +209,14 @@ PortVideoDecoder *PortVideoDecoder_Open(unsigned int fourcc, int width, int heig
     decoder->avctx.width = width;
     decoder->avctx.height = height;
     decoder->avctx.codec_id = codec_id;
+    decoder->avctx.bits_per_coded_sample = bit_count;
+    decoder->avctx.discard_damaged_percentage = 95; /* FFmpeg's default */
     if (codec_id == AV_CODEC_ID_INDEO5) {
         decoder->decode = ff_ivi_decode_frame;
         decoder->close = ff_ivi_decode_close;
+    } else if (codec_id == AV_CODEC_ID_CINEPAK) {
+        decoder->decode = ff_cinepak_decode_frame;
+        decoder->close = ff_cinepak_decode_close;
     } else {
         decoder->decode = ff_indeo3_decode_frame;
         decoder->close = ff_indeo3_decode_close;
@@ -174,7 +248,15 @@ int PortVideoDecoder_Decode(PortVideoDecoder *decoder, const unsigned char *data
         planes[i] = decoder->frame.data[i];
         linesize[i] = decoder->frame.linesize[i];
     }
+    if (decoder->avctx.codec_id == AV_CODEC_ID_CINEPAK) {
+        /* a view of the decoder's own frame (av_frame_ref in ffmpeg_compat.h): not ours to free */
+        memset(&decoder->frame, 0, sizeof(decoder->frame));
+    }
     return 1;
+}
+
+int PortVideoDecoder_IsRgb(const PortVideoDecoder *decoder) {
+    return decoder->avctx.codec_id == AV_CODEC_ID_CINEPAK && decoder->avctx.pix_fmt == AV_PIX_FMT_RGB24;
 }
 
 void PortVideoDecoder_Close(PortVideoDecoder *decoder) {

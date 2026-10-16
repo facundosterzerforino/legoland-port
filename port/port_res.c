@@ -7,14 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../src/legoland/legoland.h"
-#include "../src/legoland/globals.h"
-#include "../src/legoland/obj_instance.h"
 #include "../src/legoland/binv.h"
-#include "../src/legoland/resource.h"
-#include "../src/legoland/man3d.h"
 #include "../src/legoland/castle.h"
+#include "../src/legoland/globals.h"
+#include "../src/legoland/legoland.h"
+#include "../src/legoland/man3d.h"
 #include "../src/legoland/movie_pool.h"
+#include "../src/legoland/obj_instance.h"
+#include "../src/legoland/resource.h"
+#include "../src/legoland/string.h"
+#include "port_language.h"
 #include "port_res.h"
 #include "port_x86.h"
 
@@ -46,7 +48,7 @@ static void PortResCheckClass(const char *name, void *ctx) {
     n = size - 4;
     if (size < 4 || n > PORT_X86_SIZE_Ride - from) {
         fprintf(PortResReport, "object class %s: fixed part of %u bytes, struct Ride has 0x%x from its instances field\n",
-                name, n, PORT_X86_SIZE_Ride - from);
+            name, n, PORT_X86_SIZE_Ride - from);
         PortResProblems++;
         RES_CloseFile(file);
         return;
@@ -164,8 +166,8 @@ static int PortResCheckLoc(FILE *dump) {
             continue;
         }
         fprintf(dump, "%s count=%d base=%d cells=%d name=%.32s textures=%08x\n", files[i][0], loc->count,
-                loc->texture_base, loc->cell_count, loc->name,
-                PortResHash(2166136261u, loc->textures, loc->count * 8));
+            loc->texture_base, loc->cell_count, loc->name,
+            PortResHash(2166136261u, loc->textures, loc->count * 8));
         for (j = 0; j < loc->cell_count; j++) {
             struct LocCell *cell = &loc->cells[j];
 
@@ -208,18 +210,18 @@ static int PortResCheckLms(FILE *dump) {
         }
         memcpy(&count, lms->pad_0, 4);
         fprintf(dump, "%s verts=%d flat=%d smooth=%d textured=%d at %x %x %x %x %x %x\n", fd.cFileName, count,
-                lms->field_1c, lms->field_24, lms->field_2c,
-                (unsigned int)((unsigned char *)lms->field_c - (unsigned char *)(lms + 1)),
-                (unsigned int)((unsigned char *)lms->field_10 - (unsigned char *)(lms + 1)),
-                (unsigned int)((unsigned char *)lms->field_14 - (unsigned char *)(lms + 1)),
-                (unsigned int)((unsigned char *)lms->field_18 - (unsigned char *)(lms + 1)),
-                (unsigned int)((unsigned char *)lms->field_20 - (unsigned char *)(lms + 1)),
-                (unsigned int)((unsigned char *)lms->field_28 - (unsigned char *)(lms + 1)));
+            lms->field_1c, lms->field_24, lms->field_2c,
+            (unsigned int)((unsigned char *)lms->field_c - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->field_10 - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->field_14 - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->field_18 - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->field_20 - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->field_28 - (unsigned char *)(lms + 1)));
         fprintf(dump, " %08x %08x %08x %08x %08x\n", PortResHash(2166136261u, lms->field_c, count * 12),
-                PortResHash(2166136261u, lms->field_18, lms->field_1c * sizeof(struct LmsRef)),
-                PortResHash(2166136261u, lms->field_20, lms->field_24 * sizeof(struct LmsRef)),
-                PortResHash(2166136261u, lms->field_28, lms->field_2c * sizeof(struct LmsRef)),
-                PortResHash(2166136261u, lms->box, sizeof(lms->box)));
+            PortResHash(2166136261u, lms->field_18, lms->field_1c * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->field_20, lms->field_24 * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->field_28, lms->field_2c * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->box, sizeof(lms->box)));
         FUN_004775d0(lms);
         files++;
     } while (FindNextFileA(h, &fd));
@@ -292,7 +294,12 @@ int PortResSelfTest(const char *path) {
         PortResProblems++;
     }
     fprintf(PortResReport, "resources: %d object classes read of %d (fields in port-selftest-odf.txt)\n", PortResClasses,
-            files);
+        files);
+    /* the CD's language (port_language.h): the European CDs' string 9999, which picks the object texts */
+    LoadStringTable();
+    fprintf(PortResReport, "language: %s\n",
+        PortGameLanguage() != NULL ? PortGameLanguage() : "english (the English CD: no string 9999)");
+    DeleteStrings();
     {
         FILE *bnv = fopen("port-selftest-bnv.txt", "w");
 

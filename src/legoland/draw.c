@@ -18,6 +18,9 @@
 #include "timer.h"
 #include "wndenv.h"
 #ifdef LEGOLAND_PORT
+#include "port_language.h"
+#endif
+#ifdef LEGOLAND_PORT
 #include "miniwin/miniwin.h"
 #include "port_display.h"
 #include "port_watchdog.h"
@@ -172,6 +175,12 @@ LEGO_EXPORT int InitScreen(void) {
     font.lfWeight = 0x2bc;
     LegoFont20Bold = CreateFontIndirectA(&font);
     font.lfWeight = 0x258;
+#ifdef LEGOLAND_PORT
+    /* [port] the European CDs' build: lighter for German and Dutch (port_language.h) */
+    if (PortGameLanguageIs("GERMAN") || PortGameLanguageIs("DUTCH")) {
+        font.lfWeight = 0x1f4;
+    }
+#endif
     font.lfHeight = 0x12;
     font.lfWidth = 0;
     strcpy(font.lfFaceName, "Lego");

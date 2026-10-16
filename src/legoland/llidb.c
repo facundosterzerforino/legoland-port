@@ -26,6 +26,9 @@
 
 #include "image_sprite.h"
 #include "obj_instance.h"
+#ifdef LEGOLAND_PORT
+#include "port_language.h"
+#endif
 
 #define LLIDB_PAGE(id) ((id) >> 8)
 #define LLIDB_SLOT(id) ((id) & 0xff)
@@ -114,6 +117,13 @@ LEGO_EXPORT int LLIDB_LoadICM(void) {
     if (e != NULL) {
         strcpy(LanguageName, e->path);
     }
+#ifdef LEGOLAND_PORT
+    /* [port] the European CDs' build: the object classes' texts in the CD's language (port_language.h) */
+    if (PortGameLanguage() != NULL && strlen(PortGameLanguage()) < sizeof(LanguageName)) {
+        strcpy(LanguageName, PortGameLanguage());
+        DebugTrace("language: %s", LanguageName);
+    }
+#endif
     return 0;
 }
 

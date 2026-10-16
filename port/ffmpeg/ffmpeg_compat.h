@@ -96,8 +96,8 @@ static inline int ff_thread_once(AVOnce *once, void (*routine)(void)) {
 }
 
 /* codec, frame and packet (libavcodec/avcodec.h, decode.h, libavutil/frame.h, imgutils.h) */
-enum { AV_PIX_FMT_YUV410P = 1 };
-enum { AV_CODEC_ID_INDEO3 = 1, AV_CODEC_ID_INDEO4 = 2, AV_CODEC_ID_INDEO5 = 3 };
+enum { AV_PIX_FMT_YUV410P = 1, AV_PIX_FMT_RGB24 = 2, AV_PIX_FMT_PAL8 = 3 };
+enum { AV_CODEC_ID_INDEO3 = 1, AV_CODEC_ID_INDEO4 = 2, AV_CODEC_ID_INDEO5 = 3, AV_CODEC_ID_CINEPAK = 4 };
 enum { AVDISCARD_DEFAULT = 0, AVDISCARD_NONREF = 8, AVDISCARD_NONKEY = 32 };
 
 typedef struct AVCodecContext {
@@ -109,15 +109,20 @@ typedef struct AVCodecContext {
     int64_t max_pixels;
     int flags;
     int skip_frame;
+    int bits_per_coded_sample; /* Cinepak: 8 for paletted video */
+    int discard_damaged_percentage; /* Cinepak: frames with less data than this are refused (FFmpeg: 95) */
 } AVCodecContext;
 
-/* YUV 4:1:0 planes, owned by the frame */
+/* YUV 4:1:0 planes (Indeo), or one RGB24 plane (Cinepak), owned by the frame */
 typedef struct AVFrame {
     uint8_t *data[3];
     int linesize[3];
     int width;
     int height;
+    int flags;
 } AVFrame;
+
+#define AV_FRAME_FLAG_KEY (1 << 1)
 
 typedef struct AVPacket {
     const uint8_t *data;
@@ -190,6 +195,56 @@ static inline void av_frame_free(AVFrame **frame) {
     }
 }
 
+/* Cinepak (cinepak.c): its frame is kept between packets (inter frames update it), one RGB24 plane, or a PAL8
+ * plane and a palette; AVPacket side data and palettes are not used for LEGOLAND's 24-bit movies. */
+#define AVPALETTE_SIZE 1024
+#define AV_PKT_DATA_PALETTE 0
+#define AV_CODEC_CAP_DR1 0
+
+static inline AVFrame *av_frame_alloc(void) { return (AVFrame *)calloc(1, sizeof(AVFrame)); }
+
+static inline const uint8_t *av_packet_get_side_data(const AVPacket *pkt, int type, size_t *size) {
+    (void)pkt;
+    (void)type;
+    (void)size;
+    return NULL;
+}
+
+static inline int ff_copy_palette(void *dst, const AVPacket *src, void *logctx) {
+    (void)dst;
+    (void)src;
+    (void)logctx;
+    return 0;
+}
+
+/* allocates the frame once, for the codec's size (rounded up to 4, the decoder's blocks), and keeps its
+ * contents: the next frame is decoded over the previous one */
+static inline int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags) {
+    int width = FFALIGN(avctx->width, 4), height = FFALIGN(avctx->height, 4);
+    int pal = avctx->pix_fmt == AV_PIX_FMT_PAL8;
+    (void)flags;
+    if (frame->data[0] != NULL && frame->width == avctx->width && frame->height == avctx->height) {
+        return 0;
+    }
+    av_frame_unref(frame);
+    frame->width = avctx->width;
+    frame->height = avctx->height;
+    frame->linesize[0] = FFALIGN(width * (pal ? 1 : 3), 4);
+    frame->data[0] = (uint8_t *)calloc(1, (size_t)frame->linesize[0] * height);
+    frame->data[1] = pal ? (uint8_t *)calloc(1, AVPALETTE_SIZE) : NULL;
+    if (frame->data[0] == NULL || (pal && frame->data[1] == NULL)) {
+        av_frame_unref(frame);
+        return AVERROR(ENOMEM);
+    }
+    return 0;
+}
+
+/* a view of src's planes: the port's caller reads them before the next packet and never frees them */
+static inline int av_frame_ref(AVFrame *dst, const AVFrame *src) {
+    *dst = *src;
+    return 0;
+}
+
 extern const uint8_t ff_zigzag_direct[64];
 
 /* unaligned and aligned loads and stores (libavutil/intreadwrite.h), little-endian host */
@@ -205,6 +260,8 @@ static inline uint64_t AV_RN64(const void *p) { uint64_t v; memcpy(&v, p, 8); re
 static inline uint32_t AV_RL32(const uint8_t *p) {
     return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
 }
+static inline uint32_t AV_RB16(const uint8_t *p) { return (uint32_t)p[0] << 8 | p[1]; }
+static inline uint32_t AV_RB24(const uint8_t *p) { return (uint32_t)p[0] << 16 | (uint32_t)p[1] << 8 | p[2]; }
 static inline uint32_t AV_RB32(const uint8_t *p) {
     return (uint32_t)p[3] | (uint32_t)p[2] << 8 | (uint32_t)p[1] << 16 | (uint32_t)p[0] << 24;
 }

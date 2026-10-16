@@ -1,4 +1,4 @@
-/* [library:movie] Indeo 3 and Indeo 5 frames for AVI streams, decoded by the port instead of a Video for Windows codec.
+/* [library:movie] Indeo 3, Indeo 5 and Cinepak frames for AVI streams, decoded by the port instead of a Video for Windows codec.
  * See port_movie.h. The streams are miniwin's (miniwin/avifile.h); vfw.h is here for its types and constants. */
 #include <windows.h>
 #include <vfw.h>
@@ -59,7 +59,7 @@ static int OpenMovie(PAVISTREAM stream) {
     movie.width = format.biWidth;
     movie.height = format.biHeight;
     movie.dib = (BITMAPINFOHEADER *)calloc(1, sizeof(BITMAPINFOHEADER) + (size_t)movie.width * movie.height * 2);
-    movie.decoder = PortVideoDecoder_Open(format.biCompression, movie.width, movie.height);
+    movie.decoder = PortVideoDecoder_Open(format.biCompression, movie.width, movie.height, format.biBitCount);
     if (movie.dib == NULL || movie.decoder == NULL) {
         ResetMovie();
         return 0;
@@ -102,6 +102,24 @@ static void ConvertPicture(const unsigned char *planes[3], const int linesize[3]
     }
 }
 
+/* RGB24, top-down (Cinepak), to bottom-up RGB555, packed as the YUV pictures are */
+static void ConvertRgbPicture(const unsigned char *rgb, int linesize) {
+    unsigned short *pixels = (unsigned short *)(movie.dib + 1);
+    int x;
+    int y;
+
+    for (y = 0; y < movie.height; y++) {
+        const unsigned char *in = rgb + (size_t)y * linesize;
+        unsigned short *out = pixels + (size_t)(movie.height - 1 - y) * movie.width;
+
+        for (x = 0; x < movie.width; x++) {
+            int r = in[x * 3], g = in[x * 3 + 1], b = in[x * 3 + 2];
+
+            out[x] = (unsigned short)(((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3));
+        }
+    }
+}
+
 static int DecodeSample(long position) {
     const unsigned char *planes[3];
     int linesize[3];
@@ -133,7 +151,11 @@ static int DecodeSample(long position) {
         return 0;
     }
     if (result > 0) {
-        ConvertPicture(planes, linesize);
+        if (PortVideoDecoder_IsRgb(movie.decoder)) {
+            ConvertRgbPicture(planes[0], linesize[0]);
+        } else {
+            ConvertPicture(planes, linesize);
+        }
         movie.have_picture = 1;
     }
     return 1;

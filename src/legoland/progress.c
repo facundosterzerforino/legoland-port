@@ -15,6 +15,9 @@
 #include "stream.h"
 #include "text.h"
 #include "timer.h"
+#ifdef LEGOLAND_PORT
+#include "port_language.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x0048b7e0
 LEGO_EXPORT void InitProgressScreen(void) {
@@ -197,6 +200,12 @@ void LoadTutorialSprites(void) {
         e = &ProgressScreenTables.tutorials[i];
         e->sprite0 = LoadSprite(e->name0, 4);
         e->sprite1 = LoadSprite(e->name1, 4);
+#ifdef LEGOLAND_PORT
+        /* [port] the European CDs' build places the entries by the language (port_language.h) */
+        if (PortGameLanguage() != NULL) {
+            e->x = PortGameLanguageIs("ENGLISH") ? 0x1e : 0xa;
+        }
+#endif
     }
 }
 // FUNCTION: LEGOLAND 0x0048bd40
