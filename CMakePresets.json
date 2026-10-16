@@ -74,6 +74,16 @@
         "CMAKE_BUILD_TYPE": "Release",
         "LEGOLAND_WEB": "node"
       }
+    },
+    {
+      "name": "linux-portable",
+      "displayName": "Port: Linux release build, glibc 2.31 and later (Zig's clang)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-linux-portable",
+      "toolchainFile": "${sourceDir}/cmake/linux-portable.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
@@ -104,6 +114,10 @@
     {
       "name": "web-node",
       "configurePreset": "web-node"
+    },
+    {
+      "name": "linux-portable",
+      "configurePreset": "linux-portable"
     }
   ]
 }

@@ -208,7 +208,13 @@ if(LEGOLAND_MODERN_BUILD)
                 set_target_properties(legoland PROPERTIES SUFFIX ".html")
             endif()
         else()
-            target_link_libraries(legoland PRIVATE m pthread dl stdc++) # stdc++: FluidSynth is C++
+            if(LEGOLAND_LINUX_PORTABLE)
+                # Zig's C++ library (libc++), linked in statically
+                set_target_properties(legoland PROPERTIES LINKER_LANGUAGE CXX)
+                target_link_libraries(legoland PRIVATE m pthread dl)
+            else()
+                target_link_libraries(legoland PRIVATE m pthread dl stdc++) # stdc++: FluidSynth is C++
+            endif()
         endif()
     endif()
     # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
@@ -239,7 +245,7 @@ else()
     # 0xCC padding between functions) but with intrinsics: memset is inlined as rep stosd.
     set_source_files_properties(src/legoland/movie_pool.c PROPERTIES COMPILE_OPTIONS "/Od;/Oi")
 endif()
-if(ANDROID OR EMSCRIPTEN)
+if(ANDROID OR EMSCRIPTEN OR LEGOLAND_LINUX_PORTABLE)
     enable_language(CXX)
 elseif(WIN32 OR NOT LEGOLAND_MODERN_BUILD)
     set_target_properties(legoland PROPERTIES SUFFIX ".exe")

@@ -57,3 +57,4 @@ build-android/
 build-android-*/
 build-web/
 build-web-node/
+build-linux-portable/
