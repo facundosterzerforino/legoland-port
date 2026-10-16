@@ -188,6 +188,12 @@ if(LEGOLAND_MODERN_BUILD)
             set_target_properties(legoland PROPERTIES LINKER_LANGUAGE CXX)
             target_link_options(legoland PRIVATE -pthread -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=268435456
                 -sSTACK_SIZE=4194304 -sDEFAULT_PTHREAD_STACK_SIZE=1048576 -sPTHREAD_POOL_SIZE=8 -sEXIT_RUNTIME=1)
+            # the decompiled code calls functions through pointers of other types: a value returned where the
+            # pointer says void (the sound buffer's Stop, the objectives' event handlers), fewer or more arguments
+            # (callbacks kept in void * tables, unprototyped calls). x86 doesn't mind; WebAssembly checks every call
+            # through a pointer and stops the program ("function signature mismatch"). Emulated, such a call works
+            # as on x86 (the values converted as through memory). The list: build with -Wcast-function-type.
+            target_link_options(legoland PRIVATE -sEMULATE_FUNCTION_POINTER_CASTS=1)
             if(LEGOLAND_WEB STREQUAL "node")
                 # Node.js: the real file system, from the current folder (-port-selftest in an installed game's)
                 target_link_options(legoland PRIVATE -sNODERAWFS=1 -sENVIRONMENT=node
