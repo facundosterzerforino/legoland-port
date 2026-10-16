@@ -8202,10 +8202,11 @@ struct Out429c60 {
 };
 
 // FUNCTION: LEGOLAND 0x00429c10
-void FUN_00429c10(int c, struct FloatArray *out) {
+void FUN_00429c10(float t, struct FloatArray *out) {
     struct FVec3 v;
 
-    FUN_00429bb0(DAT_00615f84, DAT_00615f90, c, DAT_00615fd4, (float *)&v);
+    /* the integrator's time comes in as a float; its bits are the walker's position (FUN_00429c60 passed an int) */
+    FUN_00429bb0(DAT_00615f84, DAT_00615f90, *(int *)&t, DAT_00615fd4, (float *)&v);
     out->data[0] = v.x;
     out->data[1] = v.y;
     out->data[2] = v.z;
@@ -8220,7 +8221,7 @@ void FUN_00429c60(struct CurveWalker *obj, int a, unsigned int b, float c, struc
         DAT_00615f84 = obj;
         DAT_00615f90 = a;
         DAT_00615fd4 = c;
-        FUN_0041f4e0((void (*)(float, struct FloatArray *))FUN_00429c10, &DAT_00615f98, *(float *)&b, 0.01f, (struct FloatArray *)&local);
+        FUN_0041f4e0(FUN_00429c10, &DAT_00615f98, *(float *)&b, 0.01f, (struct FloatArray *)&local);
         out->x = local.v.x;
         out->y = local.v.y;
         out->z = local.v.z;

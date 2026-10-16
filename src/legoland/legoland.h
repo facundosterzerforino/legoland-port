@@ -15,13 +15,24 @@
 #define NULL ((void *)0)
 #endif
 
+/* [port] WebAssembly passes a union by value as a pointer to a copy, where x86 passed these two bytes as an unsigned
+ * short; callbacks taking a TileId are called through pointers typed with an unsigned short or an unsigned int, which
+ * then read the tile from the wrong place. Transparent, a TileId is passed as its first member, as on x86. */
+#if defined(LEGOLAND_PORT) && defined(__wasm__)
+#define TILEID_PORT_ALIGN __attribute__((aligned(2)))
+#define TILEID_PORT_TRANSPARENT __attribute__((transparent_union))
+#else
+#define TILEID_PORT_ALIGN
+#define TILEID_PORT_TRANSPARENT
+#endif
+
 typedef union TileId {
     unsigned short id;
-    struct {
+    struct TILEID_PORT_ALIGN {
         unsigned char x;
         unsigned char y;
     } pos;
-} TileId;
+} TILEID_PORT_TRANSPARENT TileId;
 
 /* Windows' ACMSTREAMHEADER (msacm.h): its user fields are pointer-sized and its driver area is 15 dwords on 64-bit
  * Windows; the ACM checks cbStruct against that size. */
