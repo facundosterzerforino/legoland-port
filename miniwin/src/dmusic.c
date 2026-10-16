@@ -116,15 +116,26 @@ static double selftest_load_ms;
 static double selftest_read_ms;
 static long selftest_bytes;
 
+/* milliseconds, for the selftest's timings (Android's C library has no timespec_get) */
+static double SelfTestMs(void) {
+    struct timespec ts;
+
+#ifdef _WIN32
+    timespec_get(&ts, TIME_UTC);
+#else
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+#endif
+    return ts.tv_sec * 1000.0 + ts.tv_nsec / 1000000.0;
+}
+
 static DWORD WINAPI SelfTestFontThread(LPVOID unused) {
     static char chunk[1 << 20];
-    struct timespec t0;
-    struct timespec t1;
+    double t0;
     FILE *f;
     size_t n;
 
     (void)unused;
-    timespec_get(&t0, TIME_UTC);
+    t0 = SelfTestMs();
     f = MiniwinFopen(selftest_font, "rb");
     selftest_bytes = 0;
     while (f != NULL && (n = fread(chunk, 1, sizeof(chunk), f)) > 0) {
@@ -133,8 +144,7 @@ static DWORD WINAPI SelfTestFontThread(LPVOID unused) {
     if (f != NULL) {
         fclose(f);
     }
-    timespec_get(&t1, TIME_UTC);
-    selftest_read_ms = (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1000000.0;
+    selftest_read_ms = SelfTestMs() - t0;
     selftest_load_ms = Dme_timeFluidSynthLoad(selftest_font);
     return 0;
 }
