@@ -23,9 +23,9 @@ Installing
 
 The music
 ---------
-The game's music plays through General MIDI instruments, which it doesn't bring itself: copy gm.dls from a Windows
-PC (C:\Windows\System32\drivers\gm.dls, the original sound), or a General MIDI SoundFont (an .sf2 file), into the
-app's folder above. Without one the game plays without music.
+The music plays with GeneralUser GS, free General MIDI instruments the app brings. For the original sound, copy
+Windows' own from a Windows PC (C:\Windows\System32\drivers\gm.dls) into the app's folder above: it's used
+instead when it's there.
 
 
 Playing

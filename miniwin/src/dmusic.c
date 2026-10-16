@@ -14,6 +14,9 @@
 #include "miniwin/dmengine.h"
 #include "miniwin/dmusic.h"
 #include "miniwin/files.h"
+#ifdef __ANDROID__
+#include <SDL3/SDL.h>
+#endif
 #include "miniwin/miniwin.h"
 
 typedef long MUSIC_TIME;
@@ -102,8 +105,9 @@ static int GmDlsPath(char *path, size_t size) {
 }
 
 /* The synthesizer's instruments: gm.dls (above), else a General MIDI SoundFont: one in the data folder (gm.sf2, or
- * the first *.sf2), else (Linux) the distribution's. Windows always has gm.dls; elsewhere it can be copied from a
- * Windows PC into the data folder, which sounds as the original. */
+ * the first *.sf2: the Linux and web releases bring GeneralUser GS), else (Linux) the distribution's, else (Android)
+ * the APK's GeneralUser GS. Windows always has gm.dls; elsewhere it can be copied from a Windows PC into the data
+ * folder, which sounds as the original. */
 static int SynthFontPath(char *path, size_t size) {
     static const char *const system_fonts[] = {"/usr/share/sounds/sf2/FluidR3_GM.sf2",
         "/usr/share/sounds/sf2/default-GM.sf2", "/usr/share/soundfonts/default.sf2", "/usr/share/soundfonts/FluidR3_GM.sf2",
@@ -134,6 +138,34 @@ static int SynthFontPath(char *path, size_t size) {
             return 1;
         }
     }
+#ifdef __ANDROID__
+    {
+        /* the APK brings GeneralUser GS (tools/music/fetch_soundfont.py) as an asset: FluidSynth reads files, so it's
+         * copied into the app's folder, once */
+        SDL_IOStream *in = SDL_IOFromFile("GeneralUser-GS.sf2", "rb");
+        char target[MAX_PATH];
+        FILE *out;
+        static char chunk[65536];
+        size_t n;
+        int ok = 1;
+
+        if (in == NULL) {
+            return 0;
+        }
+        snprintf(target, sizeof(target), "%s/GeneralUser-GS.sf2", SDL_GetAndroidExternalStoragePath());
+        out = fopen(target, "wb");
+        while (out != NULL && (n = SDL_ReadIO(in, chunk, sizeof(chunk))) > 0) {
+            ok = ok && fwrite(chunk, 1, n, out) == n;
+        }
+        SDL_CloseIO(in);
+        if (out == NULL || fclose(out) != 0 || !ok) {
+            remove(target);
+            return 0;
+        }
+        snprintf(path, size, "%s", target);
+        return 1;
+    }
+#endif
     return 0;
 }
 

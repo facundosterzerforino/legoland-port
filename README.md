@@ -34,10 +34,10 @@ Each release is the program only; the first start installs the game from your LE
 | Android | `LEGOLAND-port-android-<version>.apk` | Android 7.0 and later, ARM or x86 64-bit. Install the APK, choose the CD image on the first start. |
 | Web | `LEGOLAND-port-web-<version>.zip` | A website: put its files on any web server (HTTPS) and open `index.html`; recent Chrome, Edge, Firefox, Safari 17+. The game's files stay in the browser's storage for the site. |
 
-Off Windows the music needs General MIDI instruments, which Windows has and the others don't: copy `gm.dls` from a
-Windows PC (`C:\Windows\System32\drivers\gm.dls`) into the game's folder for the original sound, or use a General MIDI
-SoundFont (an `.sf2` file; on Linux, your distribution's `fluid-soundfont-gm`). The web page and the Android app take
-it as a file in the game's folder too.
+Off Windows the music's instruments are [GeneralUser GS](https://www.schristiancollins.com/generaluser), a free
+General MIDI SoundFont the Linux, Android and web releases bring (`tools/music/fetch_soundfont.py`). For the
+original sound, copy Windows' own `gm.dls` (`C:\Windows\System32\drivers\gm.dls`) into the game's folder (the web
+page has a button for it): it's used instead when it's there.
 
 ## Goal and approach
 

@@ -22,6 +22,9 @@ import sys
 import tarfile
 import zipfile
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'music'))
+import fetch_soundfont  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REPO = 'https://github.com/facundosterzerforino/legoland-port'
 FLUID_TAG = 'v2.6.1'
@@ -76,6 +79,11 @@ def licenses(build, platform, commit):
         stb = open(os.path.join(ROOT, 'port', 'stb', 'stb_truetype.h')).read()
         at = stb.rindex('This software is available under 2 licenses')
         text['licenses/stb_truetype.txt'] = stb[stb.rindex('/*', 0, at):]
+    if platform != 'windows':
+        lines.append('GeneralUser GS 2.0.3, the music\'s instruments (S. Christian Collins, free to use and to '
+                     'redistribute): https://www.schristiancollins.com/generaluser -- GeneralUser-GS.txt')
+        fetch_soundfont.fetch()
+        files['licenses/GeneralUser-GS.txt'] = os.path.join(ROOT, 'soundfont', 'LICENSE.txt')
     if platform == 'web':
         lines.append('coi-serviceworker 0.1.7 (MIT): in this port\'s source, port/web/ -- coi-serviceworker.txt')
         files['licenses/coi-serviceworker.txt'] = os.path.join(ROOT, 'port', 'web', 'coi-serviceworker.LICENSE')
@@ -136,6 +144,7 @@ def linux(version, commit):
     name = os.path.join(ROOT, 'dist', 'LEGOLAND-port-linux-x86_64-%s.tar.gz' % version)
     with tarfile.open(name, 'w:gz') as t:
         t.add(stripped, 'LEGOLAND/legoland')
+        t.add(fetch_soundfont.fetch(), 'LEGOLAND/GeneralUser-GS.sf2')
         add_text(t, 'LEGOLAND/README.txt', readme('linux', version))
         for arc, text in sorted(licenses(build, 'linux', commit).items()):
             add_text(t, 'LEGOLAND/' + arc, text)
@@ -172,6 +181,7 @@ def web(version, commit):
         z.write(page, 'LEGOLAND/index.html')
         for f in ('legoland.js', 'legoland.wasm', 'coi-serviceworker.js'):
             z.write(os.path.join(build, f), 'LEGOLAND/' + f)
+        z.write(fetch_soundfont.fetch(), 'LEGOLAND/GeneralUser-GS.sf2')
         z.writestr('LEGOLAND/README.txt', readme('web', version))
         for arc, text in sorted(licenses(build, 'web', commit).items()):
             z.writestr('LEGOLAND/' + arc, text)

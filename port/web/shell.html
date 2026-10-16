@@ -41,9 +41,9 @@
   </div>
   <div id="ready" class="hidden">
     <p>The game is installed in this browser.</p>
-    <p class="muted" id="instruments-note">For the music, the game needs General MIDI instruments: Windows' gm.dls (in
-      C:\Windows\System32\drivers on any Windows PC; it sounds as the original), or a General MIDI SoundFont (.sf2).</p>
-    <label class="button secondary" for="instruments" id="instruments-button">Add the music's instruments...</label>
+    <p class="muted" id="instruments-note">The music plays with free instruments (GeneralUser GS). For the original
+      sound, add Windows' own: gm.dls, in C:\Windows\System32\drivers on any Windows PC.</p>
+    <label class="button secondary" for="instruments" id="instruments-button">Add Windows' gm.dls...</label>
     <input type="file" id="instruments" accept=".dls,.sf2">
     <button id="play">Play</button>
     <button id="remove" class="secondary">Remove the game's files</button>
@@ -102,9 +102,9 @@
       return;
     }
     document.getElementById('play').textContent = ok ? 'Play' : 'Install and play';
-    const music = await hasInstruments();
-    show('instruments-note', !music);
-    show('instruments-button', !music);
+    const original = await hasInstruments(/^gm\.dls$/i);
+    show('instruments-note', !original);
+    show('instruments-button', !original);
     status.textContent = ok ? '' : image ? 'The CD image is here: the game installs from it when it starts.' : '';
   }
 
@@ -141,14 +141,28 @@
   });
 
   /* the music's instruments (gm.dls or a .sf2), into the game's folder */
-  async function hasInstruments() {
+  async function hasInstruments(pattern) {
     try {
       const folder = await gameFolder(false);
       for await (const [name] of folder.entries()) {
-        if (/^gm\.dls$|\.sf2$/i.test(name)) return true;
+        if (pattern.test(name)) return true;
       }
     } catch (e) {}
     return false;
+  }
+
+  /* the release's free instruments (GeneralUser GS, next to this page), into the game's folder, once */
+  async function addSoundFont() {
+    if (await hasInstruments(/^gm\.dls$|\.sf2$/i)) return;
+    try {
+      const response = await fetch('GeneralUser-GS.sf2');
+      if (!response.ok) return;
+      const folder = await gameFolder(true);
+      const out = await (await folder.getFileHandle('GeneralUser-GS.sf2', { create: true })).createWritable();
+      await response.body.pipeTo(out);
+    } catch (e) {
+      console.warn('the SoundFont could not be stored: ' + e);
+    }
   }
 
   document.getElementById('instruments').addEventListener('change', async (event) => {
@@ -189,6 +203,7 @@
     canvas.style.display = 'block';
     canvas.focus();
     try { await document.documentElement.requestFullscreen(); } catch (e) {}
+    await addSoundFont();
     Module.callMain([]);
   });
 

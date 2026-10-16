@@ -26,9 +26,9 @@ Playing
 1. The first time, the page asks for the game's files: choose your LEGOLAND CD's image (an .iso, or a .bin; any
    language's CD). It's copied into this browser's storage for the site (nothing is uploaded), and the game
    installs from it when it starts (about 400 MB, kept for your next visits).
-2. For the music, the game needs General MIDI instruments, which it doesn't bring itself: add gm.dls from a
-   Windows PC (C:\Windows\System32\drivers\gm.dls, the original sound) or a General MIDI SoundFont (an .sf2 file)
-   with the page's "Add the music's instruments..." button. Without one the game plays without music.
+2. The music plays with GeneralUser GS (GeneralUser-GS.sf2 here), free General MIDI instruments the page stores
+   with the game. For the original sound, add Windows' own with the page's "Add Windows' gm.dls..." button (it's in
+   C:\Windows\System32\drivers on any Windows PC).
 3. Click Play. The game goes full screen; Esc leaves full screen.
 Saved games stay in the browser's storage for the site; "Remove the game's files" deletes them with the game.
 Printing a certificate saves it as a picture in that storage too.

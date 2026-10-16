@@ -57,8 +57,11 @@ VERSION=$(git -C $P rev-parse --short HEAD)
 CODE=$(git -C $P rev-list --count HEAD)
 cp $P/port/android/AndroidManifest.xml $OUT/manifest.xml
 [ -f $P/external/legoland.exe ] || sed -i 's/ android:icon="@mipmap\/ic_launcher"//' $OUT/manifest.xml
+# the music's instruments where there's no gm.dls: GeneralUser GS (tools/music/fetch_soundfont.py), an asset
+mkdir -p $OUT/assets
+cp "$(python3 $P/tools/music/fetch_soundfont.py)" $OUT/assets/
 $BT/aapt2 link -I $JAR --manifest $OUT/manifest.xml --min-sdk-version 24 --target-sdk-version 35 \
-    --version-code $CODE --version-name "port $VERSION" -o $OUT/unsigned.apk $OUT/compiled/res.zip
+    --version-code $CODE --version-name "port $VERSION" -A $OUT/assets -o $OUT/unsigned.apk $OUT/compiled/res.zip
 
 # the code: the dex and the game's libraries (without their debug information, above)
 cp $OUT/dex/classes.dex $OUT/apk/

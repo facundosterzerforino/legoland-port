@@ -23,12 +23,9 @@ Installing
 
 The music
 ---------
-The game's music plays through General MIDI instruments, which it doesn't bring itself:
-- for the original sound, copy gm.dls from a Windows PC (C:\Windows\System32\drivers\gm.dls) into this folder;
-- or put a General MIDI SoundFont (an .sf2 file) here;
-- or install your distribution's: sudo apt install fluid-soundfont-gm (Debian, Ubuntu), or
-  sudo dnf install fluid-soundfont-gm (Fedora).
-Without any of them the game plays without music.
+The music plays with GeneralUser GS (GeneralUser-GS.sf2 here), free General MIDI instruments. For the original
+sound, copy Windows' own from a Windows PC (C:\Windows\System32\drivers\gm.dls) into this folder: it's used
+instead when it's there. (Any other General MIDI SoundFont works too: put its .sf2 here instead of GeneralUser's.)
 
 
 Playing
