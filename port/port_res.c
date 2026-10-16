@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "miniwin/files.h"
 #include "../src/legoland/binv.h"
 #include "../src/legoland/castle.h"
 #include "../src/legoland/globals.h"
@@ -111,7 +112,7 @@ static int PortResCheckBinV(FILE *dump) {
         sprintf(path, "Zbuffers\\%s", fd.cFileName);
         binv = LoadBinV(path);
         if (binv == NULL) {
-            FILE *f = fopen(path, "rb");
+            FILE *f = MiniwinFopen(path, "rb"); /* a game path: backslashes, any case */
             short magic = 0;
 
             if (f != NULL) {

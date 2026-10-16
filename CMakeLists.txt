@@ -28,6 +28,13 @@ if(LEGOLAND_MODERN_BUILD)
         # [port] Windows-only: the setup window and the watchdog (its thread sampling and debug registers); their
         # Linux counterparts come later (ROADMAP.md phase 8, step 4)
         list(FILTER PORT_SOURCES EXCLUDE REGEX "/port/port_(setup_win|watchdog)\\.c$")
+        # [port] the Win32 functions on POSIX (miniwin/src/posix/posix.h), the entry point and the stand-ins for
+        # those two (port/port_posix.c)
+        file(GLOB MINIWIN_POSIX_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/src/posix/*.c")
+        list(APPEND PORT_SOURCES ${MINIWIN_POSIX_SOURCES})
+        set_source_files_properties(${MINIWIN_POSIX_SOURCES} PROPERTIES COMPILE_DEFINITIONS _GNU_SOURCE)
+    else()
+        list(FILTER PORT_SOURCES EXCLUDE REGEX "/port/port_posix\\.c$")
     endif()
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
     # [library:timer] [library:filesystem] the game's clock and file calls (GetTickCount, fopen, _open,
