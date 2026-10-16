@@ -13,13 +13,17 @@ DWORD MiniwinGetTickCount(void) {
     return (DWORD)(steps * 125 / 8); /* steps * 15.625 ms */
 }
 
+/* Nanoseconds since the program started (SDL's start), not since the machine's: the game turns the count into
+ * milliseconds in a float, then an int (GetPerformanceTime). Counted from the boot, the float loses the milliseconds
+ * after a day or so and the int overflows after 25 days; in a browser the system's clock counts from 1970, so the
+ * movies' clock stood still from the start and the page hung in the first movie. */
 BOOL MiniwinQueryPerformanceCounter(LARGE_INTEGER *count) {
-    count->QuadPart = (LONGLONG)SDL_GetPerformanceCounter();
+    count->QuadPart = (LONGLONG)SDL_GetTicksNS();
     return TRUE;
 }
 
 BOOL MiniwinQueryPerformanceFrequency(LARGE_INTEGER *frequency) {
-    frequency->QuadPart = (LONGLONG)SDL_GetPerformanceFrequency();
+    frequency->QuadPart = 1000000000;
     return TRUE;
 }
 
