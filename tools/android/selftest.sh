@@ -39,7 +39,7 @@ $ADB shell rm -f "$APPDIR/port-selftest*.txt"
 run
 mkdir -p "$OUT"
 for f in port-selftest.txt port-selftest-odf.txt port-selftest-bnv.txt port-selftest-loc.txt port-selftest-lms.txt \
-    port-selftest-mesh.txt legoland-port-trace.txt; do
+    port-selftest-mesh.txt port-selftest-people.txt legoland-port-trace.txt; do
     $ADB pull $APPDIR/$f "$OUT/$f" > /dev/null 2>&1 || echo "no $f"
 done
 $ADB logcat -d | grep -iE "SDL|legoland|crash|FATAL" | tail -20 > "$OUT/logcat.txt" || true
