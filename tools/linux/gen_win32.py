@@ -94,7 +94,7 @@ use = json.load(open(os.path.join(ROOT, 'tools/linux/sdkuse.json')))
 have = linux_names()
 seeds = set()
 # and every identifier in our sources that the SDK declares (code under #ifdef the scan didn't see)
-for top in ('src/legoland', 'port', 'miniwin/src', 'miniwin/include/miniwin', 'extensions'):
+for top in ('src/legoland', 'port', 'miniwin/src', 'miniwin/include/miniwin', 'extensions', 'tools/test_miniwin'):
     for dirpath, dirs, files in os.walk(os.path.join(ROOT, top)):
         dirs[:] = [d for d in dirs if d not in ('dmusic', 'ffmpeg', 'blast', 'puff', 'cmake')]
         for f in files:
@@ -558,6 +558,7 @@ for c in tu.cursor.walk_preorder():
         if len(args) >= 12:
             guid_values[args[0]] = args[1:12]
 # defined in the SDK's headers only as declarations
+guid_values.setdefault('GUID_NULL', ['0x00000000', '0x0000', '0x0000'] + ['0x00'] * 8)
 guid_values.setdefault('IID_IUnknown', ['0x00000000', '0x0000', '0x0000', '0xC0', '0x00', '0x00', '0x00', '0x00', '0x00',
                                         '0x00', '0x46'])
 guids = []

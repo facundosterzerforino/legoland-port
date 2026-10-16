@@ -23,7 +23,7 @@
 #endif
 
 /* the code's wide strings are Windows' 16-bit ones (-fshort-wchar); the C library's wide functions are 32-bit, so
- * the one the code uses is here */
+ * the ones the code uses are here */
 static inline unsigned short *MiniwinWcscpy(unsigned short *to, const unsigned short *from) {
     unsigned short *start = to;
     while ((*to++ = *from++) != 0) {
@@ -31,6 +31,15 @@ static inline unsigned short *MiniwinWcscpy(unsigned short *to, const unsigned s
     return start;
 }
 #define wcscpy(to, from) MiniwinWcscpy((unsigned short *)(to), (const unsigned short *)(from))
+static inline unsigned short *MiniwinWcscat(unsigned short *to, const unsigned short *from) {
+    unsigned short *end = to;
+    while (*end != 0) {
+        end++;
+    }
+    MiniwinWcscpy(end, from);
+    return to;
+}
+#define wcscat(to, from) MiniwinWcscat((unsigned short *)(to), (const unsigned short *)(from))
 
 #define WINAPI
 #define WINAPIV

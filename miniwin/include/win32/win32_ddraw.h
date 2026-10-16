@@ -287,9 +287,11 @@ struct _DDPIXELFORMAT {
 };
 #define DDSCAPS_LOCALVIDMEM 0x10000000l
 #define DDSCAPS_NONLOCALVIDMEM 0x20000000l
+#define DDSCAPS_OFFSCREENPLAIN 0x00000040l
 #define DDSCAPS_PRIMARYSURFACE 0x00000200l
 #define DDSCAPS_SYSTEMMEMORY 0x00000800l
 #define DDSCAPS_VIDEOMEMORY 0x00004000l
+#define DDSCL_NORMAL 0x00000008l
 #define DDSD_CAPS 0x00000001l
 #define DDSD_HEIGHT 0x00000002l
 #define DDSD_LPSURFACE 0x00000800l
@@ -379,6 +381,7 @@ struct IDirectDrawClipperVtbl {
     HRESULT (*SetClipList)(IDirectDrawClipper *, LPRGNDATA, DWORD);
     HRESULT (*SetHWnd)(IDirectDrawClipper *, DWORD, HWND);
 };
+#define IDirectDrawClipper_Release(p) (p)->lpVtbl->Release(p)
 #define IDirectDrawClipper_SetClipList(p, a, b) (p)->lpVtbl->SetClipList(p, a, b)
 #define IDirectDrawClipper_SetHWnd(p, a, b) (p)->lpVtbl->SetHWnd(p, a, b)
 struct IDirectDrawPalette {
@@ -436,11 +439,13 @@ struct IDirectDrawSurfaceVtbl {
 };
 #define IDirectDrawSurface_Blt(p,a,b,c,d,e) (p)->lpVtbl->Blt(p,a,b,c,d,e)
 #define IDirectDrawSurface_Flip(p,a,b) (p)->lpVtbl->Flip(p,a,b)
+#define IDirectDrawSurface_GetDC(p,a) (p)->lpVtbl->GetDC(p,a)
 #define IDirectDrawSurface_GetFlipStatus(p,a) (p)->lpVtbl->GetFlipStatus(p,a)
 #define IDirectDrawSurface_GetSurfaceDesc(p,a) (p)->lpVtbl->GetSurfaceDesc(p,a)
 #define IDirectDrawSurface_IsLost(p) (p)->lpVtbl->IsLost(p)
 #define IDirectDrawSurface_Lock(p,a,b,c,d) (p)->lpVtbl->Lock(p,a,b,c,d)
 #define IDirectDrawSurface_Release(p) (p)->lpVtbl->Release(p)
+#define IDirectDrawSurface_ReleaseDC(p,a) (p)->lpVtbl->ReleaseDC(p,a)
 #define IDirectDrawSurface_Restore(p) (p)->lpVtbl->Restore(p)
 #define IDirectDrawSurface_SetClipper(p,a) (p)->lpVtbl->SetClipper(p,a)
 #define IDirectDrawSurface_SetColorKey(p,a,b) (p)->lpVtbl->SetColorKey(p,a,b)

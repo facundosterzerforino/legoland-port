@@ -141,8 +141,13 @@ if(LEGOLAND_MODERN_BUILD)
         # tools/linux/gen_win32.py); the code's Microsoft C (anonymous struct members, __int64...) as clang-cl takes it
         target_include_directories(legoland BEFORE PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/win32")
         # and its chars signed, as MSVC's (ARM's are unsigned), its wchar_t 16 bits, as Windows' (L"..." are the WCHAR
-        # strings DirectMusic's names are)
-        target_compile_options(legoland PRIVATE -fms-extensions -Wno-microsoft-anon-tag -fsigned-char -fshort-wchar)
+        # strings DirectMusic's names are), and no type-based alias analysis, as MSVC's and clang-cl's (the decompiled code
+        # reads memory through other types all the time; clang elsewhere would assume it doesn't, at -O2)
+        target_compile_options(legoland PRIVATE -fms-extensions -Wno-microsoft-anon-tag -fsigned-char -fshort-wchar
+            -fno-strict-aliasing)
+        # with a 16-bit wchar_t, clang would turn the code's loops over 16-bit strings into calls to the C library's
+        # wcslen (and its kin), which are 32-bit here: they're not builtins, then
+        target_compile_options(legoland PRIVATE -fno-builtin-wcslen -fno-builtin-wcscpy -fno-builtin-wcsncpy -fno-builtin-wcscat -fno-builtin-wcscmp -fno-builtin-wcschr -fno-builtin-wcsrchr -fno-builtin-wmemcpy -fno-builtin-wmemmove -fno-builtin-wmemset -fno-builtin-wmemcmp -fno-builtin-wmemchr)
         if(EMSCRIPTEN)
             target_compile_options(legoland PRIVATE -pthread)
         endif()

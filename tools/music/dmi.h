@@ -158,9 +158,9 @@ struct DMPort;
 struct DMPortVtbl {
     void *QueryInterface, *AddRef;
     ULONG(__stdcall *Release)(struct DMPort *);
-    BYTE pad_c[0x3c - 0xc];
+    void *pad_c[(0x3c - 0xc) / 4]; /* the slots between, at their 32-bit offsets: pointers on 64-bit too */
     HRESULT(__stdcall *Activate)(struct DMPort *, BOOL);
-    BYTE pad_40[0x48 - 0x40];
+    void *pad_40[(0x48 - 0x40) / 4]; /* the slots between, at their 32-bit offsets: pointers on 64-bit too */
     HRESULT(__stdcall *SetDirectSound)(struct DMPort *, void *, void *);
     HRESULT(__stdcall *GetFormat)(struct DMPort *, WAVEFORMATEX *, DWORD *, DWORD *);
 };
@@ -185,7 +185,7 @@ struct DMSegmentVtbl {
     void *SetLength;
     HRESULT(__stdcall *GetRepeats)(struct DMSegment *, DWORD *);
     HRESULT(__stdcall *SetRepeats)(struct DMSegment *, DWORD);
-    BYTE pad_1c[0x4c - 0x1c];
+    void *pad_1c[(0x4c - 0x1c) / 4]; /* the slots between, at their 32-bit offsets: pointers on 64-bit too */
     HRESULT(__stdcall *SetParam)(struct DMSegment *, const GUID *, DWORD, DWORD, MUSIC_TIME, void *);
 };
 struct DMSegment {

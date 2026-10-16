@@ -39,7 +39,10 @@ struct _DSBCAPS {
     DWORD dwUnlockTransferRate;
     DWORD dwPlayCpuOverhead;
 };
+#define DSBCAPS_CTRLFREQUENCY 0x00000020
+#define DSBCAPS_CTRLPAN 0x00000040
 #define DSBCAPS_CTRLVOLUME 0x00000080
+#define DSBCAPS_GETCURRENTPOSITION2 0x00010000
 #define DSBCAPS_GLOBALFOCUS 0x00008000
 #define DSBCAPS_LOCSOFTWARE 0x00000008
 #define DSBCAPS_PRIMARYBUFFER 0x00000001
@@ -116,6 +119,7 @@ struct _DSCAPS {
 #define DSERR_NODRIVER MAKE_DSHRESULT(120)
 #define DSERR_OUTOFMEMORY E_OUTOFMEMORY
 #define DSERR_PRIOLEVELNEEDED MAKE_DSHRESULT(70)
+#define DSSCL_NORMAL 0x00000001
 #define DSSPEAKER_STEREO 0x00000004
 #define DS_OK S_OK
 HRESULT DirectSoundCreate(LPCGUID pcGuidDevice, LPDIRECTSOUND * ppDS, LPUNKNOWN pUnkOuter);
@@ -148,8 +152,19 @@ struct IDirectSoundBufferVtbl {
     HRESULT (*Unlock)(IDirectSoundBuffer *, LPVOID, DWORD, LPVOID, DWORD);
     HRESULT (*Restore)(IDirectSoundBuffer *);
 };
+#define IDirectSoundBuffer_GetCurrentPosition(p,a,b) (p)->lpVtbl->GetCurrentPosition(p,a,b)
+#define IDirectSoundBuffer_GetFrequency(p,a) (p)->lpVtbl->GetFrequency(p,a)
+#define IDirectSoundBuffer_GetPan(p,a) (p)->lpVtbl->GetPan(p,a)
+#define IDirectSoundBuffer_GetStatus(p,a) (p)->lpVtbl->GetStatus(p,a)
+#define IDirectSoundBuffer_GetVolume(p,a) (p)->lpVtbl->GetVolume(p,a)
+#define IDirectSoundBuffer_Lock(p,a,b,c,d,e,f,g) (p)->lpVtbl->Lock(p,a,b,c,d,e,f,g)
 #define IDirectSoundBuffer_Play(p,a,b,c) (p)->lpVtbl->Play(p,a,b,c)
+#define IDirectSoundBuffer_SetCurrentPosition(p,a) (p)->lpVtbl->SetCurrentPosition(p,a)
+#define IDirectSoundBuffer_SetFrequency(p,a) (p)->lpVtbl->SetFrequency(p,a)
+#define IDirectSoundBuffer_SetPan(p,a) (p)->lpVtbl->SetPan(p,a)
+#define IDirectSoundBuffer_SetVolume(p,a) (p)->lpVtbl->SetVolume(p,a)
 #define IDirectSoundBuffer_Stop(p) (p)->lpVtbl->Stop(p)
+#define IDirectSoundBuffer_Unlock(p,a,b,c,d) (p)->lpVtbl->Unlock(p,a,b,c,d)
 struct IDirectSoundVtbl {
     HRESULT (*QueryInterface)(IDirectSound *, const IID *const, LPVOID *);
     ULONG (*AddRef)(IDirectSound *);
@@ -164,6 +179,8 @@ struct IDirectSoundVtbl {
     HRESULT (*Initialize)(IDirectSound *, LPCGUID);
 };
 #define IDirectSound_CreateSoundBuffer(p,a,b,c) (p)->lpVtbl->CreateSoundBuffer(p,a,b,c)
+#define IDirectSound_DuplicateSoundBuffer(p,a,b) (p)->lpVtbl->DuplicateSoundBuffer(p,a,b)
+#define IDirectSound_SetCooperativeLevel(p,a,b) (p)->lpVtbl->SetCooperativeLevel(p,a,b)
 extern const GUID IID_IDirectSound;
 extern const GUID IID_IDirectSoundBuffer;
 typedef LONGLONG REFERENCE_TIME;

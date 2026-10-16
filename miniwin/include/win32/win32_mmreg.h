@@ -10,11 +10,13 @@
 /* the records, forward-declared */
 struct adpcmcoef_tag;
 struct adpcmwaveformat_tag;
+struct ima_adpcmwaveformat_tag;
 struct wavefilter_tag;
 
 /* their typedef names, up front too */
 typedef struct adpcmcoef_tag ADPCMCOEFSET;
 typedef struct adpcmwaveformat_tag ADPCMWAVEFORMAT;
+typedef struct ima_adpcmwaveformat_tag IMAADPCMWAVEFORMAT;
 typedef struct wavefilter_tag * LPWAVEFILTER;
 typedef struct wavefilter_tag WAVEFILTER;
 
@@ -27,6 +29,11 @@ struct adpcmwaveformat_tag {
     WORD wSamplesPerBlock;
     WORD wNumCoef;
     ADPCMCOEFSET aCoef[];
+};
+#define ICTYPE_VIDEO mmioFOURCC('v', 'i', 'd', 'c')
+struct ima_adpcmwaveformat_tag {
+    WAVEFORMATEX wfx;
+    WORD wSamplesPerBlock;
 };
 struct wavefilter_tag {
     DWORD cbStruct;

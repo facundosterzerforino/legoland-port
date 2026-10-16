@@ -101,6 +101,42 @@ static int GmDlsPath(char *path, size_t size) {
     return 0;
 }
 
+/* The synthesizer's instruments: gm.dls (above), else a General MIDI SoundFont: one in the data folder (gm.sf2, or
+ * the first *.sf2), else (Linux) the distribution's. Windows always has gm.dls; elsewhere it can be copied from a
+ * Windows PC into the data folder, which sounds as the original. */
+static int SynthFontPath(char *path, size_t size) {
+    static const char *const system_fonts[] = {"/usr/share/sounds/sf2/FluidR3_GM.sf2",
+        "/usr/share/sounds/sf2/default-GM.sf2", "/usr/share/soundfonts/default.sf2", "/usr/share/soundfonts/FluidR3_GM.sf2",
+        "/usr/share/sounds/sf2/TimGM6mb.sf2"};
+    WIN32_FIND_DATAA found;
+    HANDLE search;
+    FILE *f;
+    size_t i;
+
+    if (GmDlsPath(path, size)) {
+        return 1;
+    }
+    snprintf(path, size, "gm.sf2");
+    if ((f = MiniwinFopen(path, "rb")) != NULL) {
+        fclose(f);
+        return 1;
+    }
+    search = FindFirstFileA("*.sf2", &found);
+    if (search != INVALID_HANDLE_VALUE) {
+        snprintf(path, size, "%s", found.cFileName);
+        FindClose(search);
+        return 1;
+    }
+    for (i = 0; i < sizeof(system_fonts) / sizeof(system_fonts[0]); i++) {
+        if ((f = fopen(system_fonts[i], "rb")) != NULL) {
+            fclose(f);
+            snprintf(path, size, "%s", system_fonts[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static void *Resolve(void *ctx, char const *name, size_t *len) {
     char path[MAX_PATH * 2];
     void *p;
@@ -639,8 +675,9 @@ static HRESULT __stdcall Music_CreatePort(Music *self, REFCLSID cls, DmPortParam
 
         perf->engine = Dme_create(Loader(), p->rate);
         Dme_setNotificationTypes(perf->engine, perf->types);
-        /* the synthesizer: FluidSynth on gm.dls, which sounds like DirectMusic's (tools/music/README.md) */
-        if (GmDlsPath(gm_dls, sizeof(gm_dls))) {
+        /* the synthesizer: FluidSynth on gm.dls, which sounds like DirectMusic's (tools/music/README.md), or a
+         * SoundFont where there's no gm.dls */
+        if (SynthFontPath(gm_dls, sizeof(gm_dls))) {
             Dme_useFluidSynth(perf->engine, gm_dls);
         }
     }

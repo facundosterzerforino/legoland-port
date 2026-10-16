@@ -4,7 +4,8 @@
  * beat notifications the game waits for arrive. Silent: the buffer's volume is at its minimum.
  *
  *   tools/test_miniwin/build.sh && tools/test_miniwin/test_dmusic.exe <data folder> [portable]
- *   (FAIL lines; exits 1 on any) */
+ *   (FAIL lines; exits 1 on any). Off Windows (tools/test_miniwin/build_linux.sh), always miniwin's, with the
+ *   instruments from gm.dls or a SoundFont (miniwin/src/dmusic.c). */
 #include <windows.h>
 #include <dsound.h>
 #include <math.h>
@@ -13,6 +14,7 @@
 
 #include "../music/dmi.h"
 #include "miniwin/dmusic.h"
+#include "miniwin/files.h"
 #include "miniwin/miniwin.h"
 
 static const GUID CLSID_DMStyle = {0xd2ac288a, 0xb39b, 0x11d1, {0x87, 0x04, 0x00, 0x60, 0x08, 0x93, 0xb1, 0xbd}};
@@ -36,7 +38,7 @@ static struct DMSegment *Load(struct DMLoader *loader, const char *data, const c
     long n;
 
     snprintf(path, sizeof(path), "%s\\imusic\\%s", data, file);
-    f = fopen(path, "rb");
+    f = MiniwinFopen(path, "rb"); /* a game path: backslashes, any case */
     if (f == NULL || used == 8) {
         printf("FAIL: can't read %s\n", path);
         failures++;

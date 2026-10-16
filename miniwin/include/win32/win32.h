@@ -89,6 +89,7 @@ struct tagRECT;
 struct tagRGBQUAD;
 struct tagSAFEARRAY;
 struct tagSAFEARRAYBOUND;
+struct tagSIZE;
 struct tagTLIBATTR;
 struct tagTYPEATTR;
 struct tagTYPEDESC;
@@ -178,6 +179,7 @@ typedef struct _PRINTER_DEFAULTSA * LPPRINTER_DEFAULTSA;
 typedef struct tagRECT * LPRECT;
 typedef struct _RGNDATA * LPRGNDATA;
 typedef struct _SECURITY_ATTRIBUTES * LPSECURITY_ATTRIBUTES;
+typedef struct tagSIZE * LPSIZE;
 typedef struct _SYSTEMTIME * LPSYSTEMTIME;
 typedef struct _SYSTEM_INFO * LPSYSTEM_INFO;
 typedef struct IUnknown * LPUNKNOWN;
@@ -211,6 +213,7 @@ typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
 typedef struct tagSAFEARRAY SAFEARRAY;
 typedef struct tagSAFEARRAYBOUND SAFEARRAYBOUND;
 typedef struct _SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES;
+typedef struct tagSIZE SIZE;
 typedef struct _SYSTEMTIME SYSTEMTIME;
 typedef struct _SYSTEM_INFO SYSTEM_INFO;
 typedef struct tagTLIBATTR TLIBATTR;
@@ -266,12 +269,13 @@ struct tagRECT {
 typedef void * LPVOID;
 int AddFontResourceA(LPCSTR a0);
 #define AddFontResource AddFontResourceA
+typedef void * PVOID;
+int AddFontResourceExA(LPCSTR name, DWORD fl, PVOID res);
 typedef int BOOL;
 typedef CHAR * LPSTR;
 BOOL AddPortA(LPSTR pName, HWND hWnd, LPSTR pMonitorName);
 #define AddPort AddPortA
 typedef LONG (*PVECTORED_EXCEPTION_HANDLER)(struct _EXCEPTION_POINTERS *);
-typedef void * PVOID;
 PVOID AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler);
 BOOL AdjustWindowRect(LPRECT lpRect, DWORD dwStyle, BOOL bMenu);
 BOOL AllocConsole(void);
@@ -642,10 +646,12 @@ typedef double DOUBLE;
 #define DT_CALCRECT 0x00000400
 #define DT_CENTER 0x00000001
 #define DT_EXPANDTABS 0x00000040
+#define DT_LEFT 0x00000000
 #define DT_NOCLIP 0x00000100
 #define DT_NOPREFIX 0x00000800
 #define DT_RIGHT 0x00000002
 #define DT_SINGLELINE 0x00000020
+#define DT_TOP 0x00000000
 #define DT_VCENTER 0x00000004
 #define DT_WORDBREAK 0x00000010
 #define DUPLICATE_SAME_ACCESS 0x00000002
@@ -665,6 +671,7 @@ LRESULT DispatchMessageW(const MSG * lpMsg);
 LONG DocumentPropertiesA(HWND hWnd, HANDLE hPrinter, LPSTR pDeviceName, PDEVMODEA pDevModeOutput, PDEVMODEA pDevModeInput, DWORD fMode);
 int DrawTextA(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format);
 #define DrawText DrawTextA
+int DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 typedef HANDLE * LPHANDLE;
 BOOL DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle, HANDLE hTargetProcessHandle, LPHANDLE lpTargetHandle, DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwOptions);
 #define EASTEUROPE_CHARSET 238
@@ -789,6 +796,7 @@ typedef float FLOAT;
 #define mmioFOURCC(ch0, ch1, ch2, ch3) MAKEFOURCC(ch0, ch1, ch2, ch3)
 #define FOURCC_LIST mmioFOURCC('L', 'I', 'S', 'T')
 #define FOURCC_RIFF mmioFOURCC('R', 'I', 'F', 'F')
+#define FR_PRIVATE 0x10
 enum tagFUNCKIND { FUNC_VIRTUAL = 0, FUNC_PUREVIRTUAL = 1, FUNC_NONVIRTUAL = 2, FUNC_STATIC = 3, FUNC_DISPATCH = 4 };
 typedef enum tagFUNCKIND FUNCKIND;
 enum tagINVOKEKIND { INVOKE_FUNC = 1, INVOKE_PROPERTYGET = 2, INVOKE_PROPERTYPUT = 4, INVOKE_PROPERTYPUTREF = 8 };
@@ -832,8 +840,10 @@ BOOL FreeLibrary(HMODULE hLibModule);
 #define GREEK_CHARSET 161
 #define GR_GDIOBJECTS 0
 #define GR_USEROBJECTS 1
+extern const IID GUID_NULL;
 #define GWL_HINSTANCE (-6)
 BOOL GdiFlush(void);
+UINT GetACP(void);
 SHORT GetAsyncKeyState(int vKey);
 #define LOBYTE(w) ((BYTE)(((DWORD_PTR)(w)) & 0xff))
 #define GetBValue(rgb) (LOBYTE((rgb)>>16))
@@ -881,6 +891,8 @@ void GetSystemInfo(LPSYSTEM_INFO lpSystemInfo);
 int GetSystemMetrics(int nIndex);
 void GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime);
 UINT GetSystemWindowsDirectoryA(LPSTR lpBuffer, UINT uSize);
+DWORD GetTempPathA(DWORD nBufferLength, LPSTR lpBuffer);
+BOOL GetTextExtentPoint32W(HDC hdc, LPCWSTR lpString, int c, LPSIZE psizl);
 BOOL GetThreadContext(HANDLE hThread, LPCONTEXT lpContext);
 DWORD GetTickCount(void);
 typedef WORD LANGID;
@@ -905,6 +917,7 @@ typedef HANDLE HLOCAL;
 #define IDYES 6
 typedef BOOL * LPBOOL;
 typedef __LONG32 * LPLONG;
+int ReleaseDC(HWND hWnd, HDC hDC);
 struct IDispatch {
     struct IDispatchVtbl * lpVtbl;
 };
@@ -1239,6 +1252,7 @@ struct tagNONCLIENTMETRICSW {
 #define OFN_HIDEREADONLY 0x00000004
 #define OFN_NOCHANGEDIR 0x00000008
 #define OFN_PATHMUSTEXIST 0x00000800
+#define OF_READ 0x00000000
 #define OPAQUE 2
 struct tagOFNW {
     DWORD lStructSize;
@@ -1315,9 +1329,9 @@ BOOL ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD
 BOOL ReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T * lpNumberOfBytesRead);
 ATOM RegisterClassExA(const WNDCLASSEXA * a0);
 ATOM RegisterClassExW(const WNDCLASSEXW * a0);
-int ReleaseDC(HWND hWnd, HDC hDC);
 BOOL RemoveFontResourceA(LPCSTR lpFileName);
 #define RemoveFontResource RemoveFontResourceA
+BOOL RemoveFontResourceExA(LPCSTR name, DWORD fl, PVOID pdv);
 BOOL ResetEvent(HANDLE hEvent);
 DWORD ResumeThread(HANDLE hThread);
 struct tagSAFEARRAYBOUND {
@@ -1339,6 +1353,10 @@ struct _SECURITY_ATTRIBUTES {
     BOOL bInheritHandle;
 };
 #define SIMPLEREGION 2
+struct tagSIZE {
+    LONG cx;
+    LONG cy;
+};
 #define SM_CMONITORS 80
 #define SM_CXSCREEN 0
 #define SM_CXVIRTUALSCREEN 78
@@ -1427,6 +1445,7 @@ int ShowCursor(BOOL bShow);
 BOOL ShowWindow(HWND hWnd, int nCmdShow);
 void Sleep(DWORD dwMilliseconds);
 int StartDocA(HDC hdc, const DOCINFOA * lpdi);
+#define StartDoc StartDocA
 int StartPage(HDC hdc);
 int StretchDIBits(HDC hdc, int xDest, int yDest, int DestWidth, int DestHeight, int xSrc, int ySrc, int SrcWidth, int SrcHeight, const void * lpBits, const BITMAPINFO * lpbmi, UINT iUsage, DWORD rop);
 DWORD SuspendThread(HANDLE hThread);
@@ -1491,6 +1510,7 @@ union _ULARGE_INTEGER {
     } u;
     ULONGLONG QuadPart;
 };
+BOOL UnionRect(LPRECT lprcDst, const RECT * lprcSrc1, const RECT * lprcSrc2);
 enum _MEDIA_TYPE { Unknown = 0, F5_1Pt2_512 = 1, F3_1Pt44_512 = 2, F3_2Pt88_512 = 3, F3_20Pt8_512 = 4, F3_720_512 = 5, F5_360_512 = 6, F5_320_512 = 7, F5_320_1024 = 8, F5_180_512 = 9, F5_160_512 = 10, RemovableMedia = 11, FixedMedia = 12, F3_120M_512 = 13, F3_640_512 = 14, F5_640_512 = 15, F5_720_512 = 16, F3_1Pt2_512 = 17, F3_1Pt23_1024 = 18, F5_1Pt23_1024 = 19, F3_128Mb_512 = 20, F3_230Mb_512 = 21, F8_256_128 = 22, F3_200Mb_512 = 23, F3_240M_512 = 24, F3_32M_512 = 25 };
 BOOL UnregisterClassA(LPCSTR lpClassName, HINSTANCE hInstance);
 BOOL UnregisterClassW(LPCWSTR lpClassName, HINSTANCE hInstance);

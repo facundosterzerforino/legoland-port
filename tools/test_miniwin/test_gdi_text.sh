@@ -17,7 +17,7 @@ clang-cl /nologo -fuse-ld=lld --target=i686-pc-windows-msvc /O2 -MT -D_CRT_SECUR
     /libpath:$X/sdk/lib/ucrt/x86 gdi32.lib user32.lib kernel32.lib
 rm -f *.obj
 SDLB=$P/build-linux/_deps
-clang -O2 -fms-extensions -Wno-microsoft-anon-tag -D_GNU_SOURCE -I$P/miniwin/include/win32 -I$P/miniwin/include \
+clang -O2 -fno-strict-aliasing -fms-extensions -Wno-microsoft-anon-tag -D_GNU_SOURCE -I$P/miniwin/include/win32 -I$P/miniwin/include \
     -I$P/miniwin/src -I$P/port -I$SDLB/sdl3-src/include -I$SDLB/sdl3-build/include-revision \
     -I$SDLB/sdl3-build/include test_gdi_text.c $P/miniwin/src/posix/*.c $P/miniwin/src/files.c \
     $P/miniwin/src/window.c $SDLB/sdl3-build/libSDL3.a -lm -lpthread -ldl -o "$OUT/test_gdi_text"

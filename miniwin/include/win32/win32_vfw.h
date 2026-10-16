@@ -8,6 +8,7 @@
 #include "win32.h"
 
 /* the records, forward-declared */
+struct HIC__;
 struct IAVIFile;
 struct IAVIFileVtbl;
 struct IAVIStream;
@@ -24,6 +25,7 @@ typedef struct _AVIFILEINFOA AVIFILEINFOA;
 typedef struct _AVIFILEINFOW AVIFILEINFOW;
 typedef struct _AVISTREAMINFOA AVISTREAMINFOA;
 typedef struct _AVISTREAMINFOW AVISTREAMINFOW;
+typedef struct HIC__ * HIC;
 typedef struct IAVIFile IAVIFile;
 typedef struct IAVIStream IAVIStream;
 typedef struct IGetFrame IGetFrame;
@@ -127,6 +129,7 @@ struct _AVISTREAMINFOW {
 };
 #define AVISTREAMREAD_CONVENIENT (-1)
 ULONG AVIStreamAddRef(PAVISTREAM pavi);
+LONG AVIStreamFindSample(PAVISTREAM pavi, LONG lPos, LONG lFlags);
 struct IGetFrame {
     struct IGetFrameVtbl * lpVtbl;
 };
@@ -135,17 +138,25 @@ LPVOID AVIStreamGetFrame(PGETFRAME pg, LONG lPos);
 HRESULT AVIStreamGetFrameClose(PGETFRAME pg);
 PGETFRAME AVIStreamGetFrameOpen(PAVISTREAM pavi, LPBITMAPINFOHEADER lpbiWanted);
 HRESULT AVIStreamInfoA(PAVISTREAM pavi, LPAVISTREAMINFOA psi, LONG lSize);
+#define FIND_KEY 0x00000010
+#define FIND_PREV 0x00000004
+#define AVIStreamNearestKeyFrame(pavi, l) AVIStreamFindSample(pavi,l,FIND_PREV|FIND_KEY)
+#define AVIStreamIsKeyFrame(pavi, l) (AVIStreamNearestKeyFrame(pavi,l) == l)
 LONG AVIStreamLength(PAVISTREAM pavi);
 HRESULT AVIStreamRead(PAVISTREAM pavi, LONG lStart, LONG lSamples, LPVOID lpBuffer, LONG cbBuffer, LONG * plBytes, LONG * plSamples);
 HRESULT AVIStreamReadFormat(PAVISTREAM pavi, LONG lPos, LPVOID lpFormat, LONG * lpcbFormat);
 ULONG AVIStreamRelease(PAVISTREAM pavi);
 LONG AVIStreamStart(PAVISTREAM pavi);
-#define FIND_KEY 0x00000010
 #define FIND_NEXT 0x00000001
-#define FIND_PREV 0x00000004
 struct IAVIStream {
     struct IAVIStreamVtbl * lpVtbl;
 };
+LRESULT ICClose(HIC hic);
+DWORD ICDecompress(HIC hic, DWORD dwFlags, LPBITMAPINFOHEADER lpbiFormat, LPVOID lpData, LPBITMAPINFOHEADER lpbi, LPVOID lpBits);
+HIC ICLocate(DWORD fccType, DWORD fccHandler, LPBITMAPINFOHEADER lpbiIn, LPBITMAPINFOHEADER lpbiOut, WORD wFlags);
+#define ICMODE_DECOMPRESS 2
+#define ICDecompressOpen(fccType, fccHandler, lpbiIn, lpbiOut) ICLocate(fccType, fccHandler, lpbiIn, lpbiOut, ICMODE_DECOMPRESS)
+#define ICERR_OK 0
 #define ckidAVIMAINHDR mmioFOURCC('a', 'v', 'i', 'h')
 #define ckidAVINEWINDEX mmioFOURCC('i', 'd', 'x', '1')
 #define ckidSTREAMFORMAT mmioFOURCC('s', 't', 'r', 'f')
@@ -158,6 +169,9 @@ struct IAVIStream {
 #define listtypeSTREAMHEADER mmioFOURCC('s', 't', 'r', 'l')
 #define streamtypeAUDIO mmioFOURCC('a', 'u', 'd', 's')
 #define streamtypeVIDEO mmioFOURCC('v', 'i', 'd', 's')
+struct HIC__ {
+    int unused;
+};
 struct IAVIFileVtbl {
     HRESULT (*QueryInterface)(IAVIFile *, const IID *const, LPVOID *);
     ULONG (*AddRef)(IAVIFile *);
