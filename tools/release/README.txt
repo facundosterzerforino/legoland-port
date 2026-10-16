@@ -13,7 +13,10 @@ Installing
 2. Start LEGOLAND-port.exe. (Don't rename it to LEGOLAND.exe: Windows would treat it as the 1999 game
    and apply its old compatibility fixes, and it wouldn't start.)
 3. The first time, it asks for the game's files. Insert your LEGOLAND CD, or click "Choose ISO..." and pick
-   your ISO image of it (no need to mount it), and click Install. You can also choose a folder: a copy of the
+   your ISO image of it (no need to mount it), and click Install. The window speaks your Windows' language
+   (English, Spanish, German, French, Italian, Dutch, Danish, Swedish, Norwegian or Czech); change it with the
+   Language list. The CDs in other languages work too (the Czech CD included); the game plays in the CD's
+   language. You can also choose a folder: a copy of the
    CD, or an old LEGOLAND installation (its saved games come along).
    The files (about 400 MB) are copied into this folder, once. After that the CD isn't needed.
 

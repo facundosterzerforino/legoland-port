@@ -1,6 +1,6 @@
 #!/bin/sh
 # Builds the miniwin tests (clang-cl + lld-link with the xwin SDK, like the clang-cl-x86 preset): test_miniwin,
-# test_paths, test_dsound, test_acm, test_avifile, test_dmusic, capture_dmusic, instruments_dmusic, test_cinepak and test_setup. Most link the
+# test_paths, test_dsound, test_acm, test_avifile, test_dmusic, capture_dmusic, instruments_dmusic, test_cinepak, test_charset, test_setup_texts and test_setup. Most link the
 # SDL3 that the port build fetched, and the last three port/dmusic and the FluidSynth it built, as the game does:
 # build the build-clang-x86 preset first.
 set -e
@@ -44,6 +44,10 @@ clang-cl $CFLAGS -std:c11 -DDM_STATIC=1 $FLUID -DDM_BUILD=1 $INCLUDES -I../../mi
 clang-cl $CFLAGS -Wno-pointer-sign $INCLUDES -I../../port test_cinepak.c ../../port/ffmpeg/port_ffmpeg.c \
     ../../port/ffmpeg/cinepak.c ../../port/ffmpeg/indeo3.c ../../port/ffmpeg/indeo5.c ../../port/ffmpeg/ivi.c \
     ../../port/ffmpeg/ivi_dsp.c /Fetest_cinepak.exe /link /machine:x86 $LIBPATHS vfw32.lib user32.lib kernel32.lib
-clang-cl $CFLAGS $INCLUDES -I../../port $SDLINC test_setup.c ../../port/port_setup.c ../../port/blast/blast.c \
+clang-cl $CFLAGS $INCLUDES -I../../port $SDLINC test_setup.c ../../port/port_setup.c ../../port/blast/blast.c ../../port/puff/puff.c \
     /Fetest_setup.exe /link /machine:x86 $LIBPATHS $SDLLIBS
+clang-cl $CFLAGS $INCLUDES test_charset.c /Fetest_charset.exe /link /machine:x86 $LIBPATHS gdi32.lib user32.lib \
+    kernel32.lib
+clang-cl $CFLAGS $INCLUDES -I../../port $SDLINC test_setup_texts.c ../../port/port_setup.c ../../port/blast/blast.c \
+    ../../port/puff/puff.c /Fetest_setup_texts.exe /link /machine:x86 $LIBPATHS $SDLLIBS comctl32.lib comdlg32.lib
 rm -f *.obj

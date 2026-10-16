@@ -16,6 +16,9 @@ Status: **OK** checked and fine, **diff** works with a known difference (see the
 | Setup from the CD in a drive | - | ? | |
 | Setup from a mounted ISO | - | ? | |
 | Setup from an ISO file (Choose ISO...) | - | Tests | `test_setup.exe` on the maintainer's ISO: identical to the install |
+| Setup from the Spanish, German (.bin) and Czech (CPack) CDs | - | Tests | `test_setup.exe`: installed, self-test passes, language detected |
+| The setup window in the game's ten languages | - | Tests | `test_setup_texts.exe`: every text fits |
+| A European CD's game: object texts, intro (Cinepak), Czech letters | - | ? | `port_language.c`, `test_cinepak.exe`, `test_charset.exe` |
 | Setup from a chosen folder (a copy of the CD; an old install, saves included) | - | Tests | `test_setup.exe`: identical to the install |
 | Setup: Cancel, a read-only folder, a full disk give a clear message | - | ? | |
 | Second start goes straight to the launcher | - | ? | |

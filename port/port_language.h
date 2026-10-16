@@ -16,4 +16,11 @@ const char *PortGameLanguage(void);
 /* Non-zero when the CD's language is name (any case). */
 int PortGameLanguageIs(const char *name);
 
+/* The character set the game's fonts need for the CD's text: its strings are in the code page of the Windows
+ * they were made for (the Czech CD's in cp1250), and the game creates its fonts with DEFAULT_CHARSET, i.e. the
+ * system's code page; on a Western Windows the Czech letters came out as others (tools/test_miniwin/
+ * test_charset.exe). EASTEUROPE_CHARSET for the Czech CD (and other Central European languages), RUSSIAN_CHARSET
+ * and GREEK_CHARSET for those; otherwise the game's own (charset). */
+int PortGameCharset(int charset);
+
 #endif

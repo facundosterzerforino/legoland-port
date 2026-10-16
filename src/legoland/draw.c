@@ -158,6 +158,10 @@ LEGO_EXPORT int InitScreen(void) {
     font.lfUnderline = 0;
     font.lfStrikeOut = 0;
     font.lfCharSet = 1;
+#ifdef LEGOLAND_PORT
+    /* [port] the CD's text in its own code page (the Czech CD: cp1250), whatever the system's (port_language.h) */
+    font.lfCharSet = (BYTE)PortGameCharset(font.lfCharSet);
+#endif
     font.lfOutPrecision = 0;
     font.lfClipPrecision = 0;
     font.lfQuality = 2;

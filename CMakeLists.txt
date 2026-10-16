@@ -16,6 +16,8 @@ if(LEGOLAND_MODERN_BUILD)
     list(APPEND PORT_SOURCES ${PORT_FFMPEG_SOURCES})
     # [library:filesystem] zlib's blast (zlib license, port/blast/README.md): main.z, for the first-run setup
     list(APPEND PORT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/port/blast/blast.c")
+    # [library:filesystem] zlib's puff (zlib license, port/puff/README.md): the Czech CD's lego.pak (Deflate)
+    list(APPEND PORT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/port/puff/puff.c")
     # [library:window] [library:video] miniwin: the Windows APIs the game calls, on SDL3 (PORTING.md)
     file(GLOB MINIWIN_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/src/*.c")
     list(APPEND PORT_SOURCES ${MINIWIN_SOURCES})

@@ -53,6 +53,7 @@ FluidSynth %s (LGPL-2.1-or-later): https://github.com/FluidSynth/fluidsynth/tree
 FFmpeg's Indeo 3 and Indeo 5 decoders (LGPL-2.1-or-later): in this port's source, port/ffmpeg/ -- FFmpeg.txt
 GothicKit dmusic (MIT, with TinySoundFont, MIT): in this port's source, port/dmusic/ -- dmusic.txt
 zlib's blast (zlib license, Mark Adler): in this port's source, port/blast/ -- blast.txt
+zlib's puff (zlib license, Mark Adler): in this port's source, port/puff/ -- puff.txt
 
 The port's source, with everything needed to rebuild LEGOLAND-port.exe (including with other versions of the LGPL
 libraries above): %s (commit %s).
@@ -64,6 +65,8 @@ libraries above): %s (commit %s).
     }
     blast = open(os.path.join(ROOT, 'port', 'blast', 'blast.h')).read()
     licenses['licenses/blast.txt'] = crlf(blast[:blast.index('*/') + 2])
+    puff = open(os.path.join(ROOT, 'port', 'puff', 'puff.h')).read()
+    licenses['licenses/puff.txt'] = crlf(puff[:puff.index('*/') + 2])
 
     os.makedirs(os.path.join(ROOT, 'dist'), exist_ok=True)
     name = os.path.join(ROOT, 'dist', 'LEGOLAND-port-%s.zip' % version)

@@ -12,8 +12,25 @@
 #endif
 
 #include "blast/blast.h"
+#include "puff/puff.h"
 
 #define PATH_SIZE 1024
+
+/* fopen for a UTF-8 path (SDL's paths are UTF-8; the C library's fopen on Windows takes the ANSI code page) */
+static FILE *OpenUtf8(const char *path, const char *mode) {
+#ifdef _WIN32
+    WCHAR wpath[PATH_SIZE];
+    WCHAR wmode[8];
+
+    if (MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, PATH_SIZE) == 0 ||
+        MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, 8) == 0) {
+        return NULL;
+    }
+    return _wfopen(wpath, wmode);
+#else
+    return fopen(path, mode);
+#endif
+}
 #define SECTOR 2048
 
 /* ---- a source: a folder (a CD drive, a copy of the CD, an install) or a CD image read directly ---- */
@@ -308,7 +325,8 @@ static int Kind(Source *s, const Node *root) {
         ChildFolder(s, root, "FMV", &a)) {
         return PORT_SETUP_INSTALLED;
     }
-    if (ChildFile(s, root, "main.z", &a)) {
+    /* the game's base files: main.z (InstallShield), or on the Czech CD data\lego.pak (CPack) */
+    if (ChildFile(s, root, "main.z", &a) || (ChildFolder(s, root, "data", &a) && ChildFile(s, &a, "lego.pak", &b))) {
         return s->iso != NULL ? PORT_SETUP_IMAGE : PORT_SETUP_CD;
     }
     return PORT_SETUP_NONE;
@@ -339,7 +357,10 @@ int PortSetupFindData(void) {
     }
     if (PortSetupKind(PortSetupExeFolder()) == PORT_SETUP_INSTALLED) {
 #ifdef _WIN32
-        return SetCurrentDirectoryA(PortSetupExeFolder()) != 0;
+        WCHAR folder[PATH_SIZE];
+
+        return MultiByteToWideChar(CP_UTF8, 0, PortSetupExeFolder(), -1, folder, PATH_SIZE) != 0 &&
+            SetCurrentDirectoryW(folder) != 0;
 #else
         return chdir(PortSetupExeFolder()) == 0;
 #endif
@@ -355,7 +376,8 @@ typedef struct Job {
     unsigned long long size;
     int from_image; /* 1: the image's bytes at image_offset */
     unsigned long long image_offset;
-    unsigned long z_offset, z_size; /* in main.z */
+    unsigned long z_offset, z_size; /* in main.z (or lego.pak) */
+    int deflated; /* 1: raw Deflate (lego.pak), else PKWARE's (main.z) */
 } Job;
 
 typedef struct Work {
@@ -446,6 +468,59 @@ static int AddPacked(Work *w, const char *target, unsigned long long size, unsig
     }
     j->z_offset = z_offset;
     j->z_size = z_size;
+    return 1;
+}
+
+/* lego.pak, the Czech CD's base files ("CPack 1.3 (c) Centauri Production"): a text header ending in a 0, then
+ * the files one after another, each: its packed size, two unknown words, a method (1: raw Deflate), its size,
+ * its name ('\'-separated) and a 0, then packed size bytes: one byte, then the Deflate stream. */
+static int AddCPack(Work *w, const unsigned char *z, size_t size, const char *path) {
+    size_t p = 0;
+
+#define U32(o) ((unsigned long)z[(o)] | (unsigned long)z[(o) + 1] << 8 | (unsigned long)z[(o) + 2] << 16 | \
+    (unsigned long)z[(o) + 3] << 24)
+    if (size < 16 || memcmp(z, "CPack", 5) != 0) {
+        return Fail(w, "Not a CPack archive", path);
+    }
+    while (p < size && z[p] != 0) {
+        p++;
+    }
+    p++;
+    while (p < size) {
+        unsigned long comp, method, orig;
+        char rel[PATH_SIZE];
+        size_t name, len = 0;
+        char *s;
+
+        if (p + 21 > size) {
+            return Fail(w, "Damaged archive", path);
+        }
+        comp = U32(p);
+        method = U32(p + 12);
+        orig = U32(p + 16);
+        name = p + 20;
+        while (name + len < size && z[name + len] != 0) {
+            len++;
+        }
+        if (name + len >= size || len == 0 || len >= sizeof(rel) || comp == 0 || name + len + 1 + comp > size ||
+            method != 1) {
+            return Fail(w, "Damaged or unknown archive entry", path);
+        }
+        memcpy(rel, z + name, len);
+        rel[len] = '\0';
+        for (s = rel; *s != '\0'; s++) {
+            *s = *s == '\\' ? '/' : *s;
+        }
+        /* the Deflate stream starts after the name's 0 and one more byte */
+        if (!AddPacked(w, rel, orig, (unsigned long)(name + len + 2), comp - 1)) {
+            return 0;
+        }
+        if (w->count > 0 && SDL_strcmp(w->jobs[w->count - 1].target, rel) == 0) {
+            w->jobs[w->count - 1].deflated = 1;
+        }
+        p = name + len + 1 + comp;
+    }
+#undef U32
     return 1;
 }
 
@@ -635,11 +710,24 @@ static int RunJob(Work *w, const Job *j, const char *target, const unsigned char
     }
     SDL_snprintf(path, sizeof(path), "%s/%s", target, j->target);
     Report(w, j->target);
-    out = fopen(path, "wb");
+    out = OpenUtf8(path, "wb");
     if (out == NULL) {
         return Fail(w, "Can't write", path);
     }
-    if (j->source == NULL && !j->from_image) {
+    if (j->source == NULL && !j->from_image && j->deflated) {
+        unsigned char *plain = (unsigned char *)malloc(j->size > 0 ? (size_t)j->size : 1);
+        unsigned long plain_size = (unsigned long)j->size, packed_size = j->z_size;
+
+        if (plain == NULL) {
+            ok = Fail(w, "Out of memory", j->target);
+        } else if (puff(plain, &plain_size, z + j->z_offset, &packed_size) != 0 || plain_size != j->size) {
+            ok = Fail(w, "Damaged file in lego.pak", j->target);
+        } else if (plain_size > 0 && fwrite(plain, 1, plain_size, out) != plain_size) {
+            ok = Fail(w, "Can't write (is the disk full?)", path);
+        }
+        free(plain);
+        w->done += j->size;
+    } else if (j->source == NULL && !j->from_image) {
         Blast b;
 
         b.in = z + j->z_offset;
@@ -674,7 +762,7 @@ static int RunJob(Work *w, const Job *j, const char *target, const unsigned char
             }
         }
     } else {
-        FILE *in = fopen(j->source, "rb");
+        FILE *in = OpenUtf8(j->source, "rb");
         size_t n;
 
         if (in == NULL) {
@@ -752,12 +840,18 @@ int PortSetupInstall(const char *source, const char *target, const PortSetupProg
     if (kind == PORT_SETUP_CD || kind == PORT_SETUP_IMAGE) {
         Node n;
 
-        ChildFile(&s, &root, "main.z", &n);
+        Node data;
+        int cpack = !ChildFile(&s, &root, "main.z", &n);
+
+        if (cpack) {
+            ChildFolder(&s, &root, "data", &data);
+            ChildFile(&s, &data, "lego.pak", &n);
+        }
         z = LoadArchive(&s, &n, &zsize);
         if (z == NULL) {
-            ok = Fail(&w, "Can't read", "main.z");
+            ok = Fail(&w, "Can't read", cpack ? "lego.pak" : "main.z");
         }
-        ok = ok && AddArchive(&w, z, zsize, "main.z");
+        ok = ok && (cpack ? AddCPack(&w, z, zsize, "lego.pak") : AddArchive(&w, z, zsize, "main.z"));
         ok = ok && ChildFolder(&s, &root, "speech", &n) && AddTree(&w, &n, "speech");
         if (ok && ChildFolder(&s, &root, "FMV", &n)) {
             ok = AddTree(&w, &n, "FMV");

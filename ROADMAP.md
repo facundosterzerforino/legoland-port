@@ -242,6 +242,15 @@ build after each.
   current folder or the exe's. `tools/test_miniwin/test_setup.exe` builds the folder from the maintainer's ISO
   of the CD (read directly, and as a folder) and from an install: identical to the maintainer's install, byte for
   byte (1613 files).
+- Other languages' CDs: the setup also reads raw `.bin` images and the Czech CD, whose base files are in
+  `data\lego.pak` (CPack 1.3 by Centauri Production: raw Deflate, unpacked with zlib's puff) instead of
+  `main.z`. The European CDs (Spanish, German, Czech, ...) carry another build of the game, which takes the CD's
+  language from string 9999 of `stab.str` and picks the object texts (9 or 10 languages in each class) by it;
+  `port/port_language.c` does the same, plus that build's font tweaks, and creates the fonts in the CD's code
+  page (the Czech CD's cp1250 drew wrong letters on a Western Windows: `test_charset.exe`). Their intro movie is
+  Cinepak: FFmpeg's decoder joins the Indeo ones (`test_cinepak.exe`: 1644 of 1700 frames identical to
+  Windows' codec, a 4x4 block or two off in the others). The setup window speaks the game's ten languages
+  (Windows' display language first, a drop-down to change it; `test_setup_texts.exe` checks they fit).
 - Step 4, the release: `tools/release/make_release.py` packs `LEGOLAND-port.exe` (never `LEGOLAND.exe`: Windows' compatibility database matches that name beside the game's files and applies the 1999 game's fixes, which crash the port while it loads), a README for players and the licenses
   (2 MB); the PDB goes in a separate zip.
 - Step 2: `docs/checklist.md`, every screen and feature with phase 4's result and the current one.

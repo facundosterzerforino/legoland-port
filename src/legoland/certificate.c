@@ -1,6 +1,7 @@
 #include "legoland.h"
 #ifdef LEGOLAND_PORT
 #include "debug.h"
+#include "port_language.h"
 #endif
 
 #define _WINSPOOL_
@@ -267,6 +268,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 plf->lfWeight = 400;
                 // STRING: LEGOLAND 0x004b86e0
                 lstrcpyA(plf->lfFaceName, "Lego");
+#ifdef LEGOLAND_PORT
+                plf->lfCharSet = (BYTE)PortGameCharset(plf->lfCharSet); /* [port] port_language.h */
+#endif
                 hFont = CreateFontIndirectA(plf);
                 if (!hFont) {
                     GlobalFree(hInfo);
@@ -287,6 +291,9 @@ int PrintCertificate(char *param_1, char *param_2, char *param_3) {
                 plf->lfHeight = -MulDiv(8, GetDeviceCaps(hDC, LOGPIXELSY), 72);
                 plf->lfWeight = 300;
                 lstrcpyA(plf->lfFaceName, "Lego");
+#ifdef LEGOLAND_PORT
+                plf->lfCharSet = (BYTE)PortGameCharset(plf->lfCharSet); /* [port] port_language.h */
+#endif
                 hFont = CreateFontIndirectA(plf);
                 if (NULL == hFont) {
                     GlobalFree(hInfo);
