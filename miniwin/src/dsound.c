@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "miniwin/miniwin.h"
+#include "miniwin/timer.h"
 
 #define MIX_RATE 44100
 #define MIX_CHUNK 1024 /* frames mixed per round */
@@ -236,6 +237,10 @@ static HRESULT STDMETHODCALLTYPE Buffer_GetCaps(IDirectSoundBuffer *self, LPDSBC
 
 static HRESULT STDMETHODCALLTYPE Buffer_GetCurrentPosition(IDirectSoundBuffer *self, LPDWORD play, LPDWORD write) {
     struct Buffer *b = AsBuffer(self);
+
+#ifdef LEGOLAND_WEB_BROWSER
+    MiniwinWebPoll(); /* the game waits for the play cursor by polling it: it moves only on the page's turn */
+#endif
     DWORD p;
 
     SDL_LockMutex(lock);

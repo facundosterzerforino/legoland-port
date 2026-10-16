@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "miniwin/timer.h"
 #include "posix.h"
 
 #ifdef LEGOLAND_WEB_BROWSER
@@ -358,7 +359,7 @@ DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, 
             /* the page's thread mustn't block: look again in a millisecond, the page running meanwhile */
             struct timespec now;
             pthread_mutex_unlock(&posix_objects_lock);
-            emscripten_sleep(1);
+            MiniwinWebSleep(1);
             pthread_mutex_lock(&posix_objects_lock);
             clock_gettime(CLOCK_MONOTONIC, &now);
             if (milliseconds != INFINITE &&

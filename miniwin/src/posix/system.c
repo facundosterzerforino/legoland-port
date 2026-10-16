@@ -18,6 +18,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "miniwin/timer.h"
 #include "posix.h"
 
 /* ---- memory: GMEM_MOVEABLE blocks don't move, so a handle is the block itself ---- */
@@ -129,7 +130,7 @@ void Sleep(DWORD milliseconds) {
 
 #ifdef LEGOLAND_WEB_BROWSER
     if (emscripten_is_main_browser_thread()) {
-        emscripten_sleep(milliseconds); /* the page runs meanwhile (ASYNCIFY) */
+        MiniwinWebSleep(milliseconds); /* the page runs meanwhile (ASYNCIFY; miniwin/timer.h) */
         return;
     }
 #endif

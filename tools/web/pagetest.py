@@ -76,7 +76,8 @@ def main():
     problems = 0
     errors = []
     with sync_playwright() as p, tempfile.TemporaryDirectory() as profile:
-        browser = p.chromium.launch_persistent_context(profile, headless=True)
+        browser = p.chromium.launch_persistent_context(profile, headless=True,
+                                                       args=['--autoplay-policy=no-user-gesture-required'])
         page = browser.new_page()
         page.on('pageerror', lambda e: errors.append('page error: %s' % e))
         page.on('console', lambda m: errors.append('console %s: %s' % (m.type, m.text)) if m.type == 'error' else None)

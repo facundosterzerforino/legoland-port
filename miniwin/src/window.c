@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 
 #include "miniwin/miniwin.h"
+#include "miniwin/timer.h"
 
 #ifdef LEGOLAND_WEB_BROWSER
 #include <emscripten.h>
@@ -76,7 +77,7 @@ void MiniwinPumpEvents(WNDPROC proc) {
 #ifdef LEGOLAND_WEB_BROWSER
     /* [library:window] the game's loop runs on the page's thread: give the page its turn (drawing the frame, the
      * input, the sound), every frame (ASYNCIFY) */
-    emscripten_sleep(0);
+    MiniwinWebSleep(0);
 #endif
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
