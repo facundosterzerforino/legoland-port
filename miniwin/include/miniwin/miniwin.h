@@ -93,4 +93,10 @@ void MiniwinSoundKeepPlayingInactive(LPDIRECTSOUNDBUFFER buffer);
 void MiniwinSoundBufferSetSource(LPDIRECTSOUNDBUFFER buffer, void (*source)(void *ctx, void *bytes, DWORD size),
     void *ctx);
 
+#ifndef _WIN32
+/* -port-selftest: the game's fonts and text drawn as the game draws them, the pixels counted (miniwin/src/posix/gdi.c);
+ * returns the problems (text that draws nothing) */
+int MiniwinTextSelfTest(FILE *report);
+#endif
+
 #endif

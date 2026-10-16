@@ -86,5 +86,10 @@ int main(int argc, char **argv) {
     }
     result = WinMain(GetModuleHandleA(NULL), NULL, line, SW_SHOWNORMAL);
     free(line);
+#ifdef LEGOLAND_WEB_BROWSER
+    /* the page goes on after the game: its sound with it, unless SDL lets go of the browser's audio (the music played
+     * on after the game ended) */
+    SDL_Quit();
+#endif
     return result;
 }

@@ -246,6 +246,8 @@
     noInitialRun: true,
     onRuntimeInitialized: () => { runtimeReady = true; refresh(); },
     onExit: () => {
+      /* the sound stops with the game (SDL_Quit at the end of main closes it; this in case it didn't get there) */
+      try { if (typeof SDL3 !== 'undefined' && SDL3.audioContext) SDL3.audioContext.close(); } catch (e) {}
       document.getElementById('canvas').style.display = 'none';
       document.getElementById('panel').style.display = '';
       if (document.fullscreenElement) document.exitFullscreen();

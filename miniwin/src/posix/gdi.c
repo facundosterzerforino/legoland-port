@@ -989,6 +989,69 @@ HDC PosixSurfaceDc(void *bits, int width, int height, int pitch) {
     return NewDc(bits, width, height, pitch);
 }
 
+/* -port-selftest: the game's text as the game draws it. Lego.ttf added (as InitHostSystemGPU does), the game's four
+ * fonts made (InitScreen: face "Lego", 24 bold, 28, 20 bold, 18 semibold), and a line drawn with each, by TextOutA and
+ * DrawTextA, on a 16-bit surface's DC (a DirectDraw surface's, miniwin/src/ddraw.c): the pixels it set are counted.
+ * None set: the text would be missing in the game. */
+int MiniwinTextSelfTest(FILE *report) {
+    static const struct {
+        int height;
+        int weight;
+    } fonts[] = {{24, 700}, {28, 400}, {20, 700}, {18, 600}};
+    static unsigned short pixels[64 * 320];
+    const char *line = "LEGOLAND Park 1999";
+    int problems = 0;
+    size_t i;
+
+    if (AddFontResourceA("Lego.ttf") == 0) {
+        fprintf(report, "text: Lego.ttf doesn't load (error %lu)\n", (unsigned long)GetLastError());
+        return 1;
+    }
+    for (i = 0; i < sizeof(fonts) / sizeof(fonts[0]); i++) {
+        LOGFONTA lf;
+        HFONT font;
+        HDC dc;
+        RECT rect = {0, 32, 320, 64};
+        int counts[2];
+        int k;
+        int j;
+
+        memset(&lf, 0, sizeof(lf));
+        lf.lfHeight = fonts[i].height;
+        lf.lfWeight = fonts[i].weight;
+        lf.lfCharSet = 1;
+        lf.lfQuality = 2;
+        strcpy(lf.lfFaceName, "Lego");
+        font = CreateFontIndirectA(&lf);
+        for (k = 0; k < 2; k++) {
+            memset(pixels, 0, sizeof(pixels));
+            dc = PosixSurfaceDc(pixels, 320, 64, 320 * 2);
+            SelectObject(dc, font);
+            SetBkMode(dc, TRANSPARENT);
+            SetTextColor(dc, RGB(255, 255, 255));
+            if (k == 0) {
+                TextOutA(dc, 0, 0, line, (int)strlen(line));
+            } else {
+                DrawTextA(dc, line, -1, &rect, DT_LEFT | DT_TOP | DT_SINGLELINE);
+            }
+            DeleteDC(dc);
+            counts[k] = 0;
+            for (j = 0; j < 64 * 320; j++) {
+                counts[k] += pixels[j] != 0;
+            }
+        }
+        fprintf(report, "text: \"%s\" %d weight %d (face %s): %d pixels by TextOutA, %d by DrawTextA\n", lf.lfFaceName,
+            fonts[i].height, fonts[i].weight, ((struct Font *)font)->file != NULL ? ((struct Font *)font)->file->face : "none",
+            counts[0], counts[1]);
+        if (counts[0] == 0 || counts[1] == 0) {
+            problems++;
+        }
+        DeleteObject(font);
+    }
+    RemoveFontResourceA("Lego.ttf");
+    return problems;
+}
+
 void PosixDeleteSurfaceDc(HDC dc) {
     DeleteDC(dc);
 }

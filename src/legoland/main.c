@@ -14,6 +14,7 @@
 #include "port_data.h"
 #include "port_launcher.h"
 #include "port_sdl.h"
+#include "miniwin/miniwin.h"
 #include "port_movie.h"
 #include "port_res.h"
 #include "port_save.h"
@@ -58,6 +59,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             save_problems = PortSaveSelfTest(save_report);
             save_problems += PortMovieSelfTest(save_report); /* [library:movie] port/port_movie.h */
             save_problems += MiniwinMusicSelfTest(save_report); /* [library:music] miniwin/dmusic.h */
+#ifndef _WIN32
+            save_problems += MiniwinTextSelfTest(save_report); /* [library:text] miniwin/miniwin.h */
+#endif
             fclose(save_report);
         }
         return PortDataSelfTest("port-selftest.txt", sdl_problems + res_problems + save_problems);
