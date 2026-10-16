@@ -78,13 +78,22 @@ int __stdcall acmStreamPrepareHeader(void *has, void *pash, unsigned int fdwPrep
 void __stdcall AVIFileExit(void) { STUB(); }
 
 // STUB: LEGOLAND 0x0049e3dc
-void __stdcall AVIFileRelease(void *file) { STUB(); }
+unsigned int __stdcall AVIFileRelease(void *file) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e3e2
-void __stdcall AVIStreamRelease(void *stream) { STUB(); }
+unsigned int __stdcall AVIStreamRelease(void *stream) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e3e8
-void __stdcall AVIStreamAddRef(void *stream) { STUB(); }
+unsigned int __stdcall AVIStreamAddRef(void *stream) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e3ee
 int __stdcall AVIStreamInfoA(void *stream, void *info, int size) {
@@ -114,7 +123,10 @@ int __stdcall AVIFileOpenA(void **file, const char *name, int mode, void *handle
 void __stdcall AVIFileInit(void) { STUB(); }
 
 // STUB: LEGOLAND 0x0049e40c
-void __stdcall AVIStreamGetFrameClose(void *frame) { STUB(); }
+int __stdcall AVIStreamGetFrameClose(void *frame) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e412
 void *__stdcall AVIStreamGetFrameOpen(void *stream, void *format) {
@@ -129,7 +141,10 @@ void *__stdcall AVIStreamGetFrame(void *getframe, int position) {
 }
 
 // STUB: LEGOLAND 0x0049e41e
-void __stdcall AVIStreamReadFormat(void *stream, int pos, void *format, int *size) { STUB(); }
+int __stdcall AVIStreamReadFormat(void *stream, int pos, void *format, int *size) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e424
 int __stdcall AVIStreamLength(void *stream) {
@@ -144,7 +159,10 @@ int __stdcall AVIStreamStart(void *stream) {
 }
 
 // STUB: LEGOLAND 0x0049e430
-void __stdcall AVIStreamRead(void *stream, int start, int samples, void *buffer, int buffer_size, int *bytes, int *samples_out) { STUB(); }
+int __stdcall AVIStreamRead(void *stream, int start, int samples, void *buffer, int buffer_size, int *bytes, int *samples_out) {
+    STUB();
+    return 0;
+}
 
 // STUB: LEGOLAND 0x0049e442
 int __stdcall EnumPrintersA(unsigned long flags, char *name, unsigned long level, unsigned char *buf, unsigned long cb, unsigned long *needed, unsigned long *returned) {

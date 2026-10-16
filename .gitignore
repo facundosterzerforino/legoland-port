@@ -55,3 +55,5 @@ tools/music/*.exe
 build-linux/
 build-android/
 build-android-*/
+build-web/
+build-web-node/

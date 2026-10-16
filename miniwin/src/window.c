@@ -3,6 +3,10 @@
 
 #include "miniwin/miniwin.h"
 
+#ifdef LEGOLAND_WEB_BROWSER
+#include <emscripten.h>
+#endif
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
@@ -69,6 +73,11 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
 void MiniwinPumpEvents(WNDPROC proc) {
     SDL_Event event;
 
+#ifdef LEGOLAND_WEB_BROWSER
+    /* [library:window] the game's loop runs on the page's thread: give the page its turn (drawing the frame, the
+     * input, the sound), every frame (ASYNCIFY) */
+    emscripten_sleep(0);
+#endif
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_EVENT_FINGER_DOWN:

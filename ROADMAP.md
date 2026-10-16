@@ -299,6 +299,19 @@ own (Android/data/<package>/files); the setup installs from the CD's image chose
 one finger is the mouse, two the secondary button, three the on-screen keyboard; the back key is Escape. Left: a
 play test on a device.
 
+## Phase 10: the web (WebAssembly)
+
+The same code with Emscripten (`cmake --preset web`): a page, `port/web/shell.html`, with the game's files in the
+browser's private storage for the site (OPFS); the first time the player chooses the CD's image, which the setup
+installs from. The game's loop gives the page its turn every frame (ASYNCIFY); its threads are WebAssembly threads
+(the page must be cross-origin isolated: `port/web/coi-serviceworker.js` where the host can't send the headers).
+wasm32 is 32-bit, as the original: its data layout is the x86 build's.
+
+Progress: builds; `-port-selftest` passes in Node.js (`cmake --preset web-node`) and in headless Chromium
+(`tools/web/pagetest.py --selftest`), reading the game from the page's storage, with the 32-bit Windows build's
+report and dumps; the page's copy of a CD image into its storage was checked the same way. Left: a play test in a
+browser.
+
 ## Throughout
 
 - **Merge the decomp regularly** (`git merge main` in `~/wt/port`). Better matches and names flow in. Resolve

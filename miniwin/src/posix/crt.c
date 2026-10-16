@@ -70,18 +70,18 @@ int _write(int fd, const void *buffer, unsigned int count) {
     return (int)write(fd, buffer, count);
 }
 
-int _lseek(int fd, int offset, int origin) {
-    return (int)lseek(fd, offset, origin);
+__LONG32 _lseek(int fd, __LONG32 offset, int origin) {
+    return (__LONG32)lseek(fd, offset, origin);
 }
 
-int _tell(int fd) {
-    return (int)lseek(fd, 0, SEEK_CUR);
+__LONG32 _tell(int fd) {
+    return (__LONG32)lseek(fd, 0, SEEK_CUR);
 }
 
-int _filelength(int fd) {
+__LONG32 _filelength(int fd) {
     struct stat st;
 
-    return fstat(fd, &st) == 0 ? (int)st.st_size : -1;
+    return fstat(fd, &st) == 0 ? (__LONG32)st.st_size : -1;
 }
 
 /* ---- searches ---- */

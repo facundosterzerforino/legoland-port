@@ -7,8 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/heap.h>
+#include <emscripten/threading.h>
+#else
 #include <sys/sysinfo.h>
 #include <sys/uio.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 
@@ -49,8 +55,11 @@ HLOCAL LocalFree(HLOCAL handle) {
     return NULL;
 }
 
-/* readable: the kernel copies a byte from it without faulting */
+/* readable: the kernel copies a byte from it without faulting (WebAssembly: inside the memory) */
 BOOL IsBadReadPtr(const void *address, UINT_PTR size) {
+#ifdef __EMSCRIPTEN__
+    return size != 0 && ((uintptr_t)address < 1024 || (uintptr_t)address + size > emscripten_get_heap_size());
+#else
     char byte;
     struct iovec local = {&byte, 1};
     struct iovec remote = {(void *)address, 1};
@@ -63,6 +72,7 @@ BOOL IsBadReadPtr(const void *address, UINT_PTR size) {
     }
     remote.iov_base = (char *)address + size - 1;
     return process_vm_readv(getpid(), &local, 1, &remote, 1, 0) != 1;
+#endif
 }
 
 SIZE_T VirtualQuery(LPCVOID address, PMEMORY_BASIC_INFORMATION info, SIZE_T size) {
@@ -74,14 +84,19 @@ SIZE_T VirtualQuery(LPCVOID address, PMEMORY_BASIC_INFORMATION info, SIZE_T size
 }
 
 void GlobalMemoryStatus(LPMEMORYSTATUS status) {
-    struct sysinfo si;
     unsigned long long total = 0;
     unsigned long long avail = 0;
+#ifdef __EMSCRIPTEN__
+    total = emscripten_get_heap_max();
+    avail = total - emscripten_get_heap_size();
+#else
+    struct sysinfo si;
 
     if (sysinfo(&si) == 0) {
         total = (unsigned long long)si.totalram * si.mem_unit;
         avail = (unsigned long long)si.freeram * si.mem_unit;
     }
+#endif
     memset(status, 0, sizeof(*status));
     status->dwLength = sizeof(*status);
     status->dwMemoryLoad = total > 0 ? (DWORD)(100 - avail * 100 / total) : 0;
@@ -112,6 +127,12 @@ DWORD GetTickCount(void) {
 void Sleep(DWORD milliseconds) {
     struct timespec ts;
 
+#ifdef LEGOLAND_WEB_BROWSER
+    if (emscripten_is_main_browser_thread()) {
+        emscripten_sleep(milliseconds); /* the page runs meanwhile (ASYNCIFY) */
+        return;
+    }
+#endif
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (long)(milliseconds % 1000) * 1000000;
     while (nanosleep(&ts, &ts) != 0 && errno == EINTR) {

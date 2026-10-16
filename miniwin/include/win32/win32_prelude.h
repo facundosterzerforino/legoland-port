@@ -14,6 +14,24 @@
 #include <sys/types.h>
 #include <setjmp.h>
 
+/* Windows' long: 32 bits. The target's long where that's 32 bits (wasm32), else int (64-bit Linux, Android) -- as
+ * the compiler's own Windows builtins (_InterlockedIncrement...) declare it. */
+#if __SIZEOF_LONG__ == 4
+#define __LONG32 long
+#else
+#define __LONG32 int
+#endif
+
+/* the code's wide strings are Windows' 16-bit ones (-fshort-wchar); the C library's wide functions are 32-bit, so
+ * the one the code uses is here */
+static inline unsigned short *MiniwinWcscpy(unsigned short *to, const unsigned short *from) {
+    unsigned short *start = to;
+    while ((*to++ = *from++) != 0) {
+    }
+    return start;
+}
+#define wcscpy(to, from) MiniwinWcscpy((unsigned short *)(to), (const unsigned short *)(from))
+
 #define WINAPI
 #define WINAPIV
 #define APIENTRY

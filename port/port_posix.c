@@ -6,11 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(LEGOLAND_WEB_BROWSER)
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include "port_setup.h"
+#endif
+#ifdef LEGOLAND_WEB_BROWSER
+#include <emscripten/wasmfs.h>
 #endif
 
 #include <SDL3/SDL_main.h> /* Android: main is the SDL_main its Java side calls */
@@ -55,8 +58,12 @@ int main(int argc, char **argv) {
     int result;
 
     PosixThreadSignalStack(); /* the crash report runs on it after a stack overflow (main.c's __except) */
-#ifdef __ANDROID__
-    /* an app starts in /: the game's folder is the app's own (port_setup.c), as the current one is the game's
+#ifdef LEGOLAND_WEB_BROWSER
+    /* the page's origin's private storage, where the game's files stay between visits: /opfs */
+    wasmfs_create_directory("/opfs", 0777, wasmfs_create_opfs_backend());
+#endif
+#if defined(__ANDROID__) || defined(LEGOLAND_WEB_BROWSER)
+    /* an app (or a page) starts in /: the game's folder is its own (port_setup.c), as the current one is the game's
      * folder when it's started from it elsewhere */
     if (chdir(PortSetupExeFolder()) != 0) {
         mkdir(PortSetupExeFolder(), 0755);

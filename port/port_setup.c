@@ -357,6 +357,11 @@ const char *PortSetupExeFolder(void) {
         SDL_snprintf(folder, sizeof(folder), "%s/", base != NULL ? base : ".");
     }
     return folder;
+#elif defined(LEGOLAND_WEB_BROWSER)
+    /* the page's origin's private storage (OPFS, mounted at /opfs: port_posix.c) */
+    return "/opfs/LEGOLAND/";
+#elif defined(__EMSCRIPTEN__)
+    return "./";
 #else
     const char *base = SDL_GetBasePath();
 

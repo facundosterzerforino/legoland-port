@@ -52,6 +52,28 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "web",
+      "displayName": "Port: WebAssembly for browsers (phase 10)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-web",
+      "toolchainFile": "${sourceDir}/cmake/emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "LEGOLAND_WEB": "browser"
+      }
+    },
+    {
+      "name": "web-node",
+      "displayName": "Port: WebAssembly for Node.js, for -port-selftest (phase 10)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-web-node",
+      "toolchainFile": "${sourceDir}/cmake/emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "LEGOLAND_WEB": "node"
+      }
     }
   ],
   "buildPresets": [
@@ -74,6 +96,14 @@
     {
       "name": "android",
       "configurePreset": "android"
+    },
+    {
+      "name": "web",
+      "configurePreset": "web"
+    },
+    {
+      "name": "web-node",
+      "configurePreset": "web-node"
     }
   ]
 }

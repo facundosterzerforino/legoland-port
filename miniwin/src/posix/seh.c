@@ -8,7 +8,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __EMSCRIPTEN__
 #include <ucontext.h>
+#endif
 
 #include "posix.h"
 
@@ -36,6 +38,7 @@ static struct TryState *State(void) {
     return state;
 }
 
+#ifndef __EMSCRIPTEN__
 static DWORD Code(int sig, const siginfo_t *info) {
     switch (sig) {
     case SIGFPE:
@@ -114,7 +117,12 @@ static void OnFault(int sig, siginfo_t *info, void *uc) {
     siglongjmp(s->frames[s->depth - 1], 1);
 }
 
+#endif
+
 static void InstallHandlers(void) {
+#ifdef __EMSCRIPTEN__
+    /* WebAssembly: a bad access or a divide by zero traps, and the program ends; there's nothing to catch */
+#else
     static const int signals[] = {SIGSEGV, SIGBUS, SIGFPE, SIGILL};
     struct sigaction sa;
     size_t i;
@@ -126,9 +134,11 @@ static void InstallHandlers(void) {
     for (i = 0; i < sizeof(signals) / sizeof(signals[0]); i++) {
         sigaction(signals[i], &sa, NULL);
     }
+#endif
 }
 
 void PosixThreadSignalStack(void) {
+#ifndef __EMSCRIPTEN__
     stack_t ss;
     stack_t old;
 
@@ -141,6 +151,7 @@ void PosixThreadSignalStack(void) {
     if (ss.ss_sp != NULL) {
         sigaltstack(&ss, NULL);
     }
+#endif
 }
 
 int PosixTryPush(void) {
@@ -176,7 +187,11 @@ int PosixTryFilter(int verdict) {
     if (s != NULL && s->depth > 0) {
         siglongjmp(s->frames[s->depth - 1], 1);
     }
+#ifdef __EMSCRIPTEN__
+    abort();
+#else
     Die(s != NULL && s->signal != 0 ? s->signal : SIGSEGV);
+#endif
     return 0;
 }
 
@@ -184,6 +199,6 @@ void *PosixExceptionInformation(void) {
     return &State()->pointers;
 }
 
-DWORD PosixExceptionCode(void) {
+unsigned int PosixExceptionCode(void) {
     return State()->record.ExceptionCode;
 }

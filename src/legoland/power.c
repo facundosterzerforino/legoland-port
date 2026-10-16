@@ -8,7 +8,7 @@
 #include "sound_music.h"
 
 // FUNCTION: LEGOLAND 0x00452990
-void LoadFountainSFX(void) {
+void LoadFountainSFX(struct Element *head) {
     unsigned int counter;
 
     counter = FountainSFXRefCount;
@@ -48,7 +48,7 @@ LEGO_EXPORT void RemoveSoundObject(struct Element *a, unsigned int b, struct Cur
 }
 
 // FUNCTION: LEGOLAND 0x00452a80
-void LoadPowerStationSFX(void) {
+void LoadPowerStationSFX(struct Element *head) {
     unsigned int counter;
 
     counter = PowerStationSFXRefCount;
@@ -87,7 +87,7 @@ void CrystalPowerStationAddObject(struct Element *param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00452b70
-void LoadDinoSFX(void) {
+void LoadDinoSFX(struct Element *head) {
     unsigned int counter;
 
     counter = DinoSFXRefCount;

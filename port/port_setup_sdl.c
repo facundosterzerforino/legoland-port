@@ -232,6 +232,17 @@ int PortSetupRun(HINSTANCE instance) {
 
     (void)instance;
     SDL_InitSubSystem(SDL_INIT_VIDEO);
+#ifdef __EMSCRIPTEN__
+    /* the page (port/web/shell.html) copies the CD's image the player chose into the game's folder before starting
+     * the game: install from it, then remove it (it's the size of the CD) */
+    if (FindSource(source) && PortSetupKind(source) == PORT_SETUP_IMAGE) {
+        int ok = Install(source);
+        remove(source);
+        return ok && PortSetupFindData();
+    }
+    fprintf(stderr, "LEGOLAND: the game's files aren't installed: choose the CD's image on the page\n");
+    return 0;
+#endif
     if (FindSource(source)) {
         static const char *const buttons[] = {"Install", "Choose another...", "Quit"};
         int answer;

@@ -6,6 +6,11 @@
 
 #include "posix.h"
 
+#ifdef LEGOLAND_WEB_BROWSER
+#include <emscripten.h>
+#include <emscripten/threading.h>
+#endif
+
 pthread_mutex_t posix_objects_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t posix_objects_changed;
 static pthread_once_t init_once = PTHREAD_ONCE_INIT;
@@ -348,6 +353,21 @@ DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, 
         if (milliseconds == 0) {
             break;
         }
+#ifdef LEGOLAND_WEB_BROWSER
+        if (emscripten_is_main_browser_thread()) {
+            /* the page's thread mustn't block: look again in a millisecond, the page running meanwhile */
+            struct timespec now;
+            pthread_mutex_unlock(&posix_objects_lock);
+            emscripten_sleep(1);
+            pthread_mutex_lock(&posix_objects_lock);
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            if (milliseconds != INFINITE &&
+                (now.tv_sec > deadline.tv_sec || (now.tv_sec == deadline.tv_sec && now.tv_nsec >= deadline.tv_nsec))) {
+                milliseconds = 0;
+            }
+            continue;
+        }
+#endif
         if (milliseconds == INFINITE) {
             timed_out = pthread_cond_wait(&posix_objects_changed, &posix_objects_lock) == ETIMEDOUT;
         } else {

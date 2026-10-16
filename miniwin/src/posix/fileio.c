@@ -536,6 +536,14 @@ DWORD GetModuleFileNameA(HMODULE module, LPSTR out, DWORD size) {
     /* the app's files folder stands for the exe's: what goes next to the exe (the .ini, the trace, the crash
      * report) goes there, with the game's data (port_setup.c) */
     n = snprintf(path, sizeof(path), "%s/LEGOLAND", SDL_GetAndroidExternalStoragePath());
+#elif defined(LEGOLAND_WEB_BROWSER)
+    /* the game's folder in the page's storage (port_setup.c) stands for the exe's */
+    n = snprintf(path, sizeof(path), "/opfs/LEGOLAND/LEGOLAND");
+#elif defined(__EMSCRIPTEN__)
+    {
+        char cwd[MAX_PATH - 16];
+        n = snprintf(path, sizeof(path), "%s/legoland", getcwd(cwd, sizeof(cwd)) != NULL ? cwd : ".");
+    }
 #else
     n = readlink("/proc/self/exe", path, sizeof(path) - 1);
 #endif
