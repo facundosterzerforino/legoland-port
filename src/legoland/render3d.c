@@ -494,12 +494,26 @@ void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct C
                     entry->b2 = param_2->b2;
                     entry->b1 = param_2->b1;
                     entry->b0 = param_2->b0;
+#ifdef LEGOLAND_PORT
+                    /* [port] the colour's three bytes: the original reads four, past the 3-byte struct (the
+                     * fourth goes unused); clang may make such a read anything, and the gardeners came out
+                     * magenta on WebAssembly */
+                    rgb = param_2->b0 | param_2->b1 << 8 | param_2->b2 << 16;
+#else
                     rgb = *(int *)param_2;
+#endif
                 } else {
                     entry->b2 = param_4->b2;
                     entry->b1 = param_4->b1;
                     entry->b0 = param_4->b0;
+#ifdef LEGOLAND_PORT
+                    /* [port] the colour's three bytes: the original reads four, past the 3-byte struct (the
+                     * fourth goes unused); clang may make such a read anything, and the gardeners came out
+                     * magenta on WebAssembly */
+                    rgb = param_4->b0 | param_4->b1 << 8 | param_4->b2 << 16;
+#else
                     rgb = *(int *)param_4;
+#endif
                 }
                 entry->ramp = FUN_00486280(0x40, &rgb);
                 count = param_6;

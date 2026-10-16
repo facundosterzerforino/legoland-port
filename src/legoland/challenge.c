@@ -190,7 +190,7 @@ void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_
     int y;
     unsigned char *src;
     unsigned char *out;
-    unsigned int *dst;
+    void **dst;
     unsigned char index;
 
     param_2->width_m1 = param_1->width - 1;
@@ -255,8 +255,8 @@ void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_
     }
     param_2->data_8 = (unsigned char *)malloc(param_1->height * param_1->width);
     if (param_1 != NULL) {
-        dst = (unsigned int *)malloc(0x404);
-        param_2->data_c = (void **)dst;
+        dst = (void **)malloc(0x101 * sizeof(void *)); /* the colour ramps: 257 pointers */
+        param_2->data_c = dst;
         for (x = 0x101; x != 0; x--) {
             *dst = 0;
             dst++;
