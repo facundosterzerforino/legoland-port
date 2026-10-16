@@ -28,8 +28,13 @@ if(LEGOLAND_MODERN_BUILD)
     # [library:timer] [library:filesystem] the game's clock and file calls (GetTickCount, fopen, _open,
     # CreateFileA...) go to miniwin's versions under the same names: miniwin/redirect.h comes first in every game
     # source
-    set_source_files_properties(${LEGOLAND_SOURCES} PROPERTIES COMPILE_OPTIONS
-        "/FI${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/miniwin/redirect.h")
+    if(WIN32)
+        set_source_files_properties(${LEGOLAND_SOURCES} PROPERTIES COMPILE_OPTIONS
+            "/FI${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/miniwin/redirect.h")
+    else()
+        set_source_files_properties(${LEGOLAND_SOURCES} PROPERTIES COMPILE_OPTIONS
+            "-include;${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include/miniwin/redirect.h")
+    endif()
     # [port] SDL3, the platform layer from phase 5 on (ROADMAP.md): a pinned release, downloaded at configure
     # time and built as a static library with the same toolchain and static C runtime. To build offline, unpack
     # the tarball somewhere and configure with -DFETCHCONTENT_SOURCE_DIR_SDL3=<folder>.
@@ -103,9 +108,14 @@ if(LEGOLAND_MODERN_BUILD)
     target_compile_definitions(legoland PRIVATE LEGOLAND_PORT=1 DIRECTINPUT_VERSION=0x0500 _CRT_SECURE_NO_WARNINGS)
     target_include_directories(legoland PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/port" "${CMAKE_CURRENT_SOURCE_DIR}/extensions"
         "${CMAKE_CURRENT_SOURCE_DIR}/miniwin/include")
-    # Static C runtime, debug info in the objects, a PDB for debuggers.
+    # Static C runtime, debug info in the objects, a PDB for debuggers (Windows); debug info (Linux).
     set_property(TARGET legoland PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    target_compile_options(legoland PRIVATE /Z7
+    if(WIN32)
+        target_compile_options(legoland PRIVATE /Z7)
+    else()
+        target_compile_options(legoland PRIVATE -g)
+    endif()
+    target_compile_options(legoland PRIVATE
         # The decompiled code often writes "if (in bounds) p = &tbl[i]; else p = NULL;" then uses p. MSVC6 kept
         # the check and the NULL access crashed; clang treats it as impossible and deletes the check, so the
         # port silently uses tbl[i] out of bounds instead. Keep the checks: the access faults as in the
@@ -116,13 +126,19 @@ if(LEGOLAND_MODERN_BUILD)
         -Wno-error=int-conversion
         -Wno-error=incompatible-function-pointer-types
         -Wno-error=return-mismatch)
-    target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
-    target_link_libraries(legoland PRIVATE
-        dxguid comctl32 comdlg32 shell32 winmm version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
+    if(WIN32)
+        target_link_options(legoland PRIVATE /DEBUG /INCREMENTAL:NO)
+        target_link_libraries(legoland PRIVATE
+            dxguid comctl32 comdlg32 shell32 winmm version winspool ole32 uuid advapi32 gdi32 user32 kernel32 dbghelp)
+    else()
+        target_link_libraries(legoland PRIVATE m pthread dl)
+    endif()
     # The original exe's resources (window icon 0x65, cursor 0x7d, element dialog 0x75, version), copied from
     # external/legoland.exe at build time rather than committed (tools/extract_resources.py).
     set(LEGOLAND_ORIGINAL_EXE "${CMAKE_CURRENT_SOURCE_DIR}/external/legoland.exe")
-    if(EXISTS "${LEGOLAND_ORIGINAL_EXE}")
+    if(NOT WIN32)
+        # [port] Linux: the icon and cursor come from elsewhere (later); no PE resources
+    elseif(EXISTS "${LEGOLAND_ORIGINAL_EXE}")
         find_package(Python3 REQUIRED COMPONENTS Interpreter)
         set(LEGOLAND_RES "${CMAKE_CURRENT_BINARY_DIR}/legoland_original.res")
         add_custom_command(OUTPUT "${LEGOLAND_RES}"
@@ -145,4 +161,6 @@ else()
     # 0xCC padding between functions) but with intrinsics: memset is inlined as rep stosd.
     set_source_files_properties(src/legoland/movie_pool.c PROPERTIES COMPILE_OPTIONS "/Od;/Oi")
 endif()
-set_target_properties(legoland PROPERTIES SUFFIX ".exe")
+if(WIN32 OR NOT LEGOLAND_MODERN_BUILD)
+    set_target_properties(legoland PROPERTIES SUFFIX ".exe")
+endif()

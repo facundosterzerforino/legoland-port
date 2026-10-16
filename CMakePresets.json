@@ -32,6 +32,16 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "linux",
+      "displayName": "Port: clang, 64-bit Linux (phase 8)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-linux",
+      "toolchainFile": "${sourceDir}/cmake/linux.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
@@ -46,6 +56,10 @@
     {
       "name": "clang-cl-x64",
       "configurePreset": "clang-cl-x64"
+    },
+    {
+      "name": "linux",
+      "configurePreset": "linux"
     }
   ]
 }

@@ -52,3 +52,4 @@ permuter_out/
 tools/test_miniwin/*.exe
 tools/music/*.exe
 /dist/
+build-linux/
