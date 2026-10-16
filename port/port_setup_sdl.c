@@ -244,7 +244,9 @@ int PortSetupRun(HINSTANCE instance) {
      * the game: install from it, then remove it (it's the size of the CD) */
     if (FindSource(source) && PortSetupKind(source) == PORT_SETUP_IMAGE) {
         int ok = Install(source);
-        remove(source);
+        if (ok) {
+            remove(source); /* only once it's installed: after a failed install the player needn't choose it again */
+        }
         return ok && PortSetupFindData();
     }
     fprintf(stderr, "LEGOLAND: the game's files aren't installed: choose the CD's image on the page\n");
