@@ -142,7 +142,8 @@ static int OpenImage(Source *s, const char *path, Node *root) {
 
 static int OpenSource(Source *s, const char *path, Node *root) {
     memset(s, 0, sizeof(*s));
-    if (IsFile(path)) {
+    if (IsFile(path) || SDL_strncmp(path, "content://", 10) == 0) {
+        /* (a content:// URI: an Android document, as its file dialog gives; only SDL_IOFromFile opens it) */
         return OpenImage(s, path, root);
     }
     if (!IsFolder(path)) {
@@ -346,9 +347,21 @@ int PortSetupKind(const char *path) {
 }
 
 const char *PortSetupExeFolder(void) {
+#ifdef __ANDROID__
+    /* the app's own folder on the shared storage (Android/data/<package>/files): no permission needed, and a file
+     * manager or a computer over USB can copy into it */
+    static char folder[PATH_SIZE];
+
+    if (folder[0] == '\0') {
+        const char *base = SDL_GetAndroidExternalStoragePath();
+        SDL_snprintf(folder, sizeof(folder), "%s/", base != NULL ? base : ".");
+    }
+    return folder;
+#else
     const char *base = SDL_GetBasePath();
 
     return base != NULL ? base : "./";
+#endif
 }
 
 int PortSetupFindData(void) {

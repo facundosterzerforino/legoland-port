@@ -248,6 +248,21 @@ int PortSetupRun(HINSTANCE instance) {
         }
     }
     for (;;) {
+#ifdef __ANDROID__
+        /* Android's file dialog chooses files, not folders: the CD's image; an installed copy can be copied into the
+         * app's folder instead */
+        static const char *const buttons[] = {"Choose the CD image...", "Quit"};
+        int answer;
+
+        SDL_snprintf(text, sizeof(text),
+            "LEGOLAND needs the game files from its CD. Choose the CD's image (an .iso or .bin file); they'll be put "
+            "in the app's folder:\n%s\n(Or copy an installed LEGOLAND folder's contents there yourself.)",
+            PortSetupExeFolder());
+        answer = Ask(text, buttons, 2);
+        if (answer == 1) {
+            answer = 2;
+        }
+#else
         static const char *const buttons[] = {"Choose ISO...", "Choose folder...", "Quit"};
         int answer;
 
@@ -256,6 +271,7 @@ int PortSetupRun(HINSTANCE instance) {
             "folder where it's copied or installed. They'll be put in the program's folder:\n%s",
             PortSetupExeFolder());
         answer = Ask(text, buttons, 3);
+#endif
         if (answer != 0 && answer != 1) {
             return 0;
         }

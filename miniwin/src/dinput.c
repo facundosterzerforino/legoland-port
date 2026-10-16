@@ -186,8 +186,9 @@ static const struct {
 static unsigned char DikFromSdl[SDL_SCANCODE_COUNT];
 static int table_ready;
 
-/* The keyboard as DirectInput's 256 bytes. */
-static void KeyboardBytes(unsigned char *state) {
+/* The keyboard as DirectInput's 256 bytes; on Android, with latched, a key that went down and up since the last
+ * such read too (the game's reads, one per frame: the on-screen keyboard's taps are shorter). */
+static void KeyboardBytes(unsigned char *state, int latched) {
     int count = 0;
     const bool *keys = SDL_GetKeyboardState(&count);
     int i;
@@ -201,10 +202,22 @@ static void KeyboardBytes(unsigned char *state) {
     }
     memset(state, 0, 256);
     for (i = 0; i < count && i < SDL_SCANCODE_COUNT; i++) {
-        if (keys[i] && DikFromSdl[i] != 0) {
+#ifdef __ANDROID__
+        int down = keys[i] || (latched && MiniwinKeyLatched(i)); /* the on-screen keyboard's taps */
+#else
+        int down = keys[i];
+#endif
+        (void)latched;
+        if (down && DikFromSdl[i] != 0) {
             state[DikFromSdl[i]] = 0x80;
         }
     }
+#ifdef __ANDROID__
+    /* [library:input] the back key (or gesture): Escape, the game's way back */
+    if (state[DikFromSdl[SDL_SCANCODE_AC_BACK]] != 0) {
+        state[0x01] = 0x80;
+    }
+#endif
 }
 
 int MiniwinKeyDown(int dik) {
@@ -213,7 +226,7 @@ int MiniwinKeyDown(int dik) {
     if (dik <= 0 || dik > 255 || !MiniwinHasFocus()) {
         return 0;
     }
-    KeyboardBytes(state);
+    KeyboardBytes(state, 0);
     return state[dik] != 0;
 }
 
@@ -331,7 +344,7 @@ static HRESULT STDMETHODCALLTYPE Device_GetDeviceState(IDirectInputDeviceA *self
             return DIERR_INVALIDPARAM;
         }
         if (MiniwinHasFocus()) {
-            KeyboardBytes((unsigned char *)data);
+            KeyboardBytes((unsigned char *)data, 1);
         } else {
             memset(data, 0, 256);
         }

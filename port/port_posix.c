@@ -2,10 +2,18 @@
  * track of, without its thread (a freeze isn't reported off Windows). And the program's entry point: main calls the
  * game's WinMain, as Windows does. (The setup off Windows: port_setup_sdl.c; the crash report: the game's own,
  * through miniwin/src/posix/seh.c.) */
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+#ifdef __ANDROID__
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include "port_setup.h"
+#endif
+
+#include <SDL3/SDL_main.h> /* Android: main is the SDL_main its Java side calls */
 
 #include "port_watchdog.h"
 
@@ -47,6 +55,14 @@ int main(int argc, char **argv) {
     int result;
 
     PosixThreadSignalStack(); /* the crash report runs on it after a stack overflow (main.c's __except) */
+#ifdef __ANDROID__
+    /* an app starts in /: the game's folder is the app's own (port_setup.c), as the current one is the game's
+     * folder when it's started from it elsewhere */
+    if (chdir(PortSetupExeFolder()) != 0) {
+        mkdir(PortSetupExeFolder(), 0755);
+        chdir(PortSetupExeFolder());
+    }
+#endif
     for (i = 1; i < argc; i++) {
         size += strlen(argv[i]) + 1;
     }

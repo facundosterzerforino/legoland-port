@@ -255,8 +255,11 @@ BOOL TerminateThread(HANDLE handle, DWORD exit_code) {
     }
     pthread_mutex_lock(&posix_objects_lock);
     if (!t->finished) {
+#ifndef __ANDROID__
         /* it stops at its next wait or sleep (a cancellation point), as close as POSIX comes */
         pthread_cancel(t->id);
+#endif
+        /* (Android's C library can't cancel a thread: it runs on, unseen, until the program ends) */
         t->exit_code = exit_code;
         t->finished = 1;
         pthread_cond_broadcast(&posix_objects_changed);

@@ -60,6 +60,9 @@ int MiniwinWindowInactive(void);
  * (bit 0 the primary button, bit 1 the secondary, bit 2 the middle one). */
 unsigned int MiniwinMouseState(int *x, int *y);
 
+/* 1 once if the key (an SDL scancode) went down since the last call: a press too short for two reads of the
+ * keyboard (an on-screen keyboard's) is still seen. */
+int MiniwinKeyLatched(int scancode);
 /* 1 while Caps Lock is on. */
 int MiniwinCapsLock(void);
 

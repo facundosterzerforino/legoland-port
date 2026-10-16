@@ -11,6 +11,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef __ANDROID__
+#include <SDL3/SDL.h>
+#endif
+
 #include "miniwin/files.h"
 #include "posix.h"
 
@@ -528,7 +532,13 @@ DWORD GetModuleFileNameA(HMODULE module, LPSTR out, DWORD size) {
         PosixSetError(ERROR_MOD_NOT_FOUND);
         return 0;
     }
+#ifdef __ANDROID__
+    /* the app's files folder stands for the exe's: what goes next to the exe (the .ini, the trace, the crash
+     * report) goes there, with the game's data (port_setup.c) */
+    n = snprintf(path, sizeof(path), "%s/LEGOLAND", SDL_GetAndroidExternalStoragePath());
+#else
     n = readlink("/proc/self/exe", path, sizeof(path) - 1);
+#endif
     if (n < 0 || size == 0) {
         PosixSetError(ERROR_GEN_FAILURE);
         return 0;

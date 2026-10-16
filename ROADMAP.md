@@ -293,6 +293,12 @@ build after each.
 
 **Done when:** the game installs as an APK and plays on an Android phone or tablet.
 
+Progress: an APK builds (`tools/android/build_apk.sh`: arm64-v8a and x86_64, no Gradle), and `-port-selftest`
+passes on an emulator with the same dumps as Windows (`tools/android/selftest.sh`). The game's folder is the app's
+own (Android/data/<package>/files); the setup installs from the CD's image chosen with Android's file dialog. Touch:
+one finger is the mouse, two the secondary button, three the on-screen keyboard; the back key is Escape. Left: a
+play test on a device.
+
 ## Throughout
 
 - **Merge the decomp regularly** (`git merge main` in `~/wt/port`). Better matches and names flow in. Resolve

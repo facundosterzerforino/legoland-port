@@ -53,3 +53,5 @@ tools/test_miniwin/*.exe
 tools/music/*.exe
 /dist/
 build-linux/
+build-android/
+build-android-*/

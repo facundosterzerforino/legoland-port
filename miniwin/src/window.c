@@ -9,6 +9,8 @@ static SDL_Texture *texture;
 static int texture_width;
 static int texture_height;
 static HWND window_hwnd;
+static int fingers; /* touching the screen now */
+static bool latched[SDL_SCANCODE_COUNT]; /* pressed since the last keyboard read (MiniwinKeyLatched) */
 
 const char *MiniwinError(void) {
     return SDL_GetError();
@@ -69,6 +71,21 @@ void MiniwinPumpEvents(WNDPROC proc) {
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+        case SDL_EVENT_FINGER_DOWN:
+            fingers++;
+            if (fingers == 3 && window != NULL) {
+                /* [library:input] three fingers: the on-screen keyboard, for typing names */
+                if (SDL_TextInputActive(window)) {
+                    SDL_StopTextInput(window);
+                } else {
+                    SDL_StartTextInput(window);
+                }
+            }
+            break;
+        case SDL_EVENT_FINGER_UP:
+        case SDL_EVENT_FINGER_CANCELED:
+            fingers = fingers > 0 ? fingers - 1 : 0;
+            break;
         case SDL_EVENT_WINDOW_FOCUS_LOST:
             proc(window_hwnd, WM_KILLFOCUS, 0, 0);
             break;
@@ -81,6 +98,9 @@ void MiniwinPumpEvents(WNDPROC proc) {
             break;
         }
         case SDL_EVENT_KEY_DOWN:
+            if (event.key.scancode < SDL_SCANCODE_COUNT) {
+                latched[event.key.scancode] = true;
+            }
             if (event.key.key == SDLK_BACKSPACE) {
                 proc(window_hwnd, WM_CHAR, 8, 0);
             }
@@ -123,6 +143,10 @@ unsigned int MiniwinMouseState(int *x, int *y) {
     if (y != NULL) {
         *y = (int)(fy * density);
     }
+    if (fingers >= 2) {
+        /* [library:input] two fingers on a touch screen: the secondary button */
+        return 2;
+    }
     if ((flags & SDL_BUTTON_LMASK) != 0) {
         buttons |= 1;
     }
@@ -133,6 +157,17 @@ unsigned int MiniwinMouseState(int *x, int *y) {
         buttons |= 4;
     }
     return buttons;
+}
+
+int MiniwinKeyLatched(int scancode) {
+    int was;
+
+    if (scancode < 0 || scancode >= SDL_SCANCODE_COUNT) {
+        return 0;
+    }
+    was = latched[scancode];
+    latched[scancode] = false;
+    return was;
 }
 
 int MiniwinCapsLock(void) {

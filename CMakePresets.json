@@ -42,6 +42,16 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "android",
+      "displayName": "Port: Android arm64 with the NDK (phase 9)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-android",
+      "toolchainFile": "${sourceDir}/cmake/android.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
@@ -60,6 +70,10 @@
     {
       "name": "linux",
       "configurePreset": "linux"
+    },
+    {
+      "name": "android",
+      "configurePreset": "android"
     }
   ]
 }
