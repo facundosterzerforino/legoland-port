@@ -57,6 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (save_report != NULL) {
             save_problems = PortSaveSelfTest(save_report);
             save_problems += PortMovieSelfTest(save_report); /* [library:movie] port/port_movie.h */
+            save_problems += MiniwinMusicSelfTest(save_report); /* [library:music] miniwin/dmusic.h */
             fclose(save_report);
         }
         return PortDataSelfTest("port-selftest.txt", sdl_problems + res_problems + save_problems);

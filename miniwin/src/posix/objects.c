@@ -301,6 +301,14 @@ static void Acquire(struct PosixObject *o) {
     }
 }
 
+/* A thread TerminateThread cancels while it waits (pthread_cond_wait, a cancellation point) holds the lock again
+ * when it goes: let go of it then, or every other thread's next wait, CreateThread... blocks forever (the music
+ * thread, terminated by ShutDownDirectMusic at the game's end). */
+static void UnlockObjects(void *unused) {
+    (void)unused;
+    pthread_mutex_unlock(&posix_objects_lock);
+}
+
 DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, DWORD milliseconds) {
     struct timespec deadline;
     DWORD i;
@@ -329,6 +337,7 @@ DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, 
         }
     }
     pthread_mutex_lock(&posix_objects_lock);
+    pthread_cleanup_push(UnlockObjects, NULL);
     for (;;) {
         int timed_out;
 
@@ -378,7 +387,7 @@ DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, 
             milliseconds = 0; /* one last look, then WAIT_TIMEOUT */
         }
     }
-    pthread_mutex_unlock(&posix_objects_lock);
+    pthread_cleanup_pop(1); /* the unlock */
     return result;
 }
 

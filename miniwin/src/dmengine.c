@@ -813,6 +813,31 @@ int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls) {
 #endif
 }
 
+double Dme_timeFluidSynthLoad(const char *gm_dls) {
+#ifdef DME_FLUIDSYNTH
+    struct timespec t0;
+    struct timespec t1;
+    fluid_settings_t *settings = new_fluid_settings();
+    fluid_synth_t *fluid;
+    int font;
+
+    timespec_get(&t0, TIME_UTC);
+    fluid = settings != NULL ? new_fluid_synth(settings) : NULL;
+    font = fluid != NULL ? fluid_synth_sfload(fluid, gm_dls, 0) : -1;
+    timespec_get(&t1, TIME_UTC);
+    if (fluid != NULL) {
+        delete_fluid_synth(fluid);
+    }
+    if (settings != NULL) {
+        delete_fluid_settings(settings);
+    }
+    return font < 0 ? -1.0 : (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1000000.0;
+#else
+    (void)gm_dls;
+    return -1.0;
+#endif
+}
+
 void Dme_destroy(DmeEngine *e) {
     if (e == NULL) {
         return;

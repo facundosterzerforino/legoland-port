@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "miniwin/files.h"
 #include "../src/legoland/binv.h"
 #include "../src/legoland/castle.h"
 #include "../src/legoland/globals.h"
@@ -15,8 +14,11 @@
 #include "../src/legoland/man3d.h"
 #include "../src/legoland/movie_pool.h"
 #include "../src/legoland/obj_instance.h"
+#include "../src/legoland/profile_io.h"
 #include "../src/legoland/resource.h"
+#include "../src/legoland/sound_sfx.h"
 #include "../src/legoland/string.h"
+#include "miniwin/files.h"
 #include "port_language.h"
 #include "port_res.h"
 #include "port_x86.h"
@@ -269,6 +271,146 @@ static int PortResCheckMeshes(FILE *dump) {
     return c.files;
 }
 
+/* The sound effects: every wave file in the volumes' sfx\ made into a sample as the game makes them
+ * (CreateSampleFromWAV: the volumes, the ACM's conversion to PCM, a DirectSound buffer), then deleted. */
+static int PortResSfxLoaded;
+static int PortResSfxWaves;
+
+/* a wave file's format, for the report: "tag 2, 1 ch, 22050 Hz, 4 bits, block 512, 12345 data bytes" */
+static void PortResWaveFormat(const char *path, char *out, size_t size) {
+    struct ResFile *file = RES_OpenFile(path);
+    unsigned int chunk[2];
+    unsigned char fmt[16];
+    int have_fmt = 0;
+
+    snprintf(out, size, "no RIFF/WAVE header");
+    if (file == NULL) {
+        snprintf(out, size, "can't open");
+        return;
+    }
+    if (RES_ReadFile(file, chunk, 8) == 8 && chunk[0] == 0x46464952 && RES_ReadFile(file, chunk, 4) == 4 &&
+        chunk[0] == 0x45564157) {
+        while (RES_ReadFile(file, chunk, 8) == 8) {
+            if (chunk[0] == 0x20746d66 && chunk[1] >= 16) {
+                unsigned int rest = chunk[1] - 16;
+                char skip[64];
+
+                if (RES_ReadFile(file, fmt, 16) != 16) {
+                    break;
+                }
+                have_fmt = 1;
+                while (rest > 0) {
+                    unsigned int n = rest < sizeof(skip) ? rest : sizeof(skip);
+                    RES_ReadFile(file, skip, n);
+                    rest -= n;
+                }
+            } else if (chunk[0] == 0x61746164) {
+                if (have_fmt) {
+                    snprintf(out, size, "tag %u, %u ch, %u Hz, %u bits, block %u, %u data bytes",
+                        fmt[0] | fmt[1] << 8, fmt[2] | fmt[3] << 8,
+                        (unsigned int)(fmt[4] | fmt[5] << 8 | fmt[6] << 16 | (unsigned int)fmt[7] << 24),
+                        fmt[14] | fmt[15] << 8, fmt[12] | fmt[13] << 8, chunk[1]);
+                }
+                break;
+            } else {
+                char skip[256];
+                unsigned int rest = chunk[1] + (chunk[1] & 1);
+
+                while (rest > 0) {
+                    unsigned int n = rest < sizeof(skip) ? rest : sizeof(skip);
+                    if (RES_ReadFile(file, skip, n) != (int)n) {
+                        rest = 0;
+                        break;
+                    }
+                    rest -= n;
+                }
+            }
+        }
+    }
+    RES_CloseFile(file);
+}
+
+static void PortResCheckSfx(const char *name, void *ctx) {
+    char path[MAX_PATH];
+    char format[160];
+    struct Sample *sample;
+    size_t len = strlen(name);
+
+    (void)ctx;
+    if (len < 4 || _stricmp(name + len - 4, ".wav") != 0) {
+        return; /* not a wave file (sfx\ also has the pirates' song, a .pk) */
+    }
+    sprintf(path, ".\\sfx\\%s", name);
+    PortResSfxWaves++;
+    sample = CreateSampleFromWAV(path);
+    if (sample != NULL) {
+        PortResSfxLoaded++;
+        DeleteSampleDef(sample);
+    } else {
+        PortResWaveFormat(path, format, sizeof(format));
+        fprintf(PortResReport, "sfx %s: doesn't load (%s)\n", name, format);
+        PortResProblems++;
+    }
+}
+
+static void PortResCheckSounds(void) {
+    int files;
+
+#ifdef LEGOLAND_WEB_NODE
+    fprintf(PortResReport, "sfx: Node.js plays no sound, not checked\n");
+    return;
+#endif
+    if (SoundAvailable == 0 && InitDirectSound(NULL) == 0) {
+        fprintf(PortResReport, "sfx: no sound device, not checked\n");
+        return;
+    }
+    PortResSfxLoaded = 0;
+    PortResSfxWaves = 0;
+    files = PortResForEachFile("sfx\\", PortResCheckSfx, NULL);
+    if (files < 0) {
+        fprintf(PortResReport, "sfx: no sfx directory\n");
+        PortResProblems++;
+        return;
+    }
+    fprintf(PortResReport, "sfx: %d of %d wave files made into samples\n", PortResSfxLoaded, PortResSfxWaves);
+}
+
+/* The music thread's start, timed: the game's own (StartMusicThread: DirectMusic's objects, the styles and segments
+ * from imusic\, the synthesizer's instruments, the downloads), as at boot, where the game waits for it after the
+ * logo movie. Then shut down. No sound device: not checked. */
+static void PortResCheckMusicStart(void) {
+    DWORD start;
+    DWORD took;
+
+#ifdef LEGOLAND_WEB_NODE
+    fprintf(PortResReport, "music thread: Node.js plays no sound, not checked\n");
+    return;
+#endif
+    if (SoundAvailable == 0) {
+        fprintf(PortResReport, "music thread: no sound device, not checked\n");
+        return;
+    }
+    MusicEnabled = 1;
+    DAT_007988bc = 0;
+    start = GetTickCount();
+    StartMusicThread(NULL);
+    while (DAT_007988bc == 0 && GetTickCount() - start < 120000) {
+        Sleep(20);
+    }
+    took = GetTickCount() - start;
+    if (DAT_007988bc == 0) {
+        fprintf(PortResReport, "music thread: not started after %lu ms\n", (unsigned long)took);
+        PortResProblems++;
+        return;
+    }
+    fprintf(PortResReport, "music thread: started in %lu ms (DirectMusic %s)\n", (unsigned long)took,
+        DMusicInitialised != 0 ? "ready" : "failed");
+    if (DMusicInitialised == 0) {
+        PortResProblems++;
+    }
+    ShutDownDirectMusic();
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -333,6 +475,8 @@ int PortResSelfTest(const char *path) {
             fclose(mesh);
         }
     }
+    PortResCheckSounds();
+    PortResCheckMusicStart();
     if (PortResDump != NULL) {
         fclose(PortResDump);
     }

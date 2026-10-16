@@ -652,6 +652,12 @@ HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKN
     if (stream == NULL) {
         SDL_AudioSpec spec;
 
+#ifdef LEGOLAND_WEB_BROWSER
+        /* in a browser the mixer runs on the page's thread, between the game's work: blocks of 4096 frames (about 85
+         * ms) instead of SDL's 1024, so a busy frame doesn't make the sound late (each late block put it further
+         * behind the movie, which then stuttered as it resynced) */
+        SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, "4096");
+#endif
         if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
             return DSERR_NODRIVER;
         }

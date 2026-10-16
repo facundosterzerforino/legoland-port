@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "_Internal.h"
 #include "miniwin/dmengine.h"
@@ -108,6 +109,63 @@ static int GmDlsPath(char *path, size_t size) {
  * the first *.sf2: the Linux and web releases bring GeneralUser GS), else (Linux) the distribution's, else (Android)
  * the APK's GeneralUser GS. Windows always has gm.dls; elsewhere it can be copied from a Windows PC into the data
  * folder, which sounds as the original. */
+static int SynthFontPath(char *path, size_t size);
+
+static char selftest_font[MAX_PATH * 2];
+static double selftest_load_ms;
+static double selftest_read_ms;
+static long selftest_bytes;
+
+static DWORD WINAPI SelfTestFontThread(LPVOID unused) {
+    static char chunk[1 << 20];
+    struct timespec t0;
+    struct timespec t1;
+    FILE *f;
+    size_t n;
+
+    (void)unused;
+    timespec_get(&t0, TIME_UTC);
+    f = MiniwinFopen(selftest_font, "rb");
+    selftest_bytes = 0;
+    while (f != NULL && (n = fread(chunk, 1, sizeof(chunk), f)) > 0) {
+        selftest_bytes += (long)n;
+    }
+    if (f != NULL) {
+        fclose(f);
+    }
+    timespec_get(&t1, TIME_UTC);
+    selftest_read_ms = (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1000000.0;
+    selftest_load_ms = Dme_timeFluidSynthLoad(selftest_font);
+    return 0;
+}
+
+int MiniwinMusicSelfTest(FILE *report) {
+    HANDLE thread;
+
+#ifdef LEGOLAND_WEB_NODE
+    fprintf(report, "music: Node.js plays no sound, not checked\n");
+    return 0;
+#endif
+    if (!SynthFontPath(selftest_font, sizeof(selftest_font))) {
+        fprintf(report, "music: no gm.dls or SoundFont (dmusic's own synthesizer plays)\n");
+        return 0;
+    }
+    thread = CreateThread(NULL, 0, SelfTestFontThread, NULL, 0, NULL);
+    if (thread == NULL) {
+        fprintf(report, "music: no thread for the instruments\n");
+        return 1;
+    }
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+    fprintf(report, "music: the instruments, %s (%ld bytes): read whole in %.0f ms, loaded by FluidSynth in %.0f ms\n",
+        selftest_font, selftest_bytes, selftest_read_ms, selftest_load_ms);
+    if (selftest_load_ms < 0) {
+        fprintf(report, "music: %s doesn't load\n", selftest_font);
+        return 1;
+    }
+    return 0;
+}
+
 static int SynthFontPath(char *path, size_t size) {
     static const char *const system_fonts[] = {"/usr/share/sounds/sf2/FluidR3_GM.sf2",
         "/usr/share/sounds/sf2/default-GM.sf2", "/usr/share/soundfonts/default.sf2", "/usr/share/soundfonts/FluidR3_GM.sf2",

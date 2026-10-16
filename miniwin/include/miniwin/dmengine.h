@@ -44,6 +44,9 @@ DmeEngine *Dme_create(DmLoader *loader, unsigned int rate);
 /* Plays through FluidSynth on this gm.dls (DLS read by FluidSynth itself, by Microsoft's rules) instead of dmusic's
  * synthesizer, when built with it (DME_FLUIDSYNTH); 0 when it can't (then dmusic's plays). */
 int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls);
+/* -port-selftest: loads this gm.dls or SoundFont into a FluidSynth of its own, as Dme_useFluidSynth does, and frees
+ * it. The milliseconds it took, or -1 when it doesn't load (or there's no FluidSynth). */
+double Dme_timeFluidSynthLoad(const char *gm_dls);
 void Dme_destroy(DmeEngine *e);
 
 /* Loads the segment's instruments and styles (DirectMusic's GUID_Download). */
