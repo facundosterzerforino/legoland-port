@@ -5,6 +5,9 @@
 #include <SDL3/SDL.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef LEGOLAND_WEB_BROWSER
+#include <emscripten.h>
+#endif
 
 #include "port_setup.h"
 #include "port_setup_win.h"
@@ -189,6 +192,10 @@ static void Report(void *ctx, unsigned long long done, unsigned long long total,
     bar.w = total > 0 ? (float)(440.0 * (double)done / (double)total) : 0;
     SDL_RenderFillRect(p->renderer, &bar);
     SDL_RenderPresent(p->renderer);
+#ifdef LEGOLAND_WEB_BROWSER
+    /* the install runs on the page's thread: give the page its turn, so that it shows the bar (ASYNCIFY) */
+    emscripten_sleep(0);
+#endif
 }
 
 static int Cancelled(void *ctx) {
