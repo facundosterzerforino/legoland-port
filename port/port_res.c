@@ -14,7 +14,10 @@
 #include "../src/legoland/man3d.h"
 #include "../src/legoland/movie_pool.h"
 #include "../src/legoland/obj_instance.h"
+#include "../src/legoland/print_sprite.h"
 #include "../src/legoland/profile_io.h"
+#include "../src/legoland/render.h"
+#include "../src/legoland/render3d.h"
 #include "../src/legoland/resource.h"
 #include "../src/legoland/sound_sfx.h"
 #include "../src/legoland/string.h"
@@ -412,6 +415,120 @@ static void PortResCheckMusicStart(void) {
     ShutDownDirectMusic();
 }
 
+/* The people as the game draws them, to port-selftest-people.txt (the same as Windows' on every target): InitMan's
+ * meshes and textures loaded (the display's pixel format as InitScreen leaves it: 16-bit, 5-6-5), each texture's
+ * pixels and colour ramps checksummed, and a gardener's and a mechanic's faces as FUN_00442580 colours them: their
+ * flags, solid colours and ramps. */
+struct PortResRamp {
+    int count;
+    unsigned short *data; /* render.c's struct TextureFrame */
+};
+
+struct PortResMesh {
+    int count;
+    struct MeshElem *elems;
+    struct PersonFace *faces; /* man3d.c's struct Mesh */
+};
+
+static unsigned int PortResFnv(const void *data, size_t size, unsigned int h) {
+    const unsigned char *p = (const unsigned char *)data;
+    size_t i;
+
+    for (i = 0; i < size; i++) {
+        h = (h ^ p[i]) * 16777619u;
+    }
+    return h;
+}
+
+static unsigned int PortResRampHash(const void *ramp) {
+    const struct PortResRamp *r = (const struct PortResRamp *)ramp;
+
+    return r == NULL || r->data == NULL ? 0 : PortResFnv(r->data, (size_t)r->count * 2, 2166136261u);
+}
+
+static void PortResDumpTextures(FILE *out, const char *who, struct LocFile *loc) {
+    int i;
+
+    if (loc == NULL) {
+        fprintf(out, "%s: no textures\n", who);
+        return;
+    }
+    for (i = 0; i < loc->count; i++) {
+        struct TextureNode *t = (struct TextureNode *)DAT_00798190[loc->texture_base + i];
+        unsigned int ramps = 2166136261u;
+        int k;
+
+        if (t == NULL) {
+            fprintf(out, "%s texture %d: none\n", who, i);
+            continue;
+        }
+        for (k = 0; k < 0x101; k++) {
+            unsigned int h = PortResRampHash(t->data_c[k]);
+
+            ramps = PortResFnv(&h, sizeof(h), PortResFnv(&k, sizeof(k), ramps));
+        }
+        fprintf(out, "%s texture %d: %dx%d pixels %08x ramps %08x\n", who, i, t->width_m1 + 1, t->height_m1 + 1,
+            PortResFnv(t->data_8, (size_t)(t->width_m1 + 1) * (t->height_m1 + 1), 2166136261u), ramps);
+    }
+}
+
+static void PortResDumpFaces(FILE *out, const char *who, int character, struct LocFile *loc, void *mesh) {
+    struct PortResMesh *m = (struct PortResMesh *)mesh;
+    struct Person person;
+    struct PersonFace *faces;
+    unsigned int count;
+    unsigned int i;
+
+    if (m == NULL || m->elems == NULL || m->elems->shared == NULL) {
+        fprintf(out, "%s: no mesh\n", who);
+        return;
+    }
+    memset(&person, 0, sizeof(person));
+    person.character = character;
+    count = (unsigned int)m->elems->shared->count;
+    faces = (struct PersonFace *)FUN_00442580(&person, loc, m->faces, count, 0);
+    if (faces == NULL) {
+        fprintf(out, "%s: no faces\n", who);
+        return;
+    }
+    for (i = 0; i < count; i++) {
+        struct PersonFace *f = &faces[i];
+
+        if ((f->flags & 0x2000) != 0) {
+            const struct PortResRamp *r = (const struct PortResRamp *)f->ramp;
+
+            fprintf(out, "%s face %u: flags %08x colour %02x %02x %02x ramp %08x (%04x %04x %04x)\n", who, i, f->flags,
+                f->b0, f->b1, f->b2, PortResRampHash(f->ramp), r != NULL && r->data != NULL ? r->data[8] : 0,
+                r != NULL && r->data != NULL ? r->data[32] : 0, r != NULL && r->data != NULL ? r->data[56] : 0);
+        } else {
+            fprintf(out, "%s face %u: flags %08x colour %02x %02x %02x cell %d\n", who, i, f->flags, f->b0, f->b1, f->b2,
+                f->cell);
+        }
+    }
+    free(faces);
+}
+
+static void PortResCheckPeople(void) {
+    FILE *out = fopen("port-selftest-people.txt", "w");
+
+    if (out == NULL) {
+        return;
+    }
+    DisplayPixelFormat = 2; /* InitScreen's: 16-bit, 5-6-5 */
+    InitMan();
+    /* the colour table the ramps are made from (FUN_004860f0), and what it's made from */
+    fprintf(out, "colours: green bits %u, constants %g %g, ColorLut[128] %04x %04x %04x, [255] %04x %04x %04x\n",
+        *(unsigned int *)&DAT_007cb5e0, FLOAT_004ab550, FLOAT_004ab444, ColorLut[128].shifted, ColorLut[128].scaled,
+        ColorLut[128].value, ColorLut[255].shifted, ColorLut[255].scaled, ColorLut[255].value);
+    PortResDumpTextures(out, "visitor", VisitorLocData);
+    PortResDumpTextures(out, "gardener", GeoffLocData);
+    PortResDumpTextures(out, "mechanic", TracyLocData);
+    PortResDumpFaces(out, "gardener", 2, GeoffLocData, GeoffMeshes[0]);
+    PortResDumpFaces(out, "mechanic", 3, TracyLocData, TracyWalkMesh);
+    fclose(out);
+    fprintf(PortResReport, "people: textures and faces in port-selftest-people.txt\n");
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -479,6 +596,7 @@ int PortResSelfTest(const char *path) {
     }
     /* the time the volumes took to read (small reads, as the game makes them: a browser's storage is slow at those) */
     fprintf(PortResReport, "resources: read in %lu ms\n", (unsigned long)(GetTickCount() - PortResStart));
+    PortResCheckPeople();
     PortResCheckSounds();
     PortResCheckMusicStart();
     if (PortResDump != NULL) {
