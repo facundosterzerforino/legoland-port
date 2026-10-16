@@ -1,7 +1,8 @@
-# legoland — Windows 11 port
+# legoland — the LEGOLAND port
 
-This repository turns the LEGOLAND decompilation into a **game that runs natively on modern Windows 11**.
-You supply your own copy of the 1999 game; the port uses its files and does not ship any game data.
+This repository turns the LEGOLAND decompilation into a **game that runs natively on Windows 11, Linux, Android and
+in web browsers**. You supply your own copy of the 1999 game; the port uses its files and does not ship any game
+data.
 
 It is built on the **matching decompilation**
 ([facundosterzerforino/legoland](https://github.com/facundosterzerforino/legoland)), which recreates `legoland.exe` as C that
@@ -15,8 +16,28 @@ modern Windows support.
 | | |
 |---|---|
 | Decompiled code (from `main`) | 94.0% reccmp progress; every pure-C function decompiled, 97% average similarity |
-| Runs on Windows 11 | **yes**: played start to finish (phase 4); on SDL3 with its own sound, movies and music (phases 5-6); the first release is phase 7 |
+| Runs on Windows 11 | **yes**: played start to finish (phase 4); on SDL3 with its own sound, movies and music (phases 5-6); released since phase 7; 32- and 64-bit |
+| Runs on Linux | **builds and passes its checks** (phase 8): `-port-selftest` with the Windows build's results, the setup, the music, the text; not play-tested yet |
+| Runs on Android | **builds and passes its checks** (phase 9): `-port-selftest` on an emulator with the Windows build's results; not play-tested on a device yet |
+| Runs in a browser | **builds and passes its checks** (phase 10): `-port-selftest` in Chromium with the 32-bit Windows build's results; not play-tested yet |
 | Hand-written assembly | **done**: all 44 inline-asm functions are plain C (phase 1 of `ROADMAP.md`) |
+
+## Releases
+
+Each release is the program only; the first start installs the game from your LEGOLAND CD (or its image: an .iso or
+.bin), in any of its languages. `tools/release/make_release.py all` makes them in `dist/`, each with a README:
+
+| Platform | File | Runs on |
+|---|---|---|
+| Windows | `LEGOLAND-port-windows-<version>.zip` | Windows 10 and 11. Unzip, start `LEGOLAND-port.exe`. |
+| Linux | `LEGOLAND-port-linux-x86_64-<version>.tar.gz` | 64-bit Linux with glibc 2.31 or later (Ubuntu 20.04, Debian 11, Fedora 32 and later), X11 or Wayland. Unpack, start `legoland`. |
+| Android | `LEGOLAND-port-android-<version>.apk` | Android 7.0 and later, ARM or x86 64-bit. Install the APK, choose the CD image on the first start. |
+| Web | `LEGOLAND-port-web-<version>.zip` | A website: put its files on any web server (HTTPS) and open `index.html`; recent Chrome, Edge, Firefox, Safari 17+. The game's files stay in the browser's storage for the site. |
+
+Off Windows the music needs General MIDI instruments, which Windows has and the others don't: copy `gm.dls` from a
+Windows PC (`C:\Windows\System32\drivers\gm.dls`) into the game's folder for the original sound, or use a General MIDI
+SoundFont (an `.sf2` file; on Linux, your distribution's `fluid-soundfont-gm`). The web page and the Android app take
+it as a file in the game's folder too.
 
 ## Goal and approach
 
@@ -40,7 +61,8 @@ once the hand-written assembly is plain C, showing a frame on any platform is a 
 3. **Title screen.** `miniwin` + SDL3: window, 2D video, input and timers on Windows 11.
 4. **Playable.** Sound, then movies and music, then every screen, saving and loading.
 5. **64-bit and other systems.** x64 Windows with no pointer-size warnings, then Linux, then Android (touch
-   input, choosing the data folder).
+   input, choosing the data folder), then the web. All four build and pass their checks; Linux, Android and the web
+   wait for their first play tests.
 
 ## Building
 
@@ -76,7 +98,34 @@ cmake --build build      # -> build/legoland.exe
 ./tools/verify           # still useful: shows which functions a port change touched
 ```
 
-More presets (x64, Linux, Android) come with later milestones.
+### The other platforms
+
+All from Linux (WSL works):
+
+```sh
+cmake --preset clang-cl-x64 && cmake --build build-clang-x64        # 64-bit Windows
+cmake --preset linux && cmake --build build-linux                   # Linux, with the host's clang
+cmake --preset linux-portable && cmake --build build-linux-portable # the Linux release: glibc 2.31+, Zig's clang
+tools/android/build_apk.sh                                          # Android: build-android/LEGOLAND-port.apk
+cmake --preset web && cmake --build build-web                       # the web: legoland.html/.js/.wasm (Emscripten)
+cmake --preset web-node && cmake --build build-web-node             # the same for Node.js (-port-selftest)
+```
+
+- **Linux** needs SDL3's build dependencies for its video and sound backends (Debian/Ubuntu: `libx11-dev
+  libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev
+  wayland-protocols libasound2-dev libpulse-dev libpipewire-0.3-dev libdecor-0-dev`). Off Windows, `<windows.h>` and
+  the DirectX headers are `miniwin/include/win32/`, generated from the SDK (`tools/linux/gen_win32.py`), and the
+  Win32 functions the game calls are `miniwin/src/posix/`. The release build uses [Zig](https://ziglang.org)'s clang
+  (`~/zig/zig`, or `ZIG`) to link against an old glibc.
+- **Android** needs the Android SDK in `~/android-sdk` (`ANDROID_HOME`): build-tools 35.0.0, platform 35, an NDK
+  (r27), and a JDK 17. No Gradle: `tools/android/build_apk.sh` compiles SDL's Java side and packs the APK, signed
+  with a key of the machine's (`~/.android/legoland-port.keystore`, made on the first build). `tools/android/selftest.sh`
+  runs `-port-selftest` on an emulator.
+- **The web** needs the [Emscripten SDK](https://emscripten.org) in `~/emsdk` (`EMSDK`). `tools/web/pagetest.py`
+  checks the page in headless Chromium and runs `-port-selftest` there. See `port/web/README.md`.
+
+Each platform's `-port-selftest` reads the game's resources, files and meshes and writes dumps that must be identical
+to the Windows build's (on Android in the app's folder, on the web in the page's storage).
 
 ## You need your own game
 
@@ -86,9 +135,14 @@ startup data from is the one exception, and the port doesn't need it at runtime)
 
 The data folder is the folder the game starts in, or the exe's own folder. When neither has the data, the first
 start shows a setup window: it finds the LEGOLAND CD in a CD drive (a mounted ISO image counts: double-click it), or
-takes a folder with a copy of the CD or an installed LEGOLAND, and copies the files next to the exe (about 400 MB:
-it unpacks the CD's `main.z` and copies `FMV`, `speech` and `volumes`; from an install, everything, saves
-included). See `port/port_setup.h`.
+takes an ISO image, a folder with a copy of the CD or an installed LEGOLAND, and copies the files next to the exe
+(about 400 MB: it unpacks the CD's `main.z` and copies `FMV`, `speech` and `volumes`; from an install, everything,
+saves included). See `port/port_setup.h`.
+
+On Linux the setup finds an image next to the program or a mounted CD by itself, or asks with the desktop's file
+dialog (`port/port_setup_sdl.c`); on Android the data folder is the app's own (`Android/data/<package>/files`,
+reachable over USB), filled from a CD image chosen with Android's file picker; on the web it's the browser's private
+storage for the site, filled from the image the page asks for.
 
 ## Resolution and window mode
 
@@ -104,7 +158,9 @@ The game still draws its 640x480, 16-bit picture and the port scales it up with 
 1920x1440 are exact 2x and 3x) and converts it to the screen's colours, with black bars on screens that aren't 4:3.
 Nothing about the game changes.
 
-The choice is saved next to the exe (`legoland-port.ini`). "Don't show this again" skips the launcher; hold
+The choice is saved next to the exe (`LEGOLAND-port.ini`). The launcher is a Windows window: on Linux, Android
+and the web the game starts full screen at the screen's resolution, and the command line (or the .ini) chooses
+otherwise. "Don't show this again" skips the launcher; hold
 Shift while starting the game to see it again. Command line: `-fullscreen` (desktop resolution), `-res 1024x768`
 (full screen in that mode), `-windowed` (or the original `WINDEBUG`) choose without the launcher, `-launcher`
 always shows it.
@@ -145,7 +201,10 @@ These are new in the port and off unless you turn them on (`extensions/`):
 
 ## Third-party code
 
-Built into the port, each under its own license: [SDL3](https://www.libsdl.org/) (zlib), FFmpeg's Indeo decoders
-(`port/ffmpeg/`, LGPL-2.1+), [GothicKit dmusic](https://github.com/GothicKit/dmusic) with TinySoundFont (`port/dmusic/`,
-MIT) and [FluidSynth](https://www.fluidsynth.org/) (LGPL-2.1+, downloaded and built from its pinned release). The
-LGPL parts can be replaced: this repository has everything needed to rebuild the exe with another version of them.
+Built into the port, each under its own license: [SDL3](https://www.libsdl.org/) (zlib), FFmpeg's Indeo and Cinepak
+decoders (`port/ffmpeg/`, LGPL-2.1+), [GothicKit dmusic](https://github.com/GothicKit/dmusic) with TinySoundFont
+(`port/dmusic/`, MIT), [FluidSynth](https://www.fluidsynth.org/) (LGPL-2.1+, downloaded and built from its pinned
+release), zlib's blast and puff (`port/blast/`, `port/puff/`, zlib); off Windows
+[stb_truetype](https://github.com/nothings/stb) (`port/stb/`, public domain or MIT), and on the web
+[coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (`port/web/`, MIT). The LGPL parts can be replaced:
+this repository has everything needed to rebuild the program with another version of them.
