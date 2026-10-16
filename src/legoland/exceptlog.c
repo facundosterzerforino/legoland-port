@@ -1,6 +1,6 @@
 #include "exceptlog.h"
-#if defined(LEGOLAND_PORT) && defined(_WIN64)
-/* [port] 64-bit: the report shows the x64 registers under the original's names (their low 32 bits, as it prints
+#if defined(LEGOLAND_PORT) && (defined(_WIN64) || defined(__LP64__))
+/* [port] 64-bit (the CONTEXT is x64's, on Linux too): the report shows the x64 registers under the original's names (their low 32 bits, as it prints
  * them; the port's own lines below print the full stack pointer's words) */
 #define Eip Rip
 #define Esp Rsp

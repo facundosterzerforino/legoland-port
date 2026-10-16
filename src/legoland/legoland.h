@@ -25,7 +25,7 @@ typedef union TileId {
 
 /* Windows' ACMSTREAMHEADER (msacm.h): its user fields are pointer-sized and its driver area is 15 dwords on 64-bit
  * Windows; the ACM checks cbStruct against that size. */
-#ifdef _WIN64
+#if defined(_WIN64) || defined(__LP64__)
 #define ACM_DRV_RESERVED 15
 #else
 #define ACM_DRV_RESERVED 10

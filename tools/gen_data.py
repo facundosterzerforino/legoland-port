@@ -556,7 +556,7 @@ out.append(r"""
 void PortLoadData(void) {
     unsigned int i;
 
-#if !defined(_WIN64)
+#if !defined(_WIN64) && !defined(__LP64__)
     /* 1. patch the pointer slots in the copy (on 64-bit, an 8-byte pointer doesn't fit a 4-byte slot: the typed
        loaders resolve each pointer they need instead) */
     for (i = 0; i < sizeof(port_fixups) / sizeof(port_fixups[0]); i++) {

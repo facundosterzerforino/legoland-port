@@ -21,7 +21,7 @@ typedef struct SampleSource SampleSource;
 struct TileSampleSource {
     /* 0x00 */ unsigned int type;
     /* 0x04 */ unsigned int : 32;
-#if defined(LEGOLAND_PORT) && defined(_WIN64)
+#if defined(LEGOLAND_PORT) && (defined(_WIN64) || defined(__LP64__))
     /* [port] struct SampleSource's source pointer is 8 bytes on 64 bits: x and y follow it at 0x10 */
     unsigned int : 32;
     unsigned int : 32;
