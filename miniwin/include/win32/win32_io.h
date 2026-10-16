@@ -9,6 +9,8 @@
 /* the records, forward-declared */
 struct _finddata64i32_t;
 
+#define _A_RDONLY 0x01
+#define _A_SUBDIR 0x10
 int _close(int _FileHandle);
 int _filelength(int _FileHandle);
 int _findclose(intptr_t _FindHandle);
