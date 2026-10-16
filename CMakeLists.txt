@@ -204,7 +204,7 @@ if(LEGOLAND_MODERN_BUILD)
                 # a browser: the game's loop yields to the page each frame (ASYNCIFY), its files are in the origin's
                 # private storage (WASMFS on OPFS), the page is port/web/shell.html
                 target_link_options(legoland PRIVATE -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=1048576 -sWASMFS=1
-                    -sFORCE_FILESYSTEM=1 -sENVIRONMENT=web,worker "-sEXPORTED_RUNTIME_METHODS=['callMain']"
+                    -sFORCE_FILESYSTEM=1 -sENVIRONMENT=web,worker "-sEXPORTED_RUNTIME_METHODS=['callMain','FS']"
                     "--shell-file=${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html")
                 set_property(TARGET legoland APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html")
                 # the page's helper, next to it (port/web/README.md)

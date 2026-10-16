@@ -122,7 +122,7 @@ def main():
                 return names.length; }''')
             print("the installed game copied into the site's storage: %d files" % count)
             page.evaluate("window.selftestDone = false; Module.onExit = () => { window.selftestDone = true; }; "
-                          "Module.callMain(['-port-selftest'])")
+                          "window.startGame(['-port-selftest'])")
             page.wait_for_function('window.selftestDone', timeout=900000)
             files = page.evaluate('''async () => {
                 const root = await navigator.storage.getDirectory();

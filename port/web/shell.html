@@ -187,6 +187,38 @@
     }
   }
 
+  /* The music's files (IMusic: 243 files, 3 MB) into the page's memory before the game starts (/imusic-mem, which
+     miniwin/src/files.c reads them from): the game's music thread opens each of them, and an open in the site's
+     storage from the game's threads takes tens of milliseconds, while the game waits for its music; here they're
+     read all at once. */
+  async function musicIntoMemory() {
+    try {
+      const folder = await gameFolder(false);
+      let music = null;
+      for await (const [name, handle] of folder.entries()) {
+        if (handle.kind === 'directory' && name.toLowerCase() === 'imusic') music = handle;
+      }
+      if (!music) return;
+      const files = [];
+      for await (const [name, handle] of music.entries()) {
+        if (handle.kind === 'file') files.push([name, handle]);
+      }
+      const data = await Promise.all(files.map(async ([name, handle]) =>
+        [name, new Uint8Array(await (await handle.getFile()).arrayBuffer())]));
+      Module.FS.mkdir('/imusic-mem');
+      for (const [name, bytes] of data) Module.FS.writeFile('/imusic-mem/' + name, bytes);
+    } catch (e) {
+      console.warn('the music is read from the site\'s storage: ' + e);
+    }
+  }
+
+  /* the game's start (Play, and tools/web/pagetest.py's -port-selftest) */
+  window.startGame = async (args) => {
+    await addSoundFont();
+    await musicIntoMemory();
+    Module.callMain(args);
+  };
+
   document.getElementById('instruments').addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -227,8 +259,7 @@
     canvas.style.display = 'block';
     canvas.focus();
     try { await document.documentElement.requestFullscreen(); } catch (e) {}
-    await addSoundFont();
-    Module.callMain([]);
+    await window.startGame([]);
   });
 
   refresh();

@@ -8,26 +8,111 @@
 
 #include "miniwin/files.h"
 
-struct Match {
-    const char *want;
-    char found[MAX_PATH];
-    int ok;
+static int Exists(const char *path) {
+    return SDL_GetPathInfo(path, NULL);
+}
+
+/* The folders' listings, kept: the game names its files in another case than the disk's ("imusic\\segtheme1.sgt" for
+ * IMusic/SegTheme1.sgt), and each such name was matched by listing its folders again. Cheap on a desktop; in a
+ * browser a listing is many round trips to the page's storage, and the music thread's 243 files took seconds. A name
+ * the listing doesn't have (a file made since) is looked up on disk again, and the listing redone. */
+struct Listing {
+    char dir[MAX_PATH];
+    char **names;
+    int count;
+    int capacity;
+    struct Listing *next;
 };
 
-static SDL_EnumerationResult SDLCALL MatchEntry(void *userdata, const char *dirname, const char *fname) {
-    struct Match *m = (struct Match *)userdata;
+static struct Listing *listings;
+static SDL_Mutex *listings_lock;
+static SDL_SpinLock listings_lock_made;
+
+static SDL_EnumerationResult SDLCALL AddName(void *userdata, const char *dirname, const char *fname) {
+    struct Listing *l = (struct Listing *)userdata;
 
     (void)dirname;
-    if (SDL_strcasecmp(fname, m->want) == 0) {
-        SDL_strlcpy(m->found, fname, sizeof(m->found));
-        m->ok = 1;
-        return SDL_ENUM_SUCCESS;
+    if (l->count == l->capacity) {
+        int capacity = l->capacity != 0 ? l->capacity * 2 : 64;
+        char **names = (char **)SDL_realloc(l->names, sizeof(char *) * (size_t)capacity);
+
+        if (names == NULL) {
+            return SDL_ENUM_FAILURE;
+        }
+        l->names = names;
+        l->capacity = capacity;
+    }
+    if ((l->names[l->count] = SDL_strdup(fname)) != NULL) {
+        l->count++;
     }
     return SDL_ENUM_CONTINUE;
 }
 
-static int Exists(const char *path) {
-    return SDL_GetPathInfo(path, NULL);
+static void LockListings(void) {
+    SDL_LockSpinlock(&listings_lock_made);
+    if (listings_lock == NULL) {
+        listings_lock = SDL_CreateMutex();
+    }
+    SDL_UnlockSpinlock(&listings_lock_made);
+    SDL_LockMutex(listings_lock);
+}
+
+/* the name in dir, in the disk's case, into found: from the kept listing, or (refresh) a new one */
+static int MatchKept(const char *dir, const char *want, char *found, size_t size, int refresh) {
+    struct Listing *l;
+    int i;
+    int ok = 0;
+
+    LockListings();
+    for (l = listings; l != NULL && SDL_strcmp(l->dir, dir) != 0; l = l->next) {
+    }
+    if (l == NULL && refresh) {
+        l = (struct Listing *)SDL_calloc(1, sizeof(*l));
+        if (l != NULL) {
+            SDL_strlcpy(l->dir, dir, sizeof(l->dir));
+            l->next = listings;
+            listings = l;
+        }
+    }
+    if (l != NULL && refresh) {
+        for (i = 0; i < l->count; i++) {
+            SDL_free(l->names[i]);
+        }
+        l->count = 0;
+        SDL_EnumerateDirectory(dir, AddName, l);
+    }
+    if (l != NULL) {
+        for (i = 0; i < l->count && !ok; i++) {
+            if (SDL_strcmp(l->names[i], want) == 0) {
+                ok = 1;
+                SDL_strlcpy(found, l->names[i], size);
+            }
+        }
+        for (i = 0; i < l->count && !ok; i++) {
+            if (SDL_strcasecmp(l->names[i], want) == 0) {
+                ok = 1;
+                SDL_strlcpy(found, l->names[i], size);
+            }
+        }
+    }
+    SDL_UnlockMutex(listings_lock);
+    return ok;
+}
+
+static void ForgetListings(void) {
+    LockListings();
+    while (listings != NULL) {
+        struct Listing *l = listings;
+        int i;
+
+        listings = l->next;
+        for (i = 0; i < l->count; i++) {
+            SDL_free(l->names[i]);
+        }
+        SDL_free(l->names);
+        SDL_free(l);
+    }
+    SDL_UnlockMutex(listings_lock);
 }
 
 const char *MiniwinPath(const char *path, char *buf, size_t size) {
@@ -50,6 +135,22 @@ const char *MiniwinPath(const char *path, char *buf, size_t size) {
             *s = '/';
         }
     }
+#ifdef LEGOLAND_WEB_BROWSER
+    {
+        /* the music's files: in the page's memory, when the page copied them there (port/web/shell.html) */
+        static int in_memory = -1;
+
+        if (in_memory < 0) {
+            in_memory = Exists("/imusic-mem");
+        }
+        if (in_memory && SDL_strncasecmp(out, "imusic", 6) == 0 && (out[6] == '/' || out[6] == '\0')) {
+            char moved[MAX_PATH];
+
+            SDL_snprintf(moved, sizeof(moved), "/imusic-mem%s", out + 6);
+            SDL_strlcpy(out, moved, sizeof(out));
+        }
+    }
+#endif
     if (out[0] == '\0' || Exists(out)) {
         SDL_strlcpy(buf, out, size);
         return buf;
@@ -75,18 +176,20 @@ const char *MiniwinPath(const char *path, char *buf, size_t size) {
         memcpy(part, p, n);
         part[n] = '\0';
         if (n > 0 && strcmp(part, ".") != 0 && strcmp(part, "..") != 0 && strpbrk(part, "*?") == NULL) {
-            struct Match m;
             char candidate[MAX_PATH];
+            char found[MAX_PATH];
+            const char *dir = len > 0 ? buf : ".";
 
-            SDL_snprintf(candidate, sizeof(candidate), "%s%s", buf, part);
-            if (!Exists(candidate)) {
-                m.want = part;
-                m.ok = 0;
-                SDL_EnumerateDirectory(len > 0 ? buf : ".", MatchEntry, &m);
-                if (!m.ok) {
-                    break; /* not on disk (yet): the rest as written */
+            if (MatchKept(dir, part, found, sizeof(found), 0)) {
+                SDL_strlcpy(part, found, sizeof(part));
+            } else {
+                SDL_snprintf(candidate, sizeof(candidate), "%s%s", buf, part);
+                if (!Exists(candidate)) {
+                    if (!MatchKept(dir, part, found, sizeof(found), 1)) {
+                        break; /* not on disk (yet): the rest as written */
+                    }
+                    SDL_strlcpy(part, found, sizeof(part));
                 }
-                SDL_strlcpy(part, m.found, sizeof(part));
             }
         }
         SDL_snprintf(buf + len, size - len, "%s%s", part, end != NULL ? "/" : "");
@@ -161,5 +264,6 @@ DWORD MiniwinGetFileAttributesA(const char *path) {
 BOOL MiniwinSetCurrentDirectoryA(const char *path) {
     char buf[MAX_PATH];
 
+    ForgetListings(); /* kept by relative names */
     return SetCurrentDirectoryA(MiniwinPath(path, buf, sizeof(buf)));
 }
