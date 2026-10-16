@@ -23,6 +23,9 @@ static FILE *OpenTraceFile(void) {
         return NULL;
     }
     slash = strrchr(path, '\\');
+    if (slash == NULL || (strrchr(path, '/') != NULL && strrchr(path, '/') > slash)) {
+        slash = strrchr(path, '/'); /* off Windows the program's path has slashes */
+    }
     if (slash == NULL) {
         return NULL;
     }
@@ -47,6 +50,10 @@ void PortTraceV(const char *fmt, va_list ap) {
         fprintf(f, "[%8lu] %s\n", GetTickCount(), line);
         fflush(f);
     }
+#ifdef __EMSCRIPTEN__
+    /* the web: the file is in the page's storage, out of sight; the browser's console shows the lines too */
+    fprintf(stderr, "[%8lu] %s\n", GetTickCount(), line);
+#endif
 }
 
 void PortTrace(const char *fmt, ...) {
