@@ -63,6 +63,7 @@ struct _devicemodeA;
 struct sockaddr;
 struct tWAVEFORMATEX;
 struct tagARRAYDESC;
+struct tagBITMAP;
 struct tagBITMAPFILEHEADER;
 struct tagBITMAPINFO;
 struct tagBITMAPINFOHEADER;
@@ -102,6 +103,7 @@ union tagCY;
 
 /* their typedef names, up front too */
 typedef union tagBINDPTR BINDPTR;
+typedef struct tagBITMAP BITMAP;
 typedef struct tagBITMAPFILEHEADER BITMAPFILEHEADER;
 typedef struct tagBITMAPINFO BITMAPINFO;
 typedef struct tagBITMAPINFOHEADER BITMAPINFOHEADER;
@@ -241,6 +243,7 @@ struct tWAVEFORMATEX {
     WORD wBitsPerSample;
     WORD cbSize;
 };
+#define ANSI_VAR_FONT 12
 typedef WORD ATOM;
 #define FACILITY_ITF 4
 typedef int LONG;
@@ -261,6 +264,7 @@ struct tagRECT {
 };
 typedef void * LPVOID;
 int AddFontResourceA(LPCSTR a0);
+#define AddFontResource AddFontResourceA
 typedef int BOOL;
 typedef CHAR * LPSTR;
 BOOL AddPortA(LPSTR pName, HWND hWnd, LPSTR pMonitorName);
@@ -276,6 +280,15 @@ union tagBINDPTR {
     FUNCDESC * lpfuncdesc;
     VARDESC * lpvardesc;
     ITypeComp * lptcomp;
+};
+struct tagBITMAP {
+    LONG bmType;
+    LONG bmWidth;
+    LONG bmHeight;
+    LONG bmWidthBytes;
+    WORD bmPlanes;
+    WORD bmBitsPixel;
+    LPVOID bmBits;
 };
 struct tagBITMAPFILEHEADER {
     WORD bfType;
@@ -307,8 +320,10 @@ struct tagBITMAPINFO {
     BITMAPINFOHEADER bmiHeader;
     RGBQUAD bmiColors[1];
 };
+#define BITSPIXEL 12
 #define BI_BITFIELDS 3
 #define BI_RGB 0
+#define BLACK_PEN 7
 typedef const WCHAR * LPCWSTR;
 typedef WCHAR * LPWSTR;
 typedef WCHAR OLECHAR;
@@ -526,8 +541,11 @@ struct tagDEC {
     };
 };
 #define DEFAULT_CHARSET 1
+#define DEFAULT_GUI_FONT 17
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) EXTERN_C const GUID FAR name
 enum tagDESCKIND { DESCKIND_NONE = 0, DESCKIND_FUNCDESC = 1, DESCKIND_VARDESC = 2, DESCKIND_TYPECOMP = 3, DESCKIND_IMPLICITAPPOBJ = 4, DESCKIND_MAX = 5 };
 typedef enum tagDESCKIND DESCKIND;
+#define DEVICE_DEFAULT_FONT 14
 struct _POINTL {
     LONG x;
     LONG y;
@@ -600,11 +618,15 @@ typedef unsigned long long UINT_PTR;
 typedef UINT_PTR WPARAM;
 typedef INT_PTR (*DLGPROC)(HWND, UINT, WPARAM, LPARAM);
 #define DMORIENT_LANDSCAPE 2
+#define DM_BITSPERPEL 0x00040000
 #define DM_COPY 2
+#define DM_DISPLAYFREQUENCY 0x00400000
 #define DM_MODIFY 8
 #define DM_IN_BUFFER DM_MODIFY
 #define DM_ORIENTATION 0x00000001
 #define DM_OUT_BUFFER DM_COPY
+#define DM_PELSHEIGHT 0x00100000
+#define DM_PELSWIDTH 0x00080000
 struct _DOCINFOA {
     int cbSize;
     LPCSTR lpszDocName;
@@ -615,6 +637,16 @@ struct _DOCINFOA {
 typedef double DOUBLE;
 #define DRIVE_CDROM 5
 #define DRIVE_NO_ROOT_DIR 1
+#define DT_BOTTOM 0x00000008
+#define DT_CALCRECT 0x00000400
+#define DT_CENTER 0x00000001
+#define DT_EXPANDTABS 0x00000040
+#define DT_NOCLIP 0x00000100
+#define DT_NOPREFIX 0x00000800
+#define DT_RIGHT 0x00000002
+#define DT_SINGLELINE 0x00000020
+#define DT_VCENTER 0x00000004
+#define DT_WORDBREAK 0x00000010
 #define DUPLICATE_SAME_ACCESS 0x00000002
 typedef LONG_PTR LRESULT;
 LRESULT DefWindowProcA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -631,6 +663,7 @@ LRESULT DispatchMessageA(const MSG * lpMsg);
 LRESULT DispatchMessageW(const MSG * lpMsg);
 LONG DocumentPropertiesA(HWND hWnd, HANDLE hPrinter, LPSTR pDeviceName, PDEVMODEA pDevModeOutput, PDEVMODEA pDevModeInput, DWORD fMode);
 int DrawTextA(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format);
+#define DrawText DrawTextA
 typedef HANDLE * LPHANDLE;
 BOOL DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle, HANDLE hTargetProcessHandle, LPHANDLE lpTargetHandle, DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwOptions);
 #define EASTEUROPE_CHARSET 238
@@ -659,6 +692,8 @@ struct tagELEMDESC {
         PARAMDESC paramdesc;
     };
 };
+#define ENUM_CURRENT_SETTINGS ((DWORD)-1)
+#define ENUM_REGISTRY_SETTINGS ((DWORD)-2)
 #define ERROR_ACCESS_DENIED 5
 #define ERROR_ALREADY_EXISTS 183
 #define ERROR_BUFFER_OVERFLOW 111
@@ -668,6 +703,7 @@ struct tagELEMDESC {
 #define ERROR_FILE_NOT_FOUND 2
 #define ERROR_GEN_FAILURE 31
 #define ERROR_INSUFFICIENT_BUFFER 122
+#define ERROR_INVALID_DATA 13
 #define ERROR_INVALID_HANDLE 6
 #define ERROR_INVALID_PARAMETER 87
 #define ERROR_INVALID_PRINTER_NAME 1801
@@ -694,6 +730,14 @@ struct tagEXCEPINFO {
 #define EXCEPTION_ACCESS_VIOLATION STATUS_ACCESS_VIOLATION
 #define EXCEPTION_CONTINUE_EXECUTION (-1)
 #define EXCEPTION_CONTINUE_SEARCH 0
+#define STATUS_FLOAT_INVALID_OPERATION ((DWORD )0xC0000090)
+#define EXCEPTION_FLT_INVALID_OPERATION STATUS_FLOAT_INVALID_OPERATION
+#define STATUS_ILLEGAL_INSTRUCTION ((DWORD )0xC000001D)
+#define EXCEPTION_ILLEGAL_INSTRUCTION STATUS_ILLEGAL_INSTRUCTION
+#define STATUS_INTEGER_DIVIDE_BY_ZERO ((DWORD )0xC0000094)
+#define EXCEPTION_INT_DIVIDE_BY_ZERO STATUS_INTEGER_DIVIDE_BY_ZERO
+#define STATUS_INTEGER_OVERFLOW ((DWORD )0xC0000095)
+#define EXCEPTION_INT_OVERFLOW STATUS_INTEGER_OVERFLOW
 struct _EXCEPTION_POINTERS {
     PEXCEPTION_RECORD ExceptionRecord;
     PCONTEXT ContextRecord;
@@ -763,6 +807,9 @@ struct tagFUNCDESC {
     ELEMDESC elemdescFunc;
     WORD wFuncFlags;
 };
+#define FW_BOLD 700
+#define FW_NORMAL 400
+#define FW_SEMIBOLD 600
 typedef WORD * LPWORD;
 BOOL FileTimeToDosDateTime(const FILETIME * lpFileTime, LPWORD lpFatDate, LPWORD lpFatTime);
 BOOL FileTimeToLocalFileTime(const FILETIME * lpFileTime, LPFILETIME lpLocalFileTime);
@@ -786,6 +833,8 @@ BOOL FreeLibrary(HMODULE hLibModule);
 #define GWL_HINSTANCE (-6)
 BOOL GdiFlush(void);
 SHORT GetAsyncKeyState(int vKey);
+#define LOBYTE(w) ((BYTE)(((DWORD_PTR)(w)) & 0xff))
+#define GetBValue(rgb) (LOBYTE((rgb)>>16))
 BOOL GetClientRect(HWND hWnd, LPRECT lpRect);
 BOOL GetComputerNameA(LPSTR lpBuffer, LPDWORD nSize);
 HANDLE GetCurrentProcess(void);
@@ -806,6 +855,7 @@ BOOL GetFileTime(HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAcces
 BOOL GetFileVersionInfoA(LPCSTR lptstrFilename, DWORD dwHandle, DWORD dwLen, LPVOID lpData);
 DWORD GetFileVersionInfoSizeA(LPCSTR lptstrFilename, LPDWORD lpdwHandle);
 HWND GetForegroundWindow(void);
+#define GetGValue(rgb) (LOBYTE(((WORD)(rgb)) >> 8))
 DWORD GetGuiResources(HANDLE hProcess, DWORD uiFlags);
 SHORT GetKeyState(int nVirtKey);
 DWORD GetLastError(void);
@@ -823,6 +873,7 @@ BOOL GetOpenFileNameW(LPOPENFILENAMEW a0);
 typedef int INT;
 UINT GetPrivateProfileIntA(LPCSTR lpAppName, LPCSTR lpKeyName, INT nDefault, LPCSTR lpFileName);
 DWORD GetPrivateProfileStringA(LPCSTR lpAppName, LPCSTR lpKeyName, LPCSTR lpDefault, LPSTR lpReturnedString, DWORD nSize, LPCSTR lpFileName);
+#define GetRValue(rgb) (LOBYTE(rgb))
 HGDIOBJ GetStockObject(int i);
 void GetSystemInfo(LPSYSTEM_INFO lpSystemInfo);
 int GetSystemMetrics(int nIndex);
@@ -989,6 +1040,7 @@ union _LARGE_INTEGER {
     LONGLONG QuadPart;
 };
 typedef DWORD LCID;
+#define LF_FACESIZE 32
 struct _LIST_ENTRY {
     struct _LIST_ENTRY * Flink;
     struct _LIST_ENTRY * Blink;
@@ -1038,6 +1090,7 @@ struct tagLOGPALETTE {
     WORD palNumEntries;
     PALETTEENTRY palPalEntry[1];
 };
+#define LOGPIXELSX 88
 #define LOGPIXELSY 90
 #define LOWORD(l) ((WORD)(((DWORD_PTR)(l)) & 0xffff))
 typedef const CHAR * LPCCH;
@@ -1176,10 +1229,15 @@ struct tagNONCLIENTMETRICSW {
     LOGFONTW lfMessageFont;
     int iPaddedBorderWidth;
 };
+#define NULLREGION 1
+#define NULL_BRUSH 5
+#define NULL_PEN 8
+#define NUMCOLORS 24
 #define OFN_FILEMUSTEXIST 0x00001000
 #define OFN_HIDEREADONLY 0x00000004
 #define OFN_NOCHANGEDIR 0x00000008
 #define OFN_PATHMUSTEXIST 0x00000800
+#define OPAQUE 2
 struct tagOFNW {
     DWORD lStructSize;
     HWND hwndOwner;
@@ -1215,10 +1273,12 @@ void OutputDebugStringA(LPCSTR lpOutputString);
 typedef const CHAR * PCSTR;
 typedef unsigned long long * PDWORD64;
 typedef BOOL (*PHANDLER_ROUTINE)(DWORD);
+#define PLANES 14
 typedef LONG * PLONG;
 #define PRIMARYLANGID(lgid) ((WORD )(lgid) & 0x3ff)
 #define PRINTER_ENUM_DEFAULT 0x00000001
 #define PROCESSOR_ARCHITECTURE_AMD64 9
+#define PS_NULL 5
 #define PS_SOLID 0
 typedef ULONG * PULONG;
 BOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
@@ -1229,9 +1289,12 @@ BOOL QueryPerformanceCounter(LARGE_INTEGER * lpPerformanceCount);
 BOOL QueryPerformanceFrequency(LARGE_INTEGER * lpFrequency);
 #define RASTERCAPS 38
 #define RC_BITBLT 1
+#define RC_DI_BITMAP 0x0080
+#define RC_STRETCHDIB 0x2000
 #define RDH_RECTANGLES 1
 #define REFCLSID const IID * __MIDL_CONST
 #define REFIID const IID * __MIDL_CONST
+#define RGB(r,g,b) ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
 struct _RGNDATAHEADER {
     DWORD dwSize;
     DWORD iType;
@@ -1252,6 +1315,7 @@ ATOM RegisterClassExA(const WNDCLASSEXA * a0);
 ATOM RegisterClassExW(const WNDCLASSEXW * a0);
 int ReleaseDC(HWND hWnd, HDC hDC);
 BOOL RemoveFontResourceA(LPCSTR lpFileName);
+#define RemoveFontResource RemoveFontResourceA
 BOOL ResetEvent(HANDLE hEvent);
 DWORD ResumeThread(HANDLE hThread);
 struct tagSAFEARRAYBOUND {
@@ -1272,10 +1336,16 @@ struct _SECURITY_ATTRIBUTES {
     LPVOID lpSecurityDescriptor;
     BOOL bInheritHandle;
 };
+#define SIMPLEREGION 2
+#define SM_CMONITORS 80
 #define SM_CXSCREEN 0
+#define SM_CXVIRTUALSCREEN 78
 #define SM_CYSCREEN 1
+#define SM_CYVIRTUALSCREEN 79
+#define SM_MOUSEPRESENT 19
 #define SM_SWAPBUTTON 23
 typedef UINT_PTR SOCKET;
+#define SPI_GETMOUSE 0x0003
 #define SPI_GETNONCLIENTMETRICS 0x0029
 #define SPI_GETWORKAREA 0x0030
 #define SRCCOPY (DWORD)0x00CC0020
@@ -1287,8 +1357,11 @@ typedef UINT_PTR SOCKET;
 #define SWP_NOSIZE 0x0001
 #define SWP_NOZORDER 0x0004
 #define SW_HIDE 0
+#define SW_MINIMIZE 6
 #define SW_RESTORE 9
 #define SW_SHOW 5
+#define SW_SHOWMINIMIZED 2
+#define SW_SHOWMINNOACTIVE 7
 #define SW_SHOWNORMAL 1
 #define SYNCHRONIZE (0x00100000)
 enum tagSYSKIND { SYS_WIN16 = 0, SYS_WIN32 = 1, SYS_MAC = 2, SYS_WIN64 = 3 };
@@ -1303,6 +1376,7 @@ struct _SYSTEMTIME {
     WORD wSecond;
     WORD wMilliseconds;
 };
+#define SYSTEM_FONT 13
 struct _SYSTEM_INFO {
     union {
         DWORD dwOemId;
@@ -1356,9 +1430,13 @@ int StretchDIBits(HDC hdc, int xDest, int yDest, int DestWidth, int DestHeight, 
 DWORD SuspendThread(HANDLE hThread);
 BOOL SystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
 BOOL SystemParametersInfoW(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
+#define TA_BASELINE 24
+#define TA_BOTTOM 8
 #define TA_CENTER 6
 #define TA_LEFT 0
+#define TA_RIGHT 2
 #define TA_TOP 0
+#define TA_UPDATECP 1
 #define __TEXT(quote) quote
 #define TEXT(quote) __TEXT(quote)
 #define TIME_CALLBACK_EVENT_PULSE 0x0020
@@ -1513,6 +1591,8 @@ SIZE_T VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_
 #define WAIT_TIMEOUT 258
 #define WAVE_FORMAT_PCM 1
 #define WHEEL_DELTA 120
+#define WHITE_BRUSH 0
+#define WHITE_PEN 6
 struct _WIN32_FIND_DATAA {
     DWORD dwFileAttributes;
     FILETIME ftCreationTime;

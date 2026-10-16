@@ -54,7 +54,12 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
         return NULL;
     }
     SDL_HideCursor(); /* the game draws its own pointer */
+#ifdef _WIN32
     window_hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+#else
+    /* no native window the code could use: the SDL window stands for it (MiniwinWindowOf) */
+    window_hwnd = (HWND)window;
+#endif
     return window_hwnd;
 }
 
@@ -87,6 +92,10 @@ void MiniwinPumpEvents(WNDPROC proc) {
             break;
         }
     }
+}
+
+void *MiniwinWindowOf(HWND hwnd) {
+    return window != NULL && hwnd == window_hwnd ? (void *)window : NULL;
 }
 
 int MiniwinOutputSize(int *width, int *height) {

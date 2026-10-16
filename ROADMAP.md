@@ -271,9 +271,13 @@ build after each.
    2. Links and `-port-selftest` passes: done, with the same dumps as Windows. `miniwin/src/posix/` has the Win32
       functions on POSIX (files, threads, events, timers, memory, strings, INI files, version information), and
       `port/port_posix.c` the entry point.
-   3. Runs: the window, its messages and input, the game's Win32 message loop on SDL's events.
-   4. GDI text with stb_truetype and Lego.TTF.
-   5. The launcher and the setup as SDL screens, the crash report from signals, the certificate saved as an image.
+   3. The window: done. miniwin's SDL window, its events as the window procedure's messages (as on Windows);
+      the display's size and modes from SDL; no launcher window (the saved choice or the command line's).
+   4. GDI text: done, with Windows' measurements (`tools/test_miniwin/test_gdi_text.sh`); stb_truetype doesn't
+      hint, so glyph edges differ by about a pixel.
+   5. Done: the setup as SDL message boxes, file dialogs and a progress bar; crash reports from signals (the
+      game's own `__try`/`__except` on `sigsetjmp`); the certificate saved as a picture.
+   Left: a play test on Linux, and the launcher as an SDL screen.
 
 **Done when:** x64 Windows and Linux builds play the same as the 32-bit one.
 

@@ -123,10 +123,10 @@ int stackdump(void *exc_info, const char *filename) {
             }
         }
         // STRING: LEGOLAND 0x004b8ae0
-#ifdef LEGOLAND_PORT
+#if defined(LEGOLAND_PORT) && defined(_WIN32)
         {
             /* [port] list the stack words that point into the exe, as RVAs, so the crash site's callers can be
-             * resolved with llvm-symbolizer against legoland.pdb */
+             * resolved with llvm-symbolizer against legoland.pdb (Windows: the exe's PE image) */
             ULONG_PTR *psp = (ULONG_PTR *)ctx->Esp;
             ULONG_PTR mod = (ULONG_PTR)GetModuleHandleA(NULL);
             DWORD size = ((IMAGE_NT_HEADERS *)(mod + ((IMAGE_DOS_HEADER *)mod)->e_lfanew))->OptionalHeader.SizeOfImage;

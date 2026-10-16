@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <setjmp.h>
 
 #define WINAPI
 #define WINAPIV
@@ -56,13 +57,22 @@
 #define __int64 long long
 #define __declspec(x)
 
-/* Structured exception handling: none off Windows. A __try block just runs; its handler never does (the port's
- * crash report on Linux comes from a signal handler instead). */
-#define __try if (1)
-#define __except(filter) else if (0)
-#define __finally
-#define GetExceptionInformation() ((void *)0)
-#define GetExceptionCode() 0
+/* Structured exception handling off Windows (miniwin/src/posix/seh.c): a __try block runs in a sigsetjmp'd frame;
+ * a fault in it (a signal) comes back there with Windows' description of it, and the __except filter decides. A
+ * __try body must not leave with return, break or goto, and as with setjmp, locals it changes that are read after a
+ * fault must be volatile (the code's __try blocks need neither). */
+int PosixTryPush(void);
+void *PosixTryTop(void);
+void PosixTryPop(void);
+int PosixTryFilter(int verdict);
+void *PosixExceptionInformation(void);
+unsigned int PosixExceptionCode(void);
+#define __try \
+    if (PosixTryPush() && sigsetjmp(*(sigjmp_buf *)PosixTryTop(), 1) == 0) \
+        for (int posix_try_once_ = 1; posix_try_once_; posix_try_once_ = 0, PosixTryPop())
+#define __except(...) else if (PosixTryPop(), PosixTryFilter((__VA_ARGS__)))
+#define GetExceptionInformation() PosixExceptionInformation()
+#define GetExceptionCode() PosixExceptionCode()
 
 /* the compiler's byte swaps, under MSVC's names */
 #define _byteswap_ushort __builtin_bswap16

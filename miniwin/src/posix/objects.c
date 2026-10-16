@@ -193,7 +193,10 @@ static void FreeObject(struct PosixObject *o) {
 
 static void *ThreadMain(void *arg) {
     struct Thread *t = (struct Thread *)arg;
-    DWORD code = t->start(t->parameter);
+    DWORD code;
+
+    PosixThreadSignalStack();
+    code = t->start(t->parameter);
 
     pthread_mutex_lock(&posix_objects_lock);
     if (!t->finished) {

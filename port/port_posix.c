@@ -1,12 +1,15 @@
 /* [port] The port's pieces that are Windows-only (port_watchdog.c, port_setup_win.c), off Windows: what they keep
- * track of, without the parts still to come (ROADMAP.md phase 8 step 4.5: the crash report from signals, the setup
- * as an SDL screen). And the program's entry point: main calls the game's WinMain, as Windows does. */
+ * track of, without its thread (a freeze isn't reported off Windows). And the program's entry point: main calls the
+ * game's WinMain, as Windows does. (The setup off Windows: port_setup_sdl.c; the crash report: the game's own,
+ * through miniwin/src/posix/seh.c.) */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
-#include "port_setup_win.h"
 #include "port_watchdog.h"
+
+void PosixThreadSignalStack(void); /* miniwin/src/posix/seh.c */
 
 static volatile int heartbeat;
 static const char *volatile current_phase;
@@ -36,14 +39,6 @@ void PortWatchRequest(int slot, void *address, const char *name) {
     (void)name; /* debug registers: Windows only */
 }
 
-int PortSetupRun(HINSTANCE instance) {
-    (void)instance;
-    fprintf(stderr,
-        "LEGOLAND: the game's data isn't here. Run the game from its folder (an install of the CD), or put this\n"
-        "program next to it. (Installing from the CD on Linux is still to come.)\n");
-    return 0;
-}
-
 int main(int argc, char **argv) {
     /* WinMain's command line: the arguments after the program's name, separated by spaces */
     size_t size = 1;
@@ -51,6 +46,7 @@ int main(int argc, char **argv) {
     int i;
     int result;
 
+    PosixThreadSignalStack(); /* the crash report runs on it after a stack overflow (main.c's __except) */
     for (i = 1; i < argc; i++) {
         size += strlen(argv[i]) + 1;
     }

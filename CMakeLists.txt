@@ -34,7 +34,7 @@ if(LEGOLAND_MODERN_BUILD)
         list(APPEND PORT_SOURCES ${MINIWIN_POSIX_SOURCES})
         set_source_files_properties(${MINIWIN_POSIX_SOURCES} PROPERTIES COMPILE_DEFINITIONS _GNU_SOURCE)
     else()
-        list(FILTER PORT_SOURCES EXCLUDE REGEX "/port/port_posix\\.c$")
+        list(FILTER PORT_SOURCES EXCLUDE REGEX "/port/port_(posix|setup_sdl)\\.c$")
     endif()
     add_executable(legoland WIN32 ${LEGOLAND_SOURCES} ${PORT_SOURCES})
     # [library:timer] [library:filesystem] the game's clock and file calls (GetTickCount, fopen, _open,

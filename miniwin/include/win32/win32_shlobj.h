@@ -17,6 +17,8 @@ struct FolderItemVtbl;
 struct FolderItems;
 struct FolderItemsVtbl;
 struct FolderVtbl;
+struct IBanneredBar;
+struct IBanneredBarVtbl;
 struct _ITEMIDLIST;
 struct _SHITEMID;
 struct _browseinfoW;
@@ -28,6 +30,7 @@ typedef struct FolderItem FolderItem;
 typedef struct FolderItemVerb FolderItemVerb;
 typedef struct FolderItemVerbs FolderItemVerbs;
 typedef struct FolderItems FolderItems;
+typedef struct IBanneredBar IBanneredBar;
 typedef struct _ITEMIDLIST ITEMIDLIST;
 typedef struct _browseinfoW * LPBROWSEINFOW;
 typedef const struct _ITEMIDLIST * LPCITEMIDLIST;
@@ -62,6 +65,10 @@ struct FolderItemVerbs {
 struct FolderItems {
     struct FolderItemsVtbl * lpVtbl;
 };
+struct IBanneredBar {
+    struct IBanneredBarVtbl * lpVtbl;
+};
+#define INTERFACE IBanneredBar
 struct _SHITEMID {
     USHORT cb;
     BYTE abID[1];
@@ -156,6 +163,12 @@ struct FolderVtbl {
     HRESULT (*MoveHere)(Folder *, VARIANT, VARIANT);
     HRESULT (*CopyHere)(Folder *, VARIANT, VARIANT);
     HRESULT (*GetDetailsOf)(Folder *, VARIANT, int, BSTR *);
+};
+struct IBanneredBarVtbl {
+    HRESULT (*SetIconSize)(IBanneredBar *, DWORD);
+    HRESULT (*GetIconSize)(IBanneredBar *, DWORD *);
+    HRESULT (*SetBitmap)(IBanneredBar *, HBITMAP);
+    HRESULT (*GetBitmap)(IBanneredBar *, HBITMAP *);
 };
 
 #endif

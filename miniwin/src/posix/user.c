@@ -1,9 +1,12 @@
-/* [library:window] Windows' user interface functions off Windows. Rectangles and message boxes are done; windows,
- * their messages and dialogs come with ROADMAP.md phase 8 step 4.3 (the game's message loop on SDL's events) and
- * fail with ERROR_CALL_NOT_IMPLEMENTED until then. See posix.h. */
+/* [library:window] Windows' user interface functions off Windows. The game's window is miniwin's SDL window (its
+ * messages come from MiniwinPumpEvents); these act on it, and give the display's size, modes and work area from
+ * SDL. Rectangles, message boxes (SDL's) and the keyboard (SDL's) are here too. Windows of the port's own (the
+ * launcher's and the setup's) are Windows' still: CreateWindowEx and the dialogs fail with
+ * ERROR_CALL_NOT_IMPLEMENTED (ROADMAP.md phase 8 step 4.5: as SDL screens). See posix.h. */
 #include <SDL3/SDL.h>
 #include <string.h>
 
+#include "miniwin/miniwin.h"
 #include "posix.h"
 
 #define NOT_YET() PosixSetError(ERROR_CALL_NOT_IMPLEMENTED)
@@ -194,7 +197,9 @@ HWND CreateWindowExA(DWORD ex_style, LPCSTR class_name, LPCSTR title, DWORD styl
 }
 
 BOOL DestroyWindow(HWND w) {
-    (void)w;
+    if (MiniwinWindowOf(w) != NULL) {
+        return TRUE; /* miniwin's: it goes with the program */
+    }
     NOT_YET();
     return FALSE;
 }
@@ -218,9 +223,28 @@ HWND GetDesktopWindow(void) {
 }
 
 BOOL ShowWindow(HWND w, int show) {
-    (void)w;
-    (void)show;
-    return FALSE;
+    SDL_Window *window = (SDL_Window *)MiniwinWindowOf(w);
+
+    if (window == NULL) {
+        return FALSE;
+    }
+    switch (show) {
+    case SW_HIDE:
+        SDL_HideWindow(window);
+        break;
+    case SW_MINIMIZE:
+    case SW_SHOWMINIMIZED:
+    case SW_SHOWMINNOACTIVE:
+        SDL_MinimizeWindow(window);
+        break;
+    case SW_RESTORE:
+        SDL_RestoreWindow(window);
+        break;
+    default:
+        SDL_ShowWindow(window);
+        break;
+    }
+    return TRUE;
 }
 
 BOOL SetWindowPos(HWND w, HWND after, int x, int y, int cx, int cy, UINT flags) {
@@ -236,13 +260,15 @@ BOOL SetWindowPos(HWND w, HWND after, int x, int y, int cx, int cy, UINT flags) 
 }
 
 BOOL IsIconic(HWND w) {
-    (void)w;
-    return FALSE;
+    SDL_Window *window = (SDL_Window *)MiniwinWindowOf(w);
+
+    return window != NULL && (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;
 }
 
 BOOL SetForegroundWindow(HWND w) {
-    (void)w;
-    return FALSE;
+    SDL_Window *window = (SDL_Window *)MiniwinWindowOf(w);
+
+    return window != NULL && SDL_RaiseWindow(window);
 }
 
 HWND SetFocus(HWND w) {
@@ -373,51 +399,96 @@ int ShowCursor(BOOL show) {
     return show ? 0 : -1;
 }
 
+/* the primary display's desktop mode, with SDL's video started for it */
+static const SDL_DisplayMode *Desktop(void) {
+    SDL_DisplayID display;
+
+    if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+        return NULL;
+    }
+    display = SDL_GetPrimaryDisplay();
+    return display != 0 ? SDL_GetDesktopDisplayMode(display) : NULL;
+}
+
 int GetSystemMetrics(int index) {
-    (void)index;
-    return 0;
+    const SDL_DisplayMode *mode;
+
+    switch (index) {
+    case SM_CXSCREEN:
+    case SM_CXVIRTUALSCREEN:
+        mode = Desktop();
+        return mode != NULL ? mode->w : 0;
+    case SM_CYSCREEN:
+    case SM_CYVIRTUALSCREEN:
+        mode = Desktop();
+        return mode != NULL ? mode->h : 0;
+    case SM_CMONITORS:
+        return 1;
+    case SM_MOUSEPRESENT:
+        return 1;
+    default:
+        return 0; /* SM_SWAPBUTTON and the rest: no swapped buttons, no frames */
+    }
 }
 
 BOOL SystemParametersInfoA(UINT action, UINT param, PVOID value, UINT ini) {
-    (void)action;
     (void)param;
-    (void)value;
     (void)ini;
-    NOT_YET();
-    return FALSE;
+    switch (action) {
+    case SPI_GETMOUSE: {
+        /* Windows' defaults: the two acceleration thresholds and the acceleration */
+        int *mouse = (int *)value;
+        mouse[0] = 6;
+        mouse[1] = 10;
+        mouse[2] = 1;
+        return TRUE;
+    }
+    case SPI_GETWORKAREA: {
+        SDL_Rect r;
+        if (Desktop() == NULL || !SDL_GetDisplayUsableBounds(SDL_GetPrimaryDisplay(), &r)) {
+            return FALSE;
+        }
+        SetRect((RECT *)value, r.x, r.y, r.x + r.w, r.y + r.h);
+        return TRUE;
+    }
+    case SPI_GETNONCLIENTMETRICS: {
+        NONCLIENTMETRICSA *m = (NONCLIENTMETRICSA *)value;
+        UINT size = m->cbSize;
+        memset(m, 0, size);
+        m->cbSize = size;
+        return TRUE;
+    }
+    default:
+        NOT_YET();
+        return FALSE;
+    }
 }
 
-BOOL EnumDisplaySettingsA(LPCSTR device, DWORD mode, DEVMODEA *out) {
-    (void)device;
-    (void)mode;
-    (void)out;
-    return FALSE;
-}
+BOOL EnumDisplaySettingsA(LPCSTR device, DWORD index, DEVMODEA *out) {
+    const SDL_DisplayMode *mode = NULL;
+    SDL_DisplayMode **modes = NULL;
+    int count = 0;
 
-HDC GetDC(HWND w) {
-    (void)w;
-    NOT_YET();
-    return NULL;
-}
-
-int ReleaseDC(HWND w, HDC dc) {
-    (void)w;
-    (void)dc;
-    return 0;
-}
-
-int FillRect(HDC dc, const RECT *r, HBRUSH brush) {
-    (void)dc;
-    (void)r;
-    (void)brush;
-    return 0;
-}
-
-int DrawTextA(HDC dc, LPCSTR text, int count, LPRECT r, UINT format) {
-    (void)dc;
-    (void)text;
-    (void)count;
-    (void)r;
-    (void)format;
-    return 0;
+    if (device != NULL || Desktop() == NULL) {
+        return FALSE;
+    }
+    if (index == ENUM_CURRENT_SETTINGS || index == ENUM_REGISTRY_SETTINGS) {
+        mode = Desktop();
+    } else {
+        modes = SDL_GetFullscreenDisplayModes(SDL_GetPrimaryDisplay(), &count);
+        if (modes != NULL && index < (DWORD)count) {
+            mode = modes[index];
+        }
+    }
+    if (mode != NULL) {
+        memset(out, 0, sizeof(*out));
+        out->dmSize = sizeof(*out);
+        out->dmPelsWidth = (DWORD)mode->w;
+        out->dmPelsHeight = (DWORD)mode->h;
+        out->dmBitsPerPel = (DWORD)SDL_BITSPERPIXEL(mode->format);
+        out->dmDisplayFrequency = (DWORD)(mode->refresh_rate + 0.5f);
+        out->dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+    }
+    SDL_free(modes);
+    return mode != NULL;
 }

@@ -8,6 +8,9 @@
 #include <string.h>
 
 #include "miniwin/miniwin.h"
+#ifndef _WIN32
+#include "posix/posix.h"
+#endif
 
 #define CLIP_RECTS_MAX 16
 
@@ -36,9 +39,9 @@ struct Surface {
     unsigned char *bits;
 #ifdef _WIN32
     HBITMAP dib; /* the pixels belong to this DIB section, so that GDI can draw on them (GetDC) */
-    HDC dc;
     HGDIOBJ dc_old;
 #endif
+    HDC dc; /* GetDC's, until ReleaseDC */
     int has_colorkey;
     DDCOLORKEY colorkey; /* source colour key (DDCKEY_SRCBLT) */
     struct Clipper *clipper;
@@ -431,9 +434,18 @@ static HRESULT STDMETHODCALLTYPE Surface_GetDC(IDirectDrawSurface *self, HDC *ou
     *out = s->dc;
     return DD_OK;
 #else
-    (void)self;
-    *out = NULL;
-    return DDERR_CANTCREATEDC;
+    /* [library:video] miniwin's GDI on the surface's pixels (miniwin/src/posix/gdi.c) */
+    struct Surface *s = AsSurface(self);
+
+    if (s->dc != NULL) {
+        return DDERR_DCALREADYCREATED;
+    }
+    s->dc = PosixSurfaceDc(s->bits, s->width, s->height, s->pitch);
+    if (s->dc == NULL) {
+        return DDERR_CANTCREATEDC;
+    }
+    *out = s->dc;
+    return DD_OK;
 #endif
 }
 
@@ -450,9 +462,14 @@ static HRESULT STDMETHODCALLTYPE Surface_ReleaseDC(IDirectDrawSurface *self, HDC
     s->dc = NULL;
     return DD_OK;
 #else
-    (void)self;
-    (void)dc;
-    return DDERR_INVALIDPARAMS;
+    struct Surface *s = AsSurface(self);
+
+    if (s->dc == NULL || dc != s->dc) {
+        return DDERR_INVALIDPARAMS;
+    }
+    DeleteDC(s->dc);
+    s->dc = NULL;
+    return DD_OK;
 #endif
 }
 

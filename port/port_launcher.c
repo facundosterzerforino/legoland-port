@@ -315,7 +315,8 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
 
     GetModuleFileNameA(NULL, ini_path, sizeof(ini_path) - 4);
     dot = strrchr(ini_path, '.');
-    strcpy(dot != NULL && strchr(dot, '\\') == NULL ? dot : ini_path + strlen(ini_path), ".ini");
+    strcpy(dot != NULL && strchr(dot, '\\') == NULL && strchr(dot, '/') == NULL ? dot : ini_path + strlen(ini_path),
+        ".ini");
 
     /* saved choice; the first time full screen at the desktop's resolution (an older .ini has only "windowed") */
     chosen_width = GetPrivateProfileIntA("display", "width", 1024, ini_path);
@@ -350,6 +351,11 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
         ask = 0;
     }
 
+#ifndef _WIN32
+    /* [port] the launcher window is Windows': elsewhere the saved choice, or the command line's (ROADMAP.md phase 8
+     * step 4.5: the launcher as an SDL screen) */
+    ask = 0;
+#endif
     if (ask) {
         if (!ShowLauncher(instance, &dont_ask)) {
             PortTrace("launcher: quit");

@@ -37,6 +37,13 @@ int PosixSplitSpec(const char *spec, char *folder, size_t folder_size, char *pat
 int PosixListFolder(const char *folder, const char *pattern, char ***names);
 void PosixFreeList(char **names, int count);
 
+/* a GDI device context drawing on width x height RGB565 pixels, pitch bytes a row (DirectDraw's GetDC); deleted with
+ * DeleteDC */
+HDC PosixSurfaceDc(void *bits, int width, int height, int pitch);
+
+/* an alternate signal stack for this thread, so that a fault on a full stack is still reported (seh.c) */
+void PosixThreadSignalStack(void);
+
 /* GetLastError's value, per thread; from errno for the file functions */
 void PosixSetError(DWORD error);
 DWORD PosixErrorFromErrno(int error);

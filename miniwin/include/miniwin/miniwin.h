@@ -31,6 +31,8 @@ enum {
  * says why). The system cursor is hidden over it: the game draws its own. */
 HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscreen);
 
+/* The SDL_Window behind the game window's HWND, or NULL for any other window. */
+void *MiniwinWindowOf(HWND hwnd);
 /* SDL's last error message. */
 const char *MiniwinError(void);
 
