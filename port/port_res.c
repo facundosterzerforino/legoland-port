@@ -273,6 +273,7 @@ static int PortResCheckMeshes(FILE *dump) {
 
 /* The sound effects: every wave file in the volumes' sfx\ made into a sample as the game makes them
  * (CreateSampleFromWAV: the volumes, the ACM's conversion to PCM, a DirectSound buffer), then deleted. */
+static DWORD PortResStart;
 static int PortResSfxLoaded;
 static int PortResSfxWaves;
 
@@ -419,6 +420,7 @@ int PortResSelfTest(const char *path) {
     if (PortResReport == NULL) {
         return 1;
     }
+    PortResStart = GetTickCount();
     PortResDump = fopen("port-selftest-odf.txt", "w");
     PortResProblems = 0;
     PortResClasses = 0;
@@ -475,6 +477,8 @@ int PortResSelfTest(const char *path) {
             fclose(mesh);
         }
     }
+    /* the time the volumes took to read (small reads, as the game makes them: a browser's storage is slow at those) */
+    fprintf(PortResReport, "resources: read in %lu ms\n", (unsigned long)(GetTickCount() - PortResStart));
     PortResCheckSounds();
     PortResCheckMusicStart();
     if (PortResDump != NULL) {

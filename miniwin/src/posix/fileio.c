@@ -18,9 +18,21 @@
 #include "miniwin/files.h"
 #include "posix.h"
 
+/* Read-only files keep a window of the file in memory. The game reads its volumes a few bytes at a time
+ * (RES_ReadFile: a length, a chunk header, a palette...), each a system call: nothing on a desktop, but in a browser
+ * every one is a round trip to the page's storage (OPFS, through its own thread), and opening a screen took seconds
+ * (the game stuttered at every click). Reads come from the window; a seek only moves the position. */
+#define READ_WINDOW 65536
+
 struct File {
     struct PosixObject base;
     int fd;
+    unsigned char *window; /* read-only files: READ_WINDOW bytes of the file from window_at (pread: the descriptor's
+                            * own position isn't used); NULL: plain reads and seeks */
+    long long window_at;
+    size_t window_len;
+    long long pos;
+    pthread_mutex_t lock; /* the window and the position, when threads share the handle */
 };
 
 struct Find {
@@ -149,7 +161,59 @@ HANDLE CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES
         return INVALID_HANDLE_VALUE;
     }
     f->fd = fd;
+    if ((oflags & O_ACCMODE) == O_RDONLY && strcmp(name, "CONIN$") != 0 &&
+        (f->window = (unsigned char *)malloc(READ_WINDOW)) != NULL) {
+        pthread_mutex_init(&f->lock, NULL);
+    }
     return (HANDLE)f;
+}
+
+/* ReadFile on a read-only file: from the window, refilled with one read where the position leaves it */
+static BOOL ReadWindowed(struct File *f, char *buffer, size_t size, size_t *done) {
+    pthread_mutex_lock(&f->lock);
+    while (*done < size) {
+        ssize_t n;
+
+        if (f->pos >= f->window_at && f->pos < f->window_at + (long long)f->window_len) {
+            size_t at = (size_t)(f->pos - f->window_at);
+            size_t take = f->window_len - at;
+
+            if (take > size - *done) {
+                take = size - *done;
+            }
+            memcpy(buffer + *done, f->window + at, take);
+            *done += take;
+            f->pos += (long long)take;
+            continue;
+        }
+        if (size - *done >= READ_WINDOW) {
+            /* a big read: straight into the caller's buffer */
+            n = pread(f->fd, buffer + *done, size - *done, (off_t)f->pos);
+            if (n > 0) {
+                *done += (size_t)n;
+                f->pos += n;
+            }
+        } else {
+            n = pread(f->fd, f->window, READ_WINDOW, (off_t)f->pos);
+            if (n >= 0) {
+                f->window_at = f->pos;
+                f->window_len = (size_t)n;
+            }
+        }
+        if (n < 0 && errno == EINTR) {
+            continue;
+        }
+        if (n < 0) {
+            pthread_mutex_unlock(&f->lock);
+            PosixSetError(PosixErrorFromErrno(errno));
+            return FALSE;
+        }
+        if (n == 0) {
+            break; /* the end: success, with fewer bytes */
+        }
+    }
+    pthread_mutex_unlock(&f->lock);
+    return TRUE;
 }
 
 BOOL ReadFile(HANDLE handle, LPVOID buffer, DWORD size, LPDWORD read_size, LPOVERLAPPED overlapped) {
@@ -163,6 +227,15 @@ BOOL ReadFile(HANDLE handle, LPVOID buffer, DWORD size, LPDWORD read_size, LPOVE
     if (f == NULL) {
         PosixSetError(ERROR_INVALID_HANDLE);
         return FALSE;
+    }
+    if (f->window != NULL) {
+        if (!ReadWindowed(f, (char *)buffer, size, &done)) {
+            return FALSE;
+        }
+        if (read_size != NULL) {
+            *read_size = (DWORD)done;
+        }
+        return TRUE;
     }
     while (done < size) {
         ssize_t n = read(f->fd, (char *)buffer + done, size - done);
@@ -225,8 +298,29 @@ DWORD SetFilePointer(HANDLE handle, LONG distance, PLONG distance_high, DWORD me
     if (distance_high != NULL) {
         offset = (long long)(((unsigned long long)(unsigned int)*distance_high << 32) | (unsigned int)distance);
     }
-    at = lseek(f->fd, (off_t)offset, method == FILE_BEGIN ? SEEK_SET : method == FILE_CURRENT ? SEEK_CUR
-                                                                                              : SEEK_END);
+    if (f->window != NULL) {
+        /* the read window's own position */
+        struct stat st;
+        long long base = 0;
+
+        pthread_mutex_lock(&f->lock);
+        if (method == FILE_CURRENT) {
+            base = f->pos;
+        } else if (method == FILE_END) {
+            base = fstat(f->fd, &st) == 0 ? (long long)st.st_size : 0;
+        }
+        if (base + offset < 0) {
+            pthread_mutex_unlock(&f->lock);
+            PosixSetError(ERROR_NEGATIVE_SEEK);
+            return INVALID_SET_FILE_POINTER;
+        }
+        f->pos = base + offset;
+        at = (off_t)f->pos;
+        pthread_mutex_unlock(&f->lock);
+    } else {
+        at = lseek(f->fd, (off_t)offset, method == FILE_BEGIN ? SEEK_SET : method == FILE_CURRENT ? SEEK_CUR
+                                                                                                  : SEEK_END);
+    }
     if (at < 0) {
         PosixSetError(errno == EINVAL ? ERROR_NEGATIVE_SEEK : PosixErrorFromErrno(errno));
         return INVALID_SET_FILE_POINTER;
@@ -282,6 +376,10 @@ BOOL CloseHandle(HANDLE handle) {
     switch (o->kind) {
     case POSIX_FILE:
         close(((struct File *)o)->fd);
+        if (((struct File *)o)->window != NULL) {
+            free(((struct File *)o)->window);
+            pthread_mutex_destroy(&((struct File *)o)->lock);
+        }
         o->kind = 0;
         free(o);
         return TRUE;

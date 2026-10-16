@@ -101,8 +101,16 @@ const char *MiniwinPath(const char *path, char *buf, size_t size) {
 
 FILE *MiniwinFopen(const char *path, const char *mode) {
     char buf[MAX_PATH];
+    FILE *f = fopen(MiniwinPath(path, buf, sizeof(buf)), mode);
 
-    return fopen(MiniwinPath(path, buf, sizeof(buf)), mode);
+#ifndef _WIN32
+    /* read in 64 KB blocks: in a browser each block is a round trip to the page's storage, and Emscripten's stdio
+     * reads 1 KB at a time */
+    if (f != NULL && mode[0] == 'r' && strchr(mode, '+') == NULL) {
+        setvbuf(f, NULL, _IOFBF, 65536);
+    }
+#endif
+    return f;
 }
 
 int MiniwinOpen(const char *path, int flags, ...) {

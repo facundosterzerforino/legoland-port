@@ -47,6 +47,7 @@
     <input type="file" id="instruments" accept=".dls,.sf2">
     <button id="play">Play</button>
     <button id="remove" class="secondary">Remove the game's files</button>
+    <button id="trace" class="secondary hidden">Save the game's log</button>
   </div>
   <p class="muted">The LEGOLAND port: the 1999 game, decompiled. You need your own copy of the CD.</p>
 </div>
@@ -106,7 +107,28 @@
     show('instruments-note', !original);
     show('instruments-button', !original);
     status.textContent = ok ? '' : image ? 'The CD image is here: the game installs from it when it starts.' : '';
+    show('trace', await traceFile() !== null);
   }
+
+  /* the game's log (legoland-port-trace.txt, port/port_trace.c): the last run's, kept in the game's folder even when
+     the page went down with the game */
+  async function traceFile() {
+    try {
+      return await (await (await gameFolder(false)).getFileHandle('legoland-port-trace.txt')).getFile();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  document.getElementById('trace').addEventListener('click', async () => {
+    const file = await traceFile();
+    if (!file) return;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(file);
+    link.download = 'legoland-port-trace.txt';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+  });
 
   /* the chosen image, streamed into the game's folder (no copy in memory) */
   document.getElementById('iso').addEventListener('change', async (event) => {
@@ -186,7 +208,9 @@
   var Module = {
     canvas: document.getElementById('canvas'),
     print: (text) => console.log(text),
-    printErr: (text) => console.warn(text),
+    /* the game's trace lines ("[ticks] ...") as plain messages: a warning carries a stack, which is slow to take
+       with the developer tools open (and the game's are deep) */
+    printErr: (text) => (/^\[ *\d+\] /.test(text) ? console.log : console.warn)(text),
     noInitialRun: true,
     onRuntimeInitialized: () => { runtimeReady = true; refresh(); },
     onExit: () => {

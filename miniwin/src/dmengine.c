@@ -3,6 +3,7 @@
  * to it. dmusic (port/dmusic) parses the files and synthesizes the sound. */
 #include <limits.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -777,6 +778,91 @@ DmeEngine *Dme_create(DmLoader *loader, unsigned int rate) {
     return e;
 }
 
+#ifdef DME_FLUIDSYNTH
+/* FluidSynth reads a SoundFont through these: the whole file in one read, then from memory. Its own reads (stdio)
+ * were a few KB at a time: in a browser each is a round trip to the page's storage (GeneralUser GS, 30 MB: 2.3 s, and
+ * the logo movie's reads waited behind them). A DLS file is left to FluidSynth's DLS loader. */
+struct WholeFile {
+    unsigned char *data;
+    long long size;
+    long long pos;
+};
+
+static void *WholeFileOpen(const char *path) {
+    struct WholeFile *w;
+    FILE *f;
+    size_t len = strlen(path);
+    long size;
+
+    if (len >= 4 && path[len - 4] == '.' && (path[len - 3] | 0x20) == 'd' && (path[len - 2] | 0x20) == 'l' &&
+        (path[len - 1] | 0x20) == 's') {
+        return NULL;
+    }
+    f = fopen(path, "rb");
+    if (f == NULL) {
+        return NULL;
+    }
+    w = (struct WholeFile *)calloc(1, sizeof(*w));
+    if (w == NULL || fseek(f, 0, SEEK_END) != 0 || (size = ftell(f)) <= 0 || fseek(f, 0, SEEK_SET) != 0 ||
+        (w->data = (unsigned char *)malloc((size_t)size)) == NULL || fread(w->data, 1, (size_t)size, f) != (size_t)size) {
+        fclose(f);
+        if (w != NULL) {
+            free(w->data);
+            free(w);
+        }
+        return NULL;
+    }
+    fclose(f);
+    w->size = size;
+    return w;
+}
+
+static int WholeFileRead(void *buf, fluid_long_long_t count, void *handle) {
+    struct WholeFile *w = (struct WholeFile *)handle;
+
+    if (count < 0 || w->pos + count > w->size) {
+        return FLUID_FAILED;
+    }
+    memcpy(buf, w->data + w->pos, (size_t)count);
+    w->pos += count;
+    return FLUID_OK;
+}
+
+static int WholeFileSeek(void *handle, fluid_long_long_t offset, int origin) {
+    struct WholeFile *w = (struct WholeFile *)handle;
+    long long to = origin == SEEK_SET ? offset : origin == SEEK_CUR ? w->pos + offset
+                                                                    : w->size + offset;
+
+    if (to < 0 || to > w->size) {
+        return FLUID_FAILED;
+    }
+    w->pos = to;
+    return FLUID_OK;
+}
+
+static fluid_long_long_t WholeFileTell(void *handle) {
+    return ((struct WholeFile *)handle)->pos;
+}
+
+static int WholeFileClose(void *handle) {
+    struct WholeFile *w = (struct WholeFile *)handle;
+
+    free(w->data);
+    free(w);
+    return FLUID_OK;
+}
+
+/* a SoundFont loader on whole-file reads, tried before FluidSynth's own (which a DLS file still goes to) */
+static void UseWholeFileReads(fluid_synth_t *fluid, fluid_settings_t *settings) {
+    fluid_sfloader_t *loader = new_fluid_defsfloader(settings);
+
+    if (loader != NULL) {
+        fluid_sfloader_set_callbacks(loader, WholeFileOpen, WholeFileRead, WholeFileSeek, WholeFileTell, WholeFileClose);
+        fluid_synth_add_sfloader(fluid, loader);
+    }
+}
+#endif
+
 int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls) {
 #ifdef DME_FLUIDSYNTH
     fluid_synth_t *fluid;
@@ -796,6 +882,9 @@ int Dme_useFluidSynth(DmeEngine *e, const char *gm_dls) {
         fluid_settings_setint(e->fluid_settings, "synth.polyphony", 256);
     }
     fluid = new_fluid_synth(e->fluid_settings);
+    if (fluid != NULL) {
+        UseWholeFileReads(fluid, e->fluid_settings);
+    }
     font = fluid != NULL ? fluid_synth_sfload(fluid, gm_dls, 0) : -1;
     if (font < 0) {
         delete_fluid_synth(fluid);
@@ -835,6 +924,9 @@ double Dme_timeFluidSynthLoad(const char *gm_dls) {
 
     t0 = SelfTestMs();
     fluid = settings != NULL ? new_fluid_synth(settings) : NULL;
+    if (fluid != NULL) {
+        UseWholeFileReads(fluid, settings);
+    }
     font = fluid != NULL ? fluid_synth_sfload(fluid, gm_dls, 0) : -1;
     t1 = SelfTestMs();
     if (fluid != NULL) {
