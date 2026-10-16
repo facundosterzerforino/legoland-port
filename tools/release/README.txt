@@ -11,9 +11,9 @@ Installing
 ----------
 1. Unzip this folder somewhere you can write to, such as Documents or the Desktop (not Program Files).
 2. Start LEGOLAND.exe.
-3. The first time, it asks for the game's files. Insert your LEGOLAND CD, or double-click your ISO image of it to
-   mount it, and click Install. You can also choose a folder: a copy of the CD, or an old LEGOLAND installation
-   (its saved games come along).
+3. The first time, it asks for the game's files. Insert your LEGOLAND CD, or click "Choose ISO..." and pick
+   your ISO image of it (no need to mount it), and click Install. You can also choose a folder: a copy of the
+   CD, or an old LEGOLAND installation (its saved games come along).
    The files (about 400 MB) are copied into this folder, once. After that the CD isn't needed.
 
 

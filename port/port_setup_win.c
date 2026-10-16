@@ -1,7 +1,8 @@
 /* [library:filesystem] The first-run setup window (Windows): when the game's data isn't found, it asks for the
- * LEGOLAND CD (or a mounted ISO, or a folder) and builds the data folder next to the exe with port_setup.c. */
+ * LEGOLAND CD (or its ISO image, or a folder) and builds the data folder next to the exe with port_setup.c. */
 #include <windows.h>
 #include <commctrl.h>
+#include <commdlg.h>
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,7 @@
 #define ID_SOURCE 203
 #define ID_PROGRESS 204
 #define ID_FILE 205
+#define ID_CHOOSE_ISO 206
 #define TIMER_PROGRESS 1
 #define NEEDED_MB 450 /* the data folder is about 400 MB */
 
@@ -22,6 +24,7 @@ static HWND window;
 static HWND source_text;
 static HWND install_button;
 static HWND choose_button;
+static HWND iso_button;
 static HWND quit_button;
 static HWND progress_bar;
 static HWND file_text;
@@ -46,10 +49,14 @@ static void ShowSource(void) {
     char text[MAX_PATH + 64];
 
     if (source[0] == '\0') {
-        SetWindowTextA(source_text, "No LEGOLAND CD found. Insert it, or choose a folder.");
+        SetWindowTextA(source_text, "No LEGOLAND CD found. Insert it, or choose its ISO image or a folder.");
     } else {
+        int kind = PortSetupKind(source);
+
         snprintf(text, sizeof(text), "Install from: %s (%s)", source,
-            PortSetupKind(source) == PORT_SETUP_CD ? "the LEGOLAND CD" : "an installed LEGOLAND");
+            kind == PORT_SETUP_CD          ? "the LEGOLAND CD"
+                : kind == PORT_SETUP_IMAGE ? "an image of the LEGOLAND CD"
+                                           : "an installed LEGOLAND");
         SetWindowTextA(source_text, text);
     }
     EnableWindow(install_button, source[0] != '\0');
@@ -89,14 +96,42 @@ static void ChooseFolder(void) {
     if (SHGetPathFromIDListA(item, path)) {
         if (PortSetupKind(path) == PORT_SETUP_NONE) {
             MessageBoxA(window,
-                "That isn't the LEGOLAND CD or a LEGOLAND folder.\n\nThe CD has main.z and the folders FMV, speech "
-                "and volumes; an installed LEGOLAND has IMusic, FMV, speech and volumes.",
+                "That isn't the LEGOLAND CD or a LEGOLAND folder.\n\nThe CD has main.z, Legoland.res and the "
+                "folder Speech; an installed LEGOLAND has IMusic, FMV, speech and volumes. For an ISO image, use "
+                "Choose ISO.",
                 "LEGOLAND", MB_OK | MB_ICONWARNING);
         } else {
             strcpy(source, path);
         }
     }
     CoTaskMemFree(item);
+    ShowSource();
+}
+
+/* an image file of the CD, read as it is (no need to mount it) */
+static void ChooseIso(void) {
+    OPENFILENAMEA ofn;
+    char path[MAX_PATH] = "";
+
+    memset(&ofn, 0, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = window;
+    ofn.lpstrFilter = "CD images (*.iso)\0*.iso\0All files (*.*)\0*.*\0";
+    ofn.lpstrFile = path;
+    ofn.nMaxFile = sizeof(path);
+    ofn.lpstrTitle = "Choose the LEGOLAND CD's ISO image";
+    ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
+    if (!GetOpenFileNameA(&ofn)) {
+        return;
+    }
+    if (PortSetupKind(path) != PORT_SETUP_IMAGE) {
+        MessageBoxA(window,
+            "That isn't an image of the LEGOLAND CD.\n\nThe CD's image is an .iso file with main.z, Legoland.res "
+            "and the folder Speech in it.",
+            "LEGOLAND", MB_OK | MB_ICONWARNING);
+    } else {
+        strcpy(source, path);
+    }
     ShowSource();
 }
 
@@ -162,6 +197,7 @@ static void StartInstall(void) {
     progress_file[0] = '\0';
     EnableWindow(install_button, FALSE);
     EnableWindow(choose_button, FALSE);
+    EnableWindow(iso_button, FALSE);
     SetWindowTextA(quit_button, "Cancel");
     ShowWindow(progress_bar, SW_SHOW);
     ShowWindow(file_text, SW_SHOW);
@@ -201,6 +237,7 @@ static void Poll(void) {
     ShowWindow(file_text, SW_HIDE);
     SetWindowTextA(quit_button, "Quit");
     EnableWindow(choose_button, TRUE);
+    EnableWindow(iso_button, TRUE);
     ShowSource();
 }
 
@@ -213,6 +250,9 @@ static LRESULT CALLBACK SetupProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
             return 0;
         case ID_CHOOSE:
             ChooseFolder();
+            return 0;
+        case ID_CHOOSE_ISO:
+            ChooseIso();
             return 0;
         case IDCANCEL:
             if (worker != NULL) {
@@ -229,8 +269,8 @@ static LRESULT CALLBACK SetupProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
         }
         return 0;
     case WM_DEVICECHANGE:
-        /* a CD inserted or an ISO mounted while the window is open */
-        if (worker == NULL) {
+        /* a CD inserted or an ISO mounted while the window is open (a chosen image stays chosen) */
+        if (worker == NULL && PortSetupKind(source) != PORT_SETUP_IMAGE) {
             FindCd();
             ShowSource();
         }
@@ -303,8 +343,8 @@ int PortSetupRun(HINSTANCE instance) {
         }
     }
     Control("STATIC",
-        "LEGOLAND needs its game files from the CD. Insert the LEGOLAND CD (or double-click your ISO image to "
-        "mount it), or choose a folder with a copy of the CD or with LEGOLAND installed.\n\nThe files (about "
+        "LEGOLAND needs its game files from the CD. Insert the LEGOLAND CD, or choose its ISO image (no need "
+        "to mount it), or a folder with a copy of the CD or with LEGOLAND installed.\n\nThe files (about "
         "400 MB) are copied next to this program, once.",
         0, 16, 14, 388, 80, -1, font);
     source_text = Control("STATIC", "", SS_PATHELLIPSIS, 16, 102, 388, 18, ID_SOURCE, font);
@@ -313,8 +353,9 @@ int PortSetupRun(HINSTANCE instance) {
     file_text = Control("STATIC", "", SS_PATHELLIPSIS, 16, 148, 388, 18, ID_FILE, font);
     ShowWindow(progress_bar, SW_HIDE);
     ShowWindow(file_text, SW_HIDE);
-    install_button = Control("BUTTON", "Install", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 136, 178, 86, 28,
+    install_button = Control("BUTTON", "Install", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP, 44, 178, 86, 28,
         ID_INSTALL, font);
+    iso_button = Control("BUTTON", "Choose ISO...", WS_TABSTOP, 136, 178, 86, 28, ID_CHOOSE_ISO, font);
     choose_button = Control("BUTTON", "Choose folder...", WS_TABSTOP, 228, 178, 86, 28, ID_CHOOSE, font);
     quit_button = Control("BUTTON", "Quit", WS_TABSTOP, 320, 178, 84, 28, IDCANCEL, font);
     FindCd();

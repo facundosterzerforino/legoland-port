@@ -235,11 +235,13 @@ build after each.
 
 **Status (2026-10-14):** started.
 - Step 4, the setup part: `port/port_setup.c` builds the data folder from the CD (`main.z`, an InstallShield 3
-  archive, unpacked with zlib's blast; `FMV\`, `speech\`, `volumes\` copied) or from an install, and
-  `port/port_setup_win.c` is the first-run window (the CD found in a CD drive or a mounted ISO, or a chosen folder;
-  progress and Cancel). The game's data folder is the current folder or the exe's. `tools/test_miniwin/test_setup.exe`
-  builds the folder from a stand-in CD (`main.z` and the three folders) and from an install: identical to the
-  maintainer's install, byte for byte.
+  archive, unpacked with zlib's blast; `Speech\` copied, the movies beside `main.z` into `FMV\` and the `.res`
+  files into `volumes\`, the layout of the real CD), straight from an ISO image (ISO 9660 with Joliet names, read
+  without mounting it) or from an install, and `port/port_setup_win.c` is the first-run window (the CD found in a
+  CD drive or a mounted ISO, an ISO file, or a chosen folder; progress and Cancel). The game's data folder is the
+  current folder or the exe's. `tools/test_miniwin/test_setup.exe` builds the folder from the maintainer's ISO
+  of the CD (read directly, and as a folder) and from an install: identical to the maintainer's install, byte for
+  byte (1613 files).
 - Step 4, the release: `tools/release/make_release.py` packs `LEGOLAND.exe`, a README for players and the licenses
   (2 MB); the PDB goes in a separate zip.
 - Step 2: `docs/checklist.md`, every screen and feature with phase 4's result and the current one.

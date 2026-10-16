@@ -15,6 +15,7 @@ Status: **OK** checked and fine, **diff** works with a known difference (see the
 | Release zip unpacked to a new folder, first start shows the setup window | - | ? | `port/port_setup_win.c` |
 | Setup from the CD in a drive | - | ? | |
 | Setup from a mounted ISO | - | ? | |
+| Setup from an ISO file (Choose ISO...) | - | Tests | `test_setup.exe` on the maintainer's ISO: identical to the install |
 | Setup from a chosen folder (a copy of the CD; an old install, saves included) | - | Tests | `test_setup.exe`: identical to the install |
 | Setup: Cancel, a read-only folder, a full disk give a clear message | - | ? | |
 | Second start goes straight to the launcher | - | ? | |
