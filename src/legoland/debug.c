@@ -38,7 +38,7 @@ void DebugTrace(const char *fmt, ...) {
 }
 
 // FUNCTION: LEGOLAND 0x0047f880
-int GameMain(void) {
+int __declspec(void) {
     char buffer[1024];
     int i;
     int j;
@@ -51,7 +51,7 @@ int GameMain(void) {
         return 1;
     }
     if (WaitForLegolandCd(1) == 0) {
-        DebugTrace("GameMain: no CD");
+        DebugTrace("__declspec: no CD");
         return 1;
     }
 
@@ -60,7 +60,7 @@ int GameMain(void) {
         if (ResourceVolumes[i] == NULL) {
             // STRING: LEGOLAND 0x004bcd28
             sprintf(buffer, "Failed to open resource %s", ResourceFileNames[i]);
-            DebugTrace("GameMain: %s", buffer);
+            DebugTrace("__declspec: %s", buffer);
             // STRING: LEGOLAND 0x004bcd18
             MessageBoxA(GetDesktopWindow(), buffer, "LEGOLAND Error", 0x30);
             for (j = 0; j < i; j++) {
@@ -71,10 +71,10 @@ int GameMain(void) {
     }
 
     LoadStringTable();
-    DebugTrace("GameMain: strings loaded");
+    DebugTrace("__declspec: strings loaded");
     InitHostSystemGPU();
     if (InitScreen() == 0) {
-        DebugTrace("GameMain: InitScreen failed");
+        DebugTrace("__declspec: InitScreen failed");
         MessageBoxA(GetDesktopWindow(), GetString(0xcc), GetString(0xcb), 0x30);
         KillHostSystemGPU();
         for (vol = ResourceVolumes; vol < ResourceVolumes + 3; vol++) {
@@ -84,7 +84,7 @@ int GameMain(void) {
     }
 
     if (InitInputSystem() == 0) {
-        DebugTrace("GameMain: InitInputSystem failed");
+        DebugTrace("__declspec: InitInputSystem failed");
         MessageBoxA(GetDesktopWindow(), GetString(0x9c4), GetString(0xcb), 0x30);
         KillInputSystem();
         KillHostSystemGPU();
@@ -94,36 +94,36 @@ int GameMain(void) {
         return 1;
     }
 
-    DebugTrace("GameMain: input ok");
+    DebugTrace("__declspec: input ok");
     PointerSprites[0] = 0;
     // STRING: LEGOLAND 0x004bcd08
     PointerSprites[1] = LoadSprite("erase it.lls", 0);
-    DebugTrace("GameMain: cursor 1 loaded");
+    DebugTrace("__declspec: cursor 1 loaded");
     // STRING: LEGOLAND 0x004bccf8
     PointerSprites[2] = LoadSprite("erase it2.lls", 0);
-    DebugTrace("GameMain: cursor 2 loaded");
+    DebugTrace("__declspec: cursor 2 loaded");
     // STRING: LEGOLAND 0x004bcce8
     PointerSprites[3] = LoadSprite("no build.lls", 0);
-    DebugTrace("GameMain: cursor 3 loaded");
+    DebugTrace("__declspec: cursor 3 loaded");
     // STRING: LEGOLAND 0x004bccd8
     PointerSprites[4] = LoadSprite("yes build.lls", 0);
-    DebugTrace("GameMain: cursor 4 loaded");
+    DebugTrace("__declspec: cursor 4 loaded");
     // STRING: LEGOLAND 0x004bccc4
     PointerSprites[5] = LoadSprite("rab over icon.lls", 0);
-    DebugTrace("GameMain: cursor 5 loaded");
+    DebugTrace("__declspec: cursor 5 loaded");
     // STRING: LEGOLAND 0x004bccb0
     PointerSprites[6] = LoadSprite("rab over icon2.lls", 0);
-    DebugTrace("GameMain: cursor 6 loaded");
+    DebugTrace("__declspec: cursor 6 loaded");
     // STRING: LEGOLAND 0x004bcca0
     PointerSprites[7] = LoadSprite("question it.lls", 0);
-    DebugTrace("GameMain: cursor 7 loaded");
+    DebugTrace("__declspec: cursor 7 loaded");
     // STRING: LEGOLAND 0x004bcc8c
     PointerSprites[8] = LoadSprite("question it2.lls", 0);
-    DebugTrace("GameMain: cursor 8 loaded");
+    DebugTrace("__declspec: cursor 8 loaded");
 
-    DebugTrace("GameMain: cursors loaded");
+    DebugTrace("__declspec: cursors loaded");
     LLIDB_LoadICM();
-    DebugTrace("GameMain: ICM loaded");
+    DebugTrace("__declspec: ICM loaded");
 
     LLIDB_RegisterNewElement("BUILD MENU", 0, 0x200);
     // STRING: LEGOLAND 0x004bcc78
@@ -135,10 +135,10 @@ int GameMain(void) {
     // STRING: LEGOLAND 0x004bcc48
     LLIDB_RegisterNewElement("SHOPS MENU", 0, 0x200);
 
-    DebugTrace("GameMain: init done, entering FUN_00459520");
+    DebugTrace("__declspec: init done, entering FUN_00459520");
     FUN_00459520();
 
-    DebugTrace("GameMain: FUN_00459520 returned");
+    DebugTrace("__declspec: FUN_00459520 returned");
     KillHostSystemGPU();
 
     for (vol = ResourceVolumes; vol < ResourceVolumes + 3; vol++) {
@@ -279,5 +279,5 @@ int __cdecl wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (CheckHostSystemGPU() == 0) {
         return 0;
     }
-    return GameMain();
+    return __declspec();
 }

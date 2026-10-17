@@ -90,8 +90,8 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     icon->string_id = 0x32;
     icon->string = GetString(0x32);
     icon->flags |= 0x6002;
-    icon->event_handler = (void *)FUN_0048ac60;
-    DAT_006687bc = FUN_0048ac60;
+    icon->event_handler = (void *)FreePlayStartIconHandler;
+    DAT_006687bc = FreePlayStartIconHandler;
     icon->flags |= 0x400;
     DAT_0079864c = icon;
 
@@ -122,10 +122,10 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     LLIDB_ClearOnLevel();
     InitFreePlayLists();
 
-    FreePlayObjectList(0xc8, 0x2a, 0x41, 0xec, 0xc8);
-    FreePlayObjectList(0x1f4, 0xbb, 0x41, 0xec, 0x1f4);
-    FreePlayObjectList(0x190, 0x14c, 0x41, 0xec, 0x190);
-    FreePlayObjectList(0x12c, 0x1dd, 0x41, 0xec, 0x12c);
+    __declspec(0xc8, 0x2a, 0x41, 0xec, 0xc8);
+    __declspec(0x1f4, 0xbb, 0x41, 0xec, 0x1f4);
+    __declspec(0x190, 0x14c, 0x41, 0xec, 0x190);
+    __declspec(0x12c, 0x1dd, 0x41, 0xec, 0x12c);
 
     FUN_0048a790();
 }
@@ -150,7 +150,7 @@ void FUN_0048ab60(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048abb0
-void FUN_0048abb0(void) {
+void StartFreePlayGame(void) {
     char buf[0x34];
 
     QueryClass = 0;
@@ -165,20 +165,20 @@ void FUN_0048abb0(void) {
     SetBricksLimited(0);
     FUN_0048ab60();
     AllocBlokeCounters(lpConfig->max_blokes);
-    FUN_00458940();
+    ResetEditState();
     MapStats.level_end = 0;
     FUN_00489ee0();
     UpdateMenu();
     UnloadWatchSprite();
     FUN_00490600(1);
-    FUN_004911c0(DAT_0066861c, 0);
+    ShowIntervalScreen(DAT_0066861c, 0);
     SetMapLoaded(1);
     ResumeGameTimer();
     UpdateSoundVols();
 }
 
 // FUNCTION: LEGOLAND 0x0048ac60
-unsigned char FUN_0048ac60(unsigned int param_1, unsigned int param_2) {
+unsigned char FreePlayStartIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_0079864c != 0 && (DAT_0079864c->flags & 0x400) != 0) {
         return 0;
     }
@@ -189,13 +189,13 @@ unsigned char FUN_0048ac60(unsigned int param_1, unsigned int param_2) {
         SpeechCloseFile();
         DAT_006687b0 = 0x4;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        FUN_0048abb0();
+        StartFreePlayGame();
         CleanUpFreePlay();
         KillTitleScreenSprites();
         RemoveIconGroup(0x7);
         EditMode.unk4 = 0x3;
         InitGameInterface(0x1);
-        FUN_00474880();
+        SetDefaultMouseHandlers();
         CurrentProfile.field_45 = 2;
     }
     return 1;
@@ -321,7 +321,7 @@ void FUN_0048afa0(const char *param) {
 }
 
 // FUNCTION: LEGOLAND 0x0048b000
-unsigned char FUN_0048b000(struct IconNode *icon, unsigned int param_2) {
+unsigned char FreePlayObjectIconHandler(struct IconNode *icon, unsigned int param_2) {
     struct IconNode *node;
     struct Element *elem;
 
@@ -419,7 +419,7 @@ LEGO_EXPORT void Add2FreePlayPanelLists(struct Sprite *a, char **name, char *nam
 }
 
 // FUNCTION: LEGOLAND 0x0048b2a0
-LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
+LEGO_EXPORT unsigned int __declspec(int a, int b, int c, int d, int e) {
     register struct InterfacePanel *group;
     struct IconNode *icon;
     struct PanelNode *list;
@@ -468,7 +468,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     group->clip_bottom = icon->y + icon->height;
     group->field_4 = 1;
     group->group = (short)a;
-    SetNewGroup_Callbacks(0, (void *)RenderFreePlayIcons, (void *)FUN_0048b000);
+    SetNewGroup_Callbacks(0, (void *)RenderFreePlayIcons, (void *)FreePlayObjectIconHandler);
     do {
         AddFreePlayIcon(group, (struct InfoSource *)list, b, y, a, 1, list->after);
         list = list->next;
@@ -612,7 +612,7 @@ struct FreePlayLoadSlot {
 };
 
 // FUNCTION: LEGOLAND 0x0048b700
-void FUN_0048b700(void) {
+void LoadProgressScreenSprites(void) {
     int i;
 
     for (i = 0; i < 10; i++) {
@@ -634,7 +634,7 @@ void FUN_0048b740(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048b770
-void FUN_0048b770(void) {
+void KillProgressScreenSprites(void) {
     struct FreePlaySpriteSlot *slot;
 
     RemoveIconGroup(0x1c);

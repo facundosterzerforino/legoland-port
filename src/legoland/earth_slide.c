@@ -212,7 +212,7 @@ void LoadEarthSlideResources(struct Element *param_1) {
     }
     EarthNodeHead = NULL;
     // STRING: LEGOLAND 0x004b663c
-    EarthPos = LoadPos("3ddata\\earth.pos");
+    EarthPos = __declspec("3ddata\\earth.pos");
     // STRING: LEGOLAND 0x004b6620
     EarthSlideRin = LoadRin("3ddata\\earthslide.rin", DAT_004b6638);
     if (EarthSlideRin != NULL) {

@@ -120,7 +120,7 @@ void FUN_00405310(TileId tile) {
         cur = cur->next;
     }
 
-    ret = FUN_00412650(tile.id);
+    ret = FindQueueEntryById(tile.id);
     ret->field_15 = 0;
     ret->field_4 = NULL;
 

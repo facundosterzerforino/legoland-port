@@ -107,7 +107,7 @@ LEGO_EXPORT void InitListProfiles(void) {
     DeleteIcon->flags |= 0x2000;
     DeleteIcon->flags |= 0x4002;
     DeleteIcon->flags |= 0x400;
-    DeleteIcon->event_handler = (void *)FUN_0048cc30;
+    DeleteIcon->event_handler = (void *)DeleteIconHandler;
 }
 
 // FUNCTION: LEGOLAND 0x0048c5e0
@@ -174,11 +174,11 @@ LEGO_EXPORT void InitProfileCheckBoxIcons(struct IconNode *param_1) {
     PopUpCloseIcon->string = GetString(0x4);
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
-    PopUpCloseIcon->event_handler = (void *)FUN_0048d450;
+    PopUpCloseIcon->event_handler = (void *)DeletePopUpCancelHandler;
 }
 
 // FUNCTION: LEGOLAND 0x0048c860
-void FUN_0048c860(struct IconNode *param_1) {
+void InitDeletePopUp(struct IconNode *param_1) {
     PuOkSprite = LoadSprite("PU_OK.lls", 4);
     PuOkOnSprite = LoadSprite("PU_OKON.lls", 4);
     PopUpCloseSprite = LoadSprite("RegClose.lls", 4);
@@ -191,14 +191,14 @@ void FUN_0048c860(struct IconNode *param_1) {
     PopUpOkIcon->string = GetString(5);
     PopUpOkIcon->flags |= 0x2000;
     PopUpOkIcon->flags |= 0x4002;
-    PopUpOkIcon->event_handler = (void *)FUN_0048e450;
+    PopUpOkIcon->event_handler = (void *)DeletePopUpOkHandler;
 
     PopUpCloseIcon = InsertIcon(PopUpOkIcon->x + 0x24, PopUpOkIcon->y, 0xe, PopUpCloseSprite);
     PopUpCloseIcon->string_id = 4;
     PopUpCloseIcon->string = GetString(4);
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
-    PopUpCloseIcon->event_handler = (void *)FUN_0048d450;
+    PopUpCloseIcon->event_handler = (void *)DeletePopUpCancelHandler;
 }
 
 // FUNCTION: LEGOLAND 0x0048c9a0
@@ -337,13 +337,13 @@ LEGO_EXPORT void CloseFontEndCheckBox(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048cc30
-unsigned char FUN_0048cc30(void *param_1, unsigned int param_2) {
+unsigned char DeleteIconHandler(void *param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         if (DAT_0080ff80.unk8 == 0) {
             InitProfileCheckBoxIcons(param_1);
         }
         if (DAT_0080ff80.unk8 == 4) {
-            FUN_0048c860(param_1);
+            InitDeletePopUp(param_1);
         }
         DeletePopUpShown = 1;
         DAT_004bef9c = 0;
@@ -412,7 +412,7 @@ LEGO_EXPORT void UpdateProfileCheckBoxIcons(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048cf10
-LEGO_EXPORT void PrintProfileDetails(void) {
+LEGO_EXPORT void __declspec(void) {
     struct IconNode *icon;
     struct IconNode *last;
     char *name;
@@ -423,7 +423,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
     icon = IconListHead;
     DeleteIcon->flags |= 0x400;
     rc.top = 0x72;
-    FUN_00455e50(DAT_007cb340, 0x8d, rc.top, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
+    PrintTextBox(DAT_007cb340, 0x8d, rc.top, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
     for (; icon != NULL; icon = icon->next) {
         show = 1;
         sel = 1;
@@ -463,9 +463,9 @@ LEGO_EXPORT void PrintProfileDetails(void) {
             if (name != NULL && show) {
                 if (CurrentProfile.profile_slot - 1 != icon->slot || (DeletePopUpShown == 0 && NewProfilePopUpShown == 0)) {
                     if (sel) {
-                        FUN_00455e50(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
+                        PrintTextBox(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
                     } else {
-                        FUN_00455e50(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0xffffff, 0);
+                        PrintTextBox(name, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0xffffff, 0);
                     }
                 }
             }
@@ -476,14 +476,14 @@ LEGO_EXPORT void PrintProfileDetails(void) {
         rc.top = last->y + 7;
         rc.right = rc.left + 0x9b;
         rc.bottom = rc.top + 0x13;
-        FUN_00455e50(GetString(0x85), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
+        PrintTextBox(GetString(0x85), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
         UpdateProfileCheckBoxIcons();
     } else if (NewProfilePopUpShown != 0) {
         rc.left = last->x + 0x14;
         rc.top = last->y - 0x14;
         rc.right = rc.left + 0xe0;
         rc.bottom = rc.top + 0x13;
-        FUN_00455e50(GetString(0x86), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
+        PrintTextBox(GetString(0x86), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x25, 0, 0xffffff);
         UpdateProfileCheckBoxIcons();
     }
     if (CurrentProfile.profile_slot != 0 && DeletePopUpShown == 0) {
@@ -580,7 +580,7 @@ unsigned char ConfirmDeleteProfileClick(unsigned int arg0, unsigned int arg1) {
 }
 
 // FUNCTION: LEGOLAND 0x0048d450
-unsigned char FUN_0048d450(unsigned int param_1, unsigned int param_2) {
+unsigned char DeletePopUpCancelHandler(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
         DeletePopUpShown = 0;
         CloseFontEndCheckBox();

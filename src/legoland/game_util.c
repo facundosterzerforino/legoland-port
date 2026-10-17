@@ -43,21 +43,21 @@ void FUN_004787d0(void) {
 void FUN_004787f0(void) {
     unsigned int id = DAT_00669098;
     DAT_00669098 = DAT_00669098 + 1;
-    CurrentScriptSection = FUN_0046b4f0(id);
+    CurrentScriptSection = AllocScriptSection(id);
     DAT_007fdca4 = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00478820
 int FUN_00478820(void) {
     // STRING: LEGOLAND 0x004bc0a4
-    FUN_004785d0("Uninitialised", 0);
+    SetScriptSectionType("Uninitialised", 0);
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00478840
 int ScriptCmdEnd(void) {
     // STRING: LEGOLAND 0x004bc0b4
-    FUN_004785d0("Closed", 0);
+    SetScriptSectionType("Closed", 0);
     FUN_004787d0();
     CurrentScriptSection = 0;
     return 1;
@@ -65,7 +65,7 @@ int ScriptCmdEnd(void) {
 
 // FUNCTION: LEGOLAND 0x00478870
 int ScriptCmdInit(char **param_1) {
-    FUN_004785d0(*param_1, 1);
+    SetScriptSectionType(*param_1, 1);
     return 1;
 }
 
@@ -97,10 +97,10 @@ int ScriptCmdAges(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00478930
 int ScriptCmdObjective(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786a0(param_1, param_2, 7) == 0) {
+        if (IsScriptCommandAllowed(param_1, param_2, 7) == 0) {
             return 0;
         }
-        FUN_004785d0(param_1->name, 2);
+        SetScriptSectionType(param_1->name, 2);
         SetScriptObjectiveKind(1);
         FUN_004787d0();
         FUN_004787f0();
@@ -113,7 +113,7 @@ int ScriptCmdOneOff(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786a0(param_1, param_2, 2) == 0) {
+    if (IsScriptCommandAllowed(param_1, param_2, 2) == 0) {
         return 0;
     }
     SetScriptObjectiveKind(0);
@@ -125,7 +125,7 @@ int ScriptCmdOngoing(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786a0(param_1, param_2, 2) == 0) {
+    if (IsScriptCommandAllowed(param_1, param_2, 2) == 0) {
         return 0;
     }
     SetScriptObjectiveKind(1);
@@ -137,7 +137,7 @@ int ScriptCmdPermanent(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786a0(param_1, param_2, 2) == 0) {
+    if (IsScriptCommandAllowed(param_1, param_2, 2) == 0) {
         return 0;
     }
     SetScriptObjectiveKind(2);
@@ -150,7 +150,7 @@ int ScriptCmdReminder(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786a0(param_1, param_2, 2) == 0) {
+    if (IsScriptCommandAllowed(param_1, param_2, 2) == 0) {
         return 0;
     }
     SetScriptObjectiveKind(3);
@@ -161,10 +161,10 @@ int ScriptCmdReminder(struct CommandArgs *param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x00478a80
 int ScriptCmdReward(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786a0(param_1, param_2, 2) == 0) {
+        if (IsScriptCommandAllowed(param_1, param_2, 2) == 0) {
             return 0;
         }
-        FUN_004785d0(param_1->name, 4);
+        SetScriptSectionType(param_1->name, 4);
     }
     return 1;
 }
@@ -176,16 +176,16 @@ int ScriptCmdMap(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_00478690(param_1, param_2, 1) == 0) {
+    if (HasEnoughScriptArgs(param_1, param_2, 1) == 0) {
         return 0;
     }
-    map = FUN_004787a0(param_1, param_2);
+    map = GetScriptArg1(param_1, param_2);
     ClearObjectCounters();
     if (LoadBaseMap(map) == 0) {
         return -1;
     }
     CalculateMapRenderOrder();
-    FUN_0045a060();
+    RestorePowerToObjects();
     return 1;
 }
 
@@ -211,10 +211,10 @@ int ScriptCmdLoad(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(param_1, param_2, 1, 1) == 0) {
+    if (CheckScriptCommand(param_1, param_2, 1, 1) == 0) {
         return 0;
     }
-    return FUN_00478b20(FUN_004787a0(param_1, param_2)) != 0;
+    return FUN_00478b20(GetScriptArg1(param_1, param_2)) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x00478bc0
@@ -229,11 +229,11 @@ unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, 
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(param_1, param_2, 5, 1) == 0) {
+    if (CheckScriptCommand(param_1, param_2, 5, 1) == 0) {
         return 0;
     }
     if (DAT_00669054 == 1) {
-        name = FUN_004787a0(param_1, param_2);
+        name = GetScriptArg1(param_1, param_2);
         if (FUN_00478b20(name) != 0) {
             GiveRewardObject(ElemID(name), 0, 1);
         }
@@ -245,7 +245,7 @@ unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, 
 // FUNCTION: LEGOLAND 0x00478c60
 int ScriptCmdCurrency(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
             return 0;
         }
         if (DAT_00669054 == 1) {
@@ -262,7 +262,7 @@ int ScriptCmdHappinessEnv(char **argv, int argc) {
     int *out;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(argv, argc, 5, 5) == 0) {
+        if (CheckScriptCommand(argv, argc, 5, 5) == 0) {
             return 0;
         }
         if (DAT_00669054 == 1) {
@@ -291,7 +291,7 @@ int ScriptCmdLookAt(struct CommandArgs *param_1, int param_2) {
         return 1;
     }
     args = (char **)param_1;
-    if (FUN_004786c0(args, param_2, 5, 2) == 0) {
+    if (CheckScriptCommand(args, param_2, 5, 2) == 0) {
         return 0;
     }
     ParseIntPair(local, args, 1);
@@ -315,7 +315,7 @@ int ScriptCmdLookAt(struct CommandArgs *param_1, int param_2) {
 int ScriptCmdBriefingFile(struct CommandArgs *param_1, int param_2) {
     char *name = DAT_004d8bb0;
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
+        if (CheckScriptCommand(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
         if (param_2 >= 1) {
@@ -334,7 +334,7 @@ int ScriptCmdBriefingFile(struct CommandArgs *param_1, int param_2) {
 int ScriptCmdHintsFile(struct CommandArgs *param_1, int param_2) {
     char *name = DAT_004d8bb0;
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(param_1, param_2, 5, 0) == 0) {
+        if (CheckScriptCommand(param_1, param_2, 5, 0) == 0) {
             return 0;
         }
         if (param_2 >= 1) {
@@ -357,7 +357,7 @@ int ScriptCmdWorkers(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
         return 0;
     }
     v1 = atoi(arg->arg1);
@@ -381,7 +381,7 @@ int ScriptCmdGardener(struct CommandArgs *arg, int argc) {
     int count;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
             return 0;
         }
         coords[0] = atoi(arg->arg1);
@@ -395,7 +395,7 @@ int ScriptCmdGardener(struct CommandArgs *arg, int argc) {
                 count--;
             }
         } else {
-            FUN_0046bad0(1, count, (unsigned int *)coords);
+            NewScriptWorkerEvent(1, count, (unsigned int *)coords);
         }
     }
     return 1;
@@ -407,7 +407,7 @@ int ScriptCmdMechanic(struct CommandArgs *arg, int argc) {
     int count;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
             return 0;
         }
         coords[0] = atoi(arg->arg1);
@@ -421,7 +421,7 @@ int ScriptCmdMechanic(struct CommandArgs *arg, int argc) {
                 count--;
             }
         } else {
-            FUN_0046bad0(0, count, (unsigned int *)coords);
+            NewScriptWorkerEvent(0, count, (unsigned int *)coords);
         }
     }
     return 1;
@@ -430,7 +430,7 @@ int ScriptCmdMechanic(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00479120
 int ScriptCmdPrompt(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 0) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 0) == 0) {
             return 0;
         }
         if (argc > 0) {
@@ -449,11 +449,11 @@ int ScriptCmdPrompt(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x004791a0
 int ScriptCmdIntro(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         if (CurrentScriptSection != 0) {
-            FUN_0046b650(arg->arg1, CurrentScriptSection);
+            SetScriptSectionIntro(arg->arg1, CurrentScriptSection);
         }
     }
     return 1;
@@ -467,7 +467,7 @@ int ScriptCmdNeed(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -493,7 +493,7 @@ int ScriptCmdNeedAt(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 3) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 3) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -514,7 +514,7 @@ int ScriptCmdNeedIn(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 6) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 6) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -531,7 +531,7 @@ int ScriptCmdConnect(struct CommandArgs *arg, int argc) {
     struct Element *id;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         id = ElemID(arg->arg1);
@@ -547,7 +547,7 @@ int ScriptCmdLink(struct CommandArgs *arg, int argc) {
     struct Element *id;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         // STRING: LEGOLAND 0x004bc0bc
@@ -573,7 +573,7 @@ int ScriptCmdRange(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -595,7 +595,7 @@ int ScriptCmdClearArea(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 4) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 4) == 0) {
             return 0;
         }
         ParseRect((int *)&vec, (char **)arg, 1);
@@ -615,10 +615,10 @@ int ScriptCmdRemove(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
             return 0;
         }
-        if (FUN_00478690(arg, argc, 2) == 0) {
+        if (HasEnoughScriptArgs(arg, argc, 2) == 0) {
             return 0;
         }
         id = ElemID(arg->arg1);
@@ -639,7 +639,7 @@ int ScriptCmdRemoveRange(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -664,7 +664,7 @@ int ScriptCmdComposite(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -691,7 +691,7 @@ int ScriptCmdLoopComposite(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -713,7 +713,7 @@ int ScriptCmdTechLevel(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -727,7 +727,7 @@ int ScriptCmdTechLevel(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x004797b0
 int ScriptCmdResearch(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         ElemID(arg->arg1);
@@ -743,7 +743,7 @@ int ScriptCmdParkVisitors(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     NewScriptParkVisitorsEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -758,7 +758,7 @@ int ScriptCmdRideVisitors(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -777,7 +777,7 @@ int ScriptCmdRiders(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -795,7 +795,7 @@ int ScriptCmdSceneryCoverage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     value = atoi(arg->arg1);
@@ -806,7 +806,7 @@ int ScriptCmdSceneryCoverage(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00479980
 int ScriptCmdPathScenery(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         NewScriptPathSceneryEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -817,7 +817,7 @@ int ScriptCmdPathScenery(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x004799d0
 int ScriptCmdRideCoverage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         NewScriptRideCoverageEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -828,7 +828,7 @@ int ScriptCmdRideCoverage(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00479a20
 int ScriptCmdShopCoverage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         NewScriptShopCoverageEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -839,7 +839,7 @@ int ScriptCmdShopCoverage(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00479a70
 int ScriptCmdFoodCoverage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         NewScriptFoodCoverageEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -850,7 +850,7 @@ int ScriptCmdFoodCoverage(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x00479ac0
 int ScriptCmdTotalCoverage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
             return 0;
         }
         NewScriptTotalCoverageEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -868,7 +868,7 @@ int ScriptCmdAppraisal(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 1, 0) == 0) {
+    if (CheckScriptCommand(arg, argc, 1, 0) == 0) {
         return 0;
     }
     if (argc >= 1) {
@@ -894,7 +894,7 @@ int ScriptCmdStudArea(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 5) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 5) == 0) {
             return 0;
         }
         ParseRect((int *)&vec, (char **)arg, 1);
@@ -909,7 +909,7 @@ int ScriptCmdSave(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     NewScriptSaveEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -924,7 +924,7 @@ int ScriptCmdHappiness(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     v1 = atoi(arg->arg1);
@@ -938,7 +938,7 @@ int ScriptCmdNeedGardeners(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     NewScriptNeedGardenersEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -950,7 +950,7 @@ int ScriptCmdNeedMechanics(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     NewScriptNeedMechanicsEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -966,7 +966,7 @@ int ScriptCmdHunger(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     v1 = atoi(arg->arg1);
@@ -988,7 +988,7 @@ int ScriptCmdFixRides(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
         return 0;
     }
     n1 = atoi(arg->arg1);
@@ -1002,7 +1002,7 @@ int ScriptCmdPowerRides(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     NewScriptPowerRidesEvent(CurrentObjectiveEventFlags, atoi(arg->arg1));
@@ -1015,7 +1015,7 @@ int ScriptCmdZoning(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 2) == 0) {
             return 0;
         }
         index = FindStringNoCase(arg->arg1, &DAT_004bb5b4, 4);
@@ -1036,7 +1036,7 @@ int ScriptCmdCheckFlag(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) == 0) {
         return 0;
     }
     n1 = atoi(arg->arg1);
@@ -1057,7 +1057,7 @@ int ScriptCmdThemeIcon(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
         return 0;
     }
     v2 = atoi(arg->arg1);
@@ -1082,7 +1082,7 @@ int ScriptCmdAddFlag(char **argv, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(argv, argc, 5, 1) == 0) {
+    if (CheckScriptCommand(argv, argc, 5, 1) == 0) {
         return 0;
     }
     v1 = atoi(argv[1]);
@@ -1107,7 +1107,7 @@ int ScriptCmdBridges(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
         return 0;
     }
     v1 = atoi(arg->arg1);
@@ -1135,7 +1135,7 @@ int ScriptCmdEndScreens(struct CommandArgs *arg, int argc) {
     buf[0] = DAT_004d8bb0[0];
     memset(buf + 1, 0, sizeof(buf) - 1);
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
             return 0;
         }
         v = atoi(arg->arg1);
@@ -1160,7 +1160,7 @@ int ScriptCmdSelectTheme(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 0) != 0) {
+    if (CheckScriptCommand(arg, argc, 2, 0) != 0) {
         if (argc != 0) {
             index = FindStringNoCase(arg->arg1, &DAT_004bb5c4, 5);
         } else {
@@ -1181,7 +1181,7 @@ int ScriptCmdSelectTab(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 0) != 0) {
+    if (CheckScriptCommand(arg, argc, 2, 0) != 0) {
         if (argc != 0) {
             index = FindStringNoCase(arg->arg1, &DAT_004bb5d8, 2);
         } else {
@@ -1202,7 +1202,7 @@ int ScriptCmdSelectMode(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 2, 1) != 0) {
+    if (CheckScriptCommand(arg, argc, 2, 1) != 0) {
         if (argc != 0) {
             index = FindStringNoCase(arg->arg1, &DAT_004bb5e0, 5);
         }
@@ -1217,7 +1217,7 @@ int ScriptCmdSelectMode(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x0047a440
 int ScriptCmdForever(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 2, 0) == 0) {
+        if (CheckScriptCommand(arg, argc, 2, 0) == 0) {
             return 0;
         }
         NewScriptForeverEvent(CurrentObjectiveEventFlags);
@@ -1233,7 +1233,7 @@ int ScriptCmdGive(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 4, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 4, 1) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -1256,7 +1256,7 @@ int ScriptCmdTake(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 4, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 4, 1) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -1271,7 +1271,7 @@ int ScriptCmdAddBricks(struct CommandArgs *arg, int argc) {
     int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 1) == 0) {
             return 0;
         }
         v = atoi(arg->arg1);
@@ -1291,7 +1291,7 @@ int ScriptCmdPlace(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 3) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 3) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -1316,7 +1316,7 @@ int ScriptCmdClear(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 4) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 4) == 0) {
             return 0;
         }
         ParseRect((int *)&vec, (char **)arg, 1);
@@ -1330,7 +1330,7 @@ int ScriptCmdUnglue(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 4) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 4) == 0) {
             return 0;
         }
         ParseRect((int *)&vec, (char **)arg, 1);
@@ -1346,7 +1346,7 @@ int ScriptCmdGlue(struct CommandArgs *arg, int argc) {
     int y;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 4) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 4) == 0) {
             return 0;
         }
         ParseRect(rect, (char **)arg, 1);
@@ -1368,7 +1368,7 @@ int ScriptCmdExtendPark(struct CommandArgs *arg, int argc) {
     struct Vec4 vec;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 4) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 4) == 0) {
             return 0;
         }
         ParseRect((int *)&vec, (char **)arg, 1);
@@ -1382,13 +1382,13 @@ int ScriptCmdFmv(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
         return 0;
     }
     if (DAT_00669054 == 4) {
         NewScriptFmvEvent(arg->arg1);
     } else {
-        FUN_00490610(arg->arg1);
+        SetPendingMovie(arg->arg1);
     }
     return 1;
 }
@@ -1396,7 +1396,7 @@ int ScriptCmdFmv(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x0047a860
 int ScriptCmdInterval(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 1) == 0) {
             return 0;
         }
         NewScriptIntervalEvent(arg->arg1);
@@ -1407,7 +1407,7 @@ int ScriptCmdInterval(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x0047a8a0
 int ScriptCmdMessage(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 4, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 4, 1) == 0) {
             return 0;
         }
         NewScriptMessageEvent(arg->arg1);
@@ -1421,7 +1421,7 @@ int ScriptCmdFeature(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
             return 0;
         }
         index = FindStringNoCase(arg->arg1, &DAT_004bb5f4, 0xc);
@@ -1446,13 +1446,13 @@ int ScriptCmdReport(struct CommandArgs *arg, int argc) {
     unsigned int v3;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
             return 0;
         }
         // STRING: LEGOLAND 0x004bc0e4
         if (_stricmp(arg->arg2, "off") != 0) {
             is_off = 0;
-            if (FUN_004786c0(arg, argc, 5, 3) == 0) {
+            if (CheckScriptCommand(arg, argc, 5, 3) == 0) {
                 return 0;
             }
             v2 = atoi(arg->arg2);
@@ -1479,10 +1479,10 @@ int ScriptCmdReport(struct CommandArgs *arg, int argc) {
             return 1;
         }
         if (is_off == 0) {
-            FUN_0046a140(index, v2, v3);
+            CallReportHandler(index, v2, v3);
             return 1;
         }
-        FUN_0046a140(index, 0, 0);
+        CallReportHandler(index, 0, 0);
     }
     return 1;
 }
@@ -1495,7 +1495,7 @@ int ScriptCmdHapFactor(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 1, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 1, 2) == 0) {
         return 0;
     }
     n = atoi(arg->arg2);
@@ -1515,7 +1515,7 @@ int ScriptCmdCapacityScale(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
         return 0;
     }
     index = FindStringNoCase(arg->arg1, &DAT_004bb6bc, 6);
@@ -1537,7 +1537,7 @@ int ScriptCmdCapacityCap(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 2) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 2) == 0) {
             return 0;
         }
         index = FindStringNoCase(arg->arg1, &DAT_004bb6bc, 6);
@@ -1563,7 +1563,7 @@ int ScriptCmdDegrade(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 4, 2) == 0) {
+    if (CheckScriptCommand(arg, argc, 4, 2) == 0) {
         return 0;
     }
     id = ElemID(arg->arg1);
@@ -1582,7 +1582,7 @@ int ScriptCmdDegrade(struct CommandArgs *arg, int argc) {
 // FUNCTION: LEGOLAND 0x0047ac80
 int ScriptCmdMaxBlokes(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 1, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 1, 1) == 0) {
             return 0;
         }
         lpConfig->max_blokes = (unsigned short)atoi(arg->arg1);
@@ -1597,7 +1597,7 @@ int ScriptCmdMaxCapacity(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
             return 0;
         }
         v = atoi(arg->arg1);
@@ -1605,7 +1605,7 @@ int ScriptCmdMaxCapacity(struct CommandArgs *arg, int argc) {
             MapStats.capacity_max = v;
             return 1;
         }
-        FUN_0046bb80(1, v);
+        NewScriptCapacityEvent(1, v);
     }
     return 1;
 }
@@ -1617,14 +1617,14 @@ int ScriptCmdMinCapacity(struct CommandArgs *arg, int argc) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+    if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
         return 0;
     }
     value = atoi(arg->arg1);
     if (DAT_00669054 == 1) {
         MapStats.capacity_min = value;
     } else {
-        FUN_0046bb80(0, value);
+        NewScriptCapacityEvent(0, value);
     }
     return 1;
 }
@@ -1634,7 +1634,7 @@ int ScriptCmdEntranceFee(struct CommandArgs *arg, int argc) {
     unsigned int v;
 
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(arg, argc, 5, 1) == 0) {
+        if (CheckScriptCommand(arg, argc, 5, 1) == 0) {
             return 0;
         }
         v = atoi(arg->arg1);
@@ -1655,7 +1655,7 @@ int ScriptCmdFlashButton(char **argv, int argc) {
 
     mask = 0;
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(argv, argc, 5, 1) == 0) {
+        if (CheckScriptCommand(argv, argc, 5, 1) == 0) {
             return 0;
         }
         for (i = 1; i <= argc; i++) {
@@ -1667,9 +1667,9 @@ int ScriptCmdFlashButton(char **argv, int argc) {
             }
         }
         if (DAT_00669054 == 1) {
-            FUN_00476070(mask, 1);
+            SetButtonFlashMask(mask, 1);
         } else {
-            FUN_0046bd70(mask, 1);
+            NewScriptFlashButtonEvent(mask, 1);
         }
     }
     return 1;
@@ -1683,7 +1683,7 @@ int ScriptCmdFlashButtonOff(char **argv, int argc) {
 
     mask = 0;
     if (ScriptConditionActive != 0) {
-        if (FUN_004786c0(argv, argc, 5, 0) == 0) {
+        if (CheckScriptCommand(argv, argc, 5, 0) == 0) {
             return 0;
         }
         if (argc == 0) {
@@ -1698,9 +1698,9 @@ int ScriptCmdFlashButtonOff(char **argv, int argc) {
             }
         }
         if (DAT_00669054 == 1) {
-            FUN_00476070(mask, 0);
+            SetButtonFlashMask(mask, 0);
         } else {
-            FUN_0046bd70(mask, 0);
+            NewScriptFlashButtonEvent(mask, 0);
         }
     }
     return 1;
@@ -1711,7 +1711,7 @@ int ScriptCmdPurge(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive == 0) {
         return 1;
     }
-    if (FUN_004786a0(param_1, param_2, 4) == 0) {
+    if (IsScriptCommandAllowed(param_1, param_2, 4) == 0) {
         return 0;
     }
     NewScriptPurgeEvent();
@@ -1721,7 +1721,7 @@ int ScriptCmdPurge(struct CommandArgs *param_1, unsigned int param_2) {
 // FUNCTION: LEGOLAND 0x0047af80
 int ScriptCmdEndLevel(struct CommandArgs *param_1, unsigned int param_2) {
     if (ScriptConditionActive != 0) {
-        if (FUN_004786a0(param_1, param_2, 4) == 0) {
+        if (IsScriptCommandAllowed(param_1, param_2, 4) == 0) {
             return 0;
         }
         NewScriptEndLevelEvent();
@@ -1737,7 +1737,7 @@ int FUN_0047afb0(const char *param_1) {
 
     FUN_00492980();
     LLIDB_ClearOnLevel();
-    FUN_004784c0();
+    ResetLevelScriptState();
     result = ParseScriptFile(param_1, DAT_004bb6f8, 0x5d, 0);
     FUN_00492990();
     v1 = (result >= 0) - 1;

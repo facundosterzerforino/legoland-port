@@ -80,7 +80,7 @@ int LoadCurrency(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00457970
-int FUN_00457970(int dx, int dy) {
+int __declspec(int dx, int dy) {
     struct Ride *ride = EditMode.unk8;
     int x, y;
     struct MapElement *elem;
@@ -212,7 +212,7 @@ void FUN_00457a70(void) {
                 QueryCursor.tile_y = MouseTileY;
                 DAT_00667c5c = 0;
                 GamePad &= ~0x400;
-                if (!(DAT_00813ac4 & 2)) {
+                if (!(MouseClickFlags & 2)) {
                     DAT_0080ff6c = NULL;
                 }
             }
@@ -230,7 +230,7 @@ void FUN_00457a70(void) {
         } else {
             SetPointer(1);
         }
-        if (DAT_00813ac4 & 0x11) {
+        if (MouseClickFlags & 0x11) {
             if (DAT_0080ff6c != NULL && (((struct Ride *)DAT_0080ff6c)->flags & 0x2000000)) {
                 DAT_00667cd8 = 1;
                 DAT_00667cdc = 0;
@@ -262,7 +262,7 @@ void FUN_00457a70(void) {
                 DAT_00667cd8 = 0;
             } else if (IsCursorBuildable(&QueryCursor)) {
                 if (Hover.type == 0x10c) {
-                    FUN_0045e850((struct Element *)((WorkOrder *)Hover.ptr)->element, &((WorkOrder *)Hover.ptr)->pos.x);
+                    ClearObjectEntrances((struct Element *)((WorkOrder *)Hover.ptr)->element, &((WorkOrder *)Hover.ptr)->pos.x);
                     ClearPathUnderFootprint((struct Ride *)((WorkOrder *)Hover.ptr)->element->ride, &((WorkOrder *)Hover.ptr)->pos.x);
                     EraseMechanicOrder((WorkOrder *)Hover.ptr);
                 } else if (Hover.type == 0x10b) {
@@ -313,7 +313,7 @@ void FUN_00457a70(void) {
             EditMode.unk8->cb_90(EditMode.unk8->element, &MousePos, 0x8f8);
         }
         BuildCursorPtr(&EditCursor, 0x8f8, FUN_0045ead0(EditMode.unk8));
-        if (DAT_00813ac4 & 0x11) {
+        if (MouseClickFlags & 0x11) {
             if (IsCursorBuildable(&EditCursor)) {
                 if (EditMode.unk8->flags & 0x2000000) {
                     DAT_00667cd8 = 1;
@@ -329,7 +329,7 @@ void FUN_00457a70(void) {
                                     tile = NULL;
                                 }
                                 if (tile != NULL && (tile->flags & 0x8a0) && (tile->field_0->ride->flags & 0x200000)) {
-                                    FUN_004779d0(&pt);
+                                    RemoveObjectAtPoint(&pt);
                                 }
                             }
                         }
@@ -338,7 +338,7 @@ void FUN_00457a70(void) {
                         for (x = DAT_00813a84; x <= DAT_00813a8c; x += FootprintWidth) {
                             pt.x = x - EditMode.unk8->footprint.x0;
                             pt.y = y - EditMode.unk8->footprint.y0;
-                            if (FUN_00457970(pt.x, pt.y)) {
+                            if (__declspec(pt.x, pt.y)) {
                                 if (WorkOrderBuildObject(EditMode.unk8->element, &pt)) {
                                     ScriptDirtyCategories |= 0x10;
                                 }
@@ -386,7 +386,7 @@ void FUN_00457a70(void) {
             QueryCursor.tile_y = MouseTileY;
             DAT_00667c5c = 0;
             GamePad &= ~0x400;
-            if (!(DAT_00813ac4 & 2)) {
+            if (!(MouseClickFlags & 2)) {
                 DAT_0080ff6c = NULL;
             }
             break;

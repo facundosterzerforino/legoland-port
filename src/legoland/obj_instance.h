@@ -126,7 +126,7 @@ int FUN_00489f90(const struct Point *pos);
 unsigned short FUN_00489fd0(const struct Point *pos);
 
 LEGO_EXPORT struct ObjInstance *GetInstanceOfClass(struct Ride *ride, const TileId *tile);
-LEGO_EXPORT TileId GetObjectUID(struct Point *pos, struct Ride *ride);
+LEGO_EXPORT TileId __declspec(struct Point *pos, struct Ride *ride);
 void FUN_00489ee0(void);
 void FreeAllObjectClassInstances(void);
 LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node);

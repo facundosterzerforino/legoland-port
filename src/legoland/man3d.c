@@ -27,7 +27,7 @@ struct Mesh {
 };
 
 // FUNCTION: LEGOLAND 0x0043f660
-LEGO_EXPORT struct Position *LoadPos(const char *path) {
+LEGO_EXPORT struct Position *__declspec(const char *path) {
     struct ResFile *file;
     struct Position *pos;
     struct PosFrame *f;
@@ -411,7 +411,7 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
     if (IntersectRect(&clip, &bounds, &clip) != 0) {
         OffsetRect(&clip, -person->screen.x, -person->screen.y);
         if (GetVideoSurface(&vid) != 0) {
-            FUN_00485f30((unsigned char *)vid.bits + person->screen.y * vid.pitch + person->screen.x * 2, vid.pitch,
+            SetRender3DTarget((unsigned char *)vid.bits + person->screen.y * vid.pitch + person->screen.x * 2, vid.pitch,
                 vid.width, vid.height);
             FUN_00488700((unsigned char *)vid.bits, (struct RenderViewport *)&MousePos);
             Render_SetViewport(&clip);
@@ -730,9 +730,9 @@ LEGO_EXPORT void UnInitMan(void) {
         FreeMesh(TracyWalkMesh);
     }
     FUN_00442c70();
-    FUN_00486250();
-    FUN_004886a0();
-    FUN_00485fa0();
+    FreeCursorCache();
+    FreeTextureNodes();
+    FreeZBuffer();
 }
 
 // FUNCTION: LEGOLAND 0x00440680

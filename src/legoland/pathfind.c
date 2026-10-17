@@ -163,9 +163,9 @@ int FUN_00481f00(struct BestNode *target, struct BestNode *start, struct BestNod
     while (count != 0) {
         n = 0;
         for (i = 0; i < count; i++) {
-            FUN_004819a0((int *)&cur[i]->x_min);
-            for (j = 0; j < (int)DAT_00669254; j++) {
-                p = DAT_0066a45c[j];
+            CollectAdjacentNodes((int *)&cur[i]->x_min);
+            for (j = 0; j < (int)AdjacentNodeCount; j++) {
+                p = AdjacentNodes[j];
                 if (!(p->field_20 & 1)) {
                     next[n++] = p;
                     if (p == target) {
@@ -259,7 +259,7 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
 }
 
 // FUNCTION: LEGOLAND 0x004821c0
-void FUN_004821c0(void) {
+void ClearDirSearchGrid(void) {
     int i;
 
     for (i = 0; i < 1152; i = i + 1) {
@@ -440,7 +440,7 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
 
     FreeDirNodeList();
     FreeDirPathNodes();
-    FUN_004821c0();
+    ClearDirSearchGrid();
 
     DAT_00669250 = 0;
     DAT_0066b454 = 0;
@@ -530,7 +530,7 @@ int FUN_00482710(int *a, int *b, int *out) {
 
     FreeDirNodeList();
     FreeDirPathNodes();
-    FUN_004821c0();
+    ClearDirSearchGrid();
 
     DAT_00669250 = 0;
     DAT_0066b454 = 0;
@@ -570,7 +570,7 @@ int FUN_00482710(int *a, int *b, int *out) {
 }
 
 // FUNCTION: LEGOLAND 0x00482860
-unsigned int FUN_00482860(void) {
+unsigned int SaveBestNodeList(void) {
     unsigned int count;
     struct BestNode *node;
 
@@ -605,22 +605,22 @@ unsigned int FUN_00482860(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004828f0
-void FUN_004828f0(void) {
+void FreeBestNodeList(void) {
     struct BestNode *next;
     while (DAT_0066b44c != 0) {
         next = ((struct BestNode *)DAT_0066b44c)->next;
         free(DAT_0066b44c);
         DAT_0066b44c = next;
     }
-    FUN_00482a80();
+    ClearEntrance1();
 }
 
 // FUNCTION: LEGOLAND 0x00482920
-int FUN_00482920(void) {
+int LoadBestNodeList(void) {
     unsigned int count;
     struct BestNode *node;
 
-    FUN_004828f0();
+    FreeBestNodeList();
 
     if (SaveGameRead(&count, 4) == 0) {
         return 0;
@@ -645,22 +645,22 @@ int FUN_00482920(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004829c0
-void FUN_004829c0(struct BestNode *node) {
+void __declspec(struct BestNode *node) {
     int count;
     struct BestNode **copy;
     struct BestNode **p;
 
     node->field_20 |= 2;
-    FUN_004819a0((int *)&node->x_min);
-    count = DAT_00669254;
+    CollectAdjacentNodes((int *)&node->x_min);
+    count = AdjacentNodeCount;
     if (count) {
         copy = (struct BestNode **)malloc(count * sizeof(struct BestNode *));
         if (copy != NULL) {
-            memcpy(copy, DAT_0066a45c, count * 4);
+            memcpy(copy, AdjacentNodes, count * 4);
             p = copy;
             for (; count > 0; count--) {
                 if (!((*p)->field_20 & 2)) {
-                    FUN_004829c0(*p);
+                    __declspec(*p);
                 }
                 p++;
             }
@@ -684,12 +684,12 @@ void FUN_00482a40(struct Point *pos) {
 
     found = FindBestNodeAtPoint(pos);
     if (found != NULL) {
-        FUN_004829c0(found);
+        __declspec(found);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00482a80
-void FUN_00482a80(void) {
+void ClearEntrance1(void) {
     Entrance1Point.x = 0;
     Entrance1Elem = 0;
 }

@@ -76,7 +76,7 @@ struct BestNode {
 void RemoveBestNode(struct BestNode *node);
 typedef struct BestNode BestNode;
 struct BestNode *FindBestNodeAtPoint(struct Point *pos);
-void FUN_004819a0(int *param_1);
+void CollectAdjacentNodes(int *param_1);
 struct BestNode *FUN_004817d0(int *param_1);
 void MergeBestNode(struct BestNode *node);
 LEGO_EXPORT void AllocBlokeCounters(unsigned int size);

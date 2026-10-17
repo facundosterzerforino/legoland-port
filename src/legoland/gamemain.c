@@ -56,7 +56,7 @@ int IsInMapBounds(int a, int b) {
 }
 
 // FUNCTION: LEGOLAND 0x004776c0
-void FUN_004776c0(struct GameMainNode *node) {
+void ReleasePathNode(struct GameMainNode *node) {
     node->next = DAT_00668fc4;
     DAT_00668fc4 = node;
 }
@@ -256,7 +256,7 @@ int FUN_004779a0(int x0, int y0, int x1, int y1) {
 }
 
 // FUNCTION: LEGOLAND 0x004779d0
-void FUN_004779d0(struct Point *p) {
+void RemoveObjectAtPoint(struct Point *p) {
     struct MapElement *tile;
     struct Element *elem;
     struct Ride *saved_class;
@@ -292,7 +292,7 @@ void FUN_004779d0(struct Point *p) {
         if (tile->flags & 0x20) {
             if (QueryClass->flags & 0x200000) {
                 RemoveObjectFromBuildList(t);
-                FUN_0045e850((struct Element *)elem, &pos.x);
+                ClearObjectEntrances((struct Element *)elem, &pos.x);
                 IncrementObjectCount((struct Ride *)QueryClass);
                 RemoveObjectFromMap(t);
             }
@@ -306,7 +306,7 @@ void FUN_004779d0(struct Point *p) {
     if (tile->flags & 0x800) {
         order = GetGardenerWorkOrderAt(p->x, p->y);
         if (NULL != order) {
-            FUN_0045e850((struct Element *)order->element, &order->pos.x);
+            ClearObjectEntrances((struct Element *)order->element, &order->pos.x);
             ptmp63 = order->element->data;
             ClearPathUnderFootprint((struct Ride *)ptmp63, &order->pos.x);
             EraseGardenerOrder(order);
@@ -317,7 +317,7 @@ void FUN_004779d0(struct Point *p) {
         order = GetMechanicWorkOrderAt(ptmp62, ptmp184);
         if (order != NULL) {
             ptmp12 = order->element;
-            FUN_0045e850((struct Element *)ptmp12, &order->pos.x);
+            ClearObjectEntrances((struct Element *)ptmp12, &order->pos.x);
             ClearPathUnderFootprint((struct Ride *)order->element->data, &order->pos.x);
             EraseMechanicOrder(order);
             return;
@@ -372,7 +372,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct GameMainNode *)nb);
+                            ReleasePathNode((struct GameMainNode *)nb);
                         } else {
                             cur_x2 = cur->x;
                             nb->field_24 = FUN_004779a0(cur_x2, cur->y, nb->x, nb->y);
@@ -404,7 +404,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct GameMainNode *)nb);
+                            ReleasePathNode((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
@@ -435,7 +435,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (NULL != best && cost > best->path_cost) {
-                            FUN_004776c0((struct GameMainNode *)nb);
+                            ReleasePathNode((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
@@ -465,7 +465,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                     }
                     if (result == 0) {
                         if (best != NULL && cost > best->path_cost) {
-                            FUN_004776c0((struct GameMainNode *)nb);
+                            ReleasePathNode((struct GameMainNode *)nb);
                         } else {
                             nb->field_24 = FUN_004779a0(cur->x, cur->y, nb->x, nb->y);
                             nb->parent = cur;
@@ -483,7 +483,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
                 }
             }
         }
-        FUN_004776c0((struct GameMainNode *)cur);
+        ReleasePathNode((struct GameMainNode *)cur);
     }
     // STRING: LEGOLAND 0x004b8a70
     id = ElemID("PATH CONTROL");
@@ -497,7 +497,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
         }
         if (!(tile->flags & 0x10)) {
             if ((tile->field_10 & 3) != 3) {
-                FUN_004779d0(pp);
+                RemoveObjectAtPoint(pp);
                 AddBasicPath((struct Element *)id, (int *)pp);
             }
         }
@@ -638,7 +638,7 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
 }
 
 // FUNCTION: LEGOLAND 0x004784c0
-void FUN_004784c0(void) {
+void ResetLevelScriptState(void) {
     NEWFLC_Repeat = 0;
     NEWFLC_BuffSize = 1;
     NEWFLC_CheckDuplicate = 1;
@@ -666,14 +666,14 @@ void FUN_004784c0(void) {
     FUN_004688e0();
     ConfigureAppraisal(0, 0);
     ClearBriefingAndHintsFileNames();
-    FUN_00482d70();
-    FUN_00462e90();
+    SetDefaultMoodDeltas();
+    SetDefaultClassLimits();
     FUN_00476000();
     ClearButtonFlashStates();
-    FUN_00490610(DAT_004d8bb0);
-    FUN_00463560();
+    SetPendingMovie(DAT_004d8bb0);
+    ResetDamageTimer();
     ResetPathUpdateTimer();
-    FUN_00459960();
+    ResetPathSceneryTimer();
 
     MapStats.brick_meter_max = 1000;
     MapStats.show_capacity = 0;
@@ -684,7 +684,7 @@ void FUN_004784c0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004785d0
-void FUN_004785d0(char *param_1, unsigned int param_2) {
+void SetScriptSectionType(char *param_1, unsigned int param_2) {
     strcpy(DAT_00669058, param_1);
     DAT_00669054 = param_2;
 }
@@ -722,21 +722,21 @@ void FUN_00478650(struct CommandArgs *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478690
-int FUN_00478690(void *param_1, unsigned int param_2, unsigned int param_3) {
+int HasEnoughScriptArgs(void *param_1, unsigned int param_2, unsigned int param_3) {
     return (int)param_2 >= (int)param_3;
 }
 
 // FUNCTION: LEGOLAND 0x004786a0
-int FUN_004786a0(void *param_1, unsigned int param_2, unsigned int param_3) {
+int IsScriptCommandAllowed(void *param_1, unsigned int param_2, unsigned int param_3) {
     return (DAT_00669054 & param_3) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x004786c0
-unsigned int FUN_004786c0(void *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
-    if (FUN_004786a0(param_1, param_2, param_3) == 0) {
+unsigned int CheckScriptCommand(void *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
+    if (IsScriptCommandAllowed(param_1, param_2, param_3) == 0) {
         return 0;
     }
-    return FUN_00478690(param_1, param_2, param_4) != 0;
+    return HasEnoughScriptArgs(param_1, param_2, param_4) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x00478700
@@ -767,6 +767,6 @@ void ParseIntPair(int *param_1, char **param_2, int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x004787a0
-char *FUN_004787a0(struct CommandArgs *param_1, unsigned int param_2) {
+char *GetScriptArg1(struct CommandArgs *param_1, unsigned int param_2) {
     return param_1->arg1;
 }

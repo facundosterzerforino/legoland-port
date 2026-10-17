@@ -395,7 +395,7 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
     strcpy(cursor_str, blink);
     rc.left = center_x;
     rc.right = center_x + 100;
-    FUN_00490fa0(cursor_str, 2, rc, 1);
+    DrawClippedText(cursor_str, 2, rc, 1);
     TempProfile.name_len = count;
 }
 
