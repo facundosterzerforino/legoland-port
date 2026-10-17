@@ -9,7 +9,9 @@
 
 #include "../src/legoland/binv.h"
 #include "../src/legoland/castle.h"
+#include "../src/legoland/draw.h"
 #include "../src/legoland/globals.h"
+#include "../src/legoland/image_sprite.h"
 #include "../src/legoland/legoland.h"
 #include "../src/legoland/man3d.h"
 #include "../src/legoland/movie_pool.h"
@@ -21,6 +23,7 @@
 #include "../src/legoland/resource.h"
 #include "../src/legoland/sound_sfx.h"
 #include "../src/legoland/string.h"
+#include "../src/legoland/text.h"
 #include "miniwin/files.h"
 #include "port_language.h"
 #include "port_res.h"
@@ -529,6 +532,157 @@ static void PortResCheckPeople(void) {
     fprintf(PortResReport, "people: textures and faces in port-selftest-people.txt\n");
 }
 
+/* The game's text as the game prints it: its own helpers (Print, PrintCent, PrintLimitedText...) on a DirectDraw
+ * surface made the render target, as the screens print theirs (the notebook's objectives, the info panels), with the
+ * game's fonts. The surface is filled with a marker colour first; the pixels each helper changed are counted. */
+static LPDIRECTDRAWSURFACE PortResTextSurface;
+
+static void PortResTextFill(void) {
+    DDSURFACEDESC desc;
+    int x;
+    int y;
+
+    memset(&desc, 0, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    if (PortResTextSurface->lpVtbl->Lock(PortResTextSurface, NULL, &desc, DDLOCK_WAIT, NULL) != DD_OK) {
+        return;
+    }
+    for (y = 0; y < (int)desc.dwHeight; y++) {
+        for (x = 0; x < (int)desc.dwWidth; x++) {
+            ((unsigned short *)((unsigned char *)desc.lpSurface + y * desc.lPitch))[x] = 0x1234;
+        }
+    }
+    PortResTextSurface->lpVtbl->Unlock(PortResTextSurface, desc.lpSurface);
+}
+
+static int PortResTextCount(void) {
+    DDSURFACEDESC desc;
+    int x;
+    int y;
+    int n = 0;
+
+    memset(&desc, 0, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    if (PortResTextSurface->lpVtbl->Lock(PortResTextSurface, NULL, &desc, DDLOCK_WAIT, NULL) != DD_OK) {
+        return -1;
+    }
+    for (y = 0; y < (int)desc.dwHeight; y++) {
+        for (x = 0; x < (int)desc.dwWidth; x++) {
+            n += ((unsigned short *)((unsigned char *)desc.lpSurface + y * desc.lPitch))[x] != 0x1234;
+        }
+    }
+    PortResTextSurface->lpVtbl->Unlock(PortResTextSurface, desc.lpSurface);
+    return n;
+}
+
+static void PortResCheckTextPath(void) {
+    static const struct {
+        HFONT *font;
+        int height;
+        int weight;
+    } fonts[] = {{&LegoFont24Bold, 24, 700}, {&LegoFont28Normal, 28, 400}, {&LegoFont20Bold, 20, 700},
+        {&LegoFont18SemiBold, 18, 600}};
+    const char *line = "LEGOLAND Park 1999";
+    DDSURFACEDESC desc;
+    RECT rc = {4, 4, 316, 60};
+    RECT saved_clip;
+    LPDIRECTDRAWSURFACE saved_target;
+    struct TextCell *cell;
+    int counts[5];
+    int cell_pixels = -1;
+    size_t i;
+
+    if (CheckHostSystemGPU() == 0) {
+        fprintf(PortResReport, "text on a surface: no DirectDraw\n");
+        PortResProblems++;
+        return;
+    }
+    for (i = 0; i < sizeof(fonts) / sizeof(fonts[0]); i++) {
+        if (*fonts[i].font == NULL) {
+            LOGFONTA lf;
+
+            memset(&lf, 0, sizeof(lf));
+            lf.lfHeight = fonts[i].height;
+            lf.lfWeight = fonts[i].weight;
+            lf.lfCharSet = 1;
+            lf.lfQuality = 2;
+            strcpy(lf.lfFaceName, "Lego");
+            *fonts[i].font = CreateFontIndirectA(&lf); /* InitScreen's fonts */
+        }
+    }
+    memset(&desc, 0, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    desc.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT;
+    desc.dwWidth = 320;
+    desc.dwHeight = 64;
+    desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+    if (DDRAWENV.ddraw2->lpVtbl->CreateSurface(DDRAWENV.ddraw2, &desc, &PortResTextSurface, NULL) != DD_OK) {
+        fprintf(PortResReport, "text on a surface: no surface\n");
+        PortResProblems++;
+        return;
+    }
+    saved_clip = SPRITE_ClipRect;
+    saved_target = renderEngine;
+    renderEngine = PortResTextSurface;
+    SetRect(&SPRITE_ClipRect, 0, 0, 320, 64);
+    VideoSurfaceLocked = 0;
+    PortResTextFill();
+    Print(4, 4, line, 0);
+    counts[0] = PortResTextCount();
+    PortResTextFill();
+    PrintCent(160, 4, 300, line, 1);
+    counts[1] = PortResTextCount();
+    PortResTextFill();
+    PrintLimitedText(4, 4, 300, line, 2, RGB(0, 0, 0), 0x10);
+    counts[2] = PortResTextCount();
+    PortResTextFill();
+    DrawTextOnRenderSurface((char *)line, 3, rc, RGB(255, 255, 255));
+    counts[3] = PortResTextCount();
+    PortResTextFill();
+    FUN_00455220(4, 4, line, 2, 300);
+    counts[4] = PortResTextCount();
+    fprintf(PortResReport,
+        "text on a surface: Print %d pixels, PrintCent %d, PrintLimitedText %d, DrawTextOnRenderSurface %d, "
+        "FUN_00455220 %d\n",
+        counts[0], counts[1], counts[2], counts[3], counts[4]);
+    for (i = 0; i < 5; i++) {
+        if (counts[i] <= 0) {
+            PortResProblems++;
+        }
+    }
+    /* a text cell, as BubbleHelp makes the advisor's speech bubble (the tutorial's messages): a function-based sprite
+     * the sprite engine renders by FUN_00455a50 into its own surface; the pixels that aren't the background counted */
+    cell = CreateTextCell("Build the Small Power Station in the park.", 200, 40, 0, 0x10, 0xd6dede, 0);
+    if (cell != NULL && RecreateSprite(cell->sprite) && MakeSprite(cell->sprite) && cell->sprite->surface != NULL) {
+        LPDIRECTDRAWSURFACE s = (LPDIRECTDRAWSURFACE)cell->sprite->surface;
+
+        memset(&desc, 0, sizeof(desc));
+        desc.dwSize = sizeof(desc);
+        if (s->lpVtbl->Lock(s, NULL, &desc, DDLOCK_WAIT, NULL) == DD_OK) {
+            unsigned short bg = *(unsigned short *)desc.lpSurface;
+            int x;
+            int y;
+
+            cell_pixels = 0;
+            for (y = 0; y < (int)desc.dwHeight; y++) {
+                for (x = 0; x < (int)desc.dwWidth; x++) {
+                    cell_pixels += ((unsigned short *)((unsigned char *)desc.lpSurface + y * desc.lPitch))[x] != bg;
+                }
+            }
+            s->lpVtbl->Unlock(s, desc.lpSurface);
+        }
+    }
+    fprintf(PortResReport, "text cell (the speech bubble's): %d pixels\n", cell_pixels);
+    if (cell_pixels <= 0) {
+        PortResProblems++;
+    }
+    FlushTextCells(1);
+    renderEngine = saved_target;
+    SPRITE_ClipRect = saved_clip;
+    PortResTextSurface->lpVtbl->Release(PortResTextSurface);
+    PortResTextSurface = NULL;
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -597,6 +751,7 @@ int PortResSelfTest(const char *path) {
     /* the time the volumes took to read (small reads, as the game makes them: a browser's storage is slow at those) */
     fprintf(PortResReport, "resources: read in %lu ms\n", (unsigned long)(GetTickCount() - PortResStart));
     PortResCheckPeople();
+    PortResCheckTextPath();
     PortResCheckSounds();
     PortResCheckMusicStart();
     if (PortResDump != NULL) {
