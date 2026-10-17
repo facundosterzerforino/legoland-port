@@ -199,9 +199,9 @@ void FUN_00452390(void) {
         DAT_00813a7c = MouseTileX;
         DAT_00813a80 = MouseTileY;
     }
-    if ((MouseClickFlags & 1) != 0) {
+    if ((DAT_00813ac4 & 1) != 0) {
         GamePad = GamePad | 0x1000;
-        MouseClickFlags = MouseClickFlags & 0xfffffffe;
+        DAT_00813ac4 = DAT_00813ac4 & 0xfffffffe;
     }
 }
 
@@ -276,11 +276,11 @@ LEGO_EXPORT void ReadGameButtons(void) {
     if ((held & DAT_00813ab0) != 0) DAT_00813ab4 |= 4;
     if ((repeat & DAT_00813ab0) != 0) DAT_00813ab4 |= 8;
 
-    MouseClickFlags = 0;
-    if ((pressed & DAT_00813ac0) != 0) MouseClickFlags = 1;
-    if ((released & DAT_00813ac0) != 0) MouseClickFlags |= 2;
-    if ((held & DAT_00813ac0) != 0) MouseClickFlags |= 4;
-    if ((repeat & DAT_00813ac0) != 0) MouseClickFlags |= 8;
+    DAT_00813ac4 = 0;
+    if ((pressed & DAT_00813ac0) != 0) DAT_00813ac4 = 1;
+    if ((released & DAT_00813ac0) != 0) DAT_00813ac4 |= 2;
+    if ((held & DAT_00813ac0) != 0) DAT_00813ac4 |= 4;
+    if ((repeat & DAT_00813ac0) != 0) DAT_00813ac4 |= 8;
 
     DAT_00813acc = 0;
     if ((pressed & DAT_00813ac8) != 0) DAT_00813acc = 1;
@@ -332,19 +332,19 @@ LEGO_EXPORT void ReadGameButtons(void) {
         if ((held & DAT_00813a5c) != 0) DAT_00813a60 |= 4;
         if ((repeat & DAT_00813a5c) != 0) DAT_00813a60 |= 8;
 
-        if ((GamePad & 4) != 0 && (MouseClickFlags & 4) != 0) {
-            MouseClickFlags |= 0x10;
+        if ((GamePad & 4) != 0 && (DAT_00813ac4 & 4) != 0) {
+            DAT_00813ac4 |= 0x10;
         }
         if ((GamePad & 0x400) != 0 && (Hover.type & 0x100) != 0) {
             if ((GamePad & 0x1000) != 0) {
                 DAT_00813a7c = MouseTileX;
                 DAT_00813a80 = MouseTileY;
-                if ((MouseClickFlags & 2) != 0) {
+                if ((DAT_00813ac4 & 2) != 0) {
                     DAT_00667c48 = 1;
-                    MouseClickFlags = MouseClickFlags | 0x11;
+                    DAT_00813ac4 = DAT_00813ac4 | 0x11;
                     GamePad = GamePad & 0xffffefff;
                 } else {
-                    MouseClickFlags = MouseClickFlags & 0xffffffee;
+                    DAT_00813ac4 = DAT_00813ac4 & 0xffffffee;
                 }
             } else {
                 FUN_00452390();

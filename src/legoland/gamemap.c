@@ -126,7 +126,7 @@ void FUN_004598d0(struct Point *coord, int *param_2, int *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00459960
-void ResetPathSceneryTimer(void) {
+void FUN_00459960(void) {
     DAT_00667d10 = GetGameTimer();
 }
 
@@ -397,21 +397,21 @@ LEGO_EXPORT int FindObjectsPower(struct Ride *ride) {
 }
 
 // FUNCTION: LEGOLAND 0x0045a000
-void MarkObjectPowered(int power, MapElement *object) {
+void FUN_0045a000(int power, MapElement *object) {
     object->flags &= 0xfeff;
     MapStats.unpowered_demand = MapStats.unpowered_demand - power;
     MapStats.unpowered_count = MapStats.unpowered_count - 1;
 }
 
 // FUNCTION: LEGOLAND 0x0045a030
-void MarkObjectUnpowered(int power, MapElement *object) {
+void FUN_0045a030(int power, MapElement *object) {
     object->flags |= 0x100;
     MapStats.unpowered_demand = MapStats.unpowered_demand + power;
     MapStats.unpowered_count = MapStats.unpowered_count + 1;
 }
 
 // FUNCTION: LEGOLAND 0x0045a060
-void RestorePowerToObjects(void) {
+void FUN_0045a060(void) {
     MapElement *object = GetFirstRenderObject();
     int power;
     if (object == NULL) {
@@ -421,7 +421,7 @@ void RestorePowerToObjects(void) {
         if (object->flags & 0x100) {
             power = -FindObjectsPower(object->field_0->data);
             if (MapStats.power_demand - (int)MapStats.unpowered_demand + power <= MapStats.power_supply) {
-                MarkObjectPowered(power, object);
+                FUN_0045a000(power, object);
                 if (MapStats.power_demand - (int)MapStats.unpowered_demand == MapStats.power_supply) {
                     return;
                 }
@@ -432,14 +432,14 @@ void RestorePowerToObjects(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0045a0d0
-void CutPowerToObjects(void) {
+void FUN_0045a0d0(void) {
     MapElement *object = GetFirstRenderObject();
     int power;
     while (object != NULL) {
         if ((object->flags & 0x100) == 0) {
             power = -FindObjectsPower(object->field_0->data);
             if (power > 0) {
-                MarkObjectUnpowered(power, object);
+                FUN_0045a030(power, object);
                 if (MapStats.power_demand - (int)MapStats.unpowered_demand <= MapStats.power_supply) {
                     break;
                 }
@@ -460,7 +460,7 @@ LEGO_EXPORT void AddObjectsPowerStats(struct Element *classid, struct Point *pos
         if (0 < power) {
             MapStats.power_supply = MapStats.power_supply + power;
             if (MapStats.unpowered_demand != 0) {
-                RestorePowerToObjects();
+                FUN_0045a060();
             }
             return;
         }
@@ -507,7 +507,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
             if ((cell->flags.bytes[1] & 2) == 0) {
                 MapStats.power_supply = MapStats.power_supply - power;
                 if (MapStats.power_demand - (int)MapStats.unpowered_demand > MapStats.power_supply) {
-                    CutPowerToObjects();
+                    FUN_0045a0d0();
                 }
             }
         } else {
@@ -525,7 +525,7 @@ LEGO_EXPORT void RemoveObjectsPowerStats(struct Element *classid, TileId coords)
                     MapStats.unpowered_demand = MapStats.unpowered_demand - amount;
                     MapStats.unpowered_count = MapStats.unpowered_count + -1;
                 }
-                RestorePowerToObjects();
+                FUN_0045a060();
             }
         }
         if (MapStats.power_supply <= MapStats.power_demand) {

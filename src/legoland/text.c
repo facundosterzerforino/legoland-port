@@ -661,7 +661,7 @@ struct TextCell *FindTextCellByName(char *name) {
 }
 
 // FUNCTION: LEGOLAND 0x00455e50
-void PrintTextBox(char *name, unsigned int x, unsigned int y, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
+void FUN_00455e50(char *name, unsigned int x, unsigned int y, int width, int height, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     struct TextCell *cell;
 
     cell = FindTextCell(name, width, height, font, format, bg_color, text_color);

@@ -1059,7 +1059,7 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
 }
 
 // FUNCTION: LEGOLAND 0x0047cba0
-LEGO_EXPORT void *__declspec(struct Element *head) {
+LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     char filename[0x200];
     char name[0x200];
     unsigned int count;
@@ -1385,7 +1385,7 @@ LEGO_EXPORT void *LLIDB_LoadData(struct Element *handle) {
         head->data = LLIDB_LoadTSMData(head);
         break;
     case LLIDB_TYPE_TSF:
-        head->data = __declspec(head);
+        head->data = LLIDB_LoadTSFData(head);
         break;
     case LLIDB_TYPE_ILF:
         head->data = LLIDB_LoadILFData(head);

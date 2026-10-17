@@ -125,22 +125,22 @@ void FUN_004511f0(int param_1) { return; }
 void FUN_00451200(void) { return; }
 
 // FUNCTION: LEGOLAND 0x00451210
-void EjectCdDrive(int param_1) {
+void FUN_00451210(int param_1) {
     int drive;
 
     FUN_004511f0(param_1);
-    if (VWin32DeviceHandle != INVALID_HANDLE_VALUE) {
+    if (DAT_004b85c4 != INVALID_HANDLE_VALUE) {
         *(char *)&drive = (char)toupper((char)param_1) - 0x40;
-        UnlockMedia(VWin32DeviceHandle, drive);
-        EjectMedia(VWin32DeviceHandle, drive);
-        UnlockLogicalVolume(VWin32DeviceHandle, drive);
-        CloseDeviceHandle(VWin32DeviceHandle);
-        VWin32DeviceHandle = INVALID_HANDLE_VALUE;
+        FUN_00451280(DAT_004b85c4, drive);
+        FUN_00451410(DAT_004b85c4, drive);
+        UnlockLogicalVolume(DAT_004b85c4, drive);
+        CloseDeviceHandle(DAT_004b85c4);
+        DAT_004b85c4 = INVALID_HANDLE_VALUE;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00451280
-int UnlockMedia(HANDLE h, int drive) {
+int FUN_00451280(HANDLE h, int drive) {
     DIOC_REGISTERS regs = {0};
     unsigned char buf[8];
     int result;
@@ -187,7 +187,7 @@ fail:
 }
 
 // FUNCTION: LEGOLAND 0x00451390
-int LockMedia(HANDLE h, int drive) {
+int FUN_00451390(HANDLE h, int drive) {
     DIOC_REGISTERS regs = {0};
     char buf[2];
 
@@ -204,7 +204,7 @@ int LockMedia(HANDLE h, int drive) {
 }
 
 // FUNCTION: LEGOLAND 0x00451410
-int EjectMedia(HANDLE h, int drive) {
+int FUN_00451410(HANDLE h, int drive) {
     DIOC_REGISTERS regs = {0};
 
     regs.reg_EBX = drive & 0xff;
@@ -227,7 +227,7 @@ int OpenVWin32Device(void) {
 BOOL __stdcall CloseDeviceHandle(HANDLE param_1) { return CloseHandle(param_1); }
 
 // FUNCTION: LEGOLAND 0x004514b0
-BOOL __stdcall LockLogicalVolume(HANDLE h, int drive, int param_3, int param_4) {
+BOOL __stdcall FUN_004514b0(HANDLE h, int drive, int param_3, int param_4) {
     DIOC_REGISTERS regs = {0};
     unsigned char category = 0x48;
     BOOL result;

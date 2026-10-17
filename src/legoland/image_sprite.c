@@ -272,7 +272,7 @@ LEGO_EXPORT void RemakeAllDetailDependentSprites(void) {
             }
             if (sprite->surface != 0) {
                 sprite->surface = 0;
-                EnsureSpriteSurface(sprite);
+                FUN_00499500(sprite);
             }
         }
         MarkSpriteResized(sprite);
@@ -382,7 +382,7 @@ LEGO_EXPORT int ReloadImageBitmapAndBuildSprites(struct Image *image) {
             }
             sprite->height = sprite->image->height - sprite->src_y;
         }
-        EnsureSpriteSurface(sprite);
+        FUN_00499500(sprite);
         MarkSpriteResized(sprite);
     }
     return 1;
@@ -486,7 +486,7 @@ LEGO_EXPORT struct Sprite *CreateSprite(struct Image *image) {
         }
         sprite->width = image->width;
         sprite->height = image->height;
-        EnsureSpriteSurface(sprite);
+        FUN_00499500(sprite);
     }
     return sprite;
 }
@@ -592,7 +592,7 @@ LEGO_EXPORT int RecreatePartialSprite(struct Sprite *sprite, struct Image *image
         }
     }
     if (had_host != 0) {
-        EnsureSpriteSurface(sprite);
+        FUN_00499500(sprite);
     }
     return 1;
 }

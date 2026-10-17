@@ -41,7 +41,7 @@ LEGO_EXPORT unsigned int GetBlink(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00499500
-int EnsureSpriteSurface(struct Sprite *sprite) {
+int FUN_00499500(struct Sprite *sprite) {
     if (sprite->flags & 0x20) {
         if (RecreateSprite(sprite) == 0) {
             return 0;

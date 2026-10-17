@@ -120,7 +120,7 @@ void FUN_00411f20(struct Queue *queue, struct RideNode *mid) {
 }
 
 // FUNCTION: LEGOLAND 0x00411f70
-int IsBlokeAtQueueHead(struct Queue *queue, struct Bloke *inner) {
+int FUN_00411f70(struct Queue *queue, struct Bloke *inner) {
     struct QueueNode *head = queue->head;
     if (head != NULL && head->field_4->rider == inner) {
         return 1;
@@ -187,7 +187,7 @@ void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00412100
-struct QueueTable *BuildQueueTable(struct PathTable *param_1) {
+struct QueueTable *FUN_00412100(struct PathTable *param_1) {
     int px;
     int py;
     int i;
@@ -250,7 +250,7 @@ void FreeIfNotNull(void *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004122a0
-void StartQueueTableBackward(struct QueueTable *param_1, struct Bloke *slot) {
+void FUN_004122a0(struct QueueTable *param_1, struct Bloke *slot) {
     slot->queue = param_1;
     slot->field_38 = param_1->count - 1;
     slot->field_34 = 0xff;
@@ -258,7 +258,7 @@ void StartQueueTableBackward(struct QueueTable *param_1, struct Bloke *slot) {
 }
 
 // FUNCTION: LEGOLAND 0x004122d0
-void StartQueueTableForward(struct QueueTable *param_1, struct Bloke *slot) {
+void FUN_004122d0(struct QueueTable *param_1, struct Bloke *slot) {
     slot->queue = param_1;
     slot->field_38 = 0;
     slot->field_34 = 1;
@@ -266,12 +266,12 @@ void StartQueueTableForward(struct QueueTable *param_1, struct Bloke *slot) {
 }
 
 // FUNCTION: LEGOLAND 0x004122f0
-struct QueueTable *GetBlokeQueueTable(struct Bloke *slot) {
+struct QueueTable *FUN_004122f0(struct Bloke *slot) {
     return slot->queue;
 }
 
 // FUNCTION: LEGOLAND 0x00412300
-void MoveBlokeAlongQueueTable(struct QueueTable *table, int x, int y, struct Bloke *bloke) {
+void FUN_00412300(struct QueueTable *table, int x, int y, struct Bloke *bloke) {
     struct Point p;
     char dir;
 
@@ -294,7 +294,7 @@ void MoveBlokeAlongQueueTable(struct QueueTable *table, int x, int y, struct Blo
 }
 
 // FUNCTION: LEGOLAND 0x004123a0
-unsigned int CountQueueNodesBetween(struct QueueNode *start, struct QueueNode *stop) {
+unsigned int FUN_004123a0(struct QueueNode *start, struct QueueNode *stop) {
     unsigned int count = 0;
     struct QueueNode *current = start;
     if (current != NULL) {
@@ -327,7 +327,7 @@ void SaveQueue(struct QueueNode *start, struct Queue *queue) {
     }
     SaveGameWrite(&n, 4);
     for (node = queue->head; node != NULL; node = node->next) {
-        n = CountQueueNodesBetween(start, (struct QueueNode *)node->field_4);
+        n = FUN_004123a0(start, (struct QueueNode *)node->field_4);
         SaveGameWrite(&n, 4);
     }
 }
@@ -342,7 +342,7 @@ struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n) {
 }
 
 // FUNCTION: LEGOLAND 0x00412490
-void LoadQueueNodes(struct QueueNode *start, struct Queue *queue) {
+void FUN_00412490(struct QueueNode *start, struct Queue *queue) {
     int n;
     int idx;
 
@@ -427,7 +427,7 @@ void *FindQueueEntryAtTile(unsigned int a, unsigned int b) {
 }
 
 // FUNCTION: LEGOLAND 0x00412650
-struct RideQueueEntry *FindQueueEntryById(unsigned short param_1) {
+struct RideQueueEntry *FUN_00412650(unsigned short param_1) {
     struct RideQueueEntry *entry = DAT_004cbeac;
     if (entry == NULL) {
         return NULL;

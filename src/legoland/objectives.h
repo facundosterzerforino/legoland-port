@@ -95,7 +95,7 @@ int FUN_00469b50(struct ObjectiveEvent *event);
 int ScriptEventTake(struct ObjectiveEvent *event);
 int ObjectiveEventAddBricks(struct ObjectiveEvent *event);
 int ObjectiveEventSetBricks(struct ObjectiveEvent *event);
-int __declspec(struct ObjectiveEvent *arg);
+int ScriptEventClear(struct ObjectiveEvent *arg);
 int ScriptEventUnglue(struct ObjectiveEvent *arg);
 int ScriptEventGlue(struct ObjectiveEvent *arg);
 int ScriptEventExtendPark(struct ObjectiveEvent *arg);

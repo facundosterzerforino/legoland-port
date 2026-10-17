@@ -150,7 +150,7 @@ LEGO_EXPORT void ScanMouse(void) {
     if (WinDebugMode != 0) {
         /* [library:input] windowed mode: the exclusive DirectInput mouse reported motion that made the game's
          * cursor drift to the bottom-right. Use the window's own cursor instead (position in
-         * __declspec, buttons here, the wheel from WM_MOUSEWHEEL: port_input.h). */
+         * UpdateControllerFromMouseData, buttons here, the wheel from WM_MOUSEWHEEL: port_input.h). */
         memset(&MouseState, 0, sizeof(MouseState));
 #ifdef LEGOLAND_PORT
         {
@@ -216,7 +216,7 @@ LEGO_EXPORT void KillInputSystem(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00473b00
-LEGO_EXPORT void __declspec(struct CtrlBuffer *buffer) {
+LEGO_EXPORT void UpdateControllerFromMouseData(struct CtrlBuffer *buffer) {
     int dx;
     register int dy;
     unsigned int mode;

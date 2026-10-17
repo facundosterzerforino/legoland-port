@@ -12,9 +12,9 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
 LEGO_EXPORT void AddPathSquare(struct Point *pos);
 LEGO_EXPORT void RemovePathSquare(struct Point *pos);
 void FUN_00482a40(struct Point *pos);
-void ClearEntrance1(void);
+void FUN_00482a80(void);
 void InitEntrance1Point(void);
-void FreeBestNodeList(void);
+void FUN_004828f0(void);
 struct Point *GetEntrance1Point(void);
-unsigned int SaveBestNodeList(void);
-int LoadBestNodeList(void);
+unsigned int FUN_00482860(void);
+int FUN_00482920(void);

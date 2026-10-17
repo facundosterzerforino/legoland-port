@@ -9,10 +9,10 @@ struct Queue {
     struct QueueNode *tail;
 };
 
-unsigned int CountQueueNodesBetween(struct QueueNode *start, struct QueueNode *stop);
+unsigned int FUN_004123a0(struct QueueNode *start, struct QueueNode *stop);
 void SaveQueue(struct QueueNode *start, struct Queue *queue);
 struct QueueNode *GetNthNextQueueNode(struct QueueNode *node, int n);
-void LoadQueueNodes(struct QueueNode *start, struct Queue *queue);
+void FUN_00412490(struct QueueNode *start, struct Queue *queue);
 
 struct PathPair {
     /* 0x00 */ int a;
@@ -24,7 +24,7 @@ struct PathTable {
     /* 0x04 */ struct PathPair *pairs;
 };
 
-struct QueueTable *BuildQueueTable(struct PathTable *param_1);
+struct QueueTable *FUN_00412100(struct PathTable *param_1);
 
 struct RideQueueEntry {
     /* 0x00 */ struct RideQueueEntry *next;
@@ -52,13 +52,13 @@ void FUN_00412060(struct Queue *queue, struct RideNode **out);
 void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_3);
 void FreeIfNotNull(void *param_1);
 struct Bloke;
-void StartQueueTableBackward(struct QueueTable *param_1, struct Bloke *slot);
-void StartQueueTableForward(struct QueueTable *param_1, struct Bloke *slot);
-struct QueueTable *GetBlokeQueueTable(struct Bloke *slot);
-void MoveBlokeAlongQueueTable(struct QueueTable *table, int x, int y, struct Bloke *bloke);
+void FUN_004122a0(struct QueueTable *param_1, struct Bloke *slot);
+void FUN_004122d0(struct QueueTable *param_1, struct Bloke *slot);
+struct QueueTable *FUN_004122f0(struct Bloke *slot);
+void FUN_00412300(struct QueueTable *table, int x, int y, struct Bloke *bloke);
 void *FindQueueEntryAtTile(unsigned int a, unsigned int b);
 struct RideQueueEntry *FUN_004125a0(int x, int y);
-struct RideQueueEntry *FindQueueEntryById(unsigned short param_1);
+struct RideQueueEntry *FUN_00412650(unsigned short param_1);
 void FUN_00412680(int x, int y, int param_3, int param_4);
 void FUN_00411f20(struct Queue *queue, struct RideNode *mid);
 

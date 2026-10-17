@@ -132,13 +132,13 @@ LEGO_EXPORT void InitScreens(unsigned char param_1) {
         case 7:
             SamplesPaused = 1;
             PauseAllSamples();
-            InitIntervalScreen();
+            FUN_00490c70();
             break;
         case 8:
-            InitCertificateScreen();
+            FUN_00490350();
             break;
         case 9:
-            InitAdvertScreen();
+            FUN_00490150();
             break;
         default:
             break;
@@ -165,7 +165,7 @@ void RenderFrontEndScreen(unsigned char param_1) {
     }
     switch (DAT_0080ff80.unk8) {
     case 0:
-        __declspec();
+        PrintProfileDetails();
         break;
     case 4:
         PrintSavedGameDetails();
@@ -175,10 +175,10 @@ void RenderFrontEndScreen(unsigned char param_1) {
         PrintExitCheckBox();
         break;
     case 7:
-        RenderIntervalScreen();
+        FUN_004910f0();
         break;
     case 8:
-        RenderCertificateScreen();
+        FUN_00490410();
         break;
     case 6:
         FUN_0048c100();
@@ -186,7 +186,7 @@ void RenderFrontEndScreen(unsigned char param_1) {
     default:
         break;
     }
-    PlayPendingFrontEndSpeech();
+    FUN_0048fc00();
     ProcessFrontEndHelp();
     UpdateFocussedIconPtr();
     PopRenderingStatus();
@@ -246,10 +246,10 @@ int _ftol() {
 #endif
 
 // FUNCTION: LEGOLAND 0x00458940
-void ResetEditState(void) {
+void FUN_00458940(void) {
     EditMode.unk0 = 0;
     EditMode.unk4 = 3;
-    SetDefaultMouseHandlers();
+    FUN_00474880();
     EditMode.unk8 = 0;
     DefaultCursor(&EditCursor);
     BuildCursorPtr(&EditCursor, 0x8f8, 0);
@@ -276,7 +276,7 @@ void InitMouse(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00458a50
-void StartLevelGame(void) {
+void FUN_00458a50(void) {
     char buf[0x34];
 
     if (MapLoaded == 0) {
@@ -292,12 +292,12 @@ void StartLevelGame(void) {
         DAT_00667c4c = FUN_0047afb0(buf);
         SetBricksLimited(1);
         AllocBlokeCounters(lpConfig->max_blokes);
-        ResetEditState();
+        FUN_00458940();
         FUN_00489ee0();
         MapStats.level_end = 0;
         UpdateMenu();
         FUN_00490600(1);
-        ShowIntervalScreen(DAT_0066861c, 0);
+        FUN_004911c0(DAT_0066861c, 0);
         MapLoaded = 1;
         ResumeGameTimer();
         FUN_0048a800();
@@ -322,7 +322,7 @@ void UnloadMap(void) {
         ResetInfoStruct();
         ClearBuildObjList();
         FUN_0049cfc0();
-        UnloadGameInterface();
+        FUN_00474ed0();
         SetBricksLimited(1);
         GamePad = (GamePad & 0xffff00ff) | (((GamePad >> 8) & 0xeb) << 8);
         MapLoaded = 0;
@@ -355,7 +355,7 @@ int FUN_00458c00(void) {
     char path[256];
 
     SpeechStreamUpdate();
-    if (MapScreenOpenPending != 0) {
+    if (DAT_008119bc != 0) {
         PauseGameTimer();
         PauseAllSamples();
         DAT_006687bc = 0;
@@ -364,16 +364,16 @@ int FUN_00458c00(void) {
         InitMapScreen();
         DisableInfoPopUPIcons();
         DisableSidePanelIcons();
-        MapScreenOpenPending = 0;
-    } else if (MapScreenClosePending != 0) {
+        DAT_008119bc = 0;
+    } else if (DAT_0080ff70 != 0) {
         ResumeAllSamples();
         DAT_006687bc = 0;
         GamePad = GamePad | 0x20;
         DAT_006687c0 = 0;
         KillMapScreen();
-        SetDefaultMouseHandlers();
+        FUN_00474880();
         EnableSidePanelIcons();
-        MapScreenClosePending = 0;
+        DAT_0080ff70 = 0;
         ResumeGameTimer();
     } else if (DAT_00667c64 != 0) {
         PauseGameTimer();
@@ -392,16 +392,16 @@ int FUN_00458c00(void) {
             DAT_00667c80 = 0;
             UnloadWatchSprite();
             InitGameInterface(0);
-            SetDefaultMouseHandlers();
+            FUN_00474880();
         } else {
             FUN_0046c5c0();
-            StartLevelGame();
+            FUN_00458a50();
         }
         UpdateSoundVols();
         DAT_00667c64 = 0;
         MapStats.level_end = 0;
         EditMode.unk4 = 3;
-        SetDefaultMouseHandlers();
+        FUN_00474880();
         ResumeGameTimer();
     }
 
@@ -418,7 +418,7 @@ int FUN_00458c00(void) {
         GameProc();
         break;
     case 1:
-        __declspec();
+        FUN_00459360();
         break;
     case 0:
         return 0;
@@ -569,7 +569,7 @@ void GameProc(void) {
             }
         }
     }
-    if (Hover.type == 5 && (MouseClickFlags & 2) != 0) {
+    if (Hover.type == 5 && (DAT_00813ac4 & 2) != 0) {
         ClearAdvisorHelp();
         DAT_00667c48 = 1;
     }
@@ -600,7 +600,7 @@ void GameProc(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459360
-void __declspec(void) {
+void FUN_00459360(void) {
     unsigned int var_4;
     struct HitInfo hit_info;
     RECT clipping;
@@ -631,20 +631,20 @@ void __declspec(void) {
         SetClipping(&old_clipping);
         RenderMouseBounds();
         SetClipping(&clipping);
-        if ((MouseClickFlags & var_4) != 0) {
+        if ((DAT_00813ac4 & var_4) != 0) {
             MapScreenSetScrollPos(&MousePos);
         }
-        if ((MouseClickFlags & 2) != 0) {
+        if ((DAT_00813ac4 & 2) != 0) {
             ticks = GetTicks();
-            if (ticks - LastMapClickTicks < 0x1f4 && abs(MousePos.x - LastMapClickX) < 5 &&
-                abs(MousePos.y - LastMapClickY) < 5) {
-                MapScreenClosePending = var_4;
-                EditMode.unk4 = PreMapScreenMode;
-                PreMapScreenMode = var_4;
+            if (ticks - DAT_00667c68 < 0x1f4 && abs(MousePos.x - DAT_00667c70) < 5 &&
+                abs(MousePos.y - DAT_00667c74) < 5) {
+                DAT_0080ff70 = var_4;
+                EditMode.unk4 = DAT_00667c60;
+                DAT_00667c60 = var_4;
             }
-            LastMapClickX = MousePos.x;
-            LastMapClickY = MousePos.y;
-            LastMapClickTicks = ticks;
+            DAT_00667c70 = MousePos.x;
+            DAT_00667c74 = MousePos.y;
+            DAT_00667c68 = ticks;
         }
     }
     UpdateFocussedIconPtr();
@@ -803,7 +803,7 @@ void FUN_00459710(char *s) {
         }
     }
     FUN_00490600(0);
-    if (LoadIntervalReport(buffer) != 0) {
+    if (FUN_004907a0(buffer) != 0) {
         DAT_00668e38 = 1;
         EditMode.unk4 = 2;
         DAT_0080ff80.unk4 = 0xffffffff;

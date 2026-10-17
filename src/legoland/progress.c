@@ -41,7 +41,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         }
     }
     if ((int)lpConfig->level <= 5) {
-        InitTutorialScreen();
+        FUN_0048bde0();
         return;
     }
     if ((int)lpConfig->level > 0xf) {
@@ -61,7 +61,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         if (MapStats.level_end == 1 && lpConfig->level == 6) {
             MapStats.level_end = 2;
         }
-        LoadProgressScreenSprites();
+        FUN_0048b700();
         // STRING: LEGOLAND 0x004bef2c
         icon = LoadSpriteIcon("Accept_on_Progress.lls", 4, 0x20e, 0x16f, 0x23);
         icon->string_id = 0x262;
@@ -164,14 +164,14 @@ unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int 
             SpeechCloseFile();
             DAT_006687b0 = 4;
             PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-            KillProgressScreenSprites();
+            FUN_0048b770();
             if ((int)lpConfig->level <= 0xf) {
                 LoadWatchSprite(0xfa, 0x181);
                 DAT_00668e38 = 0;
                 InitGameInterface(1);
                 EditMode.unk4 = 3;
-                SetDefaultMouseHandlers();
-                StartLevelGame();
+                FUN_00474880();
+                FUN_00458a50();
                 UnloadWatchSprite();
                 DAT_00798660 = 0;
                 DAT_00798668 = 0;
@@ -222,7 +222,7 @@ void FUN_0048bd40(void) {
 // FUNCTION: LEGOLAND 0x0048bd70
 // [port:rewrite] loops over the 5 tutorial entries by index; the original stopped at the address one past
 // the table (0x4bed40)
-void KillTutorialScreenSprites(void) {
+void FUN_0048bd70(void) {
     struct ProgressEntry *e;
     int i;
 
@@ -240,7 +240,7 @@ void KillTutorialScreenSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048bde0
-void InitTutorialScreen(void) {
+void FUN_0048bde0(void) {
     struct IconNode *icon;
     struct IconNode **mapping;
     struct ProgressEntry *entry;
@@ -309,13 +309,13 @@ unsigned char FUN_0048bf90(unsigned char *arg0, unsigned int arg1, unsigned int 
         SpeechCloseFile();
         DAT_006687b0 = 4;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        KillTutorialScreenSprites();
+        FUN_0048bd70();
         LoadWatchSprite(0x186, 0x18b);
         DAT_00668e38 = 0;
         InitGameInterface(1);
         EditMode.unk4 = 3;
-        SetDefaultMouseHandlers();
-        StartLevelGame();
+        FUN_00474880();
+        FUN_00458a50();
         UnloadWatchSprite();
         DAT_00798660 = 0;
         DAT_00798668 = 0;
@@ -335,9 +335,9 @@ unsigned char FUN_0048c020(unsigned int a1, unsigned int a2, unsigned int a3, un
         DAT_00798660 = 0;
         DAT_00798668 = 0;
         if (temp != 0) {
-            KillTutorialScreenSprites();
+            FUN_0048bd70();
         } else {
-            KillProgressScreenSprites();
+            FUN_0048b770();
         }
         return FUN_0048fb80(a1, a2, a3, a4);
     }
@@ -352,10 +352,10 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
         DAT_0080ff80.unk4 = 0xffffffff;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (DAT_00798664 != 0) {
-            KillTutorialScreenSprites();
+            FUN_0048bd70();
             lpConfig->level = 6;
         } else {
-            KillProgressScreenSprites();
+            FUN_0048b770();
             lpConfig->level = 1;
         }
     }

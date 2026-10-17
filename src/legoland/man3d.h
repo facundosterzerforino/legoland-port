@@ -157,7 +157,7 @@ LEGO_EXPORT void BlokeSitAnim(struct Bloke *bloke);
 LEGO_EXPORT void BlokeSetFrame(struct Bloke *bloke, int frame);
 LEGO_EXPORT int PlayBlokeAnim(struct Bloke *bloke);
 
-LEGO_EXPORT struct Position *__declspec(const char *path);
+LEGO_EXPORT struct Position *LoadPos(const char *path);
 LEGO_EXPORT void UnloadPos(struct Position *pos);
 LEGO_EXPORT void RenderBlokeIn3D(struct Bloke *bloke);
 LEGO_EXPORT void SortBlokeIn3D(struct Bloke *bloke);

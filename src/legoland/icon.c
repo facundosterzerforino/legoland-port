@@ -89,7 +89,7 @@ struct InfoSource {
 void FUN_0046d3a0(void) { DAT_006687a4 = 4; }
 
 // FUNCTION: LEGOLAND 0x0046d3c0
-void FreeIcon(struct IconNode *node) {
+void FUN_0046d3c0(struct IconNode *node) {
     if (!node) {
         return;
     }
@@ -113,13 +113,13 @@ void FreeIcon(struct IconNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046d440
-void AppendIcon(struct IconNode *node) {
+void FUN_0046d440(struct IconNode *node) {
     ((struct IconNode *)PTR_some_list_head_004ba87c)->next = node;
     PTR_some_list_head_004ba87c = node;
 }
 
 // FUNCTION: LEGOLAND 0x0046d460
-void UnlinkIconAtSlot(struct IconNode **slot) {
+void FUN_0046d460(struct IconNode **slot) {
     struct IconNode *node = *slot;
     struct IconNode *next;
     if (FocussedIconPtr == node->next) {
@@ -130,7 +130,7 @@ void UnlinkIconAtSlot(struct IconNode **slot) {
     }
     node = *slot;
     next = node->next;
-    FreeIcon(node);
+    FUN_0046d3c0(node);
     *slot = next;
 }
 
@@ -146,23 +146,23 @@ void FUN_0046d4a0(struct IconNode **slot) {
     }
     node = *slot;
     next = node->next;
-    FreeIcon(node);
+    FUN_0046d3c0(node);
     *slot = next;
 }
 
 // FUNCTION: LEGOLAND 0x0046d4e0
-void RemoveIconFromList(struct IconNode *node) {
+void FUN_0046d4e0(struct IconNode *node) {
     struct IconNode *cur;
     struct IconNode *next;
     if (IconListHead == node) {
-        UnlinkIconAtSlot(&IconListHead);
+        FUN_0046d460(&IconListHead);
     } else {
         cur = IconListHead;
         while (cur != NULL && (next = cur->next) != node) {
             cur = next;
         }
         if (cur != NULL) {
-            UnlinkIconAtSlot((struct IconNode **)cur);
+            FUN_0046d460((struct IconNode **)cur);
         }
     }
 }
@@ -178,7 +178,7 @@ LEGO_EXPORT void RemoveIconGroup(unsigned short group) {
     while (node != NULL) {
         if (node->id == group) {
             node = node->next;
-            UnlinkIconAtSlot(slot);
+            FUN_0046d460(slot);
             removed++;
         } else {
             slot = &node->next;
@@ -213,7 +213,7 @@ void FUN_0046d590(unsigned short val) {
             node = node->next;
         } else {
             node = node->next;
-            UnlinkIconAtSlot(slot);
+            FUN_0046d460(slot);
             removed++;
         }
     }
@@ -284,7 +284,7 @@ LEGO_EXPORT struct IconNode *InsertIcon(short a1, short a2, int a3, struct Sprit
             icon->flags = icon->flags | 0x10;
         }
     }
-    AppendIcon(icon);
+    FUN_0046d440(icon);
     return icon;
 }
 
@@ -575,7 +575,7 @@ int FUN_0046dd10(unsigned short param_1, short param_2, short param_3, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x0046de50
-void GetIconRect(struct IconNode *src, struct Rect32 *dst) {
+void FUN_0046de50(struct IconNode *src, struct Rect32 *dst) {
     dst->left = src->x;
     dst->top = src->y;
     dst->right = src->width + src->x;
@@ -583,8 +583,8 @@ void GetIconRect(struct IconNode *src, struct Rect32 *dst) {
 }
 
 // FUNCTION: LEGOLAND 0x0046de90
-void GetIconBBox(struct IconNode *icon, struct Bbox *bbox) {
-    GetIconRect((struct IconNode *)icon, (struct Rect32 *)bbox);
+void FUN_0046de90(struct IconNode *icon, struct Bbox *bbox) {
+    FUN_0046de50((struct IconNode *)icon, (struct Rect32 *)bbox);
     if (icon->flags & 0x20) {
         bbox->min_x = bbox->min_x - 3;
         bbox->max_x = bbox->max_x + 3;
@@ -617,9 +617,9 @@ void GetIconBBox(struct IconNode *icon, struct Bbox *bbox) {
 }
 
 // FUNCTION: LEGOLAND 0x0046df30
-int SetClippingToIcon(struct IconNode *src) {
+int FUN_0046df30(struct IconNode *src) {
     RECT rect;
-    GetIconRect(src, (struct Rect32 *)&rect);
+    FUN_0046de50(src, (struct Rect32 *)&rect);
     SetClipping(&rect);
     return 0;
 }
@@ -637,13 +637,13 @@ LEGO_EXPORT int RenderBoxIcon(struct IconNode *node) {
         node->width + border * 2, node->height + border * 2,
         border, node->box.box_color);
     if ((node->flags & 0x20) != 0) {
-        SetClippingToIcon((struct IconNode *)node);
+        FUN_0046df30((struct IconNode *)node);
     }
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x0046dfd0
-int RenderIconWithText(struct IconNode *node) {
+int FUN_0046dfd0(struct IconNode *node) {
     struct PrintCtx ctx;
 
     ctx.flags = 2;
@@ -657,7 +657,7 @@ int RenderIconWithText(struct IconNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046e040
-int RenderFocusableIcon(struct IconNode *node) {
+int FUN_0046e040(struct IconNode *node) {
     struct PrintCtx ctx;
 
     ctx.flags = 2;
@@ -697,7 +697,7 @@ LEGO_EXPORT int RenderBuildObjectIcon(struct IconNode *node) {
             if (node->field_8 != NULL) {
                 // STRING: LEGOLAND 0x004b8a80
                 sprintf(buf, "%d", cost);
-                PrintTextBox(buf, node->x + 0x3c, node->y + 0x14, 0x41, 0x14, 1, 1, 0, 0xffffff);
+                FUN_00455e50(buf, node->x + 0x3c, node->y + 0x14, 0x41, 0x14, 1, 1, 0, 0xffffff);
             }
             switch (node->field_20b) {
             case 1:
@@ -901,7 +901,7 @@ LEGO_EXPORT int RenderMoneyBar(struct IconNode *node) {
     }
     // STRING: LEGOLAND 0x004ba890
     sprintf(buf, "%5d", bricks);
-    PrintTextBox(buf, node->x + 10 + node->width, node->y - 3, 200, node->height, 0, 0, 0xff0000, 0xffffff);
+    FUN_00455e50(buf, node->x + 10 + node->width, node->y - 3, 200, node->height, 0, 0, 0xff0000, 0xffffff);
     return 0;
 }
 
@@ -998,7 +998,7 @@ LEGO_EXPORT int RenderGBarSprite(struct IconNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046ea10
-int RenderPanelIcon(struct IconNode *node) {
+int FUN_0046ea10(struct IconNode *node) {
     struct PrintCtx ctx;
     RECT rect;
     RECT out;
@@ -1017,7 +1017,7 @@ int RenderPanelIcon(struct IconNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0046eaa0
-int RenderBlinkingIcon(struct IconNode *node) {
+int FUN_0046eaa0(struct IconNode *node) {
     struct PrintCtx ctx;
 
     ctx.flags = 2;
@@ -1113,7 +1113,7 @@ void FUN_0046ec50(char param) {
                         break;
                     }
                     diff = diff + 0x7a;
-                    ClampScrollPosition((lpConfig->view_width - diff) * 0x100, lpConfig->view_height << 8, diff * 0x100, 0);
+                    FUN_00461290((lpConfig->view_width - diff) * 0x100, lpConfig->view_height << 8, diff * 0x100, 0);
                 }
                 node->x = (short)node->x - (short)param;
             }
@@ -1317,9 +1317,9 @@ int PointInBBox(struct Point *point, struct Bbox *bbox) {
 }
 
 // FUNCTION: LEGOLAND 0x0046f330
-int IsPointInIcon(struct Point *point, struct IconNode *icon) {
+int FUN_0046f330(struct Point *point, struct IconNode *icon) {
     struct Bbox bbox;
-    GetIconBBox(icon, &bbox);
+    FUN_0046de90(icon, &bbox);
     return PointInBBox(point, &bbox);
 }
 
@@ -1345,7 +1345,7 @@ LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *
                 if ((flags & 0x10) != 0 && (flags & 0x400) == 0 && x >= cur->x && y >= cur->y &&
                     x <= cur->width + cur->x && y <= cur->height + cur->y) {
                     found = cur;
-                } else if ((flags & 0x40) != 0 && (flags & 0x400) == 0 && IsPointInIcon(param_1, cur) != 0) {
+                } else if ((flags & 0x40) != 0 && (flags & 0x400) == 0 && FUN_0046f330(param_1, cur) != 0) {
                     *param_2 |= 4;
                     if (found == NULL || (found->flags & 0x800) == 0 ||
                         (cur->id - 1 != found->id - 3 && cur->id - 1 != found->id - 4)) {
@@ -1354,7 +1354,7 @@ LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *
                 }
             }
             if ((cur->flags & 0x20) != 0 && (cur->flags & 0x400) == 0) {
-                GetIconRect((struct IconNode *)cur, (struct Rect32 *)&bbox);
+                FUN_0046de50((struct IconNode *)cur, (struct Rect32 *)&bbox);
                 if (x < bbox.min_x || x > bbox.max_x || y < bbox.min_y || y > bbox.max_y) {
                     doGeom = 0;
                 } else {
@@ -1382,7 +1382,7 @@ LEGO_EXPORT unsigned char CheckFocussedIcon(void) {
                 return ((unsigned char (*)(struct IconNode *, unsigned int, short, short))icon->event_handler)(
                     icon, DAT_00813adc, (short)MousePos.x - icon->x, (short)MousePos.y - icon->y);
             }
-            buttons = MouseClickFlags;
+            buttons = DAT_00813ac4;
             DAT_00667c48 = 1;
             return ((unsigned char (*)(struct IconNode *, unsigned int, short, short))icon->event_handler)(
                 icon, buttons, (short)MousePos.x - icon->x, (short)MousePos.y - icon->y);
@@ -1390,7 +1390,7 @@ LEGO_EXPORT unsigned char CheckFocussedIcon(void) {
         {
             unsigned int buttons = DAT_00813adc;
             if ((DAT_00813adc & 7) == 0 || DAT_00668954 != 0) {
-                buttons = MouseClickFlags;
+                buttons = DAT_00813ac4;
                 DAT_00667c48 = 1;
             }
             return FUN_0046f2e0(icon, buttons, (short)MousePos.x - icon->x, (short)MousePos.y - icon->y);
@@ -1561,7 +1561,7 @@ int FUN_0046f9a0(int id, struct Element *kind, int param_3, int param_4, unsigne
     group->clip_bottom = icon->y + icon->height;
     group->field_4 = flags;
     group->group = (short)id;
-    SetNewGroup_Callbacks(0, 0, (void *)ObjectListIconHandler);
+    SetNewGroup_Callbacks(0, 0, (void *)FUN_00470000);
     total = LLIDB_GetCount();
     for (i = 0; i < total; i++) {
         LLIDB_GetElement(i, &elem);
@@ -1612,24 +1612,24 @@ void DestroyIconGroup(unsigned int group) {
     if (icon1) {
         icon2 = FindIcon(group + 3);
         if (icon2) {
-            RemoveIconFromList(icon2);
+            FUN_0046d4e0(icon2);
         }
         icon3 = FindIcon(group + 4);
         if (icon3) {
-            RemoveIconFromList(icon3);
+            FUN_0046d4e0(icon3);
         }
         icon4 = FindIcon(group + 6);
         if (icon4) {
-            RemoveIconFromList(icon4);
+            FUN_0046d4e0(icon4);
         }
         free(icon1->field_30);
-        RemoveIconFromList(icon1);
+        FUN_0046d4e0(icon1);
         RemoveIconGroup(group);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0046fbc0
-unsigned char IndicatorIconHandler(struct IconNode *icon, unsigned char flag) {
+unsigned char FUN_0046fbc0(struct IconNode *icon, unsigned char flag) {
     struct Indicator *ind = (struct Indicator *)icon->field_30;
     if (flag & 0x5) {
         if (ind->field_4 & 0x4) {
@@ -1655,10 +1655,10 @@ LEGO_EXPORT struct Indicator *AllocateTimedIndicator(struct Sprite *sprite, unsi
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
     ind->field_14 = icon;
-    icon->render_func = (void *)RenderBlinkingIcon;
+    icon->render_func = (void *)FUN_0046eaa0;
 
     icon = ind->field_14;
-    icon->event_handler = (void *)IndicatorIconHandler;
+    icon->event_handler = (void *)FUN_0046fbc0;
 
     icon = ind->field_14;
     icon->flags = icon->flags | 0x40a;
@@ -1687,10 +1687,10 @@ LEGO_EXPORT struct Indicator *AllocatePermanentIndicator(struct Sprite *sprite, 
     ReferenceSprite(sprite);
     icon = InsertIcon(0, 0, 0xe000, sprite);
     ind->field_14 = icon;
-    icon->render_func = (void *)RenderBlinkingIcon;
+    icon->render_func = (void *)FUN_0046eaa0;
 
     icon = ind->field_14;
-    icon->event_handler = (void *)IndicatorIconHandler;
+    icon->event_handler = (void *)FUN_0046fbc0;
 
     icon = ind->field_14;
     icon->flags = icon->flags | 0x40a;
@@ -1766,7 +1766,7 @@ LEGO_EXPORT void RemoveIndicator(struct Indicator *ind) {
 LEGO_EXPORT void DeleteIndicator(struct Indicator *ind) {
     struct Indicator *cur;
 
-    RemoveIconFromList(ind->field_14);
+    FUN_0046d4e0(ind->field_14);
 
     if ((ind->field_4 & 0x8) != 0) {
         if (ActiveIndicators == ind) {
@@ -1873,7 +1873,7 @@ LEGO_EXPORT void ControlIndicators(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00470000
-unsigned char ObjectListIconHandler(struct IconNode *node, unsigned char buttons) {
+unsigned char FUN_00470000(struct IconNode *node, unsigned char buttons) {
     int cost;
     struct Element *sub;
     unsigned int flags;

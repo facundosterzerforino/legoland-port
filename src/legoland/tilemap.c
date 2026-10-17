@@ -678,7 +678,7 @@ LEGO_EXPORT void RenderView(void) {
     }
     if (DAT_00667d40 != 0) {
         PushRenderingStatusAndLockVideoSurface();
-        DrawViewPathTiles();
+        FUN_00461220();
         DrawDeferredSprites();
         PopRenderingStatus();
     }
@@ -1742,7 +1742,7 @@ void FUN_0045d770(struct Cursor *param_1) {
     for (i = 0; i < DAT_00667d3c; i++) {
         for (pt.y = DAT_00801a80[i].y0; pt.y <= DAT_00801a80[i].y1; pt.y++) {
             for (pt.x = DAT_00801a80[i].x0; pt.x <= DAT_00801a80[i].x1; pt.x++) {
-                RemoveObjectAtPoint(&pt);
+                FUN_004779d0(&pt);
                 GameMap[pt.y][pt.x].field_10 &= 0xfc;
                 AddPathTileGFX(&pt, *(unsigned short *)PathSprite);
                 ScriptDirtyCategories |= 0x10;

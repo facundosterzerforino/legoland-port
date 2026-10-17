@@ -466,7 +466,7 @@ LEGO_EXPORT int KillSoundSystem(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00496540
-int CalcDistanceVolume(int param_1) {
+int FUN_00496540(int param_1) {
     int result;
 
     result = DAT_007988a0 - param_1 / 0x3c;
@@ -489,7 +489,7 @@ int FUN_00496570(int value) {
 }
 
 // FUNCTION: LEGOLAND 0x004965a0
-int SetSampleVolumeAndPan(struct Sample *sample, int x, int y) {
+int FUN_004965a0(struct Sample *sample, int x, int y) {
     unsigned int dim;
     int vol;
     int pan;
@@ -514,7 +514,7 @@ int SetSampleVolumeAndPan(struct Sample *sample, int x, int y) {
     } else {
         y = 0;
     }
-    pan = CalcDistanceVolume(y * y + x * x);
+    pan = FUN_00496540(y * y + x * x);
     result = sample->buffer->vtable->method_0x3c(sample->buffer, pan);
     if (result != 0) {
         return 0;
@@ -523,7 +523,7 @@ int SetSampleVolumeAndPan(struct Sample *sample, int x, int y) {
 }
 
 // FUNCTION: LEGOLAND 0x00496660
-int ApplySampleVolume(struct Sample *sample) {
+int FUN_00496660(struct Sample *sample) {
     if (SoundAvailable == 0) {
         return 0;
     }
@@ -538,7 +538,7 @@ int ApplySampleVolume(struct Sample *sample) {
 }
 
 // FUNCTION: LEGOLAND 0x004966a0
-int UpdateSampleVolume(struct Sample *sample) {
+int FUN_004966a0(struct Sample *sample) {
     int coord[2];
     int *obj;
 
@@ -554,7 +554,7 @@ int UpdateSampleVolume(struct Sample *sample) {
     }
     switch (sample->source_type) {
     case 0:
-        return ApplySampleVolume(sample);
+        return FUN_00496660(sample);
     case 1:
         obj = *(int **)(*(int **)&sample->bloke + 1);
         obj8 = obj[8];
@@ -568,11 +568,11 @@ int UpdateSampleVolume(struct Sample *sample) {
         coord[1] = sample->source_y - (ScrollY >> 8);
         coord[0] = sample->source_x - (ScrollX >> 8);
     }
-    return SetSampleVolumeAndPan(sample, coord[0], coord[1]);
+    return FUN_004965a0(sample, coord[0], coord[1]);
 }
 
 // FUNCTION: LEGOLAND 0x00496760
-void UpdatePlayingSamples(void) {
+void FUN_00496760(void) {
     struct Sample *sample;
     unsigned int status;
 
@@ -582,13 +582,13 @@ void UpdatePlayingSamples(void) {
     for (sample = (struct Sample *)SampleListHead; sample != 0; sample = sample->next) {
         if (sample->active != 0 && sample->source_type != 0 &&
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0 && (status & 1) != 0) {
-            UpdateSampleVolume(sample);
+            FUN_004966a0(sample);
         }
     }
 }
 
 // FUNCTION: LEGOLAND 0x004967b0
-void RefreshSampleVolumes(void) {
+void FUN_004967b0(void) {
     struct Sample *sample;
     unsigned int status;
 
@@ -598,7 +598,7 @@ void RefreshSampleVolumes(void) {
     for (sample = (struct Sample *)SampleListHead; sample != 0; sample = sample->next) {
         if (sample->active != 0 &&
             sample->buffer->vtable->method_0x24(sample->buffer, &status) == 0) {
-            UpdateSampleVolume(sample);
+            FUN_004966a0(sample);
         }
     }
 }
@@ -692,7 +692,7 @@ void AutoKillFinishedSamples(void) {
 // FUNCTION: LEGOLAND 0x004969d0
 void UpdateSound(void) {
     UpdateSfxCallbacks();
-    UpdatePlayingSamples();
+    FUN_00496760();
     UpdateSampleFades();
     AutoKillFinishedSamples();
 }
@@ -709,7 +709,7 @@ LEGO_EXPORT unsigned int UnSourcePlayableSample(struct Sample *sample) {
         return 0;
     }
     sample->source_type = 0;
-    UpdateSampleVolume(sample);
+    FUN_004966a0(sample);
     return 1;
 }
 
@@ -726,7 +726,7 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToBloke(struct Sample *sample, void
     }
     sample->source_type = 1;
     sample->bloke = bloke;
-    UpdateSampleVolume(sample);
+    FUN_004966a0(sample);
     return 1;
 }
 
@@ -744,7 +744,7 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToMapRef(struct Sample *sample, uns
     sample->source_x = x;
     sample->source_type = 2;
     sample->source_y = y;
-    UpdateSampleVolume(sample);
+    FUN_004966a0(sample);
     return 1;
 }
 
@@ -762,7 +762,7 @@ LEGO_EXPORT unsigned int SourcePlayableSampleToLevelXY(struct Sample *sample, un
     sample->source_x = x;
     sample->source_type = 3;
     sample->source_y = y;
-    UpdateSampleVolume(sample);
+    FUN_004966a0(sample);
     return 1;
 }
 
@@ -915,9 +915,9 @@ LEGO_EXPORT struct Sample *PlayInstanceOfSample(void *def, unsigned int looping,
     }
     if (config != 0) {
         memcpy(&sample->source_type, &((struct SampleSource *)config)->type, 16);
-        UpdateSampleVolume(sample);
+        FUN_004966a0(sample);
     } else {
-        ApplySampleVolume(sample);
+        FUN_00496660(sample);
     }
     if (PlaySample(sample, looping, oneshot) == 0) {
 #ifdef LEGOLAND_PORT

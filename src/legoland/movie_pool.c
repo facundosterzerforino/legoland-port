@@ -71,12 +71,12 @@ struct MoviePoolElem *FUN_00477440(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004775b0
-void *MemAlloc(unsigned int size, int flags, unsigned int tag, int line) {
+void *FUN_004775b0(unsigned int size, int flags, unsigned int tag, int line) {
     return calloc(1, size);
 }
 
 // FUNCTION: LEGOLAND 0x004775d0
-void MemFree(void *param) {
+void FUN_004775d0(void *param) {
     free(param);
 }
 

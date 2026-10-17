@@ -834,12 +834,12 @@ void FUN_00481810(int *param_1) {
     int count;
     struct Point pos;
 
-    AdjacentNodeCount = 0;
+    DAT_00669254 = 0;
     count = 0;
     pos.y = param_1[1] - 1;
     pos.x = param_1[0];
     if ((int)pos.x <= param_1[2]) {
-        out = AdjacentNodes;
+        out = DAT_0066a45c;
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -847,17 +847,17 @@ void FUN_00481810(int *param_1) {
                 pos.x = found->x_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.x++;
         } while ((int)pos.x <= param_1[2]);
     }
-    AdjacentNodes[count] = 0;
+    DAT_0066a45c[count] = 0;
     pos.x = param_1[0];
     count++;
     pos.y = param_1[3] + 1;
     if ((int)pos.x <= param_1[2]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -865,17 +865,17 @@ void FUN_00481810(int *param_1) {
                 pos.x = found->x_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.x++;
         } while ((int)pos.x <= param_1[2]);
     }
-    AdjacentNodes[count] = 0;
+    DAT_0066a45c[count] = 0;
     pos.y = param_1[1];
     count++;
     pos.x = param_1[0] - 1;
     if ((int)pos.y <= param_1[3]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -883,17 +883,17 @@ void FUN_00481810(int *param_1) {
                 pos.y = found->y_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.y++;
         } while ((int)pos.y <= param_1[3]);
     }
-    AdjacentNodes[count] = 0;
+    DAT_0066a45c[count] = 0;
     count++;
     pos.x = param_1[2] + 1;
     pos.y = param_1[1];
     if ((int)pos.y <= param_1[3]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -901,27 +901,27 @@ void FUN_00481810(int *param_1) {
                 pos.y = found->y_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.y++;
         } while ((int)pos.y <= param_1[3]);
     }
-    AdjacentNodes[count] = 0;
+    DAT_0066a45c[count] = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004819a0
-void CollectAdjacentNodes(int *param_1) {
+void FUN_004819a0(int *param_1) {
     struct BestNode *found;
     void **out;
     int count;
     struct Point pos;
 
     count = 0;
-    AdjacentNodeCount = 0;
+    DAT_00669254 = 0;
     pos.y = param_1[1] - 1;
     pos.x = param_1[0];
     if ((int)pos.x <= param_1[2]) {
-        out = AdjacentNodes;
+        out = DAT_0066a45c;
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -929,7 +929,7 @@ void CollectAdjacentNodes(int *param_1) {
                 pos.x = found->x_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.x++;
         } while ((int)pos.x <= param_1[2]);
@@ -937,7 +937,7 @@ void CollectAdjacentNodes(int *param_1) {
     pos.x = param_1[0];
     pos.y = param_1[3] + 1;
     if ((int)pos.x <= param_1[2]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -945,7 +945,7 @@ void CollectAdjacentNodes(int *param_1) {
                 pos.x = found->x_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.x++;
         } while ((int)pos.x <= param_1[2]);
@@ -953,7 +953,7 @@ void CollectAdjacentNodes(int *param_1) {
     pos.y = param_1[1];
     pos.x = param_1[0] - 1;
     if ((int)pos.y <= param_1[3]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
@@ -961,7 +961,7 @@ void CollectAdjacentNodes(int *param_1) {
                 pos.y = found->y_max;
                 count++;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.y++;
         } while ((int)pos.y <= param_1[3]);
@@ -969,14 +969,14 @@ void CollectAdjacentNodes(int *param_1) {
     pos.x = param_1[2] + 1;
     pos.y = param_1[1];
     if ((int)pos.y <= param_1[3]) {
-        out = &AdjacentNodes[count];
+        out = &DAT_0066a45c[count];
         do {
             found = FindBestNodeAtPoint(&pos);
             *out = found;
             if (found != 0) {
                 pos.y = found->y_max;
                 out++;
-                AdjacentNodeCount++;
+                DAT_00669254++;
             }
             pos.y++;
         } while ((int)pos.y <= param_1[3]);
@@ -991,40 +991,40 @@ void MergeBestNode(struct BestNode *node) {
     for (;;) {
         FUN_00481810((int *)&node->x_min);
         i = 0;
-        for (cur = AdjacentNodes[i]; cur != 0; cur = AdjacentNodes[++i]) {
-            if (cur->x_min == node->x_min && ((struct BestNode *)AdjacentNodes[i])->x_max == node->x_max) {
-                ((struct BestNode *)AdjacentNodes[i])->y_max = node->y_max;
+        for (cur = DAT_0066a45c[i]; cur != 0; cur = DAT_0066a45c[++i]) {
+            if (cur->x_min == node->x_min && ((struct BestNode *)DAT_0066a45c[i])->x_max == node->x_max) {
+                ((struct BestNode *)DAT_0066a45c[i])->y_max = node->y_max;
                 goto merged;
             }
         }
         i++;
-        for (cur = AdjacentNodes[i]; cur != 0; cur = AdjacentNodes[++i]) {
-            if (cur->x_min == node->x_min && ((struct BestNode *)AdjacentNodes[i])->x_max == node->x_max) {
-                ((struct BestNode *)AdjacentNodes[i])->y_min = node->y_min;
+        for (cur = DAT_0066a45c[i]; cur != 0; cur = DAT_0066a45c[++i]) {
+            if (cur->x_min == node->x_min && ((struct BestNode *)DAT_0066a45c[i])->x_max == node->x_max) {
+                ((struct BestNode *)DAT_0066a45c[i])->y_min = node->y_min;
                 goto merged;
             }
         }
         i++;
-        for (cur = AdjacentNodes[i]; cur != 0; cur = AdjacentNodes[++i]) {
-            if (cur->y_min == node->y_min && ((struct BestNode *)AdjacentNodes[i])->y_max == node->y_max) {
-                ((struct BestNode *)AdjacentNodes[i])->x_max = node->x_max;
+        for (cur = DAT_0066a45c[i]; cur != 0; cur = DAT_0066a45c[++i]) {
+            if (cur->y_min == node->y_min && ((struct BestNode *)DAT_0066a45c[i])->y_max == node->y_max) {
+                ((struct BestNode *)DAT_0066a45c[i])->x_max = node->x_max;
                 goto merged;
             }
         }
         i++;
-        cur = AdjacentNodes[i];
+        cur = DAT_0066a45c[i];
         if (cur == 0) {
             return;
         }
-        while (cur->y_min != node->y_min || ((struct BestNode *)AdjacentNodes[i])->y_max != node->y_max) {
-            cur = AdjacentNodes[++i];
+        while (cur->y_min != node->y_min || ((struct BestNode *)DAT_0066a45c[i])->y_max != node->y_max) {
+            cur = DAT_0066a45c[++i];
             if (cur == 0) {
                 return;
             }
         }
-        ((struct BestNode *)AdjacentNodes[i])->x_min = node->x_min;
+        ((struct BestNode *)DAT_0066a45c[i])->x_min = node->x_min;
     merged:
         RemoveBestNode(node);
-        node = AdjacentNodes[i];
+        node = DAT_0066a45c[i];
     }
 }

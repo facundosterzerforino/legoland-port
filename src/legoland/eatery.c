@@ -574,7 +574,7 @@ void FoodcartFoodUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0042eec0
-struct BrollyNode *AllocBrollyNode(unsigned short *param_1) {
+struct BrollyNode *FUN_0042eec0(unsigned short *param_1) {
     struct BrollyNode *node = malloc(sizeof(struct BrollyNode));
     if (node != NULL) {
         memset(node, 0, sizeof(struct BrollyNode));
@@ -593,11 +593,11 @@ void Restaurant1AddObject(struct Element *param_1, unsigned char *param_2) {
     id[0] = param_2[0];
     id[1] = param_2[4];
     AddBasicObject(param_1, (int *)param_2);
-    AllocBrollyNode((unsigned short *)id);
+    FUN_0042eec0((unsigned short *)id);
 }
 
 // FUNCTION: LEGOLAND 0x0042ef40
-struct BrollyNode *FindBrollyNode(unsigned short *param_1) {
+struct BrollyNode *FUN_0042ef40(unsigned short *param_1) {
     struct BrollyNode *node = DAT_00616144;
     if (node == NULL) {
         return NULL;
@@ -612,7 +612,7 @@ struct BrollyNode *FindBrollyNode(unsigned short *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042ef70
-void RemoveBrollyNode(struct BrollyNode *node) {
+void FUN_0042ef70(struct BrollyNode *node) {
     struct BrollyNode *head = DAT_00616144;
     if (head == node) {
         DAT_00616144 = node->next;
@@ -633,9 +633,9 @@ void RemoveBrollyNode(struct BrollyNode *node) {
 // FUNCTION: LEGOLAND 0x0042efb0
 void Restaurant1RemoveObject(struct Element *param_1, TileId tile, struct Cursor *param_3) {
     struct SampleSource params;
-    struct BrollyNode *node = FindBrollyNode(&tile.id);
+    struct BrollyNode *node = FUN_0042ef40(&tile.id);
     if (node != NULL) {
-        RemoveBrollyNode(node);
+        FUN_0042ef70(node);
     }
     StandardRemoveObject(param_1, tile, param_3);
     RemoveAllBlokesFromRide(((struct Element *)param_1)->ride, tile);
@@ -709,7 +709,7 @@ void Restaurant1Update(Element *obj) {
         next = node->next;
         tile = &node->tile;
         bloke = node->rider;
-        state = FindBrollyNode((unsigned short *)tile);
+        state = FUN_0042ef40((unsigned short *)tile);
         if (state == NULL) {
             return;
         }
@@ -878,7 +878,7 @@ void RenderRestaurant1(struct Element *param_1, unsigned int param_2, unsigned i
             PrintSprite(RestMaskMainSprite, param_2, param_3, param_6, 0);
         }
     }
-    state = FindBrollyNode((unsigned short *)param_4);
+    state = FUN_0042ef40((unsigned short *)param_4);
     if (state != NULL) {
         char frame = state->field_9 + 1;
         if (frame > 0xf) {
@@ -1041,7 +1041,7 @@ void FUN_0042fa90(struct RideNode *node, int dir, int idx) {
 }
 
 // FUNCTION: LEGOLAND 0x0042fb00
-void PlayOctopusStartSfx(unsigned short param_1) {
+void FUN_0042fb00(unsigned short param_1) {
     unsigned char *b = (unsigned char *)&param_1;
     struct SampleSource params;
     params.x = b[0];
@@ -1052,7 +1052,7 @@ void PlayOctopusStartSfx(unsigned short param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0042fb60
-void PlayOctopusStopSfx(unsigned short param_1) {
+void FUN_0042fb60(unsigned short param_1) {
     unsigned char *b = (unsigned char *)&param_1;
     struct SampleSource params;
     params.type = 2;
@@ -1343,7 +1343,7 @@ void Restaurant2Update(Element *obj) {
                     f7 = 0;
                     f38 = 0x143;
                     f3c = 0;
-                    PlayOctopusStartSfx(st->value);
+                    FUN_0042fb00(st->value);
                 }
             }
             break;
@@ -1358,7 +1358,7 @@ void Restaurant2Update(Element *obj) {
                 f1c = 0;
                 state = 4;
                 f6 = 0;
-                PlayOctopusStopSfx(st->value);
+                FUN_0042fb60(st->value);
             }
             break;
         case 4:
@@ -1381,7 +1381,7 @@ void Restaurant2Update(Element *obj) {
                     f34 = 1;
                     state = 3;
                     f7 = 0x20;
-                    PlayOctopusStartSfx(st->value);
+                    FUN_0042fb00(st->value);
                 }
             }
             break;
@@ -1397,7 +1397,7 @@ void Restaurant2Update(Element *obj) {
                     f34 = 0;
                     f7 = 0;
                     f8 = 0;
-                    PlayOctopusStopSfx(st->value);
+                    FUN_0042fb60(st->value);
                 }
             }
             break;

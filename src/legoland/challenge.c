@@ -173,7 +173,7 @@ void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2) {
             // STRING: LEGOLAND 0x004b7d3c
             DBPrintf("Failed to load texture %s", filename);
         } else {
-            LoadTextureNode(image, DAT_00665e8c);
+            FUN_00488670(image, DAT_00665e8c);
             DAT_0081c0c0[DAT_00665e8c * 2] = image->width;
             DAT_0081c0c0[DAT_00665e8c * 2 + 1] = image->height;
             KillImage(image);
@@ -4866,7 +4866,7 @@ advice:
     KillAppraisalSprites();
     PopRenderingStatus();
     SpeechCloseFile();
-    SetDefaultMouseHandlers();
+    FUN_00474880();
     /* passed if no check failed */
     for (shown = 0; shown < i; shown++) {
         if (recs[shown].type == 0) {

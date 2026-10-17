@@ -262,7 +262,7 @@ int SpeechReadPcmBuffer(unsigned char *dst, int count) {
 }
 
 // FUNCTION: LEGOLAND 0x00498420
-int __declspec(void) {
+int SpeechParseWavHeader(void) {
     unsigned int size;
     unsigned int tag;
     unsigned int *p;
@@ -343,7 +343,7 @@ int SpeechLoadWavFile(const char *param_1) {
                     return 0;
                 }
             }
-            if (__declspec() != 0) {
+            if (SpeechParseWavHeader() != 0) {
                 SpeechRewindToData();
                 SpeechAcmSrcSize = SpeechSourceFormat->nBlockAlign * 10;
                 SpeechAcmSrcBuffer = malloc(SpeechAcmSrcSize);

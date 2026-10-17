@@ -1144,8 +1144,8 @@ void LogFlumeEntranceLoad(Element *elem) {
     if (LogFlumeEntranceLayer != NULL) {
         LogFlumeEntranceLayer->flags |= 0x2000;
     }
-    DAT_004c2ae8 = BuildQueueTable(&DAT_004b47b8);
-    DAT_004c2af8 = BuildQueueTable(&DAT_004b47e8);
+    DAT_004c2ae8 = FUN_00412100(&DAT_004b47b8);
+    DAT_004c2af8 = FUN_00412100(&DAT_004b47e8);
     // STRING: LEGOLAND 0x004b49c8
     LogFlumeBarrelSprite = LoadSprite("lf_barrel.lls", 1);
     // STRING: LEGOLAND 0x004b49b8
@@ -2308,10 +2308,10 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 8:
-                StartQueueTableBackward((struct QueueTable *)DAT_004c2af8, (struct Bloke *)bloke);
+                FUN_004122a0((struct QueueTable *)DAT_004c2af8, (struct Bloke *)bloke);
                 break;
             case 9:
-                MoveBlokeAlongQueueTable((struct QueueTable *)DAT_004c2af8, x, y, bloke);
+                FUN_00412300((struct QueueTable *)DAT_004c2af8, x, y, bloke);
                 break;
             case 10:
                 bloke->dest.x = (x << 8) + 0x80;
@@ -5107,7 +5107,7 @@ int LogFlumeEntrance_Save(struct Element *element) {
             SaveQueue((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &buf.queue);
             for (i = 0; i < 4; i++) {
                 buf.slots[i].owner = (struct FlumeEntry *)(INT_PTR)FUN_004107b0((struct FlumeNode *)buf.sub, (struct FlumeNode *)buf.slots[i].owner);
-                buf.slots[i].busy = (struct RideNode *)(UINT_PTR)CountQueueNodesBetween((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, (struct QueueNode *)buf.slots[i].busy);
+                buf.slots[i].busy = (struct RideNode *)(UINT_PTR)FUN_004123a0((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, (struct QueueNode *)buf.slots[i].busy);
             }
             SaveGameWrite(&buf, sizeof(buf));
             entry = entry->next;
@@ -5230,7 +5230,7 @@ int LogFlumeEntrance_Load(struct Element *element) {
         }
         head = FUN_00410a50(cur, NULL);
         FUN_00410bb0(head, head);
-        LoadQueueNodes((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &queue);
+        FUN_00412490((struct QueueNode *)((struct Ride *)LogFlumeEntranceRide)->riders, &queue);
         SaveGameRead(cur, sizeof(struct FlumeEntry));
         cur->sub = (struct FlumeEntry *)head;
         cur->queue = queue;

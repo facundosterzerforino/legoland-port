@@ -654,7 +654,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         LogPrintf("Begin Measured Block 10");
         goto fail;
     }
-    if (SaveBestNodeList() == 0) {
+    if (FUN_00482860() == 0) {
         // STRING: LEGOLAND 0x004bc48c
         LogPrintf("Path Rects");
         goto fail;
@@ -669,7 +669,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         LogPrintf("Begin Measured VBlock 11");
         goto fail;
     }
-    SaveBuildObjList();
+    FUN_00450a80();
     if (EndMeasuredBlock() == 0) {
         // STRING: LEGOLAND 0x004bc440
         LogPrintf("End Measured Block 11");
@@ -864,7 +864,7 @@ LEGO_EXPORT int LoadGame(char *path) {
     EditMode.unk4 = 3;
     EditMode.unk8 = 0;
     FUN_004741c0();
-    SetDefaultMouseHandlers();
+    FUN_00474880();
     DrawWatchSprite();
     if (LoadScripts() == 0) {
         goto fail;
@@ -1011,7 +1011,7 @@ LEGO_EXPORT int LoadGame(char *path) {
     if (SkipSaveGameDword() == 0) {
         goto fail;
     }
-    LoadMechanicWorkOrders();
+    FUN_0049ce00();
     DrawWatchSprite();
     if (SkipSaveGameDword() == 0) {
         goto fail;
@@ -1115,7 +1115,7 @@ LEGO_EXPORT int LoadGame(char *path) {
     if (SkipSaveGameDword() == 0) {
         goto fail;
     }
-    if (LoadBestNodeList() == 0) {
+    if (FUN_00482920() == 0) {
         goto fail;
     }
     if (SkipSaveGameDword() == 0) {
@@ -1170,7 +1170,7 @@ LEGO_EXPORT int LoadGame(char *path) {
     DAT_00667c48 = 1;
     EditMode.unk0 = 0;
     GamePad &= ~0x1000;
-    RepostScriptIntro();
+    FUN_0046b760();
     return 1;
 fail:
     _close(SaveFileHandle);
@@ -1200,7 +1200,7 @@ LEGO_EXPORT void UnloadSaveGameMap(void) {
         LLIDB_UnLoadData(BridgesHandle);
     }
     ClearOverlays();
-    FreeBestNodeList();
+    FUN_004828f0();
     MapDataLoaded = 0;
 }
 

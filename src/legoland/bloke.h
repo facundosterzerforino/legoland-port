@@ -232,19 +232,19 @@ typedef void (*BlokeAction)(Bloke *bloke);
 
 /* Low-level AI handlers (PTR_FUN_004bd34c). */
 void LogBlokeRethinking(Bloke *bloke);
-void BlokeActionWait(Bloke *bloke);
+void FUN_004838c0(Bloke *bloke);
 void FUN_00483ef0(Bloke *bloke);
 void FUN_00484090(Bloke *bloke);
 void FUN_00483d10(Bloke *bloke);
-void BlokeActionTurn(Bloke *bloke);
+void FUN_004838e0(Bloke *bloke);
 void FUN_00484220(Bloke *bloke);
-void BlokeActionMoveToDest(Bloke *bloke);
-void BlokeActionBounce(Bloke *bloke);
+void FUN_004845d0(Bloke *bloke);
+void FUN_00484630(Bloke *bloke);
 void FUN_00484790(Bloke *bloke);
 void FUN_00483e20(Bloke *bloke);
 void FUN_00484470(Bloke *bloke);
 void FUN_00484520(Bloke *bloke);
-void BlokeActionWaitWhileHovered(Bloke *bloke);
+void FUN_004848e0(Bloke *bloke);
 void FUN_00483d90(Bloke *bloke);
 void FUN_00484350(Bloke *bloke);
 
@@ -273,7 +273,7 @@ void RandomiseBlokeName(Bloke *bloke);
 int ApplyMoodDelta(Bloke *bloke, int index, int mul);
 int GetBlokeMood(Bloke *bloke);
 void SetMoodDelta(unsigned int index, int value);
-void SetDefaultMoodDeltas(void);
+void FUN_00482d70(void);
 void DestroyAllBlokes(void);
 LEGO_EXPORT Bloke *MakeBloke(int param_1);
 LEGO_EXPORT Bloke *NewBlokeWOList(int type);

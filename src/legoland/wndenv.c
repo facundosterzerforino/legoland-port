@@ -155,7 +155,7 @@ LEGO_EXPORT int ProcessSystemEvents(void) {
     }
     ScanKeyboard();
     ScanMouse();
-    __declspec(CONTROLLERBUFFER);
+    UpdateControllerFromMouseData(CONTROLLERBUFFER);
     UpdateControllerFromKeyboardData(CONTROLLERBUFFER);
 #ifdef LEGOLAND_PORT
     ExtensionsPoll(); /* [port] extensions/: debug console commands and level music, where the original cheat keys run */

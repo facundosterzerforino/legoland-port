@@ -213,7 +213,7 @@ LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node) {
 
     bloke = node->rider;
     RemoveBlokeFromList(ride, node);
-    if (CountRidersAtTile(ride, &node->tile) == 0) {
+    if (FUN_0044f3d0(ride, &node->tile) == 0) {
         int x = node->tile.pos.x;
         int y = node->tile.pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
@@ -307,7 +307,7 @@ LEGO_EXPORT int GetAllBlokesOffRide(struct Ride *ride, unsigned short uid) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a3e0
-LEGO_EXPORT TileId __declspec(struct Point *pos, struct Ride *ride) {
+LEGO_EXPORT TileId GetObjectUID(struct Point *pos, struct Ride *ride) {
     struct MapElement *element;
     struct Point tile;
     struct Point probe;

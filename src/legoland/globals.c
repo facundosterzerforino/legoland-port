@@ -798,7 +798,7 @@ char *PTR_DAT_004b8348[8] = {0};
 void (*PTR_Bloke_DoNothing_004b8368[26])(struct Bloke *) = {0};
 
 // GLOBAL: LEGOLAND 0x004b85c4
-HANDLE VWin32DeviceHandle = INVALID_HANDLE_VALUE;
+HANDLE DAT_004b85c4 = INVALID_HANDLE_VALUE;
 
 // GLOBAL: LEGOLAND 0x004b8710
 struct FXItem FountainSFX[5];
@@ -1069,19 +1069,19 @@ short DAT_004bd32c[8][2] = {
 // GLOBAL: LEGOLAND 0x004bd34c
 BlokeAction PTR_FUN_004bd34c[16] = {
     LogBlokeRethinking,
-    BlokeActionWait,
+    FUN_004838c0,
     FUN_00483ef0,
     FUN_00484090,
     FUN_00483d10,
-    BlokeActionTurn,
+    FUN_004838e0,
     FUN_00484220,
-    BlokeActionMoveToDest,
-    BlokeActionBounce,
+    FUN_004845d0,
+    FUN_00484630,
     FUN_00484790,
     FUN_00483e20,
     FUN_00484470,
     FUN_00484520,
-    BlokeActionWaitWhileHovered,
+    FUN_004848e0,
     FUN_00483d90,
     FUN_00484350,
 };
@@ -2623,19 +2623,19 @@ struct TextCell TextCells[50];
 int MapWorldMinX;
 
 // GLOBAL: LEGOLAND 0x00667c04
-int MapWorldMinY;
+int DAT_00667c04;
 
 // GLOBAL: LEGOLAND 0x00667c08
-int MapWorldMaxX;
+int DAT_00667c08;
 
 // GLOBAL: LEGOLAND 0x00667c0c
-int MapWorldMaxY;
+int DAT_00667c0c;
 
 // GLOBAL: LEGOLAND 0x00667c14
-short MapDrawHeight;
+short DAT_00667c14;
 
 // GLOBAL: LEGOLAND 0x00667c16
-short MapDrawWidth;
+short DAT_00667c16;
 
 // GLOBAL: LEGOLAND 0x00667c18
 int MapWorldHeight;
@@ -2656,7 +2656,7 @@ void *DAT_00667c28;
 struct Sprite *FullMapSprite;
 
 // GLOBAL: LEGOLAND 0x00667c30
-unsigned int FullMapRendered;
+unsigned int DAT_00667c30;
 
 // GLOBAL: LEGOLAND 0x00667c34
 struct Sprite *MapSpannerSprite;
@@ -2683,16 +2683,16 @@ LEGO_EXPORT struct Ride *QueryClass;
 unsigned int DAT_00667c5c;
 
 // GLOBAL: LEGOLAND 0x00667c60
-unsigned int PreMapScreenMode;
+unsigned int DAT_00667c60;
 
 // GLOBAL: LEGOLAND 0x00667c68
-unsigned int LastMapClickTicks;
+unsigned int DAT_00667c68;
 
 // GLOBAL: LEGOLAND 0x00667c70
-long LastMapClickX;
+long DAT_00667c70;
 
 // GLOBAL: LEGOLAND 0x00667c74
-long LastMapClickY;
+long DAT_00667c74;
 
 // GLOBAL: LEGOLAND 0x00667c64
 unsigned int DAT_00667c64;
@@ -2875,7 +2875,7 @@ HFONT LegoFont28Normal;
 DDSURFACEDESC CurrentSurfaceDesc;
 
 // GLOBAL: LEGOLAND 0x00668108
-RECT SoftPrintClip;
+RECT DAT_00668108;
 
 // GLOBAL: LEGOLAND 0x00668118
 int renderEngineTargetIdx;
@@ -3451,13 +3451,13 @@ struct InfoNode *DAT_0066924c;
 int DAT_00669250;
 
 // GLOBAL: LEGOLAND 0x00669254
-unsigned int AdjacentNodeCount;
+unsigned int DAT_00669254;
 
 // GLOBAL: LEGOLAND 0x00669258
 unsigned int DAT_00669258[1152];
 
 // GLOBAL: LEGOLAND 0x0066a45c
-void *AdjacentNodes[1020];
+void *DAT_0066a45c[1020];
 
 // GLOBAL: LEGOLAND 0x0066b44c
 void *DAT_0066b44c;
@@ -3565,16 +3565,16 @@ void *DAT_00798190[256];
 void *DAT_00798590;
 
 // GLOBAL: LEGOLAND 0x00798598
-DDSURFACEDESC SavedSurfaceDesc;
+DDSURFACEDESC DAT_00798598;
 
 // GLOBAL: LEGOLAND 0x00798608
-RECT SavedSoftPrintClip;
+RECT DAT_00798608;
 
 // GLOBAL: LEGOLAND 0x0079861c
-LPDIRECTDRAWSURFACE ScaledSpriteScratch;
+LPDIRECTDRAWSURFACE DAT_0079861c;
 
 // GLOBAL: LEGOLAND 0x00798620
-int ScaledSpriteScratchMade;
+int DAT_00798620;
 
 // GLOBAL: LEGOLAND 0x00798624
 void *MasterDirList;
@@ -4066,7 +4066,7 @@ struct IconNode *DAT_007cb2e0;
 struct IconNode *DAT_007cb2e4;
 
 // GLOBAL: LEGOLAND 0x007cb2f0
-struct EditState DAT_007cb2f0; /* EditMode saved by SaveScreenState */
+struct EditState DAT_007cb2f0; /* EditMode saved by FUN_0048f9f0 */
 
 // GLOBAL: LEGOLAND 0x007cb300
 struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
@@ -4597,7 +4597,7 @@ unsigned int DAT_0080ff68;
 void *DAT_0080ff6c;
 
 // GLOBAL: LEGOLAND 0x0080ff70
-unsigned int MapScreenClosePending;
+unsigned int DAT_0080ff70;
 
 // GLOBAL: LEGOLAND 0x0080ff74
 LEGO_EXPORT unsigned int NEWFLC_AutoPlay;
@@ -4645,7 +4645,7 @@ LEGO_EXPORT unsigned short NEWFLC_Repeat;
 LEGO_EXPORT struct EditState EditMode;
 
 // GLOBAL: LEGOLAND 0x008119bc
-unsigned int MapScreenOpenPending;
+unsigned int DAT_008119bc;
 
 // GLOBAL: LEGOLAND 0x008119c0
 struct MapMarker DAT_008119c0[32][32]; /* one table: its last row is DAT_008138c0 (globals.h) */
@@ -4810,7 +4810,7 @@ unsigned int DAT_00813abc;
 unsigned int DAT_00813ac0;
 
 // GLOBAL: LEGOLAND 0x00813ac4
-unsigned int MouseClickFlags;
+unsigned int DAT_00813ac4;
 
 // GLOBAL: LEGOLAND 0x00813ac8
 unsigned int DAT_00813ac8;

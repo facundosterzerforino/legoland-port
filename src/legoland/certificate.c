@@ -16,7 +16,7 @@
 #include "imports.h"
 
 // FUNCTION: LEGOLAND 0x00451740
-int __declspec(char *param_1, char *param_2, char *param_3) {
+int PrintCertificate(char *param_1, char *param_2, char *param_3) {
     DEVMODEA dm;
     BYTE printers[0xa80];
     DOCINFOA di;
@@ -59,10 +59,10 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
         (void)needed;
         (void)returned;
         if (!GetDefaultPrinterA(printer_name, &name_size)) {
-            DebugTrace("__declspec: no default printer (%lu)", GetLastError());
+            DebugTrace("PrintCertificate: no default printer (%lu)", GetLastError());
             return 0;
         }
-        DebugTrace("__declspec: printing to \"%s\"", printer_name);
+        DebugTrace("PrintCertificate: printing to \"%s\"", printer_name);
         /* the original's DEVMODE is a 0x94-byte Windows 9x one with only the orientation set; current drivers
          * refuse it (CreateDC fails with ERROR_ACCESS_DENIED). Ask the driver for its full settings and turn
          * them to landscape; without them, print with the driver's defaults. */
@@ -91,19 +91,19 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
             free(full);
         }
         if (hDC == NULL) {
-            DebugTrace("__declspec: CreateDC failed (%lu)", GetLastError());
+            DebugTrace("PrintCertificate: CreateDC failed (%lu)", GetLastError());
         }
     }
 #else
     if (EnumPrintersA(1, NULL, 2, printers, 0x540, &needed, &returned) <= 0) {
 #ifdef LEGOLAND_PORT
-        DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
         return 0;
     }
     if (returned <= 0) {
 #ifdef LEGOLAND_PORT
-        DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
         return 0;
     }
@@ -115,7 +115,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
 #endif
     if (hDC == NULL) {
 #ifdef LEGOLAND_PORT
-        DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+        DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
         return 0;
     }
@@ -154,7 +154,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     _close(fd);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -166,7 +166,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     _close(fd);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -180,7 +180,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(NULL);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -193,7 +193,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -209,7 +209,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     DeleteObject(hBitmap);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -220,7 +220,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     EndDoc(hDC);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -233,7 +233,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     EndDoc(hDC);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -245,7 +245,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     EndDoc(hDC);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -259,7 +259,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     EndDoc(hDC);
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -279,7 +279,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     DeleteDC(hDC);
                     LocalFree(plf);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -302,7 +302,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     DeleteDC(hDC);
                     LocalFree(plf);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -322,7 +322,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
                     { EndDoc(hDC); }
                     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-                    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+                    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
                     return 0;
                 }
@@ -338,7 +338,7 @@ int __declspec(char *param_1, char *param_2, char *param_3) {
     }
     DeleteDC(hDC);
 #ifdef LEGOLAND_PORT
-    DebugTrace("__declspec: failed before line %d (%lu)", __LINE__, GetLastError());
+    DebugTrace("PrintCertificate: failed before line %d (%lu)", __LINE__, GetLastError());
 #endif
     return 0;
 }
@@ -352,5 +352,5 @@ int PrintCertificateWithCurrentDate(void) {
     str = asctime(localtime(&now));
     str[strlen(str) - 1] = '\0';
     // STRING: LEGOLAND 0x004b86fc
-    return __declspec("EGC.bmp", (char *)&CurrentProfile, str) != 0;
+    return PrintCertificate("EGC.bmp", (char *)&CurrentProfile, str) != 0;
 }

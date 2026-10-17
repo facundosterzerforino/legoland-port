@@ -745,7 +745,7 @@ void FUN_00471d90(void) {
     rc.top = iVar1 + 6;
     rc.right = rc.left + 0x7a + iVar5;
     rc.bottom = rc.top + 0x1b;
-    PrintTextBox(local_14, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
+    FUN_00455e50(local_14, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
     rc.left = PopUpInfoOkIcon->x;
     rc.top = iVar1;
     rc.right = CBCloseIcon->x + 0x24;
@@ -845,26 +845,26 @@ void DrawNewObjectPopup(void) {
     rc.top = 0x30;
     rc.right = NewPopMockSprite->width + 0xbb;
     rc.bottom = 0x44;
-    PrintTextBox(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
+    FUN_00455e50(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     rc.left = 0xc1;
     rc.top = 0x4b;
     rc.right = NewPopMockSprite->width + 0xbb;
     rc.bottom = 0x5f;
-    PrintTextBox(obj->field_78, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
+    FUN_00455e50(obj->field_78, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 5, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     rc.left = 0x13e;
     rc.top = 0x68;
     rc.right = 0x23a;
     rc.bottom = 0xdf;
-    PrintTextBox(obj->field_80, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x10, 0xff0000, 0xffffff);
+    FUN_00455e50(obj->field_80, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0x10, 0xff0000, 0xffffff);
     obj = (struct NewObjInfo *)NewObjects.objs[NewObjects.current];
     sprintf(text, "%d", obj->field_26);
     rc.left = 0xf0;
     rc.top = 0xd1;
     rc.right = 0x133;
     rc.bottom = 0xe3;
-    PrintTextBox(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 1, 0xff0000, 0xffffff);
+    FUN_00455e50(text, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 1, 0xff0000, 0xffffff);
     PopRenderingStatus();
     PrintSprite(NewObjects.sprites[NewObjects.current], 0xc4, 100, 0, 0);
 
@@ -1102,14 +1102,14 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         tl.y = y + 6;
         br.x = size * 32 + x + 0xbc;
         br.y = y + 0x19;
-        PrintTextBox(buf_a, tl.x, tl.y, br.x - tl.x, br.y - tl.y, 1, 1, 0xff0000, 0xffffff);
+        FUN_00455e50(buf_a, tl.x, tl.y, br.x - tl.x, br.y - tl.y, 1, 1, 0xff0000, 0xffffff);
     }
     if (buf_b) {
         tl.x = x + 0xc;
         tl.y = y + 0x23;
         br.x = size * 32 + x + 0xbc;
         br.y = y + size * 20 + 0x63;
-        PrintTextBox(buf_b, tl.x, tl.y, br.x - tl.x, br.y - tl.y, 2, 0x10, 0xff0000, 0xffffff);
+        FUN_00455e50(buf_b, tl.x, tl.y, br.x - tl.x, br.y - tl.y, 2, 0x10, 0xff0000, 0xffffff);
     }
     PopRenderingStatus();
     if (DAT_007fdf9c == 0x306) {
@@ -1122,8 +1122,8 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         width = br.x - tl.x;
         mid = (br.y + tl.y) / 2;
         ty = mid + 0x22;
-        PrintTextBox(GetString(0x8e), tl.x, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
-        PrintTextBox(GetString(0x8f), (br.x + tl.x) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
+        FUN_00455e50(GetString(0x8e), tl.x, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
+        FUN_00455e50(GetString(0x8f), (br.x + tl.x) / 2, ty, width / 2, 0x14, 2, 0x11, 0xff0000, 0xffffff);
         if (mood == 3) {
             sprite_y = mid - 0x20;
             PrintSprite(ISadSprite, width / 4 + tl.x - 0x20, sprite_y, 0, 0);
@@ -1510,7 +1510,7 @@ void FUN_004736f0(void) {
         rc.top = DAT_007fe014 + 6;
         rc.right = rc.left + DAT_00668964 * 0x14 + 0x7a;
         rc.bottom = rc.top + 0x1b;
-        PrintTextBox(DAT_00668968, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
+        FUN_00455e50(DAT_00668968, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
         /* hit box of the bar: outside it, reset the OK/close icons */
         hit.left = PopUpInfoOkIcon->x;
         hit.right = CBCloseIcon->x + 0x24;

@@ -431,7 +431,7 @@ int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
     struct NewBloke *b;
     int t;
 
-    e = FindQueueEntryById(id);
+    e = FUN_00412650(id);
     b = (struct NewBloke *)malloc(sizeof(struct NewBloke));
     if (b == 0) {
         return -1;
@@ -686,7 +686,7 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
         if ((q->field_14 & 0xf) == 6) {
             return 5;
         }
-        s = FindQueueEntryById(id);
+        s = FUN_00412650(id);
         if ((s->y != q->y || s->x + 4 != q->x) && (q->field_14 & 0xf) != 4) {
             if ((q->field_14 & 0xf) != 5) {
                 return PickQueueTurn(id, p, dir);

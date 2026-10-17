@@ -81,7 +81,7 @@ void FUN_004860f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00486190
-void *FindCursorCacheEntry(struct CursorKey *key) {
+void *FUN_00486190(struct CursorKey *key) {
     struct CursorCacheNode *node;
 
     if (DAT_00797e6c != 0) {
@@ -97,7 +97,7 @@ void *FindCursorCacheEntry(struct CursorKey *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004861d0
-struct CursorCacheNode *AddCursorCacheEntry(void *value, const unsigned char *key) {
+struct CursorCacheNode *FUN_004861d0(void *value, const unsigned char *key) {
     struct CursorCacheNode *node = (struct CursorCacheNode *)malloc(sizeof(struct CursorCacheNode));
     if (node != 0) {
         memset(node, 0, sizeof(struct CursorCacheNode));
@@ -114,7 +114,7 @@ struct CursorCacheNode *AddCursorCacheEntry(void *value, const unsigned char *ke
 }
 
 // FUNCTION: LEGOLAND 0x00486220
-void FreeCursorBitmap(void *param) {
+void FUN_00486220(void *param) {
     struct CursorBitmap *bmp = (struct CursorBitmap *)param;
     if (bmp != 0) {
         if (bmp->pixels != 0) {
@@ -125,11 +125,11 @@ void FreeCursorBitmap(void *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00486250
-void FreeCursorCache(void) {
+void FUN_00486250(void) {
     struct CursorCacheNode *node = DAT_00797e6c;
     while (node != 0) {
         struct CursorCacheNode *next = node->next;
-        FreeCursorBitmap(node->value);
+        FUN_00486220(node->value);
         free(node);
         node = next;
     }
@@ -145,7 +145,7 @@ void *FUN_00486280(int param_1, void *param_2) {
     float ab, ag, ar;
     int i;
 
-    cached = FindCursorCacheEntry(key);
+    cached = FUN_00486190(key);
     if (cached != 0) {
         return cached;
     }
@@ -188,7 +188,7 @@ void *FUN_00486280(int param_1, void *param_2) {
             } while (--param_1 != 0);
         }
     }
-    AddCursorCacheEntry(frame, (unsigned char *)key);
+    FUN_004861d0(frame, (unsigned char *)key);
     return frame;
 }
 
@@ -520,7 +520,7 @@ void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 }
 
 // FUNCTION: LEGOLAND 0x00488670
-void LoadTextureNode(struct Image *image, unsigned int index) {
+void FUN_00488670(struct Image *image, unsigned int index) {
     struct TextureNode *ptr = (struct TextureNode *)malloc(sizeof(struct TextureNode));
     if (ptr != 0) {
         BuildTextureNodeFromImage(image, ptr);
@@ -529,7 +529,7 @@ void LoadTextureNode(struct Image *image, unsigned int index) {
 }
 
 // FUNCTION: LEGOLAND 0x004886a0
-void FreeTextureNodes(void) {
+void FUN_004886a0(void) {
     struct TextureNode **slot = (struct TextureNode **)DAT_00798190;
     do {
         if (*slot != 0) {
@@ -597,15 +597,15 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
         FUN_004887a0();
     }
     DAT_0066b5b0 = CurrentSurfaceDesc;
-    DAT_0066b620 = SoftPrintClip;
+    DAT_0066b620 = DAT_00668108;
     CurrentSurfaceDesc.lpSurface = DAT_0066be54;
     CurrentSurfaceDesc.dwWidth = w;
     CurrentSurfaceDesc.dwHeight = h;
     CurrentSurfaceDesc.lPitch = 2 * w;
-    SoftPrintClip.left = 0;
-    SoftPrintClip.right = w;
-    SoftPrintClip.top = 0;
-    SoftPrintClip.bottom = h;
+    DAT_00668108.left = 0;
+    DAT_00668108.right = w;
+    DAT_00668108.top = 0;
+    DAT_00668108.bottom = h;
     local.off[0] = 0;
     local.off[1] = 0;
     local.rect.left = 0;
@@ -636,7 +636,7 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     DAT_00701e64->width = (short)w;
     DAT_00701e64->height = (short)h;
     CurrentSurfaceDesc = DAT_0066b5b0;
-    SoftPrintClip = DAT_0066b620;
+    DAT_00668108 = DAT_0066b620;
     return DAT_00701e64;
 }
 
@@ -734,7 +734,7 @@ LEGO_EXPORT unsigned int RenderTiledSprite(struct Sprite *sprite, int param_2, i
 }
 
 // FUNCTION: LEGOLAND 0x00488c80
-unsigned int __declspec(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int *param_6) {
+unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int *param_6) {
     int off[2];
     RECT src;
     RECT dst;
@@ -755,30 +755,30 @@ unsigned int __declspec(struct Sprite *sprite, int param_2, int param_3, int par
     src.left = 0;
     src.right = (short)sprite->width;
     src.bottom = (short)sprite->height;
-    if (ScaledSpriteScratchMade == 0) {
+    if (DAT_00798620 == 0) {
         memset(&desc1, 0, sizeof(desc1));
-        ScaledSpriteScratchMade = 1;
+        DAT_00798620 = 1;
         desc1.dwSize = sizeof(desc1);
         if (IDirectDrawSurface_GetSurfaceDesc(renderEngine, &desc1) == 0) {
             desc1.dwFlags = 0x1007;
             desc1.ddsCaps.dwCaps = 0x840;
             desc1.dwWidth = 0x500;
             desc1.dwHeight = 0x3c0;
-            IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc1, &ScaledSpriteScratch, NULL);
+            IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc1, &DAT_0079861c, NULL);
             off[0] = off[1] = GetTransparentColour();
-            IDirectDrawSurface_SetColorKey(ScaledSpriteScratch, 8, (LPDDCOLORKEY)off);
+            IDirectDrawSurface_SetColorKey(DAT_0079861c, 8, (LPDDCOLORKEY)off);
         }
     }
-    SavedSurfaceDesc = CurrentSurfaceDesc;
-    SavedSoftPrintClip = SoftPrintClip;
+    DAT_00798598 = CurrentSurfaceDesc;
+    DAT_00798608 = DAT_00668108;
     memset(&desc2, 0, sizeof(desc2));
     desc2.dwSize = sizeof(desc2);
-    if (IDirectDrawSurface_Lock(ScaledSpriteScratch, NULL, &desc2, 0x21, NULL) == 0) {
+    if (IDirectDrawSurface_Lock(DAT_0079861c, NULL, &desc2, 0x21, NULL) == 0) {
         clip.left = 0;
         clip.right = desc2.dwWidth;
         clip.top = 0;
         clip.bottom = desc2.dwHeight;
-        IntersectRect(&SoftPrintClip, &clip, &SPRITE_ClipRect);
+        IntersectRect(&DAT_00668108, &clip, &SPRITE_ClipRect);
         off[0] = 0;
         off[1] = 0;
         StoredTransparentColour = GetTransparentColour();
@@ -797,34 +797,34 @@ unsigned int __declspec(struct Sprite *sprite, int param_2, int param_3, int par
         }
         FUN_00464ee0(sprite, &r2, off);
         bits = desc2.lpSurface;
-        IDirectDrawSurface_Unlock(ScaledSpriteScratch, bits);
+        IDirectDrawSurface_Unlock(DAT_0079861c, bits);
     }
     IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
-    hr = IDirectDrawSurface_Blt(renderEngine, &dst, ScaledSpriteScratch, &src, 0x1008000, NULL);
+    hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);
     if (hr == 0) {
         goto ok;
     }
     if (hr == 0x887601c2) {
-        if (IDirectDrawSurface_Restore(ScaledSpriteScratch) != 0) {
+        if (IDirectDrawSurface_Restore(DAT_0079861c) != 0) {
             IDirectDrawSurface_SetClipper(renderEngine, NULL);
-            CurrentSurfaceDesc = SavedSurfaceDesc;
-            SoftPrintClip = SavedSoftPrintClip;
+            CurrentSurfaceDesc = DAT_00798598;
+            DAT_00668108 = DAT_00798608;
             return 0;
         }
         MakeSprite(sprite);
         if (IDirectDrawSurface_IsLost(PrimarySurface) != 0x887601c2 || IDirectDrawSurface_Restore(PrimarySurface) == 0) {
-            if (IDirectDrawSurface_Blt(renderEngine, &dst, ScaledSpriteScratch, &src, 0x8000, NULL) == 0) {
+            if (IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x8000, NULL) == 0) {
             ok:
                 IDirectDrawSurface_SetClipper(renderEngine, NULL);
-                CurrentSurfaceDesc = SavedSurfaceDesc;
-                SoftPrintClip = SavedSoftPrintClip;
+                CurrentSurfaceDesc = DAT_00798598;
+                DAT_00668108 = DAT_00798608;
                 return 1;
             }
         }
     }
     IDirectDrawSurface_SetClipper(renderEngine, NULL);
-    CurrentSurfaceDesc = SavedSurfaceDesc;
-    SoftPrintClip = SavedSoftPrintClip;
+    CurrentSurfaceDesc = DAT_00798598;
+    DAT_00668108 = DAT_00798608;
     return 0;
 }
 
@@ -834,7 +834,7 @@ LEGO_EXPORT unsigned int RenderScaledSprite(struct Sprite *param_1, int param_2,
 
     local[0] = 0;
     local[1] = 0;
-    __declspec(param_1, param_2, param_3, param_4, param_5, local);
+    FUN_00488c80(param_1, param_2, param_3, param_4, param_5, local);
     return 1;
 }
 

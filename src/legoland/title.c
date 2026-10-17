@@ -31,7 +31,7 @@
 LEGO_EXPORT void InitTitleScreen(void) {
     struct IconNode *icon;
 
-    UnloadGameInterface();
+    FUN_00474ed0();
     // STRING: LEGOLAND 0x004bf574
     SPRITE_TitleScreenBk = LoadSprite("TitleScreenBk.lls", 0);
 
@@ -73,15 +73,15 @@ LEGO_EXPORT void InitTitleScreen(void) {
     icon->string_id = 1000;
     icon->string = GetString(1000);
     icon->flags |= 0x6002;
-    icon->event_handler = OptionsExitIconHandler;
-    DAT_006687c0 = OptionsExitIconHandler;
+    icon->event_handler = FUN_0048f0a0;
+    DAT_006687c0 = FUN_0048f0a0;
 
     // STRING: LEGOLAND 0x004bf4f8
     icon = LoadSpriteIcon("Load_on_Title.lls", 4, 0x19, 0x118, 7);
     icon->string_id = 9;
     icon->string = GetString(9);
     icon->flags |= 0x6002;
-    icon->event_handler = TitleLoadGameHandler;
+    icon->event_handler = FUN_0048fe20;
 
     // STRING: LEGOLAND 0x004bf4e0
     icon = LoadSpriteIcon("MovieOn_On_Title.lls", 4, 0x10e, 0xa1, 7);
@@ -93,7 +93,7 @@ LEGO_EXPORT void InitTitleScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048fe20
-unsigned char TitleLoadGameHandler(unsigned int param_1, unsigned char param_2) {
+unsigned char FUN_0048fe20(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         LoadMode = 1;
@@ -153,7 +153,7 @@ void KillTitleScreenBkSpriteAndRemoveIconGroup7(void) {
 unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        SaveScreenState(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
+        FUN_0048f9f0(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
         EditMode.unk4 = 2;
         DAT_0080ff80.unk4 = 0xffffffff;
         DAT_0080ff80.unk8 = 9;
@@ -163,11 +163,11 @@ unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00490050
-unsigned char AdvertGoBackHandler(unsigned int param_1, unsigned char param_2) {
+unsigned char FUN_00490050(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         KillTitleScreenBkSpriteAndRemoveIconGroup7();
-        RestoreScreenState(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
+        FUN_0048fa40(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
     }
     return 1;
 }
@@ -206,7 +206,7 @@ unsigned char PlayCaliforniaAvi(unsigned int param_1, unsigned char param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00490150
-void InitAdvertScreen(void) {
+void FUN_00490150(void) {
     struct IconNode *icon;
 
     // STRING: LEGOLAND 0x004bf5f4
@@ -217,8 +217,8 @@ void InitAdvertScreen(void) {
     icon->string_id = 0x26;
     icon->string = GetString(0x26);
     icon->flags |= 0x6002;
-    icon->event_handler = AdvertGoBackHandler;
-    DAT_006687c0 = AdvertGoBackHandler;
+    icon->event_handler = FUN_00490050;
+    DAT_006687c0 = FUN_00490050;
     DAT_006687bc = 0;
 
     // STRING: LEGOLAND 0x004bf5cc
@@ -244,7 +244,7 @@ void InitAdvertScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00490270
-void KillCertificateScreen(void) {
+void FUN_00490270(void) {
     if (SPRITE_TitleScreenBk != 0) {
         KillSprite(SPRITE_TitleScreenBk);
         SPRITE_TitleScreenBk = 0;
@@ -257,10 +257,10 @@ void KillCertificateScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004902c0
-unsigned char CertificateGoBackHandler(unsigned int param_1, unsigned int param_2) {
+unsigned char FUN_004902c0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        KillCertificateScreen();
+        FUN_00490270();
         DAT_0080ff80.unk8 = 1;
         DAT_00798770 = 0;
     }
@@ -268,7 +268,7 @@ unsigned char CertificateGoBackHandler(unsigned int param_1, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00490300
-unsigned char CertificatePrintHandler(unsigned int param_1, unsigned int param_2) {
+unsigned char FUN_00490300(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (CertificatePrintResultTimer == 0 && DAT_0079876c == 0) {
@@ -279,7 +279,7 @@ unsigned char CertificatePrintHandler(unsigned int param_1, unsigned int param_2
 }
 
 // FUNCTION: LEGOLAND 0x00490350
-struct Sprite *InitCertificateScreen(void) {
+struct Sprite *FUN_00490350(void) {
     struct IconNode *icon;
     struct Sprite *result;
 
@@ -292,14 +292,14 @@ struct Sprite *InitCertificateScreen(void) {
     icon->string_id = 0x26;
     icon->string = GetString(0x26);
     icon->flags |= 0x6002;
-    icon->event_handler = CertificateGoBackHandler;
+    icon->event_handler = FUN_004902c0;
 
     // STRING: LEGOLAND 0x004bf61c
     icon = LoadSpriteIcon("Print_On_Certificate.lls", 4, 0x207, 14, 7);
     icon->string_id = 0x23d;
     icon->string = GetString(0x23d);
     icon->flags |= 0x6002;
-    icon->event_handler = CertificatePrintHandler;
+    icon->event_handler = FUN_00490300;
 
     // STRING: LEGOLAND 0x004bf60c
     result = LoadSprite("printinfo.lls", 4);
@@ -310,7 +310,7 @@ struct Sprite *InitCertificateScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00490410
-void RenderCertificateScreen(void) {
+void FUN_00490410(void) {
     RECT rc;
     int hit[3] = {1};
     if (DAT_00798770 != 0) {
@@ -358,7 +358,7 @@ void FUN_00490600(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00490610
-void SetPendingMovie(const char *param_1) {
+void FUN_00490610(const char *param_1) {
     if (strlen(param_1) > 0xff) {
         strncpy(DAT_00798778, param_1, 0x100);
         DAT_00798778[0xff] = 0;
@@ -410,7 +410,7 @@ unsigned int ReadResourceLines(char *param_1, void **param_2, unsigned int param
 }
 
 // FUNCTION: LEGOLAND 0x00490740
-void SetIntervalReportSpeechPrefix(const char *param_1) {
+void FUN_00490740(const char *param_1) {
     char fname[64];
 
     _splitpath(param_1, 0, 0, fname, 0);
@@ -419,7 +419,7 @@ void SetIntervalReportSpeechPrefix(const char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00490770
-void SetIntervalHintSpeechPrefix(const char *param_1) {
+void FUN_00490770(const char *param_1) {
     char fname[64];
 
     _splitpath(param_1, 0, 0, fname, 0);
@@ -427,12 +427,12 @@ void SetIntervalHintSpeechPrefix(const char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004907a0
-unsigned int LoadIntervalReport(const char *param_1) {
+unsigned int FUN_004907a0(const char *param_1) {
     char buffer[128];
     unsigned int result;
 
-    SetIntervalReportSpeechPrefix(param_1);
-    FreeIntervalReport();
+    FUN_00490740(param_1);
+    FUN_00490850();
     // STRING: LEGOLAND 0x004bf678
     sprintf(buffer, "Intervals\\%s", param_1);
     result = ReadResourceLines(buffer, (void **)DAT_007cafa0, 100);
@@ -446,17 +446,17 @@ unsigned int LoadIntervalReport(const char *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00490800
-void LoadIntervalHints(const char *param_1) {
+void FUN_00490800(const char *param_1) {
     char buffer[128];
 
-    SetIntervalHintSpeechPrefix(param_1);
-    FreeIntervalHints();
+    FUN_00490770(param_1);
+    FUN_00490880();
     sprintf(buffer, "Intervals\\%s", param_1);
     DAT_00798880 = ReadResourceLines(buffer, (void **)DAT_007cb140, 32);
 }
 
 // FUNCTION: LEGOLAND 0x00490850
-void FreeIntervalReport(void) {
+void FUN_00490850(void) {
     if (DAT_0079887c != 0) {
         free(DAT_007cafa0[0]);
     }
@@ -464,7 +464,7 @@ void FreeIntervalReport(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00490880
-void FreeIntervalHints(void) {
+void FUN_00490880(void) {
     if (DAT_00798880 != 0) {
         free(DAT_007cb140[0]);
     }
@@ -472,7 +472,7 @@ void FreeIntervalHints(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004908b0
-void KillIntervalScreen(void) {
+void FUN_004908b0(void) {
     if (SPRITE_TitleScreenBk != 0) {
         KillSprite(SPRITE_TitleScreenBk);
         SPRITE_TitleScreenBk = 0;
@@ -505,34 +505,34 @@ void KillIntervalScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00490970
-unsigned char IntervalScreenCloseHandler(unsigned int param_1, unsigned char param_2, unsigned int param_3, unsigned int param_4) {
+unsigned char FUN_00490970(unsigned int param_1, unsigned char param_2, unsigned int param_3, unsigned int param_4) {
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_00668e38 = 0;
-        KillIntervalScreen();
+        FUN_004908b0();
         EditMode.unk4 = 3;
-        SetDefaultMouseHandlers();
-        FreeIntervalReport();
-        FreeIntervalHints();
+        FUN_00474880();
+        FUN_00490850();
+        FUN_00490880();
         FUN_00490600(0);
         if (DAT_00798778[0] != 0) {
             SetPointer(0);
             PlayMovie(DAT_00798778, 1, 1);
             SetPointer(6);
-            SetPendingMovie(DAT_004d8bb0);
+            FUN_00490610(DAT_004d8bb0);
         }
         SpeechCloseFile();
         DAT_006687b0 = 4;
         ResumeGameTimer();
         ResumeAllSamples();
         ClearAdvisorHelp();
-        RepostScriptIntro();
+        FUN_0046b760();
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00490a20
-void PlayIntervalReportSpeech(unsigned int param_1) {
+void FUN_00490a20(unsigned int param_1) {
     char buffer[256];
 
     // STRING: LEGOLAND 0x004bf688
@@ -544,7 +544,7 @@ void PlayIntervalReportSpeech(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00490a60
-void PlayIntervalHintSpeech(unsigned int param_1) {
+void FUN_00490a60(unsigned int param_1) {
     char buffer[256];
 
     sprintf(buffer, "%s%02d.wav", DAT_007cb1e0, param_1 + 1);
@@ -555,7 +555,7 @@ void PlayIntervalHintSpeech(unsigned int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00490aa0
-void ShowIntervalReportPage(void) {
+void FUN_00490aa0(void) {
     if ((int)DAT_004bf670 <= 1) {
         DAT_004bf670 = 1;
         DAT_007cb2e0->flags = DAT_007cb2e0->flags | 0x400;
@@ -567,36 +567,36 @@ void ShowIntervalReportPage(void) {
     } else {
         DAT_007cb2e4->flags &= 0xfffffbff;
     }
-    PlayIntervalReportSpeech((int)DAT_004bf670 / 0xe);
+    FUN_00490a20((int)DAT_004bf670 / 0xe);
 }
 
 // FUNCTION: LEGOLAND 0x00490b20
-unsigned char IntervalNextPageHandler(unsigned int param_1, unsigned int param_2) {
+unsigned char FUN_00490b20(unsigned int param_1, unsigned int param_2) {
     SetIconSprite(DAT_007cb2e4, NextPageLitSprite);
     if ((param_2 & 2) != 0) {
         if ((DAT_007cb2e4->flags & 0x400) != 0) {
-            return IntervalScreenCloseHandler(0, param_2, 0, 0);
+            return FUN_00490970(0, param_2, 0, 0);
         }
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_004bf670 = DAT_004bf670 + 0xe;
-        ShowIntervalReportPage();
+        FUN_00490aa0();
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00490b90
-unsigned char IntervalPreviousPageHandler(unsigned int param_1, unsigned int param_2) {
+unsigned char FUN_00490b90(unsigned int param_1, unsigned int param_2) {
     SetIconSprite(DAT_007cb2e0, PreviousPageLitSprite);
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_004bf670 -= 14;
-        ShowIntervalReportPage();
+        FUN_00490aa0();
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00490be0
-unsigned char IntervalHintHandler(struct IconNode *param_1, unsigned int param_2) {
+unsigned char FUN_00490be0(struct IconNode *param_1, unsigned int param_2) {
     SetIconSprite(param_1, RepHint2Sprite);
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -607,13 +607,13 @@ unsigned char IntervalHintHandler(struct IconNode *param_1, unsigned int param_2
             }
         } while (strlen(DAT_007cb140[DAT_00798884]) == 0);
         DAT_00798888 = GetTicks() + 8000;
-        PlayIntervalHintSpeech(DAT_00798884);
+        FUN_00490a60(DAT_00798884);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00490c70
-void InitIntervalScreen(void) {
+void FUN_00490c70(void) {
     struct IconNode *accept;
     struct IconNode *icon;
 
@@ -644,13 +644,13 @@ void InitIntervalScreen(void) {
         accept->string = GetString(0x245);
     }
     accept->flags |= 0x6002;
-    accept->event_handler = IntervalScreenCloseHandler;
-    DAT_006687c0 = IntervalScreenCloseHandler;
+    accept->event_handler = FUN_00490970;
+    DAT_006687c0 = FUN_00490970;
 
     icon = InsertIcon(0x1b9, 0x50, 7, RepHint1Sprite);
     icon->string_id = 0x2d0;
     icon->string = GetString(0x2d0);
-    icon->event_handler = (void *)IntervalHintHandler;
+    icon->event_handler = (void *)FUN_00490be0;
     icon->flags |= 0x6002;
     RepHint1Icon = icon;
     if (DAT_00798880 == 0) {
@@ -664,21 +664,21 @@ void InitIntervalScreen(void) {
     DAT_007cb2e4->string = GetString(0x88e);
     DAT_007cb2e4->flags |= 0x2000;
     DAT_007cb2e4->flags |= 0x4002;
-    DAT_007cb2e4->event_handler = (void *)IntervalNextPageHandler;
-    DAT_006687bc = IntervalNextPageHandler;
+    DAT_007cb2e4->event_handler = (void *)FUN_00490b20;
+    DAT_006687bc = FUN_00490b20;
 
     DAT_007cb2e0 = InsertIcon(6, 0x1ae, 7, PreviousPageSprite);
     DAT_007cb2e0->string_id = 0x88f;
     DAT_007cb2e0->string = GetString(0x88f);
     DAT_007cb2e0->flags |= 0x2000;
     DAT_007cb2e0->flags |= 0x4002;
-    DAT_007cb2e0->event_handler = (void *)IntervalPreviousPageHandler;
+    DAT_007cb2e0->event_handler = (void *)FUN_00490b90;
     DAT_004bf670 = 1;
-    ShowIntervalReportPage();
+    FUN_00490aa0();
 }
 
 // FUNCTION: LEGOLAND 0x00490ea0
-void UpdateIntervalScreenIcons(void) {
+void FUN_00490ea0(void) {
     unsigned int _x = MousePos.x;
     unsigned int _y = MousePos.y;
     if ((int)_x < DAT_007cb2e4->x ||
@@ -706,7 +706,7 @@ void UpdateIntervalScreenIcons(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00490fa0
-void DrawClippedText(char *text, int font, RECT rc, INT_PTR color_flag) {
+void FUN_00490fa0(char *text, int font, RECT rc, INT_PTR color_flag) {
     HRGN region = CreateRectRgn(SPRITE_ClipRect.left, SPRITE_ClipRect.top, SPRITE_ClipRect.right, SPRITE_ClipRect.bottom);
     HDC hdc;
     HGDIOBJ old_region;
@@ -728,7 +728,7 @@ void DrawClippedText(char *text, int font, RECT rc, INT_PTR color_flag) {
 }
 
 // FUNCTION: LEGOLAND 0x00491080
-void PrintIntervalLine(char *param_1, int param_2, int param_3, int param_4, int param_5) {
+void FUN_00491080(char *param_1, int param_2, int param_3, int param_4, int param_5) {
     RECT rc;
 
     if (param_1 != NULL) {
@@ -739,32 +739,32 @@ void PrintIntervalLine(char *param_1, int param_2, int param_3, int param_4, int
         if (param_5 != 0) {
             NewPrintCent(param_1, 3, rc, 0);
         } else {
-            DrawClippedText(param_1, 2, rc, 0);
+            FUN_00490fa0(param_1, 2, rc, 0);
         }
     }
 }
 
 // FUNCTION: LEGOLAND 0x004910f0
-void RenderIntervalScreen(void) {
+void FUN_004910f0(void) {
     int rc[4];
     char **line;
     int y;
     int n;
     int idx;
 
-    PrintIntervalLine(DAT_007cafa0[0], 10, 0x45, 0x27, 1);
+    FUN_00491080(DAT_007cafa0[0], 10, 0x45, 0x27, 1);
     y = 0x6b;
     n = 0;
     line = &DAT_007cafa0[DAT_004bf670];
     idx = DAT_004bf670;
     while (n < 0xe && idx <= (int)DAT_0079887c) {
-        PrintIntervalLine(*line, 10, y, 0x16, 0);
+        FUN_00491080(*line, 10, y, 0x16, 0);
         n = n + 1;
         idx = idx + 1;
         line = line + 1;
         y = y + 0x18;
     }
-    UpdateIntervalScreenIcons();
+    FUN_00490ea0();
     if (DAT_00798888 != 0) {
         rc[0] = 0x1db;
         rc[1] = 5;
@@ -778,10 +778,10 @@ void RenderIntervalScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004911c0
-unsigned int ShowIntervalScreen(const char *a, const char *b) {
-    if (LoadIntervalReport(a) != 0) {
+unsigned int FUN_004911c0(const char *a, const char *b) {
+    if (FUN_004907a0(a) != 0) {
         if (b != 0) {
-            LoadIntervalHints(b);
+            FUN_00490800(b);
         }
         DAT_00668e38 = 1;
         EditMode.unk4 = 2;
@@ -799,20 +799,20 @@ unsigned int ShowIntervalScreen(const char *a, const char *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00491240
-unsigned int HasIntervalReport(const char *param_1) {
+unsigned int FUN_00491240(const char *param_1) {
     unsigned int result;
 
     if (DAT_00668e9c == 0) {
         return 0;
     }
-    if (LoadIntervalReport(param_1) != 0) {
+    if (FUN_004907a0(param_1) != 0) {
         ((struct IconNode *)DAT_00668e9c)->flags &= 0xfffffbff;
         result = 1;
     } else {
         ((struct IconNode *)DAT_00668e9c)->flags |= 0x400;
         result = 0;
     }
-    FreeIntervalReport();
+    FUN_00490850();
     return result;
 }
 

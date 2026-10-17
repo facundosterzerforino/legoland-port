@@ -105,7 +105,7 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
         AcceptIcon->flags |= 0x4002;
         AcceptIcon->flags |= 0x400;
         if (DAT_007cb310) {
-            AcceptIcon->event_handler = (void *)SaveGameScreenSaveHandler;
+            AcceptIcon->event_handler = (void *)FUN_0048f5a0;
             AcceptIcon->string_id = 0x29;
             AcceptIcon->string = GetString(0x29);
         } else {
@@ -167,7 +167,7 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
     DeleteIcon->flags |= 0x2000;
     DeleteIcon->flags |= 0x4002;
     DeleteIcon->flags |= 0x400;
-    DeleteIcon->event_handler = (void *)DeleteIconHandler;
+    DeleteIcon->event_handler = (void *)FUN_0048cc30;
 }
 
 // FUNCTION: LEGOLAND 0x0048d8f0
@@ -242,7 +242,7 @@ unsigned char FUN_0048da50(unsigned int a1, unsigned int flags, unsigned int a3,
     }
     KillTitleScreenSprites();
     EditMode.unk4 = 3;
-    SetDefaultMouseHandlers();
+    FUN_00474880();
     ResumeGameTimer();
     DAT_004bef9c = 1;
     return 1;
@@ -544,7 +544,7 @@ LEGO_EXPORT void InitNewSaveGamePOPUP(struct IconNode *icon) {
 }
 
 // FUNCTION: LEGOLAND 0x0048e3d0
-void SetTempProfileName(const char *name) {
+void FUN_0048e3d0(const char *name) {
     strcpy(TempProfile.name, name);
     TempProfile.name_len = (unsigned char)strlen(name);
     DAT_007986f0 = 1;
@@ -557,7 +557,7 @@ void ResetPopUpIconSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048e450
-unsigned char DeletePopUpOkHandler(unsigned int a1, unsigned int a2) {
+unsigned char FUN_0048e450(unsigned int a1, unsigned int a2) {
     if ((a2 & 2) != 0 && CurrentProfile.save_slot != 0) {
         CloseFontEndCheckBox();
         DeletePopUpShown = 0;
@@ -590,7 +590,7 @@ unsigned char FUN_0048e4f0(struct IconNode *icon, unsigned int a2, unsigned int 
         CurrentProfile.save_slot = icon->field_1cb;
         InitNewSaveGamePOPUP(icon);
         if (icon->field_18p != "EMPTY") {
-            SetTempProfileName(icon->field_18p);
+            FUN_0048e3d0(icon->field_18p);
         }
         DAT_00798700 = 1;
         DAT_004bef9c = 0;
@@ -676,7 +676,7 @@ LEGO_EXPORT void EnterSaveGameDetails(struct IconNode *sprite) {
         rc.top = top;
         rc.right = center_x + 100;
         rc.bottom = bottom;
-        DrawClippedText(cursor_str, 2, rc, 1);
+        FUN_00490fa0(cursor_str, 2, rc, 1);
     }
     TempProfile.name_len = count;
     focus = (struct IconNode *)PopUpOkIcon;
@@ -815,12 +815,12 @@ LEGO_EXPORT void RemoveSaveGame(unsigned char slot) {
 }
 
 // FUNCTION: LEGOLAND 0x0048eac0
-int VolumeMarkerToPercent(int param) {
+int FUN_0048eac0(int param) {
     return (100 * (param - 124)) / 241;
 }
 
 // FUNCTION: LEGOLAND 0x0048eaf0
-int VolumePercentToMarker(int param) {
+int FUN_0048eaf0(int param) {
     return (241 * param) / 100 + 124;
 }
 

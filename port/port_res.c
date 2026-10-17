@@ -243,7 +243,7 @@ static int PortResCheckLms(FILE *dump) {
             PortResHash(2166136261u, lms->field_20, lms->field_24 * sizeof(struct LmsRef)),
             PortResHash(2166136261u, lms->field_28, lms->field_2c * sizeof(struct LmsRef)),
             PortResHash(2166136261u, lms->box, sizeof(lms->box)));
-        MemFree(lms);
+        FUN_004775d0(lms);
         files++;
     } while (FindNextFileA(h, &fd));
     FindClose(h);
@@ -695,7 +695,7 @@ static void PortResCheckTextPath(void) {
     PortResTextSurface = NULL;
 }
 
-/* A sprite drawn scaled (PrintScaledSprite -> __declspec: the map's scenery) partly outside its target, with the
+/* A sprite drawn scaled (PrintScaledSprite -> FUN_00488c80: the map's scenery) partly outside its target, with the
  * game's clipper as the game in a window makes it (InitScreen: SetHWnd, and no clip list until the map's first render
  * sets one). miniwin refused such a Blt instead of clipping it, and the map's first render lost every scenery piece
  * that sticks out of its top or bottom (2026-10-17). */

@@ -383,7 +383,7 @@ LEGO_EXPORT void PushRenderingStatusAndLockVideoSurface(void) {
         local.right = lpConfig->screen_width - 1;
         local.bottom = lpConfig->screen_height - 1;
         CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-        IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
+        IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
         surface = renderEngine;
         if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
@@ -431,7 +431,7 @@ void FUN_004640f0(void) {
         }
     }
     CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-    IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
+    IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
     surface = renderEngine;
     if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
         IDirectDrawSurface_Restore(renderEngine);
@@ -454,7 +454,7 @@ LEGO_EXPORT void PopRenderingStatus(void) {
             local.right = lpConfig->screen_width - 1;
             local.bottom = lpConfig->screen_height - 1;
             CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-            IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
+            IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
             surface = renderEngine;
             if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
                 IDirectDrawSurface_Restore(renderEngine);
@@ -1129,7 +1129,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
         return;
     }
     if (image->field_14 == 3) {
-        __declspec((struct DrawLLS *)image->data, rect, (struct Point *)off);
+        DrawLLSSpriteMousePick((struct DrawLLS *)image->data, rect, (struct Point *)off);
         return;
     }
     width = rect->right - rect->left;
@@ -2016,7 +2016,7 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
 }
 
 // FUNCTION: LEGOLAND 0x00466770
-void __declspec(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
+void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     struct DrawLLSFrame *frame = (struct DrawLLSFrame *)(lls + 1);
     unsigned short *dst;
     unsigned short *pixels;

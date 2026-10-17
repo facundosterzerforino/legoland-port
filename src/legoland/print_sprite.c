@@ -95,7 +95,7 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
     if ((sprite->flags & 0x8000) == 0) {
         if (param_4 != 0) {
             if (*GetVRAMAddress(sprite) == 0) {
-                if (EnsureSpriteSurface(sprite) != 0) {
+                if (FUN_00499500(sprite) != 0) {
                     result = RenderSpriteX(sprite, x, y, param_4);
                 } else {
                     result = 0;
@@ -105,7 +105,7 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
             }
         } else {
             if (*GetVRAMAddress(sprite) == 0) {
-                if (EnsureSpriteSurface(sprite) != 0) {
+                if (FUN_00499500(sprite) != 0) {
                     result = RenderSprite(sprite, x, y);
                 } else {
                     result = 0;
@@ -133,7 +133,7 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
                     }
                     if (param_4 != 0) {
                         if (*GetVRAMAddress(sprite->group->subs[i]) == 0) {
-                            if (EnsureSpriteSurface(sprite->group->subs[i]) != 0) {
+                            if (FUN_00499500(sprite->group->subs[i]) != 0) {
                                 RenderSpriteX(sprite->group->subs[i], xoff + x, yoff + y, param_4);
                             }
                         } else {
@@ -141,7 +141,7 @@ LEGO_EXPORT unsigned int PrintSprite(struct Sprite *sprite, unsigned int x, unsi
                         }
                     } else {
                         if (*GetVRAMAddress(sprite->group->subs[i]) == 0) {
-                            if (EnsureSpriteSurface(sprite->group->subs[i]) != 0) {
+                            if (FUN_00499500(sprite->group->subs[i]) != 0) {
                                 RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
                             }
                         } else {
@@ -242,7 +242,7 @@ void FUN_004855d0(struct Sprite *sprite, int *out) {
 }
 
 // FUNCTION: LEGOLAND 0x004856a0
-LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
+LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
     struct Sprite *sprite;
     struct SpriteGroup *group;
     int mask;
@@ -258,7 +258,7 @@ LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
     if ((sprite->flags & 0x8000) == 0) {
         if (arg->mode != 0) {
             if (*GetVRAMAddress(sprite) == 0) {
-                if (EnsureSpriteSurface(sprite) != 0) {
+                if (FUN_00499500(sprite) != 0) {
                     return RenderSpriteX(sprite, x, y, arg->mode);
                 }
             } else {
@@ -266,7 +266,7 @@ LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
             }
         } else {
             if (*GetVRAMAddress(sprite) == 0) {
-                if (EnsureSpriteSurface(sprite) != 0) {
+                if (FUN_00499500(sprite) != 0) {
                     return RenderSprite(sprite, x, y);
                 }
             } else {
@@ -297,7 +297,7 @@ LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
             }
             if (arg->mode != 0) {
                 if (*GetVRAMAddress(group->subs[i]) == 0) {
-                    if (EnsureSpriteSurface(sprite->group->subs[i]) != 0) {
+                    if (FUN_00499500(sprite->group->subs[i]) != 0) {
                         RenderSpriteX(sprite->group->subs[i], xoff + x, yoff + y, arg->mode);
                     }
                 } else {
@@ -305,7 +305,7 @@ LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
                 }
             } else {
                 if (*GetVRAMAddress(group->subs[i]) == 0) {
-                    if (EnsureSpriteSurface(sprite->group->subs[i]) != 0) {
+                    if (FUN_00499500(sprite->group->subs[i]) != 0) {
                         RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
                     }
                 } else {
@@ -323,7 +323,7 @@ LEGO_EXPORT unsigned int __declspec(struct SpriteExArg *arg, int x, int y) {
 // FUNCTION: LEGOLAND 0x004858e0
 LEGO_EXPORT unsigned int PrintTiledSprite(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7) {
     if ((sprite->flags & 0x8000) == 0) {
-        if (*GetVRAMAddress(sprite) != 0 || EnsureSpriteSurface(sprite) != 0) {
+        if (*GetVRAMAddress(sprite) != 0 || FUN_00499500(sprite) != 0) {
             return RenderTiledSprite(sprite, param_2, param_3, param_4, param_5, param_6, param_7);
         }
     }
@@ -333,7 +333,7 @@ LEGO_EXPORT unsigned int PrintTiledSprite(struct Sprite *sprite, int param_2, in
 // FUNCTION: LEGOLAND 0x00485940
 LEGO_EXPORT unsigned int PrintScaledSprite(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5) {
     if (*GetVRAMAddress(sprite) == 0) {
-        if (EnsureSpriteSurface(sprite) != 0) {
+        if (FUN_00499500(sprite) != 0) {
             return RenderScaledSprite(sprite, param_2, param_3, param_4, param_5);
         }
         return 0;
@@ -569,7 +569,7 @@ void FUN_00485f20(void *ptr) {
 }
 
 // FUNCTION: LEGOLAND 0x00485f30
-void SetRender3DTarget(unsigned char *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
+void FUN_00485f30(unsigned char *param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     DAT_00797e68 = param_1;
     DAT_00701e58 = param_2;
     DAT_00701e60 = param_3;
@@ -577,7 +577,7 @@ void SetRender3DTarget(unsigned char *param_1, unsigned int param_2, unsigned in
 }
 
 // FUNCTION: LEGOLAND 0x00485f60
-void AllocZBuffer(void) {
+void FUN_00485f60(void) {
     DAT_0066be40 = 0x80;
     DAT_0066be44 = 0x78;
     DAT_00701e5c = malloc(0xf000);
@@ -585,7 +585,7 @@ void AllocZBuffer(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00485fa0
-void FreeZBuffer(void) {
+void FUN_00485fa0(void) {
     if (DAT_00701e5c != NULL) {
         free(DAT_00701e5c);
     }
@@ -595,7 +595,7 @@ void FreeZBuffer(void) {
 void FUN_00485fc0(unsigned int param_1) {
     *(unsigned int *)&DAT_007cb5e0 = param_1;
     FUN_004860f0();
-    AllocZBuffer();
+    FUN_00485f60();
     FUN_00486540();
 }
 
