@@ -5,9 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "legoland.h"
-#ifdef LEGOLAND_PORT
-#include "debug.h"
-#endif
 
 #include "../../port/port_asm.h"
 #include "challenge.h"
@@ -736,36 +733,6 @@ LEGO_EXPORT unsigned int RenderTiledSprite(struct Sprite *sprite, int param_2, i
     return ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->Blt((LPDIRECTDRAWSURFACE)renderEngine, &dst, (LPDIRECTDRAWSURFACE)sprite->surface, NULL, 0x1000000, NULL) == 0;
 }
 
-#ifdef LEGOLAND_PORT
-/* [port] > 0 while the map screen draws its overlay sprites, for its first renders (mapscreen.c): each scaled
- * sprite is traced (size, kind, the pixels it left in the scratch surface, the clip, the Blt's result), to debug
- * the scenery missing from the map the first time it opens (web, 2026-10-17). Remove once found. */
-int PortTraceScaledSprites;
-
-/* pixels other than the transparent colour in the scratch surface's top-left w x h */
-static int PortScratchPixels(const DDSURFACEDESC *desc, int w, int h) {
-    int count = 0;
-    int x;
-    int y;
-
-    if (w > (int)desc->dwWidth) {
-        w = (int)desc->dwWidth;
-    }
-    if (h > (int)desc->dwHeight) {
-        h = (int)desc->dwHeight;
-    }
-    for (y = 0; y < h; y++) {
-        const unsigned short *row = (const unsigned short *)((const unsigned char *)desc->lpSurface + y * desc->lPitch);
-        for (x = 0; x < w; x++) {
-            if (row[x] != (unsigned short)StoredTransparentColour) {
-                count++;
-            }
-        }
-    }
-    return count;
-}
-#endif
-
 // FUNCTION: LEGOLAND 0x00488c80
 unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int *param_6) {
     int off[2];
@@ -780,9 +747,6 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     void *bits;
     int x = param_2 + param_6[0];
     int y = param_3 + param_6[1];
-#ifdef LEGOLAND_PORT
-    int port_pixels = -1;
-#endif
     dst.left = x;
     dst.top = y;
     dst.right = x + param_4 + 1;
@@ -832,28 +796,11 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
             printf("break");
         }
         FUN_00464ee0(sprite, &r2, off);
-#ifdef LEGOLAND_PORT
-        if (PortTraceScaledSprites > 0) {
-            port_pixels = PortScratchPixels(&desc2, (short)sprite->width, (short)sprite->height);
-        }
-#endif
         bits = desc2.lpSurface;
         IDirectDrawSurface_Unlock(DAT_0079861c, bits);
     }
     IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
     hr = IDirectDrawSurface_Blt(renderEngine, &dst, DAT_0079861c, &src, 0x1008000, NULL);
-#ifdef LEGOLAND_PORT
-    if (PortTraceScaledSprites > 0 && PortTraceScaledSprites <= 300) {
-        PortTraceScaledSprites++;
-        DebugTrace("  scaled sprite %p %dx%d flags %x type %d data %s: %d pixels, clip %d,%d-%d,%d, to %d,%d-%d,%d, "
-                   "Blt %x",
-            (void *)sprite, (int)sprite->width, (int)sprite->height, sprite->flags,
-            (sprite->flags & 0x8020) != 0 ? -1 : (int)sprite->image->field_14,
-            (sprite->flags & 0x8020) != 0 ? "-" : (sprite->image->data != NULL ? "yes" : "NO"), port_pixels,
-            (int)DAT_00668108.left, (int)DAT_00668108.top, (int)DAT_00668108.right, (int)DAT_00668108.bottom,
-            (int)dst.left, (int)dst.top, (int)dst.right, (int)dst.bottom, (unsigned int)hr);
-    }
-#endif
     if (hr == 0) {
         goto ok;
     }

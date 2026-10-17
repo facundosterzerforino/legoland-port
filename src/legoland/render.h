@@ -47,8 +47,3 @@ void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 void FUN_004886e0(unsigned int index);
 void FUN_00488670(struct Image *image, unsigned int index);
 void FUN_004886a0(void);
-
-#ifdef LEGOLAND_PORT
-/* [port] > 0 while the map screen draws its overlay sprites: RenderScaledSprite traces each (see render.c) */
-extern int PortTraceScaledSprites;
-#endif
