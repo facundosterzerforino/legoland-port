@@ -19,8 +19,8 @@
 #include "tilemap.h"
 
 struct MapPoint {
-    int field0;
-    int field1;
+    int x;
+    int y;
 };
 
 /* A sprite overlaid on the map (OverlayList). */
@@ -143,7 +143,7 @@ LEGO_EXPORT void DrawMapScreen(void) {
 
     PrintSprite(FullMapSprite, MapViewX, MapViewY, 0, 0);
     if (FrameCounter & 0x10) {
-        for (row = DAT_008119c0; row < DAT_008119c0 + 31; row++) {
+        for (row = MapSpannerMarks; row < MapSpannerMarks + 31; row++) {
             m = *row;
             for (j = 0; j < 31; j++, m++) {
                 if (m->x != 0 || m->y != 0) {
@@ -157,8 +157,8 @@ LEGO_EXPORT void DrawMapScreen(void) {
 
 // FUNCTION: LEGOLAND 0x00456770
 void HalveMapPoint(struct MapPoint *arg) {
-    int v0 = arg->field0;
-    int v1 = arg->field1;
+    int v0 = arg->x;
+    int v1 = arg->y;
 
     if (v0 < 0) {
         v0 = -((-v0) >> 1);
@@ -172,8 +172,8 @@ void HalveMapPoint(struct MapPoint *arg) {
         v1 = v1 >> 1;
     }
 
-    arg->field0 = v0;
-    arg->field1 = v1;
+    arg->x = v0;
+    arg->y = v1;
 }
 
 // FUNCTION: LEGOLAND 0x004567a0
@@ -224,7 +224,7 @@ LEGO_EXPORT void RenderFullMap(void) {
         struct Overlay *node;
 
         FUN_0045a660();
-        memset(DAT_008119c0, 0, 0x2000); /* all 32 rows, DAT_008138c0 included */
+        memset(MapSpannerMarks, 0, 0x2000); /* all 32 rows, MapSpannerMarksLastRow included */
         MapViewX = 0;
         MapViewY = 0x20;
         MapViewWidth = 0x280;
@@ -335,11 +335,11 @@ LEGO_EXPORT void RenderFullMap(void) {
                     pt.x = pos.x;
                     pt.y = pos.y;
                     GetTileBounds(&pt, bounds);
-                    off.field0 = ride->field_14;
-                    off.field1 = ride->field_18;
+                    off.x = ride->field_14;
+                    off.y = ride->field_18;
                     HalveMapPoint(&off);
-                    bounds[0] += off.field0;
-                    bounds[1] += off.field1;
+                    bounds[0] += off.x;
+                    bounds[1] += off.y;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
                     PrintScaledSprite(TileSpriteArray[tile.field_8],
@@ -402,9 +402,9 @@ LEGO_EXPORT void RenderFullMap(void) {
                 GetTileBounds(&pt, bounds);
                 bounds[0] += ScrollX >> 8;
                 bounds[1] += ScrollY >> 8;
-                DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].x =
+                MapSpannerMarks[elem.field_5 >> 3][elem.field_4 >> 3].x =
                     ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
-                DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].y =
+                MapSpannerMarks[elem.field_5 >> 3][elem.field_4 >> 3].y =
                     (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
             }
             ride = elem.field_0->ride;

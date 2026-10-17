@@ -39,7 +39,7 @@
 LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
     struct Ride *iface = head->ride;
 
-    if (_stricmp(head->name, "PATH CONTROL") == 0) {
+    if (_stricmp(head->name, PathControlName) == 0) {
         iface->cb_98 = AddBasicPath;
         iface->cb_9c = RemoveBasicPath;
         iface->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) DrawBasicPath; /* as the original */

@@ -109,6 +109,7 @@
 #include "port_globals_layout.h"
 
 const struct PortLayoutGlobal PortLayoutGlobals[] = {
+    {0x004ab384, "GoldSlotWeightScale", (const void *)&GoldSlotWeightScale, sizeof(GoldSlotWeightScale)},
     {0x004ab390, "FLOAT_004ab390", (const void *)&FLOAT_004ab390, sizeof(FLOAT_004ab390)},
     {0x004ab398, "DOUBLE_004ab398", (const void *)&DOUBLE_004ab398, sizeof(DOUBLE_004ab398)},
     {0x004ab3dc, "DAT_004ab3dc", (const void *)&DAT_004ab3dc, sizeof(DAT_004ab3dc)},
@@ -356,10 +357,12 @@ const struct PortLayoutGlobal PortLayoutGlobals[] = {
     {0x004b8348, "PTR_DAT_004b8348", (const void *)&PTR_DAT_004b8348, sizeof(PTR_DAT_004b8348)},
     {0x004b8368, "PTR_Bloke_DoNothing_004b8368", (const void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368)},
     {0x004b85c4, "VWin32DeviceHandle", (const void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle)},
+    {0x004b86e0, "LegoFontName", (const void *)&LegoFontName, sizeof(LegoFontName)},
     {0x004b8710, "FountainSFX", (const void *)&FountainSFX, sizeof(FountainSFX)},
     {0x004b8750, "PowerStationSFX", (const void *)&PowerStationSFX, sizeof(PowerStationSFX)},
     {0x004b8768, "DINO_SFX", (const void *)&DINO_SFX, sizeof(DINO_SFX)},
     {0x004b87a8, "MONEY_SFX", (const void *)&MONEY_SFX, sizeof(MONEY_SFX)},
+    {0x004b8a70, "PathControlName", (const void *)&PathControlName, 0}, /* no size in globals.h */
     {0x004b8a88, "DAT_004b8a88", (const void *)&DAT_004b8a88, sizeof(DAT_004b8a88)},
     {0x004b8a8c, "DAT_004b8a8c", (const void *)&DAT_004b8a8c, sizeof(DAT_004b8a8c)},
     {0x004b8a90, "DAT_004b8a90", (const void *)&DAT_004b8a90, sizeof(DAT_004b8a90)},
@@ -414,6 +417,7 @@ const struct PortLayoutGlobal PortLayoutGlobals[] = {
     {0x004bb0a0, "DAT_004bb0a0", (const void *)&DAT_004bb0a0, sizeof(DAT_004bb0a0)},
     {0x004bb0a4, "DAT_004bb0a4", (const void *)&DAT_004bb0a4, sizeof(DAT_004bb0a4)},
     {0x004bb18c, "DAT_004bb18c", (const void *)&DAT_004bb18c, sizeof(DAT_004bb18c)},
+    {0x004bb49c, "BuildMenuName", (const void *)&BuildMenuName, 0}, /* no size in globals.h */
     {0x004bb4dc, "DAT_004bb4dc", (const void *)&DAT_004bb4dc, sizeof(DAT_004bb4dc)},
     {0x004bb4e0, "DAT_004bb4e0", (const void *)&DAT_004bb4e0, sizeof(DAT_004bb4e0)},
     {0x004bb598, "DAT_004bb598", (const void *)&DAT_004bb598, sizeof(DAT_004bb598)},

@@ -101,8 +101,7 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     bar->flags |= 0x400a;
 
     count = LLIDB_GetCount();
-    // STRING: LEGOLAND 0x004b8a70
-    LLIDB_FindElement("PATH CONTROL", &path_idx, 0);
+    LLIDB_FindElement(PathControlName, &path_idx, 0);
 
     for (i = 0; (int)i < (int)count; i++) {
         LLIDB_GetElement(i, (struct Element **)&elem);
@@ -219,7 +218,7 @@ LEGO_EXPORT void InitFreePlayLists(void) {
     struct Sprite *sprite;
     struct ClipQueryResult *entry;
 
-    if (LLIDB_FindElement("BUILD MENU", &build, 0) != 0) {
+    if (LLIDB_FindElement(BuildMenuName, &build, 0) != 0) {
         exit(1);
     }
     if (LLIDB_FindElement("COMMON THEME", &common, 0) != 0) {
@@ -277,8 +276,7 @@ unsigned int FUN_0048aef0(const char *arg1, struct Element *arg2) {
     result = FUN_0048a840(arg1, 0);
     if ((int)(DAT_007cb3a0 + result) <= 0x4e20) {
         if (arg2) {
-            // STRING: LEGOLAND 0x004bb49c
-            elem = ElemID("BUILD MENU");
+            elem = ElemID(BuildMenuName);
             if (arg2 != elem) {
                 if ((arg2->flags & 0x4) == 0) {
                     return 0;
@@ -418,16 +416,225 @@ LEGO_EXPORT void Add2FreePlayPanelLists(struct Sprite *a, char **name, char *nam
     }
 }
 
+// Builds one free-play object list panel (icon group `a`, at x `b`): picks the page's up/down
+// arrow sprites and object list from `e` (200, 500, 400 or 300), adds the bar icons, one icon per
+// object (0x42 pixels apart) and the full-screen icon, then turns icons a+4 / a+3 into the down /
+// up scroll arrows. With no objects it only shows the cover sprite. Returns 1 if the panel was built.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements (struct offsets are named in the comments).
+// Why asm: the C was at best 82.76% (with search-tool tweaks): MSVC6 hoists `b` into ecx at entry
+// while the original reads it late from its slot, which shifts the register picks and the tail
+// layout. See docs/attempts/0x0048b2a0-FreePlayObjectList.md. With the asm matching, the C below
+// is the plain version (no register, no temporaries).
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x0048b2a0
+__declspec(naked) LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
+    __asm {
+        // Arguments after the three pushes: [esp+0x10] a, [esp+0x14] b, [esp+0x18] c, [esp+0x1c] d,
+        // [esp+0x20] e. The `e` slot is reused for `sprite` (down arrow) and the `push ecx` slot
+        // [esp+8] holds `sprite2` (up arrow). esi = group, edi = list.
+        push ecx
+        push esi
+        push edi
+        // group = malloc(sizeof(struct InterfacePanel)); if (group == NULL) return 0;
+        push 0x2c
+        call malloc
+        mov esi, eax
+        add esp, 4
+        test esi, esi
+        jne got_group
+        pop edi
+        pop esi
+        pop ecx
+        ret
+    got_group:
+        // pick the page: sprite (down), sprite2 (up), list
+        mov eax, dword ptr [esp + 0x20] // e
+        cmp eax, 0xc8
+        jne not_page_200
+        mov eax, dword ptr [FreePlayDown1Sprite]
+        mov ecx, dword ptr [FreePlayUp1Sprite]
+        mov edi, dword ptr [DAT_007cb3d0]
+        mov dword ptr [esp + 0x20], eax
+        mov dword ptr [esp + 8], ecx
+        jmp page_chosen
+    not_page_200:
+        cmp eax, 0x1f4
+        jne not_page_500
+        mov edx, dword ptr [FreePlayDown2Sprite]
+        mov eax, dword ptr [FreePlayUp2Sprite]
+        mov edi, dword ptr [DAT_007cb3a4]
+        mov dword ptr [esp + 0x20], edx
+        mov dword ptr [esp + 8], eax
+        jmp page_chosen
+    not_page_500:
+        cmp eax, 0x190
+        jne not_page_400
+        mov ecx, dword ptr [FreePlayDown3Sprite]
+        mov edx, dword ptr [FreePlayUp3Sprite]
+        mov edi, dword ptr [DAT_007cb3b8]
+        mov dword ptr [esp + 0x20], ecx
+        mov dword ptr [esp + 8], edx
+        jmp page_chosen
+    not_page_400:
+        cmp eax, 0x12c
+        jne no_page
+        mov eax, dword ptr [FreePlayDown4Sprite]
+        mov ecx, dword ptr [FreePlayUp4Sprite]
+        mov edi, dword ptr [DAT_007cb39c]
+        mov dword ptr [esp + 0x20], eax
+        mov dword ptr [esp + 8], ecx
+        jmp page_chosen
+    no_page:
+        mov edi, dword ptr [esp + 0x14] // list = (struct PanelNode *)b
+    page_chosen:
+        // if (list == NULL) { InsertIcon(b - 3, 0x15, 7, FreePlayCoverSprite); return 0; }
+        test edi, edi
+        jne have_list
+        mov edx, dword ptr [FreePlayCoverSprite]
+        mov eax, dword ptr [esp + 0x14]
+        push edx
+        push 7
+        add eax, -3
+        push 0x15
+        push eax
+        call InsertIcon
+        add esp, 0x10
+        xor eax, eax
+        pop edi
+        pop esi
+        pop ecx
+        ret
+    have_list:
+        // icon = AddGBarIcons(group, b, c, 1, d, a); group->icon = icon;   (ebp = a)
+        mov ecx, dword ptr [esp + 0x1c] // d
+        mov edx, dword ptr [esp + 0x18] // c
+        mov eax, dword ptr [esp + 0x14] // b
+        push ebx
+        push ebp
+        mov ebp, dword ptr [esp + 0x18] // a
+        push ebp
+        push ecx
+        push 1
+        push edx
+        push eax
+        push esi
+        call AddGBarIcons
+        mov dword ptr [esi + 8], eax // group->icon
+        // b = icon->x; group->clip_left = group->content_left = b;
+        // y = icon->y; group->clip_top = group->content_top = y;   (ebx = y)
+        push offset FreePlayObjectIconHandler
+        movsx ecx, word ptr [eax + 0xc] // icon->x
+        mov dword ptr [esi + 0x1c], ecx // group->content_left
+        mov dword ptr [esi + 0xc], ecx // group->clip_left
+        movsx ebx, word ptr [eax + 0xe] // icon->y
+        mov dword ptr [esp + 0x38], ecx // b
+        mov dword ptr [esi + 0x20], ebx // group->content_top
+        mov dword ptr [esi + 0x10], ebx // group->clip_top
+        // group->clip_right = icon->width + icon->x; group->clip_bottom = icon->y + icon->height;
+        // group->field_4 = 1; group->group = a;
+        // SetNewGroup_Callbacks(0, RenderFreePlayIcons, FreePlayObjectIconHandler);
+        push offset RenderFreePlayIcons
+        movsx ecx, word ptr [eax + 0x10] // icon->width
+        movsx edx, word ptr [eax + 0xc]
+        add ecx, edx
+        push 0
+        mov dword ptr [esi + 0x24], ecx // group->clip_right
+        movsx ecx, word ptr [eax + 0x12] // icon->height
+        movsx edx, word ptr [eax + 0xe]
+        add ecx, edx
+        mov dword ptr [esi + 4], 1 // group->field_4
+        mov dword ptr [esi + 0x28], ecx // group->clip_bottom
+        mov word ptr [esi], bp // group->group
+        call SetNewGroup_Callbacks
+        add esp, 0x24
+        // do { AddFreePlayIcon(group, list, b, y, a, 1, list->after); list = list->next; y += 0x42; } while (list);
+    next_object:
+        mov eax, dword ptr [edi + 0xc] // list->after
+        mov ecx, dword ptr [esp + 0x1c] // b
+        push eax
+        push 1
+        push ebp
+        push ebx
+        push ecx
+        push edi
+        push esi
+        call AddFreePlayIcon
+        mov edi, dword ptr [edi] // list = list->next
+        add esp, 0x1c
+        add ebx, 0x42
+        test edi, edi
+        jne next_object
+        // AddFullScreenIcon(a + 6); group->field_14 = b; group->content_bottom = y;
+        lea edx, [ebp + 6]
+        push edx
+        call AddFullScreenIcon
+        mov eax, dword ptr [esp + 0x20] // b
+        lea ecx, [ebp + 4]
+        push ecx
+        mov dword ptr [esi + 0x14], eax // group->field_14
+        mov dword ptr [esi + 0x18], ebx // group->content_bottom
+        // if ((icon = FindIcon(a + 4)) != NULL) {
+        //     SetIconSprite(icon, sprite); icon->x -= 9; icon->string_id = 0x94; icon->string = GetString(0x94);
+        // }
+        call FindIcon
+        mov esi, eax
+        add esp, 8
+        test esi, esi
+        mov edi, 0xfffffff7 // -9
+        je no_down_arrow
+        mov edx, dword ptr [esp + 0x28] // sprite
+        push edx
+        push esi
+        call SetIconSprite
+        add word ptr [esi + 0xc], di // icon->x -= 9
+        push 0x94
+        mov dword ptr [esi + 0x3c], 0x94 // icon->string_id
+        call GetString
+        add esp, 0xc
+        mov dword ptr [esi + 0x38], eax // icon->string
+    no_down_arrow:
+        // if ((icon = FindIcon(a + 3)) != NULL) { same with sprite2 and string 0x95 }
+        add ebp, 3
+        push ebp
+        call FindIcon
+        add esp, 4
+        mov esi, eax
+        test esi, esi
+        pop ebp
+        pop ebx
+        je no_up_arrow
+        mov eax, dword ptr [esp + 8] // sprite2
+        push eax
+        push esi
+        call SetIconSprite
+        add word ptr [esi + 0xc], di
+        push 0x95
+        mov dword ptr [esi + 0x3c], 0x95
+        call GetString
+        add esp, 0xc
+        mov dword ptr [esi + 0x38], eax
+    no_up_arrow:
+        // return 1;
+        pop edi
+        mov eax, 1
+        pop esi
+        pop ecx
+        ret
+    }
+}
+// clang-format on
+#else
 LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
-    register struct InterfacePanel *group;
+    struct InterfacePanel *group;
     struct IconNode *icon;
     struct PanelNode *list;
     struct Sprite *sprite2;
     struct Sprite *sprite;
     unsigned int y;
 
-    unsigned int icon_y;
     group = (struct InterfacePanel *)malloc(sizeof(struct InterfacePanel));
     if (group == NULL) {
         return 0;
@@ -437,14 +644,14 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         sprite2 = FreePlayUp1Sprite;
         list = DAT_007cb3d0;
     } else if (e == 0x1f4) {
-        sprite2 = FreePlayUp2Sprite;
         sprite = FreePlayDown2Sprite;
+        sprite2 = FreePlayUp2Sprite;
         list = DAT_007cb3a4;
     } else if (e == 0x190) {
         sprite = FreePlayDown3Sprite;
         sprite2 = FreePlayUp3Sprite;
         list = DAT_007cb3b8;
-    } else if (0x12c == (unsigned int)e) {
+    } else if (e == 0x12c) {
         sprite = FreePlayDown4Sprite;
         sprite2 = FreePlayUp4Sprite;
         list = DAT_007cb39c;
@@ -460,8 +667,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     b = icon->x;
     group->clip_left = b;
     group->content_left = b;
-    icon_y = icon->y;
-    y = icon_y;
+    y = icon->y;
     group->clip_top = y;
     group->content_top = y;
     group->clip_right = icon->width + icon->x;
@@ -485,7 +691,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
         icon->string = GetString(0x94);
     }
     icon = FindIcon(a + 3);
-    if (NULL != icon) {
+    if (icon != NULL) {
         SetIconSprite(icon, sprite2);
         icon->x -= 9;
         icon->string_id = 0x95;
@@ -493,6 +699,7 @@ LEGO_EXPORT unsigned int FreePlayObjectList(int a, int b, int c, int d, int e) {
     }
     return 1;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x0048b4a0
 void FUN_0048b4a0(int arg) {

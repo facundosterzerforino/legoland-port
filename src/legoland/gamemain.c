@@ -485,8 +485,7 @@ void FindMapPathAStar(int x, int y, int a, int b) {
         }
         ReleasePathNode((struct GameMainNode *)cur);
     }
-    // STRING: LEGOLAND 0x004b8a70
-    id = ElemID("PATH CONTROL");
+    id = ElemID(PathControlName);
     nb = best;
     while (nb) {
         pp = (struct Point *)&nb->x;

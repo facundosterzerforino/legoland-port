@@ -1,6 +1,6 @@
 # CastleLevel1Update (0x00402dc0, `src/legoland/castle_level.c`)
 
-**Best: 85.88%**. Kind: C.
+**100% (2026-10-17)**. Kind: C.
 
 ## What still differs
 
@@ -15,6 +15,8 @@
 |---|---|---|---|
 | 2026-10-08 | Haiku agent (a1) | Start: case 4 uses a local `to` then `bloke->dest = to` | 85.88% |
 | 2026-10-08 | Haiku agent (a1) | Case 4 writes `bloke->dest.x/.y` directly and calls `CalcMoveLine(bloke->pos, bloke->dest, ...)` | 82.55% (worse) |
+
+| 2026-10-17 | Opus 5.5 | cases 4 and 5 both written like case 0 (`dest.x`, `dest.y` stores, `CalcMoveLine(bloke->pos, bloke->dest, ...)`): MSVC cross-jumps case 4 into case 0's tail as in the original | **100%** (case 4 alone: 83.10%) |
 
 ## Ideas not tried yet
 

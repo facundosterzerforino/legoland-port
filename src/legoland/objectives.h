@@ -106,3 +106,6 @@ void TakeRewardObject(struct Element *object);
 int ProcessUnimplementedReward(struct ObjectiveEvent *arg);
 int ProcessUnimplementedObjective(struct ObjectiveEvent *arg);
 void GiveRewardObject(struct Element *object, unsigned int a, unsigned int b);
+
+// The CRT stack probe (__chkstk); called by ScriptEventClear's asm for its 0x1854-byte frame.
+void _chkstk(void);

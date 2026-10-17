@@ -1058,7 +1058,256 @@ struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char *
     return NULL;
 }
 
+// "TileData\<file>": a named array so the asm version of LLIDB_LoadTSFData can push its address.
+// GLOBAL: LEGOLAND 0x004bc3a8
+static const char TileDataPathFormat[] = "TileData\\%s";
+
+// Loads a tile-set (.tsf) element: TileData\<path> holds the sprite count, a name, the sprite ids
+// and per-sprite data, then each sprite's file name. Allocates tile space for the sprites, loads
+// them (starting animated LLS sprites), and if the file names a parent element, links the sprite
+// list to that element's ride. Marks `head` loaded and returns the sprite list.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements (FXSpriteList offsets: +0 base, +4 count,
+// +8 sprites, +0xc sprite_ids, +0x10 data_10, +0x14 data_14, +0x18/+0x1c/+0x20 callbacks).
+// Why asm: the C was at best 93.40%, a register permutation only (which of eax/ecx/edx takes
+// sprites[i], &len and element). See docs/attempts/0x0047cba0-LLIDB_LoadTSFData.md.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x0047cba0
+__declspec(naked) LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
+    __asm {
+        // Frame once all four registers are pushed: [esp+0x10] count, [esp+0x14] len,
+        // [esp+0x18] element, [esp+0x1c] tile_base, [esp+0x20] filename[0x200],
+        // [esp+0x220] name[0x200], [esp+0x424] head. edi = file, esi = si, ebp = i, ebx = 0.
+        // sprintf(filename, "TileData\\%s", head->path); file = RES_OpenFile(filename);
+        mov eax, dword ptr [esp + 4] // head
+        sub esp, 0x410
+        lea edx, [esp + 0x10] // filename
+        mov ecx, dword ptr [eax + 4] // head->path
+        push ebx
+        push edi
+        push ecx
+        push offset TileDataPathFormat
+        push edx
+        call sprintf
+        lea eax, [esp + 0x24]
+        push eax
+        call RES_OpenFile
+        mov edi, eax
+        xor ebx, ebx
+        add esp, 0x10
+        // if (file == NULL) return NULL;
+        cmp edi, ebx
+        jne file_open
+        pop edi
+        xor eax, eax
+        pop ebx
+        add esp, 0x410
+        ret
+    file_open:
+        // si = malloc(sizeof(struct FXSpriteList)); RES_ReadFile(file, &count, 4);
+        push ebp
+        push esi
+        push 0x24
+        call malloc
+        lea ecx, [esp + 0x14] // &count
+        push 4
+        push ecx
+        push edi
+        mov esi, eax
+        call RES_ReadFile
+        // si->sprite_ids = malloc(count * 4); si->data_10 = malloc(count * 4); si->count = count;
+        // si->get_rf_flags = si->on_enter = si->on_leave = NULL;
+        mov edx, dword ptr [esp + 0x20]
+        lea eax, [edx * 4]
+        push eax
+        call malloc
+        mov dword ptr [esi + 0xc], eax
+        mov ecx, dword ptr [esp + 0x24]
+        lea edx, [ecx * 4]
+        push edx
+        call malloc
+        lea ecx, [esp + 0x2c] // &len
+        mov dword ptr [esi + 0x10], eax
+        mov eax, dword ptr [esp + 0x28]
+        push 4
+        push ecx
+        push edi
+        mov dword ptr [esi + 4], eax
+        mov dword ptr [esi + 0x18], ebx
+        mov dword ptr [esi + 0x1c], ebx
+        mov dword ptr [esi + 0x20], ebx
+        // RES_ReadFile(file, &len, 4); RES_ReadFile(file, name, len);
+        call RES_ReadFile
+        mov edx, dword ptr [esp + 0x38] // len
+        lea eax, [esp + 0x244] // name
+        push edx
+        push eax
+        push edi
+        call RES_ReadFile
+        mov eax, dword ptr [esp + 0x40] // count
+        add esp, 0x30
+        // for (i = 0; i < count; i++) {
+        //     RES_ReadFile(file, &si->sprite_ids[i], 4); RES_ReadFile(file, &si->data_10[i], 4);
+        // }
+        xor ebp, ebp
+        cmp eax, ebx
+        jle ids_done
+    next_id:
+        mov ecx, dword ptr [esi + 0xc]
+        lea ebx, [ebp * 4]
+        add ecx, ebx
+        push 4
+        push ecx
+        push edi
+        call RES_ReadFile
+        mov edx, dword ptr [esi + 0x10]
+        push 4
+        add edx, ebx
+        push edx
+        push edi
+        call RES_ReadFile
+        mov eax, dword ptr [esp + 0x28]
+        add esp, 0x18
+        inc ebp
+        cmp ebp, eax
+        jl next_id
+        xor ebx, ebx
+    ids_done:
+        // si->sprites = AllocTileSpace(si, count, &tile_base); si->base = tile_base & 0xffff;
+        lea ecx, [esp + 0x1c] // &tile_base
+        push ecx
+        push eax
+        push esi
+        call AllocTileSpace
+        mov dword ptr [esi + 8], eax
+        mov edx, dword ptr [esp + 0x28]
+        and edx, 0xffff
+        add esp, 0xc
+        mov dword ptr [esi], edx
+        // for (i = 0; i < count; i++) {
+        mov eax, dword ptr [esp + 0x10]
+        xor ebp, ebp
+        cmp eax, ebx
+        jle sprites_done
+    next_sprite:
+        //     RES_ReadFile(file, &len, 4); RES_ReadFile(file, filename, len); filename[len] = 0;
+        //     si->sprites[i] = LoadSprite(filename, 1);
+        lea eax, [esp + 0x14]
+        push 4
+        push eax
+        push edi
+        call RES_ReadFile
+        mov ecx, dword ptr [esp + 0x20]
+        lea edx, [esp + 0x2c]
+        push ecx
+        push edx
+        push edi
+        call RES_ReadFile
+        mov eax, dword ptr [esp + 0x2c]
+        lea ecx, [esp + 0x38]
+        push 1
+        push ecx
+        mov byte ptr [esp + eax + 0x40], 0
+        call LoadSprite
+        mov edx, dword ptr [esi + 8]
+        add esp, 0x20
+        mov dword ptr [edx + ebp * 4], eax
+        //     anim = si->sprites[i]->image;
+        //     if ((anim->field_14 == 2 || anim->field_14 == 3) && anim->data->frame_count > 1) LLSPlay(anim->data, anim);
+        mov eax, dword ptr [esi + 8]
+        mov eax, dword ptr [eax + ebp * 4]
+        mov eax, dword ptr [eax + 8] // ->image
+        mov ecx, dword ptr [eax + 0x14] // anim->field_14
+        cmp ecx, 2
+        je animated
+        cmp ecx, 3
+        jne sprite_done
+    animated:
+        mov ecx, dword ptr [eax] // anim->data (struct LLS *)
+        cmp word ptr [ecx + 0x10], 1 // frame_count
+        jle sprite_done
+        push eax
+        push ecx
+        call LLSPlay
+        add esp, 8
+    sprite_done:
+        mov eax, dword ptr [esp + 0x10]
+        inc ebp
+        cmp ebp, eax
+        jl next_sprite
+        // }
+    sprites_done:
+        // si->data_14 = 0; if (RES_ReadFile(file, &len, 4) == 4 && len != 0) {
+        lea ecx, [esp + 0x14]
+        push 4
+        push ecx
+        push edi
+        mov dword ptr [esi + 0x14], ebx
+        call RES_ReadFile
+        add esp, 0xc
+        cmp eax, 4
+        jne no_parent
+        mov eax, dword ptr [esp + 0x14]
+        cmp eax, ebx
+        je no_parent
+        //     name[len] = 0; RES_ReadFile(file, name, len);
+        //     if (LLIDB_FindElement(name, &element, NULL) == 0) {
+        lea edx, [esp + 0x220]
+        push eax
+        push edx
+        push edi
+        call RES_ReadFile
+        mov eax, dword ptr [esp + 0x20]
+        lea ecx, [esp + 0x24] // &element
+        push ebx
+        lea edx, [esp + 0x230] // name
+        push ecx
+        push edx
+        mov byte ptr [esp + eax + 0x238], 0
+        call LLIDB_FindElement
+        add esp, 0x18
+        test eax, eax
+        jne no_parent
+        //         head->data = si; si->data_14 = element; LLIDB_LoadData(element);
+        //         ((struct Ride *)element->data)->sprites = si;
+        mov ebx, dword ptr [esp + 0x424] // head
+        mov eax, dword ptr [esp + 0x18] // element
+        mov dword ptr [ebx + 0xc], esi
+        mov dword ptr [esi + 0x14], eax
+        mov ecx, dword ptr [esp + 0x18]
+        push ecx
+        call LLIDB_LoadData
+        mov edx, dword ptr [esp + 0x1c]
+        add esp, 4
+        mov eax, dword ptr [edx + 0xc]
+        mov dword ptr [eax + 0x74], esi
+        jmp close_file
+        //     }
+        // }
+    no_parent:
+        mov ebx, dword ptr [esp + 0x424] // head
+    close_file:
+        // RES_CloseFile(file); head->data = si; head->flags |= LLIDB_FLAG_LOADED; return si;
+        push edi
+        call RES_CloseFile
+        mov eax, dword ptr [ebx + 8]
+        add esp, 4
+        or al, 1
+        mov dword ptr [ebx + 0xc], esi
+        mov dword ptr [ebx + 8], eax
+        mov eax, esi
+        pop esi
+        pop ebp
+        pop edi
+        pop ebx
+        add esp, 0x410
+        ret
+    }
+}
+// clang-format on
+#else
 LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     char filename[0x200];
     char name[0x200];
@@ -1073,7 +1322,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     int i;
 
     char *data_c;
-    sprintf(filename, "TileData\\%s", head->path);
+    sprintf(filename, TileDataPathFormat, head->path);
     file = RES_OpenFile(filename);
     if (file == NULL) {
         return NULL;
@@ -1138,6 +1387,7 @@ LEGO_EXPORT void *LLIDB_LoadTSFData(struct Element *head) {
     head->flags = head->flags | LLIDB_FLAG_LOADED;
     return si;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x0047cdd0
 void LLIDB_UnLoadTSF(struct Element *param_1) {
@@ -1175,8 +1425,7 @@ LEGO_EXPORT void *LLIDB_LoadTSMData(struct Element *head) {
     struct TSMEntry *entry;
     int i;
 
-    // STRING: LEGOLAND 0x004bc3a8
-    sprintf(filename, "TileData\\%s", head->path);
+    sprintf(filename, TileDataPathFormat, head->path);
     file = RES_OpenFile(filename);
     if (file != NULL) {
         RES_ReadFile(file, &count, 4);

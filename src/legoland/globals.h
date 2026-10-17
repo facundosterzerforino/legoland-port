@@ -551,6 +551,8 @@ extern GUID NullGuid;
 // 0x004b4580
 extern struct FortRect DAT_004b4580;
 
+// 0x004ab384: gold-rush slot weight to map units
+extern const float GoldSlotWeightScale;
 // 0x004ab390
 extern float FLOAT_004ab390;
 extern float FLOAT_004ab468;
@@ -1028,6 +1030,7 @@ extern char DAT_004b8344;
 extern char *PTR_DAT_004b8348[8];
 // 0x004b8368
 extern void (*PTR_Bloke_DoNothing_004b8368[26])(struct Bloke *);
+// Persistent Windows 95 VWIN32 device handle used by the CD ejection path.
 // 0x004b85c4
 extern HANDLE VWin32DeviceHandle;
 // 0x004b8710
@@ -1182,6 +1185,9 @@ extern char *DAT_004bb6d4[9];
 // 0x004bb6f8
 extern struct ScriptCommand DAT_004bb6f8[0x5d];
 // 0x004bcba4
+extern const char BuildMenuName[];
+extern const char LegoFontName[5]; /* "Lego" */
+extern const char PathControlName[];
 extern const char *ResourceFileNames[3];
 // 0x004bcbf4
 extern LEGO_EXPORT struct LegoConfig *lpConfig;
@@ -3604,9 +3610,9 @@ struct MapMarker {
 // 0x008119c0: the map screen's markers, 32 rows of 32. The code takes the last row for the table's end (the loop
 // over the rows), clears the 32 rows at once, and writes to row 31: one array, or another linker than MSVC's puts
 // the last row elsewhere (the map screen walked through other globals and hung, in the web build).
-extern struct MapMarker DAT_008119c0[32][32];
+extern struct MapMarker MapSpannerMarks[32][32];
 // 0x008138c0
-#define DAT_008138c0 (DAT_008119c0[31])
+#define MapSpannerMarksLastRow (MapSpannerMarks[31])
 // 0x008139c0
 extern int MapViewHeight;
 // 0x008139c4
@@ -3739,6 +3745,7 @@ extern int DAT_00813af8;
 extern int DAT_00813afc;
 // 0x00813b00
 extern LEGO_EXPORT struct CtrlBuffer *CONTROLLERBUFFER;
+// Root of the last CDFS volume found by FindCdDriveWithVolume (four bytes, including NUL).
 // 0x00813b04
 extern char CdDrivePath[4];
 // 0x00813b08

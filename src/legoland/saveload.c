@@ -160,8 +160,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
         unsigned int *fl;
         n_elems = LLIDB_GetCount();
         SavedElementCount = 0;
-        // STRING: LEGOLAND 0x004b8a70
-        fl = &ElemID("PATH CONTROL")->flags;
+        fl = &ElemID(PathControlName)->flags;
         *fl |= 4;
         for (i = 0; i < n_elems; i++) {
             LLIDB_GetElement(i, &elem);

@@ -1,4 +1,4 @@
-# FUN_004829c0 (0x004829c0, `src/legoland/pathfind.c`)
+# MarkConnectedNodes (0x004829c0, `src/legoland/pathfind.c`)
 
 **Best: 72.55%**
 
@@ -6,7 +6,7 @@
 
 - The original pushes all four callee-saved registers at entry and uses `edi` for the `field_20 |= 2` temp; ours
   uses `esi` and only pushes/pops `edi` around the inline memcpy.
-- The original loads `DAT_00669254` into `eax` and copies it to `ebp` (loop counter) before the `je`; ours loads
+- The original loads `AdjacentNodeCount` into `eax` and copies it to `ebp` (loop counter) before the `je`; ours loads
   straight into `ebp`.
 
 ## Tried (don't repeat)

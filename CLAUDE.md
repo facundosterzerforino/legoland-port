@@ -182,6 +182,16 @@ struct assignment, etc.).
   register or stack-slot choices around the asm won't converge, transcribe the whole function as
   `__declspec(naked)` (`tools/asm2naked.py` does it) and say so in the comment above `// FUNCTION:`. The port
   replaces these functions with plain-C equivalents tagged `// [library:asm]`.
+- **Documented `__asm` for compiler choices C cannot reach** (allowed 2026-10-17). When a function is one
+  instruction choice away from 100% and every natural C form, counter type and per-file compiler option
+  (`set_source_files_properties(... COMPILE_OPTIONS ...)` in `CMakeLists.txt`) has been tried, it may be
+  transcribed as a `__declspec(naked)` function, provided a human can still read it:
+  - guard it with `#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)`, put `// FUNCTION:`
+    right under the `#if`, and keep the readable C version as the `#else` branch (the port builds that);
+  - comment every block with the C it implements, use named labels (`open_failed:`, not `L1:`), and use
+    named symbols instead of addresses (string literals become named `const char` arrays with
+    `// GLOBAL:` tags, shared through `globals.c` when other functions use the same string);
+  - say above the function why asm was needed and what was tried. Example: `GameMain` in `debug.c`.
 - **`goto` only with named labels** — cleanup/error paths like `goto fail;` are fine (the original code
   used them, and they often match better than duplicated cleanup). That includes multi-label cleanup
   ladders (`fail_release:` / `fail_free:` / `fail_close:`) when the original's failure paths enter one

@@ -599,14 +599,157 @@ void GameProc(void) {
     DAT_00667c40 = "Exiting GameProc";
 }
 
+// One frame of the map screen: draws the map, the interface background and the icons. While the
+// mouse is over the map (Hover.type bit 0x100) it draws the view bounds, scrolls to the mouse on a
+// click (MouseClickFlags bit 0) and closes the map on a double click (bit 1 twice within 500 ms
+// and 5 pixels): MapScreenClosePending = 1 and the edit mode saved on entry is restored.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements. Why asm: the C was at best 63.96%; the
+// differences are the stack slots of the locals (hit info, the two clip rects, the stored 1) and
+// which register holds the constant 1, which earlier sessions could not steer from C.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x00459360
+__declspec(naked) void RenderMapScreenFrame(void) {
+    __asm {
+        // Frame after `push ebx`: [esp+4] one = 1, [esp+8] hit_info, [esp+0x10] map_clip (RECT),
+        // [esp+0x20] saved_clip (RECT). ebx = 1 throughout.
+        sub esp, 0x2c
+        xor eax, eax
+        push ebx
+        mov ebx, 1
+        mov dword ptr [esp + 8], eax // hit_info.type = 0
+        mov dword ptr [esp + 4], ebx // one = 1
+        mov dword ptr [esp + 0xc], eax // hit_info.field_4 = 0
+        // ResetHitInfo(); PushRenderingStatusAndLockVideoSurface(); DrawMapScreen(); SetPointer(5);
+        call ResetHitInfo
+        call PushRenderingStatusAndLockVideoSurface
+        call DrawMapScreen
+        push 5
+        call SetPointer
+        // PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit_info.type);
+        mov edx, dword ptr [InterfaceBgSprite]
+        lea ecx, [esp + 8]
+        push ecx
+        push 0
+        push 0
+        push 0
+        push edx
+        call PrintSprite
+        add esp, 0x18
+        // FUN_0046ee00(); RenderIcons(); CheckFocussedIcon();
+        call FUN_0046ee00
+        call RenderIcons
+        call CheckFocussedIcon
+        // if (Hover.type == 2) { SetPointer(6); finish the frame; return; }
+        mov eax, dword ptr [Hover]
+        cmp eax, 2
+        jne not_on_icon
+        push 6
+        call SetPointer
+        add esp, 4
+        call UpdateFocussedIconPtr
+        call PopRenderingStatus
+        call RenderingComplete
+        pop ebx
+        add esp, 0x2c
+        ret
+    not_on_icon:
+        // if (Hover.type & 0x100) {   (mouse over the map)
+        test ah, 1
+        je finish
+        //     map_clip = {0, 0x20, 0x280, 0x174}; GetClipping(&saved_clip); SetClipping(&map_clip);
+        //     RenderMouseBounds(); SetClipping(&saved_clip);
+        lea eax, [esp + 0x20]
+        mov dword ptr [esp + 0x10], 0 // map_clip.left
+        push eax
+        mov dword ptr [esp + 0x18], 0x20 // map_clip.top
+        mov dword ptr [esp + 0x1c], 0x280 // map_clip.right
+        mov dword ptr [esp + 0x20], 0x174 // map_clip.bottom
+        call GetClipping
+        lea ecx, [esp + 0x14]
+        push ecx
+        call SetClipping
+        call RenderMouseBounds
+        lea edx, [esp + 0x28]
+        push edx
+        call SetClipping
+        //     if (MouseClickFlags & 1) MapScreenSetScrollPos(&MousePos);
+        mov al, byte ptr [MouseClickFlags]
+        add esp, 0xc
+        // test bl, al -- emitted as bytes: MSVC's inline assembler only produces the other valid encoding
+        _emit 0x84
+        _emit 0xc3
+        je no_scroll
+        push offset MousePos
+        call MapScreenSetScrollPos
+        add esp, 4
+    no_scroll:
+        //     if (MouseClickFlags & 2) {
+        test byte ptr [MouseClickFlags], 2
+        je finish
+        //         ticks = GetTicks();   (ecx = ticks, edi/esi = MousePos.x/y)
+        push esi
+        push edi
+        call GetTicks
+        mov esi, dword ptr [LastMapClickTicks]
+        mov edi, dword ptr [MousePos]
+        mov ecx, eax
+        sub eax, esi
+        mov esi, dword ptr [MousePos + 0x4]
+        //         if (ticks - LastMapClickTicks < 500 && abs(MousePos.x - LastMapClickX) < 5 &&
+        //             abs(MousePos.y - LastMapClickY) < 5) {
+        cmp eax, 0x1f4
+        jge remember_click
+        mov edx, dword ptr [LastMapClickX]
+        mov eax, edi
+        sub eax, edx
+        cdq
+        xor eax, edx
+        sub eax, edx
+        cmp eax, 5
+        jge remember_click
+        mov edx, dword ptr [LastMapClickY]
+        mov eax, esi
+        sub eax, edx
+        cdq
+        xor eax, edx
+        sub eax, edx
+        cmp eax, 5
+        jge remember_click
+        //             MapScreenClosePending = 1; EditMode.unk4 = PreMapScreenMode; PreMapScreenMode = 1;
+        mov edx, dword ptr [PreMapScreenMode]
+        mov dword ptr [MapScreenClosePending], ebx
+        mov dword ptr [EditMode + 0x4], edx
+        mov dword ptr [PreMapScreenMode], ebx
+        //         }
+    remember_click:
+        //         LastMapClickX = MousePos.x; LastMapClickY = MousePos.y; LastMapClickTicks = ticks;
+        mov dword ptr [LastMapClickX], edi
+        mov dword ptr [LastMapClickY], esi
+        pop edi
+        mov dword ptr [LastMapClickTicks], ecx
+        pop esi
+        //     }
+        // }
+    finish:
+        // UpdateFocussedIconPtr(); PopRenderingStatus(); RenderingComplete();
+        call UpdateFocussedIconPtr
+        call PopRenderingStatus
+        call RenderingComplete
+        pop ebx
+        add esp, 0x2c
+        ret
+    }
+}
+// clang-format on
+#else
 void RenderMapScreenFrame(void) {
-    unsigned int var_4;
     struct HitInfo hit_info;
-    RECT clipping;
+    RECT saved_clip;
     int ticks;
 
-    var_4 = 1;
     hit_info.type = 0;
     hit_info.field_4 = 0;
     ResetHitInfo();
@@ -625,22 +768,22 @@ void RenderMapScreenFrame(void) {
         return;
     }
     if ((Hover.type & 0x100) != 0) {
-        RECT old_clipping = {0, 0x20, 0x280, 0x174};
+        RECT map_clip = {0, 0x20, 0x280, 0x174};
 
-        GetClipping(&clipping);
-        SetClipping(&old_clipping);
+        GetClipping(&saved_clip);
+        SetClipping(&map_clip);
         RenderMouseBounds();
-        SetClipping(&clipping);
-        if ((MouseClickFlags & var_4) != 0) {
+        SetClipping(&saved_clip);
+        if ((MouseClickFlags & 1) != 0) {
             MapScreenSetScrollPos(&MousePos);
         }
         if ((MouseClickFlags & 2) != 0) {
             ticks = GetTicks();
-            if (ticks - LastMapClickTicks < 0x1f4 && abs(MousePos.x - LastMapClickX) < 5 &&
+            if (ticks - LastMapClickTicks < 500 && abs(MousePos.x - LastMapClickX) < 5 &&
                 abs(MousePos.y - LastMapClickY) < 5) {
-                MapScreenClosePending = var_4;
+                MapScreenClosePending = 1;
                 EditMode.unk4 = PreMapScreenMode;
-                PreMapScreenMode = var_4;
+                PreMapScreenMode = 1;
             }
             LastMapClickX = MousePos.x;
             LastMapClickY = MousePos.y;
@@ -651,6 +794,7 @@ void RenderMapScreenFrame(void) {
     PopRenderingStatus();
     RenderingComplete();
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x004594e0
 void FUN_004594e0(void) {

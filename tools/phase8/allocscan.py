@@ -1,4 +1,4 @@
-"""allocscan.py [srcdir]: every allocation (malloc/calloc/realloc/FUN_004775b0) whose size is a literal, or a
+"""allocscan.py [srcdir]: every allocation (malloc/calloc/realloc/MemAlloc) whose size is a literal, or a
 product with a literal, in the port tree, parsed for i686 and x86_64. Reports the allocation's destination type
 (the cast, or the assigned lvalue's type), the pointee's size on both targets and whether the literal covers it.
 Prints only the allocations that may be short on x64."""
@@ -12,7 +12,7 @@ import port_layout as pl  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'src/legoland'
-ALLOC = {'malloc': 0, 'calloc': None, 'realloc': 1, 'FUN_004775b0': 0}
+ALLOC = {'malloc': 0, 'calloc': None, 'realloc': 1, 'MemAlloc': 0}
 
 
 def lit(c):

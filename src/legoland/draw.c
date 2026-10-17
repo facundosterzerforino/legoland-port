@@ -166,8 +166,7 @@ LEGO_EXPORT int InitScreen(void) {
     font.lfClipPrecision = 0;
     font.lfQuality = 2;
     font.lfPitchAndFamily = 0;
-    // STRING: LEGOLAND 0x004b86e0
-    strcpy(font.lfFaceName, "Lego");
+    memcpy(font.lfFaceName, LegoFontName, sizeof(LegoFontName));
     LegoFont24Bold = CreateFontIndirectA(&font);
 
     font.lfWeight = 0x190;
@@ -187,7 +186,7 @@ LEGO_EXPORT int InitScreen(void) {
 #endif
     font.lfHeight = 0x12;
     font.lfWidth = 0;
-    strcpy(font.lfFaceName, "Lego");
+    memcpy(font.lfFaceName, LegoFontName, sizeof(LegoFontName));
     LegoFont18SemiBold = CreateFontIndirectA(&font);
 
     if (WinDebugMode == 0) {
@@ -2015,7 +2014,703 @@ LEGO_EXPORT int RecreateSprite(struct Sprite *sprite) {
     return 1;
 }
 
+// Draws one frame of a 16-bit animation (an .lls of 16-bit pixels, image type 3) into the software screen at pos,
+// the part inside clip, with the hand-written row blitters: the one for the frame's clipping (whole rows, cut on the
+// left and/or the right), the "Pick" ones when the mouse is over the sprite's rectangle (they also note a drawn pixel
+// under the cursor, DAT_007fe9a8). Layered animations (flags 1) draw frame 0 and then the current frame on top.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and each asm block is
+// commented with the C it implements. Why asm: the C was at best 98.34% (docs/attempts/0x00466770-FUN_00466770.md):
+// two register choices (ebx/ebp for frame 0's pointer and the run/mask offset; eax/edx for pixel_count) that nine
+// orders and forms of the pixels/runs/mask lines didn't reach.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x00466770
+__declspec(naked) void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
+    __asm {
+        // Frame after the four pushes: [esp+0x10] frame, [esp+0x14] pixels, [esp+0x18] hit, [esp+0x24]
+        // frame_index (in clip's argument slot) then runs, [esp+0x28] the offset of runs then mask (in pos' slot); lls at
+        // [esp+0x20], clip at [esp+0x24], pos at [esp+0x28]. esi = dst from hit_known on.
+        sub esp, 0xc
+        // DAT_007fe9a4 = CurrentSurfaceDesc.lPitch; frame = (struct DrawLLSFrame *)(lls + 1);
+        // SpriteClipOrigin.left = clip->left; DrawClipExtent.width = clip->right - clip->left;
+        // SpriteClipOrigin.top = clip->top; DrawClipExtent.height = clip->bottom - clip->top;
+        mov ecx, dword ptr [CurrentSurfaceDesc + 0x10]
+        push ebx
+        mov ebx, dword ptr [esp + 0x14]
+        push ebp
+        push esi
+        mov esi, dword ptr [esp + 0x20]
+        push edi
+        mov dword ptr [DAT_007fe9a4], ecx
+        mov edi, dword ptr [esi]
+        lea eax, [ebx + 0x18]
+        mov dword ptr [esp + 0x10], eax
+        mov dword ptr [SpriteClipOrigin + 0x4], edi
+        mov eax, dword ptr [esi + 8]
+        mov edx, dword ptr [esi]
+        sub eax, edx
+        mov dword ptr [DrawClipExtent + 0x4], eax
+        mov edx, dword ptr [esi + 4]
+        mov dword ptr [SpriteClipOrigin], edx
+        mov edx, dword ptr [esi + 0xc]
+        mov ebp, dword ptr [esi + 4]
+        // i = (int)OverrideFrame; if (i < 0) i = lls->frame; frame_index = i;
+        // if (i >= lls->frame_count) frame_index = lls->frame_count - 1;
+        mov esi, dword ptr [OverrideFrame]
+        sub edx, ebp
+        test esi, esi
+        mov dword ptr [DrawClipExtent], edx
+        jge frame_chosen
+        movsx esi, word ptr [ebx]
+    frame_chosen:
+        movsx ebx, word ptr [ebx + 0x10]
+        cmp esi, ebx
+        mov dword ptr [esp + 0x24], esi
+        jl frame_clamped
+        dec ebx
+        mov dword ptr [esp + 0x24], ebx
+    frame_clamped:
+        // hit = 0; DAT_007fe9a8 = lpSurface + MousePos.y * lPitch + MousePos.x * 2;
+        // if (MousePos.x >= pos->x && MousePos.x <= pos->x + lls->width && MousePos.y >= pos->y &&
+        //     MousePos.y <= pos->y + lls->height) hit = 1;
+        mov ebx, dword ptr [MousePos + 0x4]
+        mov esi, dword ptr [CurrentSurfaceDesc + 0x24]
+        imul ebx, ecx
+        mov ebp, esi
+        mov dword ptr [esp + 0x18], 0
+        add ebp, ebx
+        mov ebx, dword ptr [MousePos]
+        lea ebp, [ebp + ebx*2]
+        mov dword ptr [DAT_007fe9a8], ebp
+        mov ebp, dword ptr [esp + 0x28]
+        mov ebp, dword ptr [ebp]
+        cmp ebx, ebp
+        jl hit_known
+        mov esi, dword ptr [esp + 0x20]
+        mov esi, dword ptr [esi + 4]
+        add esi, ebp
+        cmp ebx, esi
+        jg mouse_tested
+        mov esi, dword ptr [esp + 0x28]
+        mov ebx, dword ptr [MousePos + 0x4]
+        mov esi, dword ptr [esi + 4]
+        cmp ebx, esi
+        jl mouse_tested
+        mov ebx, dword ptr [esp + 0x20]
+        mov ebx, dword ptr [ebx + 8]
+        add ebx, esi
+        mov esi, dword ptr [MousePos + 0x4]
+        cmp esi, ebx
+        jg mouse_tested
+        mov dword ptr [esp + 0x18], 1
+    mouse_tested:
+        mov esi, dword ptr [CurrentSurfaceDesc + 0x24]
+    hit_known:
+        // dst = lpSurface + pos->y * lPitch + (pos->x - SpriteClipOrigin.left) * 2;
+        // if (lls->flags & 1) {  (layered: frame 0 as a base, the current frame on top)
+        mov ebx, dword ptr [esp + 0x28]
+        sub ebp, edi
+        mov ebx, dword ptr [ebx + 4]
+        imul ebx, ecx
+        add esi, ebx
+        mov ebx, dword ptr [esp + 0x20]
+        test byte ptr [ebx + 0x14], 1
+        lea esi, [esi + ebp*2]
+        je single_frame
+        //     pixels = frame->pixels; runs = (unsigned char *)(frame->pixels + frame->pixel_count);
+        //     mask = (unsigned int *)(runs + frame->run_bytes);  (frame 0)
+        //     if (hit) {
+        mov ebp, dword ptr [esp + 0x10]
+        mov ebx, dword ptr [ebp + 4]
+        lea ebx, [ebx + ebx + 0x10]
+        mov dword ptr [esp + 0x28], ebx
+        add ebx, ebp
+        mov dword ptr [esp + 0x24], ebx
+        mov ebx, dword ptr [ebp + 8]
+        mov ebp, dword ptr [esp + 0x28]
+        add ebx, ebp
+        mov ebp, dword ptr [esp + 0x10]
+        add ebx, ebp
+        mov ebp, eax
+        mov dword ptr [esp + 0x28], ebx
+        mov ebx, dword ptr [esp + 0x18]
+        test ebx, ebx
+        mov ebx, dword ptr [esp + 0x20]
+        mov ebx, dword ptr [ebx + 4]
+        je base_no_pick
+        //         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16Pick(...);
+        sub ebp, edi
+        cmp ebx, ebp
+        jg base_pick_clipped
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        mov edi, dword ptr [esp + 0x20]
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        call BlitLLS16Pick
+        jmp base_drawn
+    base_pick_clipped:
+        //         else if (SpriteClipOrigin.left != 0) { if (lls->width - left > width)
+        //             BlitLLS16PickClipLeftRight(...); else BlitLLS16PickClipLeft(...); }
+        test edi, edi
+        je base_pick_clip_right
+        sub ebx, edi
+        cmp ebx, eax
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        mov edi, dword ptr [esp + 0x20]
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        jle base_pick_clip_left
+        call BlitLLS16PickClipLeftRight
+        jmp base_drawn
+    base_pick_clip_left:
+        call BlitLLS16PickClipLeft
+        jmp base_drawn
+    base_pick_clip_right:
+        //         else BlitLLS16PickClipRight(...);  (left 0, cut on the right)
+        mov edi, dword ptr [DAT_007fe9a8]
+        push edi
+        mov edi, dword ptr [esp + 0x14]
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push 0
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        call BlitLLS16PickClipRight
+        jmp base_drawn
+    base_no_pick:
+        //     } else {
+        //         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16(...);
+        sub ebp, edi
+        cmp ebx, ebp
+        jg base_clipped
+        mov eax, dword ptr [SpriteClipOrigin]
+        mov edi, dword ptr [esp + 0x10]
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x30]
+        push edx
+        mov edx, dword ptr [esp + 0x30]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        call BlitLLS16
+        add esp, 0x1c
+        jmp base_drawn_unclipped
+    base_clipped:
+        //         else if (SpriteClipOrigin.left != 0) { if (lls->width - left > width)
+        //             BlitLLS16ClipLeftRight(...); else BlitLLS16ClipLeft(...); }
+        test edi, edi
+        je base_clip_right
+        sub ebx, edi
+        cmp ebx, eax
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        mov edi, dword ptr [esp + 0x20]
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        jle base_clip_left
+        call BlitLLS16ClipLeftRight
+        jmp base_drawn
+    base_clip_left:
+        call BlitLLS16ClipLeft
+        jmp base_drawn
+    base_clip_right:
+        //         else BlitLLS16ClipRight(...); }
+        mov edi, dword ptr [DAT_007fe9a8]
+        push edi
+        mov edi, dword ptr [esp + 0x14]
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push 0
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        lea eax, [edi + 0x10]
+        push edx
+        push eax
+        push esi
+        call BlitLLS16ClipRight
+    base_drawn:
+        add esp, 0x2c
+    base_drawn_unclipped:
+        //     i = lls->frame + 1; while (i-- != 0) frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
+        mov ebp, dword ptr [esp + 0x20]
+        movsx eax, word ptr [ebp]
+        inc eax
+        mov ecx, eax
+        dec eax
+        test ecx, ecx
+        je top_frame_found
+        inc eax
+    skip_to_top_frame:
+        mov edx, dword ptr [edi]
+        add edi, edx
+        dec eax
+        jne skip_to_top_frame
+    top_frame_found:
+        //     pixels = frame->pixels; runs = ...; mask = ...;  (the current frame, on top) if (hit) {
+        mov eax, dword ptr [edi + 4]
+        lea ecx, [edi + 0x10]
+        lea ebx, [eax + eax + 0x10]
+        mov eax, dword ptr [edi + 8]
+        add eax, ebx
+        lea edx, [ebx + edi]
+        add eax, edi
+        mov edi, dword ptr [esp + 0x18]
+        test edi, edi
+        mov edi, dword ptr [ebp + 4]
+        mov ebp, dword ptr [SpriteClipOrigin + 0x4]
+        mov dword ptr [esp + 0x20], edi
+        mov edi, dword ptr [DrawClipExtent + 0x4]
+        mov ebx, edi
+        je top_no_pick
+        //         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16Pick(...);
+        sub ebx, ebp
+        mov ebp, dword ptr [esp + 0x20]
+        cmp ebp, ebx
+        jg top_pick_clipped
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin + 0x4]
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin]
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        call BlitLLS16Pick
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    top_pick_clipped:
+        //         else if (SpriteClipOrigin.left != 0) { BlitLLS16PickClipLeftRight / BlitLLS16PickClipLeft }
+        mov ebx, dword ptr [SpriteClipOrigin + 0x4]
+        test ebx, ebx
+        je top_pick_clip_right
+        sub ebp, ebx
+        cmp ebp, edi
+        mov ebp, dword ptr [DAT_007fe9a8]
+        push ebp
+        push 0
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin]
+        push ebx
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        jle pick_clip_left_and_return
+        call BlitLLS16PickClipLeftRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    top_pick_clip_right:
+        //         else BlitLLS16PickClipRight(...);
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin]
+        push 0
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        call BlitLLS16PickClipRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    top_no_pick:
+        //     } else {
+        //         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16(...);
+        sub ebx, ebp
+        mov ebp, dword ptr [esp + 0x20]
+        cmp ebp, ebx
+        jg top_clipped
+        mov edi, dword ptr [SpriteClipOrigin]
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        call BlitLLS16
+        add esp, 0x1c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    top_clipped:
+        //         else if (SpriteClipOrigin.left != 0) { BlitLLS16ClipLeftRight / BlitLLS16ClipLeft }
+        mov ebx, dword ptr [SpriteClipOrigin + 0x4]
+        test ebx, ebx
+        je top_clip_right
+        sub ebp, ebx
+        cmp ebp, edi
+        mov ebp, dword ptr [DAT_007fe9a8]
+        push ebp
+        push 0
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin]
+        push ebx
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        jle clip_left_and_return
+        call BlitLLS16ClipLeftRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    top_clip_right:
+        //         else BlitLLS16ClipRight(...); }
+        //     return; }
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push edi
+        mov edi, dword ptr [SpriteClipOrigin]
+        push 0
+        push edi
+        mov edi, dword ptr [CurrentSurfaceDesc + 0x10]
+        push edi
+        mov edi, dword ptr [DrawClipExtent]
+        push edi
+        push eax
+        push edx
+        push ecx
+        push esi
+        call BlitLLS16ClipRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    single_frame:
+        // i = frame_index; while (i-- != 0) frame = (struct DrawLLSFrame *)((unsigned char *)frame + frame->size);
+        mov ebx, dword ptr [esp + 0x24]
+        test ebx, ebx
+        je frame_zero
+        lea ebp, [ebx]
+        mov ebx, dword ptr [esp + 0x10]
+    skip_to_frame:
+        add ebx, dword ptr [ebx]
+        dec ebp
+        jne skip_to_frame
+        mov dword ptr [esp + 0x10], ebx
+    frame_found:
+        // pixels = frame->pixels; runs = ...; mask = ...;  (one frame)
+        // if (hit) {
+        lea ebp, [ebx + 0x10]
+        mov dword ptr [esp + 0x14], ebp
+        mov ebp, dword ptr [ebx + 4]
+        lea ebp, [ebp + ebp + 0x10]
+        mov dword ptr [esp + 0x28], ebp
+        add ebp, ebx
+        mov ebx, dword ptr [ebx + 8]
+        mov dword ptr [esp + 0x24], ebp
+        mov ebp, dword ptr [esp + 0x28]
+        add ebx, ebp
+        mov ebp, dword ptr [esp + 0x10]
+        add ebx, ebp
+        mov ebp, eax
+        mov dword ptr [esp + 0x28], ebx
+        mov ebx, dword ptr [esp + 0x18]
+        test ebx, ebx
+        mov ebx, dword ptr [esp + 0x20]
+        mov ebx, dword ptr [ebx + 4]
+        je single_no_pick
+        //     if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16Pick(...);
+        sub ebp, edi
+        cmp ebx, ebp
+        jg single_pick_clipped
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        push eax
+        mov eax, dword ptr [esp + 0x28]
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        push edx
+        push eax
+        push esi
+        call BlitLLS16Pick
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    frame_zero:
+        mov ebx, dword ptr [esp + 0x10]
+        jmp frame_found
+    single_pick_clipped:
+        //     else if (SpriteClipOrigin.left != 0) { BlitLLS16PickClipLeftRight / BlitLLS16PickClipLeft }
+        test edi, edi
+        je single_pick_clip_right
+        sub ebx, edi
+        cmp ebx, eax
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        push eax
+        mov eax, dword ptr [esp + 0x28]
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        push edx
+        push eax
+        push esi
+        jle pick_clip_left_and_return
+        call BlitLLS16PickClipLeftRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    pick_clip_left_and_return:
+        call BlitLLS16PickClipLeft
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    single_pick_clip_right:
+        //     else BlitLLS16PickClipRight(...);
+        mov edi, dword ptr [DAT_007fe9a8]
+        push edi
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push 0
+        push eax
+        mov eax, dword ptr [esp + 0x28]
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        push edx
+        push eax
+        push esi
+        call BlitLLS16PickClipRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    single_no_pick:
+        // } else {
+        //     if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) BlitLLS16(...);
+        sub ebp, edi
+        cmp ebx, ebp
+        jg single_clipped
+        mov eax, dword ptr [SpriteClipOrigin]
+        push eax
+        mov eax, dword ptr [esp + 0x18]
+        push ecx
+        mov ecx, dword ptr [esp + 0x30]
+        push edx
+        mov edx, dword ptr [esp + 0x30]
+        push ecx
+        push edx
+        push eax
+        push esi
+        call BlitLLS16
+        add esp, 0x1c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    single_clipped:
+        //     else if (SpriteClipOrigin.left != 0) { BlitLLS16ClipLeftRight / BlitLLS16ClipLeft }
+        test edi, edi
+        je single_clip_right
+        sub ebx, edi
+        cmp ebx, eax
+        mov ebx, dword ptr [DAT_007fe9a8]
+        push ebx
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push edi
+        push eax
+        mov eax, dword ptr [esp + 0x28]
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        push edx
+        push eax
+        push esi
+        jle clip_left_and_return
+        call BlitLLS16ClipLeftRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    clip_left_and_return:
+        call BlitLLS16ClipLeft
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    single_clip_right:
+        //     else BlitLLS16ClipRight(...); }
+        mov edi, dword ptr [DAT_007fe9a8]
+        push edi
+        push 0
+        push eax
+        mov eax, dword ptr [SpriteClipOrigin]
+        push 0
+        push eax
+        mov eax, dword ptr [esp + 0x28]
+        push ecx
+        mov ecx, dword ptr [esp + 0x40]
+        push edx
+        mov edx, dword ptr [esp + 0x40]
+        push ecx
+        push edx
+        push eax
+        push esi
+        call BlitLLS16ClipRight
+        add esp, 0x2c
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 0xc
+        ret
+    }
+}
+// clang-format on
+#else
 void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) {
     struct DrawLLSFrame *frame = (struct DrawLLSFrame *)(lls + 1);
     unsigned short *dst;
@@ -2143,6 +2838,7 @@ void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) 
         }
     }
 }
+#endif
 
 /* Port: the run-length sprite format that BlitLLS16PickClipLeftRight and its siblings draw (the original blits are inline asm).
  * A sprite frame is three streams: 16-bit pixels, a byte stream of run lengths, and a stream of 2-bit codes

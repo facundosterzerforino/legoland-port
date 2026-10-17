@@ -120,8 +120,7 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x0044e010 | [__BMPLoader](0x0044e010-__BMPLoader.md) | gfx.c | 39.57% |
 | 0x0044e580 | [LoadColourTable](0x0044e580-LoadColourTable.md) | gfx.c | 83.78% |
 | 0x0044fe80 | [FUN_0044fe80](0x0044fe80-FUN_0044fe80.md) | bloke_ai.c | 94.89% |
-| 0x00451390 | [FUN_00451390](0x00451390-FUN_00451390.md) | cdcheck.c | 90.00% |
-| 0x00451740 | [PrintCertificate](0x00451740-PrintCertificate.md) | certificate.c | 81.20% |
+| 0x00451740 | [PrintCertificate](0x00451740-PrintCertificate.md) | certificate.c | 100% (asm) |
 | 0x00451e70 | [SetupControllers](0x00451e70-SetupControllers.md) | controller.c | 91.89% |
 | 0x00452030 | [FUN_00452030](0x00452030-FUN_00452030.md) | controller.c | 57.36% |
 | 0x00453d10 | [WinMain](0x00453d10-WinMain.md) | main.c | 100% |
@@ -131,7 +130,7 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x004557c0 | [HTBubbleHelp](0x004557c0-HTBubbleHelp.md) | text.c | 76.47% |
 | 0x00455fc0 | [FUN_00455fc0](0x00455fc0-FUN_00455fc0.md) | text.c | 77.60% |
 | 0x004567a0 | [RenderFullMap](0x004567a0-RenderFullMap.md) | mapscreen.c | 81.85% |
-| 0x00457970 | [FUN_00457970](0x00457970-FUN_00457970.md) | bricks.c | 87.80% |
+| 0x00457970 | [IsFootprintClear](0x00457970-IsFootprintClear.md) | bricks.c | 87.80% |
 | 0x00457a70 | [FUN_00457a70](0x00457a70-FUN_00457a70.md) | bricks.c | 100% effective match (reccmp), bytes still differ |
 | 0x00459970 | [FUN_00459970](0x00459970-FUN_00459970.md) | gamemap.c | 94.83% |
 | 0x0045a4a0 | [CalculateMapRenderOrder](0x0045a4a0-CalculateMapRenderOrder.md) | gamemap.c | 62.28% |
@@ -153,17 +152,17 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x0045fad0 | [FUN_0045fad0](0x0045fad0-FUN_0045fad0.md) | map_object.c | 93.59% |
 | 0x0045fca0 | [FUN_0045fca0](0x0045fca0-FUN_0045fca0.md) | map_object.c | 94.76% |
 | 0x0045ff00 | [RenderCursor](0x0045ff00-RenderCursor.md) | map_object.c | 95.48% |
-| 0x004610f0 | [FUN_004610f0](0x004610f0-FUN_004610f0.md) | map_object.c | 89.95% |
-| 0x00461290 | [FUN_00461290](0x00461290-FUN_00461290.md) | map_object.c | 43.92% |
+| 0x004610f0 | [DrawPathTilesInRect](0x004610f0-DrawPathTilesInRect.md) | map_object.c | 89.95% |
+| 0x00461290 | [ClampScrollPosition](0x00461290-ClampScrollPosition.md) | map_object.c | 43.92% |
 | 0x00461a50 | [LoadBaseMap](0x00461a50-LoadBaseMap.md) | map_object.c | 84.15% |
-| 0x00462c60 | [FUN_00462c60](0x00462c60-FUN_00462c60.md) | map_object.c | 95.35% |
+| 0x00462c60 | [StartOverlayAnims](0x00462c60-StartOverlayAnims.md) | map_object.c | 95.35% |
 | 0x00462ef0 | [DoMapAI](0x00462ef0-DoMapAI.md) | map_object.c | 93.43% |
 | 0x00465850 | [FUN_00465850](0x00465850-FUN_00465850.md) | draw.c | 34.23% |
 | 0x00465ee0 | [FUN_00465ee0](0x00465ee0-FUN_00465ee0.md) | draw.c | 84.56% |
 | 0x00466560 | [PushSetTarget](0x00466560-PushSetTarget.md) | draw.c | 85.71% |
 | 0x00466770 | [FUN_00466770](0x00466770-FUN_00466770.md) | draw.c | 75.06% |
 | 0x00469c80 | [ScriptEventClear](0x00469c80-ScriptEventClear.md) | objectives.c | 94.32% |
-| 0x0046a140 | [FUN_0046a140](0x0046a140-FUN_0046a140.md) | nerps.c | 100% |
+| 0x0046a140 | [CallReportHandler](0x0046a140-CallReportHandler.md) | nerps.c | 100% |
 | 0x0046a5b0 | [ScriptEventNeedIn](0x0046a5b0-ScriptEventNeedIn.md) | nerps.c | 74.32% |
 | 0x0046b2d0 | [RunLevelScript](0x0046b2d0-RunLevelScript.md) | nerps.c | 100% |
 | 0x0046c7e0 | [LoadObjectiveEventList](0x0046c7e0-LoadObjectiveEventList.md) | nerps.c | 98.29% |
@@ -186,7 +185,7 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x00484a70 | [SetBlokePositionFromBNV](0x00484a70-SetBlokePositionFromBNV.md) | bloke.c | 95.12% |
 | 0x004856a0 | [PrintSpriteEx](0x004856a0-PrintSpriteEx.md) | print_sprite.c | 96.64% |
 | 0x00488840 | [GenerateNewImageFromZBuffer](0x00488840-GenerateNewImageFromZBuffer.md) | render.c | 76.27% |
-| 0x00488c80 | [FUN_00488c80](0x00488c80-FUN_00488c80.md) | render.c | 91.54% |
+| 0x00488c80 | [RenderScaledSpriteOffset](0x00488c80-RenderScaledSpriteOffset.md) | render.c | 91.54% |
 | 0x00489750 | [RES_OpenVolume](0x00489750-RES_OpenVolume.md) | resource.c | 96.75% |
 | 0x0048ad00 | [InitFreePlayLists](0x0048ad00-InitFreePlayLists.md) | freeplay.c | 100% |
 | 0x0048b2a0 | [FreePlayObjectList](0x0048b2a0-FreePlayObjectList.md) | freeplay.c | 82.76% |
@@ -195,7 +194,7 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x0048e550 | [EnterSaveGameDetails](0x0048e550-EnterSaveGameDetails.md) | savegame_ui.c | 84.10% |
 | 0x004921c0 | [ConvertWaveToPcm16](0x004921c0-ConvertWaveToPcm16.md) | sound_sfx.c | 92.26% |
 | 0x00492380 | [CreateSampleFromWAV](0x00492380-CreateSampleFromWAV.md) | sound_sfx.c | 97.49% |
-| 0x004966a0 | [FUN_004966a0](0x004966a0-FUN_004966a0.md) | sound_music.c | 64.15% |
+| 0x004966a0 | [UpdateSampleVolume](0x004966a0-UpdateSampleVolume.md) | sound_music.c | 64.15% |
 | 0x00498420 | [SpeechParseWavHeader](0x00498420-SpeechParseWavHeader.md) | stream.c | 93.19% |
 | 0x0049a7f0 | [Mechanic_Build](0x0049a7f0-Mechanic_Build.md) | worker.c | 96.15% |
 | 0x0049b350 | [FUN_0049b350](0x0049b350-FUN_0049b350.md) | worker.c | 100% |

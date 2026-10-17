@@ -2260,7 +2260,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
             elem->flags = elem->flags | 4;
         }
     }
-    LLIDB_FindElement("PATH CONTROL", &elem, 0);
+    LLIDB_FindElement(PathControlName, &elem, 0);
     LLIDB_LoadData((void *)elem);
     PathControlObject = elem->data;
     RES_ReadFile(file, &n, 4);

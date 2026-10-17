@@ -6,8 +6,8 @@ bloke.c:FUN_00483300 baseline
 bloke.c:FUN_00484790 baseline
 bloke.c:HandleTileEnterLeave baseline
 bloke_ai.c:FUN_0044f360 baseline
-bloke_ai.c:FUN_0044f4a0 baseline
-bloke_ai.c:FUN_0044f610 baseline
+bloke_ai.c:PutBlokeOnRide baseline
+bloke_ai.c:BlokeAIWander baseline
 bloke_ai.c:FUN_0044fe80 baseline
 boating_school.c:BoatingSchoolWaterDCalcCursor baseline
 boating_school.c:BoatingSchoolWaterRemoveObject baseline
@@ -41,7 +41,7 @@ popupinfo.c:PopUpInfoSetUp baseline
 render3d.c:Ride_ClearFlagToNotLetAnyoneOn baseline
 render3d.c:Ride_SetFlagToNotLetAnyoneOn baseline
 worker.c:AddRepairOrderForObject baseline
-worker.c:FUN_00499830 baseline
+worker.c:CreateMechanicWorkOrder baseline
 worker.c:FUN_0049b350 baseline
 worker.c:Garderner_Repair baseline
 worker.c:IterateNoneWorkersRepairOrders baseline

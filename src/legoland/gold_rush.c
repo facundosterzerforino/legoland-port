@@ -9,12 +9,14 @@
 #include "llidb.h"
 #include "man3d.h"
 #include "map_object.h"
+#include "math.h"
 #include "obj_instance.h"
 #include "objclass.h"
 #include "path_control.h"
 #include "print_sprite.h"
 #include "render3d.h"
 #include "ride_queue.h"
+#include "screens.h"
 #include "tilemap.h"
 
 struct GoldArray {
@@ -306,7 +308,88 @@ void FUN_00407000(struct RideNode *item, unsigned char *p) {
     NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
 }
 
+// Sends a gold-rush rider to its panning spot: the slot's point, offset by the tile in `p` and by
+// the slot's weight, then starts the walk (low-level action 7) facing the new direction.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements (struct offsets are named in the comments).
+// Why asm: the C is at best 79.31% because of register allocation only (the original keeps dest.y
+// in edi across the _ftol call); moving the `dest.y -= 0x50` and an `off` local did not change it.
+// See docs/attempts/0x004070b0-SendGoldRushRiderToSlot.md.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x004070b0
+__declspec(naked) void SendGoldRushRiderToSlot(struct RideNode *item, unsigned char *p) {
+    __asm {
+        // b = item->rider; s = &Gold_Slots[b->field_36]; slot = s->index;
+        mov eax, dword ptr [esp + 4]
+        push esi
+        xor ecx, ecx
+        push edi
+        mov esi, dword ptr [eax + 8] // esi = b = item->rider
+        mov cl, byte ptr [esi + 0x36] // b->field_36
+        lea eax, Gold_Slots[ecx * 8] // eax = s
+        mov ecx, dword ptr Gold_Slots[ecx * 8] // ecx = slot = s->index
+        fld dword ptr [eax + 4] // s->weight
+        // b->dest.x = Gold_Points[slot].x - 0x280; b->dest.y = Gold_Points[slot].y;
+        mov edx, dword ptr Gold_Points[ecx * 8]
+        sub edx, 0x280
+        mov dword ptr [esi + 0x24], edx // b->dest.x
+        mov eax, dword ptr Gold_Points[ecx * 8 + 4]
+        mov dword ptr [esi + 0x28], eax // b->dest.y
+        // b->dest.x += p[0] << 8; b->dest.y += p[1] << 8;  (edi = dest.y from here on)
+        mov eax, dword ptr [esp + 0x10] // p
+        xor ecx, ecx
+        mov edi, dword ptr [esi + 0x28]
+        mov cl, byte ptr [eax]
+        shl ecx, 8
+        add edx, ecx
+        fmul dword ptr [GoldSlotWeightScale] // w * 512.0f
+        mov dword ptr [esi + 0x24], edx
+        xor edx, edx
+        mov dl, byte ptr [eax + 1]
+        shl edx, 8
+        add edi, edx
+        mov dword ptr [esi + 0x28], edi
+        // b->dest.x += 0x80 - (int)(w * 512.0f); b->dest.y -= 0x50;
+        call _ftol
+        mov ecx, 0x80
+        add edi, -0x50
+        sub ecx, eax
+        mov eax, dword ptr [esi + 0x24]
+        add eax, ecx
+        lea edx, [esi + 0x98] // &b->nav
+        mov dword ptr [esi + 0x24], eax
+        mov dword ptr [esi + 0x28], edi
+        // b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
+        mov ecx, dword ptr [esi + 0x24]
+        mov eax, edi
+        push edx // &b->nav
+        mov edx, dword ptr [esi + 0x6c]
+        push eax // b->dest (y, x)
+        mov eax, dword ptr [esi + 0x68]
+        push ecx
+        push edx // b->pos (y, x)
+        push eax
+        call CalcMoveLine
+        add al, 0x10
+        // b->low_level_action = 7;
+        mov word ptr [esi + 0xe], 7
+        mov byte ptr [esi + 0x73], al // b->field_73
+        // NewDirForAction(b, (b->field_73 >> 5) + 3);
+        shr al, 5
+        add al, 3
+        push eax
+        push esi
+        call NewDirForAction
+        add esp, 0x1c
+        pop edi
+        pop esi
+        ret
+    }
+}
+// clang-format on
+#else
 void SendGoldRushRiderToSlot(struct RideNode *item, unsigned char *p) {
     struct Bloke *b = item->rider;
     struct GoldSlot *s = &Gold_Slots[b->field_36];
@@ -323,6 +406,7 @@ void SendGoldRushRiderToSlot(struct RideNode *item, unsigned char *p) {
     b->low_level_action = 7;
     NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00407170
 void FUN_00407170(struct RideNode *item, unsigned char *p) {

@@ -241,7 +241,298 @@ void FUN_004855d0(struct Sprite *sprite, int *out) {
     }
 }
 
+// Draws a sprite at (x, y) shifted by half of arg's offset. A plain sprite is drawn with
+// RenderSprite, or RenderSpriteX when arg->mode is set, after making sure it has a surface; a
+// sprite group (flags 0x8000) draws each sub-sprite whose bit is set in arg->mask, at half its
+// group offset (rounded towards zero). Returns 0 only if a plain sprite has no surface.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements (struct offsets are named in the comments).
+// Why asm: the C was at best 96.64%: the original keeps `result = 1` in ecx across the group path
+// and so loads the count into edx, MSVC6 folds the constant. Two placements of `result = 1` were
+// tried; the restructuring ideas in docs/attempts/0x004856a0-PrintSpriteEx.md were not.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x004856a0
+__declspec(naked) LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
+    __asm {
+        // Frame after the pushes: [esp+0x10] mask (the `push ecx` slot), [esp+0x18] arg, [esp+0x1c] x,
+        // [esp+0x20] y. esi = arg, edi = sprite, ebx = x, ebp = y, ecx = result.
+        push ecx
+        push ebx
+        push ebp
+        push esi
+        mov esi, dword ptr [esp + 0x14] // arg
+        mov ebx, dword ptr [esp + 0x18] // x
+        mov ebp, dword ptr [esp + 0x1c] // y
+        // x += arg->xoff / 2; y += arg->yoff / 2; sprite = arg->sprite; result = 1;
+        mov eax, dword ptr [esi + 4] // arg->xoff
+        push edi
+        cdq
+        sub eax, edx
+        mov edi, dword ptr [esi] // arg->sprite
+        sar eax, 1
+        add ebx, eax
+        mov eax, dword ptr [esi + 8] // arg->yoff
+        cdq
+        sub eax, edx
+        mov ecx, 1 // result
+        sar eax, 1
+        add ebp, eax
+        // if (!(sprite->flags & 0x8000)) {   (plain sprite)
+        mov eax, dword ptr [edi + 0x10] // sprite->flags
+        test ah, 0x80
+        mov dword ptr [esp + 0x1c], ebx
+        mov dword ptr [esp + 0x20], ebp
+        jne group_sprite
+        //     if (arg->mode) {
+        //         if (*GetVRAMAddress(sprite) != 0 || EnsureSpriteSurface(sprite))
+        //             return RenderSpriteX(sprite, x, y, arg->mode);
+        //     } else if (*GetVRAMAddress(sprite) != 0 || EnsureSpriteSurface(sprite))
+        //         return RenderSprite(sprite, x, y);
+        //     return 0;
+        mov eax, dword ptr [esi + 0x10] // arg->mode
+        push edi
+        test eax, eax
+        je plain_normal
+        call GetVRAMAddress
+        mov ecx, dword ptr [eax]
+        add esp, 4
+        test ecx, ecx
+        jne plain_x_draw
+        push edi
+        call EnsureSpriteSurface
+        add esp, 4
+        test eax, eax
+        je no_surface
+        mov eax, dword ptr [esi + 0x10]
+        push eax
+        push ebp
+        push ebx
+        push edi
+        call RenderSpriteX
+        add esp, 0x10
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        pop ecx
+        ret
+    plain_x_draw:
+        mov ecx, dword ptr [esi + 0x10]
+        push ecx
+        push ebp
+        push ebx
+        push edi
+        call RenderSpriteX
+        add esp, 0x10
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        pop ecx
+        ret
+    plain_normal:
+        call GetVRAMAddress
+        mov ecx, dword ptr [eax]
+        add esp, 4
+        test ecx, ecx
+        jne plain_normal_draw
+        push edi
+        call EnsureSpriteSurface
+        add esp, 4
+        test eax, eax
+        je no_surface
+    plain_normal_draw:
+        push ebp
+        push ebx
+        push edi
+        call RenderSprite
+        add esp, 0xc
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        pop ecx
+        ret
+    no_surface:
+        pop edi
+        pop esi
+        pop ebp
+        xor eax, eax
+        pop ebx
+        pop ecx
+        ret
+        // }
+    group_sprite:
+        // mask = arg->mask; group = sprite->group; if (group->count <= 0) return result;
+        mov edx, dword ptr [esi + 0x14] // arg->mask
+        mov eax, dword ptr [edi + 8] // sprite->group
+        mov dword ptr [esp + 0x10], edx
+        xor esi, esi // esi = i
+        mov edx, dword ptr [eax + 4] // group->count
+        test edx, edx
+        jle empty_group
+    next_sub:
+        // if (mask & 1) {
+        test byte ptr [esp + 0x10], 1
+        je sub_done
+        //     xoff = group->xoffs[i] / 2 and yoff = group->yoffs[i] / 2, rounded towards zero
+        //     (ebp = xoff, ebx = yoff)
+        mov ecx, dword ptr [eax + 0xc] // group->xoffs
+        mov edx, dword ptr [eax + 0x10] // group->yoffs
+        mov ebp, dword ptr [ecx + esi * 4]
+        mov ebx, dword ptr [edx + esi * 4]
+        test ebp, ebp
+        jge xoff_positive
+        neg ebp
+        sar ebp, 1
+        neg ebp
+        jmp xoff_done
+    xoff_positive:
+        sar ebp, 1
+    xoff_done:
+        test ebx, ebx
+        jge yoff_positive
+        neg ebx
+        sar ebx, 1
+        neg ebx
+        jmp yoff_done
+    yoff_positive:
+        sar ebx, 1
+    yoff_done:
+        //     if (arg->mode) {
+        //         if (*GetVRAMAddress(group->subs[i]) != 0 || EnsureSpriteSurface(sprite->group->subs[i]))
+        //             RenderSpriteX(sprite->group->subs[i], xoff + x, yoff + y, arg->mode);
+        mov ecx, dword ptr [esp + 0x18] // arg
+        mov edx, dword ptr [ecx + 0x10] // arg->mode
+        test edx, edx
+        je sub_normal
+        mov edx, dword ptr [eax + 8] // group->subs
+        mov eax, dword ptr [edx + esi * 4]
+        push eax
+        call GetVRAMAddress
+        mov ecx, dword ptr [eax]
+        add esp, 4
+        test ecx, ecx
+        jne sub_x_draw
+        mov ecx, dword ptr [edi + 8]
+        mov edx, dword ptr [ecx + 8]
+        mov eax, dword ptr [edx + esi * 4]
+        push eax
+        call EnsureSpriteSurface
+        add esp, 4
+        test eax, eax
+        je sub_done
+        mov ecx, dword ptr [esp + 0x18]
+        mov eax, dword ptr [esp + 0x20] // y
+        add ebx, eax
+        mov edx, dword ptr [ecx + 0x10]
+        mov ecx, dword ptr [esp + 0x1c] // x
+        push edx
+        mov edx, dword ptr [edi + 8]
+        add ebp, ecx
+        push ebx
+        mov eax, dword ptr [edx + 8]
+        push ebp
+        mov ecx, dword ptr [eax + esi * 4]
+        push ecx
+        call RenderSpriteX
+        add esp, 0x10
+        jmp sub_done
+    sub_x_draw:
+        mov edx, dword ptr [esp + 0x18]
+        mov ecx, dword ptr [esp + 0x20]
+        add ebx, ecx
+        mov eax, dword ptr [edx + 0x10]
+        mov edx, dword ptr [esp + 0x1c]
+        push eax
+        mov eax, dword ptr [edi + 8]
+        add ebp, edx
+        push ebx
+        mov ecx, dword ptr [eax + 8]
+        push ebp
+        mov edx, dword ptr [ecx + esi * 4]
+        push edx
+        call RenderSpriteX
+        add esp, 0x10
+        jmp sub_done
+    sub_normal:
+        //     } else if (*GetVRAMAddress(group->subs[i]) != 0 || EnsureSpriteSurface(sprite->group->subs[i]))
+        //         RenderSprite(sprite->group->subs[i], xoff + x, yoff + y);
+        mov eax, dword ptr [eax + 8]
+        mov ecx, dword ptr [eax + esi * 4]
+        push ecx
+        call GetVRAMAddress
+        mov ecx, dword ptr [eax]
+        add esp, 4
+        test ecx, ecx
+        jne sub_normal_draw
+        mov edx, dword ptr [edi + 8]
+        mov eax, dword ptr [edx + 8]
+        mov ecx, dword ptr [eax + esi * 4]
+        push ecx
+        call EnsureSpriteSurface
+        add esp, 4
+        test eax, eax
+        je sub_done
+        mov edx, dword ptr [esp + 0x20]
+        mov ecx, dword ptr [edi + 8]
+        mov eax, dword ptr [esp + 0x1c]
+        add ebx, edx
+        mov edx, dword ptr [ecx + 8]
+        add ebp, eax
+        push ebx
+        push ebp
+        mov eax, dword ptr [edx + esi * 4]
+        push eax
+        jmp sub_render
+    sub_normal_draw:
+        mov ecx, dword ptr [esp + 0x20]
+        mov eax, dword ptr [edi + 8]
+        mov edx, dword ptr [esp + 0x1c]
+        add ebx, ecx
+        mov ecx, dword ptr [eax + 8]
+        add ebp, edx
+        push ebx
+        push ebp
+        mov edx, dword ptr [ecx + esi * 4]
+        push edx
+    sub_render:
+        call RenderSprite
+        add esp, 0xc
+        // }
+    sub_done:
+        // group = sprite->group; i++; mask >>= 1; while (i < group->count)
+        mov eax, dword ptr [edi + 8]
+        mov edx, dword ptr [esp + 0x10]
+        inc esi
+        mov ecx, dword ptr [eax + 4]
+        sar edx, 1
+        cmp esi, ecx
+        mov dword ptr [esp + 0x10], edx
+        jl next_sub
+        // return 1;
+        pop edi
+        pop esi
+        pop ebp
+        mov eax, 1
+        pop ebx
+        pop ecx
+        ret
+    empty_group:
+        // return result;   (still 1 in ecx)
+        pop edi
+        pop esi
+        pop ebp
+        mov eax, ecx
+        pop ebx
+        pop ecx
+        ret
+    }
+}
+// clang-format on
+#else
 LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
     struct Sprite *sprite;
     struct SpriteGroup *group;
@@ -319,6 +610,7 @@ LEGO_EXPORT unsigned int PrintSpriteEx(struct SpriteExArg *arg, int x, int y) {
     } while (i < group->count);
     return 1;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x004858e0
 LEGO_EXPORT unsigned int PrintTiledSprite(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7) {

@@ -1,4 +1,4 @@
-# FUN_00463460 (0x00463460, `src/legoland/map_object.c`)
+# DegradeObject (0x00463460, `src/legoland/map_object.c`)
 
 **Best: 70.07%** (current code, with a volatile threshold)
 

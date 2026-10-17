@@ -83,7 +83,8 @@ for p in sorted(SRC.glob("*.c")):
             j = i + 1
             while j < len(lines) and (lines[j].startswith("//") or not lines[j].strip()):
                 j += 1
-            sig = lines[j]
+            # a naked function (the decomp's MSVC6-only asm) is the same function as the C the port builds
+            sig = re.sub(r"__declspec\s*\(\s*naked\s*\)\s*", "", lines[j])
             m2 = re.search(r"(\w+)\s*\(", sig)
             if m2:
                 functions[int(m.group(2), 16)] = dict(name=m2.group(1), file=p.name, sig=sig,

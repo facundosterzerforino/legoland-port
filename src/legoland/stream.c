@@ -261,7 +261,249 @@ int SpeechReadPcmBuffer(unsigned char *dst, int count) {
     return count;
 }
 
+// Parses the RIFF/WAVE header of the open speech file: checks "RIFF" and "WAVE", reads the "fmt "
+// chunk into SpeechSourceFormat (at least 18 bytes; cbSize cleared for a short WAVEFORMAT),
+// skips other chunks up to "data", then stores the data size and its file offset. Returns 1 on
+// success, 0 on any read error or unexpected tag.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements. Why asm: the C was at best 93.19%: the
+// original's chunk-skipping loop reads the next tag at the bottom and shares one return path;
+// both loop shapes tried from C lay it out differently (87.43% / 68.69%). See
+// docs/attempts/0x00498420-SpeechParseWavHeader.md.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x00498420
+__declspec(naked) int SpeechParseWavHeader(void) {
+    __asm {
+        // Frame after `push esi`: [esp+4] size, [esp+8] tag.
+        // _lseek(SpeechFileHandle, 0, 0);
+        mov eax, dword ptr [SpeechFileHandle]
+        sub esp, 8
+        push esi
+        push 0
+        push 0
+        push eax
+        call _lseek
+        // if (_read(SpeechFileHandle, &tag, 4) != 4) return 0;
+        mov edx, dword ptr [SpeechFileHandle]
+        lea ecx, [esp + 0x14] // &tag
+        push 4
+        push ecx
+        push edx
+        call _read
+        add esp, 0x18
+        cmp eax, 4
+        je read_riff
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    read_riff:
+        // if (tag != 'RIFF') return 0;
+        cmp dword ptr [esp + 8], 0x46464952
+        je riff_ok
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    riff_ok:
+        // if (_read(SpeechFileHandle, &size, 4) != 4) return 0;   (RIFF size, unused)
+        mov ecx, dword ptr [SpeechFileHandle]
+        lea eax, [esp + 4] // &size
+        push 4
+        push eax
+        push ecx
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        je read_wave
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    read_wave:
+        // if (_read(SpeechFileHandle, &tag, 4) != 4) return 0; if (tag != 'WAVE') return 0;
+        mov eax, dword ptr [SpeechFileHandle]
+        lea edx, [esp + 8]
+        push 4
+        push edx
+        push eax
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        je check_wave
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    check_wave:
+        cmp dword ptr [esp + 8], 0x45564157
+        je wave_ok
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    wave_ok:
+        // if (_read(SpeechFileHandle, &tag, 4) != 4) return 0;   ("fmt ")
+        mov edx, dword ptr [SpeechFileHandle]
+        lea ecx, [esp + 8]
+        push 4
+        push ecx
+        push edx
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        je read_fmt_size
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    read_fmt_size:
+        // if (_read(SpeechFileHandle, &size, 4) != 4) return 0;
+        mov ecx, dword ptr [SpeechFileHandle]
+        lea eax, [esp + 4]
+        push 4
+        push eax
+        push ecx
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        je alloc_format
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    alloc_format:
+        // SpeechSourceFormat = malloc(size < 0x12 ? 0x12 : size);
+        mov eax, dword ptr [esp + 4]
+        cmp eax, 0x12
+        jae format_size_ok
+        push 0x12
+        jmp format_malloc
+    format_size_ok:
+        push eax
+    format_malloc:
+        call malloc
+        // if (_read(SpeechFileHandle, SpeechSourceFormat, size) != size) return 0;
+        mov edx, dword ptr [esp + 8]
+        add esp, 4
+        mov dword ptr [SpeechSourceFormat], eax
+        push edx
+        push eax
+        mov eax, dword ptr [SpeechFileHandle]
+        push eax
+        call _read
+        mov ecx, dword ptr [esp + 0x10] // size
+        add esp, 0xc
+        cmp eax, ecx
+        je format_read
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    format_read:
+        // if (size <= 0x12) ((WAVEFORMATEX *)SpeechSourceFormat)->cbSize = 0;
+        cmp ecx, 0x12
+        ja format_done
+        mov ecx, dword ptr [SpeechSourceFormat]
+        mov word ptr [ecx + 0x10], 0
+    format_done:
+        // while (_read(SpeechFileHandle, &tag, 4) == 4) {
+        mov eax, dword ptr [SpeechFileHandle]
+        lea edx, [esp + 8]
+        push 4
+        push edx
+        push eax
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        jne fail
+    next_chunk:
+        //     if (tag == 'data') break;
+        mov eax, dword ptr [esp + 8]
+        push 4 // (first argument of the data-size read below, or of the chunk-size read)
+        cmp eax, 0x61746164
+        je found_data
+        //     if (_read(SpeechFileHandle, &size, 4) != 4) return 0;
+        mov edx, dword ptr [SpeechFileHandle]
+        lea ecx, [esp + 8]
+        push ecx
+        push edx
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        jne fail_after_data_check
+        //     p = malloc(size); if (_read(SpeechFileHandle, p, size) != size) { free(p); return 0; }
+        //     free(p);   (esi = p)
+        mov eax, dword ptr [esp + 4]
+        push eax
+        call malloc
+        mov ecx, dword ptr [esp + 8]
+        mov edx, dword ptr [SpeechFileHandle]
+        mov esi, eax
+        push ecx
+        push esi
+        push edx
+        call _read
+        mov ecx, dword ptr [esp + 0x14]
+        add esp, 0x10
+        cmp eax, ecx
+        push esi
+        jne chunk_read_failed
+        call free
+        // (next tag read at the bottom of the loop)
+        mov ecx, dword ptr [SpeechFileHandle]
+        lea eax, [esp + 0xc]
+        push 4
+        push eax
+        push ecx
+        call _read
+        add esp, 0x10
+        cmp eax, 4
+        je next_chunk
+        // }
+    fail:
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    chunk_read_failed:
+        call free
+        add esp, 4
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    found_data:
+        // if (_read(SpeechFileHandle, &SpeechDataSize, 4) != 4) return 0;
+        mov edx, dword ptr [SpeechFileHandle]
+        push offset SpeechDataSize
+        push edx
+        call _read
+        add esp, 0xc
+        cmp eax, 4
+        je data_size_read
+    fail_after_data_check:
+        xor eax, eax
+        pop esi
+        add esp, 8
+        ret
+    data_size_read:
+        // SpeechDataOffset = _tell(SpeechFileHandle); return 1;
+        mov eax, dword ptr [SpeechFileHandle]
+        push eax
+        call _tell
+        add esp, 4
+        mov dword ptr [SpeechDataOffset], eax
+        mov eax, 1
+        pop esi
+        add esp, 8
+        ret
+    }
+}
+// clang-format on
+#else
 int SpeechParseWavHeader(void) {
     unsigned int size;
     unsigned int tag;
@@ -323,6 +565,7 @@ int SpeechParseWavHeader(void) {
     SpeechDataOffset = _tell(SpeechFileHandle);
     return 1;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00498630
 int SpeechLoadWavFile(const char *param_1) {

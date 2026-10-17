@@ -1,4 +1,4 @@
-# FUN_00457970 (0x00457970, `src/legoland/bricks.c`)
+# IsFootprintClear (0x00457970, `src/legoland/bricks.c`)
 
 **Best: 87.80%**. Kind: C.
 

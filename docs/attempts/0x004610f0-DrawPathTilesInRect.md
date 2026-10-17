@@ -1,4 +1,4 @@
-# FUN_004610f0 (0x004610f0, `src/legoland/map_object.c`)
+# DrawPathTilesInRect (0x004610f0, `src/legoland/map_object.c`)
 
 **Best: 89.95%** (unchanged from start). Kind: C.
 

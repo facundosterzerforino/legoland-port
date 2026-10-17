@@ -110,6 +110,11 @@
 /* Symbols no header declares (callbacks only reached through these tables, TU-level globals). */
 void AddRollerCoasterPath2x2();
 void AdjustGardenerCount();
+void ApplyCapacityEvent();
+void ApplyFlashButtonEvent();
+void BlokeAIGoToEntrance();
+void BlokeAILeavePark();
+void BlokeAIWander();
 void Bloke_DoNothing();
 extern char CopterPathTable0[];
 extern char CopterPathTable1[];
@@ -131,16 +136,11 @@ void FUN_00427c70();
 void FUN_004286e0();
 void FUN_00429e20();
 void FUN_0044ebf0();
-void FUN_0044ed70();
 void FUN_0044f170();
-void FUN_0044f610();
-void FUN_0044fe10();
 void FUN_0044fe80();
 void FUN_00450250();
 void FUN_00450330();
 void FUN_00450450();
-void FUN_0046a300();
-void FUN_0046a4c0();
 void FUN_0046ae20();
 void FUN_0046b1e0();
 void FUN_0049a4a0();
@@ -4491,9 +4491,9 @@ static const struct PortFixup port_fixups[] = {
     {0xd368, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd36c, 'F', (void *)FUN_0044f170, 0, 0, ~0u},
     {0xd370, 'F', (void *)FUN_0044ebf0, 0, 0, ~0u},
-    {0xd374, 'F', (void *)FUN_0044ed70, 0, 0, ~0u},
+    {0xd374, 'F', (void *)BlokeAILeavePark, 0, 0, ~0u},
     {0xd378, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
-    {0xd380, 'F', (void *)FUN_0044f610, 0, 0, ~0u},
+    {0xd380, 'F', (void *)BlokeAIWander, 0, 0, ~0u},
     {0xd384, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd388, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd38c, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
@@ -4510,7 +4510,7 @@ static const struct PortFixup port_fixups[] = {
     {0xd3b8, 'F', (void *)FUN_00450330, 0, 0, ~0u},
     {0xd3bc, 'F', (void *)Garderner_Repair, 0, 0, ~0u},
     {0xd3c0, 'F', (void *)Mechanics_Repair, 0, 0, ~0u},
-    {0xd3c4, 'F', (void *)FUN_0044fe10, 0, 0, ~0u},
+    {0xd3c4, 'F', (void *)BlokeAIGoToEntrance, 0, 0, ~0u},
     {0xd3c8, 'F', (void *)FUN_0049a4a0, 0, 0, ~0u},
     {0xd3cc, 'F', (void *)FUN_0049a4d0, 0, 0, ~0u},
     {0xd710, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x24, 0x9fccu},
@@ -4635,7 +4635,7 @@ static const struct PortFixup port_fixups[] = {
     {0xed84, 'F', (void *)GenerateWorkers, 0, 0, ~0u},
     {0xed88, 'F', (void *)ScriptEventWorkers, 0, 0, ~0u},
     {0xed8c, 'F', (void *)ScriptEventDegrade, 0, 0, ~0u},
-    {0xed90, 'F', (void *)FUN_0046a300, 0, 0, ~0u},
+    {0xed90, 'F', (void *)ApplyCapacityEvent, 0, 0, ~0u},
     {0xed94, 'F', (void *)ScriptEventCapacityScale, 0, 0, ~0u},
     {0xed98, 'F', (void *)ScriptEventCapacityCap, 0, 0, ~0u},
     {0xed9c, 'F', (void *)NerpsSetEntranceFee, 0, 0, ~0u},
@@ -4646,7 +4646,7 @@ static const struct PortFixup port_fixups[] = {
     {0xedb0, 'F', (void *)ScriptEventBridges, 0, 0, ~0u},
     {0xedb4, 'F', (void *)ScriptEventBriefingFile, 0, 0, ~0u},
     {0xedb8, 'F', (void *)ScriptEventHintsFile, 0, 0, ~0u},
-    {0xedbc, 'F', (void *)FUN_0046a4c0, 0, 0, ~0u},
+    {0xedbc, 'F', (void *)ApplyFlashButtonEvent, 0, 0, ~0u},
     {0xedc0, 'F', (void *)ScriptEventPurge, 0, 0, ~0u},
     {0xedc4, 'F', (void *)ScriptEventEndLevel, 0, 0, ~0u},
     {0xedc8, 'F', (void *)ScriptEventNeed, 0, 0, ~0u},
@@ -4737,11 +4737,11 @@ static const struct PortFixup port_fixups[] = {
     {0x10174, 'G', (void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0x74, 0xd3dcu},
     {0x1017c, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x120, 0xa0c8u},
     {0x10184, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x134, 0xa0dcu},
-    {0x105b4, 'G', (void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0x10c, 0xd6d0u},
+    {0x105b4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
     {0x105b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
     {0x105bc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
     {0x105c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
-    {0x105c4, 'G', (void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0x10c, 0xd6d0u},
+    {0x105c4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
     {0x105c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
     {0x105cc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
     {0x105d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
@@ -4809,7 +4809,7 @@ static const struct PortFixup port_fixups[] = {
     {0x106c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6f8, 0x10df0u},
     {0x106cc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6f0, 0x10de8u},
     {0x106d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6e4, 0x10ddcu},
-    {0x106d4, 'G', (void *)&DAT_004b85c4, sizeof(DAT_004b85c4), 0x10c, 0xd6d0u},
+    {0x106d4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
     {0x106d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
     {0x106dc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
     {0x106e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
@@ -5299,19 +5299,19 @@ static const struct PortFixup port_fixups[] = {
     {0x12324, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x48, 0x12394u},
     {0x12328, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x40, 0x1238cu},
     {0x1234c, 'F', (void *)LogBlokeRethinking, 0, 0, ~0u},
-    {0x12350, 'F', (void *)FUN_004838c0, 0, 0, ~0u},
+    {0x12350, 'F', (void *)BlokeActionWait, 0, 0, ~0u},
     {0x12354, 'F', (void *)FUN_00483ef0, 0, 0, ~0u},
     {0x12358, 'F', (void *)FUN_00484090, 0, 0, ~0u},
     {0x1235c, 'F', (void *)FUN_00483d10, 0, 0, ~0u},
-    {0x12360, 'F', (void *)FUN_004838e0, 0, 0, ~0u},
+    {0x12360, 'F', (void *)BlokeActionTurn, 0, 0, ~0u},
     {0x12364, 'F', (void *)FUN_00484220, 0, 0, ~0u},
-    {0x12368, 'F', (void *)FUN_004845d0, 0, 0, ~0u},
-    {0x1236c, 'F', (void *)FUN_00484630, 0, 0, ~0u},
+    {0x12368, 'F', (void *)BlokeActionMoveToDest, 0, 0, ~0u},
+    {0x1236c, 'F', (void *)BlokeActionBounce, 0, 0, ~0u},
     {0x12370, 'F', (void *)FUN_00484790, 0, 0, ~0u},
     {0x12374, 'F', (void *)FUN_00483e20, 0, 0, ~0u},
     {0x12378, 'F', (void *)FUN_00484470, 0, 0, ~0u},
     {0x1237c, 'F', (void *)FUN_00484520, 0, 0, ~0u},
-    {0x12380, 'F', (void *)FUN_004848e0, 0, 0, ~0u},
+    {0x12380, 'F', (void *)BlokeActionWaitWhileHovered, 0, 0, ~0u},
     {0x12384, 'F', (void *)FUN_00483d90, 0, 0, ~0u},
     {0x12388, 'F', (void *)FUN_00484350, 0, 0, ~0u},
     {0x12ebc, 'G', (void *)&DAT_004b6d58, sizeof(DAT_004b6d58), 0x3e0, 0xc138u},
@@ -5853,7 +5853,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004bb098, sizeof(DAT_004bb098), 0x10098, 0x4},
     {(void *)&DAT_004bb09c, sizeof(DAT_004bb09c), 0x1009c, 0x4},
     {(void *)&DAT_004bb0a0, sizeof(DAT_004bb0a0), 0x100a0, 0x4},
-    {(void *)&DAT_004bb18c, sizeof(DAT_004bb18c), 0x1018c, 0x350},
+    {(void *)&DAT_004bb18c, sizeof(DAT_004bb18c), 0x1018c, 0x310},
     {(void *)&DAT_004bb4dc, sizeof(DAT_004bb4dc), 0x104dc, 0x4},
     {(void *)&DAT_004bb4e0, sizeof(DAT_004bb4e0), 0x104e0, 0xb8},
     {(void *)&DAT_004bb598, sizeof(DAT_004bb598), 0x10598, 0x8},
@@ -5861,7 +5861,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004bb5a4, sizeof(DAT_004bb5a4), 0x105a4, 0x8},
     {(void *)&DAT_004bb5ac, sizeof(DAT_004bb5ac), 0x105ac, 0x4},
     {(void *)&ScriptConditionActive, sizeof(ScriptConditionActive), 0x105b0, 0x4},
-    {(void *)&LanguageName, sizeof(LanguageName), 0x110ec, 0xab8},
+    {(void *)&LanguageName, sizeof(LanguageName), 0x110ec, 0x2bc},
     {(void *)&DAT_004bcec0, sizeof(DAT_004bcec0), 0x11ec0, 0xc},
     {(void *)&DAT_004bd32c, sizeof(DAT_004bd32c), 0x1232c, 0x20},
     {(void *)&SPRITE_ClipRect, sizeof(SPRITE_ClipRect), 0x12ea0, 0x18},
@@ -6483,9 +6483,9 @@ static void PortLoad_PTR_Bloke_DoNothing_004b8368(void) {
     }
 }
 
-static void PortLoad_DAT_004b85c4(void) {
+static void PortLoad_VWin32DeviceHandle(void) {
     unsigned int lim = 0xd5c8u;
-    PortLoadPtr(&DAT_004b85c4, 0xd5c4u, lim);
+    PortLoadPtr(&VWin32DeviceHandle, 0xd5c4u, lim);
 }
 
 static void PortLoad_FountainSFX(void) {
@@ -7559,9 +7559,9 @@ static void PortCheck_PTR_Bloke_DoNothing_004b8368(void) {
     }
 }
 
-static void PortCheck_DAT_004b85c4(void) {
+static void PortCheck_VWin32DeviceHandle(void) {
     unsigned int lim = 0xd5c8u;
-    PortCheckPtr(&DAT_004b85c4, 0xd5c4u, lim);
+    PortCheckPtr(&VWin32DeviceHandle, 0xd5c4u, lim);
 }
 
 static void PortCheck_FountainSFX(void) {
@@ -8175,7 +8175,7 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_ModelsPath,
     PortLoad_PTR_DAT_004b8348,
     PortLoad_PTR_Bloke_DoNothing_004b8368,
-    PortLoad_DAT_004b85c4,
+    PortLoad_VWin32DeviceHandle,
     PortLoad_FountainSFX,
     PortLoad_PowerStationSFX,
     PortLoad_DINO_SFX,
@@ -8315,7 +8315,7 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_ModelsPath,
     PortCheck_PTR_DAT_004b8348,
     PortCheck_PTR_Bloke_DoNothing_004b8368,
-    PortCheck_DAT_004b85c4,
+    PortCheck_VWin32DeviceHandle,
     PortCheck_FountainSFX,
     PortCheck_PowerStationSFX,
     PortCheck_DINO_SFX,

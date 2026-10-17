@@ -1,10 +1,10 @@
-# FUN_004966a0 (0x004966a0, `src/legoland/sound_music.c`)
+# UpdateSampleVolume (0x004966a0, `src/legoland/sound_music.c`)
 
 **Best: 64.15%**
 
 ## What still differs
 
-Cases 1 and 3 share their last store (`mov [esp+8],eax` = coord[1]) and the one FUN_004965a0 call in the original
+Cases 1 and 3 share their last store (`mov [esp+8],eax` = coord[1]) and the one SetSampleVolumeAndPan call in the original
 (case 1 ends with `jmp` to it). Ours duplicates the whole call tail into case 1.
 
 ## Tried (don't repeat)

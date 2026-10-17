@@ -20,4 +20,4 @@
 
 ## Ideas not tried yet
 
-- Find a source form that makes MSVC place the shared epilogue at the top: e.g. the first check as `if (FUN_00474920() != 0) {...}` with the rest of the work inside it and only the loop's failure as `return 0`.
+- Find a source form that makes MSVC place the shared epilogue at the top: e.g. the first check as `if (SaveObjectiveIcons() != 0) {...}` with the rest of the work inside it and only the loop's failure as `return 0`.

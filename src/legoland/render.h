@@ -44,6 +44,12 @@ void FUN_00486590(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
 void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
 void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
+void *FUN_00486280(int param_1, void *param_2);
+void FUN_00488700(unsigned char *base, struct RenderViewport *vp);
+int FUN_00486540(void);
+void LoadTextureNode(struct Image *image, unsigned int index);
+void FreeTextureNodes(void);
+void FUN_004864e0(void *param_1);
 void FUN_004886e0(unsigned int index);
 void LoadTextureNode(struct Image *image, unsigned int index);
 void FreeTextureNodes(void);

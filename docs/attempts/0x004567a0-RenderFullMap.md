@@ -1,6 +1,6 @@
 # RenderFullMap (0x004567a0, `src/legoland/mapscreen.c`)
 
-**Best: 81.85%**. Kind: C.
+**Best: 94.07%**. Kind: C (a switch with a jump table: asm2naked can't transcribe it).
 
 ## What still differs
 
@@ -22,3 +22,8 @@ No earlier round notes for this function.
 
 | 2026-10-08 | permuter + Opus 5.5 | many temps (bounds_y1/y2, dest_x, uid_x, ...), `register` pen/base_x/x1, loops as while, nested ifs, unsigned py/x2 (permuter 84.5% included a y1/y2 bug: expression dropped) | 81.60 -> 81.85 |
 | 2026-10-11 | Opus 5.5 | `volatile int hx` in the layered-sprite loop (per-local volatile search): it fixes the stack-slot order of the whole function (hx needs more weight). Natural forms tried first: hx/hy before GetTileBounds (79.59 / 87.67), `hx = sub_x; hx = HALF(hx);` styles (87.99) | 87.99 -> 93.98 with volatile (kept, last resort) |
+| 2026-10-17 | Opus 5.5 | hoisting block locals to the outer block (so they can't share slots): `struct MapPoint off` 84.17, `RideSpriteInfo loc` 94.07 (equal), `origin[4]` + `base` 86.26, `piece` + `dest` 85.70, off + loc 84.17, one function-wide `struct Point pt` 74.78 (with off hoisted 74.44), `height` + `dest_height` 85.82 | none better |
+
+Note (2026-10-17): the last diff hunk (the jump table's index table, 4 entries longer in ours) is reccmp cutting the
+original's table short: read from legoland.exe, the original's index table is the same 0x31 bytes as ours (case 0x30
+-> the light green block). Only the frame (`sub esp, 0xf8` in the original, 0xf0 in ours) and slot order differ.

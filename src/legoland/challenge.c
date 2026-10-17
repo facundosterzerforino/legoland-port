@@ -2179,10 +2179,10 @@ s1:
                 y += 0x18;
             }
             recs[first].type = lpass == total;
-            totacc += total;
-            passacc += lpass;
             x -= 0x30;
+            totacc += total;
             bottom = y + 0x16;
+            passacc += lpass;
             break;
         } while (ReportFlags & 0x38000000);
     }
@@ -2275,9 +2275,9 @@ s1:
                 i++;
                 y += 0x18;
             }
-            recs[first].type = lpass == total;
             totacc += total;
             passacc += lpass;
+            recs[first].type = lpass == total;
             x -= 0x30;
             bottom = y + 0x16;
             break;
@@ -2365,16 +2365,16 @@ s1:
                 APPR_ROW(ok, 0x133);
                 recs[i].arg = 0;
                 recs[i].bar = 1;
-                recs[i].value = d20_count;
                 recs[i].goal = DAT_00666048;
+                recs[i].value = d20_count;
                 recs[i].max = DAT_0066604c;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
             }
-            recs[first].type = lpass == total;
             totacc += total;
             passacc += lpass;
+            recs[first].type = lpass == total;
             x -= 0x30;
             bottom = y + 0x16;
             break;
@@ -2432,8 +2432,8 @@ s1:
                 if (y + 0x16 > 0x1b5) {
                     APPR_TOP_OF_PAGE();
                     if (pagestart != first) {
-                        i = first;
                         x = *xp;
+                        i = first;
                         AppraisalPageCount++;
                         pagestart = first;
                         continue;
@@ -2615,10 +2615,10 @@ s1:
                 y += 0x18;
             }
             recs[first].type = lpass == total;
-            totacc += total;
-            passacc += lpass;
             x -= 0x30;
+            totacc += total;
             bottom = y + 0x16;
+            passacc += lpass;
             break;
         } while (ReportFlags & 0xe00000);
     }
@@ -3556,8 +3556,8 @@ summary:
             if (rc.cur.bottom > 0x1b5) {
                 APPR_TOP_OF_PAGE();
                 if (pagestart != first) {
-                    i = first;
                     x = recs[first].x;
+                    i = first;
                     AppraisalPageCount++;
                     pagestart = first;
                     goto advice;

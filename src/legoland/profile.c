@@ -411,7 +411,349 @@ LEGO_EXPORT void UpdateProfileCheckBoxIcons(void) {
     }
 }
 
+// Draws the profile list: the title, then for every visible profile icon its sprite (selected /
+// delete-selected / off) at its row (slot * 0x26), the hover hit test for its delete button, and
+// its name. The new-profile entry hands over to EnterNewProfile. With the delete or new-profile
+// pop-up open it also draws that pop-up's prompt. Finally it enables the accept icon only when a
+// profile is selected (and, for a new profile, it has a name).
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements (IconNode offsets: +0xc x, +0xe y,
+// +0x10 width, +0x18 name, +0x1c slot, +0x20 field_20b, +0x34 flags). Why asm: the C was at best
+// 96.97% after trying all 720 declaration orders: the `last` and `name` stack slots stay swapped.
+// See docs/attempts/0x0048cf10-PrintProfileDetails.md.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x0048cf10
+__declspec(naked) LEGO_EXPORT void PrintProfileDetails(void) {
+    __asm {
+        // Frame after the pushes: [esp+0xf] sel (byte), [esp+0x10] name, [esp+0x14] last
+        // (+4 while ebx is pushed inside the loop). esi = icon, edi = rc.top, ebp = 0x400 or rc.left.
+        // DeleteIcon->flags |= 0x400;
+        mov eax, dword ptr [DeleteIcon]
+        sub esp, 0xc
+        push ebp
+        push esi
+        mov esi, dword ptr [IconListHead] // icon = IconListHead
+        push edi
+        mov edi, dword ptr [eax + 0x34]
+        mov ebp, 0x400
+        // PrintTextBox(DAT_007cb340, 0x8d, rc.top = 0x72, 0xf0, 0x2e, 3, 0x25, 0xffffff, 0);
+        push 0
+        or edi, ebp
+        push 0xffffff
+        push 0x25
+        mov dword ptr [eax + 0x34], edi
+        push 3
+        mov edi, 0x72
+        push 0x2e
+        push 0xf0
+        push edi
+        push 0x8d
+        push offset DAT_007cb340
+        call PrintTextBox
+        add esp, 0x24
+        // for (; icon != NULL; icon = icon->next) {
+        test esi, esi
+        je list_done
+        push ebx
+        jmp icon_loop_top
+    next_icon_reload:
+        mov ebp, 0x400
+    icon_loop_top:
+        //     show = 1 (ebx); sel = 1;
+        //     if (!(icon->flags & 0x400) && (icon->field_20b & 1)) {
+        mov eax, dword ptr [esi + 0x34]
+        mov ebx, 1
+        // test ebp, eax -- emitted as bytes: MSVC's inline assembler only produces the other valid encoding
+        _emit 0x85
+        _emit 0xc5
+        mov byte ptr [esp + 0x13], bl // sel
+        jne next_icon
+        test byte ptr [esi + 0x20], bl
+        je next_icon
+        //         if (MousePos.x in [icon->x - 0x18, icon->x) &&
+        //             MousePos.y in [icon->slot * 0x26 + 0x86, icon->y + icon->width))
+        //             { Hover.type = 2; Hover.ptr = icon; }
+        movsx eax, word ptr [esi + 0xc]
+        mov ecx, dword ptr [MousePos]
+        lea edx, [eax - 0x18]
+        cmp ecx, edx
+        jl hover_done
+        cmp ecx, eax
+        jge hover_done
+        xor eax, eax
+        mov al, byte ptr [esi + 0x1c]
+        lea ecx, [eax + eax * 8]
+        lea edx, [eax + ecx * 2] // slot * 19
+        mov eax, dword ptr [MousePos + 0x4]
+        lea ecx, [edx + edx + 0x86] // slot * 0x26 + 0x86
+        cmp eax, ecx
+        jl hover_done
+        movsx edx, word ptr [esi + 0x10]
+        movsx ecx, word ptr [esi + 0xe]
+        add edx, ecx
+        cmp eax, edx
+        jge hover_done
+        mov dword ptr [Hover], 2
+        mov dword ptr [Hover + 0x4], esi
+    hover_done:
+        //         if (CurrentProfile.profile_slot == icon->slot) {
+        mov dl, byte ptr [CurrentProfile + 0x43]
+        mov al, byte ptr [esi + 0x1c]
+        cmp dl, al
+        jne not_selected
+        //             if (DeletePopUpShown) {
+        //                 SetIconSprite(icon, DAT_007986b8); last = icon;
+        //                 icon->y = icon->slot * 0x26 + 0x6b; rc.top = icon->y + 0x22;
+        mov eax, dword ptr [DeletePopUpShown]
+        test eax, eax
+        je not_deleting
+        mov eax, dword ptr [DAT_007986b8]
+        push eax
+        push esi
+        call SetIconSprite
+        movzx ax, byte ptr [esi + 0x1c]
+        add esp, 8
+        mov dword ptr [esp + 0x18], esi // last
+        lea ecx, [eax + eax * 8]
+        lea eax, [eax + ecx * 2]
+        lea eax, [eax + eax + 0x6b]
+        movsx edi, ax
+        mov word ptr [esi + 0xe], ax
+        add edi, 0x22
+        jmp text_box
+    not_deleting:
+        //             } else if (NewProfilePopUpShown) { EnterNewProfile(icon); show = 0; last = icon; }
+        mov eax, dword ptr [NewProfilePopUpShown]
+        test eax, eax
+        je selected_plain
+        push esi
+        call EnterNewProfile
+        add esp, 4
+        xor ebx, ebx // show = 0
+        mov dword ptr [esp + 0x18], esi
+        jmp text_box
+    selected_plain:
+        //             } else {
+        //                 SetIconSprite(icon, RegDiffPopUpSprite);
+        //                 icon->y = icon->slot * 0x26 + 0x6b; rc.top = icon->y + 0x22;
+        //                 LightUpthisDeleteIcon(icon, 1); last = icon;
+        //             }
+        mov edx, dword ptr [RegDiffPopUpSprite]
+        push edx
+        push esi
+        call SetIconSprite
+        movzx ax, byte ptr [esi + 0x1c]
+        push 1
+        push esi
+        lea ecx, [eax + eax * 8]
+        lea eax, [eax + ecx * 2]
+        lea eax, [eax + eax + 0x6b]
+        movsx edi, ax
+        mov word ptr [esi + 0xe], ax
+        add edi, 0x22
+        call LightUpthisDeleteIcon
+        add esp, 0x10
+        mov dword ptr [esp + 0x18], esi
+        jmp text_box
+    not_selected:
+        //         } else {
+        //             SetIconSprite(icon, GetProfileOffSprite(icon->slot)); sel = 0;
+        //             icon->y = icon->slot * 0x26 + 0x86; rc.top = icon->y + 7;
+        //         }
+        mov dl, byte ptr [esi + 0x1c]
+        push edx
+        call GetProfileOffSprite
+        push eax
+        push esi
+        call SetIconSprite
+        movzx ax, byte ptr [esi + 0x1c]
+        add esp, 0xc
+        mov byte ptr [esp + 0x13], 0 // sel = 0
+        lea ecx, [eax + eax * 8]
+        lea eax, [eax + ecx * 2]
+        lea eax, [eax + eax + 0x86]
+        movsx edi, ax
+        mov word ptr [esi + 0xe], ax
+        add edi, 7
+    text_box:
+        //         rc.left = icon->x + 0x14 (ebp); rc.bottom = rc.top + 0x13 (eax); rc.right = rc.left + 0xe0 (ecx);
+        //         name = icon->field_18p; if (name == NULL || !show) continue;
+        movsx ebp, word ptr [esi + 0xc]
+        mov edx, dword ptr [esi + 0x18]
+        add ebp, 0x14
+        test edx, edx
+        lea eax, [edi + 0x13]
+        lea ecx, [ebp + 0xe0]
+        mov dword ptr [esp + 0x14], edx // name
+        je next_icon
+        test ebx, ebx
+        je next_icon
+        //         if (CurrentProfile.profile_slot - 1 == icon->slot && (DeletePopUpShown || NewProfilePopUpShown)) continue;
+        xor edx, edx
+        xor ebx, ebx
+        mov dl, byte ptr [CurrentProfile + 0x43]
+        mov bl, byte ptr [esi + 0x1c]
+        dec edx
+        cmp edx, ebx
+        jne draw_name
+        mov edx, dword ptr [DeletePopUpShown]
+        test edx, edx
+        jne next_icon
+        mov edx, dword ptr [NewProfilePopUpShown]
+        test edx, edx
+        jne next_icon
+    draw_name:
+        //         PrintTextBox(name, rc.left, rc.top, width, height, 2, 0x25, sel ? 0 : 0xffffff, sel ? 0xffffff : 0);
+        mov dl, byte ptr [esp + 0x13] // sel
+        test dl, dl
+        je draw_name_off
+        push 0xffffff
+        push 0
+        push 0x25
+        sub eax, edi
+        push 2
+        sub ecx, ebp
+        push eax
+        mov eax, dword ptr [esp + 0x28] // name
+        push ecx
+        push edi
+        push ebp
+        push eax
+        jmp draw_name_call
+    draw_name_off:
+        push 0
+        push 0xffffff
+        push 0x25
+        sub eax, edi
+        push 2
+        sub ecx, ebp
+        push eax
+        push ecx
+        mov ecx, dword ptr [esp + 0x2c] // name
+        push edi
+        push ebp
+        push ecx
+    draw_name_call:
+        call PrintTextBox
+        add esp, 0x24
+        //     }
+    next_icon:
+        mov esi, dword ptr [esi] // icon = icon->next
+        test esi, esi
+        jne next_icon_reload
+        pop ebx
+        mov ebp, 0x400
+        // }
+    list_done:
+        // if (DeletePopUpShown) {
+        //     PrintTextBox(GetString(0x85), last->x + 0x14, last->y + 7, 0x9b, 0x13, 2, 0x25, 0, 0xffffff);
+        //     UpdateProfileCheckBoxIcons();
+        mov eax, dword ptr [DeletePopUpShown]
+        test eax, eax
+        je no_delete_prompt
+        mov ecx, dword ptr [esp + 0x14] // last
+        push 0xffffff
+        push 0
+        push 0x25
+        movsx eax, word ptr [ecx + 0xc]
+        movsx ecx, word ptr [ecx + 0xe]
+        add ecx, 7
+        add eax, 0x14
+        push 2
+        lea esi, [ecx + 0x13]
+        lea edx, [eax + 0x9b]
+        sub esi, ecx
+        sub edx, eax
+        push esi
+        push edx
+        push ecx
+        push eax
+        push 0x85
+        jmp print_prompt
+    no_delete_prompt:
+        // } else if (NewProfilePopUpShown) {
+        //     PrintTextBox(GetString(0x86), last->x + 0x14, last->y - 0x14, 0xe0, 0x13, 2, 0x25, 0, 0xffffff);
+        //     UpdateProfileCheckBoxIcons();
+        // }
+        mov eax, dword ptr [NewProfilePopUpShown]
+        test eax, eax
+        je accept_icon
+        mov ecx, dword ptr [esp + 0x14]
+        push 0xffffff
+        push 0
+        push 0x25
+        movsx eax, word ptr [ecx + 0xc]
+        movsx ecx, word ptr [ecx + 0xe]
+        sub ecx, 0x14
+        add eax, 0x14
+        push 2
+        lea esi, [ecx + 0x13]
+        lea edx, [eax + 0xe0]
+        sub esi, ecx
+        sub edx, eax
+        push esi
+        push edx
+        push ecx
+        push eax
+        push 0x86
+    print_prompt:
+        call GetString
+        add esp, 4
+        push eax
+        call PrintTextBox
+        add esp, 0x24
+        call UpdateProfileCheckBoxIcons
+    accept_icon:
+        // AcceptIcon->flags: clear 0x400 (enable) if a profile is selected, no delete pop-up, and
+        // (no new-profile pop-up or TempProfileHasName()); otherwise set it.
+        mov al, byte ptr [CurrentProfile + 0x43]
+        test al, al
+        je accept_disable
+        mov eax, dword ptr [DeletePopUpShown]
+        test eax, eax
+        jne accept_disable
+        mov eax, dword ptr [NewProfilePopUpShown]
+        test eax, eax
+        je accept_enable
+        call TempProfileHasName
+        test eax, eax
+        mov eax, dword ptr [AcceptIcon]
+        mov ecx, dword ptr [eax + 0x34]
+        je accept_disable_have_flags
+        and ch, 0xfb // flags &= ~0x400
+        pop edi
+        pop esi
+        mov dword ptr [eax + 0x34], ecx
+        pop ebp
+        add esp, 0xc
+        ret
+    accept_enable:
+        mov eax, dword ptr [AcceptIcon]
+        pop edi
+        pop esi
+        pop ebp
+        mov ecx, dword ptr [eax + 0x34]
+        and ch, 0xfb
+        mov dword ptr [eax + 0x34], ecx
+        add esp, 0xc
+        ret
+    accept_disable:
+        mov eax, dword ptr [AcceptIcon]
+        mov ecx, dword ptr [eax + 0x34]
+    accept_disable_have_flags:
+        or ecx, ebp // flags |= 0x400
+        pop edi
+        pop esi
+        mov dword ptr [eax + 0x34], ecx
+        pop ebp
+        add esp, 0xc
+        ret
+    }
+}
+// clang-format on
+#else
 LEGO_EXPORT void PrintProfileDetails(void) {
     struct IconNode *icon;
     struct IconNode *last;
@@ -500,6 +842,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
         ((struct IconNode *)AcceptIcon)->flags |= 0x400;
     }
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x0048d230
 void FUN_0048d230(void) {

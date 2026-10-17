@@ -1,4 +1,4 @@
-# FUN_00461290 (0x00461290, `src/legoland/map_object.c`)
+# ClampScrollPosition (0x00461290, `src/legoland/map_object.c`)
 
 **Best: 43.92%**. Kind: C.
 

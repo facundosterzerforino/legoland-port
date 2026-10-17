@@ -71,7 +71,6 @@ void CastleLevel1Update(Element *obj) {
     unsigned int y;
     int dx;
     int dy;
-    struct Point to;
     char dir;
 
     for (node = ride->riders; node != NULL; node = next) {
@@ -134,20 +133,18 @@ void CastleLevel1Update(Element *obj) {
             }
             break;
         case 4:
-            to.x = (x << 8) - 0x680;
-            to.y = (y << 8) - 0x80;
-            bloke->dest = to;
-            dir = CalcMoveLine(bloke->pos, to, &bloke->nav);
+            bloke->dest.x = (x << 8) - 0x680;
+            bloke->dest.y = (y << 8) - 0x80;
+            dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
         case 5:
-            to.x = (x << 8) + 0x80;
-            to.y = (y << 8) + 0x80;
-            bloke->dest = to;
-            dir = CalcMoveLine(bloke->pos, to, &bloke->nav);
+            bloke->dest.x = (x << 8) + 0x80;
+            bloke->dest.y = (y << 8) + 0x80;
+            dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
             bloke->field_73 = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);

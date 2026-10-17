@@ -829,7 +829,7 @@ static void RunCommand(char *line) {
             CurrentProfile.flags[3 + level] = 1;
         }
         /* flags[0..3]: the Legoland, Western, Castle and Adventurers theme tabs of the build menu, which level
-         * scripts unlock (SetObjectiveCounter -> FUN_00476140); InitGameInterface applies them when a level starts. */
+         * scripts unlock (SetObjectiveCounter -> SetObjectiveIconShown); InitGameInterface applies them when a level starts. */
         for (i = 0; i < 4; i++) {
             CurrentProfile.flags[i] = 1;
         }
@@ -867,7 +867,7 @@ static void RunCommand(char *line) {
                 GiveRewardObject(elem, 0, 1);
             }
             if (DAT_007fdd70[0] != NULL) {
-                FUN_00476180();
+                ShowProfileObjectiveIcons();
             }
             UpdateMenu();
             ConPrintf("Gave %d more objects in this level; all theme tabs enabled.", given);

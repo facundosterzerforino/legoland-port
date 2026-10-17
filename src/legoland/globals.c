@@ -96,6 +96,9 @@ struct ColorLutEntry ColorLut[256];
 // GLOBAL: LEGOLAND 0x004ab468
 float FLOAT_004ab468;
 
+// GLOBAL: LEGOLAND 0x004ab384
+const float GoldSlotWeightScale = 512.0f;
+
 // GLOBAL: LEGOLAND 0x004ab390
 float FLOAT_004ab390;
 
@@ -797,6 +800,7 @@ char *PTR_DAT_004b8348[8] = {0};
 // GLOBAL: LEGOLAND 0x004b8368
 void (*PTR_Bloke_DoNothing_004b8368[26])(struct Bloke *) = {0};
 
+// Persistent VWIN32 handle for EjectCdDrive; invalid until opened and invalidated after closing.
 // GLOBAL: LEGOLAND 0x004b85c4
 HANDLE VWin32DeviceHandle = INVALID_HANDLE_VALUE;
 
@@ -1028,6 +1032,15 @@ char *DAT_004bb6d4[9]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb6f8
 struct ScriptCommand DAT_004bb6f8[0x5d];
+
+// GLOBAL: LEGOLAND 0x004b86e0
+const char LegoFontName[] = "Lego";
+
+// GLOBAL: LEGOLAND 0x004bb49c
+const char BuildMenuName[] = "BUILD MENU";
+
+// GLOBAL: LEGOLAND 0x004b8a70
+const char PathControlName[] = "PATH CONTROL";
 
 // GLOBAL: LEGOLAND 0x004bcba4
 const char *ResourceFileNames[3] = {
@@ -4648,7 +4661,7 @@ LEGO_EXPORT struct EditState EditMode;
 unsigned int MapScreenOpenPending;
 
 // GLOBAL: LEGOLAND 0x008119c0
-struct MapMarker DAT_008119c0[32][32]; /* one table: its last row is DAT_008138c0 (globals.h) */
+struct MapMarker MapSpannerMarks[32][32]; /* one table: its last row is MapSpannerMarksLastRow (globals.h) */
 
 // GLOBAL: LEGOLAND 0x008139c0
 int MapViewHeight;
@@ -4848,6 +4861,7 @@ int DAT_00813afc;
 // GLOBAL: LEGOLAND 0x00813b00
 LEGO_EXPORT struct CtrlBuffer *CONTROLLERBUFFER;
 
+// Last matching CD-ROM root, including its trailing backslash and NUL terminator.
 // GLOBAL: LEGOLAND 0x00813b04
 char CdDrivePath[4];
 

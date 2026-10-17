@@ -644,7 +644,88 @@ int LoadBestNodeList(void) {
     return 1;
 }
 
+// Marks `node` as visited (field_20 bit 2), collects its neighbours with CollectAdjacentNodes (into
+// AdjacentNodes, count in AdjacentNodeCount), copies that list and recurses into every neighbour not
+// visited yet: a flood fill over the path nodes.
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
+// each asm block is commented with the C it implements. Why asm: the C is at best 72.55% because
+// of register allocation only (the original saves all four callee-saved registers and uses edi for
+// the field_20 temp, ours uses esi); separate size/count variables and moving the count assignment
+// did not change it. See docs/attempts/0x004829c0-MarkConnectedNodes.md.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x004829c0
+__declspec(naked) void MarkConnectedNodes(struct BestNode *node) {
+    __asm {
+        // node->field_20 |= 2;  (mark visited)
+        mov eax, dword ptr [esp + 4]
+        push ebx
+        push ebp
+        push esi
+        push edi
+        mov edi, dword ptr [eax + 0x20] // node->field_20
+        or edi, 2
+        mov dword ptr [eax + 0x20], edi
+        // CollectAdjacentNodes(&node->x_min);  (fills AdjacentNodes with the neighbours)
+        add eax, 8 // &node->x_min
+        push eax
+        call CollectAdjacentNodes
+        // count = AdjacentNodeCount; if (count == 0) return;
+        mov eax, dword ptr [AdjacentNodeCount]
+        add esp, 4
+        test eax, eax
+        mov ebp, eax // ebp = count
+        je done
+        // copy = malloc(count * 4); if (copy == NULL) return;
+        lea esi, [eax * 4]
+        push esi
+        call malloc
+        mov ebx, eax // ebx = copy
+        add esp, 4
+        test ebx, ebx
+        je done
+        // memcpy(copy, AdjacentNodes, count * 4);  (inlined: dwords, then the remaining bytes)
+        mov ecx, esi
+        mov esi, offset AdjacentNodes
+        mov eax, ecx
+        mov edi, ebx
+        shr ecx, 2
+        rep movsd
+        mov ecx, eax
+        and ecx, 3
+        test ebp, ebp
+        rep movsb
+        // for (p = copy; count > 0; count--, p++)
+        //     if (!((*p)->field_20 & 2)) MarkConnectedNodes(*p);
+        jle free_copy
+        mov esi, ebx // esi = p
+    next_neighbour:
+        mov eax, dword ptr [esi]
+        test byte ptr [eax + 0x20], 2 // (*p)->field_20 & 2: already visited?
+        jne neighbour_done
+        push eax
+        call MarkConnectedNodes
+        add esp, 4
+    neighbour_done:
+        add esi, 4
+        dec ebp
+        jne next_neighbour
+    free_copy:
+        // free(copy);
+        push ebx
+        call free
+        add esp, 4
+    done:
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        ret
+    }
+}
+// clang-format on
+#else
 void MarkConnectedNodes(struct BestNode *node) {
     int count;
     struct BestNode **copy;
@@ -668,6 +749,7 @@ void MarkConnectedNodes(struct BestNode *node) {
         }
     }
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00482a40
 void FUN_00482a40(struct Point *pos) {

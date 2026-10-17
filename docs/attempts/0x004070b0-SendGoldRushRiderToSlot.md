@@ -1,4 +1,4 @@
-# FUN_004070b0 (0x004070b0, `src/legoland/gold_rush.c`)
+# SendGoldRushRiderToSlot (0x004070b0, `src/legoland/gold_rush.c`)
 
 **Best: 79.31%**
 

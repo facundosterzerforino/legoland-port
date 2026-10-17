@@ -590,7 +590,7 @@ Each row:
 - DrawAppraisalBar({0x126, top, 0x1a4, top+8}, ...)
 - [-9140] += 0x18
 Speech: sprintf(wavbuf, "TEXT%04d.WAV", id); SpeechLoadWavFile(wavbuf); SpeechPlay(), or UpdateSpeechPlayback().
-Exit: KillAppraisalSprites, PopRenderingStatus, SpeechCloseFile, FUN_00474880; return 0 if any record has type == 0 (`je 0x4453d1`, the shared epilogue), else return 1.
+Exit: KillAppraisalSprites, PopRenderingStatus, SpeechCloseFile, SetDefaultMouseHandlers; return 0 if any record has type == 0 (`je 0x4453d1`, the shared epilogue), else return 1.
   - Loop shape: the original pre-tests at 0x44d77e, tests at the bottom (`jne 0x44d78a` at 0x44dabf) and puts the exit code after the loop. Ours is `do { if (AppraisalScreenActive == 0) {...; return} ... } while (1)`, compiled as a top test plus `jmp`.
   - Row y: the original uses the RECT top -9140 in memory (copied from -9156 at 0x44d815; read at 0x44d973/0x44d99a/0x44d9bd; += 0x18 at 0x44d9f6-0x44da07). Ours uses `rowy` (4736, 4801) and a block-local `RECT rcRow` (4790-4797).
   - Left x is stored to -9144 (0x44d96d) and re-read (0x44d987). Ours keeps it in iVar4.

@@ -1,4 +1,4 @@
-# FUN_00462c60 (0x00462c60, `src/legoland/map_object.c`)
+# StartOverlayAnims (0x00462c60, `src/legoland/map_object.c`)
 
 **Best: 100%* (effective match, 2026-10-09)**. Kind: C.
 

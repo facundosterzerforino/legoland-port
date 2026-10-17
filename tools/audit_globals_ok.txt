@@ -125,3 +125,8 @@ indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites expli
 0x00799258 MusicTransitionSegments (0x64 of 0x9c4): reviewed, harmless (the 5x5 theme-to-theme transitions; every index is [theme][theme] with themes 0-4)
 0x004dcbd0 DAT_004dcbd0 (0x2c of 0x30): reviewed, harmless - struct VecMath is 11 words, FUN_00421540 copies exactly those; 0x004dcbfc is never used
 0x007aac40 SpeechAcmHeader (0x54 of 0x60): reviewed, harmless - struct AcmHdr is ACMSTREAMHEADER (cbStruct = sizeof, 0x54 on x86); the original's 0xc bytes after it are never used
+0x004b86e0 LegoFontName (0x5 of 0x8): reviewed 2026-10-17, harmless: the string "Lego", the rest is the next string's alignment
+0x004bcd28 ResourceOpenErrorFormat (0x1b of 0x1c): reviewed 2026-10-17, harmless: a string and its alignment byte
+0x00798608 SavedSoftPrintClip (0x10 of 0x14): reviewed 2026-10-17, harmless: a RECT; the "+" uses are the MSVC6-only asm's field offsets (+4..+0xc)
+0x007fea4c SpriteClipOrigin (0x8 of 0xc8): reviewed 2026-10-17, harmless: {top, left}; the "+" use is the MSVC6-only asm's +4 (left)
+0x007febac DrawClipExtent (0x8 of 0xc): reviewed 2026-10-17, harmless: {height, width}; the "+" use is the MSVC6-only asm's +4 (width)

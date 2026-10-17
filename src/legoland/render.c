@@ -733,7 +733,346 @@ LEGO_EXPORT unsigned int RenderTiledSprite(struct Sprite *sprite, int param_2, i
     return ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->Blt((LPDIRECTDRAWSURFACE)renderEngine, &dst, (LPDIRECTDRAWSURFACE)sprite->surface, NULL, 0x1000000, NULL) == 0;
 }
 
+// GLOBAL: LEGOLAND 0x004bdd74
+static const char ScaledSpriteBreakText[] = "break";
+
+// Draws a sprite stretched to (param_4 + 1) x (param_5 + 1) at (param_2, param_3) moved by param_6: the sprite is
+// software-printed whole into a scratch surface (made on the first call: 1280x960, colour-keyed with the transparent
+// colour), then stretched onto the render target with a colour-keyed Blt through the game's clipper. The software
+// screen (CurrentSurfaceDesc, SoftPrintClip) is pointed at the scratch for the print and restored after. Returns 1
+// when the Blt worked (after restoring a lost scratch surface once).
+//
+// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and each asm block is
+// commented with the C it implements. Why asm: the C was at best 91.54% (docs/attempts/0x00488c80-FUN_00488c80.md):
+// MSVC6 keeps param_2 in esi where the original computes it through edx, and schedules the RECT restores around the
+// CurrentSurfaceDesc copies differently; 24 orderings of the rect setup and swapping the restores didn't move it.
+// clang-format off
+#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x00488c80
+__declspec(naked) unsigned int RenderScaledSpriteOffset(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int *param_6) {
+    __asm {
+        // Frame after the four pushes: [esp+0x10] off[2], [esp+0x18] src, [esp+0x28] dst, [esp+0x38] clip,
+        // [esp+0x48] r2 (RECTs), [esp+0x58] desc1, [esp+0xc4] desc2 (DDSURFACEDESC); the arguments from
+        // [esp+0x134]. ebx = sprite, ebp = 0 throughout.
+        sub esp, 0x120
+        // dst.left = param_2 + param_6[0]; dst.top = param_3 + param_6[1];
+        // dst.right = dst.left + param_4 + 1; dst.bottom = dst.top + param_5 + 1;
+        mov ecx, dword ptr [esp + 0x138]
+        mov edx, dword ptr [esp + 0x128]
+        push ebx
+        mov ebx, dword ptr [esp + 0x128]
+        mov eax, dword ptr [ecx]
+        mov ecx, dword ptr [ecx + 4]
+        add eax, edx
+        mov edx, dword ptr [esp + 0x130]
+        add ecx, edx
+        mov edx, dword ptr [esp + 0x134]
+        mov dword ptr [esp + 0x1c], eax
+        mov dword ptr [esp + 0x20], ecx
+        lea eax, [eax + edx + 1]
+        mov edx, dword ptr [esp + 0x138]
+        mov dword ptr [esp + 0x24], eax
+        push ebp
+        lea eax, [ecx + edx + 1]
+        xor ebp, ebp
+        // src = {0, 0, sprite->width, sprite->height};
+        movsx ecx, word ptr [ebx + 0x14]
+        movsx edx, word ptr [ebx + 0x16]
+        mov dword ptr [esp + 0x2c], eax
+        // if (ScaledSpriteScratchMade == 0) {
+        mov eax, dword ptr [ScaledSpriteScratchMade]
+        push esi
+        cmp eax, ebp
+        push edi
+        mov dword ptr [esp + 0x1c], ebp
+        mov dword ptr [esp + 0x18], ebp
+        mov dword ptr [esp + 0x20], ecx
+        mov dword ptr [esp + 0x24], edx
+        jne scratch_ready
+        //     memset(&desc1, 0, sizeof(desc1)); ScaledSpriteScratchMade = 1; desc1.dwSize = sizeof(desc1);
+        mov ecx, 0x1b
+        xor eax, eax
+        lea edi, [esp + 0x58]
+        lea edx, [esp + 0x58]
+        rep stosd
+        mov eax, dword ptr [renderEngine]
+        mov dword ptr [ScaledSpriteScratchMade], 1
+        mov dword ptr [esp + 0x58], 0x6c
+        //     if (IDirectDrawSurface_GetSurfaceDesc(renderEngine, &desc1) == 0) {
+        push edx
+        mov ecx, dword ptr [eax]
+        push eax
+        call dword ptr [ecx + 0x58]
+        test eax, eax
+        jne scratch_ready
+        //         desc1.dwFlags = 0x1007; desc1.ddsCaps.dwCaps = 0x840; desc1.dwWidth = 0x500; desc1.dwHeight = 0x3c0;
+        //         IDirectDraw2_CreateSurface(DDRAWENV.ddraw2, &desc1, &ScaledSpriteScratch, NULL);
+        mov eax, dword ptr [DDRAWENV + 0x4]
+        push ebp
+        lea edx, [esp + 0x5c]
+        mov dword ptr [esp + 0x60], 0x1007
+        mov dword ptr [esp + 0xc4], 0x840
+        mov dword ptr [esp + 0x68], 0x500
+        mov dword ptr [esp + 0x64], 0x3c0
+        mov ecx, dword ptr [eax]
+        push offset ScaledSpriteScratch
+        push edx
+        push eax
+        call dword ptr [ecx + 0x18]
+        //         off[0] = off[1] = GetTransparentColour();
+        //         IDirectDrawSurface_SetColorKey(ScaledSpriteScratch, 8, (LPDDCOLORKEY)off); } }
+        call GetTransparentColour
+        mov dword ptr [esp + 0x14], eax
+        mov dword ptr [esp + 0x10], eax
+        mov eax, dword ptr [ScaledSpriteScratch]
+        lea edx, [esp + 0x10]
+        push edx
+        push 8
+        mov ecx, dword ptr [eax]
+        push eax
+        call dword ptr [ecx + 0x74]
+    scratch_ready:
+        // SavedSurfaceDesc = CurrentSurfaceDesc; SavedSoftPrintClip = SoftPrintClip;
+        mov eax, dword ptr [SoftPrintClip]
+        mov edx, dword ptr [SoftPrintClip + 0x8]
+        mov ecx, 0x1b
+        mov esi, offset CurrentSurfaceDesc
+        mov edi, offset SavedSurfaceDesc
+        mov dword ptr [SavedSoftPrintClip], eax
+        mov eax, dword ptr [SoftPrintClip + 0xc]
+        mov dword ptr [SavedSoftPrintClip + 0x8], edx
+        rep movsd
+        mov ecx, dword ptr [SoftPrintClip + 0x4]
+        mov dword ptr [SavedSoftPrintClip + 0xc], eax
+        mov dword ptr [SavedSoftPrintClip + 0x4], ecx
+        // memset(&desc2, 0, sizeof(desc2)); desc2.dwSize = sizeof(desc2);
+        mov ecx, 0x1b
+        xor eax, eax
+        lea edi, [esp + 0xc4]
+        rep stosd
+        // if (IDirectDrawSurface_Lock(ScaledSpriteScratch, NULL, &desc2, 0x21, NULL) == 0) {
+        mov eax, dword ptr [ScaledSpriteScratch]
+        push ebp
+        lea edx, [esp + 0xc8]
+        push 0x21
+        mov dword ptr [esp + 0xcc], 0x6c
+        mov ecx, dword ptr [eax]
+        push edx
+        push ebp
+        push eax
+        call dword ptr [ecx + 0x64]
+        test eax, eax
+        jne blit
+        //     clip = {0, 0, desc2.dwWidth, desc2.dwHeight}; IntersectRect(&SoftPrintClip, &clip, &SPRITE_ClipRect);
+        mov eax, dword ptr [esp + 0xd0]
+        mov ecx, dword ptr [esp + 0xcc]
+        lea edx, [esp + 0x38]
+        push offset SPRITE_ClipRect
+        push edx
+        push offset SoftPrintClip
+        mov dword ptr [esp + 0x44], ebp
+        mov dword ptr [esp + 0x4c], eax
+        mov dword ptr [esp + 0x48], ebp
+        mov dword ptr [esp + 0x50], ecx
+        call dword ptr [IntersectRect]
+        //     off[0] = 0; off[1] = 0; StoredTransparentColour = GetTransparentColour();
+        mov dword ptr [esp + 0x10], ebp
+        mov dword ptr [esp + 0x14], ebp
+        call GetTransparentColour
+        mov dword ptr [StoredTransparentColour], eax
+        //     CurrentSurfaceDesc: lpSurface = desc2.lpSurface, dwWidth = sprite->width, dwHeight = sprite->height,
+        //     lPitch = desc2.lPitch; SoftPrint_Clear();
+        mov eax, dword ptr [esp + 0xe8]
+        mov dword ptr [CurrentSurfaceDesc + 0x24], eax
+        mov eax, dword ptr [esp + 0xd4]
+        movsx ecx, word ptr [ebx + 0x14]
+        mov dword ptr [CurrentSurfaceDesc + 0xc], ecx
+        movsx edx, word ptr [ebx + 0x16]
+        mov dword ptr [CurrentSurfaceDesc + 0x8], edx
+        mov dword ptr [CurrentSurfaceDesc + 0x10], eax
+        call SoftPrint_Clear
+        //     r2 = {0, 0, sprite->width, sprite->height};
+        //     if ((short)sprite->src_x < 0 || (short)sprite->src_y < 0) printf(ScaledSpriteBreakText);
+        movsx ecx, word ptr [ebx + 0x14]
+        movsx edx, word ptr [ebx + 0x16]
+        cmp word ptr [ebx + 0x18], bp
+        mov dword ptr [esp + 0x48], ebp
+        mov dword ptr [esp + 0x50], ecx
+        mov dword ptr [esp + 0x4c], ebp
+        mov dword ptr [esp + 0x54], edx
+        jl print_break
+        cmp word ptr [ebx + 0x1a], bp
+        jge soft_print
+    print_break:
+        push offset ScaledSpriteBreakText
+        call printf
+        add esp, 4
+    soft_print:
+        //     SoftPrint_BltFast(sprite, &r2, off);
+        //     IDirectDrawSurface_Unlock(ScaledSpriteScratch, desc2.lpSurface); }
+        lea eax, [esp + 0x10]
+        lea edx, [esp + 0x48]
+        push eax
+        mov ecx, ebx
+        call SoftPrint_BltFast
+        mov eax, dword ptr [ScaledSpriteScratch]
+        mov edx, dword ptr [esp + 0xe8]
+        push edx
+        push eax
+        mov ecx, dword ptr [eax]
+        call dword ptr [ecx + 0x80]
+    blit:
+        // IDirectDrawSurface_SetClipper(renderEngine, DDrawClipper);
+        mov eax, dword ptr [renderEngine]
+        mov edx, dword ptr [DDrawClipper]
+        push edx
+        push eax
+        mov ecx, dword ptr [eax]
+        call dword ptr [ecx + 0x70]
+        // hr = IDirectDrawSurface_Blt(renderEngine, &dst, ScaledSpriteScratch, &src, 0x1008000, NULL);
+        // if (hr == 0) goto ok;
+        mov eax, dword ptr [renderEngine]
+        push ebp
+        lea edx, [esp + 0x1c]
+        push 0x1008000
+        mov ecx, dword ptr [eax]
+        push edx
+        mov edx, dword ptr [ScaledSpriteScratch]
+        push edx
+        lea edx, [esp + 0x38]
+        push edx
+        push eax
+        call dword ptr [ecx + 0x14]
+        cmp eax, ebp
+        je ok
+        // if (hr == 0x887601c2) {  (DDERR_SURFACELOST)
+        cmp eax, 0x887601c2
+        jne failed
+        //     if (IDirectDrawSurface_Restore(ScaledSpriteScratch) != 0) {
+        mov eax, dword ptr [ScaledSpriteScratch]
+        push eax
+        mov ecx, dword ptr [eax]
+        call dword ptr [ecx + 0x6c]
+        test eax, eax
+        je restored
+        //         IDirectDrawSurface_SetClipper(renderEngine, NULL);
+        //         CurrentSurfaceDesc = SavedSurfaceDesc; SoftPrintClip = SavedSoftPrintClip; return 0; }
+        mov eax, dword ptr [renderEngine]
+        push ebp
+        push eax
+        mov edx, dword ptr [eax]
+        call dword ptr [edx + 0x70]
+        mov eax, dword ptr [SavedSoftPrintClip]
+        mov edx, dword ptr [SavedSoftPrintClip + 0x8]
+        mov ecx, 0x1b
+        mov esi, offset SavedSurfaceDesc
+        mov edi, offset CurrentSurfaceDesc
+        rep movsd
+        mov ecx, dword ptr [SavedSoftPrintClip + 0x4]
+        mov dword ptr [SoftPrintClip], eax
+        mov eax, dword ptr [SavedSoftPrintClip + 0xc]
+        pop edi
+        pop esi
+        mov dword ptr [SoftPrintClip + 0xc], eax
+        pop ebp
+        mov dword ptr [SoftPrintClip + 0x4], ecx
+        mov dword ptr [SoftPrintClip + 0x8], edx
+        xor eax, eax
+        pop ebx
+        add esp, 0x120
+        ret
+    restored:
+        //     MakeSprite(sprite);
+        push ebx
+        call MakeSprite
+        //     if (IDirectDrawSurface_IsLost(PrimarySurface) != 0x887601c2 || IDirectDrawSurface_Restore(PrimarySurface) == 0) {
+        mov eax, dword ptr [PrimarySurface]
+        add esp, 4
+        mov ecx, dword ptr [eax]
+        push eax
+        call dword ptr [ecx + 0x60]
+        cmp eax, 0x887601c2
+        jne blit_again
+        mov eax, dword ptr [PrimarySurface]
+        push eax
+        mov edx, dword ptr [eax]
+        call dword ptr [edx + 0x6c]
+        test eax, eax
+        jne failed
+    blit_again:
+        //         if (IDirectDrawSurface_Blt(renderEngine, &dst, ScaledSpriteScratch, &src, 0x8000, NULL) == 0) {
+        mov eax, dword ptr [renderEngine]
+        push ebp
+        lea edx, [esp + 0x1c]
+        push 0x8000
+        mov ecx, dword ptr [eax]
+        push edx
+        mov edx, dword ptr [ScaledSpriteScratch]
+        push edx
+        lea edx, [esp + 0x38]
+        push edx
+        push eax
+        call dword ptr [ecx + 0x14]
+        test eax, eax
+        jne failed
+    ok:
+        //         ok: IDirectDrawSurface_SetClipper(renderEngine, NULL);
+        //             CurrentSurfaceDesc = SavedSurfaceDesc; SoftPrintClip = SavedSoftPrintClip; return 1; } } }
+        mov eax, dword ptr [renderEngine]
+        push ebp
+        push eax
+        mov ecx, dword ptr [eax]
+        call dword ptr [ecx + 0x70]
+        mov edx, dword ptr [SavedSoftPrintClip]
+        mov eax, dword ptr [SavedSoftPrintClip + 0x4]
+        mov ecx, 0x1b
+        mov esi, offset SavedSurfaceDesc
+        mov edi, offset CurrentSurfaceDesc
+        rep movsd
+        mov ecx, dword ptr [SavedSoftPrintClip + 0x8]
+        mov dword ptr [SoftPrintClip], edx
+        mov edx, dword ptr [SavedSoftPrintClip + 0xc]
+        pop edi
+        pop esi
+        mov dword ptr [SoftPrintClip + 0x4], eax
+        pop ebp
+        mov dword ptr [SoftPrintClip + 0x8], ecx
+        mov dword ptr [SoftPrintClip + 0xc], edx
+        mov eax, 1
+        pop ebx
+        add esp, 0x120
+        ret
+    failed:
+        // IDirectDrawSurface_SetClipper(renderEngine, NULL);
+        // CurrentSurfaceDesc = SavedSurfaceDesc; SoftPrintClip = SavedSoftPrintClip; return 0;
+        mov eax, dword ptr [renderEngine]
+        push ebp
+        push eax
+        mov ecx, dword ptr [eax]
+        call dword ptr [ecx + 0x70]
+        mov edx, dword ptr [SavedSoftPrintClip]
+        mov eax, dword ptr [SavedSoftPrintClip + 0x4]
+        mov ecx, 0x1b
+        mov esi, offset SavedSurfaceDesc
+        mov edi, offset CurrentSurfaceDesc
+        rep movsd
+        mov ecx, dword ptr [SavedSoftPrintClip + 0x8]
+        mov dword ptr [SoftPrintClip], edx
+        mov edx, dword ptr [SavedSoftPrintClip + 0xc]
+        pop edi
+        pop esi
+        mov dword ptr [SoftPrintClip + 0x4], eax
+        pop ebp
+        mov dword ptr [SoftPrintClip + 0x8], ecx
+        mov dword ptr [SoftPrintClip + 0xc], edx
+        xor eax, eax
+        pop ebx
+        add esp, 0x120
+        ret
+    }
+}
+// clang-format on
+#else
 unsigned int RenderScaledSpriteOffset(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int *param_6) {
     int off[2];
     RECT src;
@@ -792,8 +1131,7 @@ unsigned int RenderScaledSpriteOffset(struct Sprite *sprite, int param_2, int pa
         r2.top = 0;
         r2.bottom = (short)sprite->height;
         if ((short)sprite->src_x < 0 || (short)sprite->src_y < 0) {
-            // STRING: LEGOLAND 0x004bdd74
-            printf("break");
+            printf(ScaledSpriteBreakText);
         }
         SoftPrint_BltFast(sprite, &r2, off);
         bits = desc2.lpSurface;
@@ -827,6 +1165,7 @@ unsigned int RenderScaledSpriteOffset(struct Sprite *sprite, int param_2, int pa
     SoftPrintClip = SavedSoftPrintClip;
     return 0;
 }
+#endif
 
 // FUNCTION: LEGOLAND 0x00489080
 LEGO_EXPORT unsigned int RenderScaledSprite(struct Sprite *param_1, int param_2, int param_3, int param_4, int param_5) {

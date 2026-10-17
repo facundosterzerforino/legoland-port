@@ -225,7 +225,7 @@ static const struct BltCase blt_cases[] = {
 
 /* The game's clipper in a window (InitScreen: SetHWnd, no clip list until the map's first render gives it one) against
  * the full-screen game's (a clip list of the screen, here the 640x340 destination's part of it): a keyed stretch out
- * of the scaled-sprite scratch surface, partly outside the destination, as the map draws its scenery (FUN_00488c80).
+ * of the scaled-sprite scratch surface, partly outside the destination, as the map draws its scenery (RenderScaledSpriteOffset).
  * DirectDraw clips the full-screen one to its list; miniwin must clip the window one the same, not refuse it. */
 static void RunWindowClipper(void) {
     static const RECT dsts[] = {{300, -20, 341, 13}, {100, 320, 141, 353}, {-15, 100, 26, 133}, {620, 200, 661, 233}};

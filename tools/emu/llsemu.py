@@ -1,7 +1,7 @@
 """Compares the 16-bit animation drawer DrawLLSSpriteMousePick (0x466770, with the hand-written blitters it calls) in
 the original legoland.exe and in the port's x86 build, both run in a CPU emulator (Unicorn): nothing runs natively.
 The sprites are the game's real ones (the park's border scenery, from the .res volumes); each is drawn into a
-software screen the way the map draws it (whole sprite at 0,0, as FUN_00488c80 does) and with random clips and
+software screen the way the map draws it (whole sprite at 0,0, as RenderScaledSpriteOffset does) and with random clips and
 positions, with the mouse away from and over the sprite. The two screens must come out the same.
 
   python llsemu.py <installed folder> <original exe> <port exe> <port pdb> [random trials] [seed]
@@ -107,7 +107,7 @@ def sprites(installed):
                 f.seek(b)
                 d = bytearray(f.read(s))
             if struct.unpack_from('<I', d, 0xc)[0] == 8:
-                continue  # indexed-colour: another drawer (FUN_00464480)
+                continue  # indexed-colour: another drawer (SoftPrint_IndexedLLS)
             struct.pack_into('<hH', d, 0, 0, 4)  # as gfx.c loads it: frame 0, delay 4, loop delay 4
             struct.pack_into('<h', d, 0x12, 4)
             out.append((hit[0], bytes(d)))

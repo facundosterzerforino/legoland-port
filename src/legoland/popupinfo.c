@@ -88,7 +88,7 @@ LEGO_EXPORT void InitPopUpInfo(void) {
     if (LLIDB_FindElement("MECHANICS HUT", &MechanicsHutHandle, 0) != 0) {
         exit(1);
     }
-    if (LLIDB_FindElement("PATH CONTROL", &PathControlHandle, 0) != 0) {
+    if (LLIDB_FindElement(PathControlName, &PathControlHandle, 0) != 0) {
         exit(1);
     }
     // STRING: LEGOLAND 0x004b83d0

@@ -4,7 +4,7 @@ pdb = subprocess.run(['llvm-pdbutil', 'dump', '--publics', P + '/build-clang-x86
 hdr = subprocess.run(['llvm-readobj', '--sections', P + '/build-clang-x86/legoland.exe'], capture_output=True, text=True).stdout
 secva = [int(m, 16) for m in re.findall(r'VirtualAddress: (0x[0-9A-Fa-f]+)', hdr)]
 names = ['FUN_00440a30', 'FUN_00486590', 'FUN_00486c70', 'FUN_004877b0', 'FUN_00487d40', 'FUN_004864e0', 'FUN_004886e0',
-         'GetBlokeAnim3DFromPerson', 'FUN_00485fe0', 'ZBufferHelper', 'OverrideFrame', 'FUN_00464480',
+         'GetBlokeAnim3DFromPerson', 'FUN_00485fe0', 'ZBufferHelper', 'OverrideFrame', 'SoftPrint_IndexedLLS',
          'OverridePalette', 'DAT_007fe9a8', 'DAT_007feb14', 'DAT_00797e68', 'DAT_00701e58',
          'RemapTexCoordsToCell', 'DAT_0081c0c0', 'FLOAT_004ab390', 'Load3DMesh', 'RES_OpenFile', 'RES_ReadFile',
          'RES_CloseFile', 'malloc', 'calloc', 'sprintf', 'FUN_00486280', 'GetGFXFName', 'RES_SetFilePointer',
