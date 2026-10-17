@@ -695,6 +695,93 @@ static void PortResCheckTextPath(void) {
     PortResTextSurface = NULL;
 }
 
+/* A sprite drawn scaled (PrintScaledSprite -> FUN_00488c80: the map's scenery) partly outside its target, with the
+ * game's clipper as the game in a window makes it (InitScreen: SetHWnd, and no clip list until the map's first render
+ * sets one). miniwin refused such a Blt instead of clipping it, and the map's first render lost every scenery piece
+ * that sticks out of its top or bottom (2026-10-17). */
+static void PortResCheckScaledSprite(void) {
+    DDSURFACEDESC desc;
+    LPDIRECTDRAWSURFACE target = NULL;
+    LPDIRECTDRAWSURFACE saved_target;
+    LPDIRECTDRAWCLIPPER made = NULL;
+    RECT saved_clip;
+    struct Sprite *sprite;
+    int counts[2] = {-1, -1};
+    int i;
+
+    sprite = LoadSprite("mapSpanner.lls", 0);
+    if (sprite == NULL || CheckHostSystemGPU() == 0) {
+        fprintf(PortResReport, "scaled sprite: no sprite or no DirectDraw\n");
+        PortResProblems++;
+        return;
+    }
+    if (DDrawClipper == NULL) {
+        /* the window itself doesn't matter (the game's, InitScreen's SetHWnd), only that the clipper has one */
+        DDRAWENV.ddraw2->lpVtbl->CreateClipper(DDRAWENV.ddraw2, 0, &made, NULL);
+        made->lpVtbl->SetHWnd(made, 0, (HWND)(INT_PTR)1);
+        DDrawClipper = made;
+    }
+    memset(&desc, 0, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    desc.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT;
+    desc.dwWidth = 640; /* the map's picture (InitMapScreen) */
+    desc.dwHeight = 340;
+    desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+    if (DDRAWENV.ddraw2->lpVtbl->CreateSurface(DDRAWENV.ddraw2, &desc, &target, NULL) != DD_OK) {
+        fprintf(PortResReport, "scaled sprite: no surface\n");
+        PortResProblems++;
+        KillSprite(sprite);
+        return;
+    }
+    saved_clip = SPRITE_ClipRect;
+    saved_target = renderEngine;
+    renderEngine = target;
+    SetRect(&SPRITE_ClipRect, 0, 0, 640, 340);
+    for (i = 0; i < 2; i++) {
+        int w = sprite->width * 2;
+        int h = sprite->height * 2;
+        int x;
+        int y;
+
+        memset(&desc, 0, sizeof(desc));
+        desc.dwSize = sizeof(desc);
+        if (target->lpVtbl->Lock(target, NULL, &desc, DDLOCK_WAIT, NULL) != DD_OK) {
+            break;
+        }
+        for (y = 0; y < (int)desc.dwHeight; y++) {
+            memset((unsigned char *)desc.lpSurface + y * desc.lPitch, 0, desc.dwWidth * 2);
+        }
+        target->lpVtbl->Unlock(target, desc.lpSurface);
+        /* inside, then half above the top edge, as the scenery at the top of the map */
+        PrintScaledSprite(sprite, 100, i == 0 ? 50 : -h / 2, w, h);
+        memset(&desc, 0, sizeof(desc));
+        desc.dwSize = sizeof(desc);
+        if (target->lpVtbl->Lock(target, NULL, &desc, DDLOCK_WAIT, NULL) != DD_OK) {
+            break;
+        }
+        counts[i] = 0;
+        for (y = 0; y < (int)desc.dwHeight; y++) {
+            for (x = 0; x < (int)desc.dwWidth; x++) {
+                counts[i] += ((unsigned short *)((unsigned char *)desc.lpSurface + y * desc.lPitch))[x] != 0;
+            }
+        }
+        target->lpVtbl->Unlock(target, desc.lpSurface);
+    }
+    fprintf(PortResReport, "scaled sprite (the map's scenery): %d pixels inside the target, %d half outside it\n",
+        counts[0], counts[1]);
+    if (counts[0] <= 0 || counts[1] <= 0) {
+        PortResProblems++;
+    }
+    renderEngine = saved_target;
+    SPRITE_ClipRect = saved_clip;
+    target->lpVtbl->Release(target);
+    if (made != NULL) {
+        DDrawClipper = NULL;
+        made->lpVtbl->Release(made);
+    }
+    KillSprite(sprite);
+}
+
 /* The string table as the game loads it (LoadStringTable), against strings\\stab.str read here: every id the file
  * has must come back from GetString, the same text. A missing one is a text missing in the game (the exit dialog,
  * the tutorial notebook, the info popups' "(null)"). */
@@ -918,6 +1005,7 @@ int PortResSelfTest(const char *path) {
     PortResCheckStrings();
     PortResCheckPeople();
     PortResCheckTextPath();
+    PortResCheckScaledSprite();
     PortResCheckSounds();
     PortResCheckMusicStart();
     if (PortResDump != NULL) {

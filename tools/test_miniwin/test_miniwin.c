@@ -201,6 +201,10 @@ static const struct BltCase blt_cases[] = {
     {"copy part, key", 64, 64, {5, 6, 25, 36}, 1, {10, 20, 30, 50}, DDBLT_WAIT | DDBLT_KEYSRC, 0, {{0}}},
     {"stretch up 37x23 -> 80x50, key", 37, 23, {200, 100, 280, 150}, 0, {0}, DDBLT_WAIT | DDBLT_KEYSRC, 0, {{0}}},
     {"stretch up 37x23 -> 81x47", 37, 23, {200, 100, 281, 147}, 0, {0}, DDBLT_WAIT, 0, {{0}}},
+    {"stretch up 36x24 -> 41x50 (even sizes: rows and columns round differently)", 36, 24, {200, 100, 241, 150}, 0,
+        {0}, DDBLT_WAIT, 0, {{0}}},
+    {"stretch up 30x10 -> 70x33, top cut by the clip list", 30, 10, {100, 100, 170, 133}, 0, {0}, DDBLT_WAIT, 1,
+        {{0, 113, 640, 480}}},
     {"stretch down 37x23 -> 20x11, key", 37, 23, {10, 10, 30, 21}, 0, {0}, DDBLT_WAIT | DDBLT_KEYSRC, 0, {{0}}},
     {"stretch down 64x64 -> 17x9", 64, 64, {10, 10, 27, 19}, 0, {0}, DDBLT_WAIT, 0, {{0}}},
     {"stretch 2x 50x40 -> 100x80, key", 50, 40, {300, 300, 400, 380}, 0, {0}, DDBLT_WAIT | DDBLT_KEYSRC, 0, {{0}}},
@@ -218,6 +222,54 @@ static const struct BltCase blt_cases[] = {
     {"fill", 8, 8, {10, 20, 300, 200}, 0, {0}, DDBLT_WAIT | DDBLT_COLORFILL, 0, {{0}}},
     {"fill, clipped", 8, 8, {10, 20, 300, 200}, 0, {0}, DDBLT_WAIT | DDBLT_COLORFILL, 1, {{50, 0, 640, 100}}},
 };
+
+/* The game's clipper in a window (InitScreen: SetHWnd, no clip list until the map's first render gives it one) against
+ * the full-screen game's (a clip list of the screen, here the 640x340 destination's part of it): a keyed stretch out
+ * of the scaled-sprite scratch surface, partly outside the destination, as the map draws its scenery (FUN_00488c80).
+ * DirectDraw clips the full-screen one to its list; miniwin must clip the window one the same, not refuse it. */
+static void RunWindowClipper(void) {
+    static const RECT dsts[] = {{300, -20, 341, 13}, {100, 320, 141, 353}, {-15, 100, 26, 133}, {620, 200, 661, 233}};
+    static const char *const edges[] = {"top", "bottom", "left", "right"};
+    LPDIRECTDRAWSURFACE dst[SIDES];
+    LPDIRECTDRAWSURFACE src[SIDES];
+    HRESULT hr[SIDES];
+    DDCOLORKEY key = {0xf81f, 0xf81f};
+    RECT screen = {0, 0, 640, 340};
+    char name[100];
+    unsigned i;
+    int side;
+
+    for (i = 0; i < sizeof(dsts) / sizeof(dsts[0]); i++) {
+        for (side = 0; side < SIDES; side++) {
+            RECT d = dsts[i];
+            RECT s = {0, 0, 29, 25};
+
+            dst[side] = Make(side, 640, 340, DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY);
+            src[side] = Make(side, 1280, 960, DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY);
+            Pattern(dst[side], 5, 0);
+            Pattern(src[side], 6, 0xf81f);
+            IDirectDrawSurface_SetColorKey(src[side], DDCKEY_SRCBLT, &key);
+            if (side == REAL) {
+                SetClip(side, dst[side], &screen, 1);
+            } else {
+                LPDIRECTDRAWCLIPPER clipper;
+
+                IDirectDraw2_CreateClipper(dd[side], 0, &clipper, NULL);
+                IDirectDrawClipper_SetHWnd(clipper, 0, GetDesktopWindow());
+                IDirectDrawSurface_SetClipper(dst[side], clipper);
+                IDirectDrawClipper_Release(clipper);
+            }
+            hr[side] = IDirectDrawSurface_Blt(dst[side], &d, src[side], &s, DDBLT_WAIT | DDBLT_KEYSRC, NULL);
+        }
+        sprintf(name, "window clipper: stretch past the %s edge", edges[i]);
+        SameResult(name, hr[REAL], hr[MINI]);
+        Compare(name, dst[REAL], dst[MINI]);
+        for (side = 0; side < SIDES; side++) {
+            IDirectDrawSurface_Release(dst[side]);
+            IDirectDrawSurface_Release(src[side]);
+        }
+    }
+}
 
 /* Blt within one surface, overlapping. */
 static void RunOverlap(void) {
@@ -342,6 +394,7 @@ int main(void) {
     for (i = 0; i < sizeof(blt_cases) / sizeof(blt_cases[0]); i++) {
         RunBlt(&blt_cases[i]);
     }
+    RunWindowClipper();
     RunOverlap();
     RunGdi();
     RunLock();

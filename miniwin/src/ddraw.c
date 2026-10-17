@@ -18,7 +18,7 @@ struct Clipper {
     IDirectDrawClipper iface;
     LONG refs;
     HWND hwnd;
-    int count; /* 0: no clip list (only the surface's own bounds) */
+    int count; /* 0: no clip list (the surface's own bounds; refused past them unless the clipper has a window) */
     RECT rects[CLIP_RECTS_MAX];
 };
 
@@ -141,13 +141,15 @@ static void Fill(struct Surface *d, const RECT *r, WORD colour) {
 }
 
 /* Stretching, as Windows' DirectDraw does it (measured with tools/test_miniwin and a probe of every pair of sizes
- * from 1 to 640, clipped and not; exact). */
+ * from 1 to 640, clipped and not; exact). The rows were measured again on 2026-10-17 (every source of 2-32 rows
+ * stretched to 2-48, whole and cut at the top, at the bottom and both, by a clip list and by the surface's edge, and
+ * the same for columns: 0 differences in 212,722 cases): they round the other way when enlarging. */
 
-/* Which of s source pixels destination pixel i (of d) shows: enlarging starts half a source pixel in, shrinking
- * skips half of the whole source pixels each destination pixel covers. */
-static int StretchIndex(int i, int s, int d) {
+/* Which of s source pixels destination pixel i (of d) shows: enlarging starts half a source pixel in (a column rounds
+ * that half down, a row up), shrinking skips half of the whole source pixels each destination pixel covers. */
+static int StretchIndex(int i, int s, int d, int rows) {
     if (d >= s) {
-        return (int)(((long long)i * s + (s - 1) / 2) / d);
+        return (int)(((long long)i * s + (rows ? s / 2 : (s - 1) / 2)) / d);
     }
     return s / d / 2 + (int)(((long long)i * s + d / 2) / d);
 }
@@ -214,10 +216,10 @@ static HRESULT Copy(struct Surface *d, const RECT *part, const RECT *dr, const u
         return DDERR_OUTOFMEMORY;
     }
     for (x = 0; x < pw; x++) {
-        columns[x] = sr->left + x0 + StretchIndex(x, x1 - x0, pw);
+        columns[x] = sr->left + x0 + StretchIndex(x, x1 - x0, pw, 0);
     }
     for (y = 0; y < ph; y++) {
-        const WORD *srow = (const WORD *)(bits + (size_t)(sr->top + y0 + StretchIndex(y, y1 - y0, ph)) * pitch);
+        const WORD *srow = (const WORD *)(bits + (size_t)(sr->top + y0 + StretchIndex(y, y1 - y0, ph, 1)) * pitch);
         WORD *drow = (WORD *)(d->bits + (size_t)(part->top + y) * d->pitch) + part->left;
 
         for (x = 0; x < pw; x++) {
@@ -259,8 +261,13 @@ static HRESULT STDMETHODCALLTYPE Surface_Blt(IDirectDrawSurface *self, LPRECT ds
     if (dr.left >= dr.right || dr.top >= dr.bottom) {
         return DDERR_INVALIDRECT;
     }
-    if ((d->clipper == NULL || d->clipper->count == 0) && !RectInside(&dr, d->width, d->height)) {
-        /* without a clip list, DirectDraw refuses a destination outside the surface rather than clipping it */
+    if ((d->clipper == NULL || (d->clipper->count == 0 && d->clipper->hwnd == NULL)) &&
+        !RectInside(&dr, d->width, d->height)) {
+        /* without a clip list, DirectDraw refuses a destination outside the surface rather than clipping it. A
+         * clipper with a window clips to the window's visible part instead, which in the port is always the whole
+         * frame: clipped to the surface, as the full-screen game's clip list (the screen) does. The game in a window
+         * makes its clipper so (InitScreen) and gives it a clip list only at the end of the map's first render:
+         * refused, that render lost the scenery pieces that stick out of the map's top and bottom. */
         return DDERR_INVALIDRECT;
     }
     if ((flags & DDBLT_COLORFILL) != 0) {

@@ -94,7 +94,7 @@ describe how `main` works.
   and the port's build of it in a CPU emulator (Unicorn, from WSL: `uv pip install unicorn capstone pillow`), with
   the helpers they call hooked, and compares the results (`drawemu.py` person drawer, `zbemu.py` z-buffer fill,
   `remapemu.py` texture cells, `loademu.py` mesh loader, `bmpemu.py` texture loader on real game files via
-  `resvol.py`). `genrva.py rvas.json` reads the port's addresses from its PDB first. Never run original machine
+  `resvol.py`, `llsemu.py` the 16-bit animation drawer and its blitters on the game's scenery sprites). `genrva.py rvas.json` reads the port's addresses from its PDB first. Never run original machine
   code natively on Windows (mapping it into a process, suspended child processes, code patching): the
   maintainer's CrowdStrike blocks it as malware behaviour. Work from the code; ask the maintainer to reproduce.
 - **Windowed mode:** `run\legoland-windowed.exe WINDEBUG`, working directory `installed\`. (Windows keeps
