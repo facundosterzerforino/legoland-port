@@ -172,11 +172,11 @@ int _findclose(intptr_t handle) {
 int _chdir(const char *name) {
     char path[MAX_PATH];
 
-    return chdir(PosixPath(name, path, sizeof(path)));
+    return PosixChdir(PosixPath(name, path, sizeof(path)));
 }
 
 char *_getcwd(char *buffer, int size) {
-    return getcwd(buffer, (size_t)size);
+    return PosixGetcwd(buffer, (size_t)size);
 }
 
 int _mkdir(const char *name) {

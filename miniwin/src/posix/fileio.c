@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <fnmatch.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -601,10 +602,74 @@ BOOL MoveFileExA(LPCSTR from, LPCSTR to, DWORD flags) {
     return TRUE;
 }
 
+static char current_folder[PATH_MAX]; /* "" until the first PosixChdir */
+
+/* path made absolute against the remembered folder, without ".", ".." or doubled slashes */
+static void Absolute(const char *path, char *out, size_t size) {
+    char joined[PATH_MAX * 2];
+    char *parts[256];
+    int count = 0;
+    char *p;
+    char *next;
+    size_t n = 0;
+    int i;
+
+    if (path[0] == '/') {
+        snprintf(joined, sizeof(joined), "%s", path);
+    } else {
+        char here[PATH_MAX];
+        snprintf(joined, sizeof(joined), "%s/%s", PosixGetcwd(here, sizeof(here)) != NULL ? here : "", path);
+    }
+    for (p = joined; p != NULL && *p != 0; p = next) {
+        next = strchr(p, '/');
+        if (next != NULL) {
+            *next++ = 0;
+        }
+        if (*p == 0 || strcmp(p, ".") == 0) {
+            continue;
+        }
+        if (strcmp(p, "..") == 0) {
+            count = count > 0 ? count - 1 : 0;
+        } else if (count < (int)(sizeof(parts) / sizeof(parts[0]))) {
+            parts[count++] = p;
+        }
+    }
+    out[0] = 0;
+    for (i = 0; i < count && n + 1 < size; i++) {
+        n += (size_t)snprintf(out + n, size - n, "/%s", parts[i]);
+    }
+    if (count == 0) {
+        snprintf(out, size, "/");
+    }
+}
+
+int PosixChdir(const char *path) {
+    char absolute[PATH_MAX];
+
+    Absolute(path, absolute, sizeof(absolute));
+    if (chdir(absolute) != 0) {
+        return -1;
+    }
+    snprintf(current_folder, sizeof(current_folder), "%s", absolute);
+    return 0;
+}
+
+char *PosixGetcwd(char *buffer, size_t size) {
+    if (current_folder[0] == 0) {
+        return getcwd(buffer, size);
+    }
+    if (strlen(current_folder) + 1 > size) {
+        errno = ERANGE;
+        return NULL;
+    }
+    strcpy(buffer, current_folder);
+    return buffer;
+}
+
 BOOL SetCurrentDirectoryA(LPCSTR name) {
     char path[MAX_PATH];
 
-    if (chdir(PosixPath(name, path, sizeof(path))) != 0) {
+    if (PosixChdir(PosixPath(name, path, sizeof(path))) != 0) {
         PosixSetError(PosixErrorFromErrno(errno));
         return FALSE;
     }
@@ -640,7 +705,7 @@ DWORD GetModuleFileNameA(HMODULE module, LPSTR out, DWORD size) {
 #elif defined(__EMSCRIPTEN__)
     {
         char cwd[MAX_PATH - 16];
-        n = snprintf(path, sizeof(path), "%s/legoland", getcwd(cwd, sizeof(cwd)) != NULL ? cwd : ".");
+        n = snprintf(path, sizeof(path), "%s/legoland", PosixGetcwd(cwd, sizeof(cwd)) != NULL ? cwd : ".");
     }
 #else
     n = readlink("/proc/self/exe", path, sizeof(path) - 1);

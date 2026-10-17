@@ -6,6 +6,7 @@
  * a memory DC) measures but draws nothing. The one printer saves its pages as pictures (the game prints its
  * certificate) as 24-bit BMP files in the current folder. See posix.h. */
 #include <ctype.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1975,9 +1976,9 @@ int EndDoc(HDC handle) {
     free(row);
     fclose(f);
     {
-        char *cwd = SDL_GetCurrentDirectory();
-        snprintf(text, sizeof(text), "The certificate was saved as a picture:\n%s%s", cwd != NULL ? cwd : "", name);
-        SDL_free(cwd);
+        char cwd[PATH_MAX];
+        snprintf(text, sizeof(text), "The certificate was saved as a picture:\n%s/%s",
+            PosixGetcwd(cwd, sizeof(cwd)) != NULL ? cwd : ".", name);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "LEGOLAND", text, NULL);
     }
     return 1;

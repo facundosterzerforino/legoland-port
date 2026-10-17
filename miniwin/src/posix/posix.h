@@ -51,6 +51,12 @@ DWORD PosixErrorFromErrno(int error);
 /* a Windows path (backslashes, any case) as it is on disk: miniwin's MiniwinPath */
 const char *PosixPath(const char *path, char *buf, size_t size);
 
+/* The current folder: chdir that remembers it (absolute), and getcwd from what it remembered. In the browser getcwd
+ * in a folder of the page's storage (WASMFS on OPFS) gives "//LEGOLAND" for "/opfs/LEGOLAND", which chdir refuses:
+ * LoadStringTable went back to it and gave up before reading a string (every text from GetString missing). */
+int PosixChdir(const char *path);
+char *PosixGetcwd(char *buffer, size_t size);
+
 /* the monotonic clock, in milliseconds */
 unsigned long long PosixMilliseconds(void);
 

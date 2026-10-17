@@ -4,6 +4,7 @@
    the same file. */
 #include <windows.h>
 #include <ctype.h>
+#include <direct.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -718,6 +719,41 @@ static void PortResCheckStrings(void) {
     }
     fclose(f);
     data[size] = 0;
+    {
+        /* LoadStringTable's own steps, replayed: which fails where the table comes out empty */
+        char cwd[256];
+        char token[0xf0];
+        FILE *g;
+        int total = 0;
+        int len;
+        int got = -1;
+        int chdir_result = -1;
+        int seek_result = -1;
+        char *again;
+
+        if (_getcwd(cwd, sizeof(cwd)) == NULL) {
+            strcpy(cwd, "(none)");
+        }
+        g = MiniwinFopen(".\\strings\\stab.str", "r");
+        if (g != NULL) {
+            while (!feof(g)) {
+                len = (int)fread(token, 1, sizeof(token), g);
+                if (ferror(g)) {
+                    break;
+                }
+                total += len;
+            }
+            seek_result = fseek(g, 0, 0);
+            again = (char *)malloc((size_t)total + 1);
+            got = again != NULL ? (int)fread(again, 1, (size_t)total, g) : -1;
+            free(again);
+            fclose(g);
+        }
+        chdir_result = _chdir(cwd);
+        fprintf(PortResReport, "strings: the game's steps: cwd %s, fopen %s, %d bytes read (file %ld), fseek %d, read again %d, "
+                               "_chdir %d\n",
+            cwd, g != NULL ? "ok" : "failed", total, size, seek_result, got, chdir_result);
+    }
     LoadStringTable();
     for (i = 0; i < size;) {
         if (isdigit((unsigned char)data[i])) {

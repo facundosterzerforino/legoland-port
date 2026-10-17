@@ -7,7 +7,9 @@
 #include <string.h>
 #ifdef _WIN32
 #include <windows.h>
+#include <direct.h>
 #else
+#include <direct.h> /* _chdir: miniwin's, which remembers the folder (miniwin/src/posix/fileio.c) */
 #include <unistd.h>
 #endif
 
@@ -380,7 +382,7 @@ int PortSetupFindData(void) {
         return MultiByteToWideChar(CP_UTF8, 0, PortSetupExeFolder(), -1, folder, PATH_SIZE) != 0 &&
             SetCurrentDirectoryW(folder) != 0;
 #else
-        return chdir(PortSetupExeFolder()) == 0;
+        return _chdir(PortSetupExeFolder()) == 0;
 #endif
     }
     return 0;

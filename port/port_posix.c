@@ -3,6 +3,7 @@
  * game's WinMain, as Windows does. (The setup off Windows: port_setup_sdl.c; the crash report: the game's own,
  * through miniwin/src/posix/seh.c.) */
 #include <windows.h>
+#include <direct.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,9 +72,9 @@ int main(int argc, char **argv) {
 #if defined(__ANDROID__) || defined(LEGOLAND_WEB_BROWSER)
     /* an app (or a page) starts in /: the game's folder is its own (port_setup.c), as the current one is the game's
      * folder when it's started from it elsewhere */
-    if (chdir(PortSetupExeFolder()) != 0) {
+    if (_chdir(PortSetupExeFolder()) != 0) {
         mkdir(PortSetupExeFolder(), 0755);
-        chdir(PortSetupExeFolder());
+        _chdir(PortSetupExeFolder());
     }
 #endif
     for (i = 1; i < argc; i++) {
