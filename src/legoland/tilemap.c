@@ -82,7 +82,7 @@ int CollectTileSpriteLists(struct FXSpriteList **out) {
         }
         slot++;
         info++;
-    } while ((INT_PTR)slot < (INT_PTR)MapRenderOrderList);
+    } while ((INT_PTR)slot < (INT_PTR)&TileSpriteArray[2048]); /* the original's end: MapRenderOrderList, next to it */
     return count;
 }
 
