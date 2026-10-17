@@ -1,6 +1,7 @@
 /* Optional features: see extensions.h. */
 #include <string.h>
 
+#include "ext_actions.h"
 #include "ext_console.h"
 #include "ext_movie.h"
 #include "ext_music.h"
@@ -30,12 +31,16 @@ void ExtensionsParseCommandLine(const char *cmdline) {
     } else if (strstr(cmdline, "-portable-music") != NULL) {
         MiniwinUsePortableMusic(1);
     }
+    if (strstr(cmdline, "-no-action-log") != NULL) {
+        ExtActionLog = 0;
+    }
     if (strstr(cmdline, "-console") != NULL) {
         ExtConsoleStart();
     }
 }
 
 void ExtensionsPoll(void) {
+    ExtActionsPoll();
     ExtConsolePoll();
     ExtLevelMusicPoll();
 }

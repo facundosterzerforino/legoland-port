@@ -5,6 +5,9 @@
 #include "debug.h"
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 #include "bloke.h"
 #include "bloke_ai.h"
@@ -828,6 +831,9 @@ void FUN_004597e0(int param0, const char *param1) {
 
 // FUNCTION: LEGOLAND 0x00459820
 void EndLevel(unsigned int a1) {
+#ifdef LEGOLAND_PORT
+    ExtAction("end the level (%u)", a1); /* [port] action log (ext_actions.h) */
+#endif
     MapStats.level_end = a1;
     if (a1 == 1) {
         FUN_00459710(MapStats.field_198);

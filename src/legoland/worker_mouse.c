@@ -5,6 +5,9 @@
 #include "globals.h"
 #include "icon.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 #include "man3d.h"
 #include "math.h"
 #include "render3d.h"
@@ -34,6 +37,9 @@ void *GetWorkerOnMouse(void) {
 void PickUpWorker(unsigned int type, Bloke *worker) {
     // STRING: LEGOLAND 0x004ba9ec
     DBPrintf("Picking up worker (%x) Workorder = %x\n", worker, worker->order);
+#ifdef LEGOLAND_PORT
+    ExtAction("pick up %s", type == 0x307 ? "a gardener" : "a mechanic"); /* [port] action log (ext_actions.h) */
+#endif
     WorkerOnMouse = worker;
     WorkerOnMouseType = type;
     worker->low_level_action = 0xd;
@@ -277,6 +283,10 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
                     }
                     result = SetMechanicsOrderAtPostion(WorkerOnMouse, pt[0], pt[1]);
                 }
+#ifdef LEGOLAND_PORT
+                ExtAction("drop the %s at %d,%d: %s", WorkerOnMouseType == 0x307 ? "gardener" : "mechanic", pt[0], pt[1],
+                    result != 0 ? "work there" : "no work there"); /* [port] action log (ext_actions.h) */
+#endif
                 if (result == 0) {
                     break;
                 }
@@ -285,6 +295,9 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
                 }
                 return;
             }
+#ifdef LEGOLAND_PORT
+            ExtAction("drop refused: the %s stays on the cursor", WorkerOnMouseType == 0x307 ? "gardener" : "mechanic");
+#endif
             DAT_00668954 = 1;
             SetWorkersPositionAtMouse();
             return;

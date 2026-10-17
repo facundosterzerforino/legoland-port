@@ -8,6 +8,9 @@
 #include "globals.h"
 #include "icon.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 #include "man3d.h"
 #include "math.h"
 #include "text.h"
@@ -337,6 +340,9 @@ int UnloadPopUpSprites(void) {
 
 // FUNCTION: LEGOLAND 0x00471450
 LEGO_EXPORT int UnLoad_PopUpInfo(void) {
+#ifdef LEGOLAND_PORT
+    ExtAction("info popup closed"); /* [port] action log (ext_actions.h) */
+#endif
     RemoveIconGroup(0x2c3);
     return UnloadPopUpSprites();
 }
@@ -540,6 +546,10 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
     unsigned char *iVar4;
     INT_PTR iVar5;
     int hut[2]; /* [port] see the potting shed case */
+
+#ifdef LEGOLAND_PORT
+    ExtAction("info popup for %s", ExtActionHover(t.type, t.ptr)); /* [port] action log (ext_actions.h) */
+#endif
 
     uVar3 = t.data.value & 0xffff;
     x = uVar3 & 0xff;

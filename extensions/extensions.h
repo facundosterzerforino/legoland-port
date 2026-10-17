@@ -20,10 +20,14 @@ extern int ExtSkipLogo;
  * Windows'. On by default (the maintainer's choice, once it sounded right); -windows-music plays Windows' DirectMusic
  * instead (-portable-music, the old switch, is still accepted). */
 
+/* Action log (ext_actions.h): "action:" lines in the trace for what the player does (clicks and what they were on,
+ * keys, the screen, mode and build menu changes, objects built and removed, workers, popups, the advisor's messages,
+ * saves, levels). On by default (the maintainer's request, to find bugs); -no-action-log turns it off. */
+
 /* Reads the switches from the command line (after the launcher, so they override its saved choices). */
 void ExtensionsParseCommandLine(const char *cmdline);
 
-/* The extensions' per-frame work (console commands, level music). Main thread, where the original reads its cheat
+/* The extensions' per-frame work (the action log's watch, console commands, level music). Main thread, where the original reads its cheat
  * keys (ProcessSystemEvents). */
 void ExtensionsPoll(void);
 

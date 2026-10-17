@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,9 +7,21 @@
 
 #include "debug_alloc.h"
 #include "globals.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x00453a20
-LEGO_EXPORT void DBPrintf(const char *format, ...) {}
+LEGO_EXPORT void DBPrintf(const char *format, ...) {
+#ifdef LEGOLAND_PORT
+    /* [port] the original compiled its debug messages out; the action log shows them (ext_actions.h) */
+    va_list ap;
+
+    va_start(ap, format);
+    ExtActionGameMessage(format, ap);
+    va_end(ap);
+#endif
+}
 
 // FUNCTION: LEGOLAND 0x00453a30
 LEGO_EXPORT void __DEBUG_TAG(char *name) {

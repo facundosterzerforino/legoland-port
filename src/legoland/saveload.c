@@ -1,4 +1,7 @@
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
@@ -108,6 +111,9 @@ LEGO_EXPORT int SaveGame(char *filename) {
     struct MapElement tile;
     struct FXSpriteList *tab[256];
 
+#ifdef LEGOLAND_PORT
+    ExtAction("save the game as \"%s\"", filename); /* [port] action log (ext_actions.h) */
+#endif
     SaveFileHandle = _open(filename, _O_RDWR | _O_CREAT | _O_TRUNC | _O_BINARY, 0x180);
     if (SaveFileHandle == -1) {
         switch (errno) {
@@ -719,6 +725,9 @@ fail:
 
 // FUNCTION: LEGOLAND 0x0047e980
 LEGO_EXPORT int LoadGame(char *path) {
+#ifdef LEGOLAND_PORT
+    ExtAction("load the game \"%s\"", path); /* [port] action log (ext_actions.h) */
+#endif
     int i;
     int x;
     int y;

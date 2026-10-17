@@ -21,6 +21,9 @@
 
 #include "image_sprite.h"
 #include "stream.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x0046ce20
 void ClearAdvisorHelp(void) {
@@ -42,6 +45,9 @@ LEGO_EXPORT int DisplayAdvisorHelp(char *param_1, unsigned int param_2, unsigned
     DAT_007fe040 |= 1;
     AdvisorHelpText = (char *)malloc(strlen(param_1) + 1);
     strcpy(AdvisorHelpText, param_1);
+#ifdef LEGOLAND_PORT
+    ExtAction("advisor says \"%.300s\"", param_1); /* [port] action log (ext_actions.h) */
+#endif
     AdvisorHelpStartTime = GetGameTimer();
     DAT_007fe044 = param_2;
     FUN_004748a0((void *)0);

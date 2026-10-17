@@ -4,6 +4,9 @@
 #include <string.h>
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 #include "bloke.h"
 #include "bloke_ai.h"
@@ -561,8 +564,15 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
     obj = editObj->obj;
     cost = GetObjCost(obj);
     if (GetBrickCount() < cost) {
+#ifdef LEGOLAND_PORT
+        ExtAction("build \"%s\" at %d,%d refused: it costs %d, money %d", editObj->name, coords[0], coords[1], cost,
+            GetBrickCount()); /* [port] action log (ext_actions.h) */
+#endif
         return 0;
     }
+#ifdef LEGOLAND_PORT
+    ExtAction("build \"%s\" at %d,%d for %d (money %d)", editObj->name, coords[0], coords[1], cost, GetBrickCount());
+#endif
     if (editObj == CastleObjElem) {
         CastlePlacedFlag = 1;
     }
@@ -828,6 +838,9 @@ LEGO_EXPORT void StandardRemoveObject(Element *editObj, TileId coords, struct Cu
 
     pos.x = coords.pos.x;
     pos.y = coords.pos.y;
+#ifdef LEGOLAND_PORT
+    ExtAction("remove \"%s\" at %d,%d", editObj->name, pos.x, pos.y); /* [port] action log (ext_actions.h) */
+#endif
     if (pos.x >= 0 && pos.x < lpConfig->width && pos.y >= 0 && pos.y < lpConfig->height) {
         tile = &GameMap[pos.y][pos.x];
     } else {

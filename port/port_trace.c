@@ -62,7 +62,7 @@ static void WatchStrings(FILE *f) {
         strings_whole = 1;
         return;
     }
-    if (!strings_whole || strings_reported) {
+    if (!strings_whole || strings_reported || slots == 0) { /* none: freed at the end (DeleteStrings) */
         return;
     }
     strings_reported = 1;

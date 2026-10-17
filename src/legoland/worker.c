@@ -2,6 +2,9 @@
 #include <string.h>
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "ext_actions.h"
+#endif
 
 #include "bloke.h"
 #include "bloke_ai.h"
@@ -597,35 +600,59 @@ LEGO_EXPORT void PutWorkerOnRide(Bloke *worker, MapElement *tile) {
 // FUNCTION: LEGOLAND 0x0049a120
 int BuyGardener(void) {
     if (GetBrickCount() < 30) {
+#ifdef LEGOLAND_PORT
+        ExtAction("hire a gardener refused: money %d", GetBrickCount()); /* [port] action log (ext_actions.h) */
+#endif
         return 0;
     }
     if (GardenerCount >= 15) {
+#ifdef LEGOLAND_PORT
+        ExtAction("hire a gardener refused: already 15");
+#endif
         return 0;
     }
     UseBricks(30);
+#ifdef LEGOLAND_PORT
+    ExtAction("hire a gardener (money %d)", GetBrickCount());
+#endif
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0049a150
 LEGO_EXPORT void RefundGardener(void) {
     AddBricks(30);
+#ifdef LEGOLAND_PORT
+    ExtAction("a gardener given back (money %d)", GetBrickCount()); /* [port] action log (ext_actions.h) */
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x0049a160
 int BuyMechanic(void) {
     if (GetBrickCount() < 30) {
+#ifdef LEGOLAND_PORT
+        ExtAction("hire a mechanic refused: money %d", GetBrickCount()); /* [port] action log (ext_actions.h) */
+#endif
         return 0;
     }
     if (MechanicCount >= 15) {
+#ifdef LEGOLAND_PORT
+        ExtAction("hire a mechanic refused: already 15");
+#endif
         return 0;
     }
     UseBricks(30);
+#ifdef LEGOLAND_PORT
+    ExtAction("hire a mechanic (money %d)", GetBrickCount());
+#endif
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0049a190
 LEGO_EXPORT void RefundMechanic(void) {
     AddBricks(30);
+#ifdef LEGOLAND_PORT
+    ExtAction("a mechanic given back (money %d)", GetBrickCount()); /* [port] action log (ext_actions.h) */
+#endif
 }
 
 // FUNCTION: LEGOLAND 0x0049a1a0
