@@ -2,7 +2,9 @@
 <!-- The LEGOLAND port's page (ROADMAP.md phase 10), Emscripten's shell for legoland.js: the game's files live in
      this site's private storage in the browser (OPFS); the first time, the player chooses the CD's image, which is
      copied there for the game's setup to install from (port/port_setup_sdl.c). The game runs in threads, which need
-     the page to be cross-origin isolated: coi-serviceworker.js arranges that on hosts that can't send the headers. -->
+     the page to be cross-origin isolated: coi-serviceworker.js arranges that on hosts that can't send the headers.
+     Its texts come in the setup window's languages (port/port_setup_win.c), the browser's first; saved games can be
+     exported to a .zip and imported back. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -10,17 +12,24 @@
 <title>LEGOLAND</title>
 <script src="coi-serviceworker.js"></script>
 <style>
-  :root { --bg: #1b1b1f; --fg: #f2f2f2; --muted: #a8a8b0; --accent: #f6c400; --panel: #2a2a31; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f4f4f6; --fg: #18181b; --muted: #55555c; --panel: #ffffff; } }
+  :root { --bg: #1b1b1f; --fg: #f2f2f2; --muted: #a8a8b0; --accent: #f6c400; --panel: #2a2a31; --box: #34343c; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f4f4f6; --fg: #18181b; --muted: #55555c; --panel: #ffffff; --box: #eeeef2; } }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, sans-serif; }
   #canvas { display: none; width: 100vw; height: 100vh; background: #000; outline: none; }
-  #panel { max-width: 34rem; margin: 10vh auto; padding: 1.5rem 1.75rem; background: var(--panel); border-radius: 12px; }
+  #panel { max-width: 34rem; margin: 6vh auto; padding: 1.5rem 1.75rem; background: var(--panel); border-radius: 12px; }
+  @media (max-width: 40rem) { #panel { margin: 0; border-radius: 0; min-height: 100%; box-sizing: border-box; padding: 1.25rem 1rem; } }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   h1 { margin: 0 0 .5rem; font-size: 1.6rem; }
+  select { font: inherit; padding: .25rem .4rem; border-radius: 6px; background: var(--box); color: var(--fg); border: 1px solid var(--muted); }
   p { margin: .6rem 0; }
   .muted { color: var(--muted); font-size: .9rem; }
+  #steps { background: var(--box); border-radius: 8px; padding: .7rem 1rem; margin: .8rem 0; }
+  #steps h2 { font-size: 1rem; margin: 0 0 .3rem; }
+  #steps ol { margin: 0; padding-left: 1.3rem; }
+  #steps li { margin: .25rem 0; }
   button, label.button { display: inline-block; margin: .8rem .5rem 0 0; padding: .6rem 1.1rem; border: 0; border-radius: 8px;
     background: var(--accent); color: #111; font: inherit; font-weight: 600; cursor: pointer; }
-  button.secondary { background: transparent; color: var(--muted); border: 1px solid var(--muted); }
+  button.secondary, label.secondary { background: transparent; color: var(--muted); border: 1px solid var(--muted); }
   input[type=file] { display: none; }
   progress { width: 100%; height: 1rem; }
   .hidden { display: none !important; }
@@ -29,32 +38,270 @@
 <body>
 <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
 <div id="panel">
-  <h1>LEGOLAND</h1>
+  <div class="top">
+    <h1>LEGOLAND</h1>
+    <select id="lang" aria-label="Language"></select>
+  </div>
+  <div id="steps">
+    <h2 data-t="howTo"></h2>
+    <ol><li data-t="step1"></li><li data-t="step2"></li><li data-t="step3"></li></ol>
+  </div>
   <p id="status">Loading...</p>
   <progress id="progress" class="hidden"></progress>
   <div id="choose" class="hidden">
-    <p>The game needs its files from the LEGOLAND CD. Choose the CD's image (an .iso, or a .bin), from any language's
-      CD. It's copied into this browser's storage for this site, installed there, and kept for your next visits;
-      nothing is uploaded.</p>
-    <label class="button" for="iso">Choose the CD image...</label>
+    <p data-t="choose"></p>
+    <label class="button" for="iso" data-t="chooseButton"></label>
     <input type="file" id="iso" accept=".iso,.bin,application/x-iso9660-image">
   </div>
   <div id="ready" class="hidden">
-    <p>The game is installed in this browser.</p>
-    <p class="muted" id="instruments-note">The music plays with free instruments (GeneralUser GS). For the original
-      sound, add Windows' own: gm.dls, in C:\Windows\System32\drivers on any Windows PC.</p>
-    <label class="button secondary" for="instruments" id="instruments-button">Add Windows' gm.dls...</label>
+    <p data-t="installed"></p>
+    <p class="muted" id="instruments-note" data-t="instrumentsNote"></p>
+    <label class="button secondary" for="instruments" id="instruments-button" data-t="instrumentsButton"></label>
     <input type="file" id="instruments" accept=".dls,.sf2">
-    <button id="play">Play</button>
-    <button id="remove" class="secondary">Remove the game's files</button>
-    <button id="trace" class="secondary hidden">Save the game's log</button>
+    <button id="play"></button>
+    <button id="export" class="secondary" data-t="export"></button>
+    <label class="button secondary" for="import" data-t="import"></label>
+    <input type="file" id="import" accept=".zip,application/zip">
+    <button id="remove" class="secondary" data-t="remove"></button>
+    <button id="trace" class="secondary hidden" data-t="trace"></button>
   </div>
-  <p class="muted">The LEGOLAND port: the 1999 game, decompiled. You need your own copy of the CD.</p>
+  <p class="muted" data-t="footer"></p>
 </div>
 <script>
+  /* ---- the page's texts, in the setup window's languages (port/port_setup_win.c) ---- */
+  const TEXTS = {
+    en: { name: 'English', t: {
+      howTo: 'How to start', step1: 'Choose the image of your LEGOLAND CD (an .iso or .bin file, from a CD in any language).',
+      step2: 'Press "Install and play": the game installs itself in this browser (a few minutes, only the first time).',
+      step3: 'Next time just press "Play". Your saved parks stay in this browser; "Export saved games" keeps a copy.',
+      loading: 'Loading...', preparing: 'Preparing the page...', loadingGame: 'Loading the game...',
+      noStorage: 'This browser has no private file storage for sites (OPFS): the game can\'t be installed here.',
+      choose: 'The game needs its files from the LEGOLAND CD. They are copied into this browser\'s storage for this site and kept for your next visits; nothing is uploaded.',
+      chooseButton: 'Choose the CD image...', installed: 'The game is installed in this browser.',
+      imageHere: 'The CD image is here: the game installs from it when it starts.',
+      instrumentsNote: 'The music plays with free instruments (GeneralUser GS). For the original sound, add Windows\' own gm.dls (in C:\\Windows\\System32\\drivers on any Windows PC).',
+      instrumentsButton: 'Add Windows\' gm.dls...', play: 'Play', installPlay: 'Install and play',
+      export: 'Export saved games', import: 'Import saved games...', remove: 'Remove the game\'s files', trace: 'Save the game\'s log',
+      noSaves: 'There are no saved games yet.', exported: 'Saved games exported ({n} files).', imported: 'Saved games imported ({n} files).',
+      importBad: 'That file has no saved games (choose a .zip exported from this page).',
+      importConfirm: 'Replace the saved games in this browser with the ones in {name}?',
+      copying: 'Copying {name}...', copyFailed: 'The image couldn\'t be copied: {err}', ended: 'The game ended.',
+      removeConfirm: 'Remove the game\'s files (and saved parks) from this browser?',
+      footer: 'The LEGOLAND port: the 1999 game, decompiled. You need your own copy of the CD.' } },
+    es: { name: 'Español', t: {
+      howTo: 'Cómo empezar', step1: 'Elegí la imagen de tu CD de LEGOLAND (un archivo .iso o .bin, de un CD en cualquier idioma).',
+      step2: 'Tocá "Instalar y jugar": el juego se instala en este navegador (unos minutos, solo la primera vez).',
+      step3: 'La próxima vez tocá "Jugar". Tus parques guardados quedan en este navegador; "Exportar partidas" guarda una copia.',
+      loading: 'Cargando...', preparing: 'Preparando la página...', loadingGame: 'Cargando el juego...',
+      noStorage: 'Este navegador no tiene almacenamiento privado de archivos para sitios (OPFS): el juego no se puede instalar acá.',
+      choose: 'El juego necesita sus archivos del CD de LEGOLAND. Se copian al almacenamiento de este navegador para este sitio y quedan para tus próximas visitas; no se sube nada.',
+      chooseButton: 'Elegir la imagen del CD...', installed: 'El juego está instalado en este navegador.',
+      imageHere: 'La imagen del CD está acá: el juego se instala desde ella al empezar.',
+      instrumentsNote: 'La música suena con instrumentos libres (GeneralUser GS). Para el sonido original, agregá el gm.dls de Windows (en C:\\Windows\\System32\\drivers de cualquier PC con Windows).',
+      instrumentsButton: 'Agregar el gm.dls de Windows...', play: 'Jugar', installPlay: 'Instalar y jugar',
+      export: 'Exportar partidas', import: 'Importar partidas...', remove: 'Borrar los archivos del juego', trace: 'Guardar el registro del juego',
+      noSaves: 'Todavía no hay partidas guardadas.', exported: 'Partidas exportadas ({n} archivos).', imported: 'Partidas importadas ({n} archivos).',
+      importBad: 'Ese archivo no tiene partidas guardadas (elegí un .zip exportado desde esta página).',
+      importConfirm: '¿Reemplazar las partidas de este navegador por las de {name}?',
+      copying: 'Copiando {name}...', copyFailed: 'No se pudo copiar la imagen: {err}', ended: 'El juego terminó.',
+      removeConfirm: '¿Borrar los archivos del juego (y los parques guardados) de este navegador?',
+      footer: 'El port de LEGOLAND: el juego de 1999, descompilado. Necesitás tu propia copia del CD.' } },
+    de: { name: 'Deutsch', t: {
+      howTo: 'So geht es los', step1: 'Wähle das Abbild deiner LEGOLAND-CD (eine .iso- oder .bin-Datei, von einer CD in beliebiger Sprache).',
+      step2: 'Drücke „Installieren und spielen": Das Spiel installiert sich in diesem Browser (einige Minuten, nur beim ersten Mal).',
+      step3: 'Beim nächsten Mal einfach „Spielen". Gespeicherte Parks bleiben in diesem Browser; „Spielstände exportieren" sichert sie.',
+      loading: 'Wird geladen...', preparing: 'Seite wird vorbereitet...', loadingGame: 'Das Spiel wird geladen...',
+      noStorage: 'Dieser Browser hat keinen privaten Dateispeicher für Websites (OPFS): Das Spiel kann hier nicht installiert werden.',
+      choose: 'Das Spiel braucht seine Dateien von der LEGOLAND-CD. Sie werden in den Speicher dieses Browsers für diese Seite kopiert und für die nächsten Besuche behalten; nichts wird hochgeladen.',
+      chooseButton: 'CD-Abbild wählen...', installed: 'Das Spiel ist in diesem Browser installiert.',
+      imageHere: 'Das CD-Abbild ist da: Das Spiel installiert sich beim Start daraus.',
+      instrumentsNote: 'Die Musik spielt mit freien Instrumenten (GeneralUser GS). Für den Originalklang füge die gm.dls von Windows hinzu (in C:\\Windows\\System32\\drivers auf jedem Windows-PC).',
+      instrumentsButton: 'gm.dls von Windows hinzufügen...', play: 'Spielen', installPlay: 'Installieren und spielen',
+      export: 'Spielstände exportieren', import: 'Spielstände importieren...', remove: 'Spieldateien entfernen', trace: 'Protokoll des Spiels speichern',
+      noSaves: 'Es gibt noch keine Spielstände.', exported: 'Spielstände exportiert ({n} Dateien).', imported: 'Spielstände importiert ({n} Dateien).',
+      importBad: 'Diese Datei enthält keine Spielstände (wähle eine von dieser Seite exportierte .zip).',
+      importConfirm: 'Die Spielstände in diesem Browser durch die aus {name} ersetzen?',
+      copying: '{name} wird kopiert...', copyFailed: 'Das Abbild konnte nicht kopiert werden: {err}', ended: 'Das Spiel wurde beendet.',
+      removeConfirm: 'Die Spieldateien (und gespeicherten Parks) aus diesem Browser entfernen?',
+      footer: 'Die LEGOLAND-Portierung: das Spiel von 1999, dekompiliert. Du brauchst deine eigene CD.' } },
+    fr: { name: 'Français', t: {
+      howTo: 'Pour commencer', step1: 'Choisis l\'image de ton CD LEGOLAND (un fichier .iso ou .bin, d\'un CD dans n\'importe quelle langue).',
+      step2: 'Appuie sur « Installer et jouer » : le jeu s\'installe dans ce navigateur (quelques minutes, la première fois seulement).',
+      step3: 'La prochaine fois, appuie simplement sur « Jouer ». Tes parcs restent dans ce navigateur ; « Exporter les sauvegardes » en garde une copie.',
+      loading: 'Chargement...', preparing: 'Préparation de la page...', loadingGame: 'Chargement du jeu...',
+      noStorage: 'Ce navigateur n\'a pas de stockage privé de fichiers pour les sites (OPFS) : le jeu ne peut pas être installé ici.',
+      choose: 'Le jeu a besoin de ses fichiers du CD LEGOLAND. Ils sont copiés dans le stockage de ce navigateur pour ce site et gardés pour tes prochaines visites ; rien n\'est envoyé.',
+      chooseButton: 'Choisir l\'image du CD...', installed: 'Le jeu est installé dans ce navigateur.',
+      imageHere: 'L\'image du CD est là : le jeu s\'installe à partir d\'elle au démarrage.',
+      instrumentsNote: 'La musique joue avec des instruments libres (GeneralUser GS). Pour le son d\'origine, ajoute le gm.dls de Windows (dans C:\\Windows\\System32\\drivers sur n\'importe quel PC Windows).',
+      instrumentsButton: 'Ajouter le gm.dls de Windows...', play: 'Jouer', installPlay: 'Installer et jouer',
+      export: 'Exporter les sauvegardes', import: 'Importer des sauvegardes...', remove: 'Supprimer les fichiers du jeu', trace: 'Enregistrer le journal du jeu',
+      noSaves: 'Il n\'y a pas encore de sauvegardes.', exported: 'Sauvegardes exportées ({n} fichiers).', imported: 'Sauvegardes importées ({n} fichiers).',
+      importBad: 'Ce fichier ne contient pas de sauvegardes (choisis un .zip exporté depuis cette page).',
+      importConfirm: 'Remplacer les sauvegardes de ce navigateur par celles de {name} ?',
+      copying: 'Copie de {name}...', copyFailed: 'L\'image n\'a pas pu être copiée : {err}', ended: 'Le jeu est terminé.',
+      removeConfirm: 'Supprimer les fichiers du jeu (et les parcs sauvegardés) de ce navigateur ?',
+      footer: 'Le portage de LEGOLAND : le jeu de 1999, décompilé. Il te faut ton propre CD.' } },
+    it: { name: 'Italiano', t: {
+      howTo: 'Come iniziare', step1: 'Scegli l\'immagine del tuo CD di LEGOLAND (un file .iso o .bin, da un CD in qualsiasi lingua).',
+      step2: 'Premi "Installa e gioca": il gioco si installa in questo browser (qualche minuto, solo la prima volta).',
+      step3: 'La volta successiva premi solo "Gioca". I parchi salvati restano in questo browser; "Esporta i salvataggi" ne tiene una copia.',
+      loading: 'Caricamento...', preparing: 'Preparazione della pagina...', loadingGame: 'Caricamento del gioco...',
+      noStorage: 'Questo browser non ha uno spazio privato per i file dei siti (OPFS): il gioco non si può installare qui.',
+      choose: 'Il gioco ha bisogno dei suoi file dal CD di LEGOLAND. Vengono copiati nello spazio di questo browser per questo sito e conservati per le prossime visite; non viene caricato nulla.',
+      chooseButton: 'Scegli l\'immagine del CD...', installed: 'Il gioco è installato in questo browser.',
+      imageHere: 'L\'immagine del CD è qui: il gioco si installa da essa all\'avvio.',
+      instrumentsNote: 'La musica suona con strumenti liberi (GeneralUser GS). Per il suono originale aggiungi il gm.dls di Windows (in C:\\Windows\\System32\\drivers su qualsiasi PC Windows).',
+      instrumentsButton: 'Aggiungi il gm.dls di Windows...', play: 'Gioca', installPlay: 'Installa e gioca',
+      export: 'Esporta i salvataggi', import: 'Importa salvataggi...', remove: 'Rimuovi i file del gioco', trace: 'Salva il registro del gioco',
+      noSaves: 'Non ci sono ancora salvataggi.', exported: 'Salvataggi esportati ({n} file).', imported: 'Salvataggi importati ({n} file).',
+      importBad: 'Quel file non contiene salvataggi (scegli uno .zip esportato da questa pagina).',
+      importConfirm: 'Sostituire i salvataggi di questo browser con quelli di {name}?',
+      copying: 'Copia di {name}...', copyFailed: 'Non è stato possibile copiare l\'immagine: {err}', ended: 'Il gioco è terminato.',
+      removeConfirm: 'Rimuovere i file del gioco (e i parchi salvati) da questo browser?',
+      footer: 'Il port di LEGOLAND: il gioco del 1999, decompilato. Serve la tua copia del CD.' } },
+    nl: { name: 'Nederlands', t: {
+      howTo: 'Zo begin je', step1: 'Kies het image van je LEGOLAND-cd (een .iso- of .bin-bestand, van een cd in elke taal).',
+      step2: 'Druk op "Installeren en spelen": het spel installeert zich in deze browser (een paar minuten, alleen de eerste keer).',
+      step3: 'De volgende keer druk je gewoon op "Spelen". Opgeslagen parken blijven in deze browser; "Opgeslagen spellen exporteren" bewaart een kopie.',
+      loading: 'Laden...', preparing: 'De pagina wordt voorbereid...', loadingGame: 'Het spel wordt geladen...',
+      noStorage: 'Deze browser heeft geen privé-bestandsopslag voor sites (OPFS): het spel kan hier niet worden geïnstalleerd.',
+      choose: 'Het spel heeft zijn bestanden van de LEGOLAND-cd nodig. Ze worden naar de opslag van deze browser voor deze site gekopieerd en bewaard voor je volgende bezoeken; er wordt niets geüpload.',
+      chooseButton: 'Cd-image kiezen...', installed: 'Het spel is in deze browser geïnstalleerd.',
+      imageHere: 'Het cd-image is er: het spel installeert zich daaruit bij het starten.',
+      instrumentsNote: 'De muziek speelt met vrije instrumenten (GeneralUser GS). Voor het originele geluid voeg je de gm.dls van Windows toe (in C:\\Windows\\System32\\drivers op elke Windows-pc).',
+      instrumentsButton: 'gm.dls van Windows toevoegen...', play: 'Spelen', installPlay: 'Installeren en spelen',
+      export: 'Opgeslagen spellen exporteren', import: 'Opgeslagen spellen importeren...', remove: 'Spelbestanden verwijderen', trace: 'Logboek van het spel opslaan',
+      noSaves: 'Er zijn nog geen opgeslagen spellen.', exported: 'Opgeslagen spellen geëxporteerd ({n} bestanden).', imported: 'Opgeslagen spellen geïmporteerd ({n} bestanden).',
+      importBad: 'Dat bestand bevat geen opgeslagen spellen (kies een .zip die vanaf deze pagina is geëxporteerd).',
+      importConfirm: 'De opgeslagen spellen in deze browser vervangen door die uit {name}?',
+      copying: '{name} wordt gekopieerd...', copyFailed: 'Het image kon niet worden gekopieerd: {err}', ended: 'Het spel is afgelopen.',
+      removeConfirm: 'De spelbestanden (en opgeslagen parken) uit deze browser verwijderen?',
+      footer: 'De LEGOLAND-port: het spel uit 1999, gedecompileerd. Je hebt je eigen cd nodig.' } },
+    da: { name: 'Dansk', t: {
+      howTo: 'Sådan kommer du i gang', step1: 'Vælg billedet af din LEGOLAND-cd (en .iso- eller .bin-fil, fra en cd på et hvilket som helst sprog).',
+      step2: 'Tryk på "Installér og spil": spillet installeres i denne browser (et par minutter, kun første gang).',
+      step3: 'Næste gang trykker du bare på "Spil". Gemte parker bliver i denne browser; "Eksportér gemte spil" gemmer en kopi.',
+      loading: 'Indlæser...', preparing: 'Siden forberedes...', loadingGame: 'Spillet indlæses...',
+      noStorage: 'Denne browser har ikke privat fillager til websteder (OPFS): spillet kan ikke installeres her.',
+      choose: 'Spillet skal bruge sine filer fra LEGOLAND-cd\'en. De kopieres til denne browsers lager for dette websted og gemmes til dine næste besøg; intet uploades.',
+      chooseButton: 'Vælg cd-billedet...', installed: 'Spillet er installeret i denne browser.',
+      imageHere: 'Cd-billedet er her: spillet installeres fra det, når det starter.',
+      instrumentsNote: 'Musikken spiller med frie instrumenter (GeneralUser GS). For den originale lyd skal du tilføje Windows\' gm.dls (i C:\\Windows\\System32\\drivers på enhver Windows-pc).',
+      instrumentsButton: 'Tilføj Windows\' gm.dls...', play: 'Spil', installPlay: 'Installér og spil',
+      export: 'Eksportér gemte spil', import: 'Importér gemte spil...', remove: 'Fjern spillets filer', trace: 'Gem spillets log',
+      noSaves: 'Der er ingen gemte spil endnu.', exported: 'Gemte spil eksporteret ({n} filer).', imported: 'Gemte spil importeret ({n} filer).',
+      importBad: 'Den fil har ingen gemte spil (vælg en .zip eksporteret fra denne side).',
+      importConfirm: 'Erstat de gemte spil i denne browser med dem i {name}?',
+      copying: 'Kopierer {name}...', copyFailed: 'Billedet kunne ikke kopieres: {err}', ended: 'Spillet er slut.',
+      removeConfirm: 'Fjern spillets filer (og gemte parker) fra denne browser?',
+      footer: 'LEGOLAND-porten: spillet fra 1999, dekompileret. Du skal have din egen cd.' } },
+    sv: { name: 'Svenska', t: {
+      howTo: 'Så kommer du igång', step1: 'Välj avbilden av din LEGOLAND-cd (en .iso- eller .bin-fil, från en cd på vilket språk som helst).',
+      step2: 'Tryck på "Installera och spela": spelet installeras i den här webbläsaren (några minuter, bara första gången).',
+      step3: 'Nästa gång trycker du bara på "Spela". Sparade parker stannar i webbläsaren; "Exportera sparade spel" sparar en kopia.',
+      loading: 'Laddar...', preparing: 'Sidan förbereds...', loadingGame: 'Spelet laddas...',
+      noStorage: 'Den här webbläsaren har ingen privat fillagring för webbplatser (OPFS): spelet kan inte installeras här.',
+      choose: 'Spelet behöver sina filer från LEGOLAND-cd:n. De kopieras till webbläsarens lagring för den här webbplatsen och sparas till dina nästa besök; inget laddas upp.',
+      chooseButton: 'Välj cd-avbilden...', installed: 'Spelet är installerat i den här webbläsaren.',
+      imageHere: 'Cd-avbilden finns här: spelet installeras från den när det startar.',
+      instrumentsNote: 'Musiken spelas med fria instrument (GeneralUser GS). För originalljudet lägger du till Windows gm.dls (i C:\\Windows\\System32\\drivers på vilken Windows-dator som helst).',
+      instrumentsButton: 'Lägg till Windows gm.dls...', play: 'Spela', installPlay: 'Installera och spela',
+      export: 'Exportera sparade spel', import: 'Importera sparade spel...', remove: 'Ta bort spelets filer', trace: 'Spara spelets logg',
+      noSaves: 'Det finns inga sparade spel än.', exported: 'Sparade spel exporterade ({n} filer).', imported: 'Sparade spel importerade ({n} filer).',
+      importBad: 'Den filen innehåller inga sparade spel (välj en .zip som exporterats från den här sidan).',
+      importConfirm: 'Ersätta de sparade spelen i den här webbläsaren med dem i {name}?',
+      copying: 'Kopierar {name}...', copyFailed: 'Avbilden kunde inte kopieras: {err}', ended: 'Spelet är slut.',
+      removeConfirm: 'Ta bort spelets filer (och sparade parker) från den här webbläsaren?',
+      footer: 'LEGOLAND-porten: spelet från 1999, dekompilerat. Du behöver en egen cd.' } },
+    no: { name: 'Norsk', t: {
+      howTo: 'Slik kommer du i gang', step1: 'Velg bildet av LEGOLAND-CD-en din (en .iso- eller .bin-fil, fra en CD på hvilket som helst språk).',
+      step2: 'Trykk på «Installer og spill»: spillet installeres i denne nettleseren (noen minutter, bare første gang).',
+      step3: 'Neste gang trykker du bare på «Spill». Lagrede parker blir i nettleseren; «Eksporter lagrede spill» tar en kopi.',
+      loading: 'Laster inn...', preparing: 'Siden klargjøres...', loadingGame: 'Spillet lastes inn...',
+      noStorage: 'Denne nettleseren har ikke privat fillagring for nettsteder (OPFS): spillet kan ikke installeres her.',
+      choose: 'Spillet trenger filene sine fra LEGOLAND-CD-en. De kopieres til nettleserens lagring for dette nettstedet og beholdes til neste besøk; ingenting lastes opp.',
+      chooseButton: 'Velg CD-bildet...', installed: 'Spillet er installert i denne nettleseren.',
+      imageHere: 'CD-bildet er her: spillet installeres fra det når det starter.',
+      instrumentsNote: 'Musikken spiller med frie instrumenter (GeneralUser GS). For originallyden legger du til gm.dls fra Windows (i C:\\Windows\\System32\\drivers på en hvilken som helst Windows-PC).',
+      instrumentsButton: 'Legg til gm.dls fra Windows...', play: 'Spill', installPlay: 'Installer og spill',
+      export: 'Eksporter lagrede spill', import: 'Importer lagrede spill...', remove: 'Fjern spillets filer', trace: 'Lagre spillets logg',
+      noSaves: 'Det finnes ingen lagrede spill ennå.', exported: 'Lagrede spill eksportert ({n} filer).', imported: 'Lagrede spill importert ({n} filer).',
+      importBad: 'Den filen har ingen lagrede spill (velg en .zip eksportert fra denne siden).',
+      importConfirm: 'Erstatte de lagrede spillene i denne nettleseren med dem i {name}?',
+      copying: 'Kopierer {name}...', copyFailed: 'Bildet kunne ikke kopieres: {err}', ended: 'Spillet er ferdig.',
+      removeConfirm: 'Fjerne spillets filer (og lagrede parker) fra denne nettleseren?',
+      footer: 'LEGOLAND-porten: spillet fra 1999, dekompilert. Du trenger din egen CD.' } },
+    cs: { name: 'Čeština', t: {
+      howTo: 'Jak začít', step1: 'Vyber obraz svého CD LEGOLAND (soubor .iso nebo .bin, z CD v jakémkoli jazyce).',
+      step2: 'Stiskni „Nainstalovat a hrát": hra se nainstaluje do tohoto prohlížeče (pár minut, jen poprvé).',
+      step3: 'Příště stačí stisknout „Hrát". Uložené parky zůstanou v tomto prohlížeči; „Exportovat uložené hry" uloží kopii.',
+      loading: 'Načítání...', preparing: 'Příprava stránky...', loadingGame: 'Načítání hry...',
+      noStorage: 'Tento prohlížeč nemá soukromé úložiště souborů pro weby (OPFS): hru zde nelze nainstalovat.',
+      choose: 'Hra potřebuje své soubory z CD LEGOLAND. Zkopírují se do úložiště tohoto prohlížeče pro tento web a zůstanou pro příští návštěvy; nic se nenahrává.',
+      chooseButton: 'Vybrat obraz CD...', installed: 'Hra je nainstalovaná v tomto prohlížeči.',
+      imageHere: 'Obraz CD je zde: hra se z něj při spuštění nainstaluje.',
+      instrumentsNote: 'Hudba hraje se svobodnými nástroji (GeneralUser GS). Pro původní zvuk přidej gm.dls z Windows (v C:\\Windows\\System32\\drivers na jakémkoli počítači s Windows).',
+      instrumentsButton: 'Přidat gm.dls z Windows...', play: 'Hrát', installPlay: 'Nainstalovat a hrát',
+      export: 'Exportovat uložené hry', import: 'Importovat uložené hry...', remove: 'Odstranit soubory hry', trace: 'Uložit záznam hry',
+      noSaves: 'Zatím nejsou žádné uložené hry.', exported: 'Uložené hry exportovány ({n} souborů).', imported: 'Uložené hry importovány ({n} souborů).',
+      importBad: 'Tento soubor neobsahuje uložené hry (vyber .zip exportovaný z této stránky).',
+      importConfirm: 'Nahradit uložené hry v tomto prohlížeči hrami ze souboru {name}?',
+      copying: 'Kopírování {name}...', copyFailed: 'Obraz se nepodařilo zkopírovat: {err}', ended: 'Hra skončila.',
+      removeConfirm: 'Odstranit soubory hry (a uložené parky) z tohoto prohlížeče?',
+      footer: 'Port hry LEGOLAND: hra z roku 1999, dekompilovaná. Potřebuješ vlastní CD.' } },
+  };
+  const LANG_ALIASES = { nb: 'no', nn: 'no' };
+
+  function pickLanguage() {
+    try {
+      const saved = localStorage.getItem('legoland-lang');
+      if (saved && TEXTS[saved]) return saved;
+    } catch (e) {}
+    for (const tag of navigator.languages || [navigator.language || 'en']) {
+      let code = tag.toLowerCase().split('-')[0];
+      code = LANG_ALIASES[code] || code;
+      if (TEXTS[code]) return code;
+    }
+    return 'en';
+  }
+
+  let lang = pickLanguage();
+  let statusKey = 'loading';
+  let statusVars = {};
+
+  function t(key, vars) {
+    let text = (TEXTS[lang].t[key] !== undefined ? TEXTS[lang].t : TEXTS.en.t)[key] || '';
+    for (const [name, value] of Object.entries(vars || {})) text = text.split('{' + name + '}').join(value);
+    return text;
+  }
+
+  function applyTexts() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
+    setStatus(statusKey, statusVars);
+    refreshPlayLabel();
+  }
+
+  const languageMenu = document.getElementById('lang');
+  for (const [code, entry] of Object.entries(TEXTS)) languageMenu.add(new Option(entry.name, code));
+  languageMenu.value = lang;
+  languageMenu.addEventListener('change', () => {
+    lang = languageMenu.value;
+    try { localStorage.setItem('legoland-lang', lang); } catch (e) {}
+    applyTexts();
+  });
+
+  /* ---- the page ---- */
   const status = document.getElementById('status');
   const progress = document.getElementById('progress');
   const show = (id, on) => document.getElementById(id).classList.toggle('hidden', !on);
+
+  function setStatus(key, vars) {
+    statusKey = key;
+    statusVars = vars || {};
+    status.textContent = key ? t(key, statusVars) : '';
+  }
 
   async function gameFolder(create) {
     const root = await navigator.storage.getDirectory();
@@ -83,30 +330,37 @@
   }
 
   let runtimeReady = false;
+  let isInstalled = false;
+
+  function refreshPlayLabel() {
+    document.getElementById('play').textContent = t(isInstalled ? 'play' : 'installPlay');
+  }
 
   async function refresh() {
     show('progress', false);
     if (!window.crossOriginIsolated) {
-      status.textContent = 'Preparing the page...'; /* coi-serviceworker reloads it once */
+      setStatus('preparing'); /* coi-serviceworker reloads it once */
       return;
     }
     if (!navigator.storage || !navigator.storage.getDirectory) {
-      status.textContent = 'This browser has no private file storage for sites (OPFS): the game can\'t be installed here.';
+      setStatus('noStorage');
       return;
     }
     const ok = await installed();
     const image = !ok && await hasImage();
+    isInstalled = ok;
+    show('steps', !ok);
     show('choose', !ok && !image);
     show('ready', (ok || image) && runtimeReady);
     if ((ok || image) && !runtimeReady) {
-      status.textContent = 'Loading the game...';
+      setStatus('loadingGame');
       return;
     }
-    document.getElementById('play').textContent = ok ? 'Play' : 'Install and play';
+    refreshPlayLabel();
     const original = await hasInstruments(/^gm\.dls$/i);
     show('instruments-note', !original);
     show('instruments-button', !original);
-    status.textContent = ok ? '' : image ? 'The CD image is here: the game installs from it when it starts.' : '';
+    setStatus(ok ? '' : image ? 'imageHere' : '');
     show('trace', await traceFile() !== null);
   }
 
@@ -120,14 +374,170 @@
     }
   }
 
-  document.getElementById('trace').addEventListener('click', async () => {
-    const file = await traceFile();
-    if (!file) return;
+  function download(blob, name) {
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(file);
-    link.download = 'legoland-port-trace.txt';
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
     link.click();
     setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+  }
+
+  document.getElementById('trace').addEventListener('click', async () => {
+    const file = await traceFile();
+    if (file) download(file, 'legoland-port-trace.txt');
+  });
+
+  /* ---- saved games: the profiles folder (ProfileN.txt, NsaveM.sav / .sh), to a .zip and back ---- */
+  const SAVE_FILE = /^(profile\d+\.txt|\d+save\d+\.(sav|sh))$/i;
+
+  async function profilesFolder(create) {
+    const folder = await gameFolder(create);
+    for await (const [name, handle] of folder.entries()) {
+      if (handle.kind === 'directory' && name.toLowerCase() === 'profiles') return handle;
+    }
+    return create ? folder.getDirectoryHandle('profiles', { create: true }) : null;
+  }
+
+  const CRC_TABLE = (() => {
+    const table = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      table[n] = c >>> 0;
+    }
+    return table;
+  })();
+
+  function crc32(bytes) {
+    let c = 0xffffffff;
+    for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  /* a .zip of the files as they are (stored, no compression: they're small) */
+  function makeZip(files) {
+    const parts = [];
+    const central = [];
+    let offset = 0;
+    const now = new Date();
+    const time = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    const date = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    for (const { name, data } of files) {
+      const nameBytes = new TextEncoder().encode(name);
+      const crc = crc32(data);
+      const local = new DataView(new ArrayBuffer(30));
+      local.setUint32(0, 0x04034b50, true);
+      local.setUint16(4, 20, true);
+      local.setUint16(6, 0x0800, true); /* UTF-8 names */
+      local.setUint16(10, time, true);
+      local.setUint16(12, date, true);
+      local.setUint32(14, crc, true);
+      local.setUint32(18, data.length, true);
+      local.setUint32(22, data.length, true);
+      local.setUint16(26, nameBytes.length, true);
+      parts.push(local.buffer, nameBytes, data);
+      const entry = new DataView(new ArrayBuffer(46));
+      entry.setUint32(0, 0x02014b50, true);
+      entry.setUint16(4, 20, true);
+      entry.setUint16(6, 20, true);
+      entry.setUint16(8, 0x0800, true);
+      entry.setUint16(12, time, true);
+      entry.setUint16(14, date, true);
+      entry.setUint32(16, crc, true);
+      entry.setUint32(20, data.length, true);
+      entry.setUint32(24, data.length, true);
+      entry.setUint16(28, nameBytes.length, true);
+      entry.setUint32(42, offset, true);
+      central.push(entry.buffer, nameBytes);
+      offset += 30 + nameBytes.length + data.length;
+    }
+    const centralSize = central.reduce((n, part) => n + part.byteLength, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true);
+    end.setUint16(8, files.length, true);
+    end.setUint16(10, files.length, true);
+    end.setUint32(12, centralSize, true);
+    end.setUint32(16, offset, true);
+    return new Blob([...parts, ...central, end.buffer], { type: 'application/zip' });
+  }
+
+  /* the files of a .zip (stored or deflated), by its central directory */
+  async function readZip(blob) {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const view = new DataView(bytes.buffer);
+    let end = -1;
+    for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 65535); i--) {
+      if (view.getUint32(i, true) === 0x06054b50) { end = i; break; }
+    }
+    if (end < 0) return [];
+    const count = view.getUint16(end + 10, true);
+    let p = view.getUint32(end + 16, true);
+    const files = [];
+    for (let k = 0; k < count && view.getUint32(p, true) === 0x02014b50; k++) {
+      const method = view.getUint16(p + 10, true);
+      const size = view.getUint32(p + 20, true);
+      const nameLength = view.getUint16(p + 28, true);
+      const extraLength = view.getUint16(p + 30, true);
+      const commentLength = view.getUint16(p + 32, true);
+      const local = view.getUint32(p + 42, true);
+      const name = new TextDecoder().decode(bytes.subarray(p + 46, p + 46 + nameLength));
+      const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
+      let data = bytes.subarray(start, start + size);
+      if (method === 8) {
+        data = new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(
+          new DecompressionStream('deflate-raw'))).arrayBuffer());
+      } else if (method !== 0) {
+        data = null;
+      }
+      if (data) files.push({ name, data });
+      p += 46 + nameLength + extraLength + commentLength;
+    }
+    return files;
+  }
+
+  document.getElementById('export').addEventListener('click', async () => {
+    const files = [];
+    const profiles = await profilesFolder(false).catch(() => null);
+    if (profiles) {
+      for await (const [name, handle] of profiles.entries()) {
+        if (handle.kind === 'file' && SAVE_FILE.test(name)) {
+          files.push({ name: 'profiles/' + name, data: new Uint8Array(await (await handle.getFile()).arrayBuffer()) });
+        }
+      }
+    }
+    if (files.length === 0) {
+      setStatus('noSaves');
+      return;
+    }
+    files.sort((a, b) => a.name.localeCompare(b.name));
+    download(makeZip(files), 'legoland-saves-' + new Date().toISOString().slice(0, 10) + '.zip');
+    setStatus('exported', { n: files.length });
+  });
+
+  document.getElementById('import').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    let saves = [];
+    try {
+      saves = (await readZip(file)).map(({ name, data }) => ({ name: name.split(/[\\/]/).pop(), data }))
+        .filter(({ name }) => SAVE_FILE.test(name));
+    } catch (e) {}
+    if (saves.length === 0) {
+      setStatus('importBad');
+      return;
+    }
+    if (!confirm(t('importConfirm', { name: file.name }))) return;
+    const profiles = await profilesFolder(true);
+    for await (const [name, handle] of profiles.entries()) {
+      if (handle.kind === 'file' && SAVE_FILE.test(name)) await profiles.removeEntry(name);
+    }
+    for (const { name, data } of saves) {
+      const out = await (await profiles.getFileHandle(name, { create: true })).createWritable();
+      await out.write(data);
+      await out.close();
+    }
+    setStatus('imported', { n: saves.length });
   });
 
   /* the chosen image, streamed into the game's folder (no copy in memory) */
@@ -137,7 +547,7 @@
     if (navigator.storage.persist) navigator.storage.persist();
     show('choose', false);
     show('progress', true);
-    status.textContent = 'Copying ' + file.name + '...';
+    setStatus('copying', { name: file.name });
     try {
       const folder = await gameFolder(true);
       const name = /\.bin$/i.test(file.name) ? 'cd.bin' : 'cd.iso';
@@ -155,7 +565,7 @@
       }
       await out.close();
     } catch (e) {
-      status.textContent = 'The image couldn\'t be copied: ' + e;
+      setStatus('copyFailed', { err: String(e) });
       show('choose', true);
       return;
     }
@@ -231,7 +641,7 @@
   });
 
   document.getElementById('remove').addEventListener('click', async () => {
-    if (!confirm('Remove the game\'s files (and saved parks) from this browser?')) return;
+    if (!confirm(t('removeConfirm'))) return;
     const root = await navigator.storage.getDirectory();
     await root.removeEntry('LEGOLAND', { recursive: true });
     await refresh();
@@ -251,7 +661,7 @@
       document.getElementById('canvas').style.display = 'none';
       document.getElementById('panel').style.display = '';
       if (document.fullscreenElement) document.exitFullscreen();
-      refresh().then(() => { status.textContent = 'The game ended.'; });
+      refresh().then(() => setStatus('ended'));
     },
   };
 
@@ -264,6 +674,7 @@
     await window.startGame([]);
   });
 
+  applyTexts();
   refresh();
 </script>
 {{{ SCRIPT }}}
