@@ -3601,10 +3601,12 @@ extern unsigned int DAT_008119bc;
 struct MapMarker {
     unsigned int x, y;
 };
-// 0x008119c0
-extern struct MapMarker DAT_008119c0[31][32];
+// 0x008119c0: the map screen's markers, 32 rows of 32. The code takes the last row for the table's end (the loop
+// over the rows), clears the 32 rows at once, and writes to row 31: one array, or another linker than MSVC's puts
+// the last row elsewhere (the map screen walked through other globals and hung, in the web build).
+extern struct MapMarker DAT_008119c0[32][32];
 // 0x008138c0
-extern struct MapMarker DAT_008138c0[32];
+#define DAT_008138c0 (DAT_008119c0[31])
 // 0x008139c0
 extern int MapViewHeight;
 // 0x008139c4

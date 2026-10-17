@@ -758,7 +758,7 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     if (DAT_00798620 == 0) {
         memset(&desc1, 0, sizeof(desc1));
         DAT_00798620 = 1;
-        desc1.dwSize = 0x6c;
+        desc1.dwSize = sizeof(desc1);
         if (IDirectDrawSurface_GetSurfaceDesc(renderEngine, &desc1) == 0) {
             desc1.dwFlags = 0x1007;
             desc1.ddsCaps.dwCaps = 0x840;
@@ -772,7 +772,7 @@ unsigned int FUN_00488c80(struct Sprite *sprite, int param_2, int param_3, int p
     DAT_00798598 = CurrentSurfaceDesc;
     DAT_00798608 = DAT_00668108;
     memset(&desc2, 0, sizeof(desc2));
-    desc2.dwSize = 0x6c;
+    desc2.dwSize = sizeof(desc2);
     if (IDirectDrawSurface_Lock(DAT_0079861c, NULL, &desc2, 0x21, NULL) == 0) {
         clip.left = 0;
         clip.right = desc2.dwWidth;

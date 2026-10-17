@@ -4648,10 +4648,7 @@ LEGO_EXPORT struct EditState EditMode;
 unsigned int DAT_008119bc;
 
 // GLOBAL: LEGOLAND 0x008119c0
-struct MapMarker DAT_008119c0[31][32];
-
-// GLOBAL: LEGOLAND 0x008138c0
-struct MapMarker DAT_008138c0[32];
+struct MapMarker DAT_008119c0[32][32]; /* one table: its last row is DAT_008138c0 (globals.h) */
 
 // GLOBAL: LEGOLAND 0x008139c0
 int MapViewHeight;
