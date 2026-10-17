@@ -29,20 +29,20 @@ struct MapPoint {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004562c0
-void FUN_004562c0(void) {
+void SaveMouseHandlers(void) {
     DAT_00667c10 = DAT_006687bc;
     DAT_00667c28 = DAT_006687c0;
 }
 
 // FUNCTION: LEGOLAND 0x004562e0
-void FUN_004562e0(void) {
+void RestoreMouseHandlers(void) {
     DAT_006687bc = DAT_00667c10;
     DAT_006687c0 = DAT_00667c28;
 }
 
 // FUNCTION: LEGOLAND 0x00456300
 LEGO_EXPORT void InitMapScreen(void) {
-    if (DAT_00667c30 != 0) {
+    if (FullMapRendered != 0) {
         return;
     }
     FullMapSprite = CreateFunctionBasedSprite(
@@ -53,9 +53,9 @@ LEGO_EXPORT void InitMapScreen(void) {
         FullMapSprite->src_x = 0;
         FullMapSprite->src_y = 0;
     }
-    FUN_004562c0();
-    DAT_006687c0 = FUN_00475080;
-    DAT_006687bc = FUN_00475080;
+    SaveMouseHandlers();
+    DAT_006687c0 = ToggleMapScreen;
+    DAT_006687bc = ToggleMapScreen;
 }
 
 // FUNCTION: LEGOLAND 0x00456370
@@ -68,13 +68,13 @@ LEGO_EXPORT void KillMapScreen(void) {
             MapSpannerSprite = 0;
         }
     }
-    DAT_00667c30 = 0;
+    FullMapRendered = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004563b0
-void FUN_004563b0(void) {
+void DrawMapViewBox(void) {
     int x = ((ScrollX >> 8) - MapWorldMinX) * MapViewWidth / MapWorldWidth;
-    int y = ((ScrollY >> 8) - DAT_00667c04) * MapViewWidth / MapWorldHeight / 2 +
+    int y = ((ScrollY >> 8) - MapWorldMinY) * MapViewWidth / MapWorldHeight / 2 +
         MapCenterOffsetY;
     int w = MapViewWidth * MapViewWidth / MapWorldWidth;
     int h = MapViewHeight * MapViewWidth / MapWorldHeight / 2;
@@ -96,7 +96,7 @@ LEGO_EXPORT void RenderMouseBounds(void) {
         MapWorldMinX;
     in[1] = (MousePos.y - MapViewY - MapCenterOffsetY + 1) * MapWorldHeight *
             2 / MapViewWidth +
-        DAT_00667c04;
+        MapWorldMinY;
     PointToIsoPlane(in, out);
     if (out[0] >= 0 && out[1] >= 0 && out[0] < MapViewWidth &&
         out[1] < MapViewHeight) {
@@ -120,7 +120,7 @@ LEGO_EXPORT void MapScreenSetScrollPos(struct Point *point) {
         MapWorldMinX;
     in[1] = (MousePos.y - MapViewY - MapCenterOffsetY + 1) * MapWorldHeight *
             2 / MapViewWidth +
-        DAT_00667c04;
+        MapWorldMinY;
     PointToIsoPlane(in, out);
     if (out[0] >= 0 && out[1] >= 0 && out[0] < MapViewWidth &&
         out[1] < MapViewHeight) {
@@ -129,9 +129,9 @@ LEGO_EXPORT void MapScreenSetScrollPos(struct Point *point) {
             << 8;
         ScrollY = ((point->y - MapViewY - MapCenterOffsetY + 1) * MapWorldHeight * 2 /
                           MapViewWidth -
-                      MapViewHeight / 2 + DAT_00667c04)
+                      MapViewHeight / 2 + MapWorldMinY)
             << 8;
-        FUN_00461290(lpConfig->view_width << 8, lpConfig->view_height << 8, 0, 0);
+        ClampScrollPosition(lpConfig->view_width << 8, lpConfig->view_height << 8, 0, 0);
     }
 }
 
@@ -152,11 +152,11 @@ LEGO_EXPORT void DrawMapScreen(void) {
             }
         }
     }
-    FUN_004563b0();
+    DrawMapViewBox();
 }
 
 // FUNCTION: LEGOLAND 0x00456770
-void FUN_00456770(struct MapPoint *arg) {
+void HalveMapPoint(struct MapPoint *arg) {
     int v0 = arg->field0;
     int v1 = arg->field1;
 
@@ -209,7 +209,7 @@ LEGO_EXPORT void RenderFullMap(void) {
     lights = LoadSprite("MAPLIGHTS.LLS", 1);
     pen = CreatePen(PS_SOLID, 2, 0xff4000);
 
-    if (DAT_00667c30 == 0) {
+    if (FullMapRendered == 0) {
         int tile_w;
         int tile_h;
         int half_h;
@@ -240,25 +240,25 @@ LEGO_EXPORT void RenderFullMap(void) {
             SetClipping(&clip);
         }
         GetTileDimensions(&tile_w, &tile_h);
-        DAT_00667c04 = 0;
+        MapWorldMinY = 0;
         MapWorldMinX = -(lpConfig->height * tile_w / 2);
-        DAT_00667c08 = lpConfig->width * tile_w / 2;
-        DAT_00667c0c = (lpConfig->width + lpConfig->height) * tile_h / 2;
-        MapWorldWidth = DAT_00667c08 - MapWorldMinX + 1;
-        MapWorldHeight = DAT_00667c0c + 1;
+        MapWorldMaxX = lpConfig->width * tile_w / 2;
+        MapWorldMaxY = (lpConfig->width + lpConfig->height) * tile_h / 2;
+        MapWorldWidth = MapWorldMaxX - MapWorldMinX + 1;
+        MapWorldHeight = MapWorldMaxY + 1;
         scale_x = (MapViewWidth << 16) / MapWorldWidth;
         scale_y = (MapViewHeight << 16) / MapWorldHeight;
-        DAT_00667c16 = (short)((float)MapViewWidth * tile_w / MapWorldWidth + 1.0f);
-        DAT_00667c14 = (short)((float)MapViewHeight * tile_h / MapWorldHeight + 1.0f);
+        MapDrawWidth = (short)((float)MapViewWidth * tile_w / MapWorldWidth + 1.0f);
+        MapDrawHeight = (short)((float)MapViewHeight * tile_h / MapWorldHeight + 1.0f);
         half_h = (tile_h + 1) >> 1;
         RenderBlock(0, 0, MapViewWidth, MapViewHeight, GetNearestColour(0, 0, 0));
         saved_view_x = lpConfig->view_x;
         saved_view_y = lpConfig->view_y;
         lpConfig->view_x = 0;
         lpConfig->view_y = 0;
-        DAT_00667c30 = 1;
+        FullMapRendered = 1;
         MapCenterOffsetY =
-            (MapViewHeight - ((lpConfig->width + lpConfig->height - 2) * half_h - DAT_00667c04) * MapViewWidth / MapWorldHeight / 2) >>
+            (MapViewHeight - ((lpConfig->width + lpConfig->height - 2) * half_h - MapWorldMinY) * MapViewWidth / MapWorldHeight / 2) >>
             1;
 
         /* Pass 1: terrain colour blocks. */
@@ -285,24 +285,24 @@ LEGO_EXPORT void RenderFullMap(void) {
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
                     px = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
-                    py = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    py = (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
                     if ((tile.flags & 0x10) && (tile.flags & 0x80)) {
-                        RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
+                        RenderBlock(px - 7, py - 2, MapDrawWidth + 5, MapDrawHeight + 4,
                             GetNearestColour(0x80, 0x80, 0x80));
                     } else {
                         switch (src->sprite_ids[id - src->base] & 0x3f) {
                         case 0:
                         case 0x20:
-                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
+                            RenderBlock(px - 7, py - 2, MapDrawWidth + 5, MapDrawHeight + 4,
                                 GetNearestColour(0, 0x8f, 0x4f));
                             break;
                         case 1:
                         case 0x21:
-                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
+                            RenderBlock(px - 7, py - 2, MapDrawWidth + 5, MapDrawHeight + 4,
                                 GetNearestColour(0xff, 0xe0, 0x8f));
                             break;
                         case 0x30:
-                            RenderBlock(px - 7, py - 2, DAT_00667c16 + 5, DAT_00667c14 + 4,
+                            RenderBlock(px - 7, py - 2, MapDrawWidth + 5, MapDrawHeight + 4,
                                 GetNearestColour(0x5b, 0xbe, 2));
                             break;
                         }
@@ -337,15 +337,15 @@ LEGO_EXPORT void RenderFullMap(void) {
                     GetTileBounds(&pt, bounds);
                     off.field0 = ride->field_14;
                     off.field1 = ride->field_18;
-                    FUN_00456770(&off);
+                    HalveMapPoint(&off);
                     bounds[0] += off.field0;
                     bounds[1] += off.field1;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
                     PrintScaledSprite(TileSpriteArray[tile.field_8],
                         (int)((bounds[0] - MapWorldMinX) * sx),
-                        (int)((bounds[1] - DAT_00667c04) * sy) + MapCenterOffsetY,
-                        DAT_00667c16 + 1, DAT_00667c14 + 1);
+                        (int)((bounds[1] - MapWorldMinY) * sy) + MapCenterOffsetY,
+                        MapDrawWidth + 1, MapDrawHeight + 1);
                 }
             }
         }
@@ -372,7 +372,7 @@ LEGO_EXPORT void RenderFullMap(void) {
             origin[0] += ScrollX >> 8;
             origin[1] += ScrollY >> 8;
             base.x = ((origin[0] - MapWorldMinX) * scale_x) >> 16;
-            base.y = (((origin[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+            base.y = (((origin[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
             while (node != NULL) {
                 PrintScaledSprite(node->sprite,
                     (((tile_w * 2 / 3 + node->x) * scale_x) >> 16) + base.x,
@@ -405,7 +405,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                 DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].x =
                     ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
                 DAT_008119c0[elem.field_5 >> 3][elem.field_4 >> 3].y =
-                    (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
             }
             ride = elem.field_0->ride;
             info = NULL;
@@ -427,11 +427,11 @@ LEGO_EXPORT void RenderFullMap(void) {
                         bounds[1] += HALF(loc.y);
                         bounds[0] += ScrollX >> 8;
                         bounds[1] += ScrollY >> 8;
-                        DAT_00667c16 = ((struct Sprite *)loc.sprite)->width;
-                        DAT_00667c14 = ((struct Sprite *)loc.sprite)->height;
+                        MapDrawWidth = ((struct Sprite *)loc.sprite)->width;
+                        MapDrawHeight = ((struct Sprite *)loc.sprite)->height;
                         PrintScaledSprite(loc.sprite, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
-                            (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
-                            (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
+                            (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY,
+                            (MapDrawWidth * scale_x) >> 16, (MapDrawHeight * scale_y) >> 16);
                     }
                 }
             } else if (ride->element == square_track || ride->element == square_track_height ||
@@ -471,7 +471,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
                     x1 = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
-                    y1 = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    y1 = (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
                     pt.x = dest.x;
                     pt.y = dest.y;
                     GetTileBounds(&pt, bounds);
@@ -481,13 +481,13 @@ LEGO_EXPORT void RenderFullMap(void) {
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
                     x2 = ((bounds[0] - MapWorldMinX) * scale_x) >> 16;
-                    y2 = (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+                    y2 = (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY;
                     if (ride->element != square_track_height_path) {
-                        DAT_00667c16 = stick->width;
-                        DAT_00667c14 = (short)((float)scale_y * height * 7.62939453125e-06f);
-                        if (DAT_00667c14 > 0) {
-                            PrintScaledSprite(stick, x1 - ((DAT_00667c16 * scale_x) >> 17), y1,
-                                (DAT_00667c16 * scale_x) >> 16, DAT_00667c14);
+                        MapDrawWidth = stick->width;
+                        MapDrawHeight = (short)((float)scale_y * height * 7.62939453125e-06f);
+                        if (MapDrawHeight > 0) {
+                            PrintScaledSprite(stick, x1 - ((MapDrawWidth * scale_x) >> 17), y1,
+                                (MapDrawWidth * scale_x) >> 16, MapDrawHeight);
                         }
                     }
                     PushRenderingStatusAndUnlockVideoSurface();
@@ -505,7 +505,7 @@ LEGO_EXPORT void RenderFullMap(void) {
                         bounds[0] += ScrollX >> 8;
                         bounds[1] += ScrollY >> 8;
                         LineTo(hdc, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
-                            (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY);
+                            (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY);
                     }
                     SelectObject(hdc, old);
                     renderEngine->lpVtbl->ReleaseDC(renderEngine, hdc);
@@ -546,11 +546,11 @@ LEGO_EXPORT void RenderFullMap(void) {
                 bounds[0] += ScrollX >> 8;
                 bounds[1] += ScrollY >> 8;
                 sprite = info->sprite;
-                DAT_00667c16 = sprite->width;
-                DAT_00667c14 = sprite->height;
+                MapDrawWidth = sprite->width;
+                MapDrawHeight = sprite->height;
                 PrintScaledSprite(info->sprite, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
-                    (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
-                    (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
+                    (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY,
+                    (MapDrawWidth * scale_x) >> 16, (MapDrawHeight * scale_y) >> 16);
             } else {
                 /* A layered sprite: draw each part at its own offset. */
                 int i;
@@ -583,11 +583,11 @@ LEGO_EXPORT void RenderFullMap(void) {
                     bounds[1] += hy;
                     bounds[0] += ScrollX >> 8;
                     bounds[1] += ScrollY >> 8;
-                    DAT_00667c16 = sub->width;
-                    DAT_00667c14 = sub->height;
+                    MapDrawWidth = sub->width;
+                    MapDrawHeight = sub->height;
                     PrintScaledSprite(sub, ((bounds[0] - MapWorldMinX) * scale_x) >> 16,
-                        (((bounds[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY,
-                        (DAT_00667c16 * scale_x) >> 16, (DAT_00667c14 * scale_y) >> 16);
+                        (((bounds[1] - MapWorldMinY) * scale_y) >> 16) + MapCenterOffsetY,
+                        (MapDrawWidth * scale_x) >> 16, (MapDrawHeight * scale_y) >> 16);
                 }
             }
         }

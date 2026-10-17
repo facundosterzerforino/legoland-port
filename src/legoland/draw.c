@@ -383,7 +383,7 @@ LEGO_EXPORT void PushRenderingStatusAndLockVideoSurface(void) {
         local.right = lpConfig->screen_width - 1;
         local.bottom = lpConfig->screen_height - 1;
         CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-        IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
+        IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
         surface = renderEngine;
         if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
             IDirectDrawSurface_Restore(renderEngine);
@@ -431,7 +431,7 @@ void FUN_004640f0(void) {
         }
     }
     CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-    IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
+    IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
     surface = renderEngine;
     if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
         IDirectDrawSurface_Restore(renderEngine);
@@ -454,7 +454,7 @@ LEGO_EXPORT void PopRenderingStatus(void) {
             local.right = lpConfig->screen_width - 1;
             local.bottom = lpConfig->screen_height - 1;
             CurrentSurfaceDesc.dwSize = sizeof(CurrentSurfaceDesc);
-            IntersectRect(&DAT_00668108, &local, &SPRITE_ClipRect);
+            IntersectRect(&SoftPrintClip, &local, &SPRITE_ClipRect);
             surface = renderEngine;
             if (IDirectDrawSurface_Lock(surface, NULL, &CurrentSurfaceDesc, 0x21, NULL) == 0x887601c2) {
                 IDirectDrawSurface_Restore(renderEngine);
@@ -533,7 +533,7 @@ LEGO_EXPORT void ClearSpriteOverrides(void) {
 }
 
 /* Port [library:asm]: bit reader for the stream that places the pixels of an indexed-colour animation frame
- * (FUN_00464480, FUN_00465240, ZBufferHelper). The stream is a list of 32-bit words of sixteen 2-bit codes each,
+ * (SoftPrint_IndexedLLS, SoftPrint_IndexedLLSMasked, ZBufferHelper). The stream is a list of 32-bit words of sixteen 2-bit codes each,
  * lowest bits first. A run length is the next 8 bits (four codes) of the same word; if fewer than four codes are
  * left in the word, the rest of the word is dropped and the length is the low byte of the next word. */
 struct PortIdxBits {
@@ -626,7 +626,7 @@ static int PortLLSFrameIndex(struct DrawLLS *lls) {
 }
 
 // FUNCTION: LEGOLAND 0x00464480
-void FUN_00464480(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
+void SoftPrint_IndexedLLS(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
     /* Port [library:asm]: the original is inline asm. Draws one frame (two, for animations with flag 1: the base
      * frame, then the delta frame on top) of an indexed-colour animation into the software screen at pos, showing
      * only the part inside rect. Each source byte indexes a 16-bit palette (OverridePalette if overridden, else the one
@@ -892,7 +892,7 @@ LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *po
     /* Port [library:asm]: the original is inline asm. Draws one frame of an indexed-colour animation into a
      * 32-bit buffer (rows 0x200 bytes apart) at pos, showing only the part inside rect: each visible pixel is
      * written as its source byte shifted into the top byte (its depth); the palette is not used. Same stream
-     * decoder as FUN_00464480. Quirks kept: a transparent run that crosses the left clip edge advances the
+     * decoder as SoftPrint_IndexedLLS. Quirks kept: a transparent run that crosses the left clip edge advances the
      * destination by 2 bytes per pixel instead of 4; a run ending exactly at the left clip edge leaves the decoder
      * in its left-margin state. */
     struct PortIdxBits bits;
@@ -1082,7 +1082,7 @@ LEGO_EXPORT void ZBufferHelper(struct DrawLLS *lls, RECT *rect, struct Point *po
 }
 
 // FUNCTION: LEGOLAND 0x00464ee0
-void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
+void __fastcall SoftPrint_BltFast(struct Sprite *sprite, RECT *rect, int *off) {
     /* Port [library:asm]: the original is inline asm in its 16-bit copy loops. Software BltFast: draws the part
      * of the sprite inside rect (relative to the sprite, then moved by the sprite's source offset) into the
      * software screen at off = {x, y}, skipping pixels equal to the transparent colour StoredTransparentColour. Animated
@@ -1125,7 +1125,7 @@ void __fastcall FUN_00464ee0(struct Sprite *sprite, RECT *rect, int *off) {
     pitch = CurrentSurfaceDesc.lPitch;
     DAT_007fe9a8 = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
-        FUN_00464480((struct DrawLLS *)image->data, rect, (struct Point *)off);
+        SoftPrint_IndexedLLS((struct DrawLLS *)image->data, rect, (struct Point *)off);
         return;
     }
     if (image->field_14 == 3) {
@@ -1191,8 +1191,8 @@ LEGO_EXPORT void SoftPrint_Clear(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00465240
-void FUN_00465240(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
-    /* Port [library:asm]: the original is inline asm. Same as FUN_00464480 (indexed-colour animation frame drawn
+void SoftPrint_IndexedLLSMasked(struct DrawLLS *lls, RECT *rect, struct Point *pos) {
+    /* Port [library:asm]: the original is inline asm. Same as SoftPrint_IndexedLLS (indexed-colour animation frame drawn
      * into the software screen at pos, clipped to rect) but every pixel is ANDed with the colour mask DAT_007fe998
      * (the tint of SoftPrint_XBltFast), the palette is never overridden, and the cursor test is stricter. Differences
      * kept: with an overridden frame the palette is re-read from the current frame only if the animation's own
@@ -1547,7 +1547,7 @@ static void PortHalfFrame(unsigned short *dst, struct DrawLLSFrame *frame, int h
 
 // FUNCTION: LEGOLAND 0x00465a40
 LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst, unsigned int tint) {
-    /* Port [library:asm]: the original is inline asm in its 16-bit copy loops. Same as FUN_00464ee0 (software
+    /* Port [library:asm]: the original is inline asm in its 16-bit copy loops. Same as SoftPrint_BltFast (software
      * BltFast of the part of the sprite inside src, moved by the sprite's source offset, to dst->left/top) but the
      * colour of every pixel is ANDed with a mask from tint (0x00RRGGBB, via GetNearestColour) stored in
      * DAT_007fe998. Type 3 animations with tint alpha (the top byte) are drawn at half brightness instead, with the
@@ -1594,7 +1594,7 @@ LEGO_EXPORT void SoftPrint_XBltFast(struct Sprite *sprite, RECT *src, RECT *dst,
     pitch = CurrentSurfaceDesc.lPitch;
     DAT_007fe9a8 = (unsigned short *)((unsigned char *)CurrentSurfaceDesc.lpSurface + MousePos.y * pitch + MousePos.x * 2);
     if (image->field_14 == 2) {
-        FUN_00465240((struct DrawLLS *)image->data, src, (struct Point *)dst);
+        SoftPrint_IndexedLLSMasked((struct DrawLLS *)image->data, src, (struct Point *)dst);
         return;
     }
     if (image->field_14 == 3) {
@@ -2053,27 +2053,27 @@ void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) 
         mask = (unsigned int *)((unsigned char *)(frame->pixels + frame->pixel_count) + frame->run_bytes);
         if (hit) {
             if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-                FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16Pick(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             } else if (SpriteClipOrigin.left != 0) {
                 if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                    FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16PickClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 } else {
-                    FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16PickClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 }
             } else {
-                FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16PickClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         } else {
             if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-                FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+                BlitLLS16(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
             } else if (SpriteClipOrigin.left != 0) {
                 if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                    FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16ClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16ClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 }
             } else {
-                FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16ClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         }
         i = lls->frame + 1;
@@ -2085,27 +2085,27 @@ void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) 
         mask = (unsigned int *)((unsigned char *)(frame->pixels + frame->pixel_count) + frame->run_bytes);
         if (hit) {
             if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-                FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16Pick(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             } else if (SpriteClipOrigin.left != 0) {
                 if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                    FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16PickClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 } else {
-                    FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16PickClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 }
             } else {
-                FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16PickClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         } else {
             if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-                FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+                BlitLLS16(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
             } else if (SpriteClipOrigin.left != 0) {
                 if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                    FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16ClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 } else {
-                    FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                    BlitLLS16ClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
                 }
             } else {
-                FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16ClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         }
         return;
@@ -2119,32 +2119,32 @@ void DrawLLSSpriteMousePick(struct DrawLLS *lls, RECT *clip, struct Point *pos) 
     mask = (unsigned int *)((unsigned char *)(frame->pixels + frame->pixel_count) + frame->run_bytes);
     if (hit) {
         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-            FUN_00467640(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+            BlitLLS16Pick(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
         } else if (SpriteClipOrigin.left != 0) {
             if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                FUN_00466d80(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16PickClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             } else {
-                FUN_00467180(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16PickClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         } else {
-            FUN_004673f0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+            BlitLLS16PickClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
         }
     } else {
         if (lls->width <= DrawClipExtent.width - SpriteClipOrigin.left) {
-            FUN_00467f00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
+            BlitLLS16(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top);
         } else if (SpriteClipOrigin.left != 0) {
             if (lls->width - SpriteClipOrigin.left > DrawClipExtent.width) {
-                FUN_004677b0(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16ClipLeftRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             } else {
-                FUN_00467b00(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+                BlitLLS16ClipLeft(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
             }
         } else {
-            FUN_00467d10(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
+            BlitLLS16ClipRight(dst, pixels, runs, mask, DrawClipExtent.height, CurrentSurfaceDesc.lPitch, SpriteClipOrigin.top, SpriteClipOrigin.left, DrawClipExtent.width, 0, DAT_007fe9a8);
         }
     }
 }
 
-/* Port: the run-length sprite format that FUN_00466d80 and its siblings draw (the original blits are inline asm).
+/* Port: the run-length sprite format that BlitLLS16PickClipLeftRight and its siblings draw (the original blits are inline asm).
  * A sprite frame is three streams: 16-bit pixels, a byte stream of run lengths, and a stream of 2-bit codes
  * (16 per dword, lowest bits first). Each row is a sequence of codes that ends with a run length of 0:
  *   0 or 1  one literal pixel, copied from the pixel stream
@@ -2273,25 +2273,25 @@ static void PortBlitRuns(unsigned short *dst, const unsigned short *src, const u
 }
 
 // FUNCTION: LEGOLAND 0x00466d80
-void FUN_00466d80(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+void BlitLLS16PickClipLeftRight(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
     /* Port [library:asm]: the original is inline asm. Draws a run-length sprite clipped on both sides (columns left .. left+width) and records in DAT_007feb14 whether the cursor is on a drawn pixel (mouse hit test). */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_HIT);
 }
 
 // FUNCTION: LEGOLAND 0x00467180
-void FUN_00467180(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 but clipped only on the left (the sprite already fits on the right); caller guarantees left > 0. */
+void BlitLLS16PickClipLeft(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As BlitLLS16PickClipLeftRight but clipped only on the left (the sprite already fits on the right); caller guarantees left > 0. */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_HIT);
 }
 
 // FUNCTION: LEGOLAND 0x004673f0
-void FUN_004673f0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 but clipped only on the right (draws at most width columns, no left clip); caller guarantees width > 0. */
+void BlitLLS16PickClipRight(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As BlitLLS16PickClipLeftRight but clipped only on the right (draws at most width columns, no left clip); caller guarantees width > 0. */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_RIGHT | PORT_BLIT_HIT);
 }
 
 // FUNCTION: LEGOLAND 0x00467640
-void FUN_00467640(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+void BlitLLS16Pick(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
     unsigned int m;
     unsigned int c;
     unsigned int n;
@@ -2375,25 +2375,25 @@ void FUN_00467640(unsigned short *dst, unsigned short *src, unsigned char *runs,
 }
 
 // FUNCTION: LEGOLAND 0x004677b0
-void FUN_004677b0(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. As FUN_00466d80 without the cursor hit test: clipped on both sides, cursor and DAT_007feb14 untouched. */
+void BlitLLS16ClipLeftRight(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As BlitLLS16PickClipLeftRight without the cursor hit test: clipped on both sides, cursor and DAT_007feb14 untouched. */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT);
 }
 
 // FUNCTION: LEGOLAND 0x00467b00
-void FUN_00467b00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. As FUN_00467180 without the hit test: clipped only on the left. */
+void BlitLLS16ClipLeft(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As BlitLLS16PickClipLeft without the hit test: clipped only on the left. */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT);
 }
 
 // FUNCTION: LEGOLAND 0x00467d10
-void FUN_00467d10(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. As FUN_004673f0 without the hit test: clipped only on the right. */
+void BlitLLS16ClipRight(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
+    /* Port [library:asm]: the original is inline asm. As BlitLLS16PickClipRight without the hit test: clipped only on the right. */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_RIGHT);
 }
 
 // FUNCTION: LEGOLAND 0x00467f00
-void FUN_00467f00(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip) {
+void BlitLLS16(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip) {
     unsigned int m;
     unsigned int c;
     unsigned int n;
@@ -2471,7 +2471,7 @@ void FUN_00467f00(unsigned short *dst, unsigned short *src, unsigned char *runs,
 
 // FUNCTION: LEGOLAND 0x00468040
 void FUN_00468040(unsigned short *dst, unsigned short *src, unsigned char *runs, unsigned int *mask, int h, int stride, int skip, int left, int width, int flags, unsigned short *cursor) {
-    /* Port [library:asm]: the original is inline asm. Clipped on both sides like FUN_00466d80, but every written pixel is ANDed with the 16-bit mask DAT_007fe998 (colour masking), and the cursor hit test only looks at runs and uses the whole run length even when the run is clipped (a quirk, kept). */
+    /* Port [library:asm]: the original is inline asm. Clipped on both sides like BlitLLS16PickClipLeftRight, but every written pixel is ANDed with the 16-bit mask DAT_007fe998 (colour masking), and the cursor hit test only looks at runs and uses the whole run length even when the run is clipped (a quirk, kept). */
     PortBlitRuns(dst, src, runs, mask, h, stride, skip, left, width, cursor, PORT_BLIT_LEFT | PORT_BLIT_RIGHT | PORT_BLIT_AND | PORT_BLIT_HIT_RUN);
 }
 

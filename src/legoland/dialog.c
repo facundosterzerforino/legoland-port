@@ -26,13 +26,13 @@ int FUN_0043e930(RECT *rc, int min, int max, int value, int step) {
     pos = (rc->bottom - rc->top) * value / (max - min);
     RenderThickBox(rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, 2, 0);
     RenderBlock(rc->left, rc->top + pos - 1, rc->right - rc->left, 3, GetNearestColour(0xff, 0, 0));
-    if ((DAT_00813ac4 & 4) && MousePos.x >= rc->left && MousePos.x <= rc->right &&
+    if ((MouseClickFlags & 4) && MousePos.x >= rc->left && MousePos.x <= rc->right &&
         MousePos.y >= rc->top && MousePos.y <= rc->bottom) {
         DAT_0062fea4 = 1;
     } else if (!DAT_0062fea4) {
         return value;
     }
-    if (DAT_00813ac4 & 4) {
+    if (MouseClickFlags & 4) {
         pos = MousePos.y;
         if (pos < rc->top) {
             pos = rc->top;
@@ -120,7 +120,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
                 if (my >= items[i].top) {
                     if (my <= items[i].bottom) {
                         sel = i;
-                        if (!DAT_0062fea4 && (DAT_00813ac4 & 2)) {
+                        if (!DAT_0062fea4 && (MouseClickFlags & 2)) {
                             return i;
                         }
                         break;

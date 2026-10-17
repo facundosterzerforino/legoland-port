@@ -186,7 +186,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
                                 tile = 0;
                             }
                             if (tile != 0) {
-                                FUN_004779d0(&coord);
+                                RemoveObjectAtPoint(&coord);
                             }
                         }
                     }
@@ -351,7 +351,7 @@ void FUN_0045e4a0(Element *editObj, struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e620
-int FUN_0045e620(struct Ride *obj) {
+int HasExternalEntrance(struct Ride *obj) {
     struct Footprint rect;
 
     if (obj != 0) {
@@ -366,7 +366,7 @@ int FUN_0045e620(struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e690
-int FUN_0045e690(struct Ride *obj) {
+int HasSeparateExit(struct Ride *obj) {
     if (((int)obj->field_24 != obj->x) || ((int)obj->field_25 != obj->y)) {
         return 1;
     }
@@ -374,7 +374,7 @@ int FUN_0045e690(struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e6b0
-int FUN_0045e6b0(struct Ride *obj) {
+int GetEntranceSide(struct Ride *obj) {
     int x;
     struct Footprint rect;
 
@@ -390,7 +390,7 @@ int FUN_0045e6b0(struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e710
-int FUN_0045e710(struct Ride *obj) {
+int GetExitSide(struct Ride *obj) {
     struct Footprint rect;
 
     rect = obj->footprint;
@@ -404,29 +404,29 @@ int FUN_0045e710(struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e770
-void FUN_0045e770(struct Element *node, int *offset) {
+void MarkObjectEntrances(struct Element *node, int *offset) {
     struct Ride *obj;
     struct MapElement *tile;
     int x;
     int y;
 
     obj = node->ride;
-    if (FUN_0045e620(obj) != 0) {
+    if (HasExternalEntrance(obj) != 0) {
         x = (int)obj->x + offset[0];
         y = (int)obj->y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
             tile = &MapTileGrid[y][x];
             if (tile != 0) {
-                tile->field_12 |= (unsigned short)FUN_0045e6b0(obj);
+                tile->field_12 |= (unsigned short)GetEntranceSide(obj);
             }
         }
-        if (FUN_0045e690((struct Ride *)obj) != 0) {
+        if (HasSeparateExit((struct Ride *)obj) != 0) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
                 tile = &MapTileGrid[y][x];
                 if (tile != 0) {
-                    tile->field_12 |= (unsigned short)FUN_0045e710(obj);
+                    tile->field_12 |= (unsigned short)GetExitSide(obj);
                 }
             }
         }
@@ -434,29 +434,29 @@ void FUN_0045e770(struct Element *node, int *offset) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e850
-void FUN_0045e850(struct Element *node, int *offset) {
+void ClearObjectEntrances(struct Element *node, int *offset) {
     struct Ride *obj;
     struct MapElement *tile;
     int x;
     int y;
 
     obj = node->ride;
-    if (FUN_0045e620(obj) != 0) {
+    if (HasExternalEntrance(obj) != 0) {
         x = (int)obj->x + offset[0];
         y = (int)obj->y + offset[1];
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
             tile = &MapTileGrid[y][x];
             if (tile != 0) {
-                tile->field_12 &= ~(unsigned short)FUN_0045e6b0(obj);
+                tile->field_12 &= ~(unsigned short)GetEntranceSide(obj);
             }
         }
-        if (FUN_0045e690((struct Ride *)obj) != 0) {
+        if (HasSeparateExit((struct Ride *)obj) != 0) {
             x = obj->field_24 + offset[0];
             y = obj->field_25 + offset[1];
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
                 tile = &MapTileGrid[y][x];
                 if (tile != 0) {
-                    tile->field_12 &= ~(unsigned short)FUN_0045e710(obj);
+                    tile->field_12 &= ~(unsigned short)GetExitSide(obj);
                 }
             }
         }
@@ -464,7 +464,7 @@ void FUN_0045e850(struct Element *node, int *offset) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e930
-int FUN_0045e930(struct MapElement *obj) {
+int IsTileFreeOrPath(struct MapElement *obj) {
     struct Element *p;
 
     if (obj == 0) {
@@ -487,21 +487,21 @@ int FUN_0045e960(struct Element *node, int *offset) {
     int y;
 
     obj = node->ride;
-    if (FUN_0045e620(obj) != 0) {
+    if (HasExternalEntrance(obj) != 0) {
         x = offset[0] + (int)obj->x;
         y = offset[1] + (int)obj->y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
             tile = &MapTileGrid[y][x];
-            if (tile != 0 && FUN_0045e930(tile) == 0) {
+            if (tile != 0 && IsTileFreeOrPath(tile) == 0) {
                 return 0;
             }
         }
-        if (FUN_0045e690((struct Ride *)obj) != 0) {
+        if (HasSeparateExit((struct Ride *)obj) != 0) {
             x = offset[0] + (int)obj->x;
             y = offset[1] + (int)obj->y;
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
                 tile = &MapTileGrid[y][x];
-                if (tile != 0 && FUN_0045e930(tile) == 0) {
+                if (tile != 0 && IsTileFreeOrPath(tile) == 0) {
                     return 0;
                 }
             }
@@ -511,7 +511,7 @@ int FUN_0045e960(struct Element *node, int *offset) {
 }
 
 // FUNCTION: LEGOLAND 0x0045ea40
-void FUN_0045ea40(struct Ride *obj, struct Point *out) {
+void GetObjectEntrancePos(struct Ride *obj, struct Point *out) {
     if ((int)obj->x < obj->footprint.v[0] || (int)obj->x > obj->footprint.v[2] || (int)obj->y < obj->footprint.v[1] ||
         (int)obj->y > obj->footprint.v[3]) {
         if (obj->type == 1 || obj->type == 4 || obj->type == 5) {
@@ -591,7 +591,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         } else {
             SetObjRectFlags(editObj, (struct Point *)coords, 0x20);
         }
-        FUN_0045ea40(obj, &out);
+        GetObjectEntrancePos(obj, &out);
         out.x = out.x + coords[0];
         out.y = out.y + coords[1];
         if (obj->flags & 0x400000) {
@@ -608,7 +608,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
         if (FUN_0045eab0((struct Ride *)obj) != 0 || FUN_0045eaf0((struct Ride *)obj) != 0) {
             FUN_0045e080(editObj, (struct Point *)coords, 0);
         }
-        FUN_0045ea40(obj, &out);
+        GetObjectEntrancePos(obj, &out);
         out.x = out.x + coords[0];
         out.y = out.y + coords[1];
         PutObjOnMap((struct Ride *)obj, editObj, (struct Point *)coords);
@@ -619,7 +619,7 @@ LEGO_EXPORT int BuildObject(Element *editObj, int *coords) {
             FindMapPathAStar(out.x, out.y, effect->x, effect->y);
         }
     }
-    FUN_0045e770((struct Element *)editObj, coords);
+    MarkObjectEntrances((struct Element *)editObj, coords);
     return 1;
 }
 
@@ -853,7 +853,7 @@ LEGO_EXPORT void StandardRemoveObject(Element *editObj, TileId coords, struct Cu
     AddBricks(GetObjSalvageValue(obj, tile->durability_level));
     if (tile->flags & 0x80) {
         ApplyDestrTileMap(editObj, coords);
-        FUN_0045e850((struct Element *)editObj, (int *)&pos);
+        ClearObjectEntrances((struct Element *)editObj, (int *)&pos);
         RemoveObjectFromMap(coords);
     } else {
         rect = *(struct Footprint *)cursor->field_1414;
@@ -1447,7 +1447,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         return;
     }
     editing = (struct Ride *)EditMode.unk8;
-    if (FUN_0045e620(editing) == 0) {
+    if (HasExternalEntrance(editing) == 0) {
         return;
     }
     if (EditMode.unk0 != 1) {
@@ -1456,7 +1456,7 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
     tilept.x = (int)EditMode.unk8->x + cursor->tile_x;
     tilept.y = (int)EditMode.unk8->y + cursor->tile_y;
     GetTileBounds(&tilept, screen);
-    code = FUN_0045e6b0((struct Ride *)EditMode.unk8);
+    code = GetEntranceSide((struct Ride *)EditMode.unk8);
     switch (code) {
     case 8:
         PrintSprite(Arrow02Sprite, screen[0], screen[1], 0, 0);
@@ -1471,11 +1471,11 @@ LEGO_EXPORT void RenderCursor(struct Cursor *cursor) {
         PrintSprite(Arrow01Sprite, screen[0], screen[1], 0, 0);
         break;
     }
-    if ((cursor->field_1828 & 0x800) != 0 && FUN_0045e690((struct Ride *)EditMode.unk8) != 0) {
+    if ((cursor->field_1828 & 0x800) != 0 && HasSeparateExit((struct Ride *)EditMode.unk8) != 0) {
         tilept.x = EditMode.unk8->field_24 + cursor->tile_x;
         tilept.y = EditMode.unk8->field_25 + cursor->tile_y;
         GetTileBounds(&tilept, screen);
-        code = FUN_0045e710((struct Ride *)EditMode.unk8);
+        code = GetExitSide((struct Ride *)EditMode.unk8);
         switch (code) {
         case 0x80:
             PrintSprite(Arrow02Sprite, screen[0], screen[1], 0, 0);
@@ -1811,7 +1811,7 @@ void DrawDeferredSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00461080
-void FUN_00461080(int *coord, unsigned int param2, unsigned int param3, unsigned int param4) {
+void DrawPathTileAt(int *coord, unsigned int param2, unsigned int param3, unsigned int param4) {
     struct MapElement *tile;
 
     if (coord[0] >= 0 && coord[0] < lpConfig->width &&
@@ -1825,7 +1825,7 @@ void FUN_00461080(int *coord, unsigned int param2, unsigned int param3, unsigned
 }
 
 // FUNCTION: LEGOLAND 0x004610f0
-void FUN_004610f0(struct Point *param_1, int *param_2) {
+void DrawPathTilesInRect(struct Point *param_1, int *param_2) {
     short size;
     int dbl;
     short half_x;
@@ -1849,9 +1849,9 @@ void FUN_004610f0(struct Point *param_1, int *param_2) {
     row = coord;
     for (iy = out[1]; iy < param_2[3]; iy += size) {
         for (ix = out[0]; ix < half_x + param_2[2]; ix += dbl) {
-            FUN_00461080((int *)&coord, ix, iy, 0);
+            DrawPathTileAt((int *)&coord, ix, iy, 0);
             coord.y++;
-            FUN_00461080((int *)&coord, ix - half_x, half_y + iy, 0);
+            DrawPathTileAt((int *)&coord, ix - half_x, half_y + iy, 0);
             coord.y -= 2;
             coord.x++;
         }
@@ -1862,7 +1862,7 @@ void FUN_004610f0(struct Point *param_1, int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00461220
-void FUN_00461220(void) {
+void DrawViewPathTiles(void) {
     int local[6];
 
     local[0] = ScrollX >> 8;
@@ -1871,11 +1871,11 @@ void FUN_00461220(void) {
     local[3] = lpConfig->view_y;
     local[4] = lpConfig->view_width + local[2];
     local[5] = lpConfig->view_height + local[3];
-    FUN_004610f0((struct Point *)&local[0], &local[2]);
+    DrawPathTilesInRect((struct Point *)&local[0], &local[2]);
 }
 
 // FUNCTION: LEGOLAND 0x00461290
-void FUN_00461290(int param_1, int param_2, int param_3, int param_4) {
+void ClampScrollPosition(int param_1, int param_2, int param_3, int param_4) {
     int marginTopRight; /* DAT_004b95f4 / 2 */
     int marginBottomLeft; /* DAT_004b95f8 / 2 */
     int marginTopLeft; /* DAT_004b95fc / 2 */
@@ -1966,7 +1966,7 @@ void FUN_00461290(int param_1, int param_2, int param_3, int param_4) {
 LEGO_EXPORT void ProcessScrolling(unsigned int a, unsigned int b) {
     ScrollX = ScrollX + a;
     ScrollY = ScrollY + b;
-    FUN_00461290(lpConfig->view_width << 8, lpConfig->view_height << 8, 0, 0);
+    ClampScrollPosition(lpConfig->view_width << 8, lpConfig->view_height << 8, 0, 0);
 }
 
 // FUNCTION: LEGOLAND 0x004614f0
@@ -2569,7 +2569,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
         RES_ReadFile(file, &count, 4);
         for (i = 0; i < count; i++) {
             RES_ReadFile(file, ovdata, 0x14);
-            FUN_00462c00((struct OverlayParam *)ovdata);
+            AddOverlay((struct OverlayParam *)ovdata);
         }
 
         mode = 0;
@@ -2630,7 +2630,7 @@ fail: /* shared exit; also taken when the overlay-tile stream ends early */
     MapDataLoaded = 1;
     LoadInProgress = 0;
     DAT_00810140 = 0;
-    FUN_00462c60();
+    StartOverlayAnims();
     return 1;
 }
 
@@ -2692,7 +2692,7 @@ unsigned int UnloadBaseMap(void) {
     }
     free(DAT_00801a70);
     ClearOverlays();
-    FUN_004828f0();
+    FreeBestNodeList();
     MapDataLoaded = 0;
     return 1;
 }
@@ -2733,7 +2733,7 @@ LEGO_EXPORT void AddOvSav(struct OverlayParam *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00462c00
-void FUN_00462c00(struct OverlayParam *param) {
+void AddOverlay(struct OverlayParam *param) {
     struct Overlay *current;
     struct Overlay *node;
 
@@ -2756,7 +2756,7 @@ void FUN_00462c00(struct OverlayParam *param) {
 }
 
 // FUNCTION: LEGOLAND 0x00462c60
-void FUN_00462c60(void) {
+void StartOverlayAnims(void) {
     struct Overlay *node;
     struct Sprite *sample;
     struct SpriteAnim *lls;
@@ -2854,7 +2854,7 @@ void SetClassLimit(unsigned int index, unsigned int value) {
 }
 
 // FUNCTION: LEGOLAND 0x00462e90
-void FUN_00462e90(void) {
+void SetDefaultClassLimits(void) {
     MapStats.classes[0].percent = 0x32;
     MapStats.classes[0].limit = 0x14;
     MapStats.classes[1].percent = 0x21;
@@ -3040,7 +3040,7 @@ LEGO_EXPORT void RateBlokeOnLeaving(int param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00463460
-void FUN_00463460(struct MapElement *tile, struct Point *pos) {
+void DegradeObject(struct MapElement *tile, struct Point *pos) {
     unsigned int flags;
     Ride *ride;
     int power;
@@ -3069,7 +3069,7 @@ void FUN_00463460(struct MapElement *tile, struct Point *pos) {
                 if (power > 0) {
                     MapStats.power_supply -= power;
                     if (MapStats.power_demand - (int)MapStats.unpowered_demand > MapStats.power_supply) {
-                        FUN_0045a0d0();
+                        CutPowerToObjects();
                     }
                 }
             }
@@ -3079,7 +3079,7 @@ void FUN_00463460(struct MapElement *tile, struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00463520
-int FUN_00463520(void) {
+int IsRideWearDue(void) {
     int curr;
     int diff;
     int quotient;
@@ -3098,7 +3098,7 @@ int FUN_00463520(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00463560
-void FUN_00463560(void) {
+void ResetDamageTimer(void) {
     DAT_00667d54 = GetGameTimer();
     DAT_00667d58 = GetGameTimerFrames();
 }
@@ -3111,7 +3111,7 @@ LEGO_EXPORT void ProcessDamage(void) {
     struct MapElement *tile;
 
     id.id = DAT_007febb8;
-    amount = FUN_00463520();
+    amount = IsRideWearDue();
     if (amount != 0) {
         if (id.id == 0) {
             pt.x = 0;
@@ -3141,7 +3141,7 @@ LEGO_EXPORT void ProcessDamage(void) {
                         tile->durability_level = 1;
                     }
                 }
-                FUN_00463460(tile, &pt);
+                DegradeObject(tile, &pt);
             }
             id = tile->next;
         } while (id.id != 0);

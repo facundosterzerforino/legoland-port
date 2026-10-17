@@ -25,7 +25,7 @@ struct Overlay {
 LEGO_EXPORT void RenderFullMap(void);
 LEGO_EXPORT void InitMapScreen(void);
 LEGO_EXPORT void KillMapScreen(void);
-void FUN_004562e0(void);
+void RestoreMouseHandlers(void);
 
 LEGO_EXPORT void RenderMouseBounds(void);
 struct Point;

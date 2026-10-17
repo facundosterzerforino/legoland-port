@@ -213,7 +213,7 @@ LEGO_EXPORT void RemoveBlokeFromRide(struct Ride *ride, struct RideNode *node) {
 
     bloke = node->rider;
     RemoveBlokeFromList(ride, node);
-    if (FUN_0044f3d0(ride, &node->tile) == 0) {
+    if (CountRidersAtTile(ride, &node->tile) == 0) {
         int x = node->tile.pos.x;
         int y = node->tile.pos.y;
         if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {

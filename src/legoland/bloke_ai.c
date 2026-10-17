@@ -165,7 +165,7 @@ int GetMapCapacity(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0044ea50
-void FUN_0044ea50(void) {
+void SpawnVisitor(void) {
     Bloke *bloke;
 
     if (++DAT_006661c8 >= 0x1e && ParkVisitorCount < GetMapCapacity()) {
@@ -181,17 +181,17 @@ void FUN_0044ea50(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0044eab0
-int FUN_0044eab0(Bloke *bloke) {
+int IsBlokeReadyToLeave(Bloke *bloke) {
     return bloke->field_78 - bloke->mood / 2 > MapStats.total_tiles * 2;
 }
 
 // FUNCTION: LEGOLAND 0x0044eae0
-void FUN_0044eae0(Bloke *bloke) {
+void UpdateBlokeTimeInPark(Bloke *bloke) {
     bloke->field_78++;
     if ((bloke->flags & 0x8) != 0) {
         return;
     }
-    if (FUN_0044eab0(bloke) != 0) {
+    if (IsBlokeReadyToLeave(bloke) != 0) {
         NewLongTermAction(bloke, 3);
     }
 }
@@ -272,7 +272,7 @@ void FUN_0044ebf0(Bloke *bloke) {
         break;
     case 1:
         bloke->target = Entrance1Elem;
-        if (FUN_0044f4a0(bloke, Entrance1Elem->data, 0) != 0) {
+        if (PutBlokeOnRide(bloke, Entrance1Elem->data, 0) != 0) {
             bloke->param_action++;
             PushLongTermAction(bloke);
             NewLongTermAction(bloke, 5);
@@ -302,7 +302,7 @@ void LogBlokeAiMessage(char *msg) {
 }
 
 // FUNCTION: LEGOLAND 0x0044ed70
-void FUN_0044ed70(Bloke *bloke) {
+void BlokeAILeavePark(Bloke *bloke) {
     MapElement *object;
     Ride *ride;
     unsigned char dir;
@@ -401,7 +401,7 @@ void FUN_0044ed70(Bloke *bloke) {
         bloke->param_action = 5;
         return;
     case 10:
-        if (FUN_0044f4a0(bloke, Entrance1Elem->data, 0) != 0) {
+        if (PutBlokeOnRide(bloke, Entrance1Elem->data, 0) != 0) {
             bloke->flags |= 8;
             bloke->target = Entrance1Elem;
             bloke->param_action++;
@@ -532,7 +532,7 @@ int FUN_0044f360(Ride *ride, TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x0044f3d0
-unsigned int FUN_0044f3d0(Ride *ride, TileId *tile) {
+unsigned int CountRidersAtTile(Ride *ride, TileId *tile) {
     RideNode *node;
     unsigned short id;
     unsigned int count;
@@ -553,10 +553,10 @@ unsigned int FUN_0044f3d0(Ride *ride, TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x0044f400
-unsigned int FUN_0044f400(Ride *ride, TileId *tile) {
+unsigned int IsRideFull(Ride *ride, TileId *tile) {
     int count;
 
-    count = FUN_0044f3d0(ride, tile);
+    count = CountRidersAtTile(ride, tile);
     return count >= ride->seats;
 }
 
@@ -589,7 +589,7 @@ LEGO_EXPORT void RemoveBlokeFromList(Ride *ride, RideNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0044f4a0
-int FUN_0044f4a0(Bloke *bloke, Ride *ride, int wait) {
+int PutBlokeOnRide(Bloke *bloke, Ride *ride, int wait) {
     RideNode *node;
     MapElement *object;
     MapElement *element;
@@ -639,7 +639,7 @@ int FUN_0044f4a0(Bloke *bloke, Ride *ride, int wait) {
 }
 
 // FUNCTION: LEGOLAND 0x0044f610
-void FUN_0044f610(Bloke *bloke) {
+void BlokeAIWander(Bloke *bloke) {
     Ride *candidate;
     Ride *ride;
     int x;
@@ -804,7 +804,7 @@ void FUN_0044f610(Bloke *bloke) {
     case 10:
         if (FUN_0044f180(&bloke->pos, bloke->target->data) != 0) {
             tile = GetObjectUID(&bloke->pos, bloke->target->data);
-            if (FUN_0044f400(bloke->target->data, &tile) != 0) {
+            if (IsRideFull(bloke->target->data, &tile) != 0) {
                 // STRING: LEGOLAND 0x004b8500
                 sprintf(msg, "I can't go on this ride. It is full");
                 LogBlokeAiMessage(msg);
@@ -844,8 +844,8 @@ void FUN_0044f610(Bloke *bloke) {
                 /* reads the flags of the *next* LLIDB element; the ride's own flags were
                    presumably meant */
                 if ((bloke->target[1].flags & 0x100000) != 0) {
-                    if (FUN_0044f4a0(bloke, bloke->target->data, 0) != 0) {
-                        if (FUN_0044f400(bloke->target->data, &tile) == 0) {
+                    if (PutBlokeOnRide(bloke, bloke->target->data, 0) != 0) {
+                        if (IsRideFull(bloke->target->data, &tile) == 0) {
                             return;
                         }
                         x = tile.pos.x;
@@ -868,7 +868,7 @@ void FUN_0044f610(Bloke *bloke) {
                         element = NULL;
                     }
                     GetInstanceOfClass(element->field_0->data, &tile);
-                    if (FUN_0044f4a0(bloke, bloke->target->data, (rand() & 0x1ff) + 200) != 0) {
+                    if (PutBlokeOnRide(bloke, bloke->target->data, (rand() & 0x1ff) + 200) != 0) {
                         return;
                     }
                 }
@@ -889,7 +889,7 @@ void FUN_0044f610(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x0044fe10
-void FUN_0044fe10(Bloke *bloke) {
+void BlokeAIGoToEntrance(Bloke *bloke) {
     Point to;
     unsigned char dir;
 
@@ -1317,7 +1317,7 @@ LEGO_EXPORT void ControlPeople(void) {
     Bloke *bloke;
     Bloke *next;
 
-    FUN_0044ea50();
+    SpawnVisitor();
     for (bloke = FirstBloke; bloke != NULL; bloke = next) {
         next = bloke->next;
         DAT_00813b08 = bloke->field_81;
@@ -1331,7 +1331,7 @@ LEGO_EXPORT void ControlPeople(void) {
                 DoLowLevelAI(bloke);
             }
         } else {
-            FUN_0044eae0(bloke);
+            UpdateBlokeTimeInPark(bloke);
             if ((++bloke->field_5c & 0xf) == 0) {
                 ApplyMoodDelta(bloke, 8, 1);
                 FUN_00450530(bloke);
@@ -1363,7 +1363,7 @@ void FUN_00450a40(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x00450a80
-void FUN_00450a80(void) {
+void SaveBuildObjList(void) {
     int i;
     int count;
     union SavedElement handle;

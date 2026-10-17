@@ -54,8 +54,8 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->string_id = 0x3e;
     icon->string = GetString(0x3e);
     icon->flags |= flag_mask;
-    icon->event_handler = (void *)FUN_0048f0a0;
-    DAT_006687c0 = FUN_0048f0a0;
+    icon->event_handler = (void *)OptionsExitIconHandler;
+    DAT_006687c0 = OptionsExitIconHandler;
 
     // STRING: LEGOLAND 0x004bf45c
     icon = LoadSpriteIcon("Load_on_Options.lls", 4, 0x168, 0x13a, 7);
@@ -89,7 +89,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->flags |= flag_mask;
     icon->field_18s = 2;
 
-    x = FUN_0048eaf0(CurrentProfile.speech_volume);
+    x = VolumePercentToMarker(CurrentProfile.speech_volume);
     // STRING: LEGOLAND 0x004bf420
     icon = LoadSpriteIcon("VolMarkerSpeech.lls", 4, x, 0x33, 7);
     icon->string_id = 0x47;
@@ -115,7 +115,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->event_handler = (void *)OptionsUpIconHandler;
     icon->field_18s = 5;
 
-    x = FUN_0048eaf0(CurrentProfile.music_volume);
+    x = VolumePercentToMarker(CurrentProfile.music_volume);
     // STRING: LEGOLAND 0x004bf3f8
     icon = LoadSpriteIcon("VolMarkerMusic.lls", 4, x, 0x77, 7);
     icon->string_id = 0x4a;
@@ -141,7 +141,7 @@ LEGO_EXPORT void InitOptionScreen(void) {
     icon->flags |= flag_mask;
     icon->field_18s = 8;
 
-    x = FUN_0048eaf0(CurrentProfile.fx_volume);
+    x = VolumePercentToMarker(CurrentProfile.fx_volume);
     // STRING: LEGOLAND 0x004bf3d4
     icon = LoadSpriteIcon("VolMarkerFX.lls", 4, x, 0xbb, 7);
     icon->string_id = 0x4d;
@@ -201,7 +201,7 @@ unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_
         RemoveIconGroup(7);
         KillTitleScreenSprites();
         EditMode.unk4 = 3;
-        FUN_00474880();
+        SetDefaultMouseHandlers();
         UpDateCurrentProfile();
         ResumeGameTimer();
     }
@@ -220,7 +220,7 @@ unsigned char OptionsSaveIconHandler(unsigned int param_1, unsigned int param_2)
 }
 
 // FUNCTION: LEGOLAND 0x0048f0a0
-unsigned char FUN_0048f0a0(unsigned int param_1, unsigned int param_2) {
+unsigned char OptionsExitIconHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         InitExitCheckBox(0xfa, 0x28);
@@ -329,7 +329,7 @@ unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2) {
         KillTitleScreenSprites();
         EditMode.unk4 = 3;
         FUN_0048eb40();
-        FUN_00474880();
+        SetDefaultMouseHandlers();
     }
     return 1;
 }
@@ -371,7 +371,7 @@ unsigned char OptionsLoadIconHandler(unsigned int param_1, unsigned int param_2)
 }
 
 // FUNCTION: LEGOLAND 0x0048f5a0
-unsigned char FUN_0048f5a0(unsigned int param_1, unsigned int param_2) {
+unsigned char SaveGameScreenSaveHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         StoreNewSaveGameToDisk();
@@ -403,7 +403,7 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
             } else {
                 sample = 0;
             }
-            while ((DAT_00813ac4 & 4) != 0) {
+            while ((MouseClickFlags & 4) != 0) {
                 if (GetIconAtPos(&MousePos, &pos) != param_1) {
                     break;
                 }
@@ -411,7 +411,7 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                 case 2:
                     if (CurrentProfile.speech_volume != 0) {
                         CurrentProfile.speech_volume--;
-                        result = FUN_0048eaf0(CurrentProfile.speech_volume);
+                        result = VolumePercentToMarker(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
                         if (!DAT_006687b4 && !SpeechIsPlaying()) {
                             FUN_0046d230(-2);
@@ -422,14 +422,14 @@ unsigned char OptionsUpIconHandler(struct IconNode *param_1, unsigned int param_
                 case 5:
                     if (CurrentProfile.music_volume != 0) {
                         CurrentProfile.music_volume--;
-                        result = FUN_0048eaf0(CurrentProfile.music_volume);
+                        result = VolumePercentToMarker(CurrentProfile.music_volume);
                         MusicVolumeMarkerIcon->x = (short)result;
                     }
                     break;
                 case 8:
                     if (CurrentProfile.fx_volume != 0) {
                         CurrentProfile.fx_volume--;
-                        result = FUN_0048eaf0(CurrentProfile.fx_volume);
+                        result = VolumePercentToMarker(CurrentProfile.fx_volume);
                         FxVolumeMarkerIcon->x = (short)result;
                     }
                     break;
@@ -463,7 +463,7 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
             } else {
                 sample = 0;
             }
-            while ((DAT_00813ac4 & 4) != 0) {
+            while ((MouseClickFlags & 4) != 0) {
                 if (GetIconAtPos(&MousePos, &pos) != param_1) {
                     break;
                 }
@@ -471,7 +471,7 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                 case 1:
                     if (CurrentProfile.speech_volume < 0x64) {
                         CurrentProfile.speech_volume++;
-                        result = FUN_0048eaf0(CurrentProfile.speech_volume);
+                        result = VolumePercentToMarker(CurrentProfile.speech_volume);
                         SpeechVolumeMarkerIcon->x = (short)result;
                         if (!DAT_006687b4 && !SpeechIsPlaying()) {
                             FUN_0046d230(-2);
@@ -482,14 +482,14 @@ unsigned char OptionsDownIconHandler(struct IconNode *param_1, unsigned int para
                 case 4:
                     if (CurrentProfile.music_volume < 0x64) {
                         CurrentProfile.music_volume++;
-                        result = FUN_0048eaf0(CurrentProfile.music_volume);
+                        result = VolumePercentToMarker(CurrentProfile.music_volume);
                         MusicVolumeMarkerIcon->x = (short)result;
                     }
                     break;
                 case 7:
                     if (CurrentProfile.fx_volume < 0x64) {
                         CurrentProfile.fx_volume++;
-                        result = FUN_0048eaf0(CurrentProfile.fx_volume);
+                        result = VolumePercentToMarker(CurrentProfile.fx_volume);
                         FxVolumeMarkerIcon->x = (short)result;
                     }
                     break;
@@ -521,7 +521,7 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
             sample = 0;
         }
         initial_offset = MousePos.x - param_1->x;
-        while ((DAT_00813ac4 & 4) != 0) {
+        while ((MouseClickFlags & 4) != 0) {
             short min = 0x7c;
             x = MousePos.x - initial_offset;
             param_1->x = (short)x;
@@ -531,7 +531,7 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
             if (param_1->x < min) {
                 param_1->x = min;
             }
-            result = FUN_0048eac0(param_1->x);
+            result = VolumeMarkerToPercent(param_1->x);
             switch ((unsigned int)(unsigned short)param_1->field_18s) {
             case 3:
                 CurrentProfile.speech_volume = result;
@@ -560,14 +560,14 @@ unsigned char OptionsVolumeMarkerIconHandler(struct IconNode *param_1, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x0048f9f0
-void FUN_0048f9f0(unsigned int *param_1, struct ScreenMode *param_2, struct EditState *param_3) {
+void SaveScreenState(unsigned int *param_1, struct ScreenMode *param_2, struct EditState *param_3) {
     *param_1 = DAT_00668e38;
     *param_3 = EditMode;
     *param_2 = DAT_0080ff80;
 }
 
 // FUNCTION: LEGOLAND 0x0048fa40
-unsigned int FUN_0048fa40(unsigned int *param_1, struct ScreenMode *param_2, struct EditState *param_3) {
+unsigned int RestoreScreenState(unsigned int *param_1, struct ScreenMode *param_2, struct EditState *param_3) {
     unsigned int ret;
     ret = DAT_0080ff80.unk8;
     DAT_00668e38 = *param_1;
@@ -636,7 +636,7 @@ unsigned char FUN_0048fbd0(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0048fc00
-void FUN_0048fc00(void) {
+void PlayPendingFrontEndSpeech(void) {
     if (DAT_0080ff80.unk0 != 0) {
         if (PlaySpeech(DAT_0080ff80.unk0) != 0) {
             DAT_0080ff80.unk0 = 0;

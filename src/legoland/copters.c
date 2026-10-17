@@ -184,11 +184,11 @@ void CoptersLoad(struct Element *param_1) {
     }
     // STRING: LEGOLAND 0x004b43d0
     CoptersPos = LoadPos("3ddata\\copters.pos");
-    CopterQueueTables[0] = FUN_00412100(&CopterPathTable0);
-    CopterQueueTables[2] = FUN_00412100(&CopterPathTable2);
-    CopterQueueTables[1] = FUN_00412100(&CopterPathTable1);
-    CopterQueueTables[3] = FUN_00412100(&CopterPathTable3);
-    CopterQueueTables[4] = FUN_00412100(&CopterPathTable4);
+    CopterQueueTables[0] = BuildQueueTable(&CopterPathTable0);
+    CopterQueueTables[2] = BuildQueueTable(&CopterPathTable2);
+    CopterQueueTables[1] = BuildQueueTable(&CopterPathTable1);
+    CopterQueueTables[3] = BuildQueueTable(&CopterPathTable3);
+    CopterQueueTables[4] = BuildQueueTable(&CopterPathTable4);
     DAT_004c1194 = &DAT_004c119c;
     DAT_004c1190 = &DAT_004c11a0;
     DAT_004c1164 = &DAT_004c11a4;
@@ -780,12 +780,12 @@ void CoptersUpdate(struct Element *elem) {
                     spr = CopterQueueTables[4];
                     break;
                 }
-                FUN_004122d0((struct QueueTable *)spr, (struct Bloke *)b);
+                StartQueueTableForward((struct QueueTable *)spr, (struct Bloke *)b);
                 CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 2:
-                qi = (int)(INT_PTR)FUN_004122f0((struct Bloke *)b); /* the queue index */
-                FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
+                qi = (int)(INT_PTR)GetBlokeQueueTable((struct Bloke *)b); /* the queue index */
+                MoveBlokeAlongQueueTable((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 3:
             case 7:
@@ -828,12 +828,12 @@ void CoptersUpdate(struct Element *elem) {
                     spr2 = CopterQueueTables[4];
                     break;
                 }
-                FUN_004122a0((struct QueueTable *)spr2, (struct Bloke *)b);
+                StartQueueTableBackward((struct QueueTable *)spr2, (struct Bloke *)b);
                 CoptersQueueTableToIndex((struct RideNode *)link);
                 break;
             case 9:
-                qi = (int)(INT_PTR)FUN_004122f0((struct Bloke *)b); /* the queue index */
-                FUN_00412300((struct QueueTable *)CopterQueueTables[qi], x, y, b);
+                qi = (int)(INT_PTR)GetBlokeQueueTable((struct Bloke *)b); /* the queue index */
+                MoveBlokeAlongQueueTable((struct QueueTable *)CopterQueueTables[qi], x, y, b);
                 break;
             case 10:
                 b->dest.x = (x << 8) + 0x80;

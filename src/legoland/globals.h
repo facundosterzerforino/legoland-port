@@ -1029,7 +1029,7 @@ extern char *PTR_DAT_004b8348[8];
 // 0x004b8368
 extern void (*PTR_Bloke_DoNothing_004b8368[26])(struct Bloke *);
 // 0x004b85c4
-extern HANDLE DAT_004b85c4;
+extern HANDLE VWin32DeviceHandle;
 // 0x004b8710
 extern struct FXItem FountainSFX[5]; /* their file names follow */
 // 0x004b8750
@@ -2224,15 +2224,15 @@ extern struct TextCell TextCells[50];
 // 0x00667c00
 extern int MapWorldMinX;
 // 0x00667c04
-extern int DAT_00667c04;
+extern int MapWorldMinY;
 // 0x00667c08
-extern int DAT_00667c08;
+extern int MapWorldMaxX;
 // 0x00667c0c
-extern int DAT_00667c0c;
+extern int MapWorldMaxY;
 // 0x00667c14
-extern short DAT_00667c14;
+extern short MapDrawHeight;
 // 0x00667c16
-extern short DAT_00667c16;
+extern short MapDrawWidth;
 // 0x00667c18
 extern int MapWorldHeight;
 // 0x00667c1c
@@ -2246,7 +2246,7 @@ extern void *DAT_00667c28;
 // 0x00667c2c
 extern struct Sprite *FullMapSprite;
 // 0x00667c30
-extern unsigned int DAT_00667c30;
+extern unsigned int FullMapRendered;
 // 0x00667c34
 extern struct Sprite *MapSpannerSprite;
 // 0x00667c3c
@@ -2258,13 +2258,13 @@ extern LEGO_EXPORT struct Ride *QueryClass;
 // 0x00667c5c
 extern unsigned int DAT_00667c5c;
 // 0x00667c60
-extern unsigned int DAT_00667c60;
+extern unsigned int PreMapScreenMode;
 // 0x00667c68
-extern unsigned int DAT_00667c68;
+extern unsigned int LastMapClickTicks;
 // 0x00667c70
-extern long DAT_00667c70;
+extern long LastMapClickX;
 // 0x00667c74
-extern long DAT_00667c74;
+extern long LastMapClickY;
 // 0x00667c64
 extern const char *DAT_00667c40;
 // 0x00667c48
@@ -2400,7 +2400,7 @@ extern HFONT LegoFont28Normal;
 // 0x0066809c
 extern DDSURFACEDESC CurrentSurfaceDesc;
 // 0x00668108
-extern RECT DAT_00668108;
+extern RECT SoftPrintClip;
 // 0x00668118
 extern int renderEngineTargetIdx;
 // 0x0066811c
@@ -2785,13 +2785,13 @@ extern struct InfoNode *DAT_0066924c;
 // 0x00669250
 extern int DAT_00669250;
 // 0x00669254
-extern unsigned int DAT_00669254;
+extern unsigned int AdjacentNodeCount;
 // 0x004bcec0
 extern struct Point DAT_004bcec0;
 // 0x00669258
 extern unsigned int DAT_00669258[1152];
 // 0x0066a45c
-extern void *DAT_0066a45c[1020];
+extern void *AdjacentNodes[1020];
 // 0x0066b44c
 extern void *DAT_0066b44c;
 // 0x0066b450
@@ -2863,13 +2863,13 @@ extern void *DAT_00798190[256];
 // 0x00798590
 extern void *DAT_00798590;
 // 0x00798598
-extern DDSURFACEDESC DAT_00798598;
+extern DDSURFACEDESC SavedSurfaceDesc;
 // 0x00798608
-extern RECT DAT_00798608;
+extern RECT SavedSoftPrintClip;
 // 0x0079861c
-extern LPDIRECTDRAWSURFACE DAT_0079861c;
+extern LPDIRECTDRAWSURFACE ScaledSpriteScratch;
 // 0x00798620
-extern int DAT_00798620;
+extern int ScaledSpriteScratchMade;
 // 0x00798624
 extern void *MasterDirList;
 // 0x00798628
@@ -3213,7 +3213,7 @@ extern struct IconNode *DAT_007cb2e0;
 // 0x007cb2e4
 extern struct IconNode *DAT_007cb2e4;
 // 0x007cb2f0
-extern struct EditState DAT_007cb2f0; /* EditMode saved by FUN_0048f9f0 */
+extern struct EditState DAT_007cb2f0; /* EditMode saved by SaveScreenState */
 // 0x007cb300
 extern struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
 // 0x007cb30c
@@ -3565,7 +3565,7 @@ extern struct Element *CastleObjElem;
 extern unsigned int DAT_0080ff68;
 // 0x0080ff6c
 extern void *DAT_0080ff6c;
-extern unsigned int DAT_0080ff70;
+extern unsigned int MapScreenClosePending;
 // 0x0080ff74
 extern LEGO_EXPORT unsigned int NEWFLC_AutoPlay;
 // 0x0080ff78
@@ -3597,7 +3597,7 @@ extern LEGO_EXPORT unsigned short NEWFLC_Repeat;
 // 0x008119b0
 extern LEGO_EXPORT struct EditState EditMode;
 // 0x008119bc
-extern unsigned int DAT_008119bc;
+extern unsigned int MapScreenOpenPending;
 struct MapMarker {
     unsigned int x, y;
 };
@@ -3714,7 +3714,7 @@ extern unsigned int DAT_00813abc;
 // 0x00813ac0
 extern unsigned int DAT_00813ac0;
 // 0x00813ac4
-extern unsigned int DAT_00813ac4;
+extern unsigned int MouseClickFlags;
 // 0x00813ac8
 extern unsigned int DAT_00813ac8;
 // 0x00813acc

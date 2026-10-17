@@ -32,7 +32,8 @@ def names_at(rev):
                 head = d.split("=")[0]
                 n = re.search(r"\(\s*\*\s*(\w+)\s*\)", head) or re.search(r"(\w+)\s*(\[[^=]*\])?\s*;?\s*$", head.strip())
             else:
-                n = re.search(r"(\w+)\s*\(", d)
+                # a naked function's definition starts with __declspec(naked): the name is the word before the next (
+                n = re.search(r"(\w+)\s*\(", re.sub(r"__declspec\s*\(\s*\w+\s*\)", "", d))
             if n:
                 out[(m.group(1) == "GLOBAL", int(m.group(2), 16))] = n.group(1)
     return out

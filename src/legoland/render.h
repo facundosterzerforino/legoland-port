@@ -35,7 +35,7 @@ LEGO_EXPORT unsigned int RenderSpriteX(struct Sprite *sprite, int x, int y, unsi
 LEGO_EXPORT unsigned int RenderTiledSprite(struct Sprite *sprite, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7);
 LEGO_EXPORT unsigned int RenderScaledSprite(struct Sprite *param_1, int param_2, int param_3, int param_4, int param_5);
 void FUN_004860f0(void);
-void FUN_00486250(void);
+void FreeCursorCache(void);
 void FUN_004864e0(void *param_1);
 void *FUN_00486280(int param_1, void *param_2);
 void FUN_00488700(unsigned char *base, struct RenderViewport *vp);
@@ -45,5 +45,5 @@ void FUN_00486c70(struct PersonVertex *a, struct PersonVertex *b, struct PersonV
 void FUN_004877b0(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
 void FUN_00487d40(struct PersonVertex *a, struct PersonVertex *b, struct PersonVertex *c);
 void FUN_004886e0(unsigned int index);
-void FUN_00488670(struct Image *image, unsigned int index);
-void FUN_004886a0(void);
+void LoadTextureNode(struct Image *image, unsigned int index);
+void FreeTextureNodes(void);

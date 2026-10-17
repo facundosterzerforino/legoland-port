@@ -110,7 +110,7 @@ void SetMoodDelta(unsigned int index, int value) {
 }
 
 // FUNCTION: LEGOLAND 0x00482d70
-void FUN_00482d70(void) {
+void SetDefaultMoodDeltas(void) {
     MapStats.mood_delta[4] = 5;
     MapStats.mood_delta[5] = 5;
     MapStats.mood_delta[6] = 5;
@@ -588,7 +588,7 @@ void LogBlokeRethinking(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x004838c0
-void FUN_004838c0(Bloke *bloke) {
+void BlokeActionWait(Bloke *bloke) {
     bloke->field_75--;
     if (bloke->field_75 == 0) {
         bloke->field_75 = 1;
@@ -597,7 +597,7 @@ void FUN_004838c0(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x004838e0
-void FUN_004838e0(Bloke *bloke) {
+void BlokeActionTurn(Bloke *bloke) {
     if (bloke->dir != bloke->field_73) {
         TurnTowardsTargetDir(bloke);
     }
@@ -886,7 +886,7 @@ int ReachedDestination(Bloke *bloke, int dist) {
 }
 
 // FUNCTION: LEGOLAND 0x004841e0
-unsigned char FUN_004841e0(Bloke *bloke) {
+unsigned char IsNearDestination(Bloke *bloke) {
     int dx = bloke->dest.x - bloke->nav.x;
     int dy = bloke->dest.y - bloke->nav.y;
     return (dx * dx + dy * dy) <= 0x400;
@@ -999,7 +999,7 @@ void FUN_00484520(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x004845d0
-void FUN_004845d0(Bloke *bloke) {
+void BlokeActionMoveToDest(Bloke *bloke) {
     Point target;
     if (ReachedDestination(bloke, bloke->speed << 1) != 0) {
         DoPendingAction(bloke);
@@ -1011,7 +1011,7 @@ void FUN_004845d0(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x00484630
-void FUN_00484630(Bloke *bloke) {
+void BlokeActionBounce(Bloke *bloke) {
     if (bloke->height == 0) {
         bloke->field_46 = bloke->field_44;
         if (bloke->field_3a-- == 0) {
@@ -1121,7 +1121,7 @@ void FUN_00484790(Bloke *bloke) {
 }
 
 // FUNCTION: LEGOLAND 0x004848e0
-void FUN_004848e0(Bloke *bloke) {
+void BlokeActionWaitWhileHovered(Bloke *bloke) {
     if (!((Hover.type >> 8) & 0x2) || Hover.ptr != bloke) {
         bloke->flags &= 0xfff7;
         DoPendingAction(bloke);
