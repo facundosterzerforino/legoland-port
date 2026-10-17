@@ -68,6 +68,10 @@ describe how `main` works.
        r.json` lists "100% effective" matches whose jumps moved (swapped if/else arms change behaviour).
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
   `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
+- **The web page:** every release's web zip is published to GitHub Pages with
+  `~/push-pages.sh dist/LEGOLAND-port-web-<version>.zip` (the gh-pages branch of `legoland-port`, one commit replaced
+  each time; https://facundosterzerforino.github.io/legoland-port/). The maintainer asked for it to update with each
+  release (2026-10-17). It holds no game data.
 - **Publishing:** the local `port` branch is pushed to `main` of the `legoland-port` repo with `~/push-port.sh`
   (remote `port-repo` in `~/legoland`). Decomp work still goes to the `legoland` repo; never push port changes
   there.

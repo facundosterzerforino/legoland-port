@@ -24,6 +24,9 @@ modern Windows support.
 
 ## Releases
 
+**Play in the browser:** <https://facundosterzerforino.github.io/legoland-port/> (the latest web release; you choose
+your own CD image, which stays in your browser).
+
 Each release is the program only; the first start installs the game from your LEGOLAND CD (or its image: an .iso or
 .bin), in any of its languages. `tools/release/make_release.py all` makes them in `dist/`, each with a README:
 
