@@ -1374,6 +1374,45 @@ static int Width(const struct Font *font, const unsigned char *s, int n, int tab
     return w;
 }
 
+void (*MiniwinTrace)(const char *line);
+
+/* Text that drew nothing, to the trace (the first few): the game's screens print theirs with TextOutA and
+ * DrawTextA, and a text missing in the game shows here with why (no pixels, no typeface, clipped away). */
+static long drawn_pixels;
+static int nothing_reported;
+
+static void ReportNothingDrawn(const char *call, const struct Dc *dc, const char *text, int count, const RECT *rect,
+    const RECT *clip) {
+    char line[320];
+    char shown[48];
+    int i;
+    int n = 0;
+    int visible = 0;
+
+    for (i = 0; i < count && text[i] != 0; i++) {
+        visible |= text[i] != ' ' && text[i] != '\r' && text[i] != '\n' && text[i] != '\t';
+        if (n < (int)sizeof(shown) - 1) {
+            shown[n++] = text[i] >= ' ' ? text[i] : ' ';
+        }
+    }
+    shown[n] = 0;
+    if (!visible || nothing_reported >= 40 || MiniwinTrace == NULL) {
+        return;
+    }
+    nothing_reported++;
+    snprintf(line, sizeof(line),
+        "gdi: %s \"%s\" drew nothing: DC %dx%d%s, font %s (height %d, charset %d), colour %06lx, rect (%ld,%ld,%ld,%ld), "
+        "clip (%ld,%ld,%ld,%ld)",
+        call, shown, dc->width, dc->height, dc->bits == NULL ? " without pixels" : "",
+        dc->font == NULL ? "none" : dc->font->file == NULL ? "without a typeface"
+                                                           : dc->font->file->face,
+        dc->font != NULL ? (int)dc->font->lf.lfHeight : 0, dc->font != NULL ? (int)dc->font->lf.lfCharSet : 0,
+        (unsigned long)dc->text_color, rect != NULL ? (long)rect->left : 0, rect != NULL ? (long)rect->top : 0,
+        rect != NULL ? (long)rect->right : 0, rect != NULL ? (long)rect->bottom : 0, (long)clip->left, (long)clip->top,
+        (long)clip->right, (long)clip->bottom);
+    MiniwinTrace(line);
+}
+
 /* draws a run with its cell's top-left at (x, y), within clip */
 static void DrawRun(struct Dc *dc, int x, int y, const unsigned char *s, int n, int tabs, const RECT *clip) {
     const struct Font *font = dc->font;
@@ -1426,6 +1465,7 @@ static void DrawRun(struct Dc *dc, int x, int y, const unsigned char *s, int n, 
                             int coverage = bitmap[gy * w + gx];
                             if (coverage > 0 && px >= clip->left && px < clip->right) {
                                 Blend(&row[px], dc->text_color, coverage);
+                                drawn_pixels++;
                             }
                         }
                     }
@@ -1457,7 +1497,16 @@ BOOL TextOutA(HDC handle, int x, int y, LPCSTR text, int count) {
     } else if ((dc->align & TA_BOTTOM) != 0) {
         y -= font->ascent + font->descent;
     }
-    DrawRun(dc, x, y, (const unsigned char *)text, count, 0, &dc->clip);
+    {
+        long before = drawn_pixels;
+        RECT at;
+
+        DrawRun(dc, x, y, (const unsigned char *)text, count, 0, &dc->clip);
+        if (drawn_pixels == before && dc->bits != NULL) {
+            SetRect(&at, x, y, x + w, y + font->ascent + font->descent);
+            ReportNothingDrawn("TextOutA", dc, text, count, &at, &dc->clip);
+        }
+    }
     if ((dc->align & TA_UPDATECP) != 0) {
         dc->position.x += w;
     }
@@ -1489,6 +1538,8 @@ int DrawTextA(HDC handle, LPCSTR text, int count, LPRECT rect, UINT format) {
     int y;
     int result;
     RECT clip;
+    long drawn_before = 0;
+    int drew_any = 0;
 
     if (dc == NULL || text == NULL || rect == NULL) {
         return 0;
@@ -1641,6 +1692,7 @@ int DrawTextA(HDC handle, LPCSTR text, int count, LPRECT rect, UINT format) {
         free(lines);
         return line_count * line_height;
     }
+    drawn_before = drawn_pixels;
     if ((format & DT_NOCLIP) != 0 || !IntersectRect(&clip, rect, &dc->clip)) {
         if ((format & DT_NOCLIP) != 0) {
             clip = dc->clip;
@@ -1659,6 +1711,7 @@ int DrawTextA(HDC handle, LPCSTR text, int count, LPRECT rect, UINT format) {
             x = rect->right - w;
         }
         DrawRun(dc, x, y, s + lines[i].start, lines[i].length, tabs, &clip);
+        drew_any |= drawn_pixels != drawn_before;
         for (j = 0; j < lines[i].length; j++) {
             if (underline[lines[i].start + j]) {
                 RECT u;
@@ -1671,6 +1724,9 @@ int DrawTextA(HDC handle, LPCSTR text, int count, LPRECT rect, UINT format) {
             }
         }
         y += line_height;
+    }
+    if (!drew_any && dc->bits != NULL) {
+        ReportNothingDrawn("DrawTextA", dc, text, count, rect, &clip);
     }
     free(s);
     free(underline);

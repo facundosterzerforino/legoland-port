@@ -97,6 +97,9 @@ void MiniwinSoundBufferSetSource(LPDIRECTSOUNDBUFFER buffer, void (*source)(void
 /* -port-selftest: the game's fonts and text drawn as the game draws them, the pixels counted (miniwin/src/posix/gdi.c);
  * returns the problems (text that draws nothing) */
 int MiniwinTextSelfTest(FILE *report);
+
+/* A line for the port's trace (port/port_posix.c sets it; NULL: none): what miniwin's GDI reports */
+extern void (*MiniwinTrace)(const char *line);
 #endif
 
 #endif

@@ -18,7 +18,13 @@
 
 #include <SDL3/SDL_main.h> /* Android: main is the SDL_main its Java side calls */
 
+#include "miniwin/miniwin.h"
+#include "port_trace.h"
 #include "port_watchdog.h"
+
+static void TraceLine(const char *line) {
+    PortTrace("%s", line);
+}
 
 void PosixThreadSignalStack(void); /* miniwin/src/posix/seh.c */
 
@@ -84,6 +90,7 @@ int main(int argc, char **argv) {
         }
         strcat(line, argv[i]);
     }
+    MiniwinTrace = TraceLine; /* miniwin's reports in the port's trace */
     result = WinMain(GetModuleHandleA(NULL), NULL, line, SW_SHOWNORMAL);
     free(line);
 #ifdef LEGOLAND_WEB_BROWSER
