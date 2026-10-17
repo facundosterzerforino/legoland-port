@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include "globals.h"
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#endif
 #include "obj_instance.h"
 
 #include "challenge.h"
@@ -81,6 +84,30 @@ unsigned int FUN_0046cf20(void) {
 LEGO_EXPORT void ProcessInGameHelp(void) {
     int delta;
 
+#ifdef LEGOLAND_PORT
+    {
+        /* [port] every 10 s: the level script's state (game timer, its last run, the pending events), to debug a
+         * tutorial that doesn't go on (tutorial 4, web, 2026-10-17). Remove once found. */
+        static DWORD last;
+        static int lines;
+        DWORD now = GetTickCount();
+
+        if (now - last >= 10000 && lines < 300) {
+            char types[160];
+            int n = 0;
+            struct ObjectiveEvent *ev;
+
+            last = now;
+            lines++;
+            types[0] = 0;
+            for (ev = ScriptEventList; ev != NULL && n < (int)sizeof(types) - 8; ev = ev->next) {
+                n += snprintf(types + n, sizeof(types) - n, " %d%s", (int)ev->type, (ev->flags_10 & 0x80) ? "*" : "");
+            }
+            DebugTrace("objectives: game timer %u%s, script ran at %u, stopped %u, events%s", GetGameTimer(),
+                GameTimerPaused != 0 ? " (paused)" : "", DAT_007fe054, IsScriptStopped(), types);
+        }
+    }
+#endif
     PostPendingObjectiveHints();
 
     delta = (int)(GetGameTimer() - DAT_007fe054);

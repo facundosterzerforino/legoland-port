@@ -906,8 +906,31 @@ unsigned int ScriptEventCheckFlag(struct ObjectiveEvent *arg) {
     return 0;
 }
 
+#ifdef LEGOLAND_PORT
+/* [port] log what the SELECTTHEME/SELECTTAB/SELECTMODE objectives see whenever it changes, to debug a tutorial
+ * that doesn't go on (tutorial 4, web, 2026-10-17). Remove once found. */
+static void PortTraceSelect(int kind, int want, int now) {
+    static const char *const names[3] = {"SELECTTHEME", "SELECTTAB", "SELECTMODE"};
+    static int last_want[3] = {-1, -1, -1};
+    static int last_now[3] = {-1, -1, -1};
+    static int last_screen[3] = {-1, -1, -1};
+
+    if (want != last_want[kind] || now != last_now[kind] || (int)EditMode.unk4 != last_screen[kind]) {
+        last_want[kind] = want;
+        last_now[kind] = now;
+        last_screen[kind] = (int)EditMode.unk4;
+        DebugTrace("objective %s wants %d, now %d (theme %d, mode %d, screen %d, game timer %u%s)", names[kind], want,
+            now, (int)DAT_004baff8, (int)EditMode.unk0, (int)EditMode.unk4, GetGameTimer(),
+            GameTimerPaused != 0 ? " paused" : "");
+    }
+}
+#endif
+
 // FUNCTION: LEGOLAND 0x0046b100
 unsigned int ScriptEventSelectTheme(struct ObjectiveEvent *arg) {
+#ifdef LEGOLAND_PORT
+    PortTraceSelect(0, (int)arg->field_1c, (int)DAT_004baff8);
+#endif
     if (arg->field_1c == DAT_004baff8) {
         return 1;
     }
@@ -919,6 +942,9 @@ unsigned int ScriptEventSelectTheme(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046b130
 unsigned int ScriptEventSelectTab(struct ObjectiveEvent *arg) {
+#ifdef LEGOLAND_PORT
+    PortTraceSelect(1, (int)arg->field_1c, (int)DAT_00668e34);
+#endif
     if (DAT_004baff8 != 5) {
         if (arg->field_1c != 0 && DAT_00668e34 != 0) {
             return 1;
@@ -935,6 +961,9 @@ unsigned int ScriptEventSelectTab(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046b180
 unsigned int ScriptEventSelectMode(struct ObjectiveEvent *arg) {
+#ifdef LEGOLAND_PORT
+    PortTraceSelect(2, (int)arg->field_1c, (int)EditMode.unk0);
+#endif
     if (arg->field_1c == 3) {
         if (EditMode.unk0 == 1 && EditMode.unk8 == PathControlObject) {
             return 1;
@@ -1117,6 +1146,10 @@ void RunLevelScript(void) {
                     node->timestamp = ScriptEvalTime;
                     if (ScriptEventHandlers[node->type](node) != 0) {
                         if ((node->flags_10 & 7) == 0) {
+#ifdef LEGOLAND_PORT
+                            /* [port] see PortTraceSelect */
+                            DebugTrace("objective event %d met", (int)node->type);
+#endif
                             if (prev != NULL) {
                                 prev->next = node->next;
                             } else {
@@ -1183,6 +1216,9 @@ void RunLevelScript(void) {
             CurrentScriptSection = ScriptSectionList;
             if (ScriptSectionList != NULL) {
                 ScriptSectionStarted = 1;
+#ifdef LEGOLAND_PORT
+                DebugTrace("objective section started"); /* [port] see PortTraceSelect */
+#endif
                 AppendObjectiveEventList((struct NerpsListNode *)ScriptSectionList);
                 ResetObjectiveHintTimer();
             }

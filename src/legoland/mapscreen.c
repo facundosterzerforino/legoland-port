@@ -1,6 +1,9 @@
 #include <string.h>
 
 #include "legoland.h"
+#ifdef LEGOLAND_PORT
+#include "debug.h"
+#endif
 
 #include "castle.h"
 #include "clipping.h"
@@ -373,6 +376,26 @@ LEGO_EXPORT void RenderFullMap(void) {
             origin[1] += ScrollY >> 8;
             base.x = ((origin[0] - MapWorldMinX) * scale_x) >> 16;
             base.y = (((origin[1] - DAT_00667c04) * scale_y) >> 16) + MapCenterOffsetY;
+#ifdef LEGOLAND_PORT
+            {
+                /* [port] trace the first map renders' overlay sprites (render.c, PortTraceScaledSprites) */
+                static int renders;
+                struct Overlay *ov;
+                int count = 0;
+
+                for (ov = OverlayList; ov != NULL; ov = ov->next) {
+                    count++;
+                }
+                if (renders < 3) {
+                    renders++;
+                    DebugTrace("map render %d: %d overlays, clip %d,%d-%d,%d, origin %d,%d, scale %d,%d, tile %dx%d",
+                        renders, count, (int)SPRITE_ClipRect.left, (int)SPRITE_ClipRect.top,
+                        (int)SPRITE_ClipRect.right, (int)SPRITE_ClipRect.bottom, base.x, base.y, scale_x, scale_y,
+                        tile_w, tile_h);
+                    PortTraceScaledSprites = 1;
+                }
+            }
+#endif
             while (node != NULL) {
                 PrintScaledSprite(node->sprite,
                     (((tile_w * 2 / 3 + node->x) * scale_x) >> 16) + base.x,
@@ -381,6 +404,9 @@ LEGO_EXPORT void RenderFullMap(void) {
                     ((short)node->sprite->height * scale_y) >> 16);
                 node = node->next;
             }
+#ifdef LEGOLAND_PORT
+            PortTraceScaledSprites = 0;
+#endif
         }
 
         /* Pass 4: the placed objects. */
