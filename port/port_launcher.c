@@ -333,7 +333,7 @@ int PortLauncherRun(HINSTANCE instance, const char *cmdline) {
         }
     }
     ask = GetPrivateProfileIntA("display", "show_launcher", 1, ini_path) != 0;
-    ExtLevelMusic = GetPrivateProfileIntA("extensions", "level_music", 0, ini_path) != 0; /* extensions/ext_music.h */
+    ExtLevelMusic = GetPrivateProfileIntA("extensions", "level_music", 1, ini_path) != 0; /* extensions/ext_music.h */
 
     from_cmdline = ParseResolution(cmdline, &chosen_width, &chosen_height);
     if (strstr(cmdline, "WINDEBUG") != NULL || strstr(cmdline, "-windowed") != NULL) {

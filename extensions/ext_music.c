@@ -7,7 +7,7 @@
 #include "../src/legoland/globals.h"
 #include "../src/legoland/sound_sfx.h"
 
-int ExtLevelMusic = 0;
+int ExtLevelMusic = 1;
 
 enum {
     MUSIC_THEME,

@@ -86,6 +86,8 @@
     box-shadow: inset 0 0 0 2px var(--line), 0 2px 0 #0000000d; }
   button.secondary:active, label.secondary:active { box-shadow: inset 0 0 0 2px var(--line); }
   input[type=file] { display: none; }
+  .option { display: inline-flex; align-items: center; gap: .5rem; margin-top: .9rem; font-weight: 700; cursor: pointer; }
+  .option input { width: 1.2rem; height: 1.2rem; accent-color: var(--red); cursor: pointer; }
   progress { width: 100%; height: .9rem; border-radius: 999px; overflow: hidden; border: 0; background: #ece9df; appearance: none; }
   progress::-webkit-progress-bar { background: #ece9df; }
   progress::-webkit-progress-value { background: linear-gradient(90deg, var(--red), var(--yellow)); border-radius: 999px; }
@@ -129,6 +131,7 @@
     <div id="ready" class="hidden">
       <p data-t="installed"></p>
       <div class="actions"><button id="play"></button></div>
+      <label class="option"><input type="checkbox" id="level-music"> <span data-t="levelMusic"></span></label>
       <p class="muted" id="instruments-note" data-t="instrumentsNote"></p>
       <div class="tools">
         <label class="button secondary" for="instruments" id="instruments-button" data-t="instrumentsButton"></label>
@@ -335,25 +338,25 @@
   };
   /* the header's and footer's texts */
   const EXTRA = {
-    en: { tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
+    en: { levelMusic: 'Music changes with the level', tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
       source: 'Source code on GitHub', disclaimer: 'A fan project, not made or endorsed by the LEGO Group. LEGO and LEGOLAND are trademarks of the LEGO Group.' },
-    es: { tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
+    es: { levelMusic: 'La música cambia con el nivel', tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
       source: 'Código fuente en GitHub', disclaimer: 'Un proyecto de fans, no hecho ni respaldado por el Grupo LEGO. LEGO y LEGOLAND son marcas del Grupo LEGO.' },
-    de: { tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
+    de: { levelMusic: 'Musik wechselt mit dem Level', tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
       source: 'Quellcode auf GitHub', disclaimer: 'Ein Fanprojekt, nicht von der LEGO Gruppe erstellt oder unterstützt. LEGO und LEGOLAND sind Marken der LEGO Gruppe.' },
-    fr: { tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
+    fr: { levelMusic: 'La musique change avec le niveau', tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
       source: 'Code source sur GitHub', disclaimer: 'Un projet de fans, ni créé ni approuvé par le Groupe LEGO. LEGO et LEGOLAND sont des marques du Groupe LEGO.' },
-    it: { tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
+    it: { levelMusic: 'La musica cambia con il livello', tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
       source: 'Codice sorgente su GitHub', disclaimer: 'Un progetto di fan, non realizzato né approvato dal Gruppo LEGO. LEGO e LEGOLAND sono marchi del Gruppo LEGO.' },
-    nl: { tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
+    nl: { levelMusic: 'Muziek verandert met het level', tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
       source: 'Broncode op GitHub', disclaimer: 'Een fanproject, niet gemaakt of goedgekeurd door de LEGO Groep. LEGO en LEGOLAND zijn handelsmerken van de LEGO Groep.' },
-    da: { tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
+    da: { levelMusic: 'Musikken skifter med banen', tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprojekt, ikke lavet eller godkendt af LEGO Koncernen. LEGO og LEGOLAND er varemærker tilhørende LEGO Koncernen.' },
-    sv: { tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
+    sv: { levelMusic: 'Musiken byts med banan', tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
       source: 'Källkod på GitHub', disclaimer: 'Ett fanprojekt, inte gjort eller godkänt av LEGO-koncernen. LEGO och LEGOLAND är varumärken som tillhör LEGO-koncernen.' },
-    no: { tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
+    no: { levelMusic: 'Musikken skifter med brettet', tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprosjekt, ikke laget eller godkjent av LEGO-konsernet. LEGO og LEGOLAND er varemerker som tilhører LEGO-konsernet.' },
-    cs: { tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
+    cs: { levelMusic: 'Hudba se mění podle úrovně', tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
       source: 'Zdrojový kód na GitHubu', disclaimer: 'Fanouškovský projekt, který skupina LEGO nevytvořila ani neschválila. LEGO a LEGOLAND jsou ochranné známky skupiny LEGO.' },
   };
   for (const [code, texts] of Object.entries(EXTRA)) Object.assign(TEXTS[code].t, texts);
@@ -771,13 +774,20 @@
     },
   };
 
+  /* level music (extensions/ext_music.h): on unless turned off here (remembered in this browser) */
+  const levelMusic = document.getElementById('level-music');
+  try { levelMusic.checked = localStorage.getItem('legoland-level-music') !== '0'; } catch (e) { levelMusic.checked = true; }
+  levelMusic.addEventListener('change', () => {
+    try { localStorage.setItem('legoland-level-music', levelMusic.checked ? '1' : '0'); } catch (e) {}
+  });
+
   document.getElementById('play').addEventListener('click', async () => {
     const canvas = document.getElementById('canvas');
     document.getElementById('panel').style.display = 'none';
     canvas.style.display = 'block';
     canvas.focus();
     try { await document.documentElement.requestFullscreen(); } catch (e) {}
-    await window.startGame([]);
+    await window.startGame(levelMusic.checked ? [] : ['-no-level-music']);
   });
 
   applyTexts();

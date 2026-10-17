@@ -10,8 +10,9 @@ extern int ExtSkipLogo;
 
 /* -console opens a debug console for playtesting (ext_console.h; commands in docs/debug-console.md). */
 
-/* Level music (ext_music.h): each level plays the music theme that fits it. Off by default; the launcher's "Music
- * changes with the level" box saves the choice, and -level-music / -no-level-music override it. */
+/* Level music (ext_music.h): each level plays the music theme that fits it. On by default (the maintainer's choice,
+ * 2026-10-17); the launcher's "Music changes with the level" box and the web page's checkbox save the choice, and
+ * -level-music / -no-level-music override it. */
 
 /* Pause movies (ext_movie.h): a movie stops while the game is in the background instead of running on. On by
  * default (the maintainer's choice); -no-pause-movies turns it off. */
