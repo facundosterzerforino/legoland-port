@@ -4,68 +4,150 @@
      copied there for the game's setup to install from (port/port_setup_sdl.c). The game runs in threads, which need
      the page to be cross-origin isolated: coi-serviceworker.js arranges that on hosts that can't send the headers.
      Its texts come in the setup window's languages (port/port_setup_win.c), the browser's first; saved games can be
-     exported to a .zip and imported back. -->
+     exported to a .zip and imported back. The look: a sky over a LEGO baseplate, CSS only. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LEGOLAND</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="coi-serviceworker.js"></script>
 <style>
-  :root { --bg: #1b1b1f; --fg: #f2f2f2; --muted: #a8a8b0; --accent: #f6c400; --panel: #2a2a31; --box: #34343c; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f4f4f6; --fg: #18181b; --muted: #55555c; --panel: #ffffff; --box: #eeeef2; } }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, sans-serif; }
-  #canvas { display: none; width: 100vw; height: 100vh; background: #000; outline: none; }
-  #panel { max-width: 34rem; margin: 6vh auto; padding: 1.5rem 1.75rem; background: var(--panel); border-radius: 12px; }
-  @media (max-width: 40rem) { #panel { margin: 0; border-radius: 0; min-height: 100%; box-sizing: border-box; padding: 1.25rem 1rem; } }
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  h1 { margin: 0 0 .5rem; font-size: 1.6rem; }
-  select { font: inherit; padding: .25rem .4rem; border-radius: 6px; background: var(--box); color: var(--fg); border: 1px solid var(--muted); }
+  /* A park on a sunny day: a sky with clouds over a green baseplate, the page as a white card. CSS only: no game art
+     (the game's files are copyrighted) and no outside fonts (the page is cross-origin isolated). */
+  :root {
+    --ink: #1d2333; --muted: #5b6275; --card: #fffdf8; --line: #e4e1d8;
+    --red: #e3000b; --red-dark: #a30008; --yellow: #ffd500; --yellow-dark: #c9a400; --blue: #006cb7; --green: #3c9a3c;
+    --font: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", "Segoe UI", system-ui, sans-serif;
+  }
+  html, body { margin: 0; min-height: 100%; }
+  body { color: var(--ink); font: 16px/1.5 var(--font); overflow-x: hidden; }
+  #canvas { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: #000; outline: none; z-index: 10; }
+
+  .sky { position: fixed; inset: 0; z-index: -2; background: linear-gradient(#2f8fe0 0%, #6cbaf5 45%, #b9e3fd 80%); }
+  .cloud { position: absolute; width: 9rem; height: 2.6rem; background: #fff; border-radius: 2rem; opacity: .9;
+    animation: drift 70s linear infinite; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .cloud::before { width: 3.6rem; height: 3.6rem; left: 1.4rem; top: -1.7rem; }
+  .cloud::after { width: 4.6rem; height: 4.6rem; left: 3.6rem; top: -2.4rem; }
+  .cloud.c1 { top: 12%; left: -12rem; }
+  .cloud.c2 { top: 26%; left: -12rem; transform: scale(.7); animation-duration: 95s; animation-delay: -40s; }
+  .cloud.c3 { top: 6%; left: -12rem; transform: scale(.5); animation-duration: 120s; animation-delay: -80s; }
+  @keyframes drift { to { left: 110%; } }
+  @media (prefers-reduced-motion: reduce) { .cloud { animation: none; left: 70%; } .cloud.c2 { left: 15%; } .cloud.c3 { left: 45%; } }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  html { background: linear-gradient(#2f8fe0, #b9e3fd 70%, var(--green) 70%); }
+  .base { flex: 1 0 auto; margin-top: -3.5rem; padding: 4.8rem 1rem 2rem; border-top: 6px solid #2c7a2c;
+    background-color: var(--green);
+    background-image: radial-gradient(circle at 50% 42%, #6cc56c 0 22%, #4fae4f 24% 30%, #2f7f2f 32% 36%, transparent 38%);
+    background-size: 26px 26px; }
+
+  .page { box-sizing: border-box; width: 100%; max-width: 38rem; margin: 0 auto; padding: 1rem 1rem 0; position: relative; z-index: 1; }
+  .topbar { display: flex; justify-content: flex-end; }
+  select { font: inherit; font-size: .9rem; padding: .3rem .6rem; border-radius: 999px; border: 2px solid #ffffffb0;
+    background: #ffffff30; color: #fff; font-weight: 700; cursor: pointer; backdrop-filter: blur(4px); }
+  select option { color: var(--ink); }
+  header { text-align: center; margin: 1.5rem 0 1.2rem; }
+  h1 { margin: 0; font-size: clamp(2.8rem, 11vw, 4.6rem); line-height: 1; font-weight: 900; letter-spacing: .02em;
+    color: var(--yellow); text-shadow: 0 .06em 0 var(--red), 0 .12em 0 var(--red-dark), 0 .25em .5em #0000004d; }
+  .tagline { margin: .9rem 0 0; color: #fff; font-size: 1.1rem; font-weight: 700; text-shadow: 0 2px 6px #00000059; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: 1rem; }
+  .chip { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .8rem; border-radius: 999px;
+    background: #ffffffd9; font-size: .85rem; font-weight: 700; box-shadow: 0 2px 0 #0000001a; }
+  .chip::before { content: ""; width: .65rem; height: .65rem; border-radius: 3px; background: var(--c); box-shadow: inset 0 -2px 0 #00000033; }
+
+  #panel { background: var(--card); border-radius: 20px; padding: 1.5rem 1.6rem 1.3rem; border: 3px solid #fff;
+    box-shadow: 0 10px 0 #0000001f, 0 24px 48px #00305c40; }
+  #steps h2 { margin: 0 0 .7rem; font-size: 1.15rem; font-weight: 800; }
+  #steps ol { list-style: none; margin: 0 0 1rem; padding: 0; counter-reset: step; }
+  #steps li { counter-increment: step; position: relative; padding: .1rem 0 .1rem 2.6rem; margin: .55rem 0; min-height: 1.9rem; }
+  #steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 1.9rem; height: 1.9rem;
+    border-radius: 6px; display: grid; place-items: center; color: #fff; font-weight: 900; background: var(--red);
+    box-shadow: inset 0 -3px 0 #00000040, 0 2px 0 #0000001f; }
+  #steps li:nth-child(2)::before { background: var(--yellow); color: var(--ink); }
+  #steps li:nth-child(3)::before { background: var(--blue); }
+  #status { font-weight: 700; margin: .6rem 0; }
+  #status:empty { display: none; }
   p { margin: .6rem 0; }
   .muted { color: var(--muted); font-size: .9rem; }
-  #steps { background: var(--box); border-radius: 8px; padding: .7rem 1rem; margin: .8rem 0; }
-  #steps h2 { font-size: 1rem; margin: 0 0 .3rem; }
-  #steps ol { margin: 0; padding-left: 1.3rem; }
-  #steps li { margin: .25rem 0; }
-  button, label.button { display: inline-block; margin: .8rem .5rem 0 0; padding: .6rem 1.1rem; border: 0; border-radius: 8px;
-    background: var(--accent); color: #111; font: inherit; font-weight: 600; cursor: pointer; }
-  button.secondary, label.secondary { background: transparent; color: var(--muted); border: 1px solid var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .9rem; }
+  .tools { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed var(--line); }
+  button, label.button { display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: .7rem 1.3rem;
+    border: 0; border-radius: 12px; font: inherit; font-weight: 800; cursor: pointer; color: var(--ink);
+    background: var(--yellow); box-shadow: inset 0 -4px 0 var(--yellow-dark), 0 3px 0 #0000001f;
+    transition: transform .08s, filter .15s; -webkit-tap-highlight-color: transparent; }
+  button:hover, label.button:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  button:active, label.button:active { transform: translateY(2px); box-shadow: inset 0 -2px 0 var(--yellow-dark); }
+  button:focus-visible, label.button:focus-within, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  #play { background: var(--red); color: #fff; font-size: 1.15rem; padding: .8rem 2rem; box-shadow: inset 0 -4px 0 var(--red-dark), 0 3px 0 #0000001f; }
+  #play:active { box-shadow: inset 0 -2px 0 var(--red-dark); }
+  button.secondary, label.secondary { background: #fff; color: var(--muted); font-weight: 700; font-size: .9rem; padding: .5rem .9rem;
+    box-shadow: inset 0 0 0 2px var(--line), 0 2px 0 #0000000d; }
+  button.secondary:active, label.secondary:active { box-shadow: inset 0 0 0 2px var(--line); }
   input[type=file] { display: none; }
-  progress { width: 100%; height: 1rem; }
+  progress { width: 100%; height: .9rem; border-radius: 999px; overflow: hidden; border: 0; background: #ece9df; appearance: none; }
+  progress::-webkit-progress-bar { background: #ece9df; }
+  progress::-webkit-progress-value { background: linear-gradient(90deg, var(--red), var(--yellow)); border-radius: 999px; }
+  progress::-moz-progress-bar { background: linear-gradient(90deg, var(--red), var(--yellow)); border-radius: 999px; }
+  footer { max-width: 36rem; margin: 0 auto; text-align: center; color: #fff; font-size: .85rem; padding: .7rem 1rem;
+    background: #0f3d0fb3; border-radius: 14px; backdrop-filter: blur(2px); }
+  footer p { margin: .3rem 0; }
+  footer a { color: #fff; font-weight: 800; }
   .hidden { display: none !important; }
+  @media (max-width: 30rem) { #panel { padding: 1.2rem 1rem; border-radius: 16px; } .actions > * { flex: 1 1 auto; } }
 </style>
 </head>
 <body>
 <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
-<div id="panel">
-  <div class="top">
+<div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
+<div class="page">
+  <div class="topbar"><select id="lang" aria-label="Language"></select></div>
+  <header>
     <h1>LEGOLAND</h1>
-    <select id="lang" aria-label="Language"></select>
-  </div>
-  <div id="steps">
-    <h2 data-t="howTo"></h2>
-    <ol><li data-t="step1"></li><li data-t="step2"></li><li data-t="step3"></li></ol>
-  </div>
-  <p id="status">Loading...</p>
-  <progress id="progress" class="hidden"></progress>
-  <div id="choose" class="hidden">
-    <p data-t="choose"></p>
-    <label class="button" for="iso" data-t="chooseButton"></label>
-    <input type="file" id="iso" accept=".iso,.bin,application/x-iso9660-image">
-  </div>
-  <div id="ready" class="hidden">
-    <p data-t="installed"></p>
-    <p class="muted" id="instruments-note" data-t="instrumentsNote"></p>
-    <label class="button secondary" for="instruments" id="instruments-button" data-t="instrumentsButton"></label>
-    <input type="file" id="instruments" accept=".dls,.sf2">
-    <button id="play"></button>
-    <button id="export" class="secondary" data-t="export"></button>
-    <label class="button secondary" for="import" data-t="import"></label>
-    <input type="file" id="import" accept=".zip,application/zip">
-    <button id="remove" class="secondary" data-t="remove"></button>
-    <button id="trace" class="secondary hidden" data-t="trace"></button>
-  </div>
-  <p class="muted" data-t="footer"></p>
+    <p class="tagline" data-t="tagline"></p>
+    <div class="chips">
+      <span class="chip" style="--c: var(--red)" data-t="feat1"></span>
+      <span class="chip" style="--c: var(--yellow)" data-t="feat2"></span>
+      <span class="chip" style="--c: var(--blue)" data-t="feat3"></span>
+    </div>
+  </header>
+  <main id="panel">
+    <div id="steps">
+      <h2 data-t="howTo"></h2>
+      <ol><li data-t="step1"></li><li data-t="step2"></li><li data-t="step3"></li></ol>
+    </div>
+    <p id="status">Loading...</p>
+    <progress id="progress" class="hidden"></progress>
+    <div id="choose" class="hidden">
+      <p class="muted" data-t="choose"></p>
+      <div class="actions">
+        <label class="button" for="iso" data-t="chooseButton"></label>
+        <input type="file" id="iso" accept=".iso,.bin,application/x-iso9660-image">
+      </div>
+    </div>
+    <div id="ready" class="hidden">
+      <p data-t="installed"></p>
+      <div class="actions"><button id="play"></button></div>
+      <p class="muted" id="instruments-note" data-t="instrumentsNote"></p>
+      <div class="tools">
+        <label class="button secondary" for="instruments" id="instruments-button" data-t="instrumentsButton"></label>
+        <input type="file" id="instruments" accept=".dls,.sf2">
+        <button id="export" class="secondary" data-t="export"></button>
+        <label class="button secondary" for="import" data-t="import"></label>
+        <input type="file" id="import" accept=".zip,application/zip">
+        <button id="trace" class="secondary hidden" data-t="trace"></button>
+        <button id="remove" class="secondary" data-t="remove"></button>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="base">
+  <footer>
+    <p data-t="footer"></p>
+    <p><a href="https://github.com/facundosterzerforino/legoland-port" data-t="source"></a></p>
+    <p data-t="disclaimer"></p>
+  </footer>
 </div>
 <script>
   /* ---- the page's texts, in the setup window's languages (port/port_setup_win.c) ---- */
@@ -251,6 +333,30 @@
       removeConfirm: 'Odstranit soubory hry (a uložené parky) z tohoto prohlížeče?',
       footer: 'Port hry LEGOLAND: hra z roku 1999, dekompilovaná. Potřebuješ vlastní CD.' } },
   };
+  /* the header's and footer's texts */
+  const EXTRA = {
+    en: { tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
+      source: 'Source code on GitHub', disclaimer: 'A fan project, not made or endorsed by the LEGO Group. LEGO and LEGOLAND are trademarks of the LEGO Group.' },
+    es: { tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
+      source: 'Código fuente en GitHub', disclaimer: 'Un proyecto de fans, no hecho ni respaldado por el Grupo LEGO. LEGO y LEGOLAND son marcas del Grupo LEGO.' },
+    de: { tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
+      source: 'Quellcode auf GitHub', disclaimer: 'Ein Fanprojekt, nicht von der LEGO Gruppe erstellt oder unterstützt. LEGO und LEGOLAND sind Marken der LEGO Gruppe.' },
+    fr: { tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
+      source: 'Code source sur GitHub', disclaimer: 'Un projet de fans, ni créé ni approuvé par le Groupe LEGO. LEGO et LEGOLAND sont des marques du Groupe LEGO.' },
+    it: { tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
+      source: 'Codice sorgente su GitHub', disclaimer: 'Un progetto di fan, non realizzato né approvato dal Gruppo LEGO. LEGO e LEGOLAND sono marchi del Gruppo LEGO.' },
+    nl: { tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
+      source: 'Broncode op GitHub', disclaimer: 'Een fanproject, niet gemaakt of goedgekeurd door de LEGO Groep. LEGO en LEGOLAND zijn handelsmerken van de LEGO Groep.' },
+    da: { tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
+      source: 'Kildekode på GitHub', disclaimer: 'Et fanprojekt, ikke lavet eller godkendt af LEGO Koncernen. LEGO og LEGOLAND er varemærker tilhørende LEGO Koncernen.' },
+    sv: { tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
+      source: 'Källkod på GitHub', disclaimer: 'Ett fanprojekt, inte gjort eller godkänt av LEGO-koncernen. LEGO och LEGOLAND är varumärken som tillhör LEGO-koncernen.' },
+    no: { tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
+      source: 'Kildekode på GitHub', disclaimer: 'Et fanprosjekt, ikke laget eller godkjent av LEGO-konsernet. LEGO og LEGOLAND er varemerker som tilhører LEGO-konsernet.' },
+    cs: { tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
+      source: 'Zdrojový kód na GitHubu', disclaimer: 'Fanouškovský projekt, který skupina LEGO nevytvořila ani neschválila. LEGO a LEGOLAND jsou ochranné známky skupiny LEGO.' },
+  };
+  for (const [code, texts] of Object.entries(EXTRA)) Object.assign(TEXTS[code].t, texts);
   const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
   function pickLanguage() {

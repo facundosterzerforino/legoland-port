@@ -182,6 +182,15 @@ def web(version, commit):
         for f in ('legoland.js', 'legoland.wasm', 'coi-serviceworker.js'):
             z.write(os.path.join(build, f), 'LEGOLAND/' + f)
         z.write(fetch_soundfont.fetch(), 'LEGOLAND/GeneralUser-GS.sf2')
+        # the page's icons: the original exe's window icon, made from external/legoland.exe (not committed), as for
+        # the Android app (tools/android/build_apk.sh)
+        exe = os.path.join(ROOT, 'external', 'legoland.exe')
+        if os.path.exists(exe):
+            for icon, size in (('favicon.png', 64), ('apple-touch-icon.png', 180)):
+                out = os.path.join(build, icon)
+                subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'android', 'exe_icon.py'), exe, out,
+                                str(size)], check=True)
+                z.write(out, 'LEGOLAND/' + icon)
         z.writestr('LEGOLAND/README.txt', readme('web', version))
         for arc, text in sorted(licenses(build, 'web', commit).items()):
             z.writestr('LEGOLAND/' + arc, text)
