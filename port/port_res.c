@@ -3,19 +3,27 @@
    port-selftest-odf.txt in a form that doesn't depend on the build, so the 32-bit and the 64-bit reports must be
    the same file. */
 #include <windows.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../src/legoland/binv.h"
+#include "../src/legoland/bloke.h"
 #include "../src/legoland/castle.h"
+#include "../src/legoland/challenge.h"
 #include "../src/legoland/draw.h"
+#include "../src/legoland/gamemap.h"
 #include "../src/legoland/globals.h"
+#include "../src/legoland/icon.h"
 #include "../src/legoland/image_sprite.h"
+#include "../src/legoland/interface.h"
 #include "../src/legoland/legoland.h"
+#include "../src/legoland/llidb.h"
 #include "../src/legoland/man3d.h"
 #include "../src/legoland/movie_pool.h"
 #include "../src/legoland/obj_instance.h"
+#include "../src/legoland/objclass.h"
 #include "../src/legoland/print_sprite.h"
 #include "../src/legoland/profile_io.h"
 #include "../src/legoland/render.h"
@@ -24,7 +32,10 @@
 #include "../src/legoland/sound_sfx.h"
 #include "../src/legoland/string.h"
 #include "../src/legoland/text.h"
+#include "../src/legoland/tilemap.h"
+#include "../src/legoland/worker.h"
 #include "miniwin/files.h"
+#include "port_globals_layout.h"
 #include "port_language.h"
 #include "port_res.h"
 #include "port_x86.h"
@@ -683,6 +694,123 @@ static void PortResCheckTextPath(void) {
     PortResTextSurface = NULL;
 }
 
+/* The string table as the game loads it (LoadStringTable), against strings\\stab.str read here: every id the file
+ * has must come back from GetString, the same text. A missing one is a text missing in the game (the exit dialog,
+ * the tutorial notebook, the info popups' "(null)"). */
+static void PortResCheckStrings(void) {
+    FILE *f = fopen("strings/stab.str", "rb");
+    char *data;
+    long size;
+    long i;
+    int ids = 0;
+    int found = 0;
+    int differ = 0;
+    int reported = 0;
+
+    if (f == NULL || fseek(f, 0, SEEK_END) != 0 || (size = ftell(f)) <= 0 || fseek(f, 0, SEEK_SET) != 0 ||
+        (data = (char *)malloc((size_t)size + 1)) == NULL || fread(data, 1, (size_t)size, f) != (size_t)size) {
+        if (f != NULL) {
+            fclose(f);
+        }
+        fprintf(PortResReport, "strings: strings/stab.str doesn't read\n");
+        PortResProblems++;
+        return;
+    }
+    fclose(f);
+    data[size] = 0;
+    LoadStringTable();
+    for (i = 0; i < size;) {
+        if (isdigit((unsigned char)data[i])) {
+            int id = 0;
+            char text[1024];
+            int n = 0;
+            const char *got;
+
+            while (i < size && isdigit((unsigned char)data[i])) {
+                id = id * 10 + (data[i++] - '0');
+            }
+            while (i < size && data[i] != '"' && !isdigit((unsigned char)data[i])) {
+                i++;
+            }
+            if (i >= size || data[i] != '"') {
+                continue;
+            }
+            i++;
+            while (i < size) {
+                if (data[i] == '"') {
+                    if (i + 1 < size && data[i + 1] == '"') {
+                        i += 2;
+                        if (n < (int)sizeof(text) - 1) {
+                            text[n++] = '"';
+                        }
+                        continue;
+                    }
+                    i++;
+                    break;
+                }
+                if (n < (int)sizeof(text) - 1) {
+                    text[n++] = data[i];
+                }
+                i++;
+            }
+            text[n] = 0;
+            ids++;
+            got = GetString(id);
+            if (got != NULL) {
+                found++;
+                if (strcmp(got, text) != 0) {
+                    differ++;
+                }
+            } else if (reported++ < 5) {
+                fprintf(PortResReport, "strings: id %d (\"%.40s\") missing\n", id, text);
+            }
+        } else {
+            i++;
+        }
+    }
+    DeleteStrings();
+    free(data);
+    fprintf(PortResReport, "strings: %d of %d ids in strings\\stab.str loaded, %d with another text\n", found, ids, differ);
+    if (found != ids) {
+        PortResProblems++;
+    }
+}
+
+/* The globals the original has next to each other, next to each other here: the decompiled code walks from one into
+ * the next in places (the map screen's 32 marker rows, the string table's slots) and reads past the ones declared
+ * smaller than the original's data. A pair apart here is reported (the first few); port_globals_layout.c is made by
+ * tools/port/gen_globals_layout.py. */
+static void PortResCheckLayout(void) {
+    FILE *all = fopen("port-selftest-layout.txt", "w"); /* every pair apart here */
+    int i;
+    int adjacent = 0;
+    int apart = 0;
+
+    for (i = 0; i + 1 < PortLayoutGlobalCount; i++) {
+        const struct PortLayoutGlobal *a = &PortLayoutGlobals[i];
+        const struct PortLayoutGlobal *b = &PortLayoutGlobals[i + 1];
+
+        if (b->original - a->original != a->size) {
+            continue; /* not next to each other in the original (or not with this size) */
+        }
+        adjacent++;
+        if ((const char *)b->address != (const char *)a->address + a->size) {
+            if (all != NULL) {
+                fprintf(all, "%s %s\n", a->name, b->name);
+            }
+            if (apart++ < 8) {
+                fprintf(PortResReport, "layout: %s and %s, next to each other in the original, %ld bytes apart here\n",
+                    a->name, b->name, (long)((const char *)b->address - ((const char *)a->address + a->size)));
+            }
+        }
+    }
+    fprintf(PortResReport, "layout: %d of %d pairs of globals next to each other as in the original\n", adjacent - apart,
+        adjacent);
+    if (all != NULL) {
+        fclose(all);
+    }
+}
+
 int PortResSelfTest(const char *path) {
     int i;
     int files;
@@ -750,6 +878,8 @@ int PortResSelfTest(const char *path) {
     }
     /* the time the volumes took to read (small reads, as the game makes them: a browser's storage is slow at those) */
     fprintf(PortResReport, "resources: read in %lu ms\n", (unsigned long)(GetTickCount() - PortResStart));
+    PortResCheckLayout();
+    PortResCheckStrings();
     PortResCheckPeople();
     PortResCheckTextPath();
     PortResCheckSounds();

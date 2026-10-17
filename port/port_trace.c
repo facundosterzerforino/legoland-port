@@ -7,6 +7,10 @@
 
 #include "port_trace.h"
 
+/* the game's string table (src/legoland/string.c, globals.c) */
+extern void *strings[10];
+char *GetString(int n);
+
 static FILE *trace_file;
 static int trace_tried;
 
@@ -38,6 +42,42 @@ static FILE *OpenTraceFile(void) {
     return trace_file;
 }
 
+/* The game's string table, watched: whole after LoadStringTable (the selftest checks it), and texts went missing in
+ * the browser (GetString returning NULL: the exit dialog, the notebooks, the info popups' "(null)"). After each line
+ * the trace checks it, and reports once where it was damaged: the line before is the last step it was whole. */
+static int strings_whole;
+static int strings_reported;
+
+static void WatchStrings(FILE *f) {
+    int slots = 0;
+    int i;
+    int whole;
+    char line[200];
+
+    for (i = 0; i < 10; i++) {
+        slots += strings[i] != NULL;
+    }
+    whole = slots == 10 && GetString(0x89) != NULL && GetString(0x28a) != NULL;
+    if (whole) {
+        strings_whole = 1;
+        return;
+    }
+    if (!strings_whole || strings_reported) {
+        return;
+    }
+    strings_reported = 1;
+    snprintf(line, sizeof(line), "strings: the table was damaged since the line before (%d of 10 slots, EXIT %s, tutorial "
+                                 "heading %s)",
+        slots, GetString(0x89) != NULL ? "there" : "missing", GetString(0x28a) != NULL ? "there" : "missing");
+    if (f != NULL) {
+        fprintf(f, "[%8lu] %s\n", GetTickCount(), line);
+        fflush(f);
+    }
+#ifdef __EMSCRIPTEN__
+    fprintf(stderr, "[%8lu] %s\n", GetTickCount(), line);
+#endif
+}
+
 void PortTraceV(const char *fmt, va_list ap) {
     FILE *f = OpenTraceFile();
     char line[1024];
@@ -54,6 +94,7 @@ void PortTraceV(const char *fmt, va_list ap) {
     /* the web: the file is in the page's storage, out of sight; the browser's console shows the lines too */
     fprintf(stderr, "[%8lu] %s\n", GetTickCount(), line);
 #endif
+    WatchStrings(f);
 }
 
 void PortTrace(const char *fmt, ...) {
