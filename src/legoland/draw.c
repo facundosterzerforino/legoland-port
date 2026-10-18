@@ -261,8 +261,8 @@ LEGO_EXPORT int InitScreen(void) {
         AdjustWindowRect(&window_rect, 0x10cf0000, 0);
 #ifdef LEGOLAND_PORT
         /* [library:window] the SDL3 window (miniwin): a window of the chosen size, or full screen; the frame is
-         * shown through it (PortPresent) */
-        WNDENV_Sethwnd(MiniwinCreateWindow("Lego Land", PortDisplayWidth, PortDisplayHeight, PortDisplayFullscreen));
+         * shown through it (PortPresent); titled "Legoland" (the maintainer's choice; the original's is "Lego Land") */
+        WNDENV_Sethwnd(MiniwinCreateWindow("Legoland", PortDisplayWidth, PortDisplayHeight, PortDisplayFullscreen));
         DebugTrace("InitScreen: SDL window %dx%d (full screen %d), renderer %s%s%s", PortDisplayWidth,
             PortDisplayHeight, PortDisplayFullscreen, MiniwinRendererName(), WNDENV_Gethwnd() == NULL ? ", failed: " : "",
             WNDENV_Gethwnd() == NULL ? MiniwinError() : "");

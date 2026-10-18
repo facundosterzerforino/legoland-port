@@ -1,6 +1,6 @@
 # LEGOLAND, portable
 
-[Play in your browser](https://facundosterzerforino.github.io/legoland-port/) | [Releases](#usage) | [Decompilation](https://github.com/facundosterzerforino/legoland) | [Porting rules](PORTING.md) | [Roadmap](ROADMAP.md)
+[Play in your browser](https://facundosterzerforino.github.io/legoland-port/) | [Releases](https://github.com/facundosterzerforino/legoland-port/releases/latest) | [Decompilation](https://github.com/facundosterzerforino/legoland) | [Porting rules](PORTING.md) | [Roadmap](ROADMAP.md)
 
 This project is a portable version of **LEGOLAND** (LEGO Media, 1999), built on the
 [matching decompilation](https://github.com/facundosterzerforino/legoland) of its `legoland.exe`. Its goal is to make the
@@ -38,9 +38,9 @@ Dutch, Danish, Swedish, Norwegian, Czech...).
 | Platform | Download | How |
 | - | - | - |
 | Web | [Play in your browser](https://facundosterzerforino.github.io/legoland-port/) | Choose your CD image; it's installed in the browser's storage for the site, nothing is uploaded. Recent Chrome, Edge, Firefox, Safari 17+. Saved games can be exported and imported. |
-| Windows | `LEGOLAND-port-windows-<version>.zip` | Unzip and start `LEGOLAND-port.exe`. A launcher offers full screen or a window. |
-| Linux | `LEGOLAND-port-linux-x86_64-<version>.tar.gz` | glibc 2.31 or later (Ubuntu 20.04, Debian 11, Fedora 32...), X11 or Wayland. Unpack and start `legoland` (`-windowed` for a window). |
-| Android | `LEGOLAND-port-android-<version>.apk` | Android 7.0 or later. Install the APK, then choose the CD image on the first start. Touch is the mouse; two fingers the right button; three fingers show the keyboard. |
+| Windows | [`LEGOLAND-port-windows-<version>.zip`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | Unzip and start `LEGOLAND-port.exe`. A launcher offers full screen or a window. |
+| Linux | [`LEGOLAND-port-linux-x86_64-<version>.tar.gz`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | glibc 2.31 or later (Ubuntu 20.04, Debian 11, Fedora 32...), X11 or Wayland. Unpack and start `legoland` (`-windowed` for a window). |
+| Android | [`LEGOLAND-port-android-<version>.apk`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | Android 7.0 or later. Install the APK, then choose the CD image on the first start. Touch is the mouse; two fingers the right button; three fingers show the keyboard. |
 
 On Windows the setup finds the CD in a drive (a mounted ISO counts), or takes an ISO, a folder with a copy of the CD or
 an installed LEGOLAND, and copies about 400 MB next to the program. The music plays through the port's own DirectMusic;
@@ -94,6 +94,7 @@ cmake --preset linux-portable && cmake --build build-linux-portable # the Linux 
 tools/android/build_apk.sh                                          # Android (SDK + NDK, no Gradle)
 cmake --preset web && cmake --build build-web                       # the web (Emscripten)
 tools/release/make_release.py all                                   # the release packages, in dist/
+tools/release/github_release.py                                     # dist/ as a GitHub Release (needs GITHUB_TOKEN)
 ```
 
 <details>

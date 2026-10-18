@@ -68,6 +68,11 @@ describe how `main` works.
        r.json` lists "100% effective" matches whose jumps moved (swapped if/else arms change behaviour).
 - The real repo and this worktree live in WSL Ubuntu (`~/wt/port`, local branch `port`, a worktree of
   `~/legoland`); the Windows folder `C:\Users\fsterzer\Dropbox\Decomp\legoland` is a stale clone.
+- **Releases:** after `python3 tools/release/make_release.py all` (commit pushed first), run `~/push-release.sh`: it
+  makes a GitHub Release of `legoland-port` from dist/ (tools/release/github_release.py: tag = the version, notes = the
+  commits since the previous release, all the files attached) and then publishes the web zip with push-pages.sh. The
+  maintainer asked for a GitHub Release with every new port release (2026-10-18). Also copy dist/ to Dropbox
+  `legoland pc port/releases`.
 - **The web page:** every release's web zip is published to GitHub Pages with
   `~/push-pages.sh dist/LEGOLAND-port-web-<version>.zip` (the gh-pages branch of `legoland-port`, one commit replaced
   each time; https://facundosterzerforino.github.io/legoland-port/). The maintainer asked for it to update with each
