@@ -9,6 +9,9 @@
 #include "timer.h"
 
 #include <windows.h>
+#ifdef LEGOLAND_PORT
+#include "port_input.h"
+#endif
 
 // FUNCTION: LEGOLAND 0x00451e70
 LEGO_EXPORT int SetupControllers(void) {
@@ -299,9 +302,24 @@ LEGO_EXPORT void ReadGameButtons(void) {
         MousePos.y = CONTROLLERBUFFER->y;
         if (MapLoaded != 0) {
             scroll = FUN_00451f70();
+#ifdef LEGOLAND_PORT
+            if ((GamePad & 0x20) != 0) {
+                PortTouchPan(); /* [library:input] two fingers moving the park (port_input.h) */
+            }
+#endif
             if ((GamePad & 0x1000) != 0 || FocussedIconPtr == 0) {
                 if (scroll == 0 && (GamePad & 0x20) != 0) {
+#ifdef LEGOLAND_PORT
+                    /* [library:input] on a touch screen the edges scroll only under a finger (port_input.h) */
+                    if (PortTouchEdgeScroll()) {
+                        MouseScrollMap();
+                    } else {
+                        ScrollSpeedX = 0;
+                        ScrollSpeedY = 0;
+                    }
+#else
                     MouseScrollMap();
+#endif
                 }
                 if (CONTROLLERBUFFER->delta_x != 0 ||
                     CONTROLLERBUFFER->delta_y != 0 || (GamePad & 0x10) != 0) {

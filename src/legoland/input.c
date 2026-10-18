@@ -158,6 +158,8 @@ LEGO_EXPORT void ScanMouse(void) {
              * clicks where it touched (MiniwinMouseButtons) */
             unsigned int buttons = MiniwinHasFocus() ? MiniwinMouseButtons() : 0;
 
+            PortTouchFrame(); /* [library:input] dragged lists, the two-finger pan (port_input.h) */
+
             MouseState.rgbButtons[0] = (buttons & 1) != 0 ? 0x80 : 0;
             MouseState.rgbButtons[1] = (buttons & 2) != 0 ? 0x80 : 0;
             MouseState.rgbButtons[2] = (buttons & 4) != 0 ? 0x80 : 0;

@@ -37,10 +37,10 @@ Dutch, Danish, Swedish, Norwegian, Czech...).
 
 | Platform | Download | How |
 | - | - | - |
-| Web | [Play in your browser](https://facundosterzerforino.github.io/legoland-port/) | Choose your CD image; it's installed in the browser's storage for the site, nothing is uploaded. Recent Chrome, Edge, Firefox, Safari 17+. Saved games can be exported and imported. On a phone or tablet: touch is the mouse, two fingers the right button, and the keyboard opens when the game asks for a name. |
+| Web | [Play in your browser](https://facundosterzerforino.github.io/legoland-port/) | Choose your CD image; it's installed in the browser's storage for the site, nothing is uploaded. Recent Chrome, Edge, Firefox, Safari 17+. Saved games can be exported and imported. On a phone or tablet: touch is the mouse, a finger drags the object lists, two fingers move around the park (a two-finger tap is the right button), and the keyboard opens when the game asks for a name. |
 | Windows | [`LEGOLAND-port-windows-<version>.zip`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | Unzip and start `LEGOLAND-port.exe`. A launcher offers full screen or a window. |
 | Linux | [`LEGOLAND-port-linux-x86_64-<version>.tar.gz`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | glibc 2.31 or later (Ubuntu 20.04, Debian 11, Fedora 32...), X11 or Wayland. Unpack and start `legoland` (`-windowed` for a window). |
-| Android | [`LEGOLAND-port-android-<version>.apk`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | Android 7.0 or later. Install the APK, then choose the CD image on the first start. Touch is the mouse (the game's pointer is hidden); two fingers the right button; the keyboard opens when the game asks for a name (three fingers show it too). |
+| Android | [`LEGOLAND-port-android-<version>.apk`](https://github.com/facundosterzerforino/legoland-port/releases/latest) | Android 7.0 or later. Install the APK, then choose the CD image on the first start. Touch is the mouse (the game's pointer is hidden); a finger drags the object lists; two fingers move around the park, a two-finger tap is the right button; the keyboard opens when the game asks for a name (three fingers show it too). |
 
 On Windows the setup finds the CD in a drive (a mounted ISO counts), or takes an ISO, a folder with a copy of the CD or
 an installed LEGOLAND, and copies about 400 MB next to the program. The music plays through the port's own DirectMusic;

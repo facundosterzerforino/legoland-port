@@ -12,4 +12,17 @@ void PortWheelAdd(int delta);
 /* One notch of the collected movement as an lZ value: +step, -step or 0. */
 int PortWheelTake(int step);
 
+/* [library:input] Touch gestures for the game (miniwin's MiniwinSetTouchDragArea): a finger dragging an object list
+ * (the build menu's) scrolls it as its arrows do, and two fingers moving pan the park. The original only scrolls the
+ * park when the pointer touches the screen's edge, and its lists with their arrow buttons or the wheel.
+ * PortTouchFrame: each frame, from ScanMouse (scrolls the dragged list, keeps the pan for PortTouchPan). */
+void PortTouchFrame(void);
+
+/* The two-finger pan of this frame, applied to the park's view (from UpdateController, where the game scrolls). */
+void PortTouchPan(void);
+
+/* 0 when the pointer's place shouldn't scroll the park on a touch screen: no finger down (the pointer stays where
+ * the last one lifted, maybe at the edge) or two fingers (a pan). With a finger down the edges scroll as before. */
+int PortTouchEdgeScroll(void);
+
 #endif

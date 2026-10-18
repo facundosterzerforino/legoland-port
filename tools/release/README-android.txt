@@ -32,7 +32,8 @@ Playing
 -------
 - One finger is the mouse: touch to click, drag to move. The game's pointer is hidden while you use touch (a
   mouse brings it back).
-- Two fingers are the right mouse button.
+- Drag the object lists with a finger to scroll them (a tap still picks an object).
+- Two fingers moving move around the park; a two-finger tap is the right mouse button (held still: held down).
 - The keyboard opens by itself when the game asks for a name; three fingers show or hide it too.
 - The back key or gesture is Escape.
 Saved games stay in the app's folder (profiles). Printing a certificate saves it as a picture there.

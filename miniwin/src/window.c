@@ -19,11 +19,55 @@ static bool latched[SDL_SCANCODE_COUNT]; /* pressed since the last keyboard read
 
 /* [library:input] touch screens (MiniwinTouchMode, MiniwinMouseButtons): the last pointer input was a finger or a pen;
  * a finger's press the game hasn't finished seeing (1 down, 2 lifted) and the button reads since it began; a
- * two-finger press (the secondary button) keeps the primary one up until every finger is lifted. */
+ * two-finger touch keeps the primary button up until every finger is lifted. */
 static int touch_mode;
 static int touch_press;
 static int touch_reads;
 static int touch_secondary;
+
+/* [library:input] one finger in a drag area (MiniwinSetTouchDragArea: a list): DRAG_WAIT while it may still be a tap
+ * or a press (the press is held back), DRAG_MOVING once it moved (no press at all); where it started and last was,
+ * in window pixels, and the movement not taken yet (MiniwinTouchTakeDrag) */
+enum {
+    DRAG_NONE,
+    DRAG_WAIT,
+    DRAG_MOVING
+};
+static int (*drag_area)(int x, int y);
+static int drag_state;
+static float drag_start_x;
+static float drag_start_y;
+static float drag_last_x;
+static float drag_last_y;
+static Uint64 drag_start_tick;
+static float drag_dx;
+static float drag_dy;
+
+/* [library:input] two fingers: TWO_WAIT until they move (a pan) or stay (the secondary button: a tap clicks it, a
+ * still hold keeps it down); the tracked fingers (window pixels), their last centre, the pan not taken yet, and a
+ * two-finger tap's click still to give (reads) */
+enum {
+    TWO_NONE,
+    TWO_WAIT,
+    TWO_PAN,
+    TWO_HOLD,
+    TWO_DONE
+};
+static int two_state;
+static SDL_FingerID finger_id[2];
+static float finger_x[2];
+static float finger_y[2];
+static int finger_count;
+static float two_start_x;
+static float two_start_y;
+static float two_last_x;
+static float two_last_y;
+static Uint64 two_start_tick;
+static float pan_dx;
+static float pan_dy;
+static int secondary_click_reads;
+
+#define TOUCH_HOLD_MS 400 /* a still finger (or two) this long presses instead of dragging */
 
 /* [library:input] the on-screen keyboard (MiniwinWantText): shown until this tick, because the game waits for a
  * name; shown now (by the game's wait, or three fingers) */
@@ -110,6 +154,90 @@ static int FromTouch(SDL_MouseID which) {
     return which == SDL_TOUCH_MOUSEID || which == SDL_PEN_MOUSEID;
 }
 
+/* [library:input] how far a finger moves before it's a drag: a fiftieth of the window's height (about 10 of the
+ * game's pixels) */
+static float TouchSlop(void) {
+    int w = 0;
+    int h = 0;
+
+    if (window != NULL) {
+        SDL_GetWindowSizeInPixels(window, &w, &h);
+    }
+    return h > 0 ? (float)h / 50.0f : 10.0f;
+}
+
+static float Distance(float dx, float dy) {
+    return SDL_sqrtf(dx * dx + dy * dy);
+}
+
+/* [library:input] a finger's place in window pixels (SDL gives it from 0 to 1 across the window) */
+static void FingerPixels(const SDL_TouchFingerEvent *f, float *x, float *y) {
+    int w = 0;
+    int h = 0;
+
+    if (window != NULL) {
+        SDL_GetWindowSizeInPixels(window, &w, &h);
+    }
+    *x = f->x * (float)w;
+    *y = f->y * (float)h;
+}
+
+/* the two tracked fingers' centre */
+static void TwoCentre(float *x, float *y) {
+    *x = (finger_x[0] + finger_x[1]) / 2.0f;
+    *y = (finger_y[0] + finger_y[1]) / 2.0f;
+}
+
+static void TrackFinger(const SDL_TouchFingerEvent *f, int down) {
+    int i;
+    float x;
+    float y;
+
+    FingerPixels(f, &x, &y);
+    for (i = 0; i < finger_count; i++) {
+        if (finger_id[i] == f->fingerID) {
+            if (down < 0) {
+                /* lifted: the other one moves to the first place */
+                finger_count--;
+                if (i == 0 && finger_count == 1) {
+                    finger_id[0] = finger_id[1];
+                    finger_x[0] = finger_x[1];
+                    finger_y[0] = finger_y[1];
+                }
+                return;
+            }
+            finger_x[i] = x;
+            finger_y[i] = y;
+            return;
+        }
+    }
+    if (down > 0 && finger_count < 2) {
+        finger_id[finger_count] = f->fingerID;
+        finger_x[finger_count] = x;
+        finger_y[finger_count] = y;
+        finger_count++;
+    }
+}
+
+void MiniwinSetTouchDragArea(int (*area)(int x, int y)) {
+    drag_area = area;
+}
+
+void MiniwinTouchTakeDrag(float *dx, float *dy, float *pan_x, float *pan_y) {
+    *dx = drag_dx;
+    *dy = drag_dy;
+    *pan_x = pan_dx;
+    *pan_y = pan_dy;
+    drag_dx = 0.0f;
+    drag_dy = 0.0f;
+    pan_dx = 0.0f;
+    pan_dy = 0.0f;
+}
+
+int MiniwinTouchFingers(void) {
+    return fingers;
+}
+
 /* [library:input] the on-screen keyboard: Android's (SDL), or the page's text box on the web (port/web/shell.html,
  * Module.legolandKeyboard), whose characters come back through MiniwinTypeChar */
 static void ShowKeyboard(int show) {
@@ -147,33 +275,95 @@ void MiniwinPumpEvents(WNDPROC proc) {
         case SDL_EVENT_FINGER_DOWN:
             fingers++;
             touch_mode = 1;
-            if (fingers >= 2) {
+            TrackFinger(&event.tfinger, 1);
+            if (fingers == 2) {
+                /* [library:input] two fingers: a pan or the secondary button (MiniwinMouseButtons), never the first
+                 * finger's press or drag */
                 touch_secondary = 1;
                 touch_press = 0;
+                drag_state = DRAG_NONE;
+                two_state = TWO_WAIT;
+                two_start_tick = SDL_GetTicks();
+                TwoCentre(&two_start_x, &two_start_y);
+                two_last_x = two_start_x;
+                two_last_y = two_start_y;
             }
             if (fingers == 3) {
                 /* [library:input] three fingers: the on-screen keyboard, for typing names */
+                two_state = TWO_DONE;
                 ShowKeyboard(!keyboard_shown);
                 keyboard_auto = 0;
+            }
+            break;
+        case SDL_EVENT_FINGER_MOTION:
+            TrackFinger(&event.tfinger, 0);
+            if (fingers == 2 && finger_count == 2 && (two_state == TWO_WAIT || two_state == TWO_PAN)) {
+                float x;
+                float y;
+
+                TwoCentre(&x, &y);
+                if (two_state == TWO_WAIT && Distance(x - two_start_x, y - two_start_y) > TouchSlop()) {
+                    two_state = TWO_PAN; /* [library:input] two fingers moving: the park follows them */
+                }
+                if (two_state == TWO_PAN) {
+                    pan_dx += x - two_last_x;
+                    pan_dy += y - two_last_y;
+                }
+                two_last_x = x;
+                two_last_y = y;
             }
             break;
         case SDL_EVENT_FINGER_UP:
         case SDL_EVENT_FINGER_CANCELED:
             fingers = fingers > 0 ? fingers - 1 : 0;
+            TrackFinger(&event.tfinger, -1);
+            if (two_state == TWO_WAIT) {
+                /* [library:input] two fingers lifted without moving: a click of the secondary button */
+                if (event.type == SDL_EVENT_FINGER_UP) {
+                    secondary_click_reads = 2;
+                }
+                two_state = TWO_DONE;
+            } else if (two_state == TWO_PAN || two_state == TWO_HOLD) {
+                two_state = TWO_DONE;
+            }
             if (fingers == 0) {
                 touch_secondary = 0;
+                two_state = TWO_NONE;
+                finger_count = 0;
             }
             break;
         case SDL_EVENT_MOUSE_MOTION:
             if (!FromTouch(event.motion.which)) {
                 touch_mode = 0; /* a mouse: the game's pointer again */
+            } else if (drag_state != DRAG_NONE && touch_press == 1) {
+                float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
+                float x = event.motion.x * density;
+                float y = event.motion.y * density;
+
+                if (drag_state == DRAG_WAIT && Distance(x - drag_start_x, y - drag_start_y) > TouchSlop()) {
+                    drag_state = DRAG_MOVING; /* [library:input] a finger dragging a list: it scrolls, no click */
+                    drag_last_x = x;
+                    drag_last_y = y;
+                }
+                if (drag_state == DRAG_MOVING) {
+                    drag_dx += x - drag_last_x;
+                    drag_dy += y - drag_last_y;
+                    drag_last_x = x;
+                    drag_last_y = y;
+                }
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             if (FromTouch(event.button.which) && event.button.button == SDL_BUTTON_LEFT && !touch_secondary) {
+                float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
+
                 touch_mode = 1;
                 touch_press = 1;
                 touch_reads = 0;
+                drag_start_x = event.button.x * density;
+                drag_start_y = event.button.y * density;
+                drag_start_tick = SDL_GetTicks();
+                drag_state = drag_area != NULL && drag_area((int)drag_start_x, (int)drag_start_y) ? DRAG_WAIT : DRAG_NONE;
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -249,10 +439,6 @@ unsigned int MiniwinMouseState(int *x, int *y) {
     if (y != NULL) {
         *y = (int)(fy * density);
     }
-    if (fingers >= 2) {
-        /* [library:input] two fingers on a touch screen: the secondary button */
-        return 2;
-    }
     if ((flags & SDL_BUTTON_LMASK) != 0) {
         buttons |= 1;
     }
@@ -268,8 +454,35 @@ unsigned int MiniwinMouseState(int *x, int *y) {
 unsigned int MiniwinMouseButtons(void) {
     unsigned int buttons = MiniwinMouseState(NULL, NULL);
 
+    if (secondary_click_reads > 0) {
+        /* [library:input] a two-finger tap: the secondary button for two reads */
+        secondary_click_reads--;
+        buttons |= 2;
+    }
     if (fingers >= 2 || touch_secondary) {
-        return buttons & ~1u; /* the secondary button (two fingers), not the first finger's press */
+        /* [library:input] two fingers held still: the secondary button down while they stay; never the primary */
+        if (two_state == TWO_WAIT && SDL_GetTicks() - two_start_tick >= TOUCH_HOLD_MS) {
+            two_state = TWO_HOLD;
+        }
+        if (two_state == TWO_HOLD) {
+            buttons |= 2;
+        }
+        return buttons & ~1u;
+    }
+    if (touch_press != 0 && drag_state == DRAG_WAIT) {
+        if (touch_press == 1 && SDL_GetTicks() - drag_start_tick < TOUCH_HOLD_MS) {
+            /* [library:input] in a list: a tap or a drag? The press waits (the pointer is there already) */
+            touch_reads++;
+            return buttons & ~1u;
+        }
+        drag_state = DRAG_NONE; /* lifted without moving (a click) or held still (a press): as below */
+    }
+    if (touch_press != 0 && drag_state == DRAG_MOVING) {
+        if (touch_press == 2) {
+            touch_press = 0;
+            drag_state = DRAG_NONE;
+        }
+        return buttons & ~1u; /* the list was dragged: no click */
     }
     if (touch_press != 0) {
         /* [library:input] a finger: the pointer jumps to it in the first read and the press follows in the next (as

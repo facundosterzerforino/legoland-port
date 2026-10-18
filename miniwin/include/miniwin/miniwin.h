@@ -65,6 +65,17 @@ unsigned int MiniwinMouseState(int *x, int *y);
  * frame is still a click). */
 unsigned int MiniwinMouseButtons(void);
 
+/* Touch gestures. One finger that starts where area(x, y) says (window pixels; a list) and moves is a drag: its
+ * movement is taken by MiniwinTouchTakeDrag and the game gets no click (a tap there is still a click, a still press a
+ * press). Two fingers moving are a pan; held still, the secondary button; lifted at once, a secondary click. */
+void MiniwinSetTouchDragArea(int (*area)(int x, int y));
+
+/* The one-finger drag's and the two-finger pan's movement since the last call, in window pixels. */
+void MiniwinTouchTakeDrag(float *dx, float *dy, float *pan_x, float *pan_y);
+
+/* The fingers on the screen now. */
+int MiniwinTouchFingers(void);
+
 /* 1 while the last pointer input was a finger or a pen (Android, and a phone's browser, start so): the game's own
  * pointer is hidden then; a mouse that moves shows it again. */
 int MiniwinTouchMode(void);
