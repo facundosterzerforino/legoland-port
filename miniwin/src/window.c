@@ -35,6 +35,12 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
         return NULL;
     }
+#ifdef LEGOLAND_WEB_BROWSER
+    /* [library:window] the page's canvas is the window: resizable, sized by the page's CSS (the whole page), and the
+     * page itself goes full screen (its button). An SDL full-screen window kept the screen's size after the browser
+     * left full screen (Esc), taller than the page: the picture's top was cut off. */
+    fullscreen = MINIWIN_WINDOW;
+#endif
     props = SDL_CreateProperties();
     SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);

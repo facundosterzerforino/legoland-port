@@ -96,12 +96,16 @@
     background: #0f3d0fb3; border-radius: 14px; backdrop-filter: blur(2px); }
   footer p { margin: .3rem 0; }
   footer a { color: #fff; font-weight: 800; }
+  #fullscreen { position: fixed; top: .6rem; right: .6rem; z-index: 20; width: 2.6rem; height: 2.6rem; padding: 0;
+    border-radius: 10px; color: #fff; background: #000a; box-shadow: none; opacity: .55; transition: opacity .2s; }
+  #fullscreen:hover, #fullscreen:focus-visible { opacity: 1; transform: none; }
   .hidden { display: none !important; }
   @media (max-width: 30rem) { #panel { padding: 1.2rem 1rem; border-radius: 16px; } .actions > * { flex: 1 1 auto; } }
 </style>
 </head>
 <body>
 <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+<button id="fullscreen" class="hidden" aria-label="Full screen"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
 <div class="page">
   <div class="topbar"><select id="lang" aria-label="Language"></select></div>
@@ -338,25 +342,25 @@
   };
   /* the header's and footer's texts */
   const EXTRA = {
-    en: { levelMusic: 'Music changes with the level', tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
+    en: { fullscreen: 'Full screen', levelMusic: 'Music changes with the level', tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
       source: 'Source code on GitHub', disclaimer: 'A fan project, not made or endorsed by the LEGO Group. LEGO and LEGOLAND are trademarks of the LEGO Group.' },
-    es: { levelMusic: 'La música cambia con el nivel', tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
+    es: { fullscreen: 'Pantalla completa', levelMusic: 'La música cambia con el nivel', tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
       source: 'Código fuente en GitHub', disclaimer: 'Un proyecto de fans, no hecho ni respaldado por el Grupo LEGO. LEGO y LEGOLAND son marcas del Grupo LEGO.' },
-    de: { levelMusic: 'Musik wechselt mit dem Level', tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
+    de: { fullscreen: 'Vollbild', levelMusic: 'Musik wechselt mit dem Level', tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
       source: 'Quellcode auf GitHub', disclaimer: 'Ein Fanprojekt, nicht von der LEGO Gruppe erstellt oder unterstützt. LEGO und LEGOLAND sind Marken der LEGO Gruppe.' },
-    fr: { levelMusic: 'La musique change avec le niveau', tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
+    fr: { fullscreen: 'Plein écran', levelMusic: 'La musique change avec le niveau', tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
       source: 'Code source sur GitHub', disclaimer: 'Un projet de fans, ni créé ni approuvé par le Groupe LEGO. LEGO et LEGOLAND sont des marques du Groupe LEGO.' },
-    it: { levelMusic: 'La musica cambia con il livello', tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
+    it: { fullscreen: 'Schermo intero', levelMusic: 'La musica cambia con il livello', tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
       source: 'Codice sorgente su GitHub', disclaimer: 'Un progetto di fan, non realizzato né approvato dal Gruppo LEGO. LEGO e LEGOLAND sono marchi del Gruppo LEGO.' },
-    nl: { levelMusic: 'Muziek verandert met het level', tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
+    nl: { fullscreen: 'Volledig scherm', levelMusic: 'Muziek verandert met het level', tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
       source: 'Broncode op GitHub', disclaimer: 'Een fanproject, niet gemaakt of goedgekeurd door de LEGO Groep. LEGO en LEGOLAND zijn handelsmerken van de LEGO Groep.' },
-    da: { levelMusic: 'Musikken skifter med banen', tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
+    da: { fullscreen: 'Fuld skærm', levelMusic: 'Musikken skifter med banen', tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprojekt, ikke lavet eller godkendt af LEGO Koncernen. LEGO og LEGOLAND er varemærker tilhørende LEGO Koncernen.' },
-    sv: { levelMusic: 'Musiken byts med banan', tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
+    sv: { fullscreen: 'Helskärm', levelMusic: 'Musiken byts med banan', tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
       source: 'Källkod på GitHub', disclaimer: 'Ett fanprojekt, inte gjort eller godkänt av LEGO-koncernen. LEGO och LEGOLAND är varumärken som tillhör LEGO-koncernen.' },
-    no: { levelMusic: 'Musikken skifter med brettet', tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
+    no: { fullscreen: 'Fullskjerm', levelMusic: 'Musikken skifter med brettet', tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprosjekt, ikke laget eller godkjent av LEGO-konsernet. LEGO og LEGOLAND er varemerker som tilhører LEGO-konsernet.' },
-    cs: { levelMusic: 'Hudba se mění podle úrovně', tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
+    cs: { fullscreen: 'Celá obrazovka', levelMusic: 'Hudba se mění podle úrovně', tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
       source: 'Zdrojový kód na GitHubu', disclaimer: 'Fanouškovský projekt, který skupina LEGO nevytvořila ani neschválila. LEGO a LEGOLAND jsou ochranné známky skupiny LEGO.' },
   };
   for (const [code, texts] of Object.entries(EXTRA)) Object.assign(TEXTS[code].t, texts);
@@ -387,6 +391,8 @@
 
   function applyTexts() {
     document.documentElement.lang = lang;
+    document.getElementById('fullscreen').title = t('fullscreen');
+    document.getElementById('fullscreen').setAttribute('aria-label', t('fullscreen'));
     document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
     setStatus(statusKey, statusVars);
     refreshPlayLabel();
@@ -768,6 +774,8 @@
       /* the sound stops with the game (SDL_Quit at the end of main closes it; this in case it didn't get there) */
       try { if (typeof SDL3 !== 'undefined' && SDL3.audioContext) SDL3.audioContext.close(); } catch (e) {}
       document.getElementById('canvas').style.display = 'none';
+      playing = false;
+      show('fullscreen', false);
       document.getElementById('panel').style.display = '';
       if (document.fullscreenElement) document.exitFullscreen();
       refresh().then(() => setStatus('ended'));
@@ -781,12 +789,31 @@
     try { localStorage.setItem('legoland-level-music', levelMusic.checked ? '1' : '0'); } catch (e) {}
   });
 
+  /* full screen: the whole page (the canvas follows its size); while full screen, Esc goes to the game (keyboard lock,
+     Chrome/Edge: holding Esc still leaves), and the corner button comes back when the browser leaves it */
+  let playing = false;
+  async function enterFullscreen() {
+    try { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {}
+    document.getElementById('canvas').focus();
+  }
+  document.addEventListener('fullscreenchange', () => {
+    const full = document.fullscreenElement !== null;
+    show('fullscreen', playing && !full);
+    try {
+      if (full && navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']);
+      else if (navigator.keyboard && navigator.keyboard.unlock) navigator.keyboard.unlock();
+    } catch (e) {}
+  });
+  document.getElementById('fullscreen').addEventListener('click', enterFullscreen);
+
   document.getElementById('play').addEventListener('click', async () => {
     const canvas = document.getElementById('canvas');
     document.getElementById('panel').style.display = 'none';
     canvas.style.display = 'block';
     canvas.focus();
-    try { await document.documentElement.requestFullscreen(); } catch (e) {}
+    playing = true;
+    show('fullscreen', true);
+    await enterFullscreen();
     await window.startGame(levelMusic.checked ? [] : ['-no-level-music']);
   });
 
