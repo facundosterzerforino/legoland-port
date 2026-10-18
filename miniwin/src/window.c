@@ -17,6 +17,29 @@ static HWND window_hwnd;
 static int fingers; /* touching the screen now */
 static bool latched[SDL_SCANCODE_COUNT]; /* pressed since the last keyboard read (MiniwinKeyLatched) */
 
+/* [library:input] touch screens (MiniwinTouchMode, MiniwinMouseButtons): the last pointer input was a finger or a pen;
+ * a finger's press the game hasn't finished seeing (1 down, 2 lifted) and the button reads since it began; a
+ * two-finger press (the secondary button) keeps the primary one up until every finger is lifted. */
+static int touch_mode;
+static int touch_press;
+static int touch_reads;
+static int touch_secondary;
+
+/* [library:input] the on-screen keyboard (MiniwinWantText): shown until this tick, because the game waits for a
+ * name; shown now (by the game's wait, or three fingers) */
+static Uint64 text_wanted_until;
+static int keyboard_auto;
+static int keyboard_shown;
+
+/* [library:input] typed characters as key taps (MiniwinTypeChar, MiniwinTypedKey): SDL scancode, plus TYPED_SHIFT
+ * with Shift held; the first is down for one keyboard read (typed_down), then up for one */
+#define TYPED_MAX 64
+#define TYPED_SHIFT 0x10000
+static int typed[TYPED_MAX];
+static int typed_head;
+static int typed_count;
+static int typed_down;
+
 const char *MiniwinError(void) {
     return SDL_GetError();
 }
@@ -67,6 +90,12 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
         return NULL;
     }
     SDL_HideCursor(); /* the game draws its own pointer */
+#if defined(__ANDROID__)
+    touch_mode = 1; /* [library:input] a touch screen: the game's pointer hidden until a mouse moves */
+#elif defined(LEGOLAND_WEB_BROWSER)
+    /* [library:input] a phone's or tablet's browser (its main pointer is a finger): the same */
+    touch_mode = EM_ASM_INT({ return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 1 : 0; });
+#endif
 #ifdef _WIN32
     window_hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 #else
@@ -76,9 +105,37 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
     return window_hwnd;
 }
 
+/* [library:input] a mouse event SDL made from a finger or a pen */
+static int FromTouch(SDL_MouseID which) {
+    return which == SDL_TOUCH_MOUSEID || which == SDL_PEN_MOUSEID;
+}
+
+/* [library:input] the on-screen keyboard: Android's (SDL), or the page's text box on the web (port/web/shell.html,
+ * Module.legolandKeyboard), whose characters come back through MiniwinTypeChar */
+static void ShowKeyboard(int show) {
+    keyboard_shown = show;
+#ifdef LEGOLAND_WEB_BROWSER
+    EM_ASM({ if (Module.legolandKeyboard) Module.legolandKeyboard($0); }, show);
+#else
+    if (window == NULL) {
+        return;
+    }
+    if (show) {
+        SDL_StartTextInput(window);
+    } else {
+        SDL_StopTextInput(window);
+    }
+#endif
+}
+
+void MiniwinWantText(void) {
+    text_wanted_until = SDL_GetTicks() + 500;
+}
+
 /* The game's window procedure only reacts to a few messages; these are the SDL events that stand for them. */
 void MiniwinPumpEvents(WNDPROC proc) {
     SDL_Event event;
+    int wanted;
 
 #ifdef LEGOLAND_WEB_BROWSER
     /* [library:window] the game's loop runs on the page's thread: give the page its turn (drawing the frame, the
@@ -89,18 +146,40 @@ void MiniwinPumpEvents(WNDPROC proc) {
         switch (event.type) {
         case SDL_EVENT_FINGER_DOWN:
             fingers++;
-            if (fingers == 3 && window != NULL) {
+            touch_mode = 1;
+            if (fingers >= 2) {
+                touch_secondary = 1;
+                touch_press = 0;
+            }
+            if (fingers == 3) {
                 /* [library:input] three fingers: the on-screen keyboard, for typing names */
-                if (SDL_TextInputActive(window)) {
-                    SDL_StopTextInput(window);
-                } else {
-                    SDL_StartTextInput(window);
-                }
+                ShowKeyboard(!keyboard_shown);
+                keyboard_auto = 0;
             }
             break;
         case SDL_EVENT_FINGER_UP:
         case SDL_EVENT_FINGER_CANCELED:
             fingers = fingers > 0 ? fingers - 1 : 0;
+            if (fingers == 0) {
+                touch_secondary = 0;
+            }
+            break;
+        case SDL_EVENT_MOUSE_MOTION:
+            if (!FromTouch(event.motion.which)) {
+                touch_mode = 0; /* a mouse: the game's pointer again */
+            }
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            if (FromTouch(event.button.which) && event.button.button == SDL_BUTTON_LEFT && !touch_secondary) {
+                touch_mode = 1;
+                touch_press = 1;
+                touch_reads = 0;
+            }
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            if (FromTouch(event.button.which) && event.button.button == SDL_BUTTON_LEFT && touch_press == 1) {
+                touch_press = 2;
+            }
             break;
         case SDL_EVENT_WINDOW_FOCUS_LOST:
             proc(window_hwnd, WM_KILLFOCUS, 0, 0);
@@ -127,6 +206,17 @@ void MiniwinPumpEvents(WNDPROC proc) {
         default:
             break;
         }
+    }
+    /* [library:input] on a touch screen the keyboard opens while the game waits for a name, and closes after */
+    wanted = touch_mode && SDL_GetTicks() < text_wanted_until;
+    if (wanted && !keyboard_auto && !keyboard_shown) {
+        ShowKeyboard(1);
+        keyboard_auto = 1;
+    } else if (!wanted && keyboard_auto) {
+        if (keyboard_shown) {
+            ShowKeyboard(0);
+        }
+        keyboard_auto = 0;
     }
 }
 
@@ -173,6 +263,79 @@ unsigned int MiniwinMouseState(int *x, int *y) {
         buttons |= 4;
     }
     return buttons;
+}
+
+unsigned int MiniwinMouseButtons(void) {
+    unsigned int buttons = MiniwinMouseState(NULL, NULL);
+
+    if (fingers >= 2 || touch_secondary) {
+        return buttons & ~1u; /* the secondary button (two fingers), not the first finger's press */
+    }
+    if (touch_press != 0) {
+        /* [library:input] a finger: the pointer jumps to it in the first read and the press follows in the next (as
+         * a mouse moves over a button before clicking it), down for at least two reads even for a tap shorter than
+         * a frame, and as long as the finger stays */
+        touch_reads++;
+        buttons &= ~1u;
+        if (touch_reads >= 2 && (touch_press == 1 || touch_reads <= 3)) {
+            buttons |= 1;
+        } else if (touch_reads > 3) {
+            touch_press = 0;
+        }
+    }
+    return buttons;
+}
+
+int MiniwinTouchMode(void) {
+    return touch_mode;
+}
+
+#ifdef LEGOLAND_WEB_BROWSER
+EMSCRIPTEN_KEEPALIVE
+#endif
+void MiniwinTypeChar(int ch) {
+    SDL_Keymod mod = SDL_KMOD_NONE;
+    int code;
+
+    if (ch == 8) {
+        code = SDL_SCANCODE_BACKSPACE;
+    } else if (ch == '\r' || ch == '\n') {
+        code = SDL_SCANCODE_RETURN;
+    } else if (ch >= 'A' && ch <= 'Z') {
+        code = SDL_GetScancodeFromKey((SDL_Keycode)(ch - 'A' + 'a'), NULL) | TYPED_SHIFT;
+    } else if (ch >= ' ' && ch < 0x7f) {
+        code = SDL_GetScancodeFromKey((SDL_Keycode)ch, &mod);
+        if ((mod & SDL_KMOD_SHIFT) != 0) {
+            code |= TYPED_SHIFT;
+        }
+    } else {
+        return; /* the game's names are ASCII (GetInputChar) */
+    }
+    if ((code & ~TYPED_SHIFT) == SDL_SCANCODE_UNKNOWN || typed_count == TYPED_MAX) {
+        return;
+    }
+    typed[(typed_head + typed_count) % TYPED_MAX] = code;
+    typed_count++;
+}
+
+int MiniwinTypedKey(int *shift) {
+    int code;
+
+    *shift = 0;
+    if (typed_count == 0) {
+        return 0;
+    }
+    if (typed_down) {
+        /* the key's up read: the next character's tap begins at the read after it */
+        typed_down = 0;
+        typed_head = (typed_head + 1) % TYPED_MAX;
+        typed_count--;
+        return 0;
+    }
+    typed_down = 1;
+    code = typed[typed_head];
+    *shift = (code & TYPED_SHIFT) != 0;
+    return code & ~TYPED_SHIFT;
 }
 
 int MiniwinKeyLatched(int scancode) {

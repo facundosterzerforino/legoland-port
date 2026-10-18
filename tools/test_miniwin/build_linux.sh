@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds the miniwin tests that run off Windows (miniwin/src/posix/), with the host's clang and the SDL3 the linux
 # preset fetched (build it first): test_seh (structured exception handling on signals), test_gdi_print (the picture
-# printer), test_setup (the first-run setup from a CD, its image or an install), test_dmusic (the game's music with
+# printer), test_touch (taps, typing and the on-screen keyboard on touch screens), test_setup (the first-run setup from a CD, its image or an install), test_dmusic (the game's music with
 # miniwin's DirectMusic and FluidSynth). Into build-linux/tests/.
 set -e
 cd "$(dirname "$0")"
@@ -16,7 +16,8 @@ LIBS="$SDLB/sdl3-build/libSDL3.a -lm -lpthread -ldl"
 POSIX="$P/miniwin/src/posix/*.c $P/miniwin/src/files.c $P/miniwin/src/window.c"
 clang $CFLAGS test_seh.c $P/miniwin/src/posix/seh.c -lpthread -o "$OUT/test_seh"
 clang $CFLAGS test_gdi_print.c $POSIX $LIBS -o "$OUT/test_gdi_print"
-clang $CFLAGS test_setup.c $P/port/port_setup.c $P/port/blast/blast.c $P/port/puff/puff.c $LIBS -o "$OUT/test_setup"
+clang $CFLAGS test_touch.c $POSIX $LIBS -o "$OUT/test_touch"
+clang $CFLAGS test_setup.c $P/port/port_setup.c $P/port/blast/blast.c $P/port/puff/puff.c $POSIX $LIBS -o "$OUT/test_setup"
 DM=$P/port/dmusic
 # as the game's build: _GNU_SOURCE for the POSIX layer only (with it, glibc's <stdlib.h> declares C11's once_flag,
 # which dmusic's thread shim, included by miniwin's DirectMusic, declares too)
@@ -31,4 +32,4 @@ for f in test_dmusic.c $P/miniwin/src/dsound.c $P/miniwin/src/dmusic.c $P/miniwi
         -I$SDLB/fluidsynth-src/include -I$P/tools -c $f -o $T/$(basename $f .c).o
 done
 clang $T/*.o $P/build-linux/libdmusic.a $SDLB/fluidsynth-build/src/libfluidsynth.a $LIBS -lstdc++ -o "$OUT/test_dmusic"
-echo "built in $OUT: test_seh test_gdi_print test_setup test_dmusic"
+echo "built in $OUT: test_seh test_gdi_print test_touch test_setup test_dmusic"

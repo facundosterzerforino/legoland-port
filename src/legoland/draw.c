@@ -1779,7 +1779,12 @@ int BlitFrameToWindow(void) {
     dst.right = 0x280;
     dst.bottom = 0x1e0;
     LLSAuto();
+#ifdef LEGOLAND_PORT
+    /* [library:input] no pointer under a finger (a touch screen, MiniwinTouchMode) */
+    if (lpConfig->field_1e != 0 && DAT_00668148 != 0 && !MiniwinTouchMode()) {
+#else
     if (lpConfig->field_1e != 0 && DAT_00668148 != 0) {
+#endif
         PushRenderingStatusAndLockVideoSurface();
         PrintSprite(DAT_00668148, MousePos.x, MousePos.y, 0, 0);
         PopRenderingStatus();

@@ -8,7 +8,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
 <title>LEGOLAND</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -23,7 +23,10 @@
   }
   html, body { margin: 0; min-height: 100%; }
   body { color: var(--ink); font: 16px/1.5 var(--font); overflow-x: hidden; }
-  #canvas { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: #000; outline: none; z-index: 10; }
+  #canvas { display: none; position: fixed; inset: 0; width: 100%; height: 100%; background: #000; outline: none; z-index: 10;
+    touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  /* the phone keyboard's text box: focused for typing names, never seen (16px: no zoom when it's focused) */
+  #type-box { position: fixed; left: 0; bottom: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; font-size: 16px; z-index: 0; }
 
   .sky { position: fixed; inset: 0; z-index: -2; background: linear-gradient(#2f8fe0 0%, #6cbaf5 45%, #b9e3fd 80%); }
   .cloud { position: absolute; width: 9rem; height: 2.6rem; background: #fff; border-radius: 2rem; opacity: .9;
@@ -99,12 +102,16 @@
   #fullscreen { position: fixed; top: .6rem; right: .6rem; z-index: 20; width: 2.6rem; height: 2.6rem; padding: 0;
     border-radius: 10px; color: #fff; background: #000a; box-shadow: none; opacity: .55; transition: opacity .2s; }
   #fullscreen:hover, #fullscreen:focus-visible { opacity: 1; transform: none; }
+  #keyboard { position: fixed; top: .6rem; right: 3.8rem; z-index: 20; width: 2.6rem; height: 2.6rem; padding: 0;
+    border-radius: 10px; color: #fff; background: #000a; box-shadow: none; opacity: .75; }
   .hidden { display: none !important; }
   @media (max-width: 30rem) { #panel { padding: 1.2rem 1rem; border-radius: 16px; } .actions > * { flex: 1 1 auto; } }
 </style>
 </head>
 <body>
 <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+<input id="type-box" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-hidden="true" tabindex="-1">
+<button id="keyboard" class="hidden" aria-label="Keyboard"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M6 13.5h1M17 13.5h1M9 14h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <button id="fullscreen" class="hidden" aria-label="Full screen"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
 <div class="page">
@@ -342,25 +349,25 @@
   };
   /* the header's and footer's texts */
   const EXTRA = {
-    en: { fullscreen: 'Full screen', levelMusic: 'Music changes with the level', tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
+    en: { keyboard: 'Keyboard', fullscreen: 'Full screen', levelMusic: 'Music changes with the level', tagline: 'The 1999 theme park builder, in your browser.', feat1: 'Plays in the browser', feat2: 'Your files stay on your device', feat3: 'Saves you can export',
       source: 'Source code on GitHub', disclaimer: 'A fan project, not made or endorsed by the LEGO Group. LEGO and LEGOLAND are trademarks of the LEGO Group.' },
-    es: { fullscreen: 'Pantalla completa', levelMusic: 'La música cambia con el nivel', tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
+    es: { keyboard: 'Teclado', fullscreen: 'Pantalla completa', levelMusic: 'La música cambia con el nivel', tagline: 'El constructor de parques de 1999, en tu navegador.', feat1: 'Se juega en el navegador', feat2: 'Tus archivos quedan en tu dispositivo', feat3: 'Partidas que podés exportar',
       source: 'Código fuente en GitHub', disclaimer: 'Un proyecto de fans, no hecho ni respaldado por el Grupo LEGO. LEGO y LEGOLAND son marcas del Grupo LEGO.' },
-    de: { fullscreen: 'Vollbild', levelMusic: 'Musik wechselt mit dem Level', tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
+    de: { keyboard: 'Tastatur', fullscreen: 'Vollbild', levelMusic: 'Musik wechselt mit dem Level', tagline: 'Das Freizeitpark-Bauspiel von 1999, in deinem Browser.', feat1: 'Läuft im Browser', feat2: 'Deine Dateien bleiben auf deinem Gerät', feat3: 'Spielstände zum Exportieren',
       source: 'Quellcode auf GitHub', disclaimer: 'Ein Fanprojekt, nicht von der LEGO Gruppe erstellt oder unterstützt. LEGO und LEGOLAND sind Marken der LEGO Gruppe.' },
-    fr: { fullscreen: 'Plein écran', levelMusic: 'La musique change avec le niveau', tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
+    fr: { keyboard: 'Clavier', fullscreen: 'Plein écran', levelMusic: 'La musique change avec le niveau', tagline: 'Le jeu de construction de parc de 1999, dans ton navigateur.', feat1: 'Se joue dans le navigateur', feat2: 'Tes fichiers restent sur ton appareil', feat3: 'Des sauvegardes exportables',
       source: 'Code source sur GitHub', disclaimer: 'Un projet de fans, ni créé ni approuvé par le Groupe LEGO. LEGO et LEGOLAND sont des marques du Groupe LEGO.' },
-    it: { fullscreen: 'Schermo intero', levelMusic: 'La musica cambia con il livello', tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
+    it: { keyboard: 'Tastiera', fullscreen: 'Schermo intero', levelMusic: 'La musica cambia con il livello', tagline: 'Il costruttore di parchi del 1999, nel tuo browser.', feat1: 'Si gioca nel browser', feat2: 'I tuoi file restano sul tuo dispositivo', feat3: 'Salvataggi esportabili',
       source: 'Codice sorgente su GitHub', disclaimer: 'Un progetto di fan, non realizzato né approvato dal Gruppo LEGO. LEGO e LEGOLAND sono marchi del Gruppo LEGO.' },
-    nl: { fullscreen: 'Volledig scherm', levelMusic: 'Muziek verandert met het level', tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
+    nl: { keyboard: 'Toetsenbord', fullscreen: 'Volledig scherm', levelMusic: 'Muziek verandert met het level', tagline: 'Het pretparkbouwspel uit 1999, in je browser.', feat1: 'Speelt in de browser', feat2: 'Je bestanden blijven op je apparaat', feat3: 'Opgeslagen spellen om te exporteren',
       source: 'Broncode op GitHub', disclaimer: 'Een fanproject, niet gemaakt of goedgekeurd door de LEGO Groep. LEGO en LEGOLAND zijn handelsmerken van de LEGO Groep.' },
-    da: { fullscreen: 'Fuld skærm', levelMusic: 'Musikken skifter med banen', tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
+    da: { keyboard: 'Tastatur', fullscreen: 'Fuld skærm', levelMusic: 'Musikken skifter med banen', tagline: 'Forlystelsesparkspillet fra 1999, i din browser.', feat1: 'Spilles i browseren', feat2: 'Dine filer bliver på din enhed', feat3: 'Gemte spil du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprojekt, ikke lavet eller godkendt af LEGO Koncernen. LEGO og LEGOLAND er varemærker tilhørende LEGO Koncernen.' },
-    sv: { fullscreen: 'Helskärm', levelMusic: 'Musiken byts med banan', tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
+    sv: { keyboard: 'Tangentbord', fullscreen: 'Helskärm', levelMusic: 'Musiken byts med banan', tagline: 'Nöjesparksspelet från 1999, i din webbläsare.', feat1: 'Spelas i webbläsaren', feat2: 'Dina filer stannar på din enhet', feat3: 'Sparade spel du kan exportera',
       source: 'Källkod på GitHub', disclaimer: 'Ett fanprojekt, inte gjort eller godkänt av LEGO-koncernen. LEGO och LEGOLAND är varumärken som tillhör LEGO-koncernen.' },
-    no: { fullscreen: 'Fullskjerm', levelMusic: 'Musikken skifter med brettet', tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
+    no: { keyboard: 'Tastatur', fullscreen: 'Fullskjerm', levelMusic: 'Musikken skifter med brettet', tagline: 'Fornøyelsesparkspillet fra 1999, i nettleseren din.', feat1: 'Spilles i nettleseren', feat2: 'Filene dine blir på enheten din', feat3: 'Lagrede spill du kan eksportere',
       source: 'Kildekode på GitHub', disclaimer: 'Et fanprosjekt, ikke laget eller godkjent av LEGO-konsernet. LEGO og LEGOLAND er varemerker som tilhører LEGO-konsernet.' },
-    cs: { fullscreen: 'Celá obrazovka', levelMusic: 'Hudba se mění podle úrovně', tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
+    cs: { keyboard: 'Klávesnice', fullscreen: 'Celá obrazovka', levelMusic: 'Hudba se mění podle úrovně', tagline: 'Budovatelská hra o zábavním parku z roku 1999, ve tvém prohlížeči.', feat1: 'Hraje se v prohlížeči', feat2: 'Tvé soubory zůstanou ve tvém zařízení', feat3: 'Uložené hry lze exportovat',
       source: 'Zdrojový kód na GitHubu', disclaimer: 'Fanouškovský projekt, který skupina LEGO nevytvořila ani neschválila. LEGO a LEGOLAND jsou ochranné známky skupiny LEGO.' },
   };
   for (const [code, texts] of Object.entries(EXTRA)) Object.assign(TEXTS[code].t, texts);
@@ -393,6 +400,8 @@
     document.documentElement.lang = lang;
     document.getElementById('fullscreen').title = t('fullscreen');
     document.getElementById('fullscreen').setAttribute('aria-label', t('fullscreen'));
+    document.getElementById('keyboard').title = t('keyboard');
+    document.getElementById('keyboard').setAttribute('aria-label', t('keyboard'));
     document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
     setStatus(statusKey, statusVars);
     refreshPlayLabel();
@@ -776,6 +785,7 @@
       document.getElementById('canvas').style.display = 'none';
       playing = false;
       show('fullscreen', false);
+      show('keyboard', false);
       document.getElementById('panel').style.display = '';
       if (document.fullscreenElement) document.exitFullscreen();
       refresh().then(() => setStatus('ended'));
@@ -792,10 +802,66 @@
   /* full screen: the whole page (the canvas follows its size); while full screen, Esc goes to the game (keyboard lock,
      Chrome/Edge: holding Esc still leaves), and the corner button comes back when the browser leaves it */
   let playing = false;
+  const touchScreen = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   async function enterFullscreen() {
     try { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {}
-    document.getElementById('canvas').focus();
+    /* a phone: the game is 4:3, so sideways (where the browser allows it, in full screen) */
+    if (touchScreen) try { await screen.orientation.lock('landscape'); } catch (e) {}
+    if (document.activeElement !== typeBox) document.getElementById('canvas').focus();
   }
+
+  /* the on-screen keyboard (phones, tablets): the game asks for it while it waits for a name (miniwin/src/window.c
+     calls Module.legolandKeyboard; MiniwinWantText), and it opens by focusing this text box. A phone keyboard's keys
+     don't say which key they are, so what the box receives is sent to the game as characters (Module._MiniwinTypeChar,
+     taps of their keys): the difference from what was sent, Backspaces for what was removed (the box keeps some
+     padding, so a Backspace always changes it). The browser may open the keyboard only on a touch: a touch on the
+     game or the keyboard button opens it while the game waits. */
+  const typeBox = document.getElementById('type-box');
+  const PAD = '        ';
+  let typedSent = PAD, composing = false, keyboardWanted = false;
+  function typeChar(code) { if (Module._MiniwinTypeChar) Module._MiniwinTypeChar(code); }
+  function resetTypeBox() {
+    typeBox.value = PAD;
+    typedSent = PAD;
+    try { typeBox.setSelectionRange(PAD.length, PAD.length); } catch (e) {}
+  }
+  function openKeyboard() {
+    resetTypeBox();
+    typeBox.focus({ preventScroll: true });
+  }
+  Module.legolandKeyboard = (on) => {
+    keyboardWanted = !!on;
+    show('keyboard', keyboardWanted);
+    if (keyboardWanted) openKeyboard();
+    else if (document.activeElement === typeBox) { typeBox.blur(); document.getElementById('canvas').focus({ preventScroll: true }); }
+  };
+  typeBox.addEventListener('compositionstart', () => { composing = true; });
+  typeBox.addEventListener('compositionend', () => { composing = false; });
+  typeBox.addEventListener('input', () => {
+    const now = typeBox.value;
+    let same = 0;
+    while (same < now.length && same < typedSent.length && now[same] === typedSent[same]) same++;
+    for (let i = same; i < typedSent.length; i++) typeChar(8);
+    for (const ch of now.slice(same)) typeChar(ch.codePointAt(0));
+    typedSent = now;
+    if (!composing && (now.length < PAD.length / 2 || now.length > 200)) resetTypeBox();
+  });
+  /* its keys stay here (the game gets the characters above, not the keys too); Enter is the game's Enter */
+  typeBox.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter') { e.preventDefault(); typeChar(13); }
+    else if (e.key === 'Escape') { e.preventDefault(); typeBox.blur(); }
+  });
+  typeBox.addEventListener('keyup', (e) => e.stopPropagation());
+  typeBox.addEventListener('keypress', (e) => e.stopPropagation());
+  /* (the canvas would take the focus back on the touch's mouse events: not while the game waits for a name) */
+  for (const type of ['pointerdown', 'click']) {
+    document.getElementById('canvas').addEventListener(type, () => {
+      if (keyboardWanted && document.activeElement !== typeBox) openKeyboard();
+    });
+  }
+  document.getElementById('canvas').addEventListener('mousedown', (e) => { if (keyboardWanted) e.preventDefault(); });
+  document.getElementById('keyboard').addEventListener('click', openKeyboard);
   document.addEventListener('fullscreenchange', () => {
     const full = document.fullscreenElement !== null;
     show('fullscreen', playing && !full);

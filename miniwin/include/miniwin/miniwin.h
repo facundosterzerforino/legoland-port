@@ -60,6 +60,27 @@ int MiniwinWindowInactive(void);
  * (bit 0 the primary button, bit 1 the secondary, bit 2 the middle one). */
 unsigned int MiniwinMouseState(int *x, int *y);
 
+/* The buttons for the game's read of the mouse, once a frame. As MiniwinMouseState, but on a touch screen a finger's
+ * press reaches the game one read after the pointer moved to it, and lasts at least two reads (a tap shorter than a
+ * frame is still a click). */
+unsigned int MiniwinMouseButtons(void);
+
+/* 1 while the last pointer input was a finger or a pen (Android, and a phone's browser, start so): the game's own
+ * pointer is hidden then; a mouse that moves shows it again. */
+int MiniwinTouchMode(void);
+
+/* Called while the game waits for typed text (a name): on a touch screen the on-screen keyboard opens, and closes
+ * again half a second after the last call. */
+void MiniwinWantText(void);
+
+/* A typed character (ASCII; 8 Backspace, 13 Enter) for the game, as a tap of its key: the web page's text box sends
+ * what the phone's keyboard types (its keys don't say which key they are). The game sees one character per two
+ * reads of the keyboard (MiniwinTypedKey). */
+void MiniwinTypeChar(int ch);
+
+/* The typed character's key (an SDL scancode) down in this read of the keyboard, else 0; *shift = 1 with Shift. */
+int MiniwinTypedKey(int *shift);
+
 /* 1 once if the key (an SDL scancode) went down since the last call: a press too short for two reads of the
  * keyboard (an on-screen keyboard's) is still seen. */
 int MiniwinKeyLatched(int scancode);

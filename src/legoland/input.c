@@ -154,8 +154,9 @@ LEGO_EXPORT void ScanMouse(void) {
         memset(&MouseState, 0, sizeof(MouseState));
 #ifdef LEGOLAND_PORT
         {
-            /* [library:input] the buttons from SDL3 (miniwin), while the window has the focus */
-            unsigned int buttons = MiniwinHasFocus() ? MiniwinMouseState(NULL, NULL) : 0;
+            /* [library:input] the buttons from SDL3 (miniwin), while the window has the focus; a finger's taps as
+             * clicks where it touched (MiniwinMouseButtons) */
+            unsigned int buttons = MiniwinHasFocus() ? MiniwinMouseButtons() : 0;
 
             MouseState.rgbButtons[0] = (buttons & 1) != 0 ? 0x80 : 0;
             MouseState.rgbButtons[1] = (buttons & 2) != 0 ? 0x80 : 0;
@@ -607,6 +608,9 @@ LEGO_EXPORT char GetInputChar(void) {
     unsigned char state;
     int alt;
 
+#ifdef LEGOLAND_PORT
+    MiniwinWantText(); /* [library:input] the game waits for a name: the on-screen keyboard on a touch screen */
+#endif
     result = 0;
     i = 0;
     do {

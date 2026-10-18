@@ -30,9 +30,10 @@ instead when it's there.
 
 Playing
 -------
-- One finger is the mouse: touch to click, drag to move.
+- One finger is the mouse: touch to click, drag to move. The game's pointer is hidden while you use touch (a
+  mouse brings it back).
 - Two fingers are the right mouse button.
-- Three fingers show or hide the keyboard (for typing names).
+- The keyboard opens by itself when the game asks for a name; three fingers show or hide it too.
 - The back key or gesture is Escape.
 Saved games stay in the app's folder (profiles). Printing a certificate saves it as a picture there.
 

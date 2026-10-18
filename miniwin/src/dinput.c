@@ -202,7 +202,7 @@ static void KeyboardBytes(unsigned char *state, int latched) {
     }
     memset(state, 0, 256);
     for (i = 0; i < count && i < SDL_SCANCODE_COUNT; i++) {
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(LEGOLAND_WEB_BROWSER)
         int down = keys[i] || (latched && MiniwinKeyLatched(i)); /* the on-screen keyboard's taps */
 #else
         int down = keys[i];
@@ -210,6 +210,18 @@ static void KeyboardBytes(unsigned char *state, int latched) {
         (void)latched;
         if (down && DikFromSdl[i] != 0) {
             state[DikFromSdl[i]] = 0x80;
+        }
+    }
+    if (latched) {
+        /* [library:input] a character typed in the web page's text box (MiniwinTypeChar) */
+        int shift;
+        int code = MiniwinTypedKey(&shift);
+
+        if (code > 0 && code < SDL_SCANCODE_COUNT && DikFromSdl[code] != 0) {
+            state[DikFromSdl[code]] = 0x80;
+            if (shift) {
+                state[0x2a] = 0x80; /* DIK_LSHIFT */
+            }
         }
     }
 #ifdef __ANDROID__
