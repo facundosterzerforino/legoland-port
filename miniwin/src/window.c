@@ -68,6 +68,12 @@ static float pan_dy;
 static int secondary_click_reads;
 
 #define TOUCH_HOLD_MS 400 /* a still finger (or two) this long presses instead of dragging */
+/* [library:input] a tap lifted this long before the game first read the mouse is dropped (MiniwinMouseButtons) */
+#define TOUCH_STALE_NS (300 * SDL_NS_PER_MS)
+static Uint64 touch_up_ns;
+
+/* [library:input] presses so far: buttons, fingers and keys (MiniwinPressCount) */
+static unsigned int press_count;
 
 /* [library:input] the on-screen keyboard (MiniwinWantText): shown until this tick, because the game waits for a
  * name; shown now (by the game's wait, or three fingers) */
@@ -273,6 +279,7 @@ void MiniwinPumpEvents(WNDPROC proc) {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_EVENT_FINGER_DOWN:
+            press_count++;
             fingers++;
             touch_mode = 1;
             TrackFinger(&event.tfinger, 1);
@@ -354,6 +361,7 @@ void MiniwinPumpEvents(WNDPROC proc) {
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            press_count++;
             if (FromTouch(event.button.which) && event.button.button == SDL_BUTTON_LEFT && !touch_secondary) {
                 float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
 
@@ -369,6 +377,7 @@ void MiniwinPumpEvents(WNDPROC proc) {
         case SDL_EVENT_MOUSE_BUTTON_UP:
             if (FromTouch(event.button.which) && event.button.button == SDL_BUTTON_LEFT && touch_press == 1) {
                 touch_press = 2;
+                touch_up_ns = event.button.timestamp != 0 ? event.button.timestamp : SDL_GetTicksNS();
             }
             break;
         case SDL_EVENT_WINDOW_FOCUS_LOST:
@@ -383,6 +392,9 @@ void MiniwinPumpEvents(WNDPROC proc) {
             break;
         }
         case SDL_EVENT_KEY_DOWN:
+            if (!event.key.repeat) {
+                press_count++;
+            }
             if (event.key.scancode < SDL_SCANCODE_COUNT) {
                 latched[event.key.scancode] = true;
             }
@@ -469,6 +481,12 @@ unsigned int MiniwinMouseButtons(void) {
         }
         return buttons & ~1u;
     }
+    if (touch_press == 2 && touch_reads == 0 && SDL_GetTicksNS() - touch_up_ns > TOUCH_STALE_NS) {
+        /* [library:input] a tap made while the game wasn't reading the mouse (loading): lost, as a mouse's click
+         * then is. Kept, it clicked whatever came next: the first movie (skipped) or a button. */
+        touch_press = 0;
+        drag_state = DRAG_NONE;
+    }
     if (touch_press != 0 && drag_state == DRAG_WAIT) {
         if (touch_press == 1 && SDL_GetTicks() - drag_start_tick < TOUCH_HOLD_MS) {
             /* [library:input] in a list: a tap or a drag? The press waits (the pointer is there already) */
@@ -497,6 +515,10 @@ unsigned int MiniwinMouseButtons(void) {
         }
     }
     return buttons;
+}
+
+unsigned int MiniwinPressCount(void) {
+    return press_count;
 }
 
 int MiniwinTouchMode(void) {

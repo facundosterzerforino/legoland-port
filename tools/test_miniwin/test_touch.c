@@ -224,6 +224,28 @@ int main(void) {
     Frames("all lifted", 2, "00");
     Expect("fingers after all lifted", MiniwinTouchFingers() == 0 ? "0" : "not 0", "0");
 
+    /* a tap the game didn't read for a while (loading: the page had its events, the game no read): lost */
+    FirstDown(0.75f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    MiniwinPumpEvents(Proc);
+    SDL_Delay(400);
+    Frames("a tap during loading", 3, "000");
+    FirstDown(0.75f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    MiniwinPumpEvents(Proc);
+    SDL_Delay(100);
+    Frames("a tap read soon after", 4, "0110");
+
+    /* presses are counted (a movie skips only for one made while it shows) */
+    {
+        unsigned int before = MiniwinPressCount();
+
+        Mouse(SDL_EVENT_MOUSE_BUTTON_DOWN, 1, 10, 10);
+        Mouse(SDL_EVENT_MOUSE_BUTTON_UP, 1, 10, 10);
+        MiniwinPumpEvents(Proc);
+        Expect("a mouse click is a press", MiniwinPressCount() == before + 1 ? "counted" : "not counted", "counted");
+    }
+
     /* a mouse: the game's pointer is back */
     Mouse(SDL_EVENT_MOUSE_MOTION, 1, 10, 10);
     Frames("mouse moves", 1, "0");

@@ -76,6 +76,9 @@ void MiniwinTouchTakeDrag(float *dx, float *dy, float *pan_x, float *pan_y);
 /* The fingers on the screen now. */
 int MiniwinTouchFingers(void);
 
+/* The presses so far (mouse buttons, fingers, keys): a changed count means something was pressed since. */
+unsigned int MiniwinPressCount(void);
+
 /* 1 while the last pointer input was a finger or a pen (Android, and a phone's browser, start so): the game's own
  * pointer is hidden then; a mouse that moves shows it again. */
 int MiniwinTouchMode(void);

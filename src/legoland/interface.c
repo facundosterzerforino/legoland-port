@@ -68,6 +68,7 @@ struct AviStreamInfo {
 #include "obj_instance.h"
 #include "stream.h"
 #ifdef LEGOLAND_PORT
+#include "miniwin/miniwin.h"
 #include "port_movie.h"
 #endif
 
@@ -1641,6 +1642,9 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
     unsigned int target;
     unsigned int prev;
     int audio;
+#ifdef LEGOLAND_PORT
+    unsigned int presses = 0; /* [library:input] the presses before the movie's first frame (below) */
+#endif
 
     frame_index = -1;
     target = 0;
@@ -1664,16 +1668,29 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
                 break;
             }
             ReadGameButtons();
-            if ((MouseClickFlags & 1) != 0) {
-                break;
+#ifdef LEGOLAND_PORT
+            /* [library:input] only a press made once the movie shows skips it: not a click, tap or key from before
+             * (the one that started it, still held; one the game wasn't reading during loading, which a phone's
+             * touch handling keeps for the next read). Escape here also skips the movies after it (DAT_00668fb0),
+             * so the intro and the scenes went missing. */
+            if (started == 0) {
+                presses = MiniwinPressCount();
             }
-            if ((DAT_00813ad4 & 7) != 0) {
-                DAT_00668fb0 = 1;
-                break;
+            if (MiniwinPressCount() != presses) {
+#endif
+                if ((MouseClickFlags & 1) != 0) {
+                    break;
+                }
+                if ((DAT_00813ad4 & 7) != 0) {
+                    DAT_00668fb0 = 1;
+                    break;
+                }
+                if ((KeyboardState[0x39] & 0x80) != 0) {
+                    break;
+                }
+#ifdef LEGOLAND_PORT
             }
-            if ((KeyboardState[0x39] & 0x80) != 0) {
-                break;
-            }
+#endif
         } else {
             ProcessSystemEvents();
             if (((KeyboardState[0x1d] | KeyboardState[0x9d]) & 0x80) != 0 && (KeyboardState[0x10] & 0x80) != 0) {
