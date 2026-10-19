@@ -60,6 +60,22 @@ BOOL MiniwinQueryPerformanceFrequency(LARGE_INTEGER *frequency) {
     return TRUE;
 }
 
+/* The game waits for its next frame by reading the clock in a loop: the frame limiter (BlitFrameToWindow) for 28 ms
+ * on GetTickCount, the movie player for the next frame's time. That kept a core busy all the time, which on a phone
+ * is heat and battery, and in a browser time the page doesn't get. A nap of a millisecond per pass leaves the loops
+ * as they were: they still read the clock and stop at the same value (GetTickCount moves in 15.625 ms steps; a movie
+ * frame is 66 ms), just up to about a millisecond later. Windows, the play-tested build, spins as the original. */
+void MiniwinIdle(void) {
+#if defined(_WIN32)
+#elif defined(LEGOLAND_WEB_BROWSER)
+    if (emscripten_is_main_browser_thread() && page_turn == 0) {
+        MiniwinWebSleep(1);
+    }
+#else
+    SDL_DelayNS(1000000);
+#endif
+}
+
 void MiniwinSleep(DWORD milliseconds) {
 #ifdef LEGOLAND_WEB_BROWSER
     if (emscripten_is_main_browser_thread()) {

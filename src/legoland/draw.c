@@ -1729,6 +1729,9 @@ int FlipFrame(void) {
     }
     tick = GetTickCount();
     while (tick - LastPresentTicks < 0x1c) {
+#ifdef LEGOLAND_PORT
+        MiniwinIdle(); /* [library:timer] a nap, not a spin (miniwin/timer.h) */
+#endif
         tick = GetTickCount();
     }
     LastPresentTicks = GetTickCount();
@@ -1791,6 +1794,9 @@ int BlitFrameToWindow(void) {
     }
     tick = GetTickCount();
     while (tick - LastPresentTicks < 0x1c) {
+#ifdef LEGOLAND_PORT
+        MiniwinIdle(); /* [library:timer] a nap, not a spin (miniwin/timer.h) */
+#endif
         tick = GetTickCount();
     }
     LastPresentTicks = GetTickCount();

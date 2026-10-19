@@ -1731,6 +1731,9 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
             frame_index = -1;
         }
         while (target == prev) {
+#ifdef LEGOLAND_PORT
+            MiniwinIdle(); /* [library:timer] a nap, not a spin (miniwin/timer.h) */
+#endif
             target = (unsigned int)((GetPerformanceTime() - started) * handle->frame_rate) / 1000;
         }
         if (audio != 0) {

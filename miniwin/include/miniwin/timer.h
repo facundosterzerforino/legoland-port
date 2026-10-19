@@ -10,6 +10,9 @@ DWORD MiniwinGetTickCount(void);
 BOOL MiniwinQueryPerformanceCounter(LARGE_INTEGER *count);
 BOOL MiniwinQueryPerformanceFrequency(LARGE_INTEGER *frequency);
 void MiniwinSleep(DWORD milliseconds);
+/* One pass of a loop where the game waits for the clock (the frame limiter, the movie player): a nap of about a
+ * millisecond instead of a spin (miniwin/src/timer.c) */
+void MiniwinIdle(void);
 
 #ifdef LEGOLAND_WEB_BROWSER
 /* [library:timer] In a browser the game runs on the page's thread, which also plays the sound (SDL's audio callback
