@@ -151,7 +151,7 @@ static int DecodePcm(const struct Stream *s, const BYTE *in, short *out) {
     int c;
 
     for (c = 0; c < s->channels; c++) {
-        out[c] = s->src_bits == 8 ? (short)((in[c] - 128) << 8) : (short)Word(in + c * 2);
+        out[c] = s->src_bits == 8 ? (short)((in[c] - 128) * 256) : (short)Word(in + c * 2);
     }
     return 1;
 }

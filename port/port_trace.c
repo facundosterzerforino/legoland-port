@@ -70,7 +70,7 @@ static void WatchStrings(FILE *f) {
                                  "heading %s)",
         slots, GetString(0x89) != NULL ? "there" : "missing", GetString(0x28a) != NULL ? "there" : "missing");
     if (f != NULL) {
-        fprintf(f, "[%8lu] %s\n", GetTickCount(), line);
+        fprintf(f, "[%8lu] %s\n", (unsigned long)GetTickCount(), line);
         fflush(f);
     }
 #ifdef __EMSCRIPTEN__
@@ -87,7 +87,7 @@ void PortTraceV(const char *fmt, va_list ap) {
     OutputDebugStringA(line);
     OutputDebugStringA("\n");
     if (f != NULL) {
-        fprintf(f, "[%8lu] %s\n", GetTickCount(), line);
+        fprintf(f, "[%8lu] %s\n", (unsigned long)GetTickCount(), line);
         fflush(f);
     }
 #ifdef __EMSCRIPTEN__

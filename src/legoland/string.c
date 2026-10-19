@@ -17,7 +17,13 @@ void LoadStringTable(void) {
     char cwd[256];
     char token[240] = {0};
     int current_id;
+#ifdef LEGOLAND_PORT
+    /* [port] the ids have up to 4 digits ("9999"), so with the 0 that ends them the original's 4 bytes overflowed by
+     * one into the next local (found by AddressSanitizer) */
+    char num_str[16];
+#else
     char num_str[4];
+#endif
     char *data_buf;
     FILE *stream;
     int len;

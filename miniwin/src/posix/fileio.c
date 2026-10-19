@@ -450,7 +450,9 @@ int PosixListFolder(const char *folder, const char *pattern, char ***names) {
         list[count++] = strdup(e->d_name);
     }
     closedir(dir);
-    qsort(list, (size_t)count, sizeof(char *), CompareNames);
+    if (count > 1) {
+        qsort(list, (size_t)count, sizeof(char *), CompareNames); /* not with NULL: an empty folder */
+    }
     *names = list;
     return count;
 }
