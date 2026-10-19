@@ -48,6 +48,15 @@ struct AviFile {
 static FILE *open_file;
 static const struct AviFile *open_owner;
 
+/* What was read last of that file, a window of up to WINDOW_SIZE bytes from window_start. A movie reads its frames
+ * and its sound one chunk at a time, a few KB each, in the order they lie in the file; every one was a seek and a
+ * read, and stdio drops its buffer at each seek. On the web each read is a round trip to the page's storage worker:
+ * that wait was 80% of the time a movie frame took there. Read ahead instead, a window at a time. */
+#define WINDOW_SIZE (256 * 1024)
+static BYTE *window;
+static DWORD window_start;
+static DWORD window_length;
+
 static DWORD Dword(const BYTE *p) {
     return p[0] | p[1] << 8 | p[2] << 16 | (DWORD)p[3] << 24;
 }
@@ -58,13 +67,35 @@ static int ReadAt(const struct AviFile *af, DWORD offset, void *buf, DWORD size)
             fclose(open_file);
         }
         open_owner = NULL;
+        window_length = 0;
         open_file = MiniwinFopen(af->path, "rb");
         if (open_file == NULL) {
             return 0;
         }
         open_owner = af;
     }
-    return fseek(open_file, (long)offset, SEEK_SET) == 0 && fread(buf, 1, size, open_file) == size;
+    if (offset >= window_start && size <= window_length && offset - window_start <= window_length - size) {
+        memcpy(buf, window + (offset - window_start), size);
+        return 1;
+    }
+    if (window == NULL) {
+        window = (BYTE *)malloc(WINDOW_SIZE);
+    }
+    if (window == NULL || size > WINDOW_SIZE) {
+        /* bigger than the window: read it alone */
+        return fseek(open_file, (long)offset, SEEK_SET) == 0 && fread(buf, 1, size, open_file) == size;
+    }
+    window_length = 0;
+    if (fseek(open_file, (long)offset, SEEK_SET) != 0) {
+        return 0;
+    }
+    window_start = offset;
+    window_length = (DWORD)fread(window, 1, WINDOW_SIZE, open_file); /* less at the end of the file */
+    if (window_length < size) {
+        return 0;
+    }
+    memcpy(buf, window, size);
+    return 1;
 }
 
 static void FreeFile(struct AviFile *af) {
@@ -74,6 +105,7 @@ static void FreeFile(struct AviFile *af) {
         fclose(open_file);
         open_file = NULL;
         open_owner = NULL;
+        window_length = 0;
     }
     for (i = 0; i < af->streams; i++) {
         free(af->stream[i].format);
