@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <pthread.h>
+#include <stdio.h>
 
 /* Kernel objects: every HANDLE these functions return points to one. One lock and one condition for all of them,
  * which every change that can end a wait broadcasts. */
@@ -24,6 +25,16 @@ struct PosixObject {
 
 extern pthread_mutex_t posix_objects_lock;
 extern pthread_cond_t posix_objects_changed;
+
+/* [library:filesystem] Read-only files through a cache of their blocks (readcache.c): ReadFile's read-only handles
+ * and MiniwinFopen's "r" files. PosixReadCacheRead reads size bytes from pos (fewer at the end of the file; -1 and
+ * errno on an error). PosixFopenRead is fopen(path, mode) for reading, through such a cache. */
+struct PosixReadCache;
+struct PosixReadCache *PosixReadCacheNew(int fd);
+long long PosixReadCacheRead(struct PosixReadCache *c, long long pos, void *buffer, size_t size);
+void PosixReadCacheFree(struct PosixReadCache *c);
+FILE *PosixFopenRead(const char *path, const char *mode);
+int PosixOpenRead(const char *path); /* open(path, O_RDONLY), in a browser the faster way (readcache.c) */
 
 void *PosixNewObject(enum PosixKind kind, size_t size);
 void *PosixObjectOf(HANDLE handle, enum PosixKind kind); /* NULL if handle isn't one of that kind */

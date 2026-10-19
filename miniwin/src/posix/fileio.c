@@ -19,21 +19,17 @@
 #include "miniwin/files.h"
 #include "posix.h"
 
-/* Read-only files keep a window of the file in memory. The game reads its volumes a few bytes at a time
- * (RES_ReadFile: a length, a chunk header, a palette...), each a system call: nothing on a desktop, but in a browser
- * every one is a round trip to the page's storage (OPFS, through its own thread), and opening a screen took seconds
- * (the game stuttered at every click). Reads come from the window; a seek only moves the position. */
-#define READ_WINDOW 65536
-
+/* Read-only files are read through a cache of their blocks (readcache.c). The game reads its volumes a few bytes at
+ * a time (RES_ReadFile: a length, a chunk header, a palette...), each a system call: nothing on a desktop, but in a
+ * browser every one is a round trip to the page's storage (OPFS, through its own thread), and opening a screen took
+ * seconds (the game stuttered at every click). Reads come from the cache; a seek only moves the position. */
 struct File {
     struct PosixObject base;
     int fd;
-    unsigned char *window; /* read-only files: READ_WINDOW bytes of the file from window_at (pread: the descriptor's
-                            * own position isn't used); NULL: plain reads and seeks */
-    long long window_at;
-    size_t window_len;
+    struct PosixReadCache *cache; /* read-only files (pread: the descriptor's own position isn't used); NULL: plain
+                                   * reads and seeks */
     long long pos;
-    pthread_mutex_t lock; /* the window and the position, when threads share the handle */
+    pthread_mutex_t lock; /* the cache and the position, when threads share the handle */
 };
 
 struct Find {
@@ -142,9 +138,10 @@ HANDLE CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES
         int existed;
 
         PosixPath(name, path, sizeof(path));
-        existed = stat(path, &st) == 0;
+        /* (only where it matters: in a browser each look is a round trip to the page's storage) */
+        existed = (disposition == OPEN_ALWAYS || disposition == CREATE_ALWAYS) && stat(path, &st) == 0;
 
-        fd = open(path, oflags | O_CLOEXEC, 0644);
+        fd = oflags == O_RDONLY ? PosixOpenRead(path) : open(path, oflags | O_CLOEXEC, 0644);
         if (fd < 0) {
             PosixSetError(errno == EEXIST ? ERROR_FILE_EXISTS : PosixErrorFromErrno(errno));
             return INVALID_HANDLE_VALUE;
@@ -163,57 +160,27 @@ HANDLE CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES
     }
     f->fd = fd;
     if ((oflags & O_ACCMODE) == O_RDONLY && strcmp(name, "CONIN$") != 0 &&
-        (f->window = (unsigned char *)malloc(READ_WINDOW)) != NULL) {
+        (f->cache = PosixReadCacheNew(fd)) != NULL) {
         pthread_mutex_init(&f->lock, NULL);
     }
     return (HANDLE)f;
 }
 
-/* ReadFile on a read-only file: from the window, refilled with one read where the position leaves it */
-static BOOL ReadWindowed(struct File *f, char *buffer, size_t size, size_t *done) {
+/* ReadFile on a read-only file: from the cache */
+static BOOL ReadCached(struct File *f, char *buffer, size_t size, size_t *done) {
+    long long n;
+
     pthread_mutex_lock(&f->lock);
-    while (*done < size) {
-        ssize_t n;
-
-        if (f->pos >= f->window_at && f->pos < f->window_at + (long long)f->window_len) {
-            size_t at = (size_t)(f->pos - f->window_at);
-            size_t take = f->window_len - at;
-
-            if (take > size - *done) {
-                take = size - *done;
-            }
-            memcpy(buffer + *done, f->window + at, take);
-            *done += take;
-            f->pos += (long long)take;
-            continue;
-        }
-        if (size - *done >= READ_WINDOW) {
-            /* a big read: straight into the caller's buffer */
-            n = pread(f->fd, buffer + *done, size - *done, (off_t)f->pos);
-            if (n > 0) {
-                *done += (size_t)n;
-                f->pos += n;
-            }
-        } else {
-            n = pread(f->fd, f->window, READ_WINDOW, (off_t)f->pos);
-            if (n >= 0) {
-                f->window_at = f->pos;
-                f->window_len = (size_t)n;
-            }
-        }
-        if (n < 0 && errno == EINTR) {
-            continue;
-        }
-        if (n < 0) {
-            pthread_mutex_unlock(&f->lock);
-            PosixSetError(PosixErrorFromErrno(errno));
-            return FALSE;
-        }
-        if (n == 0) {
-            break; /* the end: success, with fewer bytes */
-        }
+    n = PosixReadCacheRead(f->cache, f->pos, buffer, size);
+    if (n > 0) {
+        f->pos += n;
     }
     pthread_mutex_unlock(&f->lock);
+    if (n < 0) {
+        PosixSetError(PosixErrorFromErrno(errno));
+        return FALSE;
+    }
+    *done = (size_t)n; /* fewer at the end: success */
     return TRUE;
 }
 
@@ -229,8 +196,8 @@ BOOL ReadFile(HANDLE handle, LPVOID buffer, DWORD size, LPDWORD read_size, LPOVE
         PosixSetError(ERROR_INVALID_HANDLE);
         return FALSE;
     }
-    if (f->window != NULL) {
-        if (!ReadWindowed(f, (char *)buffer, size, &done)) {
+    if (f->cache != NULL) {
+        if (!ReadCached(f, (char *)buffer, size, &done)) {
             return FALSE;
         }
         if (read_size != NULL) {
@@ -299,8 +266,8 @@ DWORD SetFilePointer(HANDLE handle, LONG distance, PLONG distance_high, DWORD me
     if (distance_high != NULL) {
         offset = (long long)(((unsigned long long)(unsigned int)*distance_high << 32) | (unsigned int)distance);
     }
-    if (f->window != NULL) {
-        /* the read window's own position */
+    if (f->cache != NULL) {
+        /* the cache's own position */
         struct stat st;
         long long base = 0;
 
@@ -377,8 +344,8 @@ BOOL CloseHandle(HANDLE handle) {
     switch (o->kind) {
     case POSIX_FILE:
         close(((struct File *)o)->fd);
-        if (((struct File *)o)->window != NULL) {
-            free(((struct File *)o)->window);
+        if (((struct File *)o)->cache != NULL) {
+            PosixReadCacheFree(((struct File *)o)->cache);
             pthread_mutex_destroy(&((struct File *)o)->lock);
         }
         o->kind = 0;

@@ -7,6 +7,9 @@
 #include <sys/stat.h>
 
 #include "miniwin/files.h"
+#ifndef _WIN32
+#include "posix/posix.h"
+#endif
 
 static int Exists(const char *path) {
     return SDL_GetPathInfo(path, NULL);
@@ -204,16 +207,26 @@ const char *MiniwinPath(const char *path, char *buf, size_t size) {
 
 FILE *MiniwinFopen(const char *path, const char *mode) {
     char buf[MAX_PATH];
+
+#if defined(__ANDROID__)
     FILE *f = fopen(MiniwinPath(path, buf, sizeof(buf)), mode);
 
-#ifndef _WIN32
-    /* read in 64 KB blocks: in a browser each block is a round trip to the page's storage, and Emscripten's stdio
-     * reads 1 KB at a time */
+    /* read in 64 KB blocks */
     if (f != NULL && mode[0] == 'r' && strchr(mode, '+') == NULL) {
         setvbuf(f, NULL, _IOFBF, 65536);
     }
-#endif
     return f;
+#else
+#ifndef _WIN32
+    /* read through a cache of the file's blocks (posix/readcache.c): in a browser each read is a round trip to the
+     * page's storage, and Emscripten's stdio reads 1 KB at a time (setvbuf can't make it more without a buffer of
+     * the caller's, which fclose wouldn't free) */
+    if (mode[0] == 'r' && strchr(mode, '+') == NULL) {
+        return PosixFopenRead(MiniwinPath(path, buf, sizeof(buf)), mode);
+    }
+#endif
+    return fopen(MiniwinPath(path, buf, sizeof(buf)), mode);
+#endif
 }
 
 int MiniwinOpen(const char *path, int flags, ...) {
