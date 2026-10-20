@@ -4,6 +4,7 @@
 #include "miniwin/miniwin.h"
 #include "port_display.h"
 #include "port_input.h"
+#include "port_trace.h"
 
 #include "../src/legoland/globals.h"
 #include "../src/legoland/icon.h"
@@ -83,17 +84,27 @@ static int TouchDragArea(int x, int y) {
     return ListAt(pt.x, pt.y, &drag_arrow) != NULL;
 }
 
-/* miniwin's aim area: the park, while an object of the build menu is being placed (EditMode 1 with an object; not a
- * path, a hedge or an object laid by dragging a rectangle, flag 0x2000000, which a finger drags as before), and not
- * on the game's buttons or panels (GetIconAtPos: a button, or flag 4 for a panel) */
-static int TouchAimArea(int x, int y) {
+/* an object of the build menu is being placed (EditMode.unk0 1 with an object, only ever in the park; not on the map
+ * screen, EditMode.unk4 1), and not a path, a hedge or an object laid by dragging a rectangle (flag 0x2000000), which
+ * a finger drags as before */
+static const struct Ride *PlacingObject(void) {
     const struct Ride *ride = EditMode.unk8;
+
+    if (EditMode.unk4 == 1 || EditMode.unk0 != 1 || ride == NULL || (const void *)ride == PathControlObject ||
+        (const void *)ride == HedgeObjectClass || (ride->flags & 0x2000000) != 0) {
+        return NULL;
+    }
+    return ride;
+}
+
+/* miniwin's aim area: the park while placing an object (PlacingObject), not on the game's buttons or panels
+ * (GetIconAtPos: a button, or flag 4 for a panel) */
+static int TouchAimArea(int x, int y) {
     POINT pt;
     struct Point at;
     unsigned char flags = 0;
 
-    if (EditMode.unk4 != 2 || EditMode.unk0 != 1 || ride == NULL || (const void *)ride == PathControlObject ||
-        (const void *)ride == HedgeObjectClass || (ride->flags & 0x2000000) != 0) {
+    if (PlacingObject() == NULL) {
         return 0;
     }
     pt.x = x;
@@ -140,6 +151,21 @@ void PortTouchFrame(void) {
 
     MiniwinSetTouchDragArea(TouchDragArea);
     MiniwinSetTouchAimArea(TouchAimArea);
+    if (MiniwinTouchMode()) {
+        /* [port] the log ("Save the game's log"): when placing with a finger starts and ends */
+        static const struct Ride *placing;
+        static int aiming;
+        const struct Ride *now = PlacingObject();
+
+        if (now != placing) {
+            PortTrace("touch: placing %s (screen %d)", now != NULL ? now->name : "nothing", (int)EditMode.unk4);
+            placing = now;
+        }
+        if (MiniwinTouchAiming() != aiming) {
+            aiming = MiniwinTouchAiming();
+            PortTrace("touch: %s", aiming ? "aiming" : "aim let go");
+        }
+    }
     MiniwinTouchTakeDrag(&dx, &dy, &px, &py);
     scale = GameScale();
     if (MiniwinTouchFingers() == 0) {
