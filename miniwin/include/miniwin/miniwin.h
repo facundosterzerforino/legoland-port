@@ -70,6 +70,15 @@ unsigned int MiniwinMouseButtons(void);
  * press). Two fingers moving are a pan; held still, the secondary button; lifted at once, a secondary click. */
 void MiniwinSetTouchDragArea(int (*area)(int x, int y));
 
+/* Placing things precisely with a finger: where area(x, y) says (window pixels; the park while an object is being
+ * placed), one finger aims instead of clicking. A finger that goes down near the aim (MiniwinTouchAiming) moves it by
+ * as much as the finger moves; one that goes down elsewhere brings the aim there. A tap on the aim (lifted without
+ * moving) clicks there. Meanwhile the pointer (MiniwinMouseState) stays on the aim, not under the finger. */
+void MiniwinSetTouchAimArea(int (*area)(int x, int y));
+
+/* 1 while the pointer is held on an aim (MiniwinSetTouchAimArea). */
+int MiniwinTouchAiming(void);
+
 /* The one-finger drag's and the two-finger pan's movement since the last call, in window pixels. */
 void MiniwinTouchTakeDrag(float *dx, float *dy, float *pan_x, float *pan_y);
 

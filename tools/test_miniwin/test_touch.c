@@ -1,5 +1,5 @@
 /* Touch screens in miniwin (miniwin/src/window.c): what the game reads, frame by frame, for a finger's tap, a long
- * press, a list dragged with a finger, two fingers (a tap, a hold, a pan), a mouse, typed characters (the web page's
+ * press, a list dragged with a finger, an object aimed and then built with a tap, two fingers (a tap, a hold, a pan), a mouse, typed characters (the web page's
  * text box) and the on-screen keyboard while the game waits for a name. Off Windows, with SDL's offscreen video (no
  * screen needed; a 640x480 window, so window pixels are the game's):
  *
@@ -143,6 +143,27 @@ static int LeftHalf(int x, int y) {
     return x < 320;
 }
 
+/* the right half is the park while an object is being placed (an aim area) */
+static int RightHalf(int x, int y) {
+    (void)y;
+    return x >= 320;
+}
+
+/* where the game's pointer is, "x,y" */
+static void Pointer(const char *what, const char *want) {
+    char got[32];
+    int x;
+    int y;
+
+    MiniwinMouseState(&x, &y);
+    snprintf(got, sizeof(got), "%d,%d", x, y);
+    Expect(what, got, want);
+}
+
+static void Aiming(const char *what, const char *want) {
+    Expect(what, MiniwinTouchAiming() ? "aiming" : "not aiming", want);
+}
+
 int main(void) {
     HWND hwnd = MiniwinCreateWindow("test", 640, 480, MINIWIN_WINDOW);
 
@@ -190,6 +211,66 @@ int main(void) {
     Drags("no list drag elsewhere", "0,0 pan 0,0");
     FirstUp(0.75f, 0.5f);
     Frames("lifted", 2, "00");
+    MiniwinSetTouchDragArea(NULL);
+
+    /* placing an object (the right half): a finger aims, a tap on the aim builds there; the aim's radius is six slops
+     * (57.6 pixels) */
+    MiniwinSetTouchDragArea(LeftHalf);
+    MiniwinSetTouchAimArea(RightHalf);
+    FirstDown(0.75f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    Frames("a first tap in the park: no click", 4, "0000");
+    Pointer("the aim where it tapped", "480,240");
+    Aiming("after the first tap", "aiming");
+    FirstDown(490.0f / 640, 240.0f / 480); /* 10 pixels from the aim: moves it */
+    Frames("finger down by the aim", 2, "00");
+    FirstMove(490.0f / 640, 300.0f / 480);
+    FirstMove(500.0f / 640, 300.0f / 480);
+    Frames("dragging the aim: no click", 3, "000");
+    Pointer("the aim moved as much as the finger (10 right, 60 down)", "490,300");
+    FirstUp(500.0f / 640, 300.0f / 480);
+    Frames("aim dragged, lifted: no click", 3, "000");
+    Pointer("the aim stays", "490,300");
+    FirstDown(0.9f, 0.1f); /* 576,48: far from the aim, brings it there */
+    FirstUp(0.9f, 0.1f);
+    Frames("a tap away from the aim: no click", 3, "000");
+    Pointer("the aim where it tapped", "576,48");
+    FirstDown(580.0f / 640, 60.0f / 480); /* 12.6 pixels away: on the aim */
+    FirstUp(580.0f / 640, 60.0f / 480);
+    Frames("a tap on the aim: a click", 1, "1");
+    Pointer("the click on the aim, not under the finger", "576,48");
+    Frames("the click's end", 3, "100");
+    Aiming("after building", "not aiming");
+    FirstDown(0.75f, 0.75f);
+    Frames("a finger held still in the park", 1, "0");
+    SDL_Delay(450);
+    Frames("held: no press", 3, "000");
+    FirstUp(0.75f, 0.75f);
+    Frames("lifted", 2, "00");
+    Pointer("the aim where it was held", "480,360");
+    FirstDown(0.75f, 0.75f);
+    Finger(SDL_EVENT_FINGER_DOWN, 2, 0.85f, 0.75f);
+    FirstMove(0.75f, 0.5f);
+    Finger(SDL_EVENT_FINGER_MOTION, 2, 0.85f, 0.5f);
+    Frames("two fingers while aiming: no click", 3, "000");
+    Drags("they pan", "0,0 pan 0,-120");
+    Finger(SDL_EVENT_FINGER_UP, 2, 0.85f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    Frames("all lifted", 2, "00");
+    Pointer("the aim stays through a pan", "480,360");
+    FirstDown(0.25f, 0.5f);
+    FirstUp(0.25f, 0.5f);
+    Frames("a tap outside the park (a button): a click", 5, "01100");
+    Aiming("after a button", "not aiming");
+    FirstDown(0.75f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    Frames("aim again", 2, "00");
+    MiniwinSetTouchAimArea(NULL);
+    Frames("not placing any more", 1, "0");
+    Aiming("the aim let go", "not aiming");
+    FirstDown(0.75f, 0.5f);
+    FirstUp(0.75f, 0.5f);
+    Frames("then a tap clicks again", 5, "01100");
     MiniwinSetTouchDragArea(NULL);
 
     /* two fingers: a tap is a secondary click, a still hold keeps it down, a move pans; never the primary */

@@ -18,6 +18,11 @@ int PortWheelTake(int step);
  * PortTouchFrame: each frame, from ScanMouse (scrolls the dragged list, keeps the pan for PortTouchPan). */
 void PortTouchFrame(void);
 
+/* [library:input] Placing an object with a finger (miniwin's MiniwinSetTouchAimArea): in the park, while an object
+ * from the build menu is being placed, a finger moves the object instead of building it at once (the finger hid the
+ * spot and a tap built wherever it landed; moving while held built a row of them). Drag it, or tap where it should
+ * go; then a tap on it builds it there. Paths, hedges and objects laid as a rectangle are dragged as before. */
+
 /* The two-finger pan of this frame, applied to the park's view (from UpdateController, where the game scrolls). */
 void PortTouchPan(void);
 

@@ -9,6 +9,7 @@
 #include "../src/legoland/icon.h"
 #include "../src/legoland/interface.h"
 #include "../src/legoland/map_object.h"
+#include "../src/legoland/obj_instance.h"
 
 /* the most notches kept waiting, so a fast spin doesn't keep scrolling long after the wheel stops */
 #define MAX_PENDING (5 * WHEEL_DELTA)
@@ -82,6 +83,30 @@ static int TouchDragArea(int x, int y) {
     return ListAt(pt.x, pt.y, &drag_arrow) != NULL;
 }
 
+/* miniwin's aim area: the park, while an object of the build menu is being placed (EditMode 1 with an object; not a
+ * path, a hedge or an object laid by dragging a rectangle, flag 0x2000000, which a finger drags as before), and not
+ * on the game's buttons or panels (GetIconAtPos: a button, or flag 4 for a panel) */
+static int TouchAimArea(int x, int y) {
+    const struct Ride *ride = EditMode.unk8;
+    POINT pt;
+    struct Point at;
+    unsigned char flags = 0;
+
+    if (EditMode.unk4 != 2 || EditMode.unk0 != 1 || ride == NULL || (const void *)ride == PathControlObject ||
+        (const void *)ride == HedgeObjectClass || (ride->flags & 0x2000000) != 0) {
+        return 0;
+    }
+    pt.x = x;
+    pt.y = y;
+    PortDisplayClientToGame(&pt);
+    if (pt.x < 0 || pt.y < 0 || pt.x >= PORT_GAME_WIDTH || pt.y >= PORT_GAME_HEIGHT) {
+        return 0;
+    }
+    at.x = pt.x;
+    at.y = pt.y;
+    return GetIconAtPos(&at, &flags) == NULL && (flags & 4) == 0;
+}
+
 /* the game's pixels per window pixel (the picture is scaled to the window) */
 static float GameScale(void) {
     POINT a;
@@ -114,6 +139,7 @@ void PortTouchFrame(void) {
     float scale;
 
     MiniwinSetTouchDragArea(TouchDragArea);
+    MiniwinSetTouchAimArea(TouchAimArea);
     MiniwinTouchTakeDrag(&dx, &dy, &px, &py);
     scale = GameScale();
     if (MiniwinTouchFingers() == 0) {

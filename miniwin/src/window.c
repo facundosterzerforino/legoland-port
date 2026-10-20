@@ -43,6 +43,28 @@ static Uint64 drag_start_tick;
 static float drag_dx;
 static float drag_dy;
 
+/* [library:input] placing an object (MiniwinSetTouchAimArea): one finger aims and a tap on the aim builds. A finger
+ * that goes down near the aim moves it by as much as the finger moves, one that goes down elsewhere brings it there;
+ * either way no press. Lifted without moving (AIM_WAIT) on the aim, it clicks there. While aim_held the game's pointer
+ * is held at aim_x, aim_y (window pixels), not where SDL's touch pointer last was; aim_click: the tap's click is under
+ * way, and the hold ends with it. */
+enum {
+    AIM_NONE,
+    AIM_WAIT,
+    AIM_MOVING
+};
+static int (*aim_area)(int x, int y);
+static int aim_state;
+static int aim_near;
+static int aim_held;
+static int aim_click;
+static float aim_x;
+static float aim_y;
+static float aim_from_x;
+static float aim_from_y;
+static float aim_start_x;
+static float aim_start_y;
+
 /* [library:input] two fingers: TWO_WAIT until they move (a pan) or stay (the secondary button: a tap clicks it, a
  * still hold keeps it down); the tracked fingers (window pixels), their last centre, the pan not taken yet, and a
  * two-finger tap's click still to give (reads) */
@@ -176,6 +198,11 @@ static float Distance(float dx, float dy) {
     return SDL_sqrtf(dx * dx + dy * dy);
 }
 
+/* [library:input] how near the aim a tap builds: six slops, about 58 of the game's pixels */
+static float AimRadius(void) {
+    return TouchSlop() * 6.0f;
+}
+
 /* [library:input] a finger's place in window pixels (SDL gives it from 0 to 1 across the window) */
 static void FingerPixels(const SDL_TouchFingerEvent *f, float *x, float *y) {
     int w = 0;
@@ -227,6 +254,14 @@ static void TrackFinger(const SDL_TouchFingerEvent *f, int down) {
 
 void MiniwinSetTouchDragArea(int (*area)(int x, int y)) {
     drag_area = area;
+}
+
+void MiniwinSetTouchAimArea(int (*area)(int x, int y)) {
+    aim_area = area;
+}
+
+int MiniwinTouchAiming(void) {
+    return aim_held;
 }
 
 void MiniwinTouchTakeDrag(float *dx, float *dy, float *pan_x, float *pan_y) {
@@ -289,6 +324,7 @@ void MiniwinPumpEvents(WNDPROC proc) {
                 touch_secondary = 1;
                 touch_press = 0;
                 drag_state = DRAG_NONE;
+                aim_state = AIM_NONE; /* (the aim stays where it is) */
                 two_state = TWO_WAIT;
                 two_start_tick = SDL_GetTicks();
                 TwoCentre(&two_start_x, &two_start_y);
@@ -342,6 +378,20 @@ void MiniwinPumpEvents(WNDPROC proc) {
         case SDL_EVENT_MOUSE_MOTION:
             if (!FromTouch(event.motion.which)) {
                 touch_mode = 0; /* a mouse: the game's pointer again */
+                aim_held = 0;
+                aim_state = AIM_NONE;
+            } else if (aim_state != AIM_NONE && touch_press == 1) {
+                float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
+                float x = event.motion.x * density;
+                float y = event.motion.y * density;
+
+                if (aim_state == AIM_WAIT && Distance(x - aim_start_x, y - aim_start_y) > TouchSlop()) {
+                    aim_state = AIM_MOVING; /* [library:input] the finger moves the aim: no click */
+                }
+                if (aim_state == AIM_MOVING) {
+                    aim_x = aim_from_x + (x - aim_start_x);
+                    aim_y = aim_from_y + (y - aim_start_y);
+                }
             } else if (drag_state != DRAG_NONE && touch_press == 1) {
                 float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
                 float x = event.motion.x * density;
@@ -372,6 +422,22 @@ void MiniwinPumpEvents(WNDPROC proc) {
                 drag_start_y = event.button.y * density;
                 drag_start_tick = SDL_GetTicks();
                 drag_state = drag_area != NULL && drag_area((int)drag_start_x, (int)drag_start_y) ? DRAG_WAIT : DRAG_NONE;
+                aim_state = AIM_NONE;
+                aim_click = 0;
+                if (drag_state == DRAG_NONE && aim_area != NULL && aim_area((int)drag_start_x, (int)drag_start_y)) {
+                    /* [library:input] placing an object: the finger aims (see aim_state) */
+                    aim_near = aim_held && Distance(drag_start_x - aim_x, drag_start_y - aim_y) <= AimRadius();
+                    aim_from_x = aim_near ? aim_x : drag_start_x;
+                    aim_from_y = aim_near ? aim_y : drag_start_y;
+                    aim_start_x = drag_start_x;
+                    aim_start_y = drag_start_y;
+                    aim_x = aim_from_x;
+                    aim_y = aim_from_y;
+                    aim_held = 1;
+                    aim_state = AIM_WAIT;
+                } else {
+                    aim_held = 0;
+                }
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -445,6 +511,11 @@ unsigned int MiniwinMouseState(int *x, int *y) {
     float density = window != NULL ? SDL_GetWindowPixelDensity(window) : 1.0f;
     unsigned int buttons = 0;
 
+    if (aim_held) {
+        /* [library:input] placing an object: the pointer stays on the aim (MiniwinSetTouchAimArea) */
+        fx = aim_x / density;
+        fy = aim_y / density;
+    }
     if (x != NULL) {
         *x = (int)(fx * density);
     }
@@ -486,6 +557,28 @@ unsigned int MiniwinMouseButtons(void) {
          * then is. Kept, it clicked whatever came next: the first movie (skipped) or a button. */
         touch_press = 0;
         drag_state = DRAG_NONE;
+        aim_state = AIM_NONE;
+    }
+    if (aim_held && aim_state == AIM_NONE && !aim_click &&
+        (aim_area == NULL || !aim_area((int)aim_x, (int)aim_y))) {
+        aim_held = 0; /* [library:input] not placing an object any more (or the aim left the park): let it go */
+    }
+    if (touch_press != 0 && aim_state != AIM_NONE) {
+        if (touch_press == 1) {
+            touch_reads++;
+            return buttons & ~1u; /* [library:input] the finger aims: no press while it's down */
+        }
+        if (aim_state == AIM_WAIT && aim_near) {
+            /* [library:input] a tap on the aim: a click there, two reads long (the pointer is there already) */
+            aim_state = AIM_NONE;
+            aim_click = 1;
+            touch_reads = 1;
+        } else {
+            /* [library:input] the aim moved or was brought here: it stays, no click */
+            aim_state = AIM_NONE;
+            touch_press = 0;
+            return buttons & ~1u;
+        }
     }
     if (touch_press != 0 && drag_state == DRAG_WAIT) {
         if (touch_press == 1 && SDL_GetTicks() - drag_start_tick < TOUCH_HOLD_MS) {
@@ -513,6 +606,10 @@ unsigned int MiniwinMouseButtons(void) {
         } else if (touch_reads > 3) {
             touch_press = 0;
         }
+    }
+    if (aim_click && touch_press == 0) {
+        aim_click = 0; /* [library:input] built: the next tap aims again */
+        aim_held = 0;
     }
     return buttons;
 }
