@@ -1,6 +1,9 @@
 /* [library:music] miniwin's style engine: see miniwin/dmengine.h. The rules it follows, and the recordings of
  * Windows' DirectMusic they were checked against, are in tools/music/README.md ("the model"); the numbers below refer
  * to it. dmusic (port/dmusic) parses the files and synthesizes the sound. */
+#ifdef LEGOLAND_WEB_BROWSER
+#include <emscripten/threading.h>
+#endif
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
@@ -1059,7 +1062,19 @@ void Dme_render(DmeEngine *e, short *out, int frames) {
     if (e == NULL) {
         return;
     }
-    mtx_lock(&e->lock);
+#ifdef LEGOLAND_WEB_BROWSER
+    /* [library:music] In the browser the mixer that calls this runs on the page's thread, which mustn't wait for the
+     * music thread while it loads its instruments: Dme_download holds the lock meanwhile and looks for files in the
+     * page's storage, and WebKit (Safari, iPhones, iPads) does every thread's storage requests on the page's thread,
+     * so the two would wait for each other for good. This block of the music is silence instead, and the music goes
+     * on from where it was with the next. */
+    if (emscripten_is_main_browser_thread()) {
+        if (mtx_trylock(&e->lock) != thrd_success) {
+            return;
+        }
+    } else
+#endif
+        mtx_lock(&e->lock);
     while (done < frames) {
         double per_frame = e->tempo * BEAT / 60.0 / e->rate;
         long next;

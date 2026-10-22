@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #ifdef LEGOLAND_WEB_BROWSER
-#include <emscripten.h>
+#include <emscripten/html5_webgl.h>
 #endif
 
 #include "port_setup.h"
@@ -193,8 +193,7 @@ static void Report(void *ctx, unsigned long long done, unsigned long long total,
     SDL_RenderFillRect(p->renderer, &bar);
     SDL_RenderPresent(p->renderer);
 #ifdef LEGOLAND_WEB_BROWSER
-    /* the install runs on the page's thread: give the page its turn, so that it shows the bar (ASYNCIFY) */
-    emscripten_sleep(0);
+    emscripten_webgl_commit_frame(); /* to the page's canvas (miniwin/src/window.c, MiniwinPresent) */
 #endif
 }
 

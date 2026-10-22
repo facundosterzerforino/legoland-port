@@ -1,5 +1,5 @@
-"""tools/web/pagetest.py <build-web folder> [<CD image>] [--selftest <installed game> <reports>]: the web build's
-page in headless Chromium (Playwright),
+"""tools/web/pagetest.py <build-web folder> [<CD image>] [--selftest <installed game> <reports>] [--webkit]: the web
+build's page in headless Chromium (Playwright; --webkit: in its WebKit, Safari's engine, for iPhones and iPads),
 served locally with the headers that make it cross-origin isolated (as coi-serviceworker.js does elsewhere): it
 must load without script errors, be isolated, start the WebAssembly runtime (its thread pool) and ask for the CD's
 image; given one, the page's own file input takes it and the copy into the site's storage (OPFS) must finish, the
@@ -14,6 +14,7 @@ import os
 import sys
 import tempfile
 import threading
+import time
 
 from playwright.sync_api import sync_playwright
 
@@ -59,10 +60,69 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+# WebKit's headless browser here (Linux, WSL) has no sound output: an audio context's clock stands still, and its
+# resume() never returns (the page hangs with it). Safari on a Mac, an iPhone or an iPad has one. With --webkit the page
+# gets this stand-in for the Web Audio calls SDL makes (SDL_emscriptenaudio.c): its script processor's callback is
+# called on the page's thread as the sound's time passes, as a real one is, and the sound goes nowhere.
+FAKE_AUDIO = """(() => {
+  class FakeBuffer {
+    constructor(channels, length, rate) {
+      this.numberOfChannels = channels; this.length = length; this.sampleRate = rate; this.duration = length / rate;
+      this.data = Array.from({ length: channels }, () => new Float32Array(length));
+    }
+    getChannelData(c) { return this.data[c]; }
+    copyToChannel(source, c, at) { this.data[c].set(source, at || 0); }
+  }
+  class FakeProcessor {
+    constructor(context, size, channels) {
+      this.context = context; this.bufferSize = size || 4096; this.channels = channels || 2; this.done = 0;
+      this.onaudioprocess = null;
+    }
+    connect() { this.context.nodes.add(this); }
+    disconnect() { this.context.nodes.delete(this); }
+  }
+  class FakeContext {
+    constructor() {
+      this.sampleRate = 48000; this.state = 'suspended'; this.destination = {}; this.nodes = new Set();
+      this.frames = 0; this.started = 0; this.timer = null; this.onstatechange = null;
+    }
+    get currentTime() { return this.frames / this.sampleRate; }
+    createBuffer(channels, length, rate) { return new FakeBuffer(channels, length, rate); }
+    createScriptProcessor(size, inputs, outputs) { return new FakeProcessor(this, size, outputs); }
+    resume() {
+      if (this.state === 'suspended') {
+        this.state = 'running';
+        this.started = performance.now() - this.frames * 1000 / this.sampleRate;
+        this.timer = setInterval(() => this.tick(), 10);
+      }
+      return Promise.resolve();
+    }
+    suspend() { if (this.state === 'running') { clearInterval(this.timer); this.state = 'suspended'; } return Promise.resolve(); }
+    close() { clearInterval(this.timer); this.state = 'closed'; return Promise.resolve(); }
+    tick() {
+      this.frames = Math.floor((performance.now() - this.started) * this.sampleRate / 1000);
+      for (const node of Array.from(this.nodes)) {
+        while (node.done + node.bufferSize <= this.frames && this.state === 'running') {
+          const buffer = new FakeBuffer(node.channels, node.bufferSize, this.sampleRate);
+          if (node.onaudioprocess) node.onaudioprocess({ outputBuffer: buffer, playbackTime: node.done / this.sampleRate });
+          node.done += node.bufferSize;
+        }
+      }
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+  window.AudioContext = FakeContext;
+  window.webkitAudioContext = FakeContext;
+})();"""
+
+
 def main():
     global GAME
     args = sys.argv[1:]
     reports = None
+    webkit = '--webkit' in args
+    args = [a for a in args if a != '--webkit']
     if '--selftest' in args:
         k = args.index('--selftest')
         GAME = os.path.abspath(args[k + 1])
@@ -76,11 +136,21 @@ def main():
     problems = 0
     errors = []
     with sync_playwright() as p, tempfile.TemporaryDirectory() as profile:
-        browser = p.chromium.launch_persistent_context(profile, headless=True,
-                                                       args=['--autoplay-policy=no-user-gesture-required'])
+        if webkit:
+            browser = p.webkit.launch_persistent_context(profile, headless=True)
+        else:
+            browser = p.chromium.launch_persistent_context(profile, headless=True,
+                                                           args=['--autoplay-policy=no-user-gesture-required'])
+        print('browser:', browser.browser.version if browser.browser else '', 'WebKit' if webkit else 'Chromium')
+        if webkit:
+            browser.add_init_script(FAKE_AUDIO)
+            print('(WebKit here has no sound output: a stand-in audio device, FAKE_AUDIO)')
         page = browser.new_page()
         page.on('pageerror', lambda e: errors.append('page error: %s' % e))
         page.on('console', lambda m: errors.append('console %s: %s' % (m.type, m.text)) if m.type == 'error' else None)
+        if os.environ.get('PAGETEST_CONSOLE'):
+            started = time.time()
+            page.on('console', lambda m: print('%7.2f console %s: %s' % (time.time() - started, m.type, m.text[:300]), flush=True))
         page.goto(url)
         page.wait_for_function("document.getElementById('status').textContent.indexOf('Loading') < 0 || "
                                "!document.getElementById('choose').classList.contains('hidden')", timeout=120000)
@@ -121,8 +191,13 @@ def main():
                 }
                 return names.length; }''')
             print("the installed game copied into the site's storage: %d files" % count)
+            # started by a click, as Play is: browsers play a page's sound only after one (WebKit's always)
             page.evaluate("window.selftestDone = false; Module.onExit = () => { window.selftestDone = true; }; "
-                          "window.startGame(['-port-selftest'])")
+                          "const b = document.createElement('button'); b.id = 'pagetest-start'; b.textContent = 'start'; "
+                          "b.style.cssText = 'position:fixed;left:0;top:0;z-index:99999'; "
+                          "b.onclick = () => { b.remove(); window.startGame(['-port-selftest']); }; "
+                          "document.body.append(b)")
+            page.click('#pagetest-start')
             page.wait_for_function('window.selftestDone', timeout=900000)
             files = page.evaluate('''async () => {
                 const root = await navigator.storage.getDirectory();

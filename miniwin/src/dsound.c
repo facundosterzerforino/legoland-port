@@ -238,9 +238,6 @@ static HRESULT STDMETHODCALLTYPE Buffer_GetCaps(IDirectSoundBuffer *self, LPDSBC
 static HRESULT STDMETHODCALLTYPE Buffer_GetCurrentPosition(IDirectSoundBuffer *self, LPDWORD play, LPDWORD write) {
     struct Buffer *b = AsBuffer(self);
 
-#ifdef LEGOLAND_WEB_BROWSER
-    MiniwinWebPoll(); /* the game waits for the play cursor by polling it: it moves only on the page's turn */
-#endif
     DWORD p;
 
     SDL_LockMutex(lock);
@@ -653,9 +650,9 @@ HRESULT WINAPI MiniwinDirectSoundCreate(LPCGUID guid, LPDIRECTSOUND *out, LPUNKN
         SDL_AudioSpec spec;
 
 #ifdef LEGOLAND_WEB_BROWSER
-        /* in a browser the mixer runs on the page's thread, between the game's work: blocks of 4096 frames (about 85
-         * ms) instead of SDL's 1024, so a busy frame doesn't make the sound late (each late block put it further
-         * behind the movie, which then stuttered as it resynced) */
+        /* in a browser the mixer runs on the page's thread, between the page's drawing and its input: blocks of 4096
+         * frames (about 85 ms) instead of SDL's 1024, so a busy moment doesn't make the sound late (each late block
+         * put it further behind the movie, which then stuttered as it resynced) */
         SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, "4096");
 #endif
         if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {

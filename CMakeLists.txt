@@ -201,15 +201,23 @@ if(LEGOLAND_MODERN_BUILD)
                 set_property(TARGET legoland APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/web/node-pre.js")
                 target_compile_definitions(legoland PRIVATE LEGOLAND_WEB_NODE=1)
             else()
-                # a browser: the game's loop yields to the page each frame (ASYNCIFY), its files are in the origin's
-                # private storage (WASMFS on OPFS), the page is port/web/shell.html
-                target_link_options(legoland PRIVATE -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=1048576 -sWASMFS=1
+                # a browser: the game runs on a worker's thread (PROXY_TO_PTHREAD: main is started on one), the page's
+                # own thread staying free for the page: the drawing (WebGL, its calls made there: OFFSCREEN_FRAMEBUFFER),
+                # the input, the sound, and the storage, which WebKit (Safari, iPhones, iPads) does for every thread
+                # there. The game's files are in the origin's private storage (WASMFS on OPFS); the page is
+                # port/web/shell.html. iOS's browsers don't start a page whose memory may grow past 1 GB (SDL's
+                # docs/README-emscripten.md).
+                target_link_options(legoland PRIVATE -sPROXY_TO_PTHREAD=1 -sOFFSCREEN_FRAMEBUFFER=1
+                    -sMAXIMUM_MEMORY=1073741824 -sWASMFS=1
                     -sFORCE_FILESYSTEM=1 -sENVIRONMENT=web,worker "-sEXPORTED_RUNTIME_METHODS=['callMain','FS']"
-                    "--shell-file=${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html")
-                set_property(TARGET legoland APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html")
+                    "--shell-file=${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html"
+                    "--post-js=${CMAKE_CURRENT_SOURCE_DIR}/port/web/offscreen_resize.js")
+                set_property(TARGET legoland APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/port/web/shell.html"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/port/web/offscreen_resize.js")
                 # the page's helper, next to it (port/web/README.md)
                 add_custom_command(TARGET legoland POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-                    "${CMAKE_CURRENT_SOURCE_DIR}/port/web/coi-serviceworker.js" "${CMAKE_CURRENT_BINARY_DIR}/")
+                    "${CMAKE_CURRENT_SOURCE_DIR}/port/web/coi-serviceworker.js"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/port/web/manifest.webmanifest" "${CMAKE_CURRENT_BINARY_DIR}/")
                 target_compile_definitions(legoland PRIVATE LEGOLAND_WEB_BROWSER=1)
                 set_target_properties(legoland PROPERTIES SUFFIX ".html")
             endif()

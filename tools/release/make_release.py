@@ -181,6 +181,7 @@ def web(version, commit):
         z.write(page, 'LEGOLAND/index.html')
         for f in ('legoland.js', 'legoland.wasm', 'coi-serviceworker.js'):
             z.write(os.path.join(build, f), 'LEGOLAND/' + f)
+        z.write(os.path.join(ROOT, 'port', 'web', 'manifest.webmanifest'), 'LEGOLAND/manifest.webmanifest')
         z.write(fetch_soundfont.fetch(), 'LEGOLAND/GeneralUser-GS.sf2')
         # the page's icons: the original exe's window icon, made from external/legoland.exe (not committed), as for
         # the Android app (tools/android/build_apk.sh)

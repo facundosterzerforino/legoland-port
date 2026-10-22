@@ -6,6 +6,10 @@
 
 #ifdef LEGOLAND_WEB_BROWSER
 #include <emscripten.h>
+#include <emscripten/html5_webgl.h>
+#include <emscripten/proxying.h>
+#include <emscripten/threading.h>
+#include <pthread.h>
 #endif
 
 static SDL_Window *window;
@@ -14,6 +18,10 @@ static SDL_Texture *texture;
 static int texture_width;
 static int texture_height;
 static HWND window_hwnd;
+#ifdef LEGOLAND_WEB_BROWSER
+/* [library:window] the game's thread (a worker's: port/web/README.md), which made the window and reads its input */
+static pthread_t window_thread;
+#endif
 static int fingers; /* touching the screen now */
 static bool latched[SDL_SCANCODE_COUNT]; /* pressed since the last keyboard read (MiniwinKeyLatched) */
 
@@ -166,7 +174,9 @@ HWND MiniwinCreateWindow(const char *title, int width, int height, int fullscree
     touch_mode = 1; /* [library:input] a touch screen: the game's pointer hidden until a mouse moves */
 #elif defined(LEGOLAND_WEB_BROWSER)
     /* [library:input] a phone's or tablet's browser (its main pointer is a finger): the same */
-    touch_mode = EM_ASM_INT({ return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 1 : 0; });
+    touch_mode = MAIN_THREAD_EM_ASM_INT(
+        { return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 1 : 0; });
+    window_thread = pthread_self();
 #endif
 #ifdef _WIN32
     window_hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
@@ -284,7 +294,7 @@ int MiniwinTouchFingers(void) {
 static void ShowKeyboard(int show) {
     keyboard_shown = show;
 #ifdef LEGOLAND_WEB_BROWSER
-    EM_ASM({ if (Module.legolandKeyboard) Module.legolandKeyboard($0); }, show);
+    MAIN_THREAD_ASYNC_EM_ASM({ if (Module.legolandKeyboard) Module.legolandKeyboard($0); }, show);
 #else
     if (window == NULL) {
         return;
@@ -307,9 +317,9 @@ void MiniwinPumpEvents(WNDPROC proc) {
     int wanted;
 
 #ifdef LEGOLAND_WEB_BROWSER
-    /* [library:window] the game's loop runs on the page's thread: give the page its turn (drawing the frame, the
-     * input, the sound), every frame (ASYNCIFY) */
-    MiniwinWebSleep(0);
+    /* [library:window] the page's events for this thread (SDL's keyboard, focus and size callbacks, the page's typed
+     * characters: MiniwinTypeChar) wait in its queue until it looks: here, every frame */
+    emscripten_current_thread_process_queued_calls();
 #endif
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -623,12 +633,26 @@ int MiniwinTouchMode(void) {
 }
 
 #ifdef LEGOLAND_WEB_BROWSER
+void MiniwinTypeChar(int ch);
+
+static void TypeCharOnGameThread(void *ch) {
+    MiniwinTypeChar((int)(intptr_t)ch);
+}
+
 EMSCRIPTEN_KEEPALIVE
 #endif
 void MiniwinTypeChar(int ch) {
     SDL_Keymod mod = SDL_KMOD_NONE;
     int code;
 
+#ifdef LEGOLAND_WEB_BROWSER
+    if (window_thread != 0 && !pthread_equal(pthread_self(), window_thread)) {
+        /* the page calls it on its own thread: the character goes to the game's, which reads them (MiniwinTypedKey) */
+        emscripten_proxy_async(emscripten_proxy_get_system_queue(), window_thread, TypeCharOnGameThread,
+            (void *)(intptr_t)ch);
+        return;
+    }
+#endif
     if (ch == 8) {
         code = SDL_SCANCODE_BACKSPACE;
     } else if (ch == '\r' || ch == '\n') {
@@ -712,4 +736,10 @@ void MiniwinPresent(const void *pixels, int pitch, int width, int height, const 
     rect.h = (float)(dest->bottom - dest->top);
     SDL_RenderTexture(renderer, texture, NULL, &rect);
     SDL_RenderPresent(renderer);
+#ifdef LEGOLAND_WEB_BROWSER
+    /* [library:window] the frame to the page's canvas: WebGL drawn from the game's thread goes to a picture of its own
+     * on the page's thread (OFFSCREEN_FRAMEBUFFER), which Emscripten copies to the canvas only for a program that
+     * returns to the browser every frame (emscripten_set_main_loop); the game keeps its own loop */
+    emscripten_webgl_commit_frame();
+#endif
 }

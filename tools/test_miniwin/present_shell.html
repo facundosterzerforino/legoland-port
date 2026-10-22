@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>miniwin test</title>
+<!-- the page for the miniwin tests in a browser (tools/test_miniwin/build_web.sh): a canvas the page's size, as the
+     game's page has, and the test's output in the console -->
+<style>
+  body { margin: 0; background: #000; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="-1"></canvas>
+<script>
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    print: (text) => console.log(text),
+    printErr: (text) => console.log(text),
+    onExit: (code) => { window.testExit = code; console.log('test exit ' + code); },
+  };
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

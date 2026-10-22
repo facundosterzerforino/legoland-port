@@ -12,6 +12,13 @@
 <title>LEGOLAND</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- added to a phone's or tablet's home screen, the page opens as an app, full screen (iPhones' and iPads' browsers
+     can't make a page full screen otherwise: the iPhone's has no full screen for pages at all) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="LEGOLAND">
 <script src="coi-serviceworker.js"></script>
 <style>
   /* A park on a sunny day: a sky with clouds over a green baseplate, the page as a white card. CSS only: no game art
@@ -746,8 +753,24 @@
     }
   }
 
-  /* the game's start (Play, and tools/web/pagetest.py's -port-selftest) */
+  /* The sound: a browser plays a page's sound only when a tap or a click started it (iPhones' and iPads' always; the
+     others when the page wasn't used before), and SDL makes its audio context later, from the game's thread, where
+     it stayed silent. So the page makes it in the tap on Play, and SDL takes it (Module.SDL3.audioContext; SDL_Quit
+     closes it at the game's end). */
+  function startSound() {
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      Module.SDL3 = Module.SDL3 || {};
+      const now = Module.SDL3.audioContext;
+      if (!now || now.state === 'closed') Module.SDL3.audioContext = new Context();
+      Module.SDL3.audioContext.resume();
+    } catch (e) {}
+  }
+
+  /* the game's start (Play, and tools/web/pagetest.py's -port-selftest), in the tap or click that started it */
   window.startGame = async (args) => {
+    startSound();
     await addSoundFont();
     await musicIntoMemory();
     Module.callMain(args);
@@ -781,13 +804,13 @@
     onRuntimeInitialized: () => { runtimeReady = true; refresh(); },
     onExit: () => {
       /* the sound stops with the game (SDL_Quit at the end of main closes it; this in case it didn't get there) */
-      try { if (typeof SDL3 !== 'undefined' && SDL3.audioContext) SDL3.audioContext.close(); } catch (e) {}
+      try { if (Module.SDL3 && Module.SDL3.audioContext) Module.SDL3.audioContext.close(); } catch (e) {}
       document.getElementById('canvas').style.display = 'none';
       playing = false;
       show('fullscreen', false);
       show('keyboard', false);
       document.getElementById('panel').style.display = '';
-      if (document.fullscreenElement) document.exitFullscreen();
+      if (fullscreenElement()) exitFullscreen();
       refresh().then(() => setStatus('ended'));
     },
   };
@@ -803,8 +826,24 @@
      Chrome/Edge: holding Esc still leaves), and the corner button comes back when the browser leaves it */
   let playing = false;
   const touchScreen = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  /* Safari's full screen is webkit-prefixed before version 16.4; an iPhone's browser has none for pages (the page
+     added to the home screen opens full screen instead: the manifest), and there the corner button isn't shown */
+  const page = document.documentElement;
+  const canFullscreen = !!(page.requestFullscreen || page.webkitRequestFullscreen) &&
+    (document.fullscreenEnabled !== false || document.webkitFullscreenEnabled === true);
+  const asApp = window.matchMedia && (window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+  function fullscreenElement() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function exitFullscreen() {
+    try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {}
+  }
   async function enterFullscreen() {
-    try { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {}
+    if (canFullscreen && !asApp) {
+      /* (not awaited for long: a browser that never answers mustn't hold up the game's start) */
+      const request = page.requestFullscreen ? page.requestFullscreen({ navigationUI: 'hide' })
+                                             : page.webkitRequestFullscreen();
+      try { await Promise.race([request, new Promise((resolve) => setTimeout(resolve, 1500))]); } catch (e) {}
+    }
     /* a phone: the game is 4:3, so sideways (where the browser allows it, in full screen) */
     if (touchScreen) try { await screen.orientation.lock('landscape'); } catch (e) {}
     if (document.activeElement !== typeBox) document.getElementById('canvas').focus();
@@ -861,24 +900,34 @@
     });
   }
   document.getElementById('canvas').addEventListener('mousedown', (e) => { if (keyboardWanted) e.preventDefault(); });
+  /* the keys are the game's while it plays: not the browser's (Tab moving the focus off the game, the arrows and
+     Space scrolling, F1's help...). SDL said so for each key it took when its key callbacks ran on the page's thread;
+     they run on the game's (port/web/README.md), too late to say it, so the page does. (The text box's keys are the
+     box's.) */
+  for (const type of ['keydown', 'keyup']) {
+    window.addEventListener(type, (e) => { if (playing && e.target !== typeBox) e.preventDefault(); });
+  }
   document.getElementById('keyboard').addEventListener('click', openKeyboard);
-  document.addEventListener('fullscreenchange', () => {
-    const full = document.fullscreenElement !== null;
-    show('fullscreen', playing && !full);
+  function fullscreenChanged() {
+    const full = fullscreenElement() !== null;
+    show('fullscreen', playing && !full && canFullscreen && !asApp);
     try {
       if (full && navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']);
       else if (navigator.keyboard && navigator.keyboard.unlock) navigator.keyboard.unlock();
     } catch (e) {}
-  });
+  }
+  document.addEventListener('fullscreenchange', fullscreenChanged);
+  document.addEventListener('webkitfullscreenchange', fullscreenChanged);
   document.getElementById('fullscreen').addEventListener('click', enterFullscreen);
 
   document.getElementById('play').addEventListener('click', async () => {
     const canvas = document.getElementById('canvas');
+    startSound(); /* (before anything waits: still within the tap) */
     document.getElementById('panel').style.display = 'none';
     canvas.style.display = 'block';
     canvas.focus();
     playing = true;
-    show('fullscreen', true);
+    show('fullscreen', canFullscreen && !asApp);
     await enterFullscreen();
     await window.startGame(levelMusic.checked ? [] : ['-no-level-music']);
   });

@@ -128,12 +128,6 @@ DWORD GetTickCount(void) {
 void Sleep(DWORD milliseconds) {
     struct timespec ts;
 
-#ifdef LEGOLAND_WEB_BROWSER
-    if (emscripten_is_main_browser_thread()) {
-        MiniwinWebSleep(milliseconds); /* the page runs meanwhile (ASYNCIFY; miniwin/timer.h) */
-        return;
-    }
-#endif
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (long)(milliseconds % 1000) * 1000000;
     while (nanosleep(&ts, &ts) != 0 && errno == EINTR) {

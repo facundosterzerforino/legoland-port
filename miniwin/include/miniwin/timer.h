@@ -14,13 +14,4 @@ void MiniwinSleep(DWORD milliseconds);
  * millisecond instead of a spin (miniwin/src/timer.c) */
 void MiniwinIdle(void);
 
-#ifdef LEGOLAND_WEB_BROWSER
-/* [library:timer] In a browser the game runs on the page's thread, which also plays the sound (SDL's audio callback
- * feeds miniwin's DirectSound mixer) and shows each picture: those happen only while the game is in emscripten_sleep
- * (ASYNCIFY). MiniwinWebSleep is that sleep (every one goes through it); MiniwinWebPoll, called where the game polls
- * the clock or a sound's play cursor, gives the page its turn when it hasn't had one for a few milliseconds. */
-void MiniwinWebSleep(unsigned int milliseconds);
-void MiniwinWebPoll(void);
-#endif
-
 #endif
