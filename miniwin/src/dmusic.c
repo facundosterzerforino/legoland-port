@@ -238,16 +238,28 @@ static int SynthFontPath(char *path, size_t size) {
 }
 
 static void *Resolve(void *ctx, char const *name, size_t *len) {
+    /* gm.dls, which every band's instruments name (292 times as the game's music starts): where there's none (the
+     * web page and the Android app have a SoundFont instead), the loader asks again for each, and each look was two
+     * or three opens that fail, several milliseconds each in a browser's storage (and in WebKit's, every one on the
+     * page's thread). Not there once, it isn't looked for again from the same search folder. */
+    static char no_gm_dls_in[MAX_PATH];
     char path[MAX_PATH * 2];
     void *p;
+    int gm = _stricmp(name, "gm.dls") == 0;
 
     (void)ctx;
+    if (gm && no_gm_dls_in[0] != '\0' && strcmp(no_gm_dls_in, search_dir) == 0) {
+        return NULL;
+    }
     snprintf(path, sizeof(path), "%s\\%s", search_dir, name);
     if ((p = ReadAll(path, len)) != NULL) {
         return p;
     }
-    if (_stricmp(name, "gm.dls") == 0 && GmDlsPath(path, sizeof(path))) {
+    if (gm && GmDlsPath(path, sizeof(path))) {
         return ReadAll(path, len);
+    }
+    if (gm) {
+        snprintf(no_gm_dls_in, sizeof(no_gm_dls_in), "%s", search_dir[0] != '\0' ? search_dir : ".");
     }
     return NULL;
 }
