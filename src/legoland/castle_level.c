@@ -88,7 +88,7 @@ void CastleLevel1Update(Element *obj) {
             bloke->dest.y = (y << 8) - 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -113,7 +113,7 @@ void CastleLevel1Update(Element *obj) {
             bloke->dest.y = (y << 8) + dy - 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -137,7 +137,7 @@ void CastleLevel1Update(Element *obj) {
             bloke->dest.y = (y << 8) - 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -146,7 +146,7 @@ void CastleLevel1Update(Element *obj) {
             bloke->dest.y = (y << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;

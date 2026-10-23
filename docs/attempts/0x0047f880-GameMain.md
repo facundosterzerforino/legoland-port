@@ -25,3 +25,8 @@
 
 - A loop shape where MSVC cannot range-analyse `i` (so it keeps the unsigned compare), while the error-path loop still sees a signed `i`.
 - Check whether the `jb` comes from a different bound expression (e.g. a size_t-typed count) that is not folded to a constant.
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 99.62%. Matching has to come from C now.

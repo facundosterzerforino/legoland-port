@@ -233,6 +233,8 @@ int GetRoadNeighbours(int x, int y, struct NeighborResult *out) {
     return count;
 }
 
+/* Choose a path tile's shape and rotation from neighboring entries with matching IDs.
+ * Shapes that remove an existing zebra crossing refund its cost through the final path. */
 // FUNCTION: LEGOLAND 0x00413650
 void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3) {
     struct NeighborResult r;
@@ -314,33 +316,43 @@ void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3) {
         if (r.field_1c != NULL && r.field_1c->id == id) {
             bits |= 0x80;
         }
+        /* These choices preserve the crossing flag and finish without a refund. Keep a
+         * return at each call: MSVC6 then shares the original argument/call tails; joining
+         * the branches at one final return changes the generated tail layout. */
         m = bits;
         if ((m & 0x11) != 0) {
             if ((m & 0x83) == 0x83) {
                 if ((m & 0x38) == 0x38) {
                     PlaceRoadTiles(param_2, param_3, flag | 7, 0);
+                    return;
                 } else {
                     PlaceRoadTiles(param_2, param_3, flag | 1, 0);
+                    return;
                 }
             } else {
                 if ((m & 0x38) == 0x38) {
                     PlaceRoadTiles(param_2, param_3, flag | 1, 2);
+                    return;
                 } else {
                     PlaceRoadTiles(param_2, param_3, flag, 0);
+                    return;
                 }
             }
         } else if ((m & 0xe0) == 0xe0) {
             if ((m & 0xe) == 0xe) {
                 PlaceRoadTiles(param_2, param_3, flag | 7, 1);
+                return;
             } else {
                 PlaceRoadTiles(param_2, param_3, flag | 1, 3);
+                return;
             }
         } else if ((m & 0xe) == 0xe) {
             PlaceRoadTiles(param_2, param_3, flag | 1, 1);
+            return;
         } else {
             PlaceRoadTiles(param_2, param_3, flag, 1);
+            return;
         }
-        return;
     case 3:
         switch (mask) {
         case 11:
@@ -456,38 +468,36 @@ void DrivingSchoolRoadsSetEditMode(void) {
     DAT_0082f760.field_1828 = 0x34;
 }
 
+/* Build and validate the driving-school road cursor, including its connection to an
+ * existing entry. Check people, available bricks and neighboring road IDs before linking
+ * the auxiliary cursor at the selected entry. */
 // FUNCTION: LEGOLAND 0x00413b50
 void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param_3) {
-    int bits;
-    struct RideQueueEntry *t;
+    int neighbor_mask;
+    struct RideQueueEntry *entry;
     struct Ride *ride;
 
     struct MapRect rect;
-    struct NeighborResult r;
+    struct NeighborResult neighbors;
     unsigned short type;
-    int ptmp553;
-    struct Ride *ptmp236;
-    unsigned int *volatile ptmp237;
-    register volatile unsigned int ptmp554;
-    struct RideQueueEntry **q = (struct RideQueueEntry **)&r;
+    struct RideQueueEntry **neighbor_entries = (struct RideQueueEntry **)&neighbors;
     int result;
     int cost;
-    ptmp236 = obj->ride;
-    ride = ptmp236;
+    ride = obj->ride;
 
-    ptmp237 = EditCursor.field_1414;
-    memcpy(ptmp237, &ride->footprint, sizeof(struct Footprint));
-    bits = 0;
-    EditCursor.field_1830 = bits;
+    /* Initialise before the footprint copy: MSVC6 then preserves the original mask/entry
+     * register allocation across the following validation calls. */
+    neighbor_mask = 0;
+    EditCursor.footprint = ride->footprint;
+    EditCursor.field_1830 = neighbor_mask;
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
-    t = SnapCursorToRoadNeighbour(&EditCursor);
+    entry = SnapCursorToRoadNeighbour(&EditCursor);
     ValidateCursor(&EditCursor, ride);
     if (IsCursorBuildable(&EditCursor) == 0) {
         return;
     }
     rect.x0 = EditCursor.field_1414[0] + EditCursor.tile_x;
-    ptmp553 = EditCursor.tile_y;
-    rect.y0 = EditCursor.field_1414[1] + ptmp553;
+    rect.y0 = EditCursor.field_1414[1] + EditCursor.tile_y;
     rect.x1 = EditCursor.field_1414[2] + EditCursor.tile_x;
     rect.y1 = EditCursor.field_1414[3] + EditCursor.tile_y;
     result = CheckForPeople(&rect);
@@ -504,41 +514,42 @@ void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param
             SetCursorBlocked(&EditCursor, 2);
         } else {
             if (IsCursorBuildable(&EditCursor) != 0) {
-                if (!(FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &r) == 0)) {
-                    if (q[0] != NULL) {
-                        type = q[0]->id;
-                    } else if (q[2] != NULL) {
-                        type = q[2]->id;
-                    } else if (q[4] != NULL) {
-                        type = q[4]->id;
-                    } else if (q[6] != NULL) {
-                        type = q[6]->id;
+                if (!(FUN_00413520(EditCursor.tile_x, EditCursor.tile_y, &neighbors) == 0)) {
+                    if (neighbor_entries[0] != NULL) {
+                        type = neighbor_entries[0]->id;
+                    } else if (neighbor_entries[2] != NULL) {
+                        type = neighbor_entries[2]->id;
+                    } else if (neighbor_entries[4] != NULL) {
+                        type = neighbor_entries[4]->id;
+                    } else if (neighbor_entries[6] != NULL) {
+                        type = neighbor_entries[6]->id;
                     } else {
-                        type = (unsigned short)(UINT_PTR)t;
+                        /* Preserve the original low-word fallback when no cardinal entry
+                         * supplies an ID. Its meaning is still uncertain. */
+                        type = (unsigned short)(UINT_PTR)entry;
                     }
-                    GetRoadNeighbours(EditCursor.tile_x, EditCursor.tile_y, &r);
-                    GetDiagonalRoadNeighbours(EditCursor.tile_x, EditCursor.tile_y, (struct RideQueueEntry **)&r);
-                    if (q[0] != NULL && q[0]->id == type) bits = 1;
-                    if (q[1] != NULL && q[1]->id == type) bits |= 2;
-                    if (q[2] != NULL && q[2]->id == type) bits |= 4;
-                    if (q[3] != NULL && q[3]->id == type) bits |= 8;
-                    if (q[4] != NULL && q[4]->id == type) bits |= 0x10;
-                    if (q[5] != NULL && q[5]->id == type) bits |= 0x20;
-                    if (q[6] != NULL && q[6]->id == type) bits |= 0x40;
-                    if (q[7] != NULL && q[7]->id == type) bits |= 0x80;
-                    if ((bits & 7) == 7 || (bits & 0x1c) == 0x1c || (bits & 0x70) == 0x70 || (bits & 0xc1) == 0xc1) {
+                    GetRoadNeighbours(EditCursor.tile_x, EditCursor.tile_y, &neighbors);
+                    GetDiagonalRoadNeighbours(EditCursor.tile_x, EditCursor.tile_y, (struct RideQueueEntry **)&neighbors);
+                    if (neighbor_entries[0] != NULL && neighbor_entries[0]->id == type) neighbor_mask = 1;
+                    if (neighbor_entries[1] != NULL && neighbor_entries[1]->id == type) neighbor_mask |= 2;
+                    if (neighbor_entries[2] != NULL && neighbor_entries[2]->id == type) neighbor_mask |= 4;
+                    if (neighbor_entries[3] != NULL && neighbor_entries[3]->id == type) neighbor_mask |= 8;
+                    if (neighbor_entries[4] != NULL && neighbor_entries[4]->id == type) neighbor_mask |= 0x10;
+                    if (neighbor_entries[5] != NULL && neighbor_entries[5]->id == type) neighbor_mask |= 0x20;
+                    if (neighbor_entries[6] != NULL && neighbor_entries[6]->id == type) neighbor_mask |= 0x40;
+                    if (neighbor_entries[7] != NULL && neighbor_entries[7]->id == type) neighbor_mask |= 0x80;
+                    if ((neighbor_mask & 7) == 7 || (neighbor_mask & 0x1c) == 0x1c || (neighbor_mask & 0x70) == 0x70 || (neighbor_mask & 0xc1) == 0xc1) {
                         SetCursorBlocked(&EditCursor, 0xe);
                     }
                 } else {
                     SetCursorBlocked(&EditCursor, 0xe);
                 }
             }
-            if (t != NULL && IsCursorBuildable(&EditCursor) != 0) {
+            if (entry != NULL && IsCursorBuildable(&EditCursor) != 0) {
                 memcpy(DAT_0082f760.field_1414, DAT_004b4bf0, 20);
                 EditCursor.next = &DAT_0082f760;
-                DAT_0082f760.tile_x = t->x;
-                { ptmp554 = t->y; }
-                DAT_0082f760.tile_y = ptmp554;
+                DAT_0082f760.tile_x = entry->x;
+                DAT_0082f760.tile_y = entry->y;
                 DAT_0082f760.field_1830 = 0;
                 DAT_0082f760.field_1828 = 0x2034;
             } else {

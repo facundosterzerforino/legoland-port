@@ -157,7 +157,7 @@ void FUN_0042cf70(struct EarthNode *param_1) {
                 bloke->dest.y = (tbl[0] + y.y) * 0x100;
                 cv = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = cv + 0x10;
+                bloke->target_dir = cv + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(cv + 0x10) >> 5) + 3);
                 q = q->next;
                 tbl = tbl + 2;
@@ -456,7 +456,7 @@ void EarthSlideRideUpdate(Element *obj) {
                 bloke->dest.y = target.y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -471,7 +471,7 @@ void EarthSlideRideUpdate(Element *obj) {
                     bloke->dest.y = (y << 8) + 0x380;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
+                    bloke->target_dir = dir + 0x10;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->param_action++;
                 }
@@ -481,7 +481,7 @@ void EarthSlideRideUpdate(Element *obj) {
                 bloke->dest.y = (y + 3) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -490,7 +490,7 @@ void EarthSlideRideUpdate(Element *obj) {
                 bloke->dest.y = (y + 3) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;

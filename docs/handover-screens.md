@@ -37,7 +37,7 @@
 ## Shared type fixes
 
 - `ElemID` now returns `struct Element *`, exposing the real element record and removing casts.
-- `HTBubbleHelp` and `FUN_00455fc0` now take `RECT *`, matching field-based rectangle use.
+- `HTBubbleHelp` and `HTBubbleHelpWithMood` (formerly `FUN_00455fc0`) take `RECT *`, matching field-based rectangle use.
 - `DAT_004bdd04` is `struct Bloke *`, matching visitor and ride APIs.
 - `ObjClass.field_c4` is `unsigned int *`; `method_94` accepts that pointer for direct callback passing.
 - `GetVisitorName` has the fixed one-argument `struct Bloke *` signature.

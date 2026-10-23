@@ -174,6 +174,12 @@ At /O2, MSVC6 omits the frame pointer. A frame in the original means one of:
   declarations are added to or retyped in globals.h -- apparently symbol-table order, not its own code. It
   has moved between 89% and 93% this way; after a globals.h change, re-tune its `mid` operand order
   rather than treating the drop as a regression in the new code.
+- MusicThreadProc (sound_sfx.c, 11 KB) fell from 100% to 99.89% (an `add esp,4` scheduled one
+  instruction later and two import loads merged) when one `extern const char BuildMenuName[];` was added
+  in the middle of globals.h; moving the new declarations to the END of globals.h restored it (2026-10-17).
+  Keep new globals.h declarations that the matched code does not depend on at the end of the file. After a
+  header change, compare the per-function report (`uv run tools/report.py`), not only the totals: one
+  large function losing 100% barely moves the fuzzy %, but takes all its bytes out of "code matched".
 
 ## Shared Cleanup Paths: `goto fail`
 - When several failure checks jump into one cleanup chain that runs the releases in reverse order and

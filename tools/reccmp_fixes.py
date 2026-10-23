@@ -9,8 +9,10 @@ the original, so a plain constant can land inside a symbol in one image and not 
 `0x7fffff`, so the line counts as a difference.
 
 The fix: when an instruction's raw (unsanitized) text is identical in both images and at least one side
-left the value as a plain number, the two lines count as equal. If both sides resolved the value to a
-symbol, the line is left alone: that may be a real pointer mismatch.
+left the value as a plain number, the two lines count as equal. Neither image has relocations and their
+layouts differ, so the same holds when both sides resolved the value to different symbols: a real pointer
+mismatch would differ in its raw value. Example: `mov ecx, 0x500000` falls inside CoasterDepthBufferData in
+the original and inside FreeSpotCursors in ours. (When this was added it changed no other function.)
 
 2. Calls through a table: `call dword ptr [edx*4 + 0x4b9d44]`. reccmp names the displacement of
 `[reg + address]` operands for every instruction except `call`, where it only handles a plain
@@ -134,8 +136,10 @@ def _compare_function_assembly(self, orig, recomp, split_points):
                 if alt_o != raw_o and alt_o == _end_names(self.recomp_sanitize, raw_r):
                     recomp[j1 + k] = (r_addr, o_text)
                 continue
-            if o_text == raw_o or r_text == raw_r:  # one side kept the plain number
-                recomp[j1 + k] = (r_addr, o_text)
+            # one side kept the plain number, or (fix 6) both named it: the two images have different layouts
+            # and no relocations, so an identical raw value names the same constant in both (`mov ecx, 0x500000`
+            # landing inside a different array in each image)
+            recomp[j1 + k] = (r_addr, o_text)
     return _orig_compare(self, orig, recomp, split_points)
 
 

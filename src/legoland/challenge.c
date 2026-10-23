@@ -103,9 +103,8 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
     param_1->width = (short)*(int *)(info + 4);
     param_1->height = (short)*(int *)(info + 8);
     param_1->field_14 = 1;
-    dst = (unsigned char *)malloc(*(int *)(info + 8) * *(int *)(info + 4));
-    param_1->data = dst;
-    if (dst == NULL) {
+    param_1->data = (unsigned char *)malloc(*(int *)(info + 8) * *(int *)(info + 4));
+    if (param_1->data == NULL) {
         free(pixels);
         free(param_1);
         RES_CloseFile(file);
@@ -113,6 +112,7 @@ unsigned int LoadBmpIntoImage(struct Image *param_1) {
     }
     if (*(short *)(info + 0xe) == 8) {
         row = pixels + row_size; /* the BMP's rows are stored bottom-up: copy them from the last one */
+        dst = param_1->data;
         RES_SetFilePointer(file, pixel_offset);
         x = 0;
         while (x < 0x100) {
@@ -317,46 +317,54 @@ struct AnimHandle *OpenAviAnim(const char *filename) {
         AVIFileInit();
     }
     found = NULL;
-    if (AVIFileOpenA(&file, filename, 0, 0) == 0) {
-        finfo.dwStreams = 0;
-        AVIFileInfoA(file, &finfo, 0x6c);
-        for (i = 0; i < finfo.dwStreams; i++) {
-            if (AVIFileGetStream(file, &stream, 0, i) != 0) {
-                break;
-            }
-            if (AVIStreamInfoA(stream, &sinfo, 0x8c) == 0 && sinfo.fccType == 0x73646976) {
-                found = stream;
-                AVIStreamAddRef(stream);
-                length = sinfo.dwLength;
-                fps = sinfo.dwRate / sinfo.dwScale;
-                width = sinfo.rcFrameRight - sinfo.rcFrameLeft;
-                height = sinfo.rcFrameBottom - sinfo.rcFrameTop;
-            }
+    if (AVIFileOpenA(&file, filename, 0, 0) != 0) {
+        if (AviAnimOpenCount == 0) {
+            AVIFileExit();
         }
-        if (found != NULL) {
-            result = (struct AnimHandle *)malloc(sizeof(struct AnimHandle));
-            if (result == NULL) {
-                AVIStreamRelease(found);
-            } else {
-                result->length = length;
-                result->fps = fps;
-                result->width = width;
-                result->height = height;
-                result->avifile = file;
-                result->getframe = NULL;
-                result->stream = found;
-                result->open_cb = NULL;
-                result->callback = NULL;
-                AviAnimOpenCount = AviAnimOpenCount + 1;
-                return result;
-            }
+        return NULL;
+    }
+    finfo.dwStreams = 0;
+    AVIFileInfoA(file, &finfo, 0x6c);
+    for (i = 0; i < finfo.dwStreams; i++) {
+        if (AVIFileGetStream(file, &stream, 0, i) != 0) {
+            break;
         }
+        if (AVIStreamInfoA(stream, &sinfo, 0x8c) == 0 && sinfo.fccType == 0x73646976) {
+            found = stream;
+            AVIStreamAddRef(stream);
+            length = sinfo.dwLength;
+            fps = sinfo.dwRate / sinfo.dwScale;
+            width = sinfo.rcFrameRight - sinfo.rcFrameLeft;
+            height = sinfo.rcFrameBottom - sinfo.rcFrameTop;
+        }
+    }
+    if (found == NULL) {
         AVIFileRelease(file);
+        if (AviAnimOpenCount == 0) {
+            AVIFileExit();
+        }
+        return NULL;
     }
-    if (AviAnimOpenCount == 0) {
-        AVIFileExit();
+    result = (struct AnimHandle *)malloc(sizeof(struct AnimHandle));
+    if (result == NULL) {
+        AVIStreamRelease(found);
+        AVIFileRelease(file);
+        if (AviAnimOpenCount == 0) {
+            AVIFileExit();
+        }
+        return NULL;
     }
-    return NULL;
+    result->length = length;
+    result->fps = fps;
+    result->width = width;
+    result->height = height;
+    result->avifile = file;
+    result->getframe = NULL;
+    result->stream = found;
+    result->open_cb = NULL;
+    result->callback = NULL;
+    AviAnimOpenCount = AviAnimOpenCount + 1;
+    return result;
 }
 
 // FUNCTION: LEGOLAND 0x00443d50

@@ -15,6 +15,8 @@
 | 2026-10-07 p6 | Haiku agent | `out[1] = lpConfig->view_y + (...) * (...) - (ScrollY >> 8);` | 93.02% (no change) |
 | 2026-10-07 p6 | Haiku agent | `int y`, `y += lpConfig->view_y;`, then `out[1] = y - (ScrollY >> 8);` | 93.02% (no change) |
 | 2026-10-09 | Opus 5.5 | `y +=` / `y -=` statements, `(int)` view_y, `(unsigned int)(ScrollY >> 8)`, `+ (view_y - (ScrollY >> 8))`, `- (ScrollY >> 8) + view_y` | 93.02 (no change, the ScrollY load is always scheduled first) |
+| 2026-10-18 | Codex | Store y through out[1] before subtracting ScrollY (compound/direct forms); take a pointer to view_y; local scroll snapshot; recheck separate sum assignment | 87.36-93.02%; no improvement |
+| 2026-10-18 | Codex | Volatile read casts on ScrollY, view_y, or both, after natural scheduling forms failed | 46.51-48.84%; rejected. Source unchanged, full build remains 93.02% |
 
 ## Ideas not tried yet
 

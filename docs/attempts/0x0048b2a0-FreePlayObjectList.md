@@ -24,3 +24,16 @@
 
 - Make the `else` branch's `list = b` use a value the compiler cannot hoist, without adding a local.
 - Try swapping the `sprite` / `sprite2` assignment order inside the branches to change which register takes `sprite2`.
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 81.50%. Matching has to come from C now.
+
+## 2026-10-19 agent notes (81.50% -> 100.00%)
+
+What the diff was: the C had `else list = (struct PanelNode *)b;` for an `e` that is none of the four pages, so
+MSVC6 loaded b into ecx at entry for both uses. The original has no such branch: on that path `list` is simply
+uninitialised and the original reads its home slot (which MSVC6 put in b's argument slot) late, at the test.
+Dropping the else (list uninitialised when e is not 200/500/400/300, as in the original) gives the original's
+code; a `switch` on e instead of the if/else chain is worse (87.23).

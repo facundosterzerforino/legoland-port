@@ -29,7 +29,7 @@ def main():
     rva = json.load(open(rva_json))
     pb = 0x400000
     sides = ((Machine(orig_exe, {}), 0x442040, 0x81c0c0), (Machine(port_exe, {}), pb + rva['RemapTexCoordsToCell'],
-                                                            pb + rva['DAT_0081c0c0']))
+                                                            pb + rva['TextureSizes']))
     bad = 0
     changed_total = 0
     for t in range(trials):

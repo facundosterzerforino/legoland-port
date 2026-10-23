@@ -153,7 +153,7 @@ void KillTitleScreenBkSpriteAndRemoveIconGroup7(void) {
 unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        SaveScreenState(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
+        SaveScreenState(&DAT_007cb30c, &TitleSavedScreenMode, &TitleSavedEditMode);
         EditMode.unk4 = 2;
         DAT_0080ff80.unk4 = 0xffffffff;
         DAT_0080ff80.unk8 = 9;
@@ -167,7 +167,7 @@ unsigned char AdvertGoBackHandler(unsigned int param_1, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         KillTitleScreenBkSpriteAndRemoveIconGroup7();
-        RestoreScreenState(&DAT_007cb30c, &DAT_007cb300, &DAT_007cb2f0);
+        RestoreScreenState(&DAT_007cb30c, &TitleSavedScreenMode, &TitleSavedEditMode);
     }
     return 1;
 }
@@ -435,7 +435,7 @@ unsigned int LoadIntervalReport(const char *param_1) {
     FreeIntervalReport();
     // STRING: LEGOLAND 0x004bf678
     sprintf(buffer, "Intervals\\%s", param_1);
-    result = ReadResourceLines(buffer, (void **)DAT_007cafa0, 100);
+    result = ReadResourceLines(buffer, (void **)IntervalTextLines, 100);
     DAT_0079887c = result;
     if (result != 0) {
         DAT_004bf670 = 1;
@@ -452,13 +452,13 @@ void LoadIntervalHints(const char *param_1) {
     SetIntervalHintSpeechPrefix(param_1);
     FreeIntervalHints();
     sprintf(buffer, "Intervals\\%s", param_1);
-    IntervalHintCount = ReadResourceLines(buffer, (void **)DAT_007cb140, 32);
+    IntervalHintCount = ReadResourceLines(buffer, (void **)IntervalHintLines, 32);
 }
 
 // FUNCTION: LEGOLAND 0x00490850
 void FreeIntervalReport(void) {
     if (DAT_0079887c != 0) {
-        free(DAT_007cafa0[0]);
+        free(IntervalTextLines[0]);
     }
     DAT_0079887c = 0;
 }
@@ -466,7 +466,7 @@ void FreeIntervalReport(void) {
 // FUNCTION: LEGOLAND 0x00490880
 void FreeIntervalHints(void) {
     if (IntervalHintCount != 0) {
-        free(DAT_007cb140[0]);
+        free(IntervalHintLines[0]);
     }
     IntervalHintCount = 0;
 }
@@ -605,7 +605,7 @@ unsigned char IntervalHintHandler(struct IconNode *param_1, unsigned int param_2
             if ((int)IntervalHintIndex >= (int)IntervalHintCount) {
                 IntervalHintIndex = 0;
             }
-        } while (strlen(DAT_007cb140[IntervalHintIndex]) == 0);
+        } while (strlen(IntervalHintLines[IntervalHintIndex]) == 0);
         IntervalHintBubbleEndTime = GetTicks() + 8000;
         PlayIntervalHintSpeech(IntervalHintIndex);
     }
@@ -752,10 +752,10 @@ void RenderIntervalScreen(void) {
     int n;
     int idx;
 
-    PrintIntervalLine(DAT_007cafa0[0], 10, 0x45, 0x27, 1);
+    PrintIntervalLine(IntervalTextLines[0], 10, 0x45, 0x27, 1);
     y = 0x6b;
     n = 0;
-    line = &DAT_007cafa0[DAT_004bf670];
+    line = &IntervalTextLines[DAT_004bf670];
     idx = DAT_004bf670;
     while (n < 0xe && idx <= (int)DAT_0079887c) {
         PrintIntervalLine(*line, 10, y, 0x16, 0);
@@ -773,7 +773,7 @@ void RenderIntervalScreen(void) {
         if ((int)GetTicks() > (int)IntervalHintBubbleEndTime) {
             IntervalHintBubbleEndTime = 0;
         }
-        BubbleHelp(rc, DAT_007cb140[IntervalHintIndex], 2);
+        BubbleHelp(rc, IntervalHintLines[IntervalHintIndex], 2);
     }
 }
 

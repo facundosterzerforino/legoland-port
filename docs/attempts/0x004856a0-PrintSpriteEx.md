@@ -24,3 +24,17 @@
   genuinely live across the branch (needs a restructure; check the non-group asm stays identical).
 - Use a signed/unsigned change on `result` or the count comparison to influence which register is used for
   the count load.
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 96.64%. Matching has to come from C now.
+
+## 2026-10-19 Opus 5.5 (plain C, no change: 96.64%)
+
+What still differs: the original sets `ecx = 1` at entry and its `group->count <= 0` exit returns ecx
+(`mov eax, ecx`), while the loop exit has its own `mov eax, 1`: `result` is a real variable there. Ours
+constant-folds `result`, so the count test uses ecx instead of edx and both exits share one `mov eax, 1`.
+Tried, all 96.64 unless noted: `result = 0; return result;` for the non-group failure, `result = RenderSprite...;
+return result;` in the non-group path, both together, a single-exit non-group path (82.90), `result = Render...`
+inside the loop (dead stores), `result = 1` inside the mask test, `return result` at the end (76.76).

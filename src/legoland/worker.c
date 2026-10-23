@@ -822,9 +822,9 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
     case 0:
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
-        worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
+        worker->target_dir = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
         worker->low_level_action = 0xc;
-        NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+        NewDirForAction(worker, (worker->target_dir >> 5) + 3);
         worker->param_action = 0xb;
         return;
     case 0xb:
@@ -844,9 +844,9 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
             }
@@ -854,9 +854,9 @@ LEGO_EXPORT void Gardener_Build(Bloke *worker) {
         case 2:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
         }
@@ -911,9 +911,9 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
     case 0:
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
-        worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
+        worker->target_dir = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
         worker->low_level_action = 0xc;
-        NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+        NewDirForAction(worker, (worker->target_dir >> 5) + 3);
         worker->param_action = 0xb;
         return;
     case 0xb:
@@ -933,9 +933,9 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
             }
@@ -943,9 +943,9 @@ LEGO_EXPORT void Mechanic_Build(Bloke *worker) {
         case 2:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
         }
@@ -1605,9 +1605,9 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 6;
             }
@@ -1615,9 +1615,9 @@ LEGO_EXPORT void Garderner_Repair(Bloke *worker) {
         case 2:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 6;
             return;
         }
@@ -1701,9 +1701,9 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
     case 0:
         worker->dest.x = worker->goal.x;
         worker->dest.y = worker->goal.y;
-        worker->field_73 = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
+        worker->target_dir = CalcMoveLine(worker->pos, worker->goal, &worker->nav) + 0x10;
         worker->low_level_action = 0xc;
-        NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+        NewDirForAction(worker, (worker->target_dir >> 5) + 3);
         worker->param_action = 0xb;
         return;
     case 0xb:
@@ -1724,9 +1724,9 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
         case 1:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             if ((worker->field_64 & 1) != 0) {
                 worker->param_action = 0x6a;
             }
@@ -1734,9 +1734,9 @@ LEGO_EXPORT void Mechanics_Repair(Bloke *worker) {
         case 2:
             worker->dest.x = dest.x;
             worker->dest.y = dest.y;
-            worker->field_73 = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
+            worker->target_dir = CalcMoveLine(worker->pos, dest, &worker->nav) + 0x10;
             worker->low_level_action = 0xc;
-            NewDirForAction(worker, (worker->field_73 >> 5) + 3);
+            NewDirForAction(worker, (worker->target_dir >> 5) + 3);
             worker->param_action = ~worker->field_64 & 1 | 0x6a;
             return;
         }
@@ -1848,7 +1848,7 @@ void SaveGardeners(void) {
         rec.pos.y = worker->pos.y;
         rec.height = worker->height;
         rec.dir = worker->dir;
-        rec.field_73 = worker->field_73;
+        rec.target_dir = worker->target_dir;
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
@@ -1911,7 +1911,7 @@ void LoadGardeners(void) {
         worker->pos.y = rec.pos.y;
         worker->height = rec.height;
         worker->dir = rec.dir;
-        worker->field_73 = rec.field_73;
+        worker->target_dir = rec.target_dir;
         worker->frame = rec.frame;
         worker->field_75 = rec.field_75;
         worker->nav = rec.nav;
@@ -1991,7 +1991,7 @@ void SaveMechanics(void) {
         rec.pos.y = worker->pos.y;
         rec.height = worker->height;
         rec.dir = worker->dir;
-        rec.field_73 = worker->field_73;
+        rec.target_dir = worker->target_dir;
         rec.frame = worker->frame;
         rec.field_75 = worker->field_75;
         rec.nav = worker->nav;
@@ -2054,7 +2054,7 @@ void LoadMechanics(void) {
         worker->pos.y = rec.pos.y;
         worker->height = rec.height;
         worker->dir = rec.dir;
-        worker->field_73 = rec.field_73;
+        worker->target_dir = rec.target_dir;
         worker->frame = rec.frame;
         worker->field_75 = rec.field_75;
         worker->nav = rec.nav;

@@ -1905,7 +1905,7 @@ void ClampScrollPosition(int param_1, int param_2, int param_3, int param_4) {
     marginLeft = DAT_004b9608 >> 1;
     maxX = DAT_004b9604 >> 1;
     GetTileDimensions(&tileW, &tileH);
-    tileW *= 0x80;
+    tileW <<= 7;
     tileH = tileW >> 1;
     rightX = lpConfig->width * tileW;
     rightY = lpConfig->width * tileH;

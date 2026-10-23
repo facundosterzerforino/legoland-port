@@ -29,3 +29,7 @@ LEGO_EXPORT int SetupControllers(void);
 LEGO_EXPORT void ReadGameButtons(void);
 void FreeControllers(void);
 void UpdateEditSelection(void);
+
+/* 0x00813a84: edit-mode selection rectangle (tiles), built from the mouse drag.
+ * Declared here, not at the end of globals.h: appending it there shifts MSVC codegen in MusicThreadProc. */
+extern struct MapRect SelectionRect;

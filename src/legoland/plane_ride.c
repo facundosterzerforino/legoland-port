@@ -599,9 +599,9 @@ void PlaneRideUpdate(struct Element *elem) {
                 bloke->pos.y <<= 8;
                 bloke->dest.x = tx * 256 + 128;
                 bloke->dest.y = ty * 256 + 128;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+                bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 0xe:

@@ -231,17 +231,17 @@ static int PortResCheckLms(FILE *dump) {
         }
         memcpy(&count, lms->pad_0, 4);
         fprintf(dump, "%s verts=%d flat=%d smooth=%d textured=%d at %x %x %x %x %x %x\n", fd.cFileName, count,
-            lms->field_1c, lms->field_24, lms->field_2c,
+            lms->flat_count, lms->gouraud_count, lms->tex_count,
             (unsigned int)((unsigned char *)lms->field_c - (unsigned char *)(lms + 1)),
             (unsigned int)((unsigned char *)lms->field_10 - (unsigned char *)(lms + 1)),
             (unsigned int)((unsigned char *)lms->field_14 - (unsigned char *)(lms + 1)),
-            (unsigned int)((unsigned char *)lms->field_18 - (unsigned char *)(lms + 1)),
-            (unsigned int)((unsigned char *)lms->field_20 - (unsigned char *)(lms + 1)),
-            (unsigned int)((unsigned char *)lms->field_28 - (unsigned char *)(lms + 1)));
+            (unsigned int)((unsigned char *)lms->flat_tris - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->gouraud_tris - (unsigned char *)(lms + 1)),
+            (unsigned int)((unsigned char *)lms->tex_tris - (unsigned char *)(lms + 1)));
         fprintf(dump, " %08x %08x %08x %08x %08x\n", PortResHash(2166136261u, lms->field_c, count * 12),
-            PortResHash(2166136261u, lms->field_18, lms->field_1c * sizeof(struct LmsRef)),
-            PortResHash(2166136261u, lms->field_20, lms->field_24 * sizeof(struct LmsRef)),
-            PortResHash(2166136261u, lms->field_28, lms->field_2c * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->flat_tris, lms->flat_count * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->gouraud_tris, lms->gouraud_count * sizeof(struct LmsRef)),
+            PortResHash(2166136261u, lms->tex_tris, lms->tex_count * sizeof(struct LmsRef)),
             PortResHash(2166136261u, lms->box, sizeof(lms->box)));
         MemFree(lms);
         files++;

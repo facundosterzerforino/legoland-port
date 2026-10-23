@@ -326,10 +326,10 @@ struct DeferredSprite {
 };
 
 struct ListLink {
-    unsigned char pad_0[0x10];
-    /* 0x10 */ int kind;
-    struct ListLink *var_14;
-    struct ListLink *var_18;
+    unsigned char pad_0[0x10]; /* the screen rectangle (a RectI) */
+    /* 0x10 */ int visible; /* 0xf when the rectangle overlaps the castle view (ClipRectIToRect), else 0 */
+    struct ListLink *prev;
+    struct ListLink *next;
 };
 
 struct CastleFloatEnt {
@@ -363,7 +363,7 @@ struct Int16Pair {
 };
 
 /* castle track-segment list node (0x60f914 table entries; also embedded in castle nodes) */
-struct LSub {
+struct CastleTrackCell {
     /* 0x00 */ struct Footprint fp; /* a link of the castle cursor's footprint chain (CastleCoasterFootprint) */
     /* 0x14 */ struct Int16Pair xy;
     /* 0x18 */ unsigned int k;
@@ -376,7 +376,7 @@ struct LSub {
    template (CastleCurves) */
 struct SegBlob {
     /* 0x00 */ unsigned int v[16];
-    /* 0x40 */ float f40;
+    /* 0x40 */ float length; /* straight and slope stretches: the length of the xy line */
     /* 0x44 */ union {
         float start;
         unsigned int start_bits; /* passed on as raw bits by the curve integrators */
@@ -551,8 +551,6 @@ extern GUID NullGuid;
 // 0x004b4580
 extern struct FortRect DAT_004b4580;
 
-// 0x004ab384: gold-rush slot weight to map units
-extern const float GoldSlotWeightScale;
 // 0x004ab390
 extern float FLOAT_004ab390;
 extern float FLOAT_004ab468;
@@ -887,7 +885,7 @@ extern struct CastleFloatEnt TrackTieShape[8];
 // 0x004b62f0
 extern unsigned int DAT_004b62f0[4];
 // 0x004b6300
-extern struct LmsFile TrackTieModel; /* a mesh header like SupportPostModel */
+extern struct LmsFile TrackTieModel; /* the track sleeper: 8 vertices (TrackTieVerts, InitTrackTieShape), 8 flat triangles */
 // 0x004b6398
 extern float DAT_004b6398[4][3];
 // 0x004b63c8
@@ -1017,11 +1015,11 @@ extern char *IconsPath;
 // 0x004b81d8
 extern char *ModelsPath;
 // 0x004b8318
-extern struct Point DAT_004b8318;
+extern struct Point ParkEntranceWalkInOffset;
 // 0x004b8320
-extern struct Point DAT_004b8320;
+extern struct Point ParkExitPos;
 // 0x004b8328
-extern struct Point DAT_004b8328;
+extern struct Point ParkExitStep;
 // 0x004b8334
 extern int BlokeTirednessThresholds[4];
 // 0x004b8344
@@ -1185,9 +1183,6 @@ extern char *DAT_004bb6d4[9];
 // 0x004bb6f8
 extern struct ScriptCommand LevelScriptCommands[0x5d];
 // 0x004bcba4
-extern const char BuildMenuName[];
-extern const char LegoFontName[5]; /* "Lego" */
-extern const char PathControlName[];
 extern const char *ResourceFileNames[3];
 // 0x004bcbf4
 extern LEGO_EXPORT struct LegoConfig *lpConfig;
@@ -1316,7 +1311,7 @@ extern struct Ride *JoustRide;
 // 0x004c1228
 extern struct RideSpriteInfo JoustSpriteInfo;
 // 0x004c123c
-extern void *DAT_004c123c[2];
+extern void *JoustRiderSprites[2];
 // 0x004c1244
 extern struct Sprite *JoustFMaskSprite;
 // 0x004c1248
@@ -1434,7 +1429,7 @@ extern struct Ride *LogFlumeTunnelRide;
 // 0x004cbe1c
 extern struct Sprite *LogFlumeFc1M3Sprite;
 // 0x004cbe20
-extern struct FlumeEntry *DAT_004cbe20[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
+extern struct FlumeEntry *FlumeNeighbours[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
 // 0x004cbe30
 extern struct Ride *LogFlumeTrackRide;
 // 0x004cbe48
@@ -1662,15 +1657,15 @@ extern struct PathNode *BoatBfsFrontier;
 // 0x004d8244
 extern struct PathNode *BoatBfsNextFrontier;
 // 0x004d8250
-struct SprEnt {
-    unsigned int field_0;
+struct PiecePlacement {
+    unsigned int joins; /* 1: joins after the tail, 2: before the head */
     struct CastleState *owner;
-    int id_a;
-    struct PathSeg *h_a;
-    int id_b;
-    struct PathSeg *h_b;
+    int next_spot;
+    struct PathSeg *tail_anchor;
+    int prev_spot;
+    struct PathSeg *head_anchor;
 };
-extern struct SprEnt CoasterPlacement;
+extern struct PiecePlacement CoasterPlacement;
 // 0x004d8268
 extern unsigned int CoasterPieceCount;
 // 0x004d8270
@@ -1734,9 +1729,9 @@ extern int DepthSpanRecordCount;
 // 0x0060f90c
 extern int DepthSpanRecordsOverflow;
 // 0x004e3870
-extern char DAT_004e3870[0x96000];
+extern char CoasterDepthBufferData[];
 // 0x0060f914
-extern struct LSub CastleTrackCells[21];
+extern struct CastleTrackCell CastleTrackCells[21];
 // 0x006102f8
 extern struct SegBlob CastleCurves[3];
 // 0x00610a04
@@ -1745,11 +1740,11 @@ extern unsigned int CastleCoasterPlaced;
 extern unsigned int CastleTrackCellCount;
 // 0x00610a18
 extern struct RenderItemNode *CastleRiderRenderList;
-// 0x00610a20 — sqrtf lookup table (64 entries: {intercept, slope} pairs)
+// 0x00610a20 — 1/sqrt mantissa table (64 entries: {intercept, slope} pairs)
 extern float rsqrtf_mantissa_table[128];
-// 0x00610c40 — invsqrtf lookup table (64 entries: {intercept, slope} pairs)
-extern float sqrtf_mantissa_table[128];
-// 0x00610e44 — invsqrtf exponent scale table (256 entries)
+// 0x00610c40 — sqrt mantissa table (64 entries: {intercept, slope} pairs)
+extern float sqrtf_mantissa_table[129];
+// 0x00610e44 — sqrt exponent scale table (256 entries: sqrt(2^(e - 127)))
 extern float sqrtf_exp_table[256];
 // 0x00611244 — sqrtf exponent scale table (256 entries)
 extern float rsqrtf_exp_table[256];
@@ -1825,7 +1820,7 @@ extern int ArcLengthCurvePair;
 extern float ArcLengthDepth;
 extern struct CastleFloatEnt DAT_004b5f80[3][4];
 // 0x004b6150
-extern struct LmsFile SupportPostModel; /* the castle cursor's mesh */
+extern struct LmsFile SupportPostModel; /* the track support post: 12 vertices (written by DrawSupportPost), 16 flat triangles */
 extern struct CastleFloatEnt DAT_00612210[3][4];
 // 0x00615f90
 extern int DAT_00615f90;
@@ -1842,7 +1837,7 @@ extern struct BinVFile *BalloonzBinV;
 // 0x00616018
 extern struct BinVFile *BalloonzBinVs[4];
 // 0x0061603c
-extern struct Sprite *DAT_0061603c[2];
+extern struct Sprite *BalloonzRiderSprites[2];
 // 0x00616044
 extern struct Sprite *BalloonzLayer;
 // 0x00616048
@@ -1876,7 +1871,7 @@ extern void *CarouselOffBinV;
 // 0x0061608c
 extern void *CarouselBinV;
 // 0x00616090
-extern void *DAT_00616090[3];
+extern void *CarouselBinVs[3];
 // 0x006160b8
 extern struct Sprite *ZCarouselSprite;
 // 0x006160bc
@@ -2003,7 +1998,7 @@ extern void *SpinningBarrelsBinVs[3];
 // 0x0062fdfc
 extern void *BoxBlokesOn1BNV;
 // 0x0062fe00
-extern void *DAT_0062fe00[2];
+extern void *SpinningBarrelsRiderSprites[2];
 // 0x0062fe08
 extern struct BarrelNode *SpinningBarrelList;
 // 0x0062fe48
@@ -2266,7 +2261,7 @@ extern unsigned int DAT_00667c5c;
 // 0x00667c60
 extern unsigned int PreMapScreenMode;
 // 0x00667c68
-extern unsigned int LastMapClickTicks;
+extern int LastMapClickTicks;
 // 0x00667c70
 extern long LastMapClickX;
 // 0x00667c74
@@ -3205,9 +3200,9 @@ extern char IntervalReportSpeechPrefix[0x100];
 // 0x007caf80
 extern struct Sprite *RepHint1Sprite;
 // 0x007cafa0
-extern char *DAT_007cafa0[104];
+extern char *IntervalTextLines[104];
 // 0x007cb140
-extern char *DAT_007cb140[32];
+extern char *IntervalHintLines[32];
 // 0x007cb1c0
 extern struct IconNode *RepHint1Icon;
 // 0x007cb1c4
@@ -3219,9 +3214,9 @@ extern struct IconNode *TitlePreviousPageIcon;
 // 0x007cb2e4
 extern struct IconNode *TitleNextPageIcon;
 // 0x007cb2f0
-extern struct EditState DAT_007cb2f0; /* EditMode saved by SaveScreenState */
+extern struct EditState TitleSavedEditMode; /* EditMode saved by SaveScreenState */
 // 0x007cb300
-extern struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
+extern struct ScreenMode TitleSavedScreenMode; /* DAT_0080ff80 saved */
 // 0x007cb30c
 extern unsigned int DAT_007cb30c; /* DAT_00668e38 saved */
 // 0x007cb310
@@ -3687,14 +3682,6 @@ extern int DragStartTileY;
 extern int DragEndTileX;
 // 0x00813a80
 extern int DragEndTileY;
-// 0x00813a84
-extern int SelectionRect;
-// 0x00813a88
-extern int DAT_00813a88;
-// 0x00813a8c
-extern int DAT_00813a8c;
-// 0x00813a90
-extern int DAT_00813a90;
 // 0x00813a94
 extern unsigned int PrevHeldButtons;
 // 0x00813a98
@@ -4009,7 +3996,7 @@ extern struct FMat4 CastleViewMatrix;
 // 0x008299fc
 extern struct FMat4 CastleWorldToScreen;
 // 0x008299ac
-extern int DAT_008299ac[4];
+extern int CastleViewRect[4];
 // 0x00829a3c
 extern struct ListLink CastleLinkList;
 // 0x00829a58
@@ -4049,7 +4036,7 @@ extern char *CoasterShadeTableData;
 // 0x00829c60
 extern void *CoasterShadeTables[1024];
 // 0x0082ac60
-extern struct FloatArray *DAT_0082ac60[48];
+extern struct FloatArray *VecScratchPool[32];
 // 0x0082ad20
 /* castle.c: the castle parts' handlers (a row per part class; the table ends where CastleDispatchTableEnd starts) */
 struct DispatchRow {
@@ -4217,7 +4204,7 @@ extern int ClipVertexPool[0x100];
 // 0x004d87c4
 extern int *ClipVertexPoolNext;
 // 0x004d87cc
-extern int *DAT_004d87cc[32];
+extern int *ClipVertsOut[32];
 // 0x004d884c
 extern int *ClipVertsIn[32];
 // 0x004d88cc
@@ -4226,11 +4213,11 @@ extern struct FloatArray **DifferenceTableRows[5];
 // 0x004b5660
 extern float RK4Coefficients[4][2];
 
-struct Struct1e40;
+struct SlopeCurve;
 // 0x004dd644
-extern struct Struct1e40 *SplitCurveStart;
+extern struct SlopeCurve *SplitCurveStart;
 // 0x004dd648
-extern struct Struct1e40 *SplitCurve;
+extern struct SlopeCurve *SplitCurve;
 // 0x004dd64c
 extern float *SplitPointsNext;
 // 0x004dd650
@@ -4347,3 +4334,17 @@ extern int DAT_004b42ac[3];
 extern int DAT_004b42b8[3];
 // 0x004b42c4
 extern int DAT_004b42c4[3];
+
+// Constants the original pools (strings and a float), shared by name between several functions.
+// Keep these at the END of this file: MSVC6 /O2's
+// register allocation depends on the order of the declarations it has seen, and declaring them
+// earlier turned MusicThreadProc (sound_sfx.c, 11 KB) from 100% into 99.89% without any change
+// to the function itself.
+// 0x004ab384: gold-rush slot weight to map units
+extern const float GoldSlotWeightScale;
+// 0x004b86e0
+extern const char LegoFontName[5]; /* "Lego" */
+// 0x004b8a70
+extern const char PathControlName[];
+// 0x004bb49c
+extern const char BuildMenuName[];

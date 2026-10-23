@@ -74,7 +74,7 @@ struct WorkerSave {
     /* 0x5c */ Point pos;
     /* 0x64 */ unsigned short height;
     /* 0x66 */ unsigned char dir;
-    /* 0x67 */ unsigned char field_73;
+    /* 0x67 */ unsigned char target_dir;
     /* 0x68 */ unsigned char frame;
     /* 0x69 */ unsigned char field_75;
     /* 0x6a */ unsigned char pad_6a[2];

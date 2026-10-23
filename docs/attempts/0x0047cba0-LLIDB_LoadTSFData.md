@@ -19,3 +19,14 @@
 ## Ideas not tried yet
 
 - Reorder the `element` use so the original's `eax`/`edx` split comes out (e.g. read `*(int *)(element + 0xc)` into a local before the `head->data` store).
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 94.46%. Matching has to come from C now.
+
+## 2026-10-19 Opus 5.5 (plain C, no change: 94.46%)
+
+The original stores `name[len] = 0` after the name read (it is scheduled between the next call's pushes), but
+moving the terminator back after `RES_ReadFile(file, name, len)` gives 90.58, also with the `if (ret == 4 && len)`
+flattened, without `ret`, without `data_c`, and with `&si->sprite_ids[i]` indexing. The permuter's order stays.

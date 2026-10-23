@@ -380,47 +380,52 @@ int *FindDrivingSchoolCarNear(int *param_1, int param_2, int param_3) {
     return 0;
 }
 
+/* Compute velocity toward the next waypoint and ease large turns in the 16-way heading.
+ * Used at driving-school car creation and before each position integration. */
 // FUNCTION: LEGOLAND 0x004019c0
-void UpdateDrivingSchoolCarVelocity(struct NewBloke *m) {
-    unsigned char oldDir = m->f_b8;
-    volatile unsigned char moving = m->f_bb;
-    int dy, dx, dist, diff, vx, vy;
-    unsigned char newDir;
+void UpdateDrivingSchoolCarVelocity(struct NewBloke *car) {
+    /* Zero-extend the saved byte before comparing headings, as in the original. */
+    unsigned int old_heading = car->f_b8;
+    unsigned char waypoint_count = car->f_bb;
+    int dy, dx, dist, heading_diff, vx, vy;
+    unsigned char target_heading;
 
-    if (!moving) {
-        m->velX = 0;
-        m->velY = 0;
+    if (!waypoint_count) {
+        car->velX = 0;
+        car->velY = 0;
     } else {
         do {
-            dx = m->dest.x - m->fx;
-            dy = m->dest.y - m->fy;
+            dx = car->dest.x - car->fx;
+            dy = car->dest.y - car->fy;
             dist = (int)sqrt((float)dx * (float)dx + (float)dy * (float)dy);
             if (dist != 0) {
-                m->dirX = (float)dx / dist;
-                m->dirY = (float)dy / dist;
-                newDir = (ArcTan256(dx, dy) + 8) >> 4 & 15;
-                m->f_b8 = newDir;
-                diff = (newDir - oldDir) & 15;
-                if (diff & 8)
-                    diff |= -16;
-                if (diff < -2 || (unsigned)diff > 2) {
-                    if (diff & 8)
-                        oldDir--;
+                car->dirX = (float)dx / dist;
+                car->dirY = (float)dy / dist;
+                target_heading = (ArcTan256(dx, dy) + 8) >> 4 & 15;
+                car->f_b8 = target_heading;
+                heading_diff = (target_heading - old_heading) & 15;
+                if (heading_diff & 8)
+                    heading_diff |= -16;
+                /* Interpret the wrapped difference as signed: -1 and -2 are small turns too. */
+                if (heading_diff < -2 || heading_diff > 2) {
+                    if (heading_diff & 8)
+                        car->f_b8 = old_heading - 1;
                     else
-                        oldDir++;
-                    m->f_b8 = oldDir;
-                    m->f_b8 = oldDir & 15;
+                        car->f_b8 = old_heading + 1;
+                    /* Keep the turn in the field before wrapping it. MSVC6 preserves the
+                     * original unmasked/masked byte stores with this branch structure. */
+                    car->f_b8 &= 15;
                 }
-                vx = m->f_c8 * dx / dist;
-                vy = m->f_c8 * dy / dist;
+                vx = car->f_c8 * dx / dist;
+                vy = car->f_c8 * dy / dist;
             } else {
                 vx = 0;
-                m->dirX = 0;
-                m->dirY = 0;
+                car->dirX = 0;
+                car->dirY = 0;
                 vy = 0;
             }
-            m->velX = vx;
-            m->velY = vy;
+            car->velX = vx;
+            car->velY = vy;
         } while (0);
     }
 }
@@ -593,8 +598,8 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     struct RideQueueEntry *t1;
     struct RideQueueEntry *t2;
     struct RideQueueEntry *t3;
-    struct PathPair pt;
-    unsigned char r;
+    int pt[4]; /* only pt[0] and pt[1] are used; the frame reserves 16 bytes */
+    char r;
     int mask;
 
     int pb;
@@ -607,21 +612,21 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
     if (NULL == e) {
         return 0;
     }
-    StepPointByDirection(&e->x, &pt.a, dir);
-    q = FindRoadEntryAt(pt.a, pt.b);
+    StepPointByDirection(&e->x, pt, dir);
+    q = FindRoadEntryAt(pt[0], pt[1]);
     if (q != NULL && q->id == id && (q->field_14 & 0xf) != 6) {
-        StepPointByDirection(&q->x, &pt.a, dir);
-        t1 = FindRoadEntryAt(pt.a, pt.b);
+        StepPointByDirection(&q->x, pt, dir);
+        t1 = FindRoadEntryAt(pt[0], pt[1]);
         if (t1 != NULL && (t1->id != id || (0xf & t1->field_14) == 6)) {
             t1 = NULL;
         }
-        StepPointByDirection(&q->x, &pt.a, (dir - 2) & 7);
-        t2 = FindRoadEntryAt(pt.a, pt.b);
+        StepPointByDirection(&q->x, pt, (dir - 2) & 7);
+        t2 = FindRoadEntryAt(pt[0], pt[1]);
         if (t2 != NULL && (t2->id != id || (t2->field_14 & 0xf) == 6)) {
             t2 = NULL;
         }
-        StepPointByDirection(&q->x, &pt.a, (dir + 2) & 7);
-        t3 = FindRoadEntryAt(pt.a, pt.b);
+        StepPointByDirection(&q->x, pt, (dir + 2) & 7);
+        t3 = FindRoadEntryAt(pt[0], pt[1]);
         if (t3 != NULL && (t3->id != id || (0xf & t3->field_14) == 6)) {
             t3 = NULL;
         }
@@ -642,7 +647,7 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
         case 5:
             return (~r & 2) | 1;
         case 3:
-            return ((r & 2) != 0) + 1;
+            return (r & 2) ? 2 : 1;
         case 6:
             return ((~r & 2) | 4) >> 1;
         case 7:

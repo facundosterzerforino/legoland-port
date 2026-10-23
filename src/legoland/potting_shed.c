@@ -56,7 +56,7 @@ void PottingShedUpdate(Element *obj) {
             bloke->flags |= 8;
             bloke->dest.x += 0x900;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -71,7 +71,7 @@ void PottingShedUpdate(Element *obj) {
             bloke->flags |= 8;
             bloke->dest.x -= 0x900;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;

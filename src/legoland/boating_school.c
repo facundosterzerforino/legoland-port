@@ -880,7 +880,7 @@ void BoatingSchoolUpdate(void) {
             bloke->dest.x = ((BoatingSchoolRide->x + tile.pos.x) << 8) + DAT_004b5290[4 - slot].x;
             bloke->dest.y = ((BoatingSchoolRide->y + tile.pos.y) << 8) + DAT_004b5290[4 - slot].y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             break;
@@ -911,7 +911,7 @@ void BoatingSchoolUpdate(void) {
             bloke->dest.y = ((BoatingSchoolRide->field_25 + tile.pos.y) << 8) + 0x240;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -920,7 +920,7 @@ void BoatingSchoolUpdate(void) {
             bloke->dest.y = ((BoatingSchoolRide->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             break;
@@ -929,7 +929,7 @@ void BoatingSchoolUpdate(void) {
             bloke->dest.y = ((BoatingSchoolRide->field_25 + tile.pos.y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             source2.type = 1;

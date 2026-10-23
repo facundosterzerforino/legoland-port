@@ -88,7 +88,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x - 2) << 8;
                 bloke->dest.y = (y - 4) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -97,7 +97,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x - 2) << 8;
                 bloke->dest.y = (y << 8) - 0x680;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -106,7 +106,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x << 8) - 0x260;
                 bloke->dest.y = (y - 8) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -115,7 +115,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x - 2) << 8;
                 bloke->dest.y = (y << 8) - 0x980;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -124,7 +124,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x << 8) - 0x260;
                 bloke->dest.y = (y - 12) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -133,7 +133,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x - 2) << 8;
                 bloke->dest.y = (y << 8) - 0x980;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -142,7 +142,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x << 8) - 0x260;
                 bloke->dest.y = (y - 8) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -151,7 +151,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x - 2) << 8;
                 bloke->dest.y = (y << 8) - 0x680;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -160,7 +160,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.y = (y - 4) << 8;
                 bloke->dest.x = (x - 2) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
@@ -169,7 +169,7 @@ void TempleUpdate(Element *obj) {
                 bloke->dest.x = (x << 8) + 0x80;
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 bloke->low_level_action = 7;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;

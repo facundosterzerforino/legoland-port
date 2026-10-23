@@ -9,7 +9,7 @@ void DrawTextOnRenderSurface(char *text, int font, RECT rc, COLORREF color);
 LEGO_EXPORT void PrintCent(int cx, int y, int width, const char *text, int font);
 LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font);
 LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font);
-void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood);
+void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood_icon);
 LEGO_EXPORT HGDIOBJ SelectFont(HDC hdc, int font_id);
 
 struct TextCell;

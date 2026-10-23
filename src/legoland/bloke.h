@@ -105,7 +105,7 @@ struct Bloke {
     Point pos;
     unsigned short height;
     unsigned char dir;
-    unsigned char field_73;
+    unsigned char target_dir;
     unsigned char frame;
     unsigned char field_75;
     unsigned char pad_76[0x78 - 0x76];
@@ -200,7 +200,7 @@ struct BlokeSave {
     /* 0x78 */ Point pos;
     /* 0x80 */ unsigned short height;
     /* 0x82 */ unsigned char dir;
-    /* 0x83 */ unsigned char field_73;
+    /* 0x83 */ unsigned char target_dir;
     /* 0x84 */ unsigned char frame;
     /* 0x85 */ unsigned char field_75;
     /* 0x86 */ unsigned char pad_86[2];

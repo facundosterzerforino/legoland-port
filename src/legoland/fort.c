@@ -124,7 +124,7 @@ void FortWanderUpdate(RideNode *node, Bloke *bloke) {
         bloke->dest.y = (int)(((tile->pos.y + DAT_004b4580.top) << 8) + h * fy);
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
         bloke->low_level_action = 7;
-        bloke->field_73 = dir + 0x10;
+        bloke->target_dir = dir + 0x10;
         NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
         bloke->field_40 = 3;
         break;
@@ -147,73 +147,84 @@ void FortWanderUpdate(RideNode *node, Bloke *bloke) {
     }
 }
 
+/* Update the fort animation and advance each rider after its current movement finishes.
+ * Keep the walking setup in each case, with target_dir assigned before low_level_action:
+ * MSVC6 then shares the case 2/3 call tail and batches both calls' stack cleanup exactly
+ * as in the original. An explicit shared label inserts an extra stack adjustment. */
 // FUNCTION: LEGOLAND 0x00406660
 void FortUpdate(Element *elem) {
-    struct RideNode *volatile ptmp785;
     struct Ride *ride = elem->ride;
-    struct Sprite *spr;
+    struct Sprite *sprite;
     RideNode *node;
-    short *lls;
+    LLS *animation;
     RideNode *next;
     int x, y;
-    register Bloke *bloke;
-    char tx;
+    Bloke *bloke;
+    int tile_x;
     unsigned char dir;
 
-    spr = GetSpriteForLayer(FortLayer, 2);
-    if (spr != NULL) {
-        lls = (short *)GetLLSForSprite((struct Sprite *)spr);
-        if (lls) {
-            if (++lls[0] >= lls[8]) {
-                lls[0] = 0;
+    /* Layer 2 advances one frame per update and loops at the end of its LLS. */
+    sprite = GetSpriteForLayer(FortLayer, 2);
+    if (sprite != NULL) {
+        animation = GetLLSForSprite(sprite);
+        if (animation != NULL) {
+            if (++animation->frame >= animation->frame_count) {
+                animation->frame = 0;
             }
         }
     }
-    ptmp785 = ride->riders;
-    node = ptmp785;
+    node = ride->riders;
     if (node != NULL) {
         do {
+            /* State 4 removes this node, so save the following rider before updating it. */
+            next = node->next;
             bloke = node->rider;
             x = ride->x;
-            tx = node->tile.pos.x;
-            x = x + tx;
-            next = node->next;
-            y = node->tile.pos.y + ride->y;
-            if ((int)bloke->low_level_action == 0) {
+            /* A full-width int preserves the tile's unsigned byte coordinate. */
+            tile_x = node->tile.pos.x;
+            y = ride->y;
+            x = x + tile_x;
+            y = y + node->tile.pos.y;
+            if (bloke->low_level_action == 0) {
                 switch (bloke->param_action) {
                 case 0:
+                    /* Walk four tiles left of the ride-offset tile, then begin wandering. */
                     bloke->flags |= 8;
                     bloke->dest.x = (x - 4) << 8;
                     bloke->dest.y = y << 8;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->target_dir = 0x10 + dir;
                     bloke->low_level_action = 7;
-                    bloke->field_73 = 0x10 + dir;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->field_40 = 2;
                     bloke->param_action++;
                     break;
                 case 1:
+                    /* The wandering substate advances param_action when the visit ends. */
                     FortWanderUpdate(node, bloke);
                     break;
                 case 2:
-                    bloke->dest.x = (tx << 8) + 0x80;
+                    /* Return to the assigned tile's centre in 8.8 fixed-point coordinates. */
+                    bloke->dest.x = (tile_x << 8) + 0x80;
                     bloke->dest.y = (node->tile.pos.y << 8) + 0x80;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->target_dir = 0x10 + dir;
                     bloke->low_level_action = 7;
-                    bloke->field_73 = 0x10 + dir;
                     NewDirForAction(bloke, ((unsigned char)(0x10 + dir) >> 5) + 3);
                     bloke->param_action++;
                     break;
                 case 3:
+                    /* Walk to the centre of the tile offset by the ride's x/y coordinates. */
                     bloke->dest.x = (x << 8) + 0x80;
                     bloke->dest.y = (y << 8) + 0x80;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->target_dir = 0x10 + dir;
                     bloke->low_level_action = 7;
-                    bloke->field_73 = 0x10 + dir;
                     NewDirForAction(bloke, ((unsigned char)(0x10 + dir) >> 5) + 3);
                     bloke->param_action++;
                     break;
                 case 4:
+                    /* Release the rider and clear the flag set on entry. */
                     RemoveBlokeFromRide(ride, node);
                     bloke->flags = bloke->flags & (~8);
                     break;

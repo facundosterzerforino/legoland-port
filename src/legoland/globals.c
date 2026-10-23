@@ -438,6 +438,9 @@ unsigned int ClipVertexStride;
 // GLOBAL: LEGOLAND 0x004b560c
 int ClipVertexLastField;
 
+// GLOBAL: LEGOLAND 0x005798fc
+unsigned short CoasterSurfaceData[640 * 480]; /* the renderer's 16-bit frame until GetCoasterSurface locks a surface */
+
 // GLOBAL: LEGOLAND 0x004b5b20
 void *CoasterSurfaceBits;
 
@@ -457,7 +460,7 @@ char LanguageName[36] = "english";
 char SitLoManSitName[] = "sit.lomansit";
 
 // GLOBAL: LEGOLAND 0x004b5abc
-float HermiteBasis[4][4];
+float HermiteBasis[4][4] = {{-2.0f, 2.0f, 1.0f, 1.0f}, {3.0f, -3.0f, -1.0f, -2.0f}, {0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 0.0f}};
 
 // GLOBAL: LEGOLAND 0x004b5b3c
 struct RecBuf *DepthSpanRecordEnd;
@@ -486,10 +489,10 @@ const char *GirlVisitorTextures[2] = {
     "Face01"};
 
 // GLOBAL: LEGOLAND 0x004b5c1c
-struct FMat4 CastleIsoProjections[2];
+struct FMat4 CastleIsoProjections[2] = {{{{1.60334f, -1.60334f, 0.0f, 0.0f}, {0.801688f, 0.801688f, 1.96416f, 0.0f}, {3.19995f, 3.19995f, 0.0f, 32767.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}}, {{{1.60334f, -1.60334f, 0.0f, 0.0f}, {0.801688f, 0.801688f, 1.96416f, 0.0f}, {3.19995f, 3.19995f, 0.0f, 32767.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}}};
 
 // GLOBAL: LEGOLAND 0x004b5c9c
-unsigned int DAT_004b5c9c;
+unsigned int DAT_004b5c9c = 0x427c0000 /* 63.0f */;
 
 // GLOBAL: LEGOLAND 0x004b5ca0
 unsigned int CastleLightDir;
@@ -498,10 +501,10 @@ unsigned int CastleLightDir;
 unsigned int DAT_004b5ca4;
 
 // GLOBAL: LEGOLAND 0x004b5ca8
-unsigned int DAT_004b5ca8;
+unsigned int DAT_004b5ca8 = 0xbf800000 /* -1.0f */;
 
 // GLOBAL: LEGOLAND 0x004b5cac
-float DAT_004b5cac;
+float DAT_004b5cac = 63.0f;
 
 // GLOBAL: LEGOLAND 0x004b5cb0
 unsigned int TrackLightDir;
@@ -510,19 +513,19 @@ unsigned int TrackLightDir;
 unsigned int DAT_004b5cb4;
 
 // GLOBAL: LEGOLAND 0x004b5cb8
-unsigned int DAT_004b5cb8;
+unsigned int DAT_004b5cb8 = 0xbf800000 /* -1.0f */;
 
 // GLOBAL: LEGOLAND 0x004b5cbc
-float DAT_004b5cbc;
+float DAT_004b5cbc = 40.0f;
 
 // GLOBAL: LEGOLAND 0x004b5cc0
-unsigned int ModelLightDir;
+unsigned int ModelLightDir = 0x3e70a3d7 /* 0.235f */;
 
 // GLOBAL: LEGOLAND 0x004b5cc4
-unsigned int DAT_004b5cc4;
+unsigned int DAT_004b5cc4 = 0x3eb0a3d7 /* 0.345f */;
 
 // GLOBAL: LEGOLAND 0x004b5cc8
-unsigned int DAT_004b5cc8;
+unsigned int DAT_004b5cc8 = 0xbf800000 /* -1.0f */;
 
 // GLOBAL: LEGOLAND 0x004b5cf4
 char RollerCoasterSavePath[32] = "RollerCoaster\\RollerCoaster.sav";
@@ -566,11 +569,23 @@ unsigned int DAT_004b5f14[4][2] = {{0x3fc00000, 0x3f000000}, {0x3f000000, 0x3fc0
 // GLOBAL: LEGOLAND 0x004b5f60
 struct TexMesh RailTubeMesh = {0, 0, 0, 0, (struct MeshVert *)DAT_006139c8, DAT_006148b8, (unsigned int (*)[3])DAT_00612708};
 
+// GLOBAL: LEGOLAND 0x004b6010
+unsigned short DAT_004b6010[16][8]; /* SupportPostModel's 16 triangles */
+
+// GLOBAL: LEGOLAND 0x004b6110
+float DAT_004b6110[16];
+
 // GLOBAL: LEGOLAND 0x004b6150
 struct LmsFile SupportPostModel = {0};
 
 // GLOBAL: LEGOLAND 0x004b61e0
-struct CastleFloatEnt TrackTieShape[8] = {0};
+struct CastleFloatEnt TrackTieShape[8] = {0}; /* a unit box; c holds z as float bits */
+
+// GLOBAL: LEGOLAND 0x004b6240
+float DAT_004b6240[12];
+
+// GLOBAL: LEGOLAND 0x004b6270
+unsigned short DAT_004b6270[8][8]; /* TrackTieModel's 8 triangles */
 
 // GLOBAL: LEGOLAND 0x004b62f0
 unsigned int DAT_004b62f0[4];
@@ -780,13 +795,13 @@ char *IconsPath = ".\\graphics\\icons\\";
 char *ModelsPath = ".\\graphics\\models\\";
 
 // GLOBAL: LEGOLAND 0x004b8318
-struct Point DAT_004b8318; /* offset of the park entrance walk-in start */
+struct Point ParkEntranceWalkInOffset; /* offset of the park entrance walk-in start */
 
 // GLOBAL: LEGOLAND 0x004b8320
-struct Point DAT_004b8320; /* park exit (goal of leaving blokes) */
+struct Point ParkExitPos; /* park exit (goal of leaving blokes) */
 
 // GLOBAL: LEGOLAND 0x004b8328
-struct Point DAT_004b8328; /* step past the exit */
+struct Point ParkExitStep; /* step past the exit */
 
 // GLOBAL: LEGOLAND 0x004b8334
 int BlokeTirednessThresholds[4] = {0}; /* bloke tiredness thresholds */
@@ -1278,7 +1293,7 @@ struct Ride *JoustRide;
 struct RideSpriteInfo JoustSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004c123c
-void *DAT_004c123c[2]; /* rider sprite by field_30: [1] is the joust z-sprite */
+void *JoustRiderSprites[2]; /* rider sprite by field_30: [1] is the joust z-sprite */
 
 // GLOBAL: LEGOLAND 0x004c1244
 struct Sprite *JoustFMaskSprite;
@@ -1452,7 +1467,7 @@ struct Ride *LogFlumeTunnelRide;
 struct Sprite *LogFlumeFc1M3Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbe20
-struct FlumeEntry *DAT_004cbe20[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
+struct FlumeEntry *FlumeNeighbours[4]; /* the 4 neighbours of a log flume tile (up, right, down, left) */
 
 // GLOBAL: LEGOLAND 0x004cbe30
 struct Ride *LogFlumeTrackRide;
@@ -1798,7 +1813,7 @@ struct PathNode *BoatBfsFrontier;
 struct PathNode *BoatBfsNextFrontier;
 
 // GLOBAL: LEGOLAND 0x004d8250
-struct SprEnt CoasterPlacement;
+struct PiecePlacement CoasterPlacement;
 
 // GLOBAL: LEGOLAND 0x004d8268
 unsigned int CoasterPieceCount;
@@ -1879,10 +1894,10 @@ int DepthSpanRecordCount;
 int DepthSpanRecordsOverflow;
 
 // GLOBAL: LEGOLAND 0x004e3870
-char DAT_004e3870[0x96000]; /* 640x480 16-bit depth buffer */
+char CoasterDepthBufferData[640 * 480 * 2]; /* the castle view's 16-bit depth buffer (CoasterDepthBuffer) */
 
 // GLOBAL: LEGOLAND 0x0060f914
-struct LSub CastleTrackCells[21];
+struct CastleTrackCell CastleTrackCells[21];
 
 // GLOBAL: LEGOLAND 0x006102f8
 struct SegBlob CastleCurves[3];
@@ -1898,12 +1913,6 @@ struct RenderItemNode *CastleRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x00610a20
 float rsqrtf_mantissa_table[128];
-
-// GLOBAL: LEGOLAND 0x00610c40
-float sqrtf_mantissa_table[128];
-
-// GLOBAL: LEGOLAND 0x00610e44
-float sqrtf_exp_table[256];
 
 // GLOBAL: LEGOLAND 0x00611244
 float rsqrtf_exp_table[256];
@@ -2057,7 +2066,7 @@ struct BinVFile *BalloonzBinV;
 struct BinVFile *BalloonzBinVs[4];
 
 // GLOBAL: LEGOLAND 0x0061603c
-struct Sprite *DAT_0061603c[2]; /* rider sprite by field_30: [1] is ZBalloon2Sprite */
+struct Sprite *BalloonzRiderSprites[2]; /* rider sprite by field_30: [1] is ZBalloon2Sprite */
 
 // GLOBAL: LEGOLAND 0x00616044
 struct Sprite *BalloonzLayer;
@@ -2108,7 +2117,7 @@ void *CarouselOffBinV;
 void *CarouselBinV;
 
 // GLOBAL: LEGOLAND 0x00616090
-void *DAT_00616090[3]; /* carousel BinVs (on, ride, off), indexed by the saved path index */
+void *CarouselBinVs[3]; /* carousel BinVs (on, ride, off), indexed by the saved path index */
 
 // GLOBAL: LEGOLAND 0x006160b8
 struct Sprite *ZCarouselSprite;
@@ -2297,7 +2306,7 @@ void *SpinningBarrelsBinVs[3];
 void *BoxBlokesOn1BNV;
 
 // GLOBAL: LEGOLAND 0x0062fe00
-void *DAT_0062fe00[2]; /* rider sprite by field_30: [1] is ZSpinningBarrelsSprite */
+void *SpinningBarrelsRiderSprites[2]; /* rider sprite by field_30: [1] is ZSpinningBarrelsSprite */
 
 // GLOBAL: LEGOLAND 0x0062fe08
 struct BarrelNode *SpinningBarrelList;
@@ -2699,7 +2708,7 @@ unsigned int DAT_00667c5c;
 unsigned int PreMapScreenMode;
 
 // GLOBAL: LEGOLAND 0x00667c68
-unsigned int LastMapClickTicks;
+int LastMapClickTicks;
 
 // GLOBAL: LEGOLAND 0x00667c70
 long LastMapClickX;
@@ -4058,10 +4067,10 @@ char IntervalReportSpeechPrefix[0x100];
 struct Sprite *RepHint1Sprite;
 
 // GLOBAL: LEGOLAND 0x007cafa0
-char *DAT_007cafa0[104]; /* text lines (ReadResourceLines, up to 100) */
+char *IntervalTextLines[104]; /* text lines (ReadResourceLines, up to 100) */
 
 // GLOBAL: LEGOLAND 0x007cb140
-char *DAT_007cb140[32]; /* text lines (ReadResourceLines, up to 32) */
+char *IntervalHintLines[32]; /* text lines (ReadResourceLines, up to 32) */
 
 // GLOBAL: LEGOLAND 0x007cb1c0
 struct IconNode *RepHint1Icon;
@@ -4079,10 +4088,10 @@ struct IconNode *TitlePreviousPageIcon;
 struct IconNode *TitleNextPageIcon;
 
 // GLOBAL: LEGOLAND 0x007cb2f0
-struct EditState DAT_007cb2f0; /* EditMode saved by SaveScreenState */
+struct EditState TitleSavedEditMode; /* EditMode saved by SaveScreenState */
 
 // GLOBAL: LEGOLAND 0x007cb300
-struct ScreenMode DAT_007cb300; /* DAT_0080ff80 saved */
+struct ScreenMode TitleSavedScreenMode; /* DAT_0080ff80 saved */
 
 // GLOBAL: LEGOLAND 0x007cb30c
 unsigned int DAT_007cb30c; /* DAT_00668e38 saved */
@@ -4775,16 +4784,7 @@ int DragEndTileX;
 int DragEndTileY;
 
 // GLOBAL: LEGOLAND 0x00813a84
-int SelectionRect;
-
-// GLOBAL: LEGOLAND 0x00813a88
-int DAT_00813a88;
-
-// GLOBAL: LEGOLAND 0x00813a8c
-int DAT_00813a8c;
-
-// GLOBAL: LEGOLAND 0x00813a90
-int DAT_00813a90;
+struct MapRect SelectionRect;
 
 // GLOBAL: LEGOLAND 0x00813a94
 unsigned int PrevHeldButtons;
@@ -5256,7 +5256,7 @@ struct FMat4 CastleViewMatrix;
 struct FMat4 CastleWorldToScreen;
 
 // GLOBAL: LEGOLAND 0x008299ac
-int DAT_008299ac[4]; /* view rect: left, top, right, bottom */
+int CastleViewRect[4]; /* view rect: left, top, right, bottom */
 
 // GLOBAL: LEGOLAND 0x00829a3c
 struct ListLink CastleLinkList;
@@ -5312,7 +5312,7 @@ char *CoasterShadeTableData;
 void *CoasterShadeTables[1024];
 
 // GLOBAL: LEGOLAND 0x0082ac60
-struct FloatArray *DAT_0082ac60[48];
+struct FloatArray *VecScratchPool[32]; /* InitVecMath fills 30 */
 
 // GLOBAL: LEGOLAND 0x0082ad20
 struct DispatchRow CastleDispatchTable[6];
@@ -5439,6 +5439,9 @@ struct RideSpriteInfo PottingShedSpriteInfo;
 // GLOBAL: LEGOLAND 0x004ab404
 float FLOAT_004ab404;
 
+// GLOBAL: LEGOLAND 0x0082ace0
+struct PlaneSet ClipPlaneSet;
+
 // GLOBAL: LEGOLAND 0x004b55fc
 struct PlaneSet *ClipPlanes;
 
@@ -5449,13 +5452,13 @@ struct Train *DerivTrain;
 struct CurveWalker DerivTrainWalker;
 
 // GLOBAL: LEGOLAND 0x004b5634
-float ScalarDerivThirdDiffWeight;
+float ScalarDerivThirdDiffWeight = 0.16666667f;
 
 // GLOBAL: LEGOLAND 0x004b559c
-float TrainCarSeatX[3];
+float TrainCarSeatX[3] = {0.0f, 4.0f, 8.0f};
 
 // GLOBAL: LEGOLAND 0x004b55a8
-float TrainSeatSpacing;
+float TrainSeatSpacing = 16.0f;
 
 // GLOBAL: LEGOLAND 0x004b4cac
 char SafariManboxName[] = "manbox??";
@@ -5487,23 +5490,26 @@ int DAT_00638110;
 // GLOBAL: LEGOLAND 0x00638108
 int DAT_00638108;
 
+// GLOBAL: LEGOLAND 0x004d87cc
+int *ClipVertsOut[32];
+
 // GLOBAL: LEGOLAND 0x004b5600
 int **ClipVertexLists[2];
 
 // GLOBAL: LEGOLAND 0x004b5610
-float DerivThirdDiffWeight;
+float DerivThirdDiffWeight = 0.16666667f;
 
 // GLOBAL: LEGOLAND 0x004b5614
-float Deriv4PointFirstOffset;
+float Deriv4PointFirstOffset = -1.0f;
 
 // GLOBAL: LEGOLAND 0x004b5618
-float Deriv4PointOffsets[3];
+float Deriv4PointOffsets[3] = {-0.33333334f, 0.33333334f, 1.0f};
 
 // GLOBAL: LEGOLAND 0x004b5624
-float Deriv4PointFirstWeight;
+float Deriv4PointFirstWeight = 0.0625f;
 
 // GLOBAL: LEGOLAND 0x004b5628
-float Deriv4PointWeights[3];
+float Deriv4PointWeights[3] = {-1.6875f, 1.6875f, -0.0625f};
 
 // GLOBAL: LEGOLAND 0x004d83c4
 int ClipVertexPool[0x100];
@@ -5511,8 +5517,6 @@ int ClipVertexPool[0x100];
 // GLOBAL: LEGOLAND 0x004d87c4
 int *ClipVertexPoolNext;
 
-// GLOBAL: LEGOLAND 0x004d87cc
-int *DAT_004d87cc[32]; /* second clip vertex buffer; ClipVertexLists[1] points here */
 
 // GLOBAL: LEGOLAND 0x004d884c
 int *ClipVertsIn[32];
@@ -5521,13 +5525,13 @@ int *ClipVertsIn[32];
 struct FloatArray **DifferenceTableRows[5];
 
 // GLOBAL: LEGOLAND 0x004b5660
-float RK4Coefficients[4][2];
+float RK4Coefficients[4][2] = {{0.0f, 0.1666666f}, {0.5f, 0.3333333f}, {0.5f, 0.3333333f}, {1.0f, 0.1666666f}};
 
 // GLOBAL: LEGOLAND 0x004dd644
-struct Struct1e40 *SplitCurveStart;
+struct SlopeCurve *SplitCurveStart;
 
 // GLOBAL: LEGOLAND 0x004dd648
-struct Struct1e40 *SplitCurve;
+struct SlopeCurve *SplitCurve;
 
 // GLOBAL: LEGOLAND 0x004dd64c
 float *SplitPointsNext;

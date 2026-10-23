@@ -24,3 +24,10 @@
 
 - Make `i` live across the sqrt block by using it there (e.g. a loop bound shared with the sqrt), so MSVC
   cannot sink the constant.
+
+## 2026-10-21 (Opus 5.5): still 99.09
+Finding: wrapping the quadratic solve in a `static __inline SolveQuadratic(a, b, c, roots)` helper (called in the
+`a` block) fixes `mov esi, 2` / `lea ecx, roots`: they stay before the inlined body as in the original. But then b
+is kept on the FPU stack (fst + fmul) where the original stores it and reloads it after computing c: 96.33.
+volatile b / sq / parameter inside the helper: 93.15-95.41. Discriminant spelled 6 ways, c-before-b params: 96.33.
+Without the volatiles in the current version: 95.41-97.27.

@@ -89,8 +89,10 @@ struct ObjClassAlias {
     const char *aliases;
 };
 
+/* Not const: the original keeps this table in .data, directly followed by its alias strings, so the loop's
+ * end pointer (&ObjClassAliasTable[5].aliases) lands inside the first of them. */
 // GLOBAL: LEGOLAND 0x004bcdcc
-static const struct ObjClassAlias ObjClassAliasTable[] = {
+static struct ObjClassAlias ObjClassAliasTable[] = {
     {"CASTLE OBJ",
         // STRING: LEGOLAND 0x004bce60
         "CASTLE_DUMMY;ROLLER COASTER TRACK;SQUARE_TRACK;"},
@@ -111,9 +113,12 @@ static const struct ObjClassAlias ObjClassAliasTable[] = {
         "BOATING SCHOOL WATER;"},
 };
 
+/* Load the semicolon-terminated dependencies of a matching object class. Each name is
+   temporarily terminated for ElemID; successful loads get flag 4 so they are not loaded
+   again. Like the original, this only processes names followed by a semicolon. */
 // FUNCTION: LEGOLAND 0x004809d0
 void LoadObjectClassAliasElements(struct Element *cls) {
-    const char *const *slot;
+    const char **slot;
     char *token;
     char *semicolon;
     struct Element *elem;
@@ -122,8 +127,10 @@ void LoadObjectClassAliasElements(struct Element *cls) {
     slot = &ObjClassAliasTable[0].aliases;
     do {
         if (_strcmpi(cls->name, slot[-1]) == 0) {
-            strcpy(buffer, slot[0]);
+            /* Initialize before the copy and restore each delimiter before advancing:
+               MSVC6 then keeps the token and resolved element in separate registers. */
             token = buffer;
+            strcpy(buffer, slot[0]);
             semicolon = strchr(buffer, ';');
             while (semicolon != 0) {
                 *semicolon = '\0';
@@ -131,8 +138,8 @@ void LoadObjectClassAliasElements(struct Element *cls) {
                 if (elem != 0 && (elem->flags & 4) == 0 && LLIDB_LoadData(elem) != 0) {
                     elem->flags |= 4;
                 }
-                token = semicolon + 1;
                 *semicolon = ';';
+                token = semicolon + 1;
                 semicolon = strchr(token, ';');
             }
         }

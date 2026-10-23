@@ -6,62 +6,62 @@
 0x004b4458 DAT_004b4458 (0x14 of 0x18): reviewed, harmless
 0x004b4768 LogFlumeTrackSpriteFiles (0x28 of 0x30): reviewed, harmless
 0x004b4bd0 DAT_004b4bd0 (0x14 of 0x20): reviewed, harmless
-0x004b4cac DAT_004b4cac (0x9 of 0xc): reviewed, harmless
+0x004b4cac SafariManboxName (0x9 of 0xc): reviewed, harmless
 0x004b53d4 DAT_004b53d4 (0x190 of 0x19c): reviewed, harmless
-0x004b5584 DAT_004b5584 (0x10 of 0x18): reviewed, harmless
+0x004b5584 PieceNeighbourOffsets (0x10 of 0x18): reviewed, harmless
 0x004b5ec0 DAT_004b5ec0 (0x10 of 0x20): reviewed, harmless
 0x004b63c8 DAT_004b63c8 (0x30 of 0x34): reviewed, harmless
 0x004b6968 OCTOPUS_SFX (0x24 of 0x28): reviewed, harmless
 0x004b72e4 DAT_004b72e4 (0x190 of 0x194): reviewed, harmless
-0x004b79bc DAT_004b79bc (0x9 of 0x14): reviewed, harmless
+0x004b79bc PlaneRideManboxName (0x9 of 0x14): reviewed, harmless
 0x004b8768 DINO_SFX (0x3c of 0x40): reviewed, harmless
 0x004b9228 GameFX (0x114 of 0x118): reviewed, harmless
 0x004bdea0 SPRITE_ClipRect (0x10 of 0x18): reviewed, harmless
-0x004c10e8 DAT_004c10e8 (0x4 of 0x8): reviewed, harmless
-0x004c1100 DAT_004c1100 (0x14 of 0x18): reviewed, harmless
-0x004c1170 DAT_004c1170 (0x14 of 0x18): reviewed, harmless
+0x004c10e8 CastleLevelRiderRenderList (0x4 of 0x8): reviewed, harmless
+0x004c1100 CatapultSpriteInfo (0x14 of 0x18): reviewed, harmless
+0x004c1170 CoptersSpriteInfo (0x14 of 0x18): reviewed, harmless
 0x004c1208 GoldRushBlokeRenderList (0x4 of 0x8): reviewed, harmless
-0x004c2aa0 DAT_004c2aa0 (0x4 of 0x8): reviewed, harmless
+0x004c2aa0 LogFlumeSpecialCorner2Ride (0x4 of 0x8): reviewed, harmless
 0x004c2c18 DAT_004c2c18 (0x1834 of 0x1844): reviewed, harmless
 0x004c4468 DAT_004c4468 (0x1834 of 0x1838): reviewed, harmless
 0x004cbe30 LogFlumeTrackRide (0x4 of 0x8): reviewed, harmless
-0x004cbeb8 DAT_004cbeb8 (0x4 of 0x8): reviewed, harmless
-0x004cbed0 DAT_004cbed0 (0x14 of 0x18): reviewed, harmless
-0x004cbf40 DAT_004cbf40 (0x14 of 0x18): reviewed, harmless
-0x004cbf70 DAT_004cbf70 (0x4 of 0x8): reviewed, harmless
-0x004cbf98 DAT_004cbf98 (0x14 of 0x20): reviewed, harmless
-0x004cbff0 DAT_004cbff0 (0x14 of 0x18): reviewed, harmless
+0x004cbeb8 TrafficLightPhase (0x4 of 0x8): reviewed, harmless
+0x004cbed0 SafariSpriteInfo (0x14 of 0x18): reviewed, harmless
+0x004cbf40 SpiderRideSpriteInfo (0x14 of 0x18): reviewed, harmless
+0x004cbf70 TempleRiderRenderList (0x4 of 0x8): reviewed, harmless
+0x004cbf98 TempleSlideSpriteInfo (0x14 of 0x20): reviewed, harmless
+0x004cbff0 WaterWorksSpriteInfo (0x14 of 0x18): reviewed, harmless
 0x004cc090 DAT_004cc090 (0x60d0 of 0x60d4): reviewed, harmless
 0x004d2168 DAT_004d2168 (0x60d0 of 0x60d4): reviewed, harmless
-0x004d829c DAT_004d829c (0x100 of 0x104): reviewed, harmless
-0x004d88cc DAT_004d88cc (0x14 of 0x28): reviewed, harmless
-0x004dd5d8 DAT_004dd5d8 (0x4 of 0x8): reviewed, harmless
-0x0060f914 DAT_0060f914 (0x2d0 of 0x2e4): reviewed, harmless
+0x004d829c TrainInertiaHistory (0x100 of 0x104): reviewed, harmless
+0x004d88cc DifferenceTableRows (0x14 of 0x28): reviewed, harmless
+0x004dd5d8 VecScratchTop (0x4 of 0x8): reviewed, harmless
+0x0060f914 CastleTrackCells (0x2d0 of 0x2e4): reviewed, harmless
 0x00610500 DAT_00610500 (0x100 of 0x104): reviewed, harmless
-0x00610a20 sqrtf_table (0x200 of 0x220): reviewed, harmless
-0x00610c40 invsqrtf_table (0x200 of 0x204): reviewed, harmless
-0x00616120 DAT_00616120 (0x14 of 0x1c): reviewed, harmless
+0x00610a20 rsqrtf_mantissa_table (0x200 of 0x220): reviewed, harmless
+0x00610c40 sqrtf_mantissa_table (0x200 of 0x204): reviewed, harmless
+0x00616120 EaterySpriteInfo (0x14 of 0x1c): reviewed, harmless
 0x00629c58 DAT_00629c58 (0x60d0 of 0x60d4): reviewed, harmless
-0x0062fd48 DAT_0062fd48 (0x14 of 0x18): reviewed, harmless
-0x0062fdb0 DAT_0062fdb0 (0x14 of 0x18): reviewed, harmless
+0x0062fd48 SpaceTowerSpriteInfo (0x14 of 0x18): reviewed, harmless
+0x0062fdb0 SpinningBarrelsSpriteInfo (0x14 of 0x18): reviewed, harmless
 0x0062fe58 PlaneRide (0x4 of 0x8): reviewed, harmless
-0x0062fe60 DAT_0062fe60 (0x14 of 0x18): reviewed, harmless
-0x00665e8c DAT_00665e8c (0x4 of 0x60): reviewed, harmless
-0x00665f48 DAT_00665f48 (0x4 of 0x14): reviewed, harmless
+0x0062fe60 PlaneRideSpriteInfo (0x14 of 0x18): reviewed, harmless
+0x00665e8c LoadedTextureCount (0x4 of 0x60): reviewed, harmless
+0x00665f48 AviAnimOpenCount (0x4 of 0x14): reviewed, harmless
 0x006664ec DAT_006664ec (0x4 of 0xc): reviewed, harmless
 0x00667c20 MapCenterOffsetY (0x4 of 0x8): reviewed, harmless
 0x00667c54 QueryObj (0x2 of 0x4): reviewed, harmless
-0x00668da8 DAT_00668da8 (0x3b of 0x3c): reviewed, harmless
+0x00668da8 PrevKeyState (0x3b of 0x3c): reviewed, harmless
 0x00668de4 CheatKeyState (0x3b of 0x3c): reviewed, harmless
 0x00668e20 DAT_00668e20 (0x10 of 0x14): reviewed, harmless
 0x00668e64 DAT_00668e64 (0x1 of 0x4): reviewed, harmless
 0x00668f3c AviSoundBytesPerFrame (0x4 of 0x8): reviewed, harmless
-0x00668fb8 DAT_00668fb8 (0x4 of 0x8): reviewed, harmless
-0x00669098 DAT_00669098 (0x4 of 0x108): reviewed, harmless
+0x00668fb8 ActiveMoviePool (0x4 of 0x8): reviewed, harmless
+0x00669098 NextScriptSectionId (0x4 of 0x108): reviewed, harmless
 0x006691b4 SavedElementCount (0x4 of 0x8): reviewed, harmless
-0x00669258 DAT_00669258 (0x1200 of 0x1204): reviewed, harmless
+0x00669258 PathVisitedBits (0x1200 of 0x1204): reviewed, harmless
 0x00799230 MusicSegments (0x8c of 0x9ec): reviewed, harmless
-0x00799c1c DAT_00799c1c (0x8c of 0x9ec): reviewed, harmless
+0x00799c1c MusicFileData (0x8c of 0x9ec): reviewed, harmless
 0x0079ac20 SpeechRawBuffer (0x10000 of 0x10004): reviewed, harmless
 0x007aac24 SpeechConvertedUsed (0x4 of 0x1c): reviewed, harmless
 0x007cad4c DMusicSoundBuffer (0x4 of 0x14): reviewed, harmless
@@ -78,16 +78,16 @@
 0x0080ffa0 CurrentProfile (0x110 of 0x120): reviewed, harmless
 0x00810160 QueryCursor (0x1834 of 0x1840): reviewed, harmless
 0x008139cc MapViewY (0x4 of 0x14): reviewed, harmless
-0x00813b08 DAT_00813b08 (0x4 of 0x18): reviewed, harmless
+0x00813b08 CurrentBlokeLetter (0x4 of 0x18): reviewed, harmless
 0x00814020 ColourLookupTable (0x8000 of 0x8008): reviewed, harmless
-0x0081ce00 DAT_0081ce00 (0xc1a0 of 0xc1e0): reviewed, harmless
-0x00829a80 DAT_00829a80 (0x14 of 0x3c): reviewed, harmless
+0x0081ce00 FreeSpotCursors (0xc1a0 of 0xc1e0): reviewed, harmless
+0x00829a80 CastleCoasterFootprint (0x14 of 0x3c): reviewed, harmless
 0x00829ba8 DAT_00829ba8 (0x10 of 0x44): reviewed, harmless
-0x00829c34 DAT_00829c34 (0x4 of 0x20): reviewed, harmless
-0x00829c54 DAT_00829c54 (0x4 of 0xc): reviewed, harmless
+0x00829c34 CastleDummyRide (0x4 of 0x20): reviewed, harmless
+0x00829c54 CoasterShadeTableData (0x4 of 0xc): reviewed, harmless
 0x0082c6e0 DAT_0082c6e0 (0x1834 of 0x1840): reviewed, harmless
 0x0082df20 DAT_0082df20 (0x1834 of 0x1840): reviewed, harmless
-0x004e3870 DAT_004e3870 (0x96000 of 0x96008): depth buffer, cleared with exactly 0x96000 bytes; the rest is padding
+0x004e3870 CoasterDepthBufferData (0x96000 of 0x96008): depth buffer, cleared with exactly 0x96000 bytes; the rest is padding
 # Overlaps (a global declared bigger than its space in the original), reviewed 2026-10-04: the code never
 # reaches the following global through it, so the port's extra size is unused space.
 overlap:0x004b4140 Helicopter_SFX: Load_FXList(.., 4) uses 4 entries of 12 bytes = the original 0x30
@@ -98,32 +98,32 @@ overlap:0x004b4830 FlumeStages_004b4830: as above
 overlap:0x004b51d8 DAT_004b51d8: indexed (x & 0xf) * 2 + 1, at most 0x80 bytes
 overlap:0x004b7750 DAT_004b7750: an 8-byte AnimLayout, only its address is compared
 overlap:0x004d8bb0 DAT_004d8bb0: the empty string, only read
-overlap:0x0060f914 DAT_0060f914: entries filled up to a data-dependent count; the original's neighbour would be overwritten by the same overflow
+overlap:0x0060f914 CastleTrackCells: entries filled up to a data-dependent count; the original's neighbour would be overwritten by the same overflow
 overlap:0x00615f70 DAT_00615f70: material table never written (zero); reaching +0x10 needs a second material
 overlap:0x00643ee8 DAT_00643ee8: vertex buffer, data-dependent count as in the original
 overlap:0x00667d70 DDRAWENV: the original's CheckHostSystemGPU also zeroes the globals after it (0x3d8 bytes); called once at startup, when they are zero anyway
-overlap:0x0081c0c0 DAT_0081c0c0: image sizes indexed by image count, data-dependent as in the original
-codeptr:0x004b5648 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
-codeptr:0x004b564c rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
-codeptr:0x004b5658 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
-codeptr:0x004b565c rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
-codeptr:0x004b5f50 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
-codeptr:0x004b5f54 rasterizer filler table, used only by the inline-asm draw functions (FUN_00420810/a20/c40, FUN_004234e0) the port rewrote in C: reviewed, harmless
+overlap:0x0081c0c0 TextureSizes: image sizes indexed by image count, data-dependent as in the original
+codeptr:0x004b5648 rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
+codeptr:0x004b564c rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5658 rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
+codeptr:0x004b565c rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5f50 rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
+codeptr:0x004b5f54 rasterizer filler table, used only by the inline-asm draw functions (DrawLmsFlatTriangles/a20/c40, DrawEdgeMeshTriangles) the port rewrote in C: reviewed, harmless
 0x0082add0 CoasterTrainCarLms (0xc of 0x10): car type is 0..2; the fourth word is padding: reviewed, harmless
 indexed:0x004b42c4 sign table of FUN_00404630 (copters), inline asm the port rewrote with its own tables: reviewed, harmless
 indexed:0x004b7b04 sign table of FUN_00441980 (render3d), inline asm the port rewrote with its own tables: reviewed, harmless
 indexed:0x004cbef8 LoadSafariRide: port lists the globals explicitly (47661c1): reviewed, harmless
-indexed:0x004cbf04 LoadSafariRide: port reads DAT_004cbf08 for index 1 (47661c1): reviewed, harmless
+indexed:0x004cbf04 LoadSafariRide: port reads SafariRiderSprite for index 1 (47661c1): reviewed, harmless
 indexed:0x004cbfcc temple slide load: port reads ZTempSlideSprite for index 1 (int + pointer, not one array): reviewed, harmless
-indexed:0x00610a18 lego_sqrtf_init: port writes sqrtf_table directly (7fe1f7b): reviewed, harmless
-indexed:0x00610a1c lego_sqrtf_init: port writes sqrtf_table directly (7fe1f7b): reviewed, harmless
-indexed:0x006160bc carousel load: port reads DAT_006160c0 for index 1 (ride + sprite, not one array): reviewed, harmless
-indexed:0x0062fe94 LoadZoomer: port reads DAT_0062fe98 for index 1 (47661c1): reviewed, harmless
-indexed:0x008139e0 FUN_00455fc0: port lists the eleven bubble-help sprites explicitly (47661c1): reviewed, harmless
+indexed:0x00610a18 lego_rsqrtf_init: port writes rsqrtf_mantissa_table directly (7fe1f7b): reviewed, harmless
+indexed:0x00610a1c lego_rsqrtf_init: port writes rsqrtf_mantissa_table directly (7fe1f7b): reviewed, harmless
+indexed:0x006160bc carousel load: port reads CarouselRiderSprite for index 1 (ride + sprite, not one array): reviewed, harmless
+indexed:0x0062fe94 LoadZoomer: port reads PlaneRideRiderSprite for index 1 (47661c1): reviewed, harmless
+indexed:0x008139e0 HTBubbleHelpWithMood: port lists the eleven bubble-help sprites explicitly (47661c1): reviewed, harmless
 0x004b7ac0 BlokeColours (0x18 of 0x20): reviewed, harmless (8 RGB triples, then alignment padding before DAT_004b7ae0)
 0x007fe9c0 PointerSprites (0x24 of 0x50): reviewed, harmless (the 9 cursors debug.c loads; SetPointer indexes only those)
 0x00799258 MusicTransitionSegments (0x64 of 0x9c4): reviewed, harmless (the 5x5 theme-to-theme transitions; every index is [theme][theme] with themes 0-4)
-0x004dcbd0 DAT_004dcbd0 (0x2c of 0x30): reviewed, harmless - struct VecMath is 11 words, FUN_00421540 copies exactly those; 0x004dcbfc is never used
+0x004dcbd0 VecMathOps (0x2c of 0x30): reviewed, harmless - struct VecMath is 11 words, InitVecMath copies exactly those; 0x004dcbfc is never used
 0x007aac40 SpeechAcmHeader (0x54 of 0x60): reviewed, harmless - struct AcmHdr is ACMSTREAMHEADER (cbStruct = sizeof, 0x54 on x86); the original's 0xc bytes after it are never used
 0x004b86e0 LegoFontName (0x5 of 0x8): reviewed 2026-10-17, harmless: the string "Lego", the rest is the next string's alignment
 0x004bcd28 ResourceOpenErrorFormat (0x1b of 0x1c): reviewed 2026-10-17, harmless: a string and its alignment byte

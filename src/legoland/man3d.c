@@ -29,180 +29,17 @@ struct Mesh {
 // Loads a .pos animation file: two counts (frames per entry, entries), then for every frame a
 // position (3 floats) and a 3x3 matrix (9 floats). Each matrix is turned 90 degrees about Y
 // (BuildYRotationMatrix(pi/2) * mat) as it is loaded. Scale fields start at 1.0, offsets at 0.
-//
-// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
-// each asm block is commented with the C it implements. Why asm: the C was at best 66.91%; MSVC6
-// strength-reduces the frame pointer to &f->mat differently and only a volatile got it that far.
-// With the asm matching, the C below is the plain version (no volatile).
-// clang-format off
-#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x0043f660
-__declspec(naked) LEGO_EXPORT struct Position *LoadPos(const char *path) {
-    __asm {
-        // Frame after the prologue: [esp+0x10] j, [esp+0x14] pos, [esp+0x18] i, [esp+0x1c] rot[3][3],
-        // [esp+0x40] tmp[3][3]; the `path` slot [esp+0x68] is reused as the matrix row counter.
-        // Register use: edi = file, esi = pos, ebx = i, ebp = &f->mat of the current frame.
-        sub esp, 0x54
-        mov eax, dword ptr [esp + 0x58] // path
-        push ebx
-        push ebp
-        push esi
-        push edi
-        // file = RES_OpenFile(path); pos = malloc(sizeof(struct Position));
-        push eax
-        call RES_OpenFile
-        push 0x28 // sizeof(struct Position)
-        mov edi, eax
-        call malloc
-        mov esi, eax
-        // pos->field_8 = pos->field_c = pos->field_10 = 1.0f; pos->field_14 = pos->field_18 = 0;
-        // RES_ReadFile(file, &pos->count_inner, 4);
-        push 4
-        mov eax, 0x3f800000 // 1.0f
-        xor ebx, ebx
-        push esi // &pos->count_inner
-        push edi
-        mov dword ptr [esp + 0x28], esi // remember pos
-        mov dword ptr [esi + 8], eax
-        mov dword ptr [esi + 0xc], eax
-        mov dword ptr [esi + 0x10], eax
-        mov dword ptr [esi + 0x14], ebx
-        mov dword ptr [esi + 0x18], ebx
-        call RES_ReadFile
-        // RES_ReadFile(file, &pos->count, 4);
-        lea ebp, [esi + 4] // &pos->count
-        push 4
-        push ebp
-        push edi
-        call RES_ReadFile
-        // pos->entries = malloc(pos->count * sizeof(struct PosFrame *));
-        mov ecx, dword ptr [ebp]
-        shl ecx, 2
-        push ecx
-        call malloc
-        mov dword ptr [esi + 0x24], eax // pos->entries
-        mov eax, dword ptr [ebp]
-        add esp, 0x24
-        // for (i = 0; i < pos->count; i++) {
-        mov dword ptr [esp + 0x18], ebx
-        test eax, eax
-        jle close_file
-    next_entry:
-        //     pos->entries[i] = malloc(pos->count_inner * sizeof(struct PosFrame));  (0x30 bytes each)
-        mov eax, dword ptr [esi] // pos->count_inner
-        lea edx, [eax + eax * 2]
-        shl edx, 4
-        push edx
-        call malloc
-        mov ecx, dword ptr [esi + 0x24]
-        add esp, 4
-        mov dword ptr [esp + 0x10], 0 // j = 0
-        mov dword ptr [ecx + ebx * 4], eax
-        //     for (j = 0, f = pos->entries[i]; j < pos->count_inner; j++, f++) {
-        mov edx, dword ptr [esi + 0x24]
-        mov eax, dword ptr [esi]
-        mov ebp, dword ptr [edx + ebx * 4] // f
-        test eax, eax
-        jle entry_done
-        add ebp, 0xc // ebp = &f->mat
-    next_frame:
-        //         RES_ReadFile(file, &f->pos[0], 4); ... &f->pos[1] ... &f->pos[2]
-        lea eax, [ebp - 0xc]
-        push 4
-        push eax
-        push edi
-        call RES_ReadFile
-        lea esi, [ebp - 4]
-        push 4
-        lea ecx, [esi - 4]
-        push ecx
-        push edi
-        call RES_ReadFile
-        push 4
-        push esi
-        push edi
-        call RES_ReadFile
-        add esp, 0x24
-        //         read the nine matrix floats: for (row = 3; row; row--) for (col = 3; col; col--) RES_ReadFile(file, walk++, 4);
-        mov esi, ebp // esi = walk
-        mov dword ptr [esp + 0x68], 3 // row
-    next_row:
-        mov ebx, 3 // col
-    next_col:
-        push 4
-        push esi
-        push edi
-        call RES_ReadFile
-        add esp, 0xc
-        add esi, 4
-        dec ebx
-        jne next_col
-        mov eax, dword ptr [esp + 0x68]
-        dec eax
-        mov dword ptr [esp + 0x68], eax
-        jne next_row
-        //         BuildYRotationMatrix(1.5707963f, rot);
-        lea edx, [esp + 0x1c] // rot
-        push edx
-        push 0x3fc90fda // 1.5707963f (pi / 2)
-        call BuildYRotationMatrix
-        //         MatrixMultiply(rot, f->mat, tmp);
-        lea eax, [esp + 0x48] // tmp
-        lea ecx, [esp + 0x24] // rot
-        push eax
-        push ebp
-        push ecx
-        call MatrixMultiply
-        //         CopyMatrix(tmp, f->mat);
-        lea edx, [esp + 0x54] // tmp
-        push ebp
-        push edx
-        call CopyMatrix
-        mov ecx, dword ptr [esp + 0x30] // pos
-        mov eax, dword ptr [esp + 0x2c] // j
-        add esp, 0x1c
-        inc eax
-        mov edx, dword ptr [ecx] // pos->count_inner
-        add ebp, 0x30 // f++
-        cmp eax, edx
-        mov dword ptr [esp + 0x10], eax
-        jl next_frame
-        //     }
-        mov ebx, dword ptr [esp + 0x18] // i
-        mov esi, ecx // pos
-    entry_done:
-        mov eax, dword ptr [esi + 4] // pos->count
-        inc ebx
-        cmp ebx, eax
-        mov dword ptr [esp + 0x18], ebx
-        jl next_entry
-        // }
-    close_file:
-        // RES_CloseFile(file); return pos;
-        push edi
-        call RES_CloseFile
-        add esp, 4
-        mov eax, esi
-        pop edi
-        pop esi
-        pop ebp
-        pop ebx
-        add esp, 0x54
-        ret
-    }
-}
-// clang-format on
-#else
 LEGO_EXPORT struct Position *LoadPos(const char *path) {
     struct ResFile *file;
     struct Position *pos;
-    struct PosFrame *f;
-    float *walk;
+    struct PosFrame *frames;
     float rot[3][3];
     float tmp[3][3];
     int i;
     int j;
-    int k;
+    int row;
+    int col;
 
     file = RES_OpenFile(path);
     pos = (struct Position *)malloc(sizeof(struct Position));
@@ -216,24 +53,24 @@ LEGO_EXPORT struct Position *LoadPos(const char *path) {
     pos->entries = (struct PosFrame **)malloc(pos->count * sizeof(struct PosFrame *));
     for (i = 0; i < pos->count; i++) {
         pos->entries[i] = (struct PosFrame *)malloc(pos->count_inner * sizeof(struct PosFrame));
-        f = pos->entries[i];
-        for (j = 0; j < pos->count_inner; j++, f++) {
-            RES_ReadFile(file, &f->pos[0], 4);
-            RES_ReadFile(file, &f->pos[1], 4);
-            RES_ReadFile(file, &f->pos[2], 4);
-            walk = &f->mat[0][0];
-            for (k = 0; k < 9; k++) {
-                RES_ReadFile(file, walk++, 4);
+        frames = pos->entries[i];
+        for (j = 0; j < pos->count_inner; j++) {
+            RES_ReadFile(file, &frames[j].pos[0], 4);
+            RES_ReadFile(file, &frames[j].pos[1], 4);
+            RES_ReadFile(file, &frames[j].pos[2], 4);
+            for (row = 0; row < 3; row++) {
+                for (col = 0; col < 3; col++) {
+                    RES_ReadFile(file, &frames[j].mat[row][col], 4);
+                }
             }
             BuildYRotationMatrix(1.5707963f, &rot[0][0]);
-            MatrixMultiply(&rot[0][0], &f->mat[0][0], &tmp[0][0]);
-            CopyMatrix((struct Matrix3x3 *)&tmp[0][0], (struct Matrix3x3 *)&f->mat[0][0]);
+            MatrixMultiply(&rot[0][0], &frames[j].mat[0][0], &tmp[0][0]);
+            CopyMatrix((struct Matrix3x3 *)&tmp[0][0], (struct Matrix3x3 *)&frames[j].mat[0][0]);
         }
     }
     RES_CloseFile(file);
     return pos;
 }
-#endif
 
 // FUNCTION: LEGOLAND 0x0043f7d0
 LEGO_EXPORT void UnloadPos(struct Position *pos) {

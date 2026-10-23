@@ -219,8 +219,8 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct P
         } else {
             cell = (struct MapCell *)&GameMap[pos->y][pos->x];
         }
-        DAT_004b8320.x = (cell->src.b.byte_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
-        DAT_004b8320.y = ((unsigned int)(entrance->footprint.v[3] - entrance->footprint.v[1]) >> 1) * 0x100 +
+        ParkExitPos.x = (cell->src.b.byte_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
+        ParkExitPos.y = ((unsigned int)(entrance->footprint.v[3] - entrance->footprint.v[1]) >> 1) * 0x100 +
             (cell->src.b.byte_5 + entrance->footprint.v[1]) * 0x100;
     }
     ScriptDirtyCategories = ScriptDirtyCategories | 1;

@@ -25,3 +25,16 @@
 
 - Find a source form that makes MSVC keep a fresh frame slot instead of reusing the `dx` parameter slot (e.g. take the
   address of a value that is still live in the original, or compute `dx`/`dy` into the loop bounds differently).
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 87.80%. Matching has to come from C now.
+
+## 2026-10-19 Opus 5.5: 87.80% -> 100% in plain C
+
+The offset is one `struct Point` passed by value: `int IsFootprintClear(struct Point off)`, and the only caller
+passes its `pt` (it was `IsFootprintClear(pt.x, pt.y)`). MSVC6 never packs a local into a struct argument's slot,
+so `idx` gets the fresh frame slot (`push ecx`) the original has, and everything else falls into place.
+Lesson: when ours puts a local into a dead parameter slot and the original doesn't, check whether the
+parameters are really a struct passed by value (look at the callers).

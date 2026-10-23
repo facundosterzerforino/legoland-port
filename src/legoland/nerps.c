@@ -77,7 +77,7 @@ unsigned int ScriptEventFeature(struct ObjectiveEvent *arg) {
 }
 
 // GLOBAL: LEGOLAND 0x004b7e38
-void (*PTR_FUN_004b7e38[25])(unsigned int, unsigned int) = {
+void (*ReportGoalSetters[25])(unsigned int, unsigned int) = {
     (void (*)(unsigned int, unsigned int))FUN_004443b0,
     (void (*)(unsigned int, unsigned int))FUN_004443e0,
     (void (*)(unsigned int, unsigned int))FUN_00444410,
@@ -108,7 +108,7 @@ void (*PTR_FUN_004b7e38[25])(unsigned int, unsigned int) = {
 // FUNCTION: LEGOLAND 0x0046a140
 void CallReportHandler(int index, unsigned int param_2, unsigned int param_3) {
     if (index >= 0 && index < 0x19) {
-        PTR_FUN_004b7e38[index](param_3, param_2);
+        ReportGoalSetters[index](param_3, param_2);
     }
 }
 

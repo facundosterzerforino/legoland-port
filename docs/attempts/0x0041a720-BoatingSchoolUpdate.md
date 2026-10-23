@@ -2,6 +2,9 @@
 
 **Best: 96.58%**. Kind: C.
 
+Current checkout verified at **94.41% on 2026-10-18**; the historical best above
+is not the current baseline.
+
 ## What still differs
 
 - Register choice after the bloke-count check in `case 0`: the original increments `bloke_count` through `edx` and loads `BoatingSchoolRide` into `edx` for the removal call; ours uses `ecx` and `eax`. The `eax` load is a 5-byte short form, so the function is 1 byte shorter and every later jump displacement shows as a diff.
@@ -18,6 +21,7 @@
 | 2026-10-07 p4 | Haiku agent | Swapped `field_73` and `low_level_action` stores in case 0 | 94.41% (no change) |
 | 2026-10-08 | permuter + Opus 5.5 | `unsigned int slot`; case 1 condition split into two nested ifs | 94.41 -> 96.58 |
 | 2026-10-09 | Opus 5.5 | all 6 orders of `param_action++` / `source2.type = 1` / `source2.bloke = bloke` | 95.53-96.09 (current order best; type-first puts the store before NewDirForAction's cleanup) |
+| 2026-10-18 | Codex | Recheck case-1 nesting against the current checkout: four nested conditions, early-break guards (all, outer pair, or inner pair), reversed outer tests, split inner tests; signed/unsigned slot | Standalone baseline 96.09%; 12 variants 95.25-96.09%, no gain. Source unchanged; full build remains 94.41% |
 
 ## Ideas not tried yet
 

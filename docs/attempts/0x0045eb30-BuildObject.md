@@ -23,3 +23,11 @@
 - Declare `packed` as a plain `unsigned short` (or `TileId` built via a temp) so its slot choice changes.
 - Swap the `coords[0]`/`coords[1]` byte loads to a single struct copy from `coords`.
 - Change the `FindMapPathAStar` argument expressions so `out.x`/`out.y` are read through `effect` first.
+
+## 2026-10-21 (Opus 5.5): still 96.81
+The original stores `packed` in the dead `editObj` parameter slot ([esp+0x20] after 5 pushes); ours uses
+the `coords` slot, so every other slot moves by 4.
+| Change | Result |
+|---|---|
+| all 120 declaration orders | 96.81 |
+| obj before packed; y before x; no casts; packed built late / block-scoped in the 0x80000 branch | 73.89-96.81 |

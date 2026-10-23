@@ -25,3 +25,11 @@ MSVC does not seem to care about declaration order for these slots (the `file`/`
 - Check whether the nested blocks (`n/idx/objpos` and `prev/carry/hibit/runlen/rle`) take slots that
   overlap in the original; hoisting them to the top changes the frame size, so compare the frame first.
 - Check whether `hdr[200]` / `strbuf` / `namebuf` ordering or size (512 vs another size) moves the scalars.
+
+## 2026-10-21 (Opus 5.5): still 96.71 harness / 97.17 verify
+Frame is the same size (0x524). The original reuses slot [esp+0x40] for an address-taken local and later
+for a compiler temporary in the tile loop; ours gives the temporary its own slot, shifting six slots by 8.
+| Change | Result |
+|---|---|
+| 295 random declaration orders of the 20 locals | 96.71 (layout ignores declaration order) |
+| n/idx block-scoped in the first loop (frame shrinks to 0x51c); separate block-scoped pos per loop | 89.88-92.51 |

@@ -446,8 +446,6 @@ void RenderDrivingSchool(Element *obj, unsigned int param_2, unsigned int param_
 void DrivingSchoolUpdate(Element *obj) {
     int tile_id;
     int ride_y0;
-    struct Bloke *rider;
-    struct Bloke *rider2;
     unsigned int ride_y3;
     int ride_x0;
     int flags;
@@ -455,7 +453,7 @@ void DrivingSchoolUpdate(Element *obj) {
     int ride_x3;
     struct Ride *ride = obj->ride;
     struct RideNode *node = ride->riders;
-    register struct RideNode *next;
+    struct RideNode *next;
     struct Bloke *bloke;
     struct SampleSource source;
     struct SampleSource source2;
@@ -468,9 +466,7 @@ void DrivingSchoolUpdate(Element *obj) {
     UpdateDrivingSchoolCars();
     UpdateTrafficLights();
     while (node) {
-        rider2 = node->rider;
-        rider = rider2;
-        bloke = rider;
+        bloke = node->rider;
         next = node->next;
         if (0 == bloke->low_level_action) {
             switch (bloke->param_action) {
@@ -482,7 +478,7 @@ void DrivingSchoolUpdate(Element *obj) {
                 bloke->dest.y = (tile_y - 3 + ride_y0) << 8;
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = 0x10 + move;
+                bloke->target_dir = 0x10 + move;
                 NewDirForAction(bloke, ((unsigned char)(move + 0x10) >> 5) + 3);
                 bloke->field_58 = (rand() & 7) + 1;
                 bloke->param_action++;
@@ -491,7 +487,8 @@ void DrivingSchoolUpdate(Element *obj) {
                 if (!bloke->field_58) {
                     tile_id = node->tile.id;
                     count = CountNewBlokesWithId(tile_id);
-                    if (5 * count < (int)CountRoadEntriesWithId(node->tile.id)) {
+                    /* The original compares the weighted rider count as a signed value (jge). */
+                    if ((int)(5 * count) < (int)CountRoadEntriesWithId(node->tile.id)) {
                         res = AddDrivingSchoolCar(node->tile.id, bloke);
                         if (0 == res) {
                             source.type = 1;
@@ -502,8 +499,10 @@ void DrivingSchoolUpdate(Element *obj) {
                             AdjustPSampleFreq(sample, 10);
                             BlokeSitAnim(bloke);
                             BlokeSetFrame(bloke, 0);
-                            bloke->flags = bloke->flags | 0x80;
+                            /* Advance the state before setting flag 0x80: MSVC6 then
+                             * schedules this load/increment and flag update as in the original. */
                             bloke->param_action++;
+                            bloke->flags = bloke->flags | 0x80;
                         } else if (res == -1) {
                             bloke->param_action = 3;
                         } else if (res == -2) {
@@ -519,21 +518,18 @@ void DrivingSchoolUpdate(Element *obj) {
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
                 bloke->pos.x = (node->tile.pos.x + ride->x) << 8;
-                ride_y3 = ride->y;
-                bloke->pos.y = (node->tile.pos.y - 3 + ride_y3) << 8;
-                ride_x3 = ride->x;
-                bloke->dest.x = ((node->tile.pos.x + ride_x3) << 8) + 0x80;
+                bloke->pos.y = (node->tile.pos.y - 3 + ride->y) << 8;
+                bloke->dest.x = ((node->tile.pos.x + ride->x) << 8) + 0x80;
                 bloke->dest.y = ((node->tile.pos.y + ride->y) << 8) + 0x80;
                 move = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = move + 0x10;
+                bloke->target_dir = move + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(move + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 4:
                 RemoveBlokeFromRide(ride, node);
-                flags = bloke->flags;
-                bloke->flags = flags & 0xfff7;
+                bloke->flags &= 0xfff7;
                 source2.type = 1;
                 source2.bloke = bloke;
                 KillAllSamplesFromSource(&source2);

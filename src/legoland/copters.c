@@ -838,9 +838,9 @@ void CoptersUpdate(struct Element *elem) {
             case 10:
                 b->dest.x = (x << 8) + 0x80;
                 b->dest.y = (y << 8) + 0x80;
-                b->field_73 = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
+                b->target_dir = CalcMoveLine(b->pos, b->dest, &b->nav) + 0x10;
                 b->low_level_action = 7;
-                NewDirForAction(b, (unsigned char)((b->field_73 >> 5) + 3));
+                NewDirForAction(b, (unsigned char)((b->target_dir >> 5) + 3));
                 b->param_action++;
                 break;
             case 11:

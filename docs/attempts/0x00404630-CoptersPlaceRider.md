@@ -24,3 +24,22 @@
 ## Ideas not tried yet
 
 - Get `entry` spilled to `[ebp+8]` without reusing `node` (maybe an inner block, or a second pointer local).
+
+## 2026-10-19 agent notes (81.61% -> 82.76%)
+
+The jump table showed the case bodies were attached to the wrong `index` values: the original sends index 0 to
+layer 3 (y offset 0xd7), 1 to layer 0 (0xeb), 2 to layer 4 (0xe1), 3 to layer 1 (0xe6) and 4 to layer 2 (0xe6),
+and its case bodies are laid out in layer order, so the source listed them as `case 1, case 3, case 4, case 0,
+case 2`. Fixed (this was also a behaviour bug: riders were placed on the wrong layer).
+
+Still different: the p1 store after GetRenderOffsetForLayer (volatile kept), the operand order of two of the
+six products in the cross product `mat[2] = mat[1] x mat[0]` (MSVC6 picks the order itself: swapping the
+source operands, writing it with row pointers, without the `frame` local or as `m = ...mat` changes nothing or
+makes it worse), and eax/ecx swapped for the j offset in the fixed-point loop.
+
+| Change | Harness |
+|---|---|
+| operands of every product swapped / cross written as b x a | 81.55 (no change) |
+| row pointers a, b, c | 80.36 |
+| `float (*m)[3]` local | 73.81 |
+| no `frame` local (full expression each time) | 53.49 |

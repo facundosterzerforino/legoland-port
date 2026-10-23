@@ -1,19 +1,19 @@
 # Findings of tools/audit_null.py: places that set a pointer to NULL and then use it.
 # Baseline 2026-10-04 (70 uses, not reviewed one by one): since -fno-delete-null-pointer-checks each one
 # faults like the original instead of corrupting memory. One that shows up in a crash trace is reached in play.
-bloke.c:FUN_00483260 baseline
-bloke.c:FUN_00483300 baseline
-bloke.c:FUN_00484790 baseline
+bloke.c:StartPassThroughTile baseline
+bloke.c:CheckPassThroughTile baseline
+bloke.c:BlokeActionPassThroughTile baseline
 bloke.c:HandleTileEnterLeave baseline
 bloke_ai.c:FUN_0044f360 baseline
 bloke_ai.c:PutBlokeOnRide baseline
 bloke_ai.c:BlokeAIWander baseline
-bloke_ai.c:FUN_0044fe80 baseline
+bloke_ai.c:BlokeAIGoToBrolly baseline
 boating_school.c:BoatingSchoolWaterDCalcCursor baseline
 boating_school.c:BoatingSchoolWaterRemoveObject baseline
-boating_school.c:FUN_0041c4c0 baseline
+boating_school.c:AddBoatPathTile baseline
 bricks.c:FUN_00457a70 baseline
-gamemain.c:FUN_004777f0 baseline
+gamemain.c:GetPathNodeAt baseline
 gamemain.c:FindMapPathAStar baseline
 gamemap.c:AddObjectsPowerStats baseline
 gamemap.c:CalculateMapRenderOrder baseline
@@ -50,5 +50,5 @@ worker.c:Mechanics_Repair baseline
 worker.c:PutWorkerOnRide baseline
 worker_mouse.c:FUN_00470270 baseline
 worker_mouse.c:FUN_004704b0 baseline
-castle.c:FUN_004273e0 reviewed 2026-10-14: the seat is read before FUN_004215b0 clears it (same as the original)
+castle.c:TakeTrainSeatOccupant reviewed 2026-10-14: the seat is read before UnseatCastleVisitor clears it (same as the original)
 llidb.c:LLIDB_LoadTSFData reviewed 2026-10-15: element->data is filled by LLIDB_LoadData(element) on the line before (the analyzer links it to LLIDB_UnloadElementData setting head->data = NULL)

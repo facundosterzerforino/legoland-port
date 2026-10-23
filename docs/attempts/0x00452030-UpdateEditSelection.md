@@ -1,12 +1,12 @@
-# FUN_00452030 (0x00452030, `src/legoland/controller.c`)
+# UpdateEditSelection (0x00452030, `src/legoland/controller.c`)
 
-**Best: 57.36%** (round 2 version (edit cursor / selection rectangle)). Kind: C.
+**Best: 100.00%** (matched 2026-10-19). Kind: C.
 
-## What still differs
+## How it matched
 
-- The 0x800 path reloads all four globals after the merge point; the original only reloads `edi` and keeps the rest in registers.
-- Register assignment and branch layout in the `EditMode.unk0 == 2` block; the min/max stores are in a different order.
-- The footprint-width branch around `0x4520e3` (`test edx,edx; je`) is laid out differently. The tail after the cursor-field stores has not been compared yet.
+- `DAT_00813a84..90` are one rectangle: typed as `struct MapRect SelectionRect` (x0, y0, x1, y1) and stored in natural order. With four separate ints MSVC keeps the store order reversed; with the struct the natural order matches.
+- Body from the 2026-10-09 natural-order version (`decomp-rw/0x00452030/land.c`).
+- `extern struct MapRect SelectionRect;` is declared in `controller.h`, NOT appended to `globals.h`: appending it there drops `MusicThreadProc` (0x492db0, sound_sfx.c, unrelated) from 100% to 99.89% (register scheduling shift).
 
 ## Tried (don't repeat)
 
@@ -24,8 +24,6 @@
 | 2026-10-08 | permuter + Opus 5.5 | local_c / iVar5 declaration order swapped (for the swapped [esp+0x18]/[esp+0x1c] slots) | 57.36 (no change) |
 | 2026-10-09 | Opus 5.5 | DAT_00813a84..90 stores in natural order a84, a88, a8c, a90 (the original order) in both arms | 74.36 (store order right, but min/max registers all shift; the reversed order was compensating). The four globals are a rect |
 | 2026-10-09 | Opus 5.5 | permuter 12 min (about 180-270 variants) | no gain |
-
-## Ideas not tried yet
-
-- Retype `DAT_00813a74..DAT_00813a90` to `int` in globals.h instead of the casts (touches other TUs: check them).
-- Work through the EditMode == 2 block and the tail.
+| 2026-10-19 | Opus 5.5 | 81 local variants of the reversed-order version | best 98.16% (2/272 instr: FootprintHeight load vs `repe cmpsd`) |
+| 2026-10-19 | Opus 5.5 | a84..a90 -> `struct MapRect SelectionRect`, natural store order, extern at end of globals.h | 100% but MusicThreadProc 100 -> 99.89 (rejected) |
+| 2026-10-19 | Opus 5.5 | same, extern moved to controller.h | **100%, 0 regressions (kept)** |

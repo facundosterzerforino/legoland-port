@@ -82,133 +82,16 @@ int LoadCurrency(void) {
 // Can the object being placed (EditMode.unk8) go at offset (dx, dy)? Every tile under its footprint
 // must be on the map, carry none of the blocking flags 0x8f8, and if it holds an object
 // (field_12), the object being placed must be the PATH CONTROL element. Returns 1 if so, else 0.
-//
-// MSVC6 build: exact naked __asm transcription; the C in the #else branch is the same function and
-// each asm block is commented with the C it implements (struct offsets are named in the comments).
-// Why asm: the C is at best 87.80% because of frame layout only (the original gives `idx` a fresh
-// stack slot, MSVC6 reuses the dead `dx` parameter slot for it) and the register picks that follow;
-// six scope/initialiser/local variants were tried. See docs/attempts/0x00457970-IsFootprintClear.md.
-// clang-format off
-#if defined(_MSC_VER) && (_MSC_VER <= 1200) && defined(_M_IX86)
 // FUNCTION: LEGOLAND 0x00457970
-__declspec(naked) int IsFootprintClear(int dx, int dy) {
-    __asm {
-        // [esp + 0x10] (after the pushes) is `idx`, the PATH CONTROL element LLIDB_FindElement returns.
-        // ride = EditMode.unk8; dx += ride->footprint.x0; dy += ride->footprint.y0;
-        push ecx
-        mov eax, dword ptr [EditMode + 0x8] // EditMode.unk8
-        push ebx
-        mov ebx, dword ptr [esp + 0xc] // ebx = dx
-        push ebp
-        mov edx, dword ptr [eax + 0x40] // ride->footprint.y0
-        push esi
-        mov esi, dword ptr [eax + 0x3c] // ride->footprint.x0
-        mov eax, dword ptr [FootprintHeight]
-        add ebx, esi
-        mov esi, dword ptr [esp + 0x18] // dy
-        add esi, edx
-        push edi
-        add eax, esi
-        mov dword ptr [esp + 0x1c], esi // dy written back to its slot
-        // for (y = dy; y < dy + FootprintHeight; y++)   (ebp = y)
-        cmp esi, eax
-        mov ebp, esi
-        jge clear
-        mov ecx, dword ptr [FootprintWidth]
-        mov edx, dword ptr [lpConfig]
-    next_row:
-        // for (x = dx; x < dx + FootprintWidth; x++)   (edi = x, esi = x * sizeof(struct MapElement))
-        lea eax, [ecx + ebx]
-        mov edi, ebx
-        cmp ebx, eax
-        jge row_done
-        lea esi, [ebx + ebx * 4]
-        shl esi, 2
-    next_tile:
-        // elem = on the map ? &GameMap[y][x] : NULL; if (elem == NULL) return 0;
-        test esi, esi
-        jl blocked
-        xor eax, eax
-        mov ax, word ptr [edx + 0x14] // lpConfig->width
-        cmp edi, eax
-        jge blocked
-        test ebp, ebp
-        jl blocked
-        xor eax, eax
-        mov ax, word ptr [edx + 0x16] // lpConfig->height
-        cmp ebp, eax
-        jge blocked
-        mov eax, dword ptr [GameMap]
-        mov eax, dword ptr [eax + ebp * 4]
-        add eax, esi
-        je blocked
-        // if (elem->flags & 0x8f8) return 0;
-        test word ptr [eax + 0xc], 0x8f8
-        jne blocked
-        // if (elem->field_12 != 0) {
-        //     LLIDB_FindElement("PATH CONTROL", &idx, 0);
-        //     if (EditMode.unk8->element != idx) return 0;
-        // }
-        cmp word ptr [eax + 0x12], 0
-        je tile_ok
-        lea ecx, [esp + 0x10] // &idx
-        push 0
-        push ecx
-        push offset PathControlName
-        call LLIDB_FindElement
-        mov edx, dword ptr [EditMode + 0x8]
-        mov ecx, dword ptr [esp + 0x1c] // idx
-        add esp, 0xc
-        mov eax, dword ptr [edx + 0xc4] // EditMode.unk8->element
-        cmp eax, ecx
-        jne blocked
-        mov ecx, dword ptr [FootprintWidth]
-        mov edx, dword ptr [lpConfig]
-    tile_ok:
-        inc edi
-        lea eax, [ecx + ebx]
-        add esi, 0x14 // next MapElement
-        cmp edi, eax
-        jl next_tile
-        mov esi, dword ptr [esp + 0x1c] // dy
-    row_done:
-        mov eax, dword ptr [FootprintHeight]
-        inc ebp
-        add eax, esi
-        cmp ebp, eax
-        jge clear
-        jmp next_row
-    blocked:
-        // return 0;
-        pop edi
-        pop esi
-        pop ebp
-        xor eax, eax
-        pop ebx
-        pop ecx
-        ret
-    clear:
-        // return 1;
-        pop edi
-        pop esi
-        pop ebp
-        mov eax, 1
-        pop ebx
-        pop ecx
-        ret
-    }
-}
-// clang-format on
-#else
-int IsFootprintClear(int dx, int dy) {
+int IsFootprintClear(struct Point off) {
     struct Ride *ride = EditMode.unk8;
     int x, y;
     struct MapElement *elem;
 
-    dx += ride->footprint.x0;
-    dy += ride->footprint.y0;
-    for (y = dy; y < dy + FootprintHeight; y++) {
-        for (x = dx; x < dx + FootprintWidth; x++) {
+    off.x += ride->footprint.x0;
+    off.y += ride->footprint.y0;
+    for (y = off.y; y < off.y + FootprintHeight; y++) {
+        for (x = off.x; x < off.x + FootprintWidth; x++) {
             if (x >= 0 && x < lpConfig->width && y >= 0 && y < lpConfig->height) {
                 elem = &GameMap[y][x];
             } else {
@@ -225,7 +108,6 @@ int IsFootprintClear(int dx, int dy) {
     }
     return 1;
 }
-#endif
 
 // FUNCTION: LEGOLAND 0x00457a70
 void FUN_00457a70(void) {
@@ -354,8 +236,8 @@ void FUN_00457a70(void) {
             if (DAT_0080ff6c != NULL && (((struct Ride *)DAT_0080ff6c)->flags & 0x2000000)) {
                 DAT_00667cd8 = 1;
                 DAT_00667cdc = 0;
-                for (y = DAT_00813a88; y <= DAT_00813a90; y += DAT_00813a3c) {
-                    for (x = SelectionRect; x <= DAT_00813a8c; x += DAT_00813a38) {
+                for (y = SelectionRect.y0; y <= SelectionRect.y1; y += DAT_00813a3c) {
+                    for (x = SelectionRect.x0; x <= SelectionRect.x1; x += DAT_00813a38) {
                         QueryCursor.field_1414[4] = 0;
                         QueryCursor.tile_x = x;
                         QueryCursor.tile_y = y;
@@ -439,8 +321,8 @@ void FUN_00457a70(void) {
                     DAT_00667cd8 = 1;
                     DAT_00667cdc = 0;
                     if (EditMode.unk8 == PathControlObject) {
-                        for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
-                            for (x = SelectionRect; x <= DAT_00813a8c; x += FootprintWidth) {
+                        for (y = SelectionRect.y0; y <= SelectionRect.y1; y += FootprintHeight) {
+                            for (x = SelectionRect.x0; x <= SelectionRect.x1; x += FootprintWidth) {
                                 pt.x = x - EditMode.unk8->footprint.x0;
                                 pt.y = y - EditMode.unk8->footprint.y0;
                                 if (pt.x >= 0 && pt.x < lpConfig->width && pt.y >= 0 && pt.y < lpConfig->height) {
@@ -454,11 +336,11 @@ void FUN_00457a70(void) {
                             }
                         }
                     }
-                    for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
-                        for (x = SelectionRect; x <= DAT_00813a8c; x += FootprintWidth) {
+                    for (y = SelectionRect.y0; y <= SelectionRect.y1; y += FootprintHeight) {
+                        for (x = SelectionRect.x0; x <= SelectionRect.x1; x += FootprintWidth) {
                             pt.x = x - EditMode.unk8->footprint.x0;
                             pt.y = y - EditMode.unk8->footprint.y0;
-                            if (IsFootprintClear(pt.x, pt.y)) {
+                            if (IsFootprintClear(pt)) {
                                 if (WorkOrderBuildObject(EditMode.unk8->element, &pt)) {
                                     ScriptDirtyCategories |= 0x10;
                                 }

@@ -144,8 +144,8 @@ void StepQueueRider(struct Queue *queue, int param_2, int param_3, struct Bloke 
     inner->dest.x = x;
     dir = CalcMoveLine(*(struct Point *)&inner->pos.x, *(struct Point *)&inner->dest.x, &inner->nav);
     inner->low_level_action = 7;
-    inner->field_73 = dir + 0x10;
-    NewDirForAction((Bloke *)inner, (unsigned char)(inner->field_73 >> 5) + 3);
+    inner->target_dir = dir + 0x10;
+    NewDirForAction((Bloke *)inner, (unsigned char)(inner->target_dir >> 5) + 3);
     inner->field_38++;
     cur = inner->field_38;
     if (cur >= table->count) {
@@ -186,6 +186,8 @@ void StepQueueRiders(struct Queue *queue, unsigned int param_2, unsigned int par
     }
 }
 
+/* Build the queue's sampled positions from its segment offsets. Each segment contributes
+ * its Euclidean length rounded down, and its endpoint becomes the next segment's origin. */
 // FUNCTION: LEGOLAND 0x00412100
 struct QueueTable *BuildQueueTable(struct PathTable *param_1) {
     int px;
@@ -201,6 +203,7 @@ struct QueueTable *BuildQueueTable(struct PathTable *param_1) {
     int cx;
     int cy;
     int total;
+    Point end;
 
     total = 0;
     for (i = 0; i < param_1->count; i++) {
@@ -236,8 +239,12 @@ struct QueueTable *BuildQueueTable(struct PathTable *param_1) {
                 py += dy;
             }
         }
-        start.x += dx;
-        start.y += dy;
+        /* Form both endpoint coordinates before updating the origin. MSVC6 then keeps
+         * the sums in the original segment registers through the loop's final stores. */
+        end.x = dx + start.x;
+        end.y = dy + start.y;
+        start.x = end.x;
+        start.y = end.y;
     }
     return table;
 }
@@ -281,8 +288,8 @@ void MoveBlokeAlongQueueTable(struct QueueTable *table, int x, int y, struct Blo
     bloke->dest.y = p.y << 8;
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
     bloke->low_level_action = 7;
-    bloke->field_73 = dir + 0x10;
-    NewDirForAction(bloke, (unsigned char)(bloke->field_73 >> 5) + 3);
+    bloke->target_dir = dir + 0x10;
+    NewDirForAction(bloke, (unsigned char)(bloke->target_dir >> 5) + 3);
     bloke->field_38 += (signed char)bloke->field_34;
     if ((signed char)bloke->field_34 < 0) {
         if (bloke->field_38 < 0) {

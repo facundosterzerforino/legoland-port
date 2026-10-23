@@ -22,3 +22,10 @@
 
 - Restructure the outer `for (;;)` / `rect = *rect.next` so the x0 reload is emitted in the join block.
 - Use `rect.x0` directly in the y-loop body instead of the `x` induction variable's initial value.
+
+## 2026-10-21 (Opus 5.5): still 99.10
+| Change | Result |
+|---|---|
+| ty hoisted to the y loop; tx/ty swapped; `x + param_2.pos.x`; tx/ty at function scope; bounds inlined | 43.97-99.10 |
+| bounds as a `static __inline` MapTileAt helper (if/return and ?: forms); `tile = 0` then if | 90.50-99.10 |
+| `y = rect.y0; for (; ...)`; `if (rect.next) { rect = *rect.next; continue; } break;`; do/while(1); unsigned x | 98.20-99.10 |

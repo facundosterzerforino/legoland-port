@@ -80,7 +80,7 @@ void FUN_0043a820(struct AnimEntry *param_1, struct RideNode *param_2) {
     bloke->dest.y = base.y;
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
     bloke->low_level_action = 7;
-    bloke->field_73 = dir + 0x10;
+    bloke->target_dir = dir + 0x10;
     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
     param_2->rider->field_38++;
 }
@@ -192,27 +192,21 @@ void StartSpaceTowerCar(struct SpaceTowerCar *arg) {
 
 // FUNCTION: LEGOLAND 0x0043aac0
 void ResetSpaceTowerCar(struct SpaceTowerCar *arg) {
-    int r;
-
-    arg->var_c = arg->var_c & 0xffffbffe;
-    arg->seats[0].flags = arg->seats[0].flags & 0xfffffffe;
-    arg->seats[1].flags = arg->seats[1].flags & 0xfffffffe;
+    arg->var_c &= 0xffffbffe;
     arg->seats[0].pos = 0;
+    arg->seats[0].flags &= 0xfffffffe;
     arg->seats[1].pos = 0;
+    arg->seats[1].flags &= 0xfffffffe;
     arg->seats[2].pos = 0;
     arg->seats[3].pos = 0;
-    arg->seats[2].flags = arg->seats[2].flags & 0xfffffffe;
-    arg->seats[3].flags = arg->seats[3].flags & 0xfffffffe;
-    r = rand();
-    arg->seats[0].delta = (char)(r % 3) + '\a';
-    r = rand();
-    arg->seats[1].delta = (char)(r % 3) + '\a';
-    r = rand();
-    arg->seats[2].delta = (char)(r % 3) + '\a';
-    r = rand();
+    arg->seats[2].flags &= 0xfffffffe;
+    arg->seats[3].flags &= 0xfffffffe;
+    arg->seats[0].delta = rand() % 3 + 7;
+    arg->seats[1].delta = rand() % 3 + 7;
+    arg->seats[2].delta = rand() % 3 + 7;
+    arg->seats[3].delta = rand() % 3 + 7;
     arg->var_4 = 0;
     arg->var_2 = 0;
-    arg->seats[3].delta = (char)(r % 3) + '\a';
     FadeSpaceTowerSfx((unsigned char *)arg);
 }
 
@@ -830,7 +824,7 @@ void SpaceTowerUpdate(struct Element *param_1) {
                 bloke->dest.y = ride_y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -846,7 +840,7 @@ void SpaceTowerUpdate(struct Element *param_1) {
                 bloke->dest.y = (DAT_004b77e8[seat].y + coord_y) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, (char)SpaceTowerSeats[seat >> 1].direction);
                 bloke->param_action++;
                 break;
@@ -880,7 +874,7 @@ void SpaceTowerUpdate(struct Element *param_1) {
                 bloke->dest.y = (((signed char)ride->field_25 + tile_y) << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = 0x10 + dir;
+                bloke->target_dir = 0x10 + dir;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;

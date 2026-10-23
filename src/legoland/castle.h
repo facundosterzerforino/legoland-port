@@ -25,22 +25,32 @@ struct PieceDoor {
     /* 0x06 */ short y;
 };
 
+/* A track piece type (one per piece element; see CastlePieceClass, SquareTrackPieceClass, HeightTrack*PieceClass).
+ * flags bit 1: fixed-height piece (an anchor; the castle and the height blocks). f4/f8: the heights its next/prev
+ * ends take (set_heights), in height steps. next_door/prev_door: where, relative to the piece, the next/previous
+ * piece must sit (mask = allowed directions, see PieceNeighbourOffsets). Methods: fill_open_end makes a piece whose
+ * one end is unconnected straight-through; set_heights sets the end heights on attach (plain track copies the
+ * neighbour's height, anchors use f4/f8); get_curve returns the curve stretch drawn/ridden over the piece;
+ * on_add/on_remove run when the piece is placed/removed (only the path height block uses them, to add/remove the
+ * 2x2 path under it). */
 /* a piece's class (the piece's cls; the castle's own is CastlePieceClass): data, then methods */
 struct PieceClass {
     /* 0x00 */ unsigned int flags;
     /* 0x04 */ int f4;
     /* 0x08 */ int f8;
-    /* 0x0c */ struct PieceDoor door_a;
-    /* 0x14 */ struct PieceDoor door_b;
-    /* 0x1c */ void (*method_1c)(struct PathSeg *self);
-    /* 0x20 */ unsigned int (*method_20)(struct PathSeg *self, float height);
-    /* 0x24 */ struct SegBlob *(*method_24)(struct PathSeg *self);
-    /* 0x28 */ void (*method_28)(struct PathSeg *self);
-    /* 0x2c */ void (*method_2c)(struct PathSeg *self);
+    /* 0x0c */ struct PieceDoor next_door;
+    /* 0x14 */ struct PieceDoor prev_door;
+    /* 0x1c */ void (*fill_open_end)(struct PathSeg *self);
+    /* 0x20 */ unsigned int (*set_heights)(struct PathSeg *self, float height);
+    /* 0x24 */ struct SegBlob *(*get_curve)(struct PathSeg *self);
+    /* 0x28 */ void (*on_add)(struct PathSeg *self);
+    /* 0x2c */ void (*on_remove)(struct PathSeg *self);
     /* 0x30 */ unsigned int field_30;
     /* 0x34 */ unsigned int field_34;
 };
 
+/* One end of a piece. end_a is the end toward prev, end_b the end toward next; dir is the direction (1 N, 2 E, 4 S,
+ * 8 W) in which the neighbour lies, 0xffffffff while unconnected. */
 /* one end of a piece: the direction it opens to, its height and the piece joined there */
 struct PieceEnd {
     /* 0x00 */ unsigned int dir;
@@ -48,6 +58,9 @@ struct PieceEnd {
     /* 0x08 */ struct PathSeg *link;
 };
 
+/* The start of every piece and of the castle itself (CastleState.piece). In a closed ring the castle's piece is
+ * also the ring's sentinel. flags bit 1: the curve and world position are stored in the piece itself (vec/blob)
+ * instead of coming from get_curve. */
 /* the start of every piece (and of the castle itself, CastleState.piece, the pieces' ring sentinel) */
 struct PieceHead {
     /* 0x00 */ unsigned int flags;
@@ -80,7 +93,8 @@ struct PieceHead {
     };
 };
 
-/* a curve stretch's methods: pairs of (point at t, derivative at t), t passed as raw float bits */
+/* a curve stretch's methods (one row of 8 in CurveFunctionTable per stretch kind): pairs of (point at t, derivative at t),
+ * t passed as raw float bits */
 struct CurveFnPair {
     void (*func)(void *base, int t, struct FVec3 *out);
     void (*fn)(void *self, int t, void *out);
@@ -90,14 +104,14 @@ struct CurveVt {
     union {
         struct CurveFnPair pair[4];
         struct {
-            void (*method_0)(struct SegBlob *self, float t, float *out);
-            void *pad_4;
-            void (*method_8)(struct SegBlob *self, float t, float *out);
-            void (*method_c)(struct SegBlob *self, float t, float *out);
-            void (*method_10)(struct SegBlob *self, float t, float *out);
-            void *pad_14;
-            void *pad_18;
-            unsigned int (*method_1c)(struct SegBlob *self, unsigned int t, float *out);
+            void (*side_a_pos)(struct SegBlob *self, float t, float *out); /* centre + side offset */
+            void *side_a_tangent;
+            void (*pos)(struct SegBlob *self, float t, float *out); /* the centre line */
+            void (*tangent)(struct SegBlob *self, float t, float *out);
+            void (*side_b_pos)(struct SegBlob *self, float t, float *out); /* centre - side offset */
+            void *side_b_tangent;
+            void *split_points; /* (self, float *out): parameters to split the stretch at for drawing; returns the count */
+            unsigned int (*normal)(struct SegBlob *self, unsigned int t, float *out); /* the track's up vector */
         };
     };
 };
@@ -166,6 +180,9 @@ struct TrainBogie {
     /* 0x20 */ struct TrainWheel w1;
 };
 
+/* A car of the train (kind 0 head, 1 middle, 2 tail). Two bogies (each a wheel pair on the track), two seats, the
+ * centre between the bogies and its potential energy. flags bit 1: drawn this frame. link is its entry in the
+ * castle's dirty-rectangle list. */
 /* a car of the castle's coaster train (the train's cars form a ring through prev/next) */
 struct TrainCar {
     /* 0x00 */ unsigned int flags;
@@ -174,17 +191,17 @@ struct TrainCar {
     /* 0x40 */ struct TrainBogie rear;
     /* 0x78 */ struct TrainSeat seats[2];
     /* 0xb8 */ struct FVec3 center;
-    /* 0xc4 */ float weight;
+    /* 0xc4 */ float potential; /* potential energy: mass * height (PositionTrainCar) */
     /* 0xc8 */ struct ListLink link;
     /* 0xe4 */ struct TrainCar *prev;
     /* 0xe8 */ struct TrainCar *next;
 };
 
 /* the train's motion state (Train.motion) */
-struct AnimOut {
-    unsigned int kind;
-    float f4; /* position along the current curve stretch */
-    float f8; /* speed */
+struct TrainMotion {
+    unsigned int count; /* always 2: this is a FloatArray of [pos, energy] for the integrator */
+    float pos; /* curve parameter along the current curve stretch */
+    float energy; /* total energy: potential energy of the cars + kinetic energy */
 };
 
 /* vector arithmetic on FloatArrays (VecMathOps is the template; InitVecMath copies it with a dimension) */
@@ -212,13 +229,17 @@ struct Integrator {
     /* 0x3c */ struct Train *owner;
 };
 
-/* the castle's coaster train (CastleState.field_d8) */
+/* The castle's coaster train. flags: 2 running, 0x40 held at the start (until hold_until), and the phase: 8 in the
+ * station (leaving), 4 out on the track (physics), 0x10 arriving back at the castle. walker is the head car's
+ * position on the track, motion its curve parameter and total energy, stepped by integ (RK4). The cars form a ring
+ * through head. */
+/* the castle's coaster train (CastleState.train) */
 struct Train {
     /* 0x00 */ unsigned int flags;
-    /* 0x04 */ int field_4; /* game time of the last step */
-    /* 0x08 */ int field_8; /* game time the hold (flags & 0x40) ends */
+    /* 0x04 */ int last_step_time; /* game time of the last step */
+    /* 0x08 */ int hold_until; /* game time the hold (flags & 0x40) ends */
     /* 0x0c */ struct CurveWalker walker;
-    /* 0x20 */ struct AnimOut motion;
+    /* 0x20 */ struct TrainMotion motion;
     /* 0x2c */ struct Integrator integ; /* state &motion, owner itself */
     /* 0x6c */ struct CastleState *track;
     /* 0x70 */ struct TrainCar head;
@@ -239,18 +260,22 @@ struct LmsRec {
     unsigned char pad_4[8];
 };
 
+/* A coaster model (.lms, from RollerCoaster/RollerCoaster/CreatedData; offsets are made absolute by LoadLmsFile).
+ * Three triangle lists, one per shading mode; each LmsRef's idx selects the triangle's material record in the
+ * model's .lfm file, whose key is an lpt colour (flat, Gouraud) or an ltx texture index (textured). DrawLmsModel
+ * transforms the vertices and draws the three lists. */
 /* a roller coaster mesh (.lms, CreatedData): the offsets at 0x0c..0x28 are relocated into pointers on load */
 struct LmsFile {
     /* 0x00 */ unsigned char pad_0[0xc];
     /* 0x0c */ void *field_c;
     /* 0x10 */ void *field_10;
     /* 0x14 */ void *field_14;
-    /* 0x18 */ struct LmsRef *field_18; /* field_1c of them */
-    /* 0x1c */ int field_1c;
-    /* 0x20 */ struct LmsRef *field_20; /* field_24 of them */
-    /* 0x24 */ int field_24;
-    /* 0x28 */ struct LmsRef *field_28; /* field_2c of them */
-    /* 0x2c */ int field_2c;
+    /* 0x18 */ struct LmsRef *flat_tris; /* flat_count flat-shaded triangles (lfm key: lpt colour) */
+    /* 0x1c */ int flat_count;
+    /* 0x20 */ struct LmsRef *gouraud_tris; /* gouraud_count Gouraud-shaded triangles (lfm key: lpt colour) */
+    /* 0x24 */ int gouraud_count;
+    /* 0x28 */ struct LmsRef *tex_tris; /* tex_count textured triangles (lfm key: ltx texture) */
+    /* 0x2c */ int tex_count;
     /* 0x30 */ struct FVec3 box[8]; /* the bounding box's corners */
 };
 #ifdef LEGOLAND_PORT
@@ -271,22 +296,25 @@ struct CastleVisitor {
     /* 0x24 */ void (*unlink)(struct CastleVisitor *self); /* FreeCastleVisitor */
 };
 
+/* CastleCoaster: the castle and its track. flags: 0 no castle placed, 1 the pieces form an open chain from head
+ * (prev end free) to tail (next end free), 2 they form a closed ring through the castle's own piece.
+ * next_spots/prev_spots: the free cells where a piece can attach after the tail / before the head. */
 /* CastleCoaster: the castle */
 struct CastleState {
     /* 0x00 */ unsigned int flags; /* 2: the pieces form a closed ring */
     /* 0x04 */ struct PieceHead piece;
     /* 0x30 */ unsigned char pad_30[0xa8 - 0x30];
-    /* 0xa8 */ struct PathSeg *f_a8;
-    /* 0xac */ struct DirPoints pts_a;
-    /* 0xc0 */ struct PathSeg *f_c0;
-    /* 0xc4 */ struct DirPoints pts_b;
-    /* 0xd8 */ struct Train *field_d8;
+    /* 0xa8 */ struct PathSeg *tail;
+    /* 0xac */ struct DirPoints next_spots;
+    /* 0xc0 */ struct PathSeg *head;
+    /* 0xc4 */ struct DirPoints prev_spots;
+    /* 0xd8 */ struct Train *train;
     /* 0xdc */ unsigned char pad_dc[4];
-    /* 0xe0 */ unsigned int field_e0;
+    /* 0xe0 */ unsigned int arrive_time; /* game time the train last stopped in the station */
     /* 0xe4 */ struct CastleVisitor visitors;
-    /* 0x10c */ void (*method_10c)(struct CastleState *self, struct SegBlob **node, float *t, struct FVec3 *pos);
-    /* 0x110 */ float (*method_110)(struct Train *self, float time_left); /* CastleStepLeaving */
-    /* 0x114 */ float (*method_114)(struct Train *self, float time_left); /* CastleStepArriving */
+    /* 0x10c */ void (*get_start)(struct CastleState *self, struct SegBlob **node, float *t, struct FVec3 *pos);
+    /* 0x110 */ float (*step_leaving)(struct Train *self, float time_left); /* CastleStepLeaving */
+    /* 0x114 */ float (*step_arriving)(struct Train *self, float time_left); /* CastleStepArriving */
 };
 
 struct Point;
@@ -295,10 +323,31 @@ int GetCoasterPieceMapLine(struct Point *pos, void *a2, void *a3, void *a4, void
 struct ObjAtC8;
 struct ListLink;
 struct Int16Pair;
-struct EdgeMesh;
+/* a triangle mesh: vertices, edges between two vertices, triangles of three edges (bit 31: edge reversed) */
+struct MVert {
+    int x;
+    int y;
+    int rest[3];
+};
+struct MEdge {
+    int v0;
+    int v1;
+};
+struct MTri {
+    int e[3];
+};
+struct EdgeMesh {
+    int f0;
+    int nVerts;
+    int nEdges;
+    int nTris;
+    struct MVert *verts;
+    struct MEdge *edges;
+    struct MTri *tris;
+};
 struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src);
 struct FVec3;
-struct SprEnt;
+struct PiecePlacement;
 struct FitRes;
 struct RectI;
 void DrawCastleTrainOnPiece(struct PieceHead *param_1);
@@ -308,12 +357,12 @@ void InitCastleVisitorList(struct CastleState *param_1);
 struct RecIdx;
 struct RecSrc;
 void ClearDepthSpans(int n, struct RecIdx *idx, struct RecSrc *src);
-struct Struct426f40Dst;
-struct Struct427070Src;
-struct Struct427050Dst;
-struct Struct426d80X;
-struct SaveRec;
-struct Struct426e80Dst;
+struct TrainSaveRecord;
+struct VisitorLoadRecord;
+struct VisitorSaveRecord;
+struct CastleSaveInfo;
+struct CastleSaveRecord;
+struct PieceSaveRef;
 struct BlokeSex0;
 void FreeCastleVisitor(struct CastleVisitor *p);
 
@@ -394,7 +443,7 @@ void PositionTrainCarsAndBogies(void *obj, float val, void *tmp);
 void EvalTrainPotentialAndCentres(float a, struct FloatArray *out);
 void PositionTrainCars(void *obj, float val, void *b);
 unsigned int GetTrainCarRearPos(struct TrainCar *obj, float *param);
-void FindPathPosAtRangeBehind(float *center, float r, struct CurveWalker *src, float hi, float x, struct CurveWalker *dst, float *out);
+void FindPathPosAtRangeBehind(float *center, float r, struct CurveWalker *src, float first_hi, float x, struct CurveWalker *dst, float *out);
 float CurveArcLength(struct CurveWalker *a, unsigned int hi, struct CurveWalker *b, unsigned int lo, int idx, float c);
 void GetTrainCarCenter(unsigned char *obj, unsigned int *out);
 int HasStraightForClosingSlope(struct PieceClass *info, struct CastleState *owner, struct PathSeg **a, struct PathSeg **b);
@@ -407,9 +456,9 @@ void SetTrainWheelPos(struct TrainWheel *param_1, struct CurveWalker *param_2, u
 void OnCoasterRingOpened(struct CastleState *owner);
 void ResetCoasterHeightsBack(struct PathSeg *n);
 void ResetCoasterHeightsForward(struct PathSeg *n);
-int CheckTrackPiecePlacement(struct PieceClass *info, short *pos, struct SprEnt *ent);
-int CheckAnchorPiecePlacement(struct PieceClass *info, short *pos, struct SprEnt *ent);
-int MatchPieceToCoasterEnds(short *pos, struct SprEnt *ent, struct PieceClass *info);
+int CheckTrackPiecePlacement(struct PieceClass *info, short *pos, struct PiecePlacement *ent);
+int CheckAnchorPiecePlacement(struct PieceClass *info, short *pos, struct PiecePlacement *ent);
+int MatchPieceToCoasterEnds(short *pos, struct PiecePlacement *ent, struct PieceClass *info);
 void RemoveMapObjectIfEnabled(struct Element *element, TileId tile, struct Cursor *cursor);
 void RemovePathSegMapObject(struct PathSeg *obj);
 float GetTrainParamSpeed(struct Train *param);
@@ -418,7 +467,11 @@ struct Ride;
 struct PathSeg *FindPathSegAt(struct CastleState *host, struct Ride *ride, short *pt);
 void GetTrainCarCenterAndAxis(struct TrainCar *obj, float *out);
 void SetClipRect(int a, int b, int c, int d);
-struct PlaneSet;
+/* the clip planes (a x + b y + c >= 0 is inside) */
+struct PlaneSet {
+    int count;
+    float p[4][3];
+};
 void SetClipPlanesFromRect(const int *r, struct PlaneSet *out);
 float ParamSpeedToTrackSpeed(struct Train *param, float result);
 float GetTrainTrackSpeed(struct Train *param);
@@ -508,15 +561,15 @@ void HeightTrackPathCalcCursor(struct Element *obj, int *x, unsigned int y);
 void HeightTrackPathAddObject(struct Element *obj, const struct Struct427bc0Src *src);
 void UpdateCastleView(void);
 
-struct SaveRec *ReadSaveRec(void);
-void LoadCastleTrain(struct Struct426f40Dst *src, struct CastleState *obj);
-void LoadCastleVisitors(struct Struct427070Src *arr, int count, struct CastleState *obj);
-void MeasureCastleSave(struct CastleState *param1, struct Struct426d80X *param2);
-void WriteCastleSave(struct Struct426d80X *src, struct SaveRec *dst);
-void SaveCastleVisitors(struct CastleState *a1, struct Struct427050Dst *a2);
+struct CastleSaveRecord *ReadSaveRec(void);
+void LoadCastleTrain(struct TrainSaveRecord *src, struct CastleState *obj);
+void LoadCastleVisitors(struct VisitorLoadRecord *arr, int count, struct CastleState *obj);
+void MeasureCastleSave(struct CastleState *param1, struct CastleSaveInfo *param2);
+void WriteCastleSave(struct CastleSaveInfo *src, struct CastleSaveRecord *dst);
+void SaveCastleVisitors(struct CastleState *a1, struct VisitorSaveRecord *a2);
 void WriteSaveRec(unsigned int *param_1);
-void SaveCoasterPieces(struct CastleState *obj, struct Struct426e80Dst *out);
-void SaveCastleTrain(struct Train *src, struct Struct426f40Dst *dst);
+void SaveCoasterPieces(struct CastleState *obj, struct PieceSaveRef *out);
+void SaveCastleTrain(struct Train *src, struct TrainSaveRecord *dst);
 struct BlokeInfo;
 struct LmsRec *BuildCastleVisitorModel(struct BlokeInfo *p);
 

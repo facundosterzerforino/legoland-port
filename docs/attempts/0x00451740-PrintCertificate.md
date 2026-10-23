@@ -56,3 +56,10 @@ the plain C (no volatile temporaries). The strings became named arrays so the as
 CertificateDocName (local) and LegoFontName (globals.c, shared with InitScreen in draw.c, which now
 copies it with memcpy(..., sizeof(LegoFontName)): MSVC6 inlines that exactly like the original's
 inlined strcpy of the literal; a plain strcpy from the array is not inlined, 71%).
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 38.31%. Matching has to come from C now.
+Then the best C from before the asm version was put back (it is better than the plain `#else` C; its `volatile`
+or extra local is commented in the source): 89.11%.

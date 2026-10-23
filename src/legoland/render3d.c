@@ -1164,6 +1164,8 @@ LEGO_EXPORT char *GetChestTextureNameOfBloke(struct BlokeSex0 *param_1) {
     return "chest girly2";
 }
 
+// GetLegColourOfBloke: the bloke's leg colour as 0xRRGGBB, from the BlokeColours entry (3 bytes: R, G, B) its
+// person's field_8c selects.
 // FUNCTION: LEGOLAND 0x004431f0
 LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1) {
     volatile unsigned int idx = param_1->field_4->field_8c;
@@ -1173,6 +1175,7 @@ LEGO_EXPORT unsigned int GetLegColourOfBloke(struct BlokeSex0 *param_1) {
     return (((r << 8) | g) << 8) | b;
 }
 
+// GetArmColourOfBloke: the same as GetLegColourOfBloke for the arm colour (the entry field_90 selects).
 // FUNCTION: LEGOLAND 0x00443220
 LEGO_EXPORT unsigned int GetArmColourOfBloke(struct BlokeSex0 *param_1) {
     unsigned int idx = param_1->field_4->field_90;

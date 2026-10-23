@@ -184,6 +184,11 @@ LEGO_EXPORT unsigned int RES_GetResourcePath(void) {
     return 0;
 }
 
+// RES_OpenVolume: opens the resource volume <path's file name>.res, from .\volumes\ first and then from the CD.
+// The volume's name is the file name upper-cased (20 chars, zero padded); if a volume with that name is already
+// open it is returned instead. A volume file starts with the offset of its directory, which runs to the end of the
+// file; the directory is read and turned into entries (FUN_004895a0), and the volume goes to the front of
+// MasterVolList with one reference. Returns NULL (and frees everything) if the file can't be opened or read.
 // FUNCTION: LEGOLAND 0x00489750
 LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
     char fname[0x100];

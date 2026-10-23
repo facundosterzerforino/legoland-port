@@ -17,9 +17,12 @@
 |---|---|---|---|
 | 2026-10-07 | Haiku 5.5 (flumea) | Swap the `cursor.tile_x` / `cursor.tile_y` assignment lines | 91.18% (worse) |
 | 2026-10-07 | Haiku 5.5 (flumea) | `int tx` local holding tile_x, stored after tile_y | 82.35% (worse) |
+| 2026-10-18 | Codex | Replace first/second/both footprint memcpy operations with struct assignment, or use `&cursor.footprint` as destination | 95.10% object score, unchanged; no edit retained |
+| 2026-10-18 | Codex | Compute both coordinates in a Point, storing x/y or y/x; separate x/y locals; preload the footprint y offset | 72.55% / 82.35% / 95.10% object scores; no improvement, including combinations with the struct copies |
+| 2026-10-18 | Codex | Save TileId before/between/after coordinate calculations or before the first copy; use saved tile coordinates or a TileId pointer | 60.19–70.87% object scores; changes later register allocation |
+| 2026-10-18 | Codex | Move cursor footprint copy before or between coordinate stores | 72.55–74.51% object scores; worse |
 
 ## Ideas not tried yet
 
-- Hold `tile_x` and `tile_y` in locals computed in the original's order, then store tile_y before tile_x without
-  reordering the expression that loads `cur->tile` (the two experiments above both changed the load order too).
-- Read `cur->tile` through a `TileId *` local to see whether that gives the original's `dl` / `al` load pattern.
+- A snapshot of the footprint offsets, rather than of the completed coordinates, may affect load scheduling.
+- The typed footprint assignment and TileId-pointer forms have now been tried; neither fixes the order.

@@ -72,7 +72,7 @@ embedded structs (`struct PieceHead;`, MS extension, MSVC6 and clang accept it) 
   (globals declared twice), `dupproto.py`/`dupfix.py` (prototypes duplicated by the merge; keeps the decomp's).
 - `whichglob.py [--decomp] addr...` (the annotated global containing an address), `dumpva.py va len` (the
   original exe's bytes there), `vf.sh addr...` (incremental build + reccmp for those functions).
-- `dvcommit.sh` refuses a commit when any function got worse (except MusicThreadProc and FUN_00425e20, which
+- `dvcommit.sh` refuses a commit when any function got worse (except MusicThreadProc and UpdateCastleView, which
   move with unrelated edits) and pushes the decomp with `~/push-decomp.sh`.
 
 The data loader (`tools/gen_data.py` with `tools/port_layout.py`) loads every global that holds pointers field by

@@ -28,18 +28,42 @@ still differs" when they change. When a function reaches 100%, delete its file.
   instructions as raw bytes with `_emit` (RenderTransSprite).
 - **reccmp false positives:** a constant that falls inside a data symbol's range in only one of the two
   images shows as a diff on a byte-identical line (`decomp-tips.md`).
+- **Endpoint sums:** when a loop's final coordinate additions use different registers, calculate both
+  coordinates in a `Point end` before updating the running origin. This matched `BuildQueueTable`
+  (93.48 -> 100%); reversing addition operands or chaining assignments did not help.
+  A paired `Point` also matched `UpdateLogFlumeEntranceEntry` (`FUN_0040be00`,
+  90.61 -> 100%): calculate x and y from the global ride before passing them to the
+  queue update. Caching the ride pointer, using scalar x/y locals, or introducing a
+  TileId pointer did not match. All 14 alternative forms were compared before retaining
+  the Point with direct global accesses; no assembly or volatile access was needed.
+- **Branch-local field updates:** assigning a direction byte in each turn branch, then masking the
+  field after the join, can preserve two original stores without volatile access. Updating a local
+  and assigning the field twice instead let MSVC6 eliminate the first store. This matched
+  `UpdateDrivingSchoolCarVelocity` (94.29 -> 100%).
+- **Terminal shape-selection branches:** returning immediately after every call in a complete
+  `if`/`else` tree can change MSVC6's shared argument/call tails. This matched `UpdateQueuePathShape`
+  (98.43 -> 100%); a single return after the tree produced a different layout. Argument-side flag
+  assignments, narrow flag casts and changing the mask type did not match.
+- **Token lifetimes:** initializing a token pointer before a buffer copy and restoring a delimiter
+  before advancing the token can keep the token and resolved object in separate saved registers.
+  This improved `LoadObjectClassAliasElements` (73.10 -> 98.63%) without redundant increments;
+  advancing immediately after lookup left a scheduling difference.
+- **Rectangle intermediates:** `HTBubbleHelpWithMood` (`FUN_00455fc0`, 82.35 -> 100%) needs
+  its unpadded right edge stored in the RECT before the clipping branch; add the icon allowance
+  in the edge test. Correcting that state, the center comparison order and RECT initialization
+  allowed all five volatile qualifiers and every permuter temporary to be removed. Qualifier
+  removal and initialization changes alone did not recover the match (64 standalone trials,
+  65.09-83.96% against an 83.24% harness baseline); the natural rectangle form reached 100%.
 
 ## Index
 
 | Address | Function | File | Best |
 |---|---|---|---|
-| 0x004019c0 | [FUN_004019c0](0x004019c0-FUN_004019c0.md) | ride_bloke.c | 92.08% |
 | 0x00401f30 | [PickQueueTurn](0x00401f30-PickQueueTurn.md) | ride_bloke.c | 70.73% |
 | 0x00402780 | [FUN_00402780](0x00402780-FUN_00402780.md) | ride_bloke.c | 75.00% |
 | 0x00402dc0 | [CastleLevel1Update](0x00402dc0-CastleLevel1Update.md) | castle_level.c | 85.88% |
 | 0x00404630 | [CoptersPlaceRider](0x00404630-CoptersPlaceRider.md) | copters.c | 54.39% |
-| 0x00405bd0 | [DrivingSchoolUpdate](0x00405bd0-DrivingSchoolUpdate.md) | driving_school.c | 80.18% |
-| 0x00406660 | [FortUpdate](0x00406660-FortUpdate.md) | fort.c | 77.12% |
+| 0x00405bd0 | [DrivingSchoolUpdate](0x00405bd0-DrivingSchoolUpdate.md) | driving_school.c | 84.09% |
 | 0x00407ad0 | [JoustRemoveObject](0x00407ad0-JoustRemoveObject.md) | joust.c | 95.00% |
 | 0x00408f90 | [FUN_00408f90](0x00408f90-FUN_00408f90.md) | log_flume.c | 40.96% |
 | 0x004092b0 | [FUN_004092b0](0x004092b0-FUN_004092b0.md) | log_flume.c | 84.62% |
@@ -48,7 +72,6 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x0040abf0 | [LogFlumeEntranceRemoveObject](0x0040abf0-LogFlumeEntranceRemoveObject.md) | log_flume.c | 95.10% |
 | 0x0040ae90 | [FUN_0040ae90](0x0040ae90-FUN_0040ae90.md) | log_flume.c | 45.11% |
 | 0x0040bab0 | [FUN_0040bab0](0x0040bab0-FUN_0040bab0.md) | log_flume.c | 44.09% |
-| 0x0040be00 | [FUN_0040be00](0x0040be00-FUN_0040be00.md) | log_flume.c | 90.61% |
 | 0x0040bf70 | [LogFlumeEntranceUpdate](0x0040bf70-LogFlumeEntranceUpdate.md) | log_flume.c | 82.05% |
 | 0x0040c250 | [FUN_0040c250](0x0040c250-FUN_0040c250.md) | log_flume.c | 42.86% |
 | 0x0040c8d0 | [LogFlumeTrackRemoveObject](0x0040c8d0-LogFlumeTrackRemoveObject.md) | log_flume.c | 92.59% |
@@ -59,12 +82,12 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x00411680 | [AdvanceFlumeMover](0x00411680-AdvanceFlumeMover.md) | log_flume.c | 63.04% |
 | 0x00411fa0 | [FUN_00411fa0](0x00411fa0-FUN_00411fa0.md) | ride_queue.c | 87.74% |
 | 0x00413450 | [FUN_00413450](0x00413450-FUN_00413450.md) | roads.c | 90.00% |
-| 0x00413650 | [UpdateQueuePathShape](0x00413650-UpdateQueuePathShape.md) | roads.c | 97.18% |
+| 0x00413b50 | [DrivingSchoolRoadsCalcCursor](0x00413b50-DrivingSchoolRoadsCalcCursor.md) | roads.c | 94.67% |
 | 0x00415220 | [SafariRideUpdate](0x00415220-SafariRideUpdate.md) | safari_ride.c | 75.56% |
 | 0x00415ae0 | [RenderSpider](0x00415ae0-RenderSpider.md) | spider_ride.c | 98.62% |
 | 0x00416fa0 | [RenderTempleSlide](0x00416fa0-RenderTempleSlide.md) | temple_slide.c | 95.00% |
 | 0x00417430 | [TempleSlideUpdate](0x00417430-TempleSlideUpdate.md) | temple_slide.c | 79.39% |
-| 0x00418710 | [FUN_00418710](0x00418710-FUN_00418710.md) | water_works.c | 82.69% |
+| 0x00418710 | [IsBlokeNearElephantFountain](0x00418710-IsBlokeNearElephantFountain.md) | water_works.c | 82.69% |
 | 0x004198a0 | [BoatingSchoolBuildStepPath](0x004198a0-BoatingSchoolBuildStepPath.md) | boating_school.c | 81.26% |
 | 0x0041a720 | [BoatingSchoolUpdate](0x0041a720-BoatingSchoolUpdate.md) | boating_school.c | 96.58% |
 | 0x0041df00 | [FUN_0041df00](0x0041df00-FUN_0041df00.md) | castle.c | 44.94% |
@@ -83,10 +106,12 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x00424700 | [RenderCastleDummy](0x00424700-RenderCastleDummy.md) | castle.c | 88.41% |
 | 0x00425e20 | [FUN_00425e20](0x00425e20-FUN_00425e20.md) | castle.c | 90.70% |
 | 0x004269e0 | [lego_sqrtf_init](0x004269e0-lego_sqrtf_init.md) | castle.c | 100% |
+| 0x004280b0 | [FUN_004280b0](0x004280b0-FUN_004280b0.md) | castle.c | 99.39% (effective) |
 | 0x004284d0 | [FUN_004284d0](0x004284d0-FUN_004284d0.md) | castle.c | 71.38% |
 | 0x00429cf0 | [FUN_00429cf0](0x00429cf0-FUN_00429cf0.md) | castle.c | 97.27% |
 | 0x0042aa90 | [BalloonzUpdate](0x0042aa90-BalloonzUpdate.md) | balloonz.c | 94.65% |
 | 0x0042bcf0 | [RenderCarousel](0x0042bcf0-RenderCarousel.md) | carousel.c | 42.80% |
+| 0x0042c820 | [CarouselUpdate](0x0042c820-CarouselUpdate.md) | carousel.c | 85.71% |
 | 0x0042f0f0 | [FUN_0042f0f0](0x0042f0f0-FUN_0042f0f0.md) | eatery.c | 88.29% |
 | 0x0042fbb0 | [Restaurant2Update](0x0042fbb0-Restaurant2Update.md) | eatery.c | 41.89% |
 | 0x004304e0 | [RenderEateryBaseLayers](0x004304e0-RenderEateryBaseLayers.md) | eatery.c | 87.10% |
@@ -128,7 +153,6 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x00454380 | [WriteModuleInfo](0x00454380-WriteModuleInfo.md) | exceptlog.c | 100% |
 | 0x00455370 | [BubbleHelp](0x00455370-BubbleHelp.md) | text.c | 24.23% |
 | 0x004557c0 | [HTBubbleHelp](0x004557c0-HTBubbleHelp.md) | text.c | 76.47% |
-| 0x00455fc0 | [FUN_00455fc0](0x00455fc0-FUN_00455fc0.md) | text.c | 77.60% |
 | 0x004567a0 | [RenderFullMap](0x004567a0-RenderFullMap.md) | mapscreen.c | 81.85% |
 | 0x00457970 | [IsFootprintClear](0x00457970-IsFootprintClear.md) | bricks.c | 87.80% |
 | 0x00457a70 | [FUN_00457a70](0x00457a70-FUN_00457a70.md) | bricks.c | 100% effective match (reccmp), bytes still differ |
@@ -181,6 +205,8 @@ still differs" when they change. When a function reaches 100%, delete its file.
 | 0x0047d8e0 | [SaveGame](0x0047d8e0-SaveGame.md) | saveload.c | 91.55% |
 | 0x0047e980 | [LoadGame](0x0047e980-LoadGame.md) | saveload.c | 81.34% |
 | 0x0047f880 | [GameMain](0x0047f880-GameMain.md) | debug.c | 99.62% |
+| 0x004809d0 | [LoadObjectClassAliasElements](0x004809d0-LoadObjectClassAliasElements.md) | objclass.c | 98.63% |
+| 0x00484790 | [FUN_00484790](0x00484790-FUN_00484790.md) | bloke.c | 97.62% |
 | 0x00484920 | [DoLowLevelAI](0x00484920-DoLowLevelAI.md) | bloke.c | 100% |
 | 0x00484a70 | [SetBlokePositionFromBNV](0x00484a70-SetBlokePositionFromBNV.md) | bloke.c | 95.12% |
 | 0x004856a0 | [PrintSpriteEx](0x004856a0-PrintSpriteEx.md) | print_sprite.c | 96.64% |

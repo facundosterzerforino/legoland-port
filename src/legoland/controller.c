@@ -109,22 +109,22 @@ void UpdateEditSelection(void) {
         if (DragStartTileY > DragEndTileY) {
             max_y = DragStartTileY;
         }
-        /* both arms end in the same stores; the compiler merges them */
+        /* both arms end in the same stores; the compiler merges them into one tail */
         if (DAT_0080ff6c != NULL) {
             cls = DAT_0080ff6c;
             FootprintWidth = cls->footprint.x1 - cls->footprint.x0 + 1;
             FootprintHeight = cls->footprint.y1 - cls->footprint.y0 + 1;
-            DAT_00813a90 = max_y;
-            DAT_00813a8c = max_x;
-            DAT_00813a88 = min_y;
-            SelectionRect = min_x;
+            SelectionRect.x0 = min_x;
+            SelectionRect.y0 = min_y;
+            SelectionRect.x1 = max_x;
+            SelectionRect.y1 = max_y;
         } else {
             FootprintWidth = 1;
             FootprintHeight = 1;
-            DAT_00813a90 = max_y;
-            DAT_00813a8c = max_x;
-            DAT_00813a88 = min_y;
-            SelectionRect = min_x;
+            SelectionRect.x0 = min_x;
+            SelectionRect.y0 = min_y;
+            SelectionRect.x1 = max_x;
+            SelectionRect.y1 = max_y;
         }
     } else {
         min_x = DragStartTileX < DragEndTileX ? DragStartTileX : DragEndTileX;
@@ -158,16 +158,16 @@ void UpdateEditSelection(void) {
             max_y = (FootprintHeight - min_y + max_y) / FootprintHeight * FootprintHeight + min_y - 1;
         }
         if (EditMode.unk0 == 1 && EditMode.unk8 != NULL) {
-            SelectionRect = EditMode.unk8->footprint.x0 + min_x;
-            DAT_00813a88 = EditMode.unk8->footprint.y0 + min_y;
-            DAT_00813a8c = EditMode.unk8->footprint.x0 + max_x;
-            DAT_00813a90 = EditMode.unk8->footprint.y0 + max_y;
+            SelectionRect.x0 = EditMode.unk8->footprint.x0 + min_x;
+            SelectionRect.y0 = EditMode.unk8->footprint.y0 + min_y;
+            SelectionRect.x1 = EditMode.unk8->footprint.x0 + max_x;
+            SelectionRect.y1 = EditMode.unk8->footprint.y0 + max_y;
         }
     }
-    EditCursor.field_1414[0] = SelectionRect - min_x;
-    EditCursor.field_1414[1] = DAT_00813a88 - min_y;
-    EditCursor.field_1414[2] = DAT_00813a8c - min_x;
-    EditCursor.field_1414[3] = DAT_00813a90 - min_y;
+    EditCursor.field_1414[2] = SelectionRect.x1 - min_x;
+    EditCursor.field_1414[3] = SelectionRect.y1 - min_y;
+    EditCursor.field_1414[0] = SelectionRect.x0 - min_x;
+    EditCursor.field_1414[1] = SelectionRect.y0 - min_y;
     EditCursor.field_1414[4] = 0;
     EditCursor.tile_x = min_x;
     EditCursor.tile_y = min_y;

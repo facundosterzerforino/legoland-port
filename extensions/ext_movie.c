@@ -44,15 +44,15 @@ int ExtPauseMoviesResync(unsigned int frame, int play_pos) {
         return play_pos;
     }
     /* SetCurrentPosition takes bytes: the frame's slot in the sound buffer */
-    play_pos = (int)(AviSoundBytesPerFrame * DAT_00668fa0);
-    if (DAT_00668ee0 == 0) {
+    play_pos = (int)(AviSoundBytesPerFrame * AviSoundBufferSlot);
+    if (AviAudioNeedsAcm == 0) {
         return play_pos; /* PCM: AVI positions are sample frames, as the game assumes */
     }
     /* Compressed: AVI positions count blocks. Normal playback hands out the decoded sound AviSoundBytesPerFrame
      * bytes per movie frame, so the frame's sound starts that many bytes times frame into the decoded stream:
      * decode the block holding it, and leave the rest of that block for the refill to use first. */
-    DAT_00668fb4 = 0;
-    DAT_00668f54 = 0;
+    AviAcmDstBytes = 0;
+    AviAcmDstOffset = 0;
     if (MiniwinAcmStreamSize(AviAcmStream, AviAcmStreamHeader.cbSrcLength, &per_block, 0 /* ACM_STREAMSIZEF_SOURCE */) != 0 ||
         per_block == 0) {
         AviAudioSamplePos = DAT_00668f88; /* silence, as before */
@@ -72,8 +72,8 @@ int ExtPauseMoviesResync(unsigned int frame, int play_pos) {
     MiniwinAcmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
     AviAudioSamplePos++;
     if (AviAcmStreamHeader.cbDstLengthUsed > skip) {
-        DAT_00668fb4 = AviAcmStreamHeader.cbDstLengthUsed - skip;
-        DAT_00668f54 = (int)skip;
+        AviAcmDstBytes = AviAcmStreamHeader.cbDstLengthUsed - skip;
+        AviAcmDstOffset = (int)skip;
     }
     return play_pos;
 }

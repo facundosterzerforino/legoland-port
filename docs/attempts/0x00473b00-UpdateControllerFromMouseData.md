@@ -19,3 +19,10 @@
 
 - Read `mouse_threshold2` through a volatile cast too, to match the reload pattern in the mode==2 block.
 - Write the x/y clamps with a shared zero local so MSVC keeps 0 in a register for the stores and compares.
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 82.73%. Matching has to come from C now.
+Then the best C from before the asm version was put back (it is better than the plain `#else` C; its `volatile`
+or extra local is commented in the source): 93.21%.

@@ -18,3 +18,15 @@
 ## Ideas not tried yet
 
 - the permuter
+
+## 2026-10-19: back to C
+
+The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
+The function is the plain C that was the `#else` branch again: 72.55%. Matching has to come from C now.
+
+## 2026-10-19 agent notes (72.55% -> 74.51%)
+
+Indexed loop (`for (i = 0; i < count; i++) ... copy[i]`) instead of the pointer walk: 72.55 -> 74.51 (harness).
+Still different: the original pushes edi at entry and does `node->field_20 |= 2` through edi; ours uses esi and
+pushes edi only around the inline memcpy. No change from: `count` tested via the global, a `size` local, an early
+`return` when count is 0, `field_20 = field_20 | 2`, `== 0` vs `!` tests (15 combinations, 72.55-74.51).

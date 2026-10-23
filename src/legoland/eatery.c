@@ -86,7 +86,7 @@ void ChuckWagonUpdate(Element *obj) {
                 bloke->dest.y = (y + 1) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -95,7 +95,7 @@ void ChuckWagonUpdate(Element *obj) {
                 bloke->dest.y = (y + 1) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
             case 2:
@@ -115,7 +115,7 @@ void ChuckWagonUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -215,7 +215,7 @@ void SharkCafeUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -236,7 +236,7 @@ void SharkCafeUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -400,7 +400,7 @@ void CastleBBQUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -409,7 +409,7 @@ void CastleBBQUpdate(Element *obj) {
                 bloke->dest.y = y << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -429,7 +429,7 @@ void CastleBBQUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -438,7 +438,7 @@ void CastleBBQUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -477,7 +477,7 @@ void FoodcartDrinkUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x180;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -499,7 +499,7 @@ void FoodcartDrinkUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -538,7 +538,7 @@ void FoodcartFoodUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -559,7 +559,7 @@ void FoodcartFoodUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -678,7 +678,7 @@ void FUN_0042f0f0(struct Bloke *bloke, int x, int y, int step) {
     bloke->dest.x = (DAT_004b66f4[idx] + x) * 0x100 + DAT_004b66f4[idx + 2];
     bloke->dest.y = (y + y_add) * 0x100 + DAT_004b66f4[idx + 3];
     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-    bloke->field_73 = dir + 0x10;
+    bloke->target_dir = dir + 0x10;
     bloke->low_level_action = 7;
     bloke->field_37 = (unsigned char)frame;
     if (dir_flag == 1) {
@@ -726,7 +726,7 @@ void Restaurant1Update(Element *obj) {
                 bloke->dest.y = y << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 for (i = 0, p = (char *)seats.c; i < 3; i++, p++) {
                     if (*p == 0) {
@@ -802,7 +802,7 @@ void Restaurant1Update(Element *obj) {
                 bloke->dest.y = (y + 1) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1130,7 +1130,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = (y - 2) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->field_5c = 300;
                 bloke->field_44 = bloke->speed;
@@ -1143,7 +1143,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = ((y - 4) << 8) + fc * 100;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1153,7 +1153,7 @@ void Restaurant2Update(Element *obj) {
                     bloke->dest.x = (x << 8) + 0x2ce;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
+                    bloke->target_dir = dir + 0x10;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->param_action++;
                     f10++;
@@ -1164,7 +1164,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = (y << 8) - 0x39c;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1173,7 +1173,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = (y << 8) - 0x532 + f10 * 100;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 fc--;
@@ -1204,7 +1204,7 @@ void Restaurant2Update(Element *obj) {
                     bloke->dest.y = (y << 8) - 0xc9c;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
+                    bloke->target_dir = dir + 0x10;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->param_action++;
                 }
@@ -1214,7 +1214,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = (y << 8) - 0xc9c;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1260,7 +1260,7 @@ void Restaurant2Update(Element *obj) {
                     bloke->dest.y = (y << 8) - 0x46a;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
+                    bloke->target_dir = dir + 0x10;
                     NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                     bloke->param_action++;
                 }
@@ -1270,7 +1270,7 @@ void Restaurant2Update(Element *obj) {
                 bloke->dest.y = (y << 8) - 0x46a;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->speed = (unsigned char)bloke->field_44;
                 bloke->param_action++;
@@ -1715,7 +1715,7 @@ void FoodcartIcecreamUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) - 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1735,7 +1735,7 @@ void FoodcartIcecreamUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
+                bloke->target_dir = dir + 0x10;
                 NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -1965,9 +1965,9 @@ void OctopusCafeUpdate(Element *obj) {
             bloke->dest.x = DAT_004b6990[spot * 2] + (tile->pos.x << 8) - 0x80 + off.x;
             bloke->dest.y = (tile->pos.y << 8) + DAT_004b6990[spot * 2 + 1] + 0x80 + off.y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
-            NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+            NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
             bloke->param_action++;
             continue;
         case 7:
@@ -1985,7 +1985,7 @@ void OctopusCafeUpdate(Element *obj) {
             bloke->dest.x = DAT_004b6990[spot * 2] + (tile->pos.x << 8) - 0x80 + off.x;
             bloke->dest.y = (tile->pos.y << 8) + DAT_004b6990[spot * 2 + 1] + 0x80 + off.y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             bloke->param_action++;
             bloke->field_5c = 200;
@@ -2015,7 +2015,7 @@ void OctopusCafeUpdate(Element *obj) {
             bloke->dest.x = DAT_004b6990[spot * 2] + (tile->pos.x << 8) - 0x80 + off.x;
             bloke->dest.y = (tile->pos.y << 8) + DAT_004b6990[spot * 2 + 1] + 0x80 + off.y;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             bloke->param_action++;
             continue;
@@ -2036,7 +2036,7 @@ void OctopusCafeUpdate(Element *obj) {
             bloke->dest.y = (tile->pos.y << 8) + 0x80 + DAT_004b6990[idx * 2 + 1];
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             continue;
         case 17:
@@ -2045,7 +2045,7 @@ void OctopusCafeUpdate(Element *obj) {
             bloke->dest.y = ((tile->pos.y + ride->y) << 8) + 0x80;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
             bloke->low_level_action = 7;
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
             continue;
@@ -2060,9 +2060,9 @@ void OctopusCafeUpdate(Element *obj) {
         bloke->dest.x = DAT_004b6990[idx * 2] - 0x80 + (tile->pos.x << 8);
         bloke->dest.y = (tile->pos.y << 8) + 0x80 + DAT_004b6990[idx * 2 + 1];
         dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-        bloke->field_73 = dir + 0x10;
+        bloke->target_dir = dir + 0x10;
         bloke->low_level_action = 7;
-        NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+        NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
         bloke->param_action++;
     }
 }

@@ -1761,6 +1761,7 @@ void FUN_0045d770(struct Cursor *param_1) {
     PathUpdateNeeded = 1;
 }
 
+// RestoreBaseMap: puts the tile's base sprite (field_a) back as its current sprite (field_8).
 // FUNCTION: LEGOLAND 0x0045da60
 LEGO_EXPORT void RestoreBaseMap(int tile_x, int row_y) {
     struct MapElement *tile = &GameMap[row_y][tile_x];

@@ -37,16 +37,6 @@ struct Particle {
     int c;
 };
 
-struct FlumeOut {
-    int kind;
-    unsigned char pad_4[0xc - 0x4];
-    int f_0c;
-    int f_10;
-    unsigned char pad_14[0x1c - 0x14];
-    int f_1c;
-    int f_20;
-};
-
 struct WalkNode {
     struct WalkNode *var_0;
     struct FlumeSlot *var_4;
@@ -494,16 +484,16 @@ void FindFlumeNeighbours(TileId tile) {
 
     buf.b0 = tile.pos.x;
     buf.b1 = tile.pos.y - h;
-    DAT_004cbe20[0] = FindFlumePieceAtTile(&buf);
+    FlumeNeighbours[0] = FindFlumePieceAtTile(&buf);
     buf.b0 = tile.pos.x + w;
     buf.b1 = tile.pos.y;
-    DAT_004cbe20[1] = FindFlumePieceAtTile(&buf);
+    FlumeNeighbours[1] = FindFlumePieceAtTile(&buf);
     buf.b0 = tile.pos.x;
     buf.b1 = tile.pos.y + h;
-    DAT_004cbe20[2] = FindFlumePieceAtTile(&buf);
+    FlumeNeighbours[2] = FindFlumePieceAtTile(&buf);
     buf.b0 = tile.pos.x - w;
     buf.b1 = tile.pos.y;
-    DAT_004cbe20[3] = FindFlumePieceAtTile(&buf);
+    FlumeNeighbours[3] = FindFlumePieceAtTile(&buf);
 }
 
 // FUNCTION: LEGOLAND 0x00409410
@@ -526,27 +516,27 @@ int FlumeNeighbourMask(struct FlumeEntry **ctx) {
 
 // FUNCTION: LEGOLAND 0x00409440
 void GetFlumeNeighbours(TileId param_1, void **param_2) {
-    DAT_004cbe20[0] = 0;
-    DAT_004cbe20[1] = 0;
-    DAT_004cbe20[2] = 0;
-    DAT_004cbe20[3] = 0;
+    FlumeNeighbours[0] = 0;
+    FlumeNeighbours[1] = 0;
+    FlumeNeighbours[2] = 0;
+    FlumeNeighbours[3] = 0;
     FindFlumeNeighbours(param_1);
-    *param_2 = DAT_004cbe20;
+    *param_2 = FlumeNeighbours;
 }
 
 // FUNCTION: LEGOLAND 0x00409470
 unsigned int CountFlumeNeighbours(unsigned int *list) {
     unsigned int result = 0;
-    if (DAT_004cbe20[0] != 0) {
+    if (FlumeNeighbours[0] != 0) {
         result = 1;
     }
-    if (DAT_004cbe20[1] != 0) {
+    if (FlumeNeighbours[1] != 0) {
         result++;
     }
-    if (DAT_004cbe20[2] != 0) {
+    if (FlumeNeighbours[2] != 0) {
         result++;
     }
-    if (DAT_004cbe20[3] != 0) {
+    if (FlumeNeighbours[3] != 0) {
         result++;
     }
     return result;
@@ -1305,23 +1295,20 @@ void FUN_0040a5d0(struct FlumeEntry *param) {
 // FUNCTION: LEGOLAND 0x0040a600
 void LogFlumeEntranceAddObject(Element *elem, int *pt) {
     TileId t;
-    register struct FlumeEntry *entry;
+    struct FlumeEntry *entry;
     struct FlumeEntry *mid;
     struct FlumeEntry *node;
     struct FlumeEntry *prev;
-    register struct Ride *ride;
+    struct Ride *ride;
     int pos[2];
     int coords[2];
     int h;
     int midY;
-    register int last;
+    int last;
     int count;
     int i;
 
-    int fy0;
-    int fy1;
     int node_y;
-    int fx0;
     t.pos.x = pt[0];
     t.pos.y = pt[1];
     ride = elem->ride;
@@ -1329,8 +1316,7 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
     AddFlumeEntry(t);
     entry = FindFlumeEntryByTile(&t);
     if (entry != NULL) {
-        fy1 = LogFlumeFootprint.y1;
-        h = fy1 - LogFlumeFootprint.y0;
+        h = LogFlumeFootprint.y1 - LogFlumeFootprint.y0;
         midY = t.pos.y + ride->footprint.y0 + ((ride->footprint.y1 - ride->footprint.y0) >> 1);
         pos[0] = t.pos.x + ride->footprint.x0 + 1;
         entry->sub2 = (struct FlumeEntry *)FlumeQueueTable0;
@@ -1343,8 +1329,7 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
             node->parent = entry;
             node->link28 = NULL;
             node->flags10d |= 3;
-            fx0 = LogFlumeFootprint.x0;
-            node->tile.pos.x = pos[0] - fx0;
+            node->tile.pos.x = pos[0] - LogFlumeFootprint.x0;
             node->tile.pos.y = pos[1] - LogFlumeFootprint.y0;
         }
         PushFlumeListNode((struct FlumeEntry *)entry, (struct ListNode *)node);
@@ -1375,8 +1360,7 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
                 node->parent = entry;
                 node->flags10d = node->flags10d | 7;
                 node->tile.pos.x = pos[0] - LogFlumeFootprint.x0;
-                fy0 = LogFlumeFootprint.y0;
-                node->tile.pos.y = coords[1] - fy0;
+                node->tile.pos.y = coords[1] - LogFlumeFootprint.y0;
             }
             if (coords[1] <= midY) {
                 if (coords[1] + h >= midY) {
@@ -1421,7 +1405,7 @@ void LogFlumeEntranceAddObject(Element *elem, int *pt) {
 // FUNCTION: LEGOLAND 0x0040a930
 void LogFlumeEntranceCalcCursor(Element *elem, int *param_2, unsigned int param_3) {
     struct Ride *ride;
-    register int x;
+    int x;
     int h;
     unsigned int y;
 
@@ -1568,9 +1552,9 @@ int FUN_0040adb0(TileId tile, struct FlumeRect *rect, int param_3, int y, float 
     RECT rc;
 
     rc.left = rect->var_0 + tile.pos.x;
+    rc.top = rect->var_4 + tile.pos.y;
     rc.right = rect->var_8 + tile.pos.x;
     rc.bottom = rect->var_c + tile.pos.y;
-    rc.top = rect->var_4 + tile.pos.y;
     pt.x = rc.left;
     pt.y = rc.top;
     GetTileBounds(&pt, bounds);
@@ -1672,7 +1656,7 @@ void DrawLogFlumeBarrel(struct FlumeSlot *slot, struct FlumeEntry *other, int dr
         /* centre the barrel sprite horizontally; lift it by 3/4 of its height plus half the
            slot's bob offset */
         pos.x = p.x - (spriteB->width >> 1);
-        p.y -= (int)((short)spriteB->height * 0.75f + (slot->field_1c >> 1));
+        p.y -= (int)(((short)spriteB->height * 0.75f) + (int)(slot->field_1c >> 1));
         p.x = pos.x;
         if (drawBarrel != 0) {
             struct RideNode *node;
@@ -2154,34 +2138,39 @@ void FUN_0040bd40(struct FlumeEntry *set, int index) {
     }
 }
 
+/* Per-entry update used by LogFlumeEntranceUpdate: advance its boat slots, hand
+   over queued riders, and update the queue's admission flag and walking positions. */
 // FUNCTION: LEGOLAND 0x0040be00
 void UpdateLogFlumeEntranceEntry(struct FlumeEntry *set) {
     struct FlumeSlot *slot;
-    struct RideNode *item; /* the rider the queue hands over */
-    int i;
+    struct RideNode *rider_node; /* the rider the queue hands over */
+    int slot_index;
 
+    /* Flag 2 expires after the entry's configured tick limit. */
     if (set->flags & 2) {
         if (++set->ticks >= set->field_28) {
             set->flags &= ~2;
         }
     }
+    /* Only circulate boats on connected track; service the slots every third update. */
     if (IsFlumeLoopClosed((struct FlumeEntry *)set)) {
         set->timer--;
         if (set->timer < 0) {
             set->timer = 2;
-            for (i = 0; i < set->count; i++) {
-                UpdateFlumeSlot(set, i);
+            for (slot_index = 0; slot_index < set->count; slot_index++) {
+                UpdateFlumeSlot(set, slot_index);
             }
             if (!(set->flags & 1)) {
                 slot = NULL;
                 if (FindFreeFlumeStationSlot(set, &slot)) {
-                    item = NULL;
+                    /* Transfer the next ready queued rider to an available boarding slot. */
+                    rider_node = NULL;
                     set->target = slot;
                     if (QueueHasNodes(&set->queue)) {
                         if (IsQueueHeadAtFront(&set->queue)) {
                             set->flags |= 1;
-                            LeaveQueueHead(&set->queue, (struct RideNode **)&item);
-                            slot->busy = item;
+                            LeaveQueueHead(&set->queue, (struct RideNode **)&rider_node);
+                            slot->busy = rider_node;
                         }
                     }
                 }
@@ -2190,12 +2179,21 @@ void UpdateLogFlumeEntranceEntry(struct FlumeEntry *set) {
     } else {
         FUN_0040a580((struct FlumeEntry *)set);
     }
-    StepQueueRiders(&set->queue, LogFlumeEntranceRide->x + set->tile.pos.x, LogFlumeEntranceRide->y + set->tile.pos.y);
+    {
+        /* Calculate both world coordinates before the queue call. The Point preserves
+           MSVC6's original register allocation; a cached ride pointer does not. */
+        Point queue_position;
+        queue_position.x = LogFlumeEntranceRide->x + set->tile.pos.x;
+        queue_position.y = LogFlumeEntranceRide->y + set->tile.pos.y;
+        StepQueueRiders(&set->queue, queue_position.x, queue_position.y);
+    }
+    /* Prevent new arrivals while the entrance queue is full. */
     if (IsQueueFull(&set->queue)) {
         Ride_SetFlagToNotLetAnyoneOn(&set->tile);
     } else {
         Ride_ClearFlagToNotLetAnyoneOn(&set->tile);
     }
+    /* Advance the entry's phase modulo 16. */
     set->submode = (set->submode + 1) & 0xf;
 }
 
@@ -2210,26 +2208,24 @@ void UpdateAllLogFlumeEntrances(void) {
 
 // FUNCTION: LEGOLAND 0x0040bf70
 void LogFlumeEntranceUpdate(Element *obj) {
-    int field_73;
-    RideNode *ptmp375;
+    int target_dir;
     Ride *ride = obj->ride;
     RideNode *elem;
-    register Bloke *bloke;
+    Bloke *bloke;
     RideNode *next;
-    register TileId *tile;
+    TileId *tile;
     struct FlumeEntry *entry;
     unsigned int x;
     char dir;
     unsigned int y;
     int v;
-    ptmp375 = ride->riders;
-    elem = ptmp375;
+    elem = ride->riders;
 
     UpdateAllLogFlumeEntrances();
     while (NULL != elem) {
+        bloke = elem->rider;
         tile = &elem->tile;
         x = ride->field_24 + tile->pos.x;
-        bloke = elem->rider;
         next = elem->next;
         y = ride->field_25 + tile->pos.y;
         if (bloke->low_level_action == 0) {
@@ -2251,8 +2247,8 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->dest.y = v;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 3:
@@ -2262,8 +2258,8 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->dest.y = v;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 4:
@@ -2291,9 +2287,9 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->dest.y = (tile->pos.y << 8) - 0x100;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                field_73 = bloke->field_73;
-                NewDirForAction(bloke, (field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                target_dir = bloke->target_dir;
+                NewDirForAction(bloke, (target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 7:
@@ -2303,8 +2299,8 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->dest.y = v;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = 0x10 + dir;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = 0x10 + dir;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 8:
@@ -2318,8 +2314,8 @@ void LogFlumeEntranceUpdate(Element *obj) {
                 bloke->dest.y = ((tile->pos.y + ride->field_25) << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 11:
@@ -2673,8 +2669,8 @@ void DrawFlumeBarrelList(void *a1, struct FlumeEntry *a2) {
  * another column. */
 // FUNCTION: LEGOLAND 0x0040ca60
 int RenderLogFlumeCorner(struct FlumeEntry *entry, int arg) {
+    int count = 0;
     struct FlumeEntry *par = entry->parent;
-    volatile int count = 0; /* volatile: the original re-reads this from its stack slot */
     int i;
     struct FlumeSlot *slot;
     double w;
@@ -2873,37 +2869,37 @@ void FindFlumeConnectionNeighbours(struct InputBuffer *esi) {
 
     ebx = ebx - edx;
 
-    DAT_004cbe20[0] = 0;
-    DAT_004cbe20[1] = 0;
-    DAT_004cbe20[2] = 0;
-    DAT_004cbe20[3] = 0;
+    FlumeNeighbours[0] = 0;
+    FlumeNeighbours[1] = 0;
+    FlumeNeighbours[2] = 0;
+    FlumeNeighbours[3] = 0;
 
     if (esi->flags & 1) {
         buf.b0 = esi->var_4;
         buf.b1 = esi->var_8 - (unsigned char)ebx;
-        DAT_004cbe20[0] = FindFlumePieceAtTile(&buf);
+        FlumeNeighbours[0] = FindFlumePieceAtTile(&buf);
     }
     if (esi->flags & 2) {
         buf.b0 = esi->var_c + (unsigned char)local_8;
         buf.b1 = esi->var_10;
-        DAT_004cbe20[1] = FindFlumePieceAtTile(&buf);
+        FlumeNeighbours[1] = FindFlumePieceAtTile(&buf);
     }
     if (esi->flags & 4) {
         buf.b0 = esi->var_14;
         buf.b1 = esi->var_18 + (unsigned char)ebx;
-        DAT_004cbe20[2] = FindFlumePieceAtTile(&buf);
+        FlumeNeighbours[2] = FindFlumePieceAtTile(&buf);
     }
     if (esi->flags & 8) {
         buf.b0 = esi->var_1c - (unsigned char)local_8;
         buf.b1 = esi->var_20;
-        DAT_004cbe20[3] = FindFlumePieceAtTile(&buf);
+        FlumeNeighbours[3] = FindFlumePieceAtTile(&buf);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0040cf10
 void GetFlumeConnectionNeighbours(struct InputBuffer *param_1, struct FlumeEntry ***param_2) {
     FindFlumeConnectionNeighbours(param_1);
-    *param_2 = DAT_004cbe20;
+    *param_2 = FlumeNeighbours;
 }
 
 // FUNCTION: LEGOLAND 0x0040cf30
@@ -3769,15 +3765,12 @@ int CanPlaceFlumeSpecialCorner(struct FlumeEntry **ctx) {
 
 // FUNCTION: LEGOLAND 0x0040e440
 void GetFlumeSpecialCornerConnections(TileId p, unsigned int *result) {
-    int px;
     unsigned int w = LogFlumeFootprint.x1 - LogFlumeFootprint.x0;
-    unsigned int v3;
     unsigned int h = LogFlumeFootprint.y1 - LogFlumeFootprint.y0;
-    int v1;
 
     switch (FlumeSpecialCornerIndex) {
     case 0:
-        p.pos.x = p.pos.x + ((unsigned char)LogFlumeSpecialCorner1Ride->footprint.v[0]);
+        p.pos.x += (unsigned char)LogFlumeSpecialCorner1Ride->footprint.v[0];
         p.pos.y += (unsigned char)LogFlumeSpecialCorner1Ride->footprint.v[1];
         result[0] = 3;
         result[1] = p.pos.x + 3;
@@ -3787,32 +3780,29 @@ void GetFlumeSpecialCornerConnections(TileId p, unsigned int *result) {
         break;
     case 1:
         p.pos.x += (unsigned char)LogFlumeSpecialCorner2Ride->footprint.v[0];
-        v1 = LogFlumeSpecialCorner2Ride->footprint.v[1];
+        p.pos.y += (unsigned char)LogFlumeSpecialCorner2Ride->footprint.v[1];
         result[0] = 6;
-        p.pos.y += (unsigned char)v1;
         result[3] = LogFlumeSpecialCorner2Ride->footprint.v[2] - LogFlumeSpecialCorner2Ride->footprint.v[0] - w + p.pos.x + 1;
-        result[5] = 2 + p.pos.x;
         result[4] = p.pos.y + 2;
+        result[5] = p.pos.x + 2;
         result[6] = LogFlumeSpecialCorner2Ride->footprint.v[3] - LogFlumeSpecialCorner2Ride->footprint.v[1] - h + p.pos.y + 1;
         break;
     case 2:
         p.pos.x += (unsigned char)LogFlumeSpecialCorner3Ride->footprint.v[0];
-        p.pos.y = p.pos.y + ((unsigned char)LogFlumeSpecialCorner3Ride->footprint.v[1]);
+        p.pos.y += (unsigned char)LogFlumeSpecialCorner3Ride->footprint.v[1];
         result[0] = 12;
-        px = p.pos.x;
-        result[5] = 4 + px;
-        v3 = LogFlumeSpecialCorner3Ride->footprint.v[3];
+        result[5] = p.pos.x + 4;
+        result[6] = LogFlumeSpecialCorner3Ride->footprint.v[3] - LogFlumeSpecialCorner3Ride->footprint.v[1] - h + p.pos.y + 1;
         result[7] = p.pos.x;
-        result[6] = v3 - LogFlumeSpecialCorner3Ride->footprint.v[1] - h + p.pos.y + 1;
         result[8] = p.pos.y + 3;
         break;
     case 3:
-        p.pos.x = p.pos.x + ((unsigned char)LogFlumeSpecialCorner4Ride->footprint.v[0]);
+        p.pos.x += (unsigned char)LogFlumeSpecialCorner4Ride->footprint.v[0];
         p.pos.y += (unsigned char)LogFlumeSpecialCorner4Ride->footprint.v[1];
-        result[7] = p.pos.x;
-        result[1] = p.pos.x + 4;
         result[0] = 9;
+        result[7] = p.pos.x;
         result[8] = p.pos.y + 4;
+        result[1] = p.pos.x + 4;
         result[2] = p.pos.y;
         break;
     }
@@ -4675,23 +4665,16 @@ unsigned int CanPlaceLogFlumeHoldUp(struct FlumeEntry **param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x0040feb0
-void GetLogFlumeHoldUpConnections(TileId pos, struct FlumeOut *out) {
-    struct Ride *ride = (struct Ride *)LogFlumeHoldUpRide;
-    unsigned char x;
-    unsigned char y;
-    int span;
+void GetLogFlumeHoldUpConnections(TileId p, unsigned int *result) {
+    unsigned int w = LogFlumeFootprint.x1 - LogFlumeFootprint.x0;
 
-    span = LogFlumeFootprint.x1 - LogFlumeFootprint.x0;
-    x = pos.pos.x + (unsigned char)ride->footprint.x0;
-    y = pos.pos.y + (unsigned char)ride->footprint.y0;
-    pos.pos.x = x;
-    pos.pos.y = y;
-    out->kind = 10;
-    out->f_1c = pos.pos.x;
-    out->f_20 = pos.pos.y + 9;
-    ride = (struct Ride *)LogFlumeHoldUpRide;
-    out->f_10 = pos.pos.y + 7;
-    out->f_0c = ride->footprint.x1 - ride->footprint.x0 - span + pos.pos.x + 1;
+    p.pos.x += (unsigned char)LogFlumeHoldUpRide->footprint.v[0];
+    p.pos.y += (unsigned char)LogFlumeHoldUpRide->footprint.v[1];
+    result[0] = 10;
+    result[7] = p.pos.x;
+    result[8] = p.pos.y + 9;
+    result[3] = LogFlumeHoldUpRide->footprint.v[2] - LogFlumeHoldUpRide->footprint.v[0] - w + p.pos.x + 1;
+    result[4] = p.pos.y + 7;
 }
 
 // FUNCTION: LEGOLAND 0x0040ff30
@@ -4801,41 +4784,29 @@ void LogFlumeHoldUpRemoveObject(struct Element *param_1, TileId param_2, struct 
 
 // FUNCTION: LEGOLAND 0x00410180
 void BuildLogFlumeDropNodes(struct FlumeNode *param_1) {
-    volatile int ptmp170;
-    int ptmp171;
-    struct FlumeNode *parent;
+    struct FlumeNode *parent = param_1;
     struct FlumeNode *node;
-    register TileId pos;
     struct FlumeNode *prev;
-    register int ptmp172;
-    int w;
-    register int n;
-    volatile int ptmp424;
-    parent;
-    parent = param_1;
-    w = LogFlumeFootprint.y1 - LogFlumeFootprint.y0;
+    unsigned char x;
+    unsigned char y;
+    int h = LogFlumeFootprint.y1 - LogFlumeFootprint.y0;
+    int i;
 
-    pos.pos.y = ((struct Ride *)LogFlumeDropRide)->footprint.y0 + parent->tile.pos.y;
-    pos.pos.x = ((struct Ride *)LogFlumeDropRide)->footprint.x0 + parent->tile.pos.x + 2;
-    node = NewFlumeNode(parent, 3, 0, pos.pos.y, pos.pos.x);
+    y = ((struct Ride *)LogFlumeDropRide)->footprint.y0 + parent->tile.pos.y;
+    x = ((struct Ride *)LogFlumeDropRide)->footprint.x0 + parent->tile.pos.x + 2;
+    node = NewFlumeNode(parent, 3, 0, y, x);
     AppendListNode((struct FlumeEntry *)parent, (struct ListNode *)node);
-    n = 0x18 / w;
-    n = n + (-2);
     parent->field_30 = node;
     prev = node;
-    for (; 0 < n; n--) {
-        pos.pos.y += w;
-        ptmp170 = pos.pos.y;
-        node = NewFlumeNode(parent, 1, 0, ptmp170, pos.pos.x);
-        { AppendListNode((struct FlumeEntry *)parent, (struct ListNode *)node); }
+    for (i = 0; i < 0x18 / h - 2; i++) {
+        y += h;
+        node = NewFlumeNode(parent, 1, 0, y, x);
+        AppendListNode((struct FlumeEntry *)parent, (struct ListNode *)node);
         LinkNodeAfter((struct FlumeEntry *)prev, (struct FlumeEntry *)node);
         prev = node;
     }
-    pos.pos.y += w;
-    ptmp172 = pos.pos.x;
-    ptmp171 = ptmp172;
-    ptmp424 = pos.pos.y;
-    node = NewFlumeNode(parent, 3, 2, ptmp424, ptmp171);
+    y += h;
+    node = NewFlumeNode(parent, 3, 2, y, x);
     AppendListNode((struct FlumeEntry *)parent, (struct ListNode *)node);
     LinkNodeAfter((struct FlumeEntry *)prev, (struct FlumeEntry *)node);
     parent->field_34 = node;

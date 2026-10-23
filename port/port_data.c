@@ -112,32 +112,28 @@ void AddRollerCoasterPath2x2();
 void AdjustGardenerCount();
 void ApplyCapacityEvent();
 void ApplyFlashButtonEvent();
+void BisectRoot();
+void BlokeAIEnterPark();
+void BlokeAIGoToBrolly();
 void BlokeAIGoToEntrance();
 void BlokeAILeavePark();
 void BlokeAIWander();
 void Bloke_DoNothing();
+void CastleFillOpenEnd();
+void CastleGetCurve();
+void CastleSetHeights();
+extern char ClipPlaneSet[];
+extern char CoasterSurfaceData[];
 extern char CopterPathTable0[];
 extern char CopterPathTable1[];
 extern char CopterPathTable2[];
 extern char CopterPathTable3[];
 extern char CopterPathTable4[];
-extern char DAT_004b4608[];
-extern char DAT_004b47b8[];
-extern char DAT_004b47e8[];
-void FUN_00423940();
-void FUN_00423970();
-void FUN_00423990();
-void FUN_004275b0();
-void FUN_004275c0();
-void FUN_00427a40();
-void FUN_00427a80();
-void FUN_00427c30();
-void FUN_00427c70();
-void FUN_004286e0();
-void FUN_00429e20();
-void FUN_0044ebf0();
+extern char DAT_004b6010[];
+extern char DAT_004b6110[];
+extern char DAT_004b6240[];
+extern char DAT_004b6270[];
 void FUN_0044f170();
-void FUN_0044fe80();
 void FUN_00450250();
 void FUN_00450330();
 void FUN_00450450();
@@ -146,18 +142,24 @@ void FUN_0046b1e0();
 void FUN_0049a4a0();
 void FUN_0049a4d0();
 void FlipFrame();
+extern char FlumePathTable0[];
+extern char FlumePathTable1[];
 void Gardener_Build();
 void Gardener_Idle();
 void Garderner_Repair();
 void GenerateWorkers();
+void GetTrackPieceCurve();
+extern char GoldRushPathTable[];
+void HeightTrackFillOpenEnd();
+void HeightTrackSetHeights();
 void IsStringEmpty();
 void LogFlumeHoldUpRemoveObject();
 void Mechanic_Build();
 void Mechanic_Idle();
 void Mechanics_Repair();
 void NerpsSetEntranceFee();
-extern char PTR_FUN_004b7e38[];
 void RemoveRollerCoasterPath2x2();
+extern char ReportGoalSetters[];
 void ScriptCmdAddBricks();
 void ScriptCmdAddFlag();
 void ScriptCmdAges();
@@ -294,6 +296,10 @@ void ScriptEventThemeIcon();
 void ScriptEventTotalCoverage();
 void ScriptEventWorkers();
 void ScriptEventZoning();
+void SquareTrackFillOpenEnd();
+void SquareTrackSetHeights();
+void TrackPieceOnAdd();
+void TrackPieceOnRemove();
 
 #define PORT_DATA_VA 0x004ab000u
 #define PORT_DATA_SIZE 0x17000u
@@ -4240,27 +4246,27 @@ static const struct PortFixup port_fixups[] = {
     {0x410, 'G', (void *)&EditCursor, sizeof(EditCursor), 0x1440, ~0u},
     {0x208c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x741d4, ~0u},
     {0x2090, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x54221, ~0u},
-    {0x2e4c, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x16788, ~0u},
-    {0x2ffc, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x46788, ~0u},
-    {0x301c, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x26788, ~0u},
-    {0x3070, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x1c790, ~0u},
+    {0x2e4c, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x16704, ~0u},
+    {0x2ffc, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x46704, ~0u},
+    {0x301c, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x26704, ~0u},
+    {0x3070, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x1c790, ~0u},
     {0x30c0, 'G', (void *)&DAT_004cc090, sizeof(DAT_004cc090), 0x3fe4, ~0u},
-    {0x315c, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x367f4, ~0u},
+    {0x315c, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x36770, ~0u},
     {0x318c, 'G', (void *)&DAT_004cc090, sizeof(DAT_004cc090), 0x3f70, ~0u},
-    {0x35a4, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x8c803, ~0u},
-    {0x3e60, 'F', (void *)FUN_004119a0, 0, 0, ~0u},
+    {0x35a4, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x8c803, ~0u},
+    {0x3e60, 'F', (void *)AddFlumeScore, 0, 0, ~0u},
     {0x3f80, 'F', (void *)LogFlumeHoldUpRemoveObject, 0, 0, ~0u},
     {0x4f1c, 'G', (void *)&NullGuid, sizeof(NullGuid), 0x307a, 0x504au},
     {0x4f20, 'G', (void *)&DAT_004cc090, sizeof(DAT_004cc090), 0x3fbc, ~0u},
-    {0x4f24, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0xc7de, ~0u},
-    {0x4f28, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x2c7e0, ~0u},
-    {0x4f2c, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x4c7e2, ~0u},
-    {0x4f30, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x6c7e4, ~0u},
-    {0x4f34, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x8c7e6, ~0u},
-    {0x4f38, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x167e0, ~0u},
-    {0x4f3c, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x367e2, ~0u},
-    {0x4f40, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x567e4, ~0u},
-    {0x4f44, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x767e6, ~0u},
+    {0x4f24, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0xc7de, ~0u},
+    {0x4f28, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x2c7e0, ~0u},
+    {0x4f2c, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x4c7e2, ~0u},
+    {0x4f30, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x6c7e4, ~0u},
+    {0x4f34, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x8c7e6, ~0u},
+    {0x4f38, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x1675c, ~0u},
+    {0x4f3c, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x3675e, ~0u},
+    {0x4f40, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x56760, ~0u},
+    {0x4f44, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x76762, ~0u},
     {0x4f48, 'G', (void *)&DAT_0060fef8, sizeof(DAT_0060fef8), 0x168, ~0u},
     {0x4f4c, 'G', (void *)&DAT_0062fef8, sizeof(DAT_0062fef8), 0x16a, ~0u},
     {0x4f50, 'G', (void *)&DAT_0064cd90, sizeof(DAT_0064cd90), 0x32d4, ~0u},
@@ -4269,11 +4275,11 @@ static const struct PortFixup port_fixups[] = {
     {0x4f5c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x44216, ~0u},
     {0x4f60, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x64218, ~0u},
     {0x4f64, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x8421a, ~0u},
-    {0x4f68, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0xe208, ~0u},
-    {0x4f6c, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x2e20a, ~0u},
-    {0x4f70, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x4e20c, ~0u},
-    {0x4f74, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x6e20e, ~0u},
-    {0x4f78, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x8e210, ~0u},
+    {0x4f68, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0xe208, ~0u},
+    {0x4f6c, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x2e20a, ~0u},
+    {0x4f70, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x4e20c, ~0u},
+    {0x4f74, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x6e20e, ~0u},
+    {0x4f78, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x8e210, ~0u},
     {0x4f7c, 'G', (void *)&SpeechPcmBuffer, sizeof(SpeechPcmBuffer), 0x53da, ~0u},
     {0x4f80, 'G', (void *)&PrintListPool, sizeof(PrintListPool), 0x4a7c, ~0u},
     {0x4f84, 'G', (void *)&PrintListPool, sizeof(PrintListPool), 0x24a7e, ~0u},
@@ -4337,61 +4343,61 @@ static const struct PortFixup port_fixups[] = {
     {0x9fc0, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x24, 0x9fccu},
     {0xa2c0, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0x2c, 0xa2ecu},
     {0xa2cc, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0x18, 0xa2d8u},
-    {0xa5fc, 'G', (void *)&DAT_0082ac60, sizeof(DAT_0082ac60), 0x80, ~0u},
-    {0xa600, 'G', (void *)&DAT_004d884c, sizeof(DAT_004d884c), 0x0, ~0u},
-    {0xa604, 'G', (void *)&DAT_004d87cc, sizeof(DAT_004d87cc), 0x0, ~0u},
-    {0xa648, 'F', (void *)FUN_0041f8d0, 0, 0, ~0u},
-    {0xa64c, 'F', (void *)FUN_0041fba0, 0, 0, ~0u},
-    {0xa658, 'F', (void *)FUN_0041fd80, 0, 0, ~0u},
-    {0xa65c, 'F', (void *)FUN_0041ff80, 0, 0, ~0u},
-    {0xa8d8, 'G', (void *)&DAT_004b5700, sizeof(DAT_004b5700), 0x0, 0xa700u},
+    {0xa5fc, 'G', (void *)&ClipPlaneSet, 0x34u, 0x0, ~0u},
+    {0xa600, 'G', (void *)&ClipVertsIn, sizeof(ClipVertsIn), 0x0, ~0u},
+    {0xa604, 'G', (void *)&ClipVertsOut, sizeof(ClipVertsOut), 0x0, ~0u},
+    {0xa648, 'F', (void *)FillSpansFlat, 0, 0, ~0u},
+    {0xa64c, 'F', (void *)FillSpansFlatZ, 0, 0, ~0u},
+    {0xa658, 'F', (void *)FillSpansGouraud, 0, 0, ~0u},
+    {0xa65c, 'F', (void *)FillSpansGouraudZ, 0, 0, ~0u},
+    {0xa8d8, 'G', (void *)&BoxFaceNormals, sizeof(BoxFaceNormals), 0x0, 0xa700u},
     {0xa8e0, 'G', (void *)&DAT_004b5748, sizeof(DAT_004b5748), 0x0, 0xa748u},
-    {0xa96c, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x50, 0xa9d8u},
-    {0xa970, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x48, 0xa9d0u},
-    {0xa97c, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x38, 0xa9c0u},
-    {0xa980, 'G', (void *)&DAT_004b5988, sizeof(DAT_004b5988), 0x48, 0xa9d0u},
+    {0xa96c, 'G', (void *)&CastleVisitorInfo, sizeof(CastleVisitorInfo), 0x50, 0xa9d8u},
+    {0xa970, 'G', (void *)&CastleVisitorInfo, sizeof(CastleVisitorInfo), 0x48, 0xa9d0u},
+    {0xa97c, 'G', (void *)&CastleVisitorInfo, sizeof(CastleVisitorInfo), 0x38, 0xa9c0u},
+    {0xa980, 'G', (void *)&CastleVisitorInfo, sizeof(CastleVisitorInfo), 0x48, 0xa9d0u},
     {0xaaac, 'G', (void *)&SitLoManSitName, 0xdu, 0x18, 0xaa10u},
     {0xaab0, 'G', (void *)&SitLoManSitName, 0xdu, 0x40, 0xaa38u},
     {0xaab4, 'G', (void *)&SitLoManSitName, 0xdu, 0x68, 0xaa60u},
     {0xaab8, 'G', (void *)&SitLoManSitName, 0xdu, 0x90, 0xaa88u},
-    {0xab20, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x84, ~0u},
-    {0xab24, 'G', (void *)&DAT_004e3870, sizeof(DAT_004e3870), 0x0, ~0u},
-    {0xab3c, 'G', (void *)&DAT_004dd870, sizeof(DAT_004dd870), 0x0, ~0u},
-    {0xab64, 'F', (void *)FUN_00423940, 0, 0, ~0u},
-    {0xab68, 'F', (void *)FUN_00423970, 0, 0, ~0u},
-    {0xab6c, 'F', (void *)FUN_00423990, 0, 0, ~0u},
-    {0xad3c, 'F', (void *)FUN_00427a40, 0, 0, ~0u},
-    {0xad40, 'F', (void *)FUN_00427a80, 0, 0, ~0u},
-    {0xad44, 'F', (void *)FUN_004286e0, 0, 0, ~0u},
-    {0xad48, 'F', (void *)FUN_004275c0, 0, 0, ~0u},
-    {0xad4c, 'F', (void *)FUN_004275b0, 0, 0, ~0u},
-    {0xad74, 'F', (void *)FUN_00427c30, 0, 0, ~0u},
-    {0xad78, 'F', (void *)FUN_00427c70, 0, 0, ~0u},
-    {0xad7c, 'F', (void *)FUN_004286e0, 0, 0, ~0u},
-    {0xad80, 'F', (void *)FUN_004275c0, 0, 0, ~0u},
-    {0xad84, 'F', (void *)FUN_004275b0, 0, 0, ~0u},
-    {0xadac, 'F', (void *)FUN_00427c30, 0, 0, ~0u},
-    {0xadb0, 'F', (void *)FUN_00427c70, 0, 0, ~0u},
-    {0xadb4, 'F', (void *)FUN_004286e0, 0, 0, ~0u},
-    {0xadb8, 'F', (void *)FUN_004275c0, 0, 0, ~0u},
-    {0xadbc, 'F', (void *)FUN_004275b0, 0, 0, ~0u},
-    {0xade4, 'F', (void *)FUN_00427c30, 0, 0, ~0u},
-    {0xade8, 'F', (void *)FUN_00427c70, 0, 0, ~0u},
-    {0xadec, 'F', (void *)FUN_004286e0, 0, 0, ~0u},
+    {0xab20, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x0, ~0u},
+    {0xab24, 'G', (void *)&CoasterDepthBufferData, 0x96000u, 0x0, ~0u},
+    {0xab3c, 'G', (void *)&DepthSpanRecords, sizeof(DepthSpanRecords), 0x0, ~0u},
+    {0xab64, 'F', (void *)CastleFillOpenEnd, 0, 0, ~0u},
+    {0xab68, 'F', (void *)CastleSetHeights, 0, 0, ~0u},
+    {0xab6c, 'F', (void *)CastleGetCurve, 0, 0, ~0u},
+    {0xad3c, 'F', (void *)SquareTrackFillOpenEnd, 0, 0, ~0u},
+    {0xad40, 'F', (void *)SquareTrackSetHeights, 0, 0, ~0u},
+    {0xad44, 'F', (void *)GetTrackPieceCurve, 0, 0, ~0u},
+    {0xad48, 'F', (void *)TrackPieceOnAdd, 0, 0, ~0u},
+    {0xad4c, 'F', (void *)TrackPieceOnRemove, 0, 0, ~0u},
+    {0xad74, 'F', (void *)HeightTrackFillOpenEnd, 0, 0, ~0u},
+    {0xad78, 'F', (void *)HeightTrackSetHeights, 0, 0, ~0u},
+    {0xad7c, 'F', (void *)GetTrackPieceCurve, 0, 0, ~0u},
+    {0xad80, 'F', (void *)TrackPieceOnAdd, 0, 0, ~0u},
+    {0xad84, 'F', (void *)TrackPieceOnRemove, 0, 0, ~0u},
+    {0xadac, 'F', (void *)HeightTrackFillOpenEnd, 0, 0, ~0u},
+    {0xadb0, 'F', (void *)HeightTrackSetHeights, 0, 0, ~0u},
+    {0xadb4, 'F', (void *)GetTrackPieceCurve, 0, 0, ~0u},
+    {0xadb8, 'F', (void *)TrackPieceOnAdd, 0, 0, ~0u},
+    {0xadbc, 'F', (void *)TrackPieceOnRemove, 0, 0, ~0u},
+    {0xade4, 'F', (void *)HeightTrackFillOpenEnd, 0, 0, ~0u},
+    {0xade8, 'F', (void *)HeightTrackSetHeights, 0, 0, ~0u},
+    {0xadec, 'F', (void *)GetTrackPieceCurve, 0, 0, ~0u},
     {0xadf0, 'F', (void *)AddRollerCoasterPath2x2, 0, 0, ~0u},
     {0xadf4, 'F', (void *)RemoveRollerCoasterPath2x2, 0, 0, ~0u},
-    {0xaf50, 'F', (void *)FUN_00428860, 0, 0, ~0u},
-    {0xaf54, 'F', (void *)FUN_00428860, 0, 0, ~0u},
+    {0xaf50, 'F', (void *)FillSpansTexturedZ, 0, 0, ~0u},
+    {0xaf54, 'F', (void *)FillSpansTexturedZ, 0, 0, ~0u},
     {0xaf70, 'G', (void *)&DAT_006139c8, sizeof(DAT_006139c8), 0x0, ~0u},
     {0xaf74, 'G', (void *)&DAT_006148b8, sizeof(DAT_006148b8), 0x0, ~0u},
     {0xaf78, 'G', (void *)&DAT_00612708, sizeof(DAT_00612708), 0x0, ~0u},
     {0xb15c, 'G', (void *)&DAT_006137e8, sizeof(DAT_006137e8), 0x0, ~0u},
-    {0xb160, 'G', (void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0x190, 0xb110u},
-    {0xb168, 'G', (void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0x90, 0xb010u},
-    {0xb30c, 'G', (void *)&DAT_00614858, sizeof(DAT_00614858), 0x0, ~0u},
-    {0xb310, 'G', (void *)&DAT_004b61e0, sizeof(DAT_004b61e0), 0x60, 0xb240u},
-    {0xb318, 'G', (void *)&DAT_004b61e0, sizeof(DAT_004b61e0), 0x90, 0xb270u},
-    {0xb3fc, 'F', (void *)FUN_00429e20, 0, 0, ~0u},
+    {0xb160, 'G', (void *)&DAT_004b6110, 0x40u, 0x0, 0xb110u},
+    {0xb168, 'G', (void *)&DAT_004b6010, 0x100u, 0x0, 0xb010u},
+    {0xb30c, 'G', (void *)&TrackTieVerts, sizeof(TrackTieVerts), 0x0, ~0u},
+    {0xb310, 'G', (void *)&DAT_004b6240, 0x30u, 0x0, 0xb240u},
+    {0xb318, 'G', (void *)&DAT_004b6270, 0x80u, 0x0, 0xb270u},
+    {0xb3fc, 'F', (void *)BisectRoot, 0, 0, ~0u},
     {0xb4d8, 'G', (void *)&CAROUSSEL_SFX, sizeof(CAROUSSEL_SFX), 0x34, 0xb50cu},
     {0xb4e4, 'G', (void *)&CAROUSSEL_SFX, sizeof(CAROUSSEL_SFX), 0x18, 0xb4f0u},
     {0xb668, 'G', (void *)&ENTRANCE_SFX, sizeof(ENTRANCE_SFX), 0xc, 0xb674u},
@@ -4426,8 +4432,8 @@ static const struct PortFixup port_fixups[] = {
     {0xc784, 'G', (void *)&DAT_004b7750, sizeof(DAT_004b7750), 0x0, 0xc750u},
     {0xc78c, 'G', (void *)&DAT_004b76b8, sizeof(DAT_004b76b8), 0x0, 0xc6b8u},
     {0xc794, 'G', (void *)&DAT_004b76b8, sizeof(DAT_004b76b8), 0x0, 0xc6b8u},
-    {0xc9d0, 'G', (void *)&DAT_004b79d0, sizeof(DAT_004b79d0), 0x34, 0xca04u},
-    {0xc9dc, 'G', (void *)&DAT_004b79d0, sizeof(DAT_004b79d0), 0x18, 0xc9e8u},
+    {0xc9d0, 'G', (void *)&PlaneRideFX, sizeof(PlaneRideFX), 0x34, 0xca04u},
+    {0xc9dc, 'G', (void *)&PlaneRideFX, sizeof(PlaneRideFX), 0x18, 0xc9e8u},
     {0xce38, 'F', (void *)FUN_004443b0, 0, 0, ~0u},
     {0xce3c, 'F', (void *)FUN_004443e0, 0, 0, ~0u},
     {0xce40, 'F', (void *)FUN_00444410, 0, 0, ~0u},
@@ -4490,7 +4496,7 @@ static const struct PortFixup port_fixups[] = {
     {0xd364, 'G', (void *)&DAT_006661cc, sizeof(DAT_006661cc), 0x2bc, ~0u},
     {0xd368, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd36c, 'F', (void *)FUN_0044f170, 0, 0, ~0u},
-    {0xd370, 'F', (void *)FUN_0044ebf0, 0, 0, ~0u},
+    {0xd370, 'F', (void *)BlokeAIEnterPark, 0, 0, ~0u},
     {0xd374, 'F', (void *)BlokeAILeavePark, 0, 0, ~0u},
     {0xd378, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd380, 'F', (void *)BlokeAIWander, 0, 0, ~0u},
@@ -4500,7 +4506,7 @@ static const struct PortFixup port_fixups[] = {
     {0xd390, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd394, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
     {0xd398, 'F', (void *)Bloke_DoNothing, 0, 0, ~0u},
-    {0xd39c, 'F', (void *)FUN_0044fe80, 0, 0, ~0u},
+    {0xd39c, 'F', (void *)BlokeAIGoToBrolly, 0, 0, ~0u},
     {0xd3a0, 'F', (void *)FUN_00450250, 0, 0, ~0u},
     {0xd3a4, 'F', (void *)FUN_00450450, 0, 0, ~0u},
     {0xd3a8, 'F', (void *)Gardener_Idle, 0, 0, ~0u},
@@ -4688,15 +4694,15 @@ static const struct PortFixup port_fixups[] = {
     {0xee58, 'F', (void *)ScriptEventForever, 0, 0, ~0u},
     {0xf87c, 'G', (void *)&IconListHead, sizeof(IconListHead), 0x0, ~0u},
     {0xf880, 'G', (void *)&DAT_006687cc, sizeof(DAT_006687cc), 0x0, ~0u},
-    {0x100a4, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xc4, 0xac0cu},
-    {0x100a8, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
-    {0x100ac, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0x88, 0xabd0u},
-    {0x100b0, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
-    {0x100b4, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xa0, 0xabe8u},
-    {0x100b8, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
-    {0x100bc, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0x6c, 0xabb4u},
-    {0x100c0, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
-    {0x100c4, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
+    {0x100a4, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xc4, 0xac0cu},
+    {0x100a8, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
+    {0x100ac, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0x88, 0xabd0u},
+    {0x100b0, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
+    {0x100b4, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xa0, 0xabe8u},
+    {0x100b8, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
+    {0x100bc, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0x6c, 0xabb4u},
+    {0x100c0, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
+    {0x100c4, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
     {0x100cc, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xac, 0xa36cu},
     {0x100d0, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xbc, 0xa37cu},
     {0x100d4, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xbc, 0xa37cu},
@@ -4738,277 +4744,277 @@ static const struct PortFixup port_fixups[] = {
     {0x1017c, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x120, 0xa0c8u},
     {0x10184, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x134, 0xa0dcu},
     {0x105b4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
-    {0x105b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
-    {0x105bc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
-    {0x105c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
+    {0x105b8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x980, 0x11078u},
+    {0x105bc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x978, 0x11070u},
+    {0x105c0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x970, 0x11068u},
     {0x105c4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
-    {0x105c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
-    {0x105cc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
-    {0x105d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
-    {0x105d4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x968, 0x11060u},
-    {0x105d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x960, 0x11058u},
-    {0x105dc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x954, 0x1104cu},
-    {0x105e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x94c, 0x11044u},
-    {0x105e4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x944, 0x1103cu},
-    {0x105e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x93c, 0x11034u},
-    {0x105ec, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x934, 0x1102cu},
-    {0x105f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x930, 0x11028u},
-    {0x105f4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x924, 0x1101cu},
-    {0x105f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x918, 0x11010u},
-    {0x105fc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x90c, 0x11004u},
-    {0x10600, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x900, 0x10ff8u},
-    {0x10604, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8f8, 0x10ff0u},
-    {0x10608, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8f0, 0x10fe8u},
-    {0x1060c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8e4, 0x10fdcu},
-    {0x10610, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8d8, 0x10fd0u},
-    {0x10614, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8cc, 0x10fc4u},
-    {0x10618, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8c0, 0x10fb8u},
-    {0x1061c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8b0, 0x10fa8u},
-    {0x10620, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8a0, 0x10f98u},
-    {0x10624, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x898, 0x10f90u},
-    {0x10628, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x88c, 0x10f84u},
-    {0x1062c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x880, 0x10f78u},
-    {0x10630, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x874, 0x10f6cu},
-    {0x10634, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x86c, 0x10f64u},
-    {0x10638, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x864, 0x10f5cu},
-    {0x1063c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x85c, 0x10f54u},
-    {0x10640, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x854, 0x10f4cu},
-    {0x10644, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x84c, 0x10f44u},
-    {0x10648, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x83c, 0x10f34u},
-    {0x1064c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x82c, 0x10f24u},
-    {0x10650, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x820, 0x10f18u},
-    {0x10654, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x814, 0x10f0cu},
-    {0x10658, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x808, 0x10f00u},
-    {0x1065c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7fc, 0x10ef4u},
-    {0x10660, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7f0, 0x10ee8u},
-    {0x10664, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7e4, 0x10edcu},
-    {0x10668, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7d8, 0x10ed0u},
-    {0x1066c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7cc, 0x10ec4u},
-    {0x10670, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7c4, 0x10ebcu},
-    {0x10674, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7b8, 0x10eb0u},
-    {0x10678, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7ac, 0x10ea4u},
-    {0x1067c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x7a4, 0x10e9cu},
-    {0x10680, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x794, 0x10e8cu},
-    {0x10684, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x78c, 0x10e84u},
-    {0x10688, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x780, 0x10e78u},
-    {0x1068c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x774, 0x10e6cu},
-    {0x10690, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x768, 0x10e60u},
-    {0x10694, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x75c, 0x10e54u},
-    {0x10698, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x74c, 0x10e44u},
-    {0x1069c, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x744, 0x10e3cu},
-    {0x106a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x73c, 0x10e34u},
-    {0x106a4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x8f0, 0x10fe8u},
-    {0x106a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x734, 0x10e2cu},
-    {0x106ac, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x728, 0x10e20u},
-    {0x106b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x720, 0x10e18u},
-    {0x106b4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x714, 0x10e0cu},
-    {0x106b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x70c, 0x10e04u},
+    {0x105c8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x970, 0x11068u},
+    {0x105cc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x978, 0x11070u},
+    {0x105d0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x980, 0x11078u},
+    {0x105d4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x968, 0x11060u},
+    {0x105d8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x960, 0x11058u},
+    {0x105dc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x954, 0x1104cu},
+    {0x105e0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x94c, 0x11044u},
+    {0x105e4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x944, 0x1103cu},
+    {0x105e8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x93c, 0x11034u},
+    {0x105ec, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x934, 0x1102cu},
+    {0x105f0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x930, 0x11028u},
+    {0x105f4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x924, 0x1101cu},
+    {0x105f8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x918, 0x11010u},
+    {0x105fc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x90c, 0x11004u},
+    {0x10600, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x900, 0x10ff8u},
+    {0x10604, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8f8, 0x10ff0u},
+    {0x10608, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8f0, 0x10fe8u},
+    {0x1060c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8e4, 0x10fdcu},
+    {0x10610, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8d8, 0x10fd0u},
+    {0x10614, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8cc, 0x10fc4u},
+    {0x10618, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8c0, 0x10fb8u},
+    {0x1061c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8b0, 0x10fa8u},
+    {0x10620, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8a0, 0x10f98u},
+    {0x10624, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x898, 0x10f90u},
+    {0x10628, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x88c, 0x10f84u},
+    {0x1062c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x880, 0x10f78u},
+    {0x10630, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x874, 0x10f6cu},
+    {0x10634, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x86c, 0x10f64u},
+    {0x10638, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x864, 0x10f5cu},
+    {0x1063c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x85c, 0x10f54u},
+    {0x10640, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x854, 0x10f4cu},
+    {0x10644, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x84c, 0x10f44u},
+    {0x10648, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x83c, 0x10f34u},
+    {0x1064c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x82c, 0x10f24u},
+    {0x10650, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x820, 0x10f18u},
+    {0x10654, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x814, 0x10f0cu},
+    {0x10658, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x808, 0x10f00u},
+    {0x1065c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7fc, 0x10ef4u},
+    {0x10660, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7f0, 0x10ee8u},
+    {0x10664, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7e4, 0x10edcu},
+    {0x10668, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7d8, 0x10ed0u},
+    {0x1066c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7cc, 0x10ec4u},
+    {0x10670, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7c4, 0x10ebcu},
+    {0x10674, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7b8, 0x10eb0u},
+    {0x10678, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7ac, 0x10ea4u},
+    {0x1067c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x7a4, 0x10e9cu},
+    {0x10680, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x794, 0x10e8cu},
+    {0x10684, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x78c, 0x10e84u},
+    {0x10688, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x780, 0x10e78u},
+    {0x1068c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x774, 0x10e6cu},
+    {0x10690, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x768, 0x10e60u},
+    {0x10694, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x75c, 0x10e54u},
+    {0x10698, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x74c, 0x10e44u},
+    {0x1069c, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x744, 0x10e3cu},
+    {0x106a0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x73c, 0x10e34u},
+    {0x106a4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x8f0, 0x10fe8u},
+    {0x106a8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x734, 0x10e2cu},
+    {0x106ac, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x728, 0x10e20u},
+    {0x106b0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x720, 0x10e18u},
+    {0x106b4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x714, 0x10e0cu},
+    {0x106b8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x70c, 0x10e04u},
     {0x106bc, 'G', (void *)&DAT_004ba884, sizeof(DAT_004ba884), 0x4, 0xf888u},
-    {0x106c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x70c, 0x10e04u},
-    {0x106c4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x704, 0x10dfcu},
-    {0x106c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6f8, 0x10df0u},
-    {0x106cc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6f0, 0x10de8u},
-    {0x106d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6e4, 0x10ddcu},
+    {0x106c0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x70c, 0x10e04u},
+    {0x106c4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x704, 0x10dfcu},
+    {0x106c8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6f8, 0x10df0u},
+    {0x106cc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6f0, 0x10de8u},
+    {0x106d0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6e4, 0x10ddcu},
     {0x106d4, 'G', (void *)&VWin32DeviceHandle, sizeof(VWin32DeviceHandle), 0x10c, 0xd6d0u},
-    {0x106d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x970, 0x11068u},
-    {0x106dc, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x978, 0x11070u},
-    {0x106e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x980, 0x11078u},
-    {0x106e4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x934, 0x1102cu},
-    {0x106e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x94c, 0x11044u},
-    {0x106ec, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x93c, 0x11034u},
-    {0x106f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x930, 0x11028u},
-    {0x106f4, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6dc, 0x10dd4u},
-    {0x106f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6d4, 0x10dccu},
+    {0x106d8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x970, 0x11068u},
+    {0x106dc, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x978, 0x11070u},
+    {0x106e0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x980, 0x11078u},
+    {0x106e4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x934, 0x1102cu},
+    {0x106e8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x94c, 0x11044u},
+    {0x106ec, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x93c, 0x11034u},
+    {0x106f0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x930, 0x11028u},
+    {0x106f4, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6dc, 0x10dd4u},
+    {0x106f8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6d4, 0x10dccu},
     {0x106fc, 'F', (void *)IsStringEmpty, 0, 0, ~0u},
-    {0x10700, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6cc, 0x10dc4u},
+    {0x10700, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6cc, 0x10dc4u},
     {0x10704, 'F', (void *)ScriptCmdAges, 0, 0, ~0u},
-    {0x10708, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6c4, 0x10dbcu},
+    {0x10708, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6c4, 0x10dbcu},
     {0x1070c, 'F', (void *)ScriptCmdInit, 0, 0, ~0u},
-    {0x10710, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6b8, 0x10db0u},
+    {0x10710, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6b8, 0x10db0u},
     {0x10714, 'F', (void *)ScriptCmdObjective, 0, 0, ~0u},
-    {0x10718, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6ac, 0x10da4u},
+    {0x10718, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6ac, 0x10da4u},
     {0x1071c, 'F', (void *)ScriptCmdOneOff, 0, 0, ~0u},
-    {0x10720, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x6a0, 0x10d98u},
+    {0x10720, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x6a0, 0x10d98u},
     {0x10724, 'F', (void *)ScriptCmdOngoing, 0, 0, ~0u},
-    {0x10728, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x694, 0x10d8cu},
+    {0x10728, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x694, 0x10d8cu},
     {0x1072c, 'F', (void *)ScriptCmdPermanent, 0, 0, ~0u},
-    {0x10730, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x688, 0x10d80u},
+    {0x10730, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x688, 0x10d80u},
     {0x10734, 'F', (void *)ScriptCmdReminder, 0, 0, ~0u},
-    {0x10738, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x67c, 0x10d74u},
+    {0x10738, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x67c, 0x10d74u},
     {0x1073c, 'F', (void *)ScriptCmdReward, 0, 0, ~0u},
-    {0x10740, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x674, 0x10d6cu},
+    {0x10740, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x674, 0x10d6cu},
     {0x10744, 'F', (void *)ScriptCmdEnd, 0, 0, ~0u},
-    {0x10748, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x930, 0x11028u},
+    {0x10748, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x930, 0x11028u},
     {0x1074c, 'F', (void *)ScriptCmdMap, 0, 0, ~0u},
-    {0x10750, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x66c, 0x10d64u},
+    {0x10750, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x66c, 0x10d64u},
     {0x10754, 'F', (void *)ScriptCmdLoad, 0, 0, ~0u},
-    {0x10758, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x664, 0x10d5cu},
+    {0x10758, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x664, 0x10d5cu},
     {0x1075c, 'F', (void *)ScriptCmdEnable, 0, 0, ~0u},
-    {0x10760, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x658, 0x10d50u},
+    {0x10760, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x658, 0x10d50u},
     {0x10764, 'F', (void *)ScriptCmdCurrency, 0, 0, ~0u},
-    {0x10768, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x648, 0x10d40u},
+    {0x10768, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x648, 0x10d40u},
     {0x1076c, 'F', (void *)ScriptCmdHappinessEnv, 0, 0, ~0u},
-    {0x10770, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x640, 0x10d38u},
+    {0x10770, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x640, 0x10d38u},
     {0x10774, 'F', (void *)ScriptCmdLookAt, 0, 0, ~0u},
-    {0x10778, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x630, 0x10d28u},
+    {0x10778, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x630, 0x10d28u},
     {0x1077c, 'F', (void *)ScriptCmdBriefingFile, 0, 0, ~0u},
-    {0x10780, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x620, 0x10d18u},
+    {0x10780, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x620, 0x10d18u},
     {0x10784, 'F', (void *)ScriptCmdBriefingFile, 0, 0, ~0u},
-    {0x10788, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x614, 0x10d0cu},
+    {0x10788, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x614, 0x10d0cu},
     {0x1078c, 'F', (void *)ScriptCmdHintsFile, 0, 0, ~0u},
-    {0x10790, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x608, 0x10d00u},
+    {0x10790, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x608, 0x10d00u},
     {0x10794, 'F', (void *)ScriptCmdBlueprint, 0, 0, ~0u},
-    {0x10798, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5fc, 0x10cf4u},
+    {0x10798, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5fc, 0x10cf4u},
     {0x1079c, 'F', (void *)ScriptCmdGardener, 0, 0, ~0u},
-    {0x107a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5f0, 0x10ce8u},
+    {0x107a0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5f0, 0x10ce8u},
     {0x107a4, 'F', (void *)ScriptCmdMechanic, 0, 0, ~0u},
-    {0x107a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5e8, 0x10ce0u},
+    {0x107a8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5e8, 0x10ce0u},
     {0x107ac, 'F', (void *)ScriptCmdWorkers, 0, 0, ~0u},
-    {0x107b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5dc, 0x10cd4u},
+    {0x107b0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5dc, 0x10cd4u},
     {0x107b4, 'F', (void *)ScriptCmdMaxBlokes, 0, 0, ~0u},
-    {0x107b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5d0, 0x10cc8u},
+    {0x107b8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5d0, 0x10cc8u},
     {0x107bc, 'F', (void *)ScriptCmdHapFactor, 0, 0, ~0u},
-    {0x107c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5c0, 0x10cb8u},
+    {0x107c0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5c0, 0x10cb8u},
     {0x107c4, 'F', (void *)ScriptCmdCapacityScale, 0, 0, ~0u},
-    {0x107c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5b4, 0x10cacu},
+    {0x107c8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5b4, 0x10cacu},
     {0x107cc, 'F', (void *)ScriptCmdCapacityCap, 0, 0, ~0u},
-    {0x107d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x5a8, 0x10ca0u},
+    {0x107d0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x5a8, 0x10ca0u},
     {0x107d4, 'F', (void *)ScriptCmdFlashButton, 0, 0, ~0u},
-    {0x107d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x598, 0x10c90u},
+    {0x107d8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x598, 0x10c90u},
     {0x107dc, 'F', (void *)ScriptCmdFlashButtonOff, 0, 0, ~0u},
-    {0x107e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x590, 0x10c88u},
+    {0x107e0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x590, 0x10c88u},
     {0x107e4, 'F', (void *)ScriptCmdPrompt, 0, 0, ~0u},
-    {0x107e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x588, 0x10c80u},
+    {0x107e8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x588, 0x10c80u},
     {0x107ec, 'F', (void *)ScriptCmdIntro, 0, 0, ~0u},
-    {0x107f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x580, 0x10c78u},
+    {0x107f0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x580, 0x10c78u},
     {0x107f4, 'F', (void *)ScriptCmdNeed, 0, 0, ~0u},
-    {0x107f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x578, 0x10c70u},
+    {0x107f8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x578, 0x10c70u},
     {0x107fc, 'F', (void *)ScriptCmdNeedAt, 0, 0, ~0u},
-    {0x10800, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x570, 0x10c68u},
+    {0x10800, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x570, 0x10c68u},
     {0x10804, 'F', (void *)ScriptCmdNeedIn, 0, 0, ~0u},
-    {0x10808, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x568, 0x10c60u},
+    {0x10808, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x568, 0x10c60u},
     {0x1080c, 'F', (void *)ScriptCmdConnect, 0, 0, ~0u},
-    {0x10810, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x560, 0x10c58u},
+    {0x10810, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x560, 0x10c58u},
     {0x10814, 'F', (void *)ScriptCmdLink, 0, 0, ~0u},
-    {0x10818, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x558, 0x10c50u},
+    {0x10818, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x558, 0x10c50u},
     {0x1081c, 'F', (void *)ScriptCmdRange, 0, 0, ~0u},
-    {0x10820, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x54c, 0x10c44u},
+    {0x10820, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x54c, 0x10c44u},
     {0x10824, 'F', (void *)ScriptCmdClearArea, 0, 0, ~0u},
-    {0x10828, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x544, 0x10c3cu},
+    {0x10828, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x544, 0x10c3cu},
     {0x1082c, 'F', (void *)ScriptCmdRemove, 0, 0, ~0u},
-    {0x10830, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x538, 0x10c30u},
+    {0x10830, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x538, 0x10c30u},
     {0x10834, 'F', (void *)ScriptCmdRemoveRange, 0, 0, ~0u},
-    {0x10838, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x52c, 0x10c24u},
+    {0x10838, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x52c, 0x10c24u},
     {0x1083c, 'F', (void *)ScriptCmdComposite, 0, 0, ~0u},
-    {0x10840, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x51c, 0x10c14u},
+    {0x10840, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x51c, 0x10c14u},
     {0x10844, 'F', (void *)ScriptCmdLoopComposite, 0, 0, ~0u},
-    {0x10848, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x510, 0x10c08u},
+    {0x10848, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x510, 0x10c08u},
     {0x1084c, 'F', (void *)ScriptCmdTechLevel, 0, 0, ~0u},
-    {0x10850, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x504, 0x10bfcu},
+    {0x10850, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x504, 0x10bfcu},
     {0x10854, 'F', (void *)ScriptCmdResearch, 0, 0, ~0u},
-    {0x10858, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4f4, 0x10becu},
+    {0x10858, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4f4, 0x10becu},
     {0x1085c, 'F', (void *)ScriptCmdParkVisitors, 0, 0, ~0u},
-    {0x10860, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4e4, 0x10bdcu},
+    {0x10860, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4e4, 0x10bdcu},
     {0x10864, 'F', (void *)ScriptCmdRideVisitors, 0, 0, ~0u},
-    {0x10868, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4dc, 0x10bd4u},
+    {0x10868, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4dc, 0x10bd4u},
     {0x1086c, 'F', (void *)ScriptCmdRiders, 0, 0, ~0u},
-    {0x10870, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4cc, 0x10bc4u},
+    {0x10870, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4cc, 0x10bc4u},
     {0x10874, 'F', (void *)ScriptCmdSceneryCoverage, 0, 0, ~0u},
-    {0x10878, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4c0, 0x10bb8u},
+    {0x10878, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4c0, 0x10bb8u},
     {0x1087c, 'F', (void *)ScriptCmdPathScenery, 0, 0, ~0u},
-    {0x10880, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4b0, 0x10ba8u},
+    {0x10880, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4b0, 0x10ba8u},
     {0x10884, 'F', (void *)ScriptCmdRideCoverage, 0, 0, ~0u},
-    {0x10888, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x4a0, 0x10b98u},
+    {0x10888, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x4a0, 0x10b98u},
     {0x1088c, 'F', (void *)ScriptCmdShopCoverage, 0, 0, ~0u},
-    {0x10890, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x490, 0x10b88u},
+    {0x10890, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x490, 0x10b88u},
     {0x10894, 'F', (void *)ScriptCmdFoodCoverage, 0, 0, ~0u},
-    {0x10898, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x484, 0x10b7cu},
+    {0x10898, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x484, 0x10b7cu},
     {0x1089c, 'F', (void *)ScriptCmdTotalCoverage, 0, 0, ~0u},
-    {0x108a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x478, 0x10b70u},
+    {0x108a0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x478, 0x10b70u},
     {0x108a4, 'F', (void *)ScriptCmdAppraisal, 0, 0, ~0u},
-    {0x108a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x46c, 0x10b64u},
+    {0x108a8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x46c, 0x10b64u},
     {0x108ac, 'F', (void *)ScriptCmdStudArea, 0, 0, ~0u},
-    {0x108b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x464, 0x10b5cu},
+    {0x108b0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x464, 0x10b5cu},
     {0x108b4, 'F', (void *)ScriptCmdSave, 0, 0, ~0u},
-    {0x108b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x458, 0x10b50u},
+    {0x108b8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x458, 0x10b50u},
     {0x108bc, 'F', (void *)ScriptCmdHappiness, 0, 0, ~0u},
-    {0x108c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x448, 0x10b40u},
+    {0x108c0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x448, 0x10b40u},
     {0x108c4, 'F', (void *)ScriptCmdNeedGardeners, 0, 0, ~0u},
-    {0x108c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x438, 0x10b30u},
+    {0x108c8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x438, 0x10b30u},
     {0x108cc, 'F', (void *)ScriptCmdNeedMechanics, 0, 0, ~0u},
-    {0x108d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x430, 0x10b28u},
+    {0x108d0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x430, 0x10b28u},
     {0x108d4, 'F', (void *)ScriptCmdHunger, 0, 0, ~0u},
-    {0x108d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x424, 0x10b1cu},
+    {0x108d8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x424, 0x10b1cu},
     {0x108dc, 'F', (void *)ScriptCmdFixRides, 0, 0, ~0u},
-    {0x108e0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x418, 0x10b10u},
+    {0x108e0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x418, 0x10b10u},
     {0x108e4, 'F', (void *)ScriptCmdPowerRides, 0, 0, ~0u},
-    {0x108e8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x410, 0x10b08u},
+    {0x108e8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x410, 0x10b08u},
     {0x108ec, 'F', (void *)ScriptCmdZoning, 0, 0, ~0u},
-    {0x108f0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x404, 0x10afcu},
+    {0x108f0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x404, 0x10afcu},
     {0x108f4, 'F', (void *)ScriptCmdCheckFlag, 0, 0, ~0u},
-    {0x108f8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3f8, 0x10af0u},
+    {0x108f8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3f8, 0x10af0u},
     {0x108fc, 'F', (void *)ScriptCmdSelectTheme, 0, 0, ~0u},
-    {0x10900, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3ec, 0x10ae4u},
+    {0x10900, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3ec, 0x10ae4u},
     {0x10904, 'F', (void *)ScriptCmdSelectTab, 0, 0, ~0u},
-    {0x10908, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3e0, 0x10ad8u},
+    {0x10908, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3e0, 0x10ad8u},
     {0x1090c, 'F', (void *)ScriptCmdSelectMode, 0, 0, ~0u},
-    {0x10910, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3d8, 0x10ad0u},
+    {0x10910, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3d8, 0x10ad0u},
     {0x10914, 'F', (void *)ScriptCmdForever, 0, 0, ~0u},
-    {0x10918, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3d0, 0x10ac8u},
+    {0x10918, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3d0, 0x10ac8u},
     {0x1091c, 'F', (void *)ScriptCmdGive, 0, 0, ~0u},
-    {0x10920, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3c8, 0x10ac0u},
+    {0x10920, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3c8, 0x10ac0u},
     {0x10924, 'F', (void *)ScriptCmdTake, 0, 0, ~0u},
-    {0x10928, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3bc, 0x10ab4u},
+    {0x10928, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3bc, 0x10ab4u},
     {0x1092c, 'F', (void *)ScriptCmdAddBricks, 0, 0, ~0u},
-    {0x10930, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3b4, 0x10aacu},
+    {0x10930, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3b4, 0x10aacu},
     {0x10934, 'F', (void *)ScriptCmdPlace, 0, 0, ~0u},
-    {0x10938, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3ac, 0x10aa4u},
+    {0x10938, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3ac, 0x10aa4u},
     {0x1093c, 'F', (void *)ScriptCmdClear, 0, 0, ~0u},
-    {0x10940, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x3a4, 0x10a9cu},
+    {0x10940, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x3a4, 0x10a9cu},
     {0x10944, 'F', (void *)ScriptCmdUnglue, 0, 0, ~0u},
-    {0x10948, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x39c, 0x10a94u},
+    {0x10948, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x39c, 0x10a94u},
     {0x1094c, 'F', (void *)ScriptCmdGlue, 0, 0, ~0u},
-    {0x10950, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x390, 0x10a88u},
+    {0x10950, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x390, 0x10a88u},
     {0x10954, 'F', (void *)ScriptCmdExtendPark, 0, 0, ~0u},
-    {0x10958, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x38c, 0x10a84u},
+    {0x10958, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x38c, 0x10a84u},
     {0x1095c, 'F', (void *)ScriptCmdFmv, 0, 0, ~0u},
-    {0x10960, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x380, 0x10a78u},
+    {0x10960, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x380, 0x10a78u},
     {0x10964, 'F', (void *)ScriptCmdInterval, 0, 0, ~0u},
-    {0x10968, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x378, 0x10a70u},
+    {0x10968, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x378, 0x10a70u},
     {0x1096c, 'F', (void *)ScriptCmdMessage, 0, 0, ~0u},
-    {0x10970, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x370, 0x10a68u},
+    {0x10970, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x370, 0x10a68u},
     {0x10974, 'F', (void *)ScriptCmdFeature, 0, 0, ~0u},
-    {0x10978, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x368, 0x10a60u},
+    {0x10978, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x368, 0x10a60u},
     {0x1097c, 'F', (void *)ScriptCmdReport, 0, 0, ~0u},
-    {0x10980, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x360, 0x10a58u},
+    {0x10980, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x360, 0x10a58u},
     {0x10984, 'F', (void *)ScriptCmdDegrade, 0, 0, ~0u},
-    {0x10988, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x354, 0x10a4cu},
+    {0x10988, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x354, 0x10a4cu},
     {0x1098c, 'F', (void *)ScriptCmdMaxCapacity, 0, 0, ~0u},
-    {0x10990, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x348, 0x10a40u},
+    {0x10990, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x348, 0x10a40u},
     {0x10994, 'F', (void *)ScriptCmdMaxCapacity, 0, 0, ~0u},
-    {0x10998, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x33c, 0x10a34u},
+    {0x10998, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x33c, 0x10a34u},
     {0x1099c, 'F', (void *)ScriptCmdMinCapacity, 0, 0, ~0u},
-    {0x109a0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x330, 0x10a28u},
+    {0x109a0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x330, 0x10a28u},
     {0x109a4, 'F', (void *)ScriptCmdMinCapacity, 0, 0, ~0u},
-    {0x109a8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x324, 0x10a1cu},
+    {0x109a8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x324, 0x10a1cu},
     {0x109ac, 'F', (void *)ScriptCmdEntranceFee, 0, 0, ~0u},
-    {0x109b0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x318, 0x10a10u},
+    {0x109b0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x318, 0x10a10u},
     {0x109b4, 'F', (void *)ScriptCmdThemeIcon, 0, 0, ~0u},
-    {0x109b8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x310, 0x10a08u},
+    {0x109b8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x310, 0x10a08u},
     {0x109bc, 'F', (void *)ScriptCmdAddFlag, 0, 0, ~0u},
-    {0x109c0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x308, 0x10a00u},
+    {0x109c0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x308, 0x10a00u},
     {0x109c4, 'F', (void *)ScriptCmdBridges, 0, 0, ~0u},
-    {0x109c8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2fc, 0x109f4u},
+    {0x109c8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x2fc, 0x109f4u},
     {0x109cc, 'F', (void *)ScriptCmdEndScreens, 0, 0, ~0u},
-    {0x109d0, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2f4, 0x109ecu},
+    {0x109d0, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x2f4, 0x109ecu},
     {0x109d4, 'F', (void *)ScriptCmdPurge, 0, 0, ~0u},
-    {0x109d8, 'G', (void *)&DAT_004bb6f8, sizeof(DAT_004bb6f8), 0x2e8, 0x109e0u},
+    {0x109d8, 'G', (void *)&LevelScriptCommands, sizeof(LevelScriptCommands), 0x2e8, 0x109e0u},
     {0x109dc, 'F', (void *)ScriptCmdEndLevel, 0, 0, ~0u},
     {0x11ba4, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x24, 0x11c18u},
     {0x11ba8, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x14, 0x11c08u},
     {0x11bac, 'G', (void *)&lpConfig, sizeof(lpConfig), 0x4, 0x11bf8u},
     {0x11bf4, 'I', NULL, 0, 0x11bb0, 0x11bb0u},
-    {0x11dcc, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xc4, 0xac0cu},
+    {0x11dcc, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xc4, 0xac0cu},
     {0x11dd0, 'I', NULL, 0, 0x11e60, 0x11e60u},
     {0x11dd4, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x354, 0x9bb4u},
     {0x11dd8, 'I', NULL, 0, 0x11e4c, 0x11e4cu},
@@ -5018,362 +5024,362 @@ static const struct PortFixup port_fixups[] = {
     {0x11de8, 'I', NULL, 0, 0x11e0c, 0x11e0cu},
     {0x11dec, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xac, 0xa36cu},
     {0x11df0, 'I', NULL, 0, 0x11df4, 0x11df4u},
-    {0x11ecc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x960, 0x12cacu},
-    {0x11ed0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x954, 0x12ca0u},
-    {0x11ed4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x94c, 0x12c98u},
-    {0x11ed8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x944, 0x12c90u},
-    {0x11edc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x93c, 0x12c88u},
-    {0x11ee0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x930, 0x12c7cu},
-    {0x11ee4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x928, 0x12c74u},
-    {0x11ee8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x920, 0x12c6cu},
-    {0x11eec, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x918, 0x12c64u},
-    {0x11ef0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x910, 0x12c5cu},
-    {0x11ef4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x908, 0x12c54u},
-    {0x11ef8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8fc, 0x12c48u},
-    {0x11efc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8f4, 0x12c40u},
-    {0x11f00, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8ec, 0x12c38u},
-    {0x11f04, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8e4, 0x12c30u},
-    {0x11f08, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8dc, 0x12c28u},
-    {0x11f0c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8d4, 0x12c20u},
-    {0x11f10, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8cc, 0x12c18u},
-    {0x11f14, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8c4, 0x12c10u},
-    {0x11f18, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8bc, 0x12c08u},
-    {0x11f1c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8b4, 0x12c00u},
-    {0x11f20, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8ac, 0x12bf8u},
-    {0x11f24, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x8a4, 0x12bf0u},
-    {0x11f28, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x89c, 0x12be8u},
-    {0x11f2c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x894, 0x12be0u},
-    {0x11f30, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x88c, 0x12bd8u},
-    {0x11f34, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x884, 0x12bd0u},
-    {0x11f38, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x87c, 0x12bc8u},
-    {0x11f3c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x874, 0x12bc0u},
-    {0x11f40, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x86c, 0x12bb8u},
-    {0x11f44, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x864, 0x12bb0u},
-    {0x11f48, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x85c, 0x12ba8u},
-    {0x11f4c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x854, 0x12ba0u},
-    {0x11f50, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x84c, 0x12b98u},
-    {0x11f54, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x848, 0x12b94u},
-    {0x11f58, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x840, 0x12b8cu},
-    {0x11f5c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x83c, 0x12b88u},
-    {0x11f60, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x834, 0x12b80u},
-    {0x11f64, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x830, 0x12b7cu},
-    {0x11f68, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x828, 0x12b74u},
-    {0x11f6c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x820, 0x12b6cu},
-    {0x11f70, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x81c, 0x12b68u},
-    {0x11f74, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x814, 0x12b60u},
-    {0x11f78, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x808, 0x12b54u},
-    {0x11f7c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x800, 0x12b4cu},
-    {0x11f80, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7f8, 0x12b44u},
-    {0x11f84, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7f0, 0x12b3cu},
-    {0x11f88, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7e8, 0x12b34u},
-    {0x11f8c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7e0, 0x12b2cu},
-    {0x11f90, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7d8, 0x12b24u},
-    {0x11f94, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7d0, 0x12b1cu},
-    {0x11f98, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7c4, 0x12b10u},
-    {0x11f9c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7bc, 0x12b08u},
-    {0x11fa0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7b4, 0x12b00u},
-    {0x11fa4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7ac, 0x12af8u},
-    {0x11fa8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7a4, 0x12af0u},
-    {0x11fac, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x79c, 0x12ae8u},
-    {0x11fb0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x794, 0x12ae0u},
-    {0x11fb4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x790, 0x12adcu},
-    {0x11fb8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x788, 0x12ad4u},
-    {0x11fbc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x780, 0x12accu},
-    {0x11fc0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x77c, 0x12ac8u},
-    {0x11fc4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x774, 0x12ac0u},
-    {0x11fc8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x76c, 0x12ab8u},
-    {0x11fcc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x764, 0x12ab0u},
-    {0x11fd0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x75c, 0x12aa8u},
-    {0x11fd4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x754, 0x12aa0u},
-    {0x11fd8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x74c, 0x12a98u},
-    {0x11fdc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x744, 0x12a90u},
-    {0x11fe0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x73c, 0x12a88u},
-    {0x11fe4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x734, 0x12a80u},
-    {0x11fe8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x72c, 0x12a78u},
-    {0x11fec, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x724, 0x12a70u},
-    {0x11ff0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x71c, 0x12a68u},
-    {0x11ff4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x714, 0x12a60u},
-    {0x11ff8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x70c, 0x12a58u},
-    {0x11ffc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x708, 0x12a54u},
-    {0x12000, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x700, 0x12a4cu},
-    {0x12004, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6fc, 0x12a48u},
-    {0x12008, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6f4, 0x12a40u},
-    {0x1200c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6ec, 0x12a38u},
-    {0x12010, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6e4, 0x12a30u},
-    {0x12014, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6dc, 0x12a28u},
-    {0x12018, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6d4, 0x12a20u},
-    {0x1201c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6cc, 0x12a18u},
-    {0x12020, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6c4, 0x12a10u},
-    {0x12024, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6bc, 0x12a08u},
-    {0x12028, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6b4, 0x12a00u},
-    {0x1202c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6ac, 0x129f8u},
-    {0x12030, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6a4, 0x129f0u},
-    {0x12034, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x69c, 0x129e8u},
-    {0x12038, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x690, 0x129dcu},
-    {0x1203c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x684, 0x129d0u},
-    {0x12040, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x67c, 0x129c8u},
-    {0x12044, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x670, 0x129bcu},
-    {0x12048, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x668, 0x129b4u},
-    {0x1204c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x65c, 0x129a8u},
-    {0x12050, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x654, 0x129a0u},
-    {0x12054, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x64c, 0x12998u},
-    {0x12058, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x644, 0x12990u},
-    {0x1205c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x63c, 0x12988u},
-    {0x12060, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x630, 0x1297cu},
-    {0x12064, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x628, 0x12974u},
-    {0x12068, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x620, 0x1296cu},
-    {0x1206c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x618, 0x12964u},
-    {0x12070, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x610, 0x1295cu},
-    {0x12074, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x608, 0x12954u},
-    {0x12078, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x600, 0x1294cu},
-    {0x1207c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5f8, 0x12944u},
-    {0x12080, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5f0, 0x1293cu},
-    {0x12084, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5e8, 0x12934u},
-    {0x12088, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5e0, 0x1292cu},
-    {0x1208c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5d8, 0x12924u},
-    {0x12090, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5d0, 0x1291cu},
-    {0x12094, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5c8, 0x12914u},
-    {0x12098, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5c0, 0x1290cu},
-    {0x1209c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5b8, 0x12904u},
-    {0x120a0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5b0, 0x128fcu},
-    {0x120a4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5a8, 0x128f4u},
-    {0x120a8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x5a4, 0x128f0u},
-    {0x120ac, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x59c, 0x128e8u},
-    {0x120b0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x594, 0x128e0u},
-    {0x120b4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x58c, 0x128d8u},
-    {0x120b8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x584, 0x128d0u},
-    {0x120bc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x57c, 0x128c8u},
-    {0x120c0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x574, 0x128c0u},
-    {0x120c4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x56c, 0x128b8u},
-    {0x120c8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x564, 0x128b0u},
-    {0x120cc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x55c, 0x128a8u},
-    {0x120d0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x554, 0x128a0u},
-    {0x120d4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x54c, 0x12898u},
-    {0x120d8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x540, 0x1288cu},
-    {0x120dc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x538, 0x12884u},
-    {0x120e0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x530, 0x1287cu},
-    {0x120e4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x528, 0x12874u},
-    {0x120e8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x51c, 0x12868u},
-    {0x120ec, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x510, 0x1285cu},
-    {0x120f0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x508, 0x12854u},
-    {0x120f4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4fc, 0x12848u},
-    {0x120f8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4f4, 0x12840u},
-    {0x120fc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4ec, 0x12838u},
-    {0x12100, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4e4, 0x12830u},
-    {0x12104, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4dc, 0x12828u},
-    {0x12108, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4d4, 0x12820u},
-    {0x1210c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4c8, 0x12814u},
-    {0x12110, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4c0, 0x1280cu},
-    {0x12114, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4b4, 0x12800u},
-    {0x12118, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4ac, 0x127f8u},
-    {0x1211c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x4a4, 0x127f0u},
-    {0x12120, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x49c, 0x127e8u},
-    {0x12124, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x494, 0x127e0u},
-    {0x12128, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x48c, 0x127d8u},
-    {0x1212c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x484, 0x127d0u},
-    {0x12130, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x47c, 0x127c8u},
-    {0x12134, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x474, 0x127c0u},
-    {0x12138, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x46c, 0x127b8u},
-    {0x1213c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x460, 0x127acu},
-    {0x12140, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x458, 0x127a4u},
-    {0x12144, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x450, 0x1279cu},
-    {0x12148, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x448, 0x12794u},
-    {0x1214c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x440, 0x1278cu},
-    {0x12150, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x438, 0x12784u},
-    {0x12154, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x430, 0x1277cu},
-    {0x12158, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x428, 0x12774u},
-    {0x1215c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x420, 0x1276cu},
-    {0x12160, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x41c, 0x12768u},
-    {0x12164, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x414, 0x12760u},
-    {0x12168, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x40c, 0x12758u},
-    {0x1216c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x404, 0x12750u},
-    {0x12170, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3fc, 0x12748u},
-    {0x12174, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3f8, 0x12744u},
-    {0x12178, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3ec, 0x12738u},
-    {0x1217c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3e4, 0x12730u},
-    {0x12180, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3dc, 0x12728u},
-    {0x12184, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3d4, 0x12720u},
-    {0x12188, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3cc, 0x12718u},
-    {0x1218c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3c0, 0x1270cu},
-    {0x12190, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3b8, 0x12704u},
-    {0x12194, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3ac, 0x126f8u},
-    {0x12198, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x3a4, 0x126f0u},
-    {0x1219c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x39c, 0x126e8u},
-    {0x121a0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x394, 0x126e0u},
-    {0x121a4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x38c, 0x126d8u},
-    {0x121a8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x380, 0x126ccu},
-    {0x121ac, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x378, 0x126c4u},
-    {0x121b0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x370, 0x126bcu},
-    {0x121b4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x364, 0x126b0u},
-    {0x121b8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x35c, 0x126a8u},
-    {0x121bc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x354, 0x126a0u},
-    {0x121c0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x34c, 0x12698u},
-    {0x121c4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x344, 0x12690u},
-    {0x121c8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x338, 0x12684u},
-    {0x121cc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x330, 0x1267cu},
-    {0x121d0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x324, 0x12670u},
-    {0x121d4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x31c, 0x12668u},
-    {0x121d8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x314, 0x12660u},
-    {0x121dc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x308, 0x12654u},
-    {0x121e0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2fc, 0x12648u},
-    {0x121e4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2f4, 0x12640u},
-    {0x121e8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2ec, 0x12638u},
-    {0x121ec, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2e0, 0x1262cu},
-    {0x121f0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2d4, 0x12620u},
-    {0x121f4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2cc, 0x12618u},
-    {0x121f8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2c4, 0x12610u},
-    {0x121fc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2bc, 0x12608u},
-    {0x12200, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2b4, 0x12600u},
-    {0x12204, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2b0, 0x125fcu},
-    {0x12208, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2a8, 0x125f4u},
-    {0x1220c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x2a0, 0x125ecu},
-    {0x12210, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x298, 0x125e4u},
-    {0x12214, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x288, 0x125d4u},
-    {0x12218, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x280, 0x125ccu},
-    {0x1221c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x278, 0x125c4u},
-    {0x12220, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x270, 0x125bcu},
-    {0x12224, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x268, 0x125b4u},
-    {0x12228, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x260, 0x125acu},
-    {0x1222c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x258, 0x125a4u},
-    {0x12230, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x250, 0x1259cu},
-    {0x12234, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x248, 0x12594u},
-    {0x12238, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x23c, 0x12588u},
-    {0x1223c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x234, 0x12580u},
-    {0x12240, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x22c, 0x12578u},
-    {0x12244, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x224, 0x12570u},
-    {0x12248, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x21c, 0x12568u},
-    {0x1224c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x210, 0x1255cu},
-    {0x12250, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x204, 0x12550u},
-    {0x12254, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1f8, 0x12544u},
-    {0x12258, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1f0, 0x1253cu},
-    {0x1225c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1e8, 0x12534u},
-    {0x12260, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1e0, 0x1252cu},
-    {0x12264, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1d4, 0x12520u},
-    {0x12268, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1cc, 0x12518u},
-    {0x1226c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1c4, 0x12510u},
-    {0x12270, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1bc, 0x12508u},
-    {0x12274, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1b4, 0x12500u},
-    {0x12278, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1ac, 0x124f8u},
-    {0x1227c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x1a4, 0x124f0u},
-    {0x12280, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x19c, 0x124e8u},
-    {0x12284, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x194, 0x124e0u},
-    {0x12288, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x18c, 0x124d8u},
-    {0x1228c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x184, 0x124d0u},
-    {0x12290, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x178, 0x124c4u},
-    {0x12294, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x170, 0x124bcu},
-    {0x12298, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x168, 0x124b4u},
-    {0x1229c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x160, 0x124acu},
-    {0x122a0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x158, 0x124a4u},
-    {0x122a4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x150, 0x1249cu},
-    {0x122a8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x790, 0x12adcu},
-    {0x122ac, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x144, 0x12490u},
-    {0x122b0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x138, 0x12484u},
-    {0x122b4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x130, 0x1247cu},
-    {0x122b8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x124, 0x12470u},
-    {0x122bc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x11c, 0x12468u},
-    {0x122c0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x114, 0x12460u},
-    {0x122c4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x104, 0x12450u},
-    {0x122c8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xfc, 0x12448u},
-    {0x122cc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xf4, 0x12440u},
-    {0x122d0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xf4, 0x12440u},
-    {0x122d4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xe8, 0x12434u},
-    {0x122d8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xe0, 0x1242cu},
-    {0x122dc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xd8, 0x12424u},
-    {0x122e0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xd0, 0x1241cu},
-    {0x122e4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xc8, 0x12414u},
-    {0x122e8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xc0, 0x1240cu},
-    {0x122ec, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xb8, 0x12404u},
-    {0x122f0, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xb0, 0x123fcu},
-    {0x122f4, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xa8, 0x123f4u},
-    {0x122f8, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0xa0, 0x123ecu},
-    {0x122fc, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x98, 0x123e4u},
-    {0x12300, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x90, 0x123dcu},
-    {0x12304, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x84, 0x123d0u},
-    {0x12308, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6ec, 0x12a38u},
-    {0x1230c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x7c, 0x123c8u},
-    {0x12310, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x74, 0x123c0u},
-    {0x12314, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x6c, 0x123b8u},
-    {0x12318, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x64, 0x123b0u},
-    {0x1231c, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x58, 0x123a4u},
-    {0x12320, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x50, 0x1239cu},
-    {0x12324, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x48, 0x12394u},
-    {0x12328, 'G', (void *)&PTR_FUN_004bd34c, sizeof(PTR_FUN_004bd34c), 0x40, 0x1238cu},
+    {0x11ecc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x960, 0x12cacu},
+    {0x11ed0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x954, 0x12ca0u},
+    {0x11ed4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x94c, 0x12c98u},
+    {0x11ed8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x944, 0x12c90u},
+    {0x11edc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x93c, 0x12c88u},
+    {0x11ee0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x930, 0x12c7cu},
+    {0x11ee4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x928, 0x12c74u},
+    {0x11ee8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x920, 0x12c6cu},
+    {0x11eec, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x918, 0x12c64u},
+    {0x11ef0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x910, 0x12c5cu},
+    {0x11ef4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x908, 0x12c54u},
+    {0x11ef8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8fc, 0x12c48u},
+    {0x11efc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8f4, 0x12c40u},
+    {0x11f00, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8ec, 0x12c38u},
+    {0x11f04, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8e4, 0x12c30u},
+    {0x11f08, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8dc, 0x12c28u},
+    {0x11f0c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8d4, 0x12c20u},
+    {0x11f10, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8cc, 0x12c18u},
+    {0x11f14, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8c4, 0x12c10u},
+    {0x11f18, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8bc, 0x12c08u},
+    {0x11f1c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8b4, 0x12c00u},
+    {0x11f20, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8ac, 0x12bf8u},
+    {0x11f24, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x8a4, 0x12bf0u},
+    {0x11f28, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x89c, 0x12be8u},
+    {0x11f2c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x894, 0x12be0u},
+    {0x11f30, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x88c, 0x12bd8u},
+    {0x11f34, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x884, 0x12bd0u},
+    {0x11f38, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x87c, 0x12bc8u},
+    {0x11f3c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x874, 0x12bc0u},
+    {0x11f40, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x86c, 0x12bb8u},
+    {0x11f44, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x864, 0x12bb0u},
+    {0x11f48, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x85c, 0x12ba8u},
+    {0x11f4c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x854, 0x12ba0u},
+    {0x11f50, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x84c, 0x12b98u},
+    {0x11f54, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x848, 0x12b94u},
+    {0x11f58, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x840, 0x12b8cu},
+    {0x11f5c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x83c, 0x12b88u},
+    {0x11f60, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x834, 0x12b80u},
+    {0x11f64, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x830, 0x12b7cu},
+    {0x11f68, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x828, 0x12b74u},
+    {0x11f6c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x820, 0x12b6cu},
+    {0x11f70, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x81c, 0x12b68u},
+    {0x11f74, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x814, 0x12b60u},
+    {0x11f78, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x808, 0x12b54u},
+    {0x11f7c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x800, 0x12b4cu},
+    {0x11f80, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7f8, 0x12b44u},
+    {0x11f84, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7f0, 0x12b3cu},
+    {0x11f88, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7e8, 0x12b34u},
+    {0x11f8c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7e0, 0x12b2cu},
+    {0x11f90, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7d8, 0x12b24u},
+    {0x11f94, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7d0, 0x12b1cu},
+    {0x11f98, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7c4, 0x12b10u},
+    {0x11f9c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7bc, 0x12b08u},
+    {0x11fa0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7b4, 0x12b00u},
+    {0x11fa4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7ac, 0x12af8u},
+    {0x11fa8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7a4, 0x12af0u},
+    {0x11fac, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x79c, 0x12ae8u},
+    {0x11fb0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x794, 0x12ae0u},
+    {0x11fb4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x790, 0x12adcu},
+    {0x11fb8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x788, 0x12ad4u},
+    {0x11fbc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x780, 0x12accu},
+    {0x11fc0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x77c, 0x12ac8u},
+    {0x11fc4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x774, 0x12ac0u},
+    {0x11fc8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x76c, 0x12ab8u},
+    {0x11fcc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x764, 0x12ab0u},
+    {0x11fd0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x75c, 0x12aa8u},
+    {0x11fd4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x754, 0x12aa0u},
+    {0x11fd8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x74c, 0x12a98u},
+    {0x11fdc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x744, 0x12a90u},
+    {0x11fe0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x73c, 0x12a88u},
+    {0x11fe4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x734, 0x12a80u},
+    {0x11fe8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x72c, 0x12a78u},
+    {0x11fec, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x724, 0x12a70u},
+    {0x11ff0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x71c, 0x12a68u},
+    {0x11ff4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x714, 0x12a60u},
+    {0x11ff8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x70c, 0x12a58u},
+    {0x11ffc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x708, 0x12a54u},
+    {0x12000, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x700, 0x12a4cu},
+    {0x12004, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6fc, 0x12a48u},
+    {0x12008, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6f4, 0x12a40u},
+    {0x1200c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6ec, 0x12a38u},
+    {0x12010, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6e4, 0x12a30u},
+    {0x12014, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6dc, 0x12a28u},
+    {0x12018, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6d4, 0x12a20u},
+    {0x1201c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6cc, 0x12a18u},
+    {0x12020, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6c4, 0x12a10u},
+    {0x12024, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6bc, 0x12a08u},
+    {0x12028, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6b4, 0x12a00u},
+    {0x1202c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6ac, 0x129f8u},
+    {0x12030, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6a4, 0x129f0u},
+    {0x12034, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x69c, 0x129e8u},
+    {0x12038, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x690, 0x129dcu},
+    {0x1203c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x684, 0x129d0u},
+    {0x12040, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x67c, 0x129c8u},
+    {0x12044, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x670, 0x129bcu},
+    {0x12048, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x668, 0x129b4u},
+    {0x1204c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x65c, 0x129a8u},
+    {0x12050, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x654, 0x129a0u},
+    {0x12054, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x64c, 0x12998u},
+    {0x12058, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x644, 0x12990u},
+    {0x1205c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x63c, 0x12988u},
+    {0x12060, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x630, 0x1297cu},
+    {0x12064, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x628, 0x12974u},
+    {0x12068, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x620, 0x1296cu},
+    {0x1206c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x618, 0x12964u},
+    {0x12070, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x610, 0x1295cu},
+    {0x12074, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x608, 0x12954u},
+    {0x12078, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x600, 0x1294cu},
+    {0x1207c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5f8, 0x12944u},
+    {0x12080, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5f0, 0x1293cu},
+    {0x12084, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5e8, 0x12934u},
+    {0x12088, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5e0, 0x1292cu},
+    {0x1208c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5d8, 0x12924u},
+    {0x12090, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5d0, 0x1291cu},
+    {0x12094, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5c8, 0x12914u},
+    {0x12098, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5c0, 0x1290cu},
+    {0x1209c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5b8, 0x12904u},
+    {0x120a0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5b0, 0x128fcu},
+    {0x120a4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5a8, 0x128f4u},
+    {0x120a8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x5a4, 0x128f0u},
+    {0x120ac, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x59c, 0x128e8u},
+    {0x120b0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x594, 0x128e0u},
+    {0x120b4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x58c, 0x128d8u},
+    {0x120b8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x584, 0x128d0u},
+    {0x120bc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x57c, 0x128c8u},
+    {0x120c0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x574, 0x128c0u},
+    {0x120c4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x56c, 0x128b8u},
+    {0x120c8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x564, 0x128b0u},
+    {0x120cc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x55c, 0x128a8u},
+    {0x120d0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x554, 0x128a0u},
+    {0x120d4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x54c, 0x12898u},
+    {0x120d8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x540, 0x1288cu},
+    {0x120dc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x538, 0x12884u},
+    {0x120e0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x530, 0x1287cu},
+    {0x120e4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x528, 0x12874u},
+    {0x120e8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x51c, 0x12868u},
+    {0x120ec, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x510, 0x1285cu},
+    {0x120f0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x508, 0x12854u},
+    {0x120f4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4fc, 0x12848u},
+    {0x120f8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4f4, 0x12840u},
+    {0x120fc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4ec, 0x12838u},
+    {0x12100, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4e4, 0x12830u},
+    {0x12104, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4dc, 0x12828u},
+    {0x12108, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4d4, 0x12820u},
+    {0x1210c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4c8, 0x12814u},
+    {0x12110, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4c0, 0x1280cu},
+    {0x12114, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4b4, 0x12800u},
+    {0x12118, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4ac, 0x127f8u},
+    {0x1211c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x4a4, 0x127f0u},
+    {0x12120, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x49c, 0x127e8u},
+    {0x12124, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x494, 0x127e0u},
+    {0x12128, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x48c, 0x127d8u},
+    {0x1212c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x484, 0x127d0u},
+    {0x12130, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x47c, 0x127c8u},
+    {0x12134, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x474, 0x127c0u},
+    {0x12138, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x46c, 0x127b8u},
+    {0x1213c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x460, 0x127acu},
+    {0x12140, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x458, 0x127a4u},
+    {0x12144, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x450, 0x1279cu},
+    {0x12148, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x448, 0x12794u},
+    {0x1214c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x440, 0x1278cu},
+    {0x12150, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x438, 0x12784u},
+    {0x12154, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x430, 0x1277cu},
+    {0x12158, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x428, 0x12774u},
+    {0x1215c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x420, 0x1276cu},
+    {0x12160, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x41c, 0x12768u},
+    {0x12164, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x414, 0x12760u},
+    {0x12168, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x40c, 0x12758u},
+    {0x1216c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x404, 0x12750u},
+    {0x12170, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3fc, 0x12748u},
+    {0x12174, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3f8, 0x12744u},
+    {0x12178, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3ec, 0x12738u},
+    {0x1217c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3e4, 0x12730u},
+    {0x12180, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3dc, 0x12728u},
+    {0x12184, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3d4, 0x12720u},
+    {0x12188, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3cc, 0x12718u},
+    {0x1218c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3c0, 0x1270cu},
+    {0x12190, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3b8, 0x12704u},
+    {0x12194, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3ac, 0x126f8u},
+    {0x12198, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x3a4, 0x126f0u},
+    {0x1219c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x39c, 0x126e8u},
+    {0x121a0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x394, 0x126e0u},
+    {0x121a4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x38c, 0x126d8u},
+    {0x121a8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x380, 0x126ccu},
+    {0x121ac, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x378, 0x126c4u},
+    {0x121b0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x370, 0x126bcu},
+    {0x121b4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x364, 0x126b0u},
+    {0x121b8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x35c, 0x126a8u},
+    {0x121bc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x354, 0x126a0u},
+    {0x121c0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x34c, 0x12698u},
+    {0x121c4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x344, 0x12690u},
+    {0x121c8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x338, 0x12684u},
+    {0x121cc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x330, 0x1267cu},
+    {0x121d0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x324, 0x12670u},
+    {0x121d4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x31c, 0x12668u},
+    {0x121d8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x314, 0x12660u},
+    {0x121dc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x308, 0x12654u},
+    {0x121e0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2fc, 0x12648u},
+    {0x121e4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2f4, 0x12640u},
+    {0x121e8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2ec, 0x12638u},
+    {0x121ec, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2e0, 0x1262cu},
+    {0x121f0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2d4, 0x12620u},
+    {0x121f4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2cc, 0x12618u},
+    {0x121f8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2c4, 0x12610u},
+    {0x121fc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2bc, 0x12608u},
+    {0x12200, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2b4, 0x12600u},
+    {0x12204, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2b0, 0x125fcu},
+    {0x12208, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2a8, 0x125f4u},
+    {0x1220c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x2a0, 0x125ecu},
+    {0x12210, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x298, 0x125e4u},
+    {0x12214, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x288, 0x125d4u},
+    {0x12218, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x280, 0x125ccu},
+    {0x1221c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x278, 0x125c4u},
+    {0x12220, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x270, 0x125bcu},
+    {0x12224, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x268, 0x125b4u},
+    {0x12228, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x260, 0x125acu},
+    {0x1222c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x258, 0x125a4u},
+    {0x12230, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x250, 0x1259cu},
+    {0x12234, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x248, 0x12594u},
+    {0x12238, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x23c, 0x12588u},
+    {0x1223c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x234, 0x12580u},
+    {0x12240, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x22c, 0x12578u},
+    {0x12244, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x224, 0x12570u},
+    {0x12248, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x21c, 0x12568u},
+    {0x1224c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x210, 0x1255cu},
+    {0x12250, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x204, 0x12550u},
+    {0x12254, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1f8, 0x12544u},
+    {0x12258, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1f0, 0x1253cu},
+    {0x1225c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1e8, 0x12534u},
+    {0x12260, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1e0, 0x1252cu},
+    {0x12264, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1d4, 0x12520u},
+    {0x12268, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1cc, 0x12518u},
+    {0x1226c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1c4, 0x12510u},
+    {0x12270, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1bc, 0x12508u},
+    {0x12274, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1b4, 0x12500u},
+    {0x12278, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1ac, 0x124f8u},
+    {0x1227c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x1a4, 0x124f0u},
+    {0x12280, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x19c, 0x124e8u},
+    {0x12284, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x194, 0x124e0u},
+    {0x12288, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x18c, 0x124d8u},
+    {0x1228c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x184, 0x124d0u},
+    {0x12290, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x178, 0x124c4u},
+    {0x12294, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x170, 0x124bcu},
+    {0x12298, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x168, 0x124b4u},
+    {0x1229c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x160, 0x124acu},
+    {0x122a0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x158, 0x124a4u},
+    {0x122a4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x150, 0x1249cu},
+    {0x122a8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x790, 0x12adcu},
+    {0x122ac, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x144, 0x12490u},
+    {0x122b0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x138, 0x12484u},
+    {0x122b4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x130, 0x1247cu},
+    {0x122b8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x124, 0x12470u},
+    {0x122bc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x11c, 0x12468u},
+    {0x122c0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x114, 0x12460u},
+    {0x122c4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x104, 0x12450u},
+    {0x122c8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xfc, 0x12448u},
+    {0x122cc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xf4, 0x12440u},
+    {0x122d0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xf4, 0x12440u},
+    {0x122d4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xe8, 0x12434u},
+    {0x122d8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xe0, 0x1242cu},
+    {0x122dc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xd8, 0x12424u},
+    {0x122e0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xd0, 0x1241cu},
+    {0x122e4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xc8, 0x12414u},
+    {0x122e8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xc0, 0x1240cu},
+    {0x122ec, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xb8, 0x12404u},
+    {0x122f0, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xb0, 0x123fcu},
+    {0x122f4, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xa8, 0x123f4u},
+    {0x122f8, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0xa0, 0x123ecu},
+    {0x122fc, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x98, 0x123e4u},
+    {0x12300, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x90, 0x123dcu},
+    {0x12304, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x84, 0x123d0u},
+    {0x12308, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6ec, 0x12a38u},
+    {0x1230c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x7c, 0x123c8u},
+    {0x12310, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x74, 0x123c0u},
+    {0x12314, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x6c, 0x123b8u},
+    {0x12318, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x64, 0x123b0u},
+    {0x1231c, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x58, 0x123a4u},
+    {0x12320, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x50, 0x1239cu},
+    {0x12324, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x48, 0x12394u},
+    {0x12328, 'G', (void *)&BlokeActionTable, sizeof(BlokeActionTable), 0x40, 0x1238cu},
     {0x1234c, 'F', (void *)LogBlokeRethinking, 0, 0, ~0u},
     {0x12350, 'F', (void *)BlokeActionWait, 0, 0, ~0u},
-    {0x12354, 'F', (void *)FUN_00483ef0, 0, 0, ~0u},
-    {0x12358, 'F', (void *)FUN_00484090, 0, 0, ~0u},
-    {0x1235c, 'F', (void *)FUN_00483d10, 0, 0, ~0u},
+    {0x12354, 'F', (void *)BlokeActionWalkPath, 0, 0, ~0u},
+    {0x12358, 'F', (void *)BlokeActionWalkPathStraight, 0, 0, ~0u},
+    {0x1235c, 'F', (void *)BlokeActionRandomWalk, 0, 0, ~0u},
     {0x12360, 'F', (void *)BlokeActionTurn, 0, 0, ~0u},
-    {0x12364, 'F', (void *)FUN_00484220, 0, 0, ~0u},
+    {0x12364, 'F', (void *)BlokeActionMoveToDestOnPath, 0, 0, ~0u},
     {0x12368, 'F', (void *)BlokeActionMoveToDest, 0, 0, ~0u},
     {0x1236c, 'F', (void *)BlokeActionBounce, 0, 0, ~0u},
-    {0x12370, 'F', (void *)FUN_00484790, 0, 0, ~0u},
-    {0x12374, 'F', (void *)FUN_00483e20, 0, 0, ~0u},
-    {0x12378, 'F', (void *)FUN_00484470, 0, 0, ~0u},
-    {0x1237c, 'F', (void *)FUN_00484520, 0, 0, ~0u},
+    {0x12370, 'F', (void *)BlokeActionPassThroughTile, 0, 0, ~0u},
+    {0x12374, 'F', (void *)BlokeActionWalkUntilPath, 0, 0, ~0u},
+    {0x12378, 'F', (void *)BlokeActionMoveToDestAvoiding, 0, 0, ~0u},
+    {0x1237c, 'F', (void *)BlokeActionMoveToDestStayOnPath, 0, 0, ~0u},
     {0x12380, 'F', (void *)BlokeActionWaitWhileHovered, 0, 0, ~0u},
-    {0x12384, 'F', (void *)FUN_00483d90, 0, 0, ~0u},
-    {0x12388, 'F', (void *)FUN_00484350, 0, 0, ~0u},
+    {0x12384, 'F', (void *)BlokeActionRandomWalkDelayed, 0, 0, ~0u},
+    {0x12388, 'F', (void *)BlokeActionMoveUntilPath, 0, 0, ~0u},
     {0x12ebc, 'G', (void *)&DAT_004b6d58, sizeof(DAT_004b6d58), 0x3e0, 0xc138u},
-    {0x12ecc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb9c, 0x13a54u},
-    {0x12edc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb94, 0x13a4cu},
-    {0x12eec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb8c, 0x13a44u},
-    {0x12efc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb7c, 0x13a34u},
+    {0x12ecc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb9c, 0x13a54u},
+    {0x12edc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb94, 0x13a4cu},
+    {0x12eec, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb8c, 0x13a44u},
+    {0x12efc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb7c, 0x13a34u},
     {0x12f0c, 'G', (void *)&DAT_004b6d58, sizeof(DAT_004b6d58), 0x3d8, 0xc130u},
-    {0x12f1c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb74, 0x13a2cu},
-    {0x12f2c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb68, 0x13a20u},
-    {0x12f3c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb58, 0x13a10u},
-    {0x12f4c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb48, 0x13a00u},
-    {0x12f5c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb38, 0x139f0u},
-    {0x12f6c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb2c, 0x139e4u},
-    {0x12f7c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb20, 0x139d8u},
-    {0x12f8c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb14, 0x139ccu},
-    {0x12f9c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xb04, 0x139bcu},
-    {0x12fac, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xaf8, 0x139b0u},
-    {0x12fbc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xaec, 0x139a4u},
-    {0x12fcc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xae0, 0x13998u},
-    {0x12fdc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xad4, 0x1398cu},
-    {0x12fec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xac4, 0x1397cu},
-    {0x12ffc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xab4, 0x1396cu},
-    {0x1300c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xaa4, 0x1395cu},
-    {0x1301c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa94, 0x1394cu},
-    {0x1302c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa8c, 0x13944u},
-    {0x1303c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa84, 0x1393cu},
-    {0x1304c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa78, 0x13930u},
-    {0x1305c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa6c, 0x13924u},
-    {0x1306c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa60, 0x13918u},
-    {0x1307c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa58, 0x13910u},
-    {0x1308c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa50, 0x13908u},
-    {0x1309c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa48, 0x13900u},
-    {0x130ac, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa3c, 0x138f4u},
-    {0x130bc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa30, 0x138e8u},
-    {0x130cc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa24, 0x138dcu},
-    {0x130dc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa1c, 0x138d4u},
-    {0x130ec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa14, 0x138ccu},
+    {0x12f1c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb74, 0x13a2cu},
+    {0x12f2c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb68, 0x13a20u},
+    {0x12f3c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb58, 0x13a10u},
+    {0x12f4c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb48, 0x13a00u},
+    {0x12f5c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb38, 0x139f0u},
+    {0x12f6c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb2c, 0x139e4u},
+    {0x12f7c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb20, 0x139d8u},
+    {0x12f8c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb14, 0x139ccu},
+    {0x12f9c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xb04, 0x139bcu},
+    {0x12fac, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xaf8, 0x139b0u},
+    {0x12fbc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xaec, 0x139a4u},
+    {0x12fcc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xae0, 0x13998u},
+    {0x12fdc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xad4, 0x1398cu},
+    {0x12fec, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xac4, 0x1397cu},
+    {0x12ffc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xab4, 0x1396cu},
+    {0x1300c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xaa4, 0x1395cu},
+    {0x1301c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa94, 0x1394cu},
+    {0x1302c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa8c, 0x13944u},
+    {0x1303c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa84, 0x1393cu},
+    {0x1304c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa78, 0x13930u},
+    {0x1305c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa6c, 0x13924u},
+    {0x1306c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa60, 0x13918u},
+    {0x1307c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa58, 0x13910u},
+    {0x1308c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa50, 0x13908u},
+    {0x1309c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa48, 0x13900u},
+    {0x130ac, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa3c, 0x138f4u},
+    {0x130bc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa30, 0x138e8u},
+    {0x130cc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa24, 0x138dcu},
+    {0x130dc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa1c, 0x138d4u},
+    {0x130ec, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa14, 0x138ccu},
     {0x130fc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x2bc, 0xda64u},
     {0x1310c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x2b0, 0xda58u},
     {0x1311c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x2a4, 0xda4cu},
-    {0x1312c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0xa04, 0x138bcu},
-    {0x1313c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9fc, 0x138b4u},
-    {0x1314c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9f4, 0x138acu},
-    {0x1315c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9e4, 0x1389cu},
-    {0x1316c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9d4, 0x1388cu},
-    {0x1317c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9c8, 0x13880u},
-    {0x1318c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9c0, 0x13878u},
-    {0x1319c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9b4, 0x1386cu},
-    {0x131ac, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x9a8, 0x13860u},
-    {0x131bc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x99c, 0x13854u},
-    {0x131cc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x990, 0x13848u},
-    {0x131dc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x984, 0x1383cu},
-    {0x131ec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x97c, 0x13834u},
-    {0x131fc, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x968, 0x13820u},
-    {0x1320c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x950, 0x13808u},
-    {0x1321c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x140, 0xc5b8u},
-    {0x1322c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x134, 0xc5acu},
-    {0x1323c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x124, 0xc59cu},
+    {0x1312c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0xa04, 0x138bcu},
+    {0x1313c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9fc, 0x138b4u},
+    {0x1314c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9f4, 0x138acu},
+    {0x1315c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9e4, 0x1389cu},
+    {0x1316c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9d4, 0x1388cu},
+    {0x1317c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9c8, 0x13880u},
+    {0x1318c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9c0, 0x13878u},
+    {0x1319c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9b4, 0x1386cu},
+    {0x131ac, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x9a8, 0x13860u},
+    {0x131bc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x99c, 0x13854u},
+    {0x131cc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x990, 0x13848u},
+    {0x131dc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x984, 0x1383cu},
+    {0x131ec, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x97c, 0x13834u},
+    {0x131fc, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x968, 0x13820u},
+    {0x1320c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x950, 0x13808u},
+    {0x1321c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x140, 0xc5b8u},
+    {0x1322c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x134, 0xc5acu},
+    {0x1323c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x124, 0xc59cu},
     {0x1324c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x168, 0xd910u},
     {0x1325c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x158, 0xd900u},
-    {0x1326c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x14c, 0xc5c4u},
+    {0x1326c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x14c, 0xc5c4u},
     {0x1327c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x140, 0xd8e8u},
     {0x1328c, 'G', (void *)&PTR_Bloke_DoNothing_004b8368, sizeof(PTR_Bloke_DoNothing_004b8368), 0x74, 0xd3dcu},
     {0x1329c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1bc, 0xd964u},
@@ -5381,23 +5387,23 @@ static const struct PortFixup port_fixups[] = {
     {0x132bc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x19c, 0xd944u},
     {0x132cc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x188, 0xd930u},
     {0x132dc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x14c, 0xd8f4u},
-    {0x132ec, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x17c, 0xc5f4u},
-    {0x132fc, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x168, 0xc5e0u},
-    {0x1330c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x184, 0xc5fcu},
-    {0x1331c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x170, 0xc5e8u},
+    {0x132ec, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x17c, 0xc5f4u},
+    {0x132fc, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x168, 0xc5e0u},
+    {0x1330c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x184, 0xc5fcu},
+    {0x1331c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x170, 0xc5e8u},
     {0x1332c, 'I', NULL, 0, 0x9670, 0x9670u},
     {0x1333c, 'G', (void *)&DAT_004b4580, sizeof(DAT_004b4580), 0x20, 0x95a0u},
-    {0x1334c, 'G', (void *)&DAT_004b7478, sizeof(DAT_004b7478), 0x160, 0xc5d8u},
+    {0x1334c, 'G', (void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0x160, 0xc5d8u},
     {0x1335c, 'G', (void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0xd0, 0x9ef0u},
     {0x1336c, 'G', (void *)&Catapult_SFX, sizeof(Catapult_SFX), 0x64, 0x912cu},
     {0x1337c, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x178, 0xd920u},
     {0x1338c, 'G', (void *)&DAT_004b77e8, sizeof(DAT_004b77e8), 0xb4, 0xc89cu},
     {0x1339c, 'G', (void *)&DAT_004b42c4, sizeof(DAT_004b42c4), 0x120, 0x93e4u},
     {0x133ac, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1e8, 0xd990u},
-    {0x133bc, 'G', (void *)&DAT_004b79d0, sizeof(DAT_004b79d0), 0x9c, 0xca6cu},
+    {0x133bc, 'G', (void *)&PlaneRideFX, sizeof(PlaneRideFX), 0x9c, 0xca6cu},
     {0x133cc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1dc, 0xd984u},
     {0x133dc, 'G', (void *)&DAT_004b4ce4, sizeof(DAT_004b4ce4), 0x90, 0x9d74u},
-    {0x133ec, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x944, 0x137fcu},
+    {0x133ec, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x944, 0x137fcu},
     {0x133fc, 'G', (void *)&MONEY_SFX, sizeof(MONEY_SFX), 0x1c8, 0xd970u},
     {0x1340c, 'G', (void *)&DAT_004b4e20, sizeof(DAT_004b4e20), 0x98, 0x9eb8u},
     {0x1341c, 'G', (void *)&BoxBlokeBnvName, 0xbu, 0xc4, 0xc978u},
@@ -5415,12 +5421,12 @@ static const struct PortFixup port_fixups[] = {
     {0x134dc, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0x94, 0xa354u},
     {0x134ec, 'G', (void *)&PTR_s_Boat_Noise_wav, sizeof(PTR_s_Boat_Noise_wav), 0xbc, 0xa37cu},
     {0x134fc, 'G', (void *)&DAT_004b4034, sizeof(DAT_004b4034), 0x58, 0x908cu},
-    {0x1350c, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xc4, 0xac0cu},
-    {0x1351c, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0x6c, 0xabb4u},
-    {0x1352c, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xb4, 0xabfcu},
-    {0x1353c, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0xa0, 0xabe8u},
-    {0x1354c, 'G', (void *)&DAT_004b5b48, sizeof(DAT_004b5b48), 0x88, 0xabd0u},
-    {0x1355c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x92c, 0x137e4u},
+    {0x1350c, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xc4, 0xac0cu},
+    {0x1351c, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0x6c, 0xabb4u},
+    {0x1352c, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xb4, 0xabfcu},
+    {0x1353c, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0xa0, 0xabe8u},
+    {0x1354c, 'G', (void *)&CastlePieceClass, sizeof(CastlePieceClass), 0x88, 0xabd0u},
+    {0x1355c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x92c, 0x137e4u},
     {0x1356c, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x354, 0x9bb4u},
     {0x1357c, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x2c4, 0x9b24u},
     {0x1358c, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x2b0, 0x9b10u},
@@ -5431,17 +5437,17 @@ static const struct PortFixup port_fixups[] = {
     {0x135dc, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x28c, 0x9aecu},
     {0x135ec, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x2a0, 0x9b00u},
     {0x135fc, 'G', (void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x344, 0x9ba4u},
-    {0x1360c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x914, 0x137ccu},
-    {0x1361c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x904, 0x137bcu},
-    {0x1362c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x8f4, 0x137acu},
-    {0x1363c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x8e0, 0x13798u},
-    {0x1364c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x8d0, 0x13788u},
-    {0x1365c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x8bc, 0x13774u},
-    {0x1366c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x8ac, 0x13764u},
-    {0x1367c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x898, 0x13750u},
-    {0x1368c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x884, 0x1373cu},
-    {0x1369c, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x874, 0x1372cu},
-    {0x136ac, 'G', (void *)&DAT_004bdeb8, sizeof(DAT_004bdeb8), 0x860, 0x13718u},
+    {0x1360c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x914, 0x137ccu},
+    {0x1361c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x904, 0x137bcu},
+    {0x1362c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x8f4, 0x137acu},
+    {0x1363c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x8e0, 0x13798u},
+    {0x1364c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x8d0, 0x13788u},
+    {0x1365c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x8bc, 0x13774u},
+    {0x1366c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x8ac, 0x13764u},
+    {0x1367c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x898, 0x13750u},
+    {0x1368c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x884, 0x1373cu},
+    {0x1369c, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x874, 0x1372cu},
+    {0x136ac, 'G', (void *)&FreePlayObjectTable, sizeof(FreePlayObjectTable), 0x860, 0x13718u},
     {0x136bc, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x14c, 0xa0f4u},
     {0x136cc, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0xe0, 0xa088u},
     {0x136dc, 'G', (void *)&WATERWORKS_SFX, sizeof(WATERWORKS_SFX), 0x100, 0xa0a8u},
@@ -5478,79 +5484,79 @@ static const struct PortFixup port_fixups[] = {
     {0x13cf8, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
     {0x13d10, 'G', (void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x0, 0x13d40u},
     {0x13d14, 'G', (void *)&ProgressScreenTables, sizeof(ProgressScreenTables), 0x1ac, 0x13d2cu},
-    {0x14898, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14898, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1489c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148a8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148a8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148ac, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148b8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148b8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148bc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148c8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148c8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148cc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148d8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148d8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148dc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148e8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148e8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148ec, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x148f8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x148f8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x148fc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14908, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14908, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1490c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14918, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14918, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1491c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14928, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14928, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1492c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14938, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14938, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1493c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14948, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14948, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1494c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14958, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14958, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1495c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14968, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14968, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1496c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14978, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14978, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1497c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14988, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14988, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1498c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x14998, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x14998, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x1499c, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x149a8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x149a8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x149ac, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x149b8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x149b8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x149bc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x149c8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x1e20c, ~0u},
+    {0x149c8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x1e20c, ~0u},
     {0x149cc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x7420d, ~0u},
-    {0x149d8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x6e1ff, ~0u},
-    {0x149dc, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x2e1fd, ~0u},
+    {0x149d8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x6e1ff, ~0u},
+    {0x149dc, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x2e1fd, ~0u},
     {0x149ec, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x64213, ~0u},
     {0x149f0, 'G', (void *)&DAT_0063835c, sizeof(DAT_0063835c), 0x7d09, ~0u},
     {0x149fc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x24213, ~0u},
     {0x14a00, 'G', (void *)&DAT_0062fef8, sizeof(DAT_0062fef8), 0x176, ~0u},
     {0x14a10, 'G', (void *)&DAT_0064cd90, sizeof(DAT_0064cd90), 0x32d7, ~0u},
-    {0x14a14, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x8e1ff, ~0u},
-    {0x14a18, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x3e208, ~0u},
-    {0x14a24, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x6e1ff, ~0u},
-    {0x14a28, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x2e1fd, ~0u},
+    {0x14a14, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x8e1ff, ~0u},
+    {0x14a18, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x3e208, ~0u},
+    {0x14a24, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x6e1ff, ~0u},
+    {0x14a28, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x2e1fd, ~0u},
     {0x14a38, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x64213, ~0u},
     {0x14a3c, 'G', (void *)&DAT_0063835c, sizeof(DAT_0063835c), 0x7d09, ~0u},
     {0x14a48, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x24213, ~0u},
     {0x14a4c, 'G', (void *)&DAT_0062fef8, sizeof(DAT_0062fef8), 0x176, ~0u},
     {0x14a5c, 'G', (void *)&DAT_0064cd90, sizeof(DAT_0064cd90), 0x32d7, ~0u},
-    {0x14a60, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x8e1ff, ~0u},
-    {0x14a64, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x3e208, ~0u},
+    {0x14a60, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x8e1ff, ~0u},
+    {0x14a64, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x3e208, ~0u},
     {0x14a70, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x64211, ~0u},
     {0x14abc, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x64211, ~0u},
     {0x14ac0, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x24211, ~0u},
-    {0x14ac4, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x3e206, ~0u},
+    {0x14ac4, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x3e206, ~0u},
     {0x14ac8, 'G', (void *)&DAT_0066be54, sizeof(DAT_0066be54), 0x8421e, ~0u},
-    {0x14da8, 'G', (void *)&DAT_00701e68, sizeof(DAT_00701e68), 0x2e20d, ~0u},
+    {0x14da8, 'G', (void *)&ZBufferImagePixels, sizeof(ZBufferImagePixels), 0x2e20d, ~0u},
     {0x14dac, 'G', (void *)&DAT_0062fef8, sizeof(DAT_0062fef8), 0x171, ~0u},
     {0x15130, 'I', NULL, 0, 0x1513a, 0x1513au},
     {0x15134, 'I', NULL, 0, 0x1513a, 0x1513au},
     {0x151bc, 'G', (void *)&CurrentProfile, sizeof(CurrentProfile), 0xe1, ~0u},
     {0x151c0, 'G', (void *)&CurrentProfile, sizeof(CurrentProfile), 0xe1, ~0u},
     {0x151c4, 'G', (void *)&CurrentProfile, sizeof(CurrentProfile), 0xe1, ~0u},
-    {0x151fc, 'G', (void *)&DAT_0081ce00, sizeof(DAT_0081ce00), 0x3282, ~0u},
-    {0x15200, 'G', (void *)&DAT_0081ce00, sizeof(DAT_0081ce00), 0x3282, ~0u},
-    {0x15204, 'G', (void *)&DAT_0081ce00, sizeof(DAT_0081ce00), 0x3282, ~0u},
+    {0x151fc, 'G', (void *)&FreeSpotCursors, sizeof(FreeSpotCursors), 0x3282, ~0u},
+    {0x15200, 'G', (void *)&FreeSpotCursors, sizeof(FreeSpotCursors), 0x3282, ~0u},
+    {0x15204, 'G', (void *)&FreeSpotCursors, sizeof(FreeSpotCursors), 0x3282, ~0u},
     {0x15370, 'G', (void *)&NullGuid, sizeof(NullGuid), 0xcc, 0x209cu},
     {0x15374, 'G', (void *)&NullGuid, sizeof(NullGuid), 0xbc, 0x208cu},
     {0x15378, 'G', (void *)&PathSprite, sizeof(PathSprite), 0x350, ~0u},
@@ -5582,7 +5588,7 @@ static const struct PortFixup port_fixups[] = {
     {0x156bc, 'G', (void *)&NullGuid, sizeof(NullGuid), 0xdc, 0x20acu},
     {0x156c4, 'G', (void *)&NullGuid, sizeof(NullGuid), 0xd8, 0x20a8u},
     {0x156cc, 'G', (void *)&NullGuid, sizeof(NullGuid), 0xd4, 0x20a4u},
-    {0x159bc, 'G', (void *)&DAT_00579878, sizeof(DAT_00579878), 0x40a70, ~0u},
+    {0x159bc, 'G', (void *)&CoasterSurfaceData, 0x96000u, 0x409ec, ~0u},
     {0x15ab4, 'I', NULL, 0, 0x15a34, 0x15a34u},
     {0x15ab8, 'I', NULL, 0, 0x15a74, 0x15a74u},
     {0x15b6c, 'G', (void *)&NullGuid, sizeof(NullGuid), 0x4ac, 0x247cu},
@@ -5629,7 +5635,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&FLOAT_004ab424, sizeof(FLOAT_004ab424), 0x424, 0x4},
     {(void *)&FLOAT_004ab428, sizeof(FLOAT_004ab428), 0x428, 0x4},
     {(void *)&FLOAT_004ab42c, sizeof(FLOAT_004ab42c), 0x42c, 0x4},
-    {(void *)&DAT_004ab430, sizeof(DAT_004ab430), 0x430, 0x8},
+    {(void *)&TrainCarMass, sizeof(TrainCarMass), 0x430, 0x8},
     {(void *)&FLOAT_004ab438, sizeof(FLOAT_004ab438), 0x438, 0x4},
     {(void *)&FLOAT_004ab43c, sizeof(FLOAT_004ab43c), 0x43c, 0x8},
     {(void *)&FLOAT_004ab444, sizeof(FLOAT_004ab444), 0x444, 0x8},
@@ -5697,7 +5703,7 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b4860, sizeof(DAT_004b4860), 0x9860, 0x370},
     {(void *)&DAT_004b4bd0, sizeof(DAT_004b4bd0), 0x9bd0, 0x20},
     {(void *)&DAT_004b4bf0, sizeof(DAT_004b4bf0), 0x9bf0, 0x14},
-    {(void *)&DAT_004b4c04, sizeof(DAT_004b4c04), 0x9c04, 0x4},
+    {(void *)&TrafficLightTimer, sizeof(TrafficLightTimer), 0x9c04, 0x4},
     {(void *)&DAT_004b4c08, sizeof(DAT_004b4c08), 0x9c08, 0xa4},
     {(void *)&DAT_004b4cc4, sizeof(DAT_004b4cc4), 0x9cc4, 0x20},
     {(void *)&DAT_004b4ce4, sizeof(DAT_004b4ce4), 0x9ce4, 0xa4},
@@ -5714,37 +5720,37 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5290, sizeof(DAT_004b5290), 0xa290, 0x30},
     {(void *)&DAT_004b53c0, sizeof(DAT_004b53c0), 0xa3c0, 0x14},
     {(void *)&DAT_004b53d4, sizeof(DAT_004b53d4), 0xa3d4, 0x19c},
-    {(void *)&DAT_004b5584, sizeof(DAT_004b5584), 0xa584, 0x18},
-    {(void *)&DAT_004b559c, sizeof(DAT_004b559c), 0xa59c, 0xc},
-    {(void *)&FLOAT_004b55a8, sizeof(FLOAT_004b55a8), 0xa5a8, 0x4c},
-    {(void *)&DAT_004b55f4, sizeof(DAT_004b55f4), 0xa5f4, 0x8},
-    {(void *)&DAT_004b5608, sizeof(DAT_004b5608), 0xa608, 0x4},
-    {(void *)&DAT_004b560c, sizeof(DAT_004b560c), 0xa60c, 0x4},
-    {(void *)&DAT_004b5610, sizeof(DAT_004b5610), 0xa610, 0x4},
-    {(void *)&DAT_004b5614, sizeof(DAT_004b5614), 0xa614, 0x4},
-    {(void *)&DAT_004b5618, sizeof(DAT_004b5618), 0xa618, 0xc},
-    {(void *)&DAT_004b5624, sizeof(DAT_004b5624), 0xa624, 0x4},
-    {(void *)&DAT_004b5628, sizeof(DAT_004b5628), 0xa628, 0xc},
-    {(void *)&FLOAT_004b5634, sizeof(FLOAT_004b5634), 0xa634, 0x14},
-    {(void *)&DAT_004b5660, sizeof(DAT_004b5660), 0xa660, 0xa0},
-    {(void *)&DAT_004b5700, sizeof(DAT_004b5700), 0xa700, 0x48},
+    {(void *)&PieceNeighbourOffsets, sizeof(PieceNeighbourOffsets), 0xa584, 0x18},
+    {(void *)&TrainCarSeatX, sizeof(TrainCarSeatX), 0xa59c, 0xc},
+    {(void *)&TrainSeatSpacing, sizeof(TrainSeatSpacing), 0xa5a8, 0x4c},
+    {(void *)&MapObjectsEnabled, sizeof(MapObjectsEnabled), 0xa5f4, 0x8},
+    {(void *)&ClipVertexStride, sizeof(ClipVertexStride), 0xa608, 0x4},
+    {(void *)&ClipVertexLastField, sizeof(ClipVertexLastField), 0xa60c, 0x4},
+    {(void *)&DerivThirdDiffWeight, sizeof(DerivThirdDiffWeight), 0xa610, 0x4},
+    {(void *)&Deriv4PointFirstOffset, sizeof(Deriv4PointFirstOffset), 0xa614, 0x4},
+    {(void *)&Deriv4PointOffsets, sizeof(Deriv4PointOffsets), 0xa618, 0xc},
+    {(void *)&Deriv4PointFirstWeight, sizeof(Deriv4PointFirstWeight), 0xa624, 0x4},
+    {(void *)&Deriv4PointWeights, sizeof(Deriv4PointWeights), 0xa628, 0xc},
+    {(void *)&ScalarDerivThirdDiffWeight, sizeof(ScalarDerivThirdDiffWeight), 0xa634, 0x14},
+    {(void *)&RK4Coefficients, sizeof(RK4Coefficients), 0xa660, 0xa0},
+    {(void *)&BoxFaceNormals, sizeof(BoxFaceNormals), 0xa700, 0x48},
     {(void *)&DAT_004b5748, sizeof(DAT_004b5748), 0xa748, 0xc0},
     {(void *)&DAT_004b5808, sizeof(DAT_004b5808), 0xa808, 0xc0},
-    {(void *)&DAT_004b5964, sizeof(DAT_004b5964), 0xa964, 0x8},
-    {(void *)&DAT_004b5974, sizeof(DAT_004b5974), 0xa974, 0x8},
-    {(void *)&DAT_004b5abc, sizeof(DAT_004b5abc), 0xaabc, 0x64},
-    {(void *)&DAT_004b5b28, sizeof(DAT_004b5b28), 0xab28, 0x14},
-    {(void *)&DAT_004b5c1c, sizeof(DAT_004b5c1c), 0xac1c, 0x80},
+    {(void *)&ManVisitorColours, sizeof(ManVisitorColours), 0xa964, 0x8},
+    {(void *)&GirlVisitorColours, sizeof(GirlVisitorColours), 0xa974, 0x8},
+    {(void *)&HermiteBasis, sizeof(HermiteBasis), 0xaabc, 0x64},
+    {(void *)&CoasterSurfacePitch, sizeof(CoasterSurfacePitch), 0xab28, 0x14},
+    {(void *)&CastleIsoProjections, sizeof(CastleIsoProjections), 0xac1c, 0x80},
     {(void *)&DAT_004b5c9c, sizeof(DAT_004b5c9c), 0xac9c, 0x4},
-    {(void *)&DAT_004b5ca0, sizeof(DAT_004b5ca0), 0xaca0, 0x4},
+    {(void *)&CastleLightDir, sizeof(CastleLightDir), 0xaca0, 0x4},
     {(void *)&DAT_004b5ca4, sizeof(DAT_004b5ca4), 0xaca4, 0x4},
     {(void *)&DAT_004b5ca8, sizeof(DAT_004b5ca8), 0xaca8, 0x4},
     {(void *)&DAT_004b5cac, sizeof(DAT_004b5cac), 0xacac, 0x4},
-    {(void *)&DAT_004b5cb0, sizeof(DAT_004b5cb0), 0xacb0, 0x4},
+    {(void *)&TrackLightDir, sizeof(TrackLightDir), 0xacb0, 0x4},
     {(void *)&DAT_004b5cb4, sizeof(DAT_004b5cb4), 0xacb4, 0x4},
     {(void *)&DAT_004b5cb8, sizeof(DAT_004b5cb8), 0xacb8, 0x4},
     {(void *)&DAT_004b5cbc, sizeof(DAT_004b5cbc), 0xacbc, 0x4},
-    {(void *)&DAT_004b5cc0, sizeof(DAT_004b5cc0), 0xacc0, 0x4},
+    {(void *)&ModelLightDir, sizeof(ModelLightDir), 0xacc0, 0x4},
     {(void *)&DAT_004b5cc4, sizeof(DAT_004b5cc4), 0xacc4, 0x4},
     {(void *)&DAT_004b5cc8, sizeof(DAT_004b5cc8), 0xacc8, 0x2c},
     {(void *)&RollerCoasterSavePath, sizeof(RollerCoasterSavePath), 0xacf4, 0x2c},
@@ -5756,12 +5762,12 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b5ee0, sizeof(DAT_004b5ee0), 0xaee0, 0x14},
     {(void *)&DAT_004b5ef4, sizeof(DAT_004b5ef4), 0xaef4, 0x20},
     {(void *)&DAT_004b5f14, sizeof(DAT_004b5f14), 0xaf14, 0x3c},
-    {(void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0xaf80, 0x1d0},
-    {(void *)&DAT_004b61e0, sizeof(DAT_004b61e0), 0xb1e0, 0x110},
+    {(void *)&DAT_004b5f80, sizeof(DAT_004b5f80), 0xaf80, 0x90},
+    {(void *)&TrackTieShape, sizeof(TrackTieShape), 0xb1e0, 0x60},
     {(void *)&DAT_004b62f0, sizeof(DAT_004b62f0), 0xb2f0, 0x10},
     {(void *)&DAT_004b6398, sizeof(DAT_004b6398), 0xb398, 0x30},
     {(void *)&DAT_004b63c8, sizeof(DAT_004b63c8), 0xb3c8, 0x34},
-    {(void *)&DAT_004b6408, sizeof(DAT_004b6408), 0xb408, 0xc4},
+    {(void *)&WheelCurvePairs, sizeof(WheelCurvePairs), 0xb408, 0xc4},
     {(void *)&CarouselBlokeBoxName, sizeof(CarouselBlokeBoxName), 0xb4cc, 0xc},
     {(void *)&DAT_004b65c0, sizeof(DAT_004b65c0), 0xb5c0, 0x78},
     {(void *)&DAT_004b6638, sizeof(DAT_004b6638), 0xb638, 0x1c},
@@ -5787,8 +5793,8 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&JungleCruiseStartFootprint, sizeof(JungleCruiseStartFootprint), 0xc278, 0x18},
     {(void *)&DAT_004b7290, sizeof(DAT_004b7290), 0xc290, 0x54},
     {(void *)&DAT_004b72e4, sizeof(DAT_004b72e4), 0xc2e4, 0x194},
-    {(void *)&DAT_004b7478, sizeof(DAT_004b7478), 0xc478, 0x1a0},
-    {(void *)&DAT_004b7798, sizeof(DAT_004b7798), 0xc798, 0x50},
+    {(void *)&JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint), 0xc478, 0x1a0},
+    {(void *)&SpaceTowerSeats, sizeof(SpaceTowerSeats), 0xc798, 0x50},
     {(void *)&DAT_004b77e8, sizeof(DAT_004b77e8), 0xc7e8, 0xcc},
     {(void *)&DAT_004b7abc, sizeof(DAT_004b7abc), 0xcabc, 0x4},
     {(void *)&BlokeColours, sizeof(BlokeColours), 0xcac0, 0x20},
@@ -5801,21 +5807,21 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b7d78, sizeof(DAT_004b7d78), 0xcd78, 0x6},
     {(void *)&DAT_004b7d7e, sizeof(DAT_004b7d7e), 0xcd7e, 0x6},
     {(void *)&DAT_004b7d84, sizeof(DAT_004b7d84), 0xcd84, 0xb4},
-    {(void *)&DAT_004b8318, sizeof(DAT_004b8318), 0xd318, 0x8},
-    {(void *)&DAT_004b8320, sizeof(DAT_004b8320), 0xd320, 0x8},
-    {(void *)&DAT_004b8328, sizeof(DAT_004b8328), 0xd328, 0xc},
-    {(void *)&DAT_004b8334, sizeof(DAT_004b8334), 0xd334, 0x10},
-    {(void *)&DAT_004b8344, sizeof(DAT_004b8344), 0xd344, 0x4},
+    {(void *)&ParkEntranceWalkInOffset, sizeof(ParkEntranceWalkInOffset), 0xd318, 0x8},
+    {(void *)&ParkExitPos, sizeof(ParkExitPos), 0xd320, 0x8},
+    {(void *)&ParkExitStep, sizeof(ParkExitStep), 0xd328, 0xc},
+    {(void *)&BlokeTirednessThresholds, sizeof(BlokeTirednessThresholds), 0xd334, 0x10},
+    {(void *)&NextBlokeLetter, sizeof(NextBlokeLetter), 0xd344, 0x4},
     {(void *)&DAT_004b8a88, sizeof(DAT_004b8a88), 0xda88, 0x4},
     {(void *)&DAT_004b8a8c, sizeof(DAT_004b8a8c), 0xda8c, 0x4},
     {(void *)&DAT_004b8a90, sizeof(DAT_004b8a90), 0xda90, 0x12c},
     {(void *)&PercentSFormat, sizeof(PercentSFormat), 0xdbbc, 0x53c},
     {(void *)&BrickCount, sizeof(BrickCount), 0xe0f8, 0x4},
     {(void *)&UnlimitedBricks, sizeof(UnlimitedBricks), 0xe0fc, 0x114},
-    {(void *)&DAT_004b9210, sizeof(DAT_004b9210), 0xe210, 0x4},
-    {(void *)&DAT_004b9214, sizeof(DAT_004b9214), 0xe214, 0x4},
-    {(void *)&DAT_004b9218, sizeof(DAT_004b9218), 0xe218, 0x4},
-    {(void *)&DAT_004b921c, sizeof(DAT_004b921c), 0xe21c, 0x4},
+    {(void *)&Bridge1SpriteOffsetX, sizeof(Bridge1SpriteOffsetX), 0xe210, 0x4},
+    {(void *)&Bridge1SpriteOffsetY, sizeof(Bridge1SpriteOffsetY), 0xe214, 0x4},
+    {(void *)&Bridge0SpriteOffsetX, sizeof(Bridge0SpriteOffsetX), 0xe218, 0x4},
+    {(void *)&Bridge0SpriteOffsetY, sizeof(Bridge0SpriteOffsetY), 0xe21c, 0x4},
     {(void *)&BGFullUpdate, sizeof(BGFullUpdate), 0xe220, 0x8},
     {(void *)&DAT_004b9550, sizeof(DAT_004b9550), 0xe550, 0x8},
     {(void *)&DAT_004b9558, sizeof(DAT_004b9558), 0xe558, 0x24},
@@ -5837,33 +5843,33 @@ static const struct PortGlobal port_globals[] = {
     {(void *)&DAT_004b9610, sizeof(DAT_004b9610), 0xe610, 0x694},
     {(void *)&OverrideFrame, sizeof(OverrideFrame), 0xeca8, 0x64},
     {(void *)&ScriptEventCategories, sizeof(ScriptEventCategories), 0xee5c, 0x11c},
-    {(void *)&DAT_004b9f78, sizeof(DAT_004b9f78), 0xef78, 0x10},
-    {(void *)&DAT_004b9f88, sizeof(DAT_004b9f88), 0xef88, 0x4},
-    {(void *)&DAT_004b9f8c, sizeof(DAT_004b9f8c), 0xef8c, 0x8f0},
+    {(void *)&AdvisorHelpRect, sizeof(AdvisorHelpRect), 0xef78, 0x10},
+    {(void *)&HelpChanged, sizeof(HelpChanged), 0xef88, 0x4},
+    {(void *)&CurrentHelpKey, sizeof(CurrentHelpKey), 0xef8c, 0x8f0},
     {(void *)&DAT_004ba884, sizeof(DAT_004ba884), 0xf884, 0x5c},
     {(void *)&DAT_004ba8e0, sizeof(DAT_004ba8e0), 0xf8e0, 0xcc},
-    {(void *)&DAT_004ba9ac, sizeof(DAT_004ba9ac), 0xf9ac, 0x3a8},
+    {(void *)&AdviceSpeechIds, sizeof(AdviceSpeechIds), 0xf9ac, 0x3a8},
     {(void *)&mouse_granularity, sizeof(mouse_granularity), 0xfd54, 0x4},
     {(void *)&CheatKeyMap, sizeof(CheatKeyMap), 0xfd58, 0x250},
     {(void *)&DAT_004bafa8, sizeof(DAT_004bafa8), 0xffa8, 0x50},
     {(void *)&DAT_004baff8, sizeof(DAT_004baff8), 0xfff8, 0x4},
     {(void *)&DAT_004baffc, sizeof(DAT_004baffc), 0xfffc, 0x50},
-    {(void *)&DAT_004bb04c, sizeof(DAT_004bb04c), 0x1004c, 0x48},
+    {(void *)&InterfaceIconPos, sizeof(InterfaceIconPos), 0x1004c, 0x48},
     {(void *)&DAT_004bb094, sizeof(DAT_004bb094), 0x10094, 0x4},
     {(void *)&DAT_004bb098, sizeof(DAT_004bb098), 0x10098, 0x4},
     {(void *)&DAT_004bb09c, sizeof(DAT_004bb09c), 0x1009c, 0x4},
     {(void *)&DAT_004bb0a0, sizeof(DAT_004bb0a0), 0x100a0, 0x4},
     {(void *)&DAT_004bb18c, sizeof(DAT_004bb18c), 0x1018c, 0x310},
     {(void *)&DAT_004bb4dc, sizeof(DAT_004bb4dc), 0x104dc, 0x4},
-    {(void *)&DAT_004bb4e0, sizeof(DAT_004bb4e0), 0x104e0, 0xb8},
+    {(void *)&AviFrameFormat, sizeof(AviFrameFormat), 0x104e0, 0xb8},
     {(void *)&DAT_004bb598, sizeof(DAT_004bb598), 0x10598, 0x8},
     {(void *)&DAT_004bb5a0, sizeof(DAT_004bb5a0), 0x105a0, 0x4},
     {(void *)&DAT_004bb5a4, sizeof(DAT_004bb5a4), 0x105a4, 0x8},
     {(void *)&DAT_004bb5ac, sizeof(DAT_004bb5ac), 0x105ac, 0x4},
     {(void *)&ScriptConditionActive, sizeof(ScriptConditionActive), 0x105b0, 0x4},
     {(void *)&LanguageName, sizeof(LanguageName), 0x110ec, 0x2bc},
-    {(void *)&DAT_004bcec0, sizeof(DAT_004bcec0), 0x11ec0, 0xc},
-    {(void *)&DAT_004bd32c, sizeof(DAT_004bd32c), 0x1232c, 0x20},
+    {(void *)&PathGoalTile, sizeof(PathGoalTile), 0x11ec0, 0xc},
+    {(void *)&BlokeDirVectors, sizeof(BlokeDirVectors), 0x1232c, 0x20},
     {(void *)&SPRITE_ClipRect, sizeof(SPRITE_ClipRect), 0x12ea0, 0x18},
     {(void *)&DAT_004bed40, sizeof(DAT_004bed40), 0x13d40, 0x25c},
     {(void *)&DAT_004bef9c, sizeof(DAT_004bef9c), 0x13f9c, 0x6d4},
@@ -6085,12 +6091,12 @@ static void PortLoad_SpiderRide_SFX(void) {
     }
 }
 
-static void PortLoad_DAT_004b4f08(void) {
+static void PortLoad_TempleSlidePathNames(void) {
     unsigned int lim = 0x9f18u;
     int i0;
 
     for (i0 = 0; i0 < 4; i0++) {
-        PortLoadPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+        PortLoadPtr(&TempleSlidePathNames[i0], 0x9f08u + i0 * 0x4, lim);
     }
 }
 
@@ -6125,211 +6131,211 @@ static void PortLoad_DAT_004b5570(void) {
     PortLoadPtr(&DAT_004b5570.next, 0xa570u + 0x10, lim);
 }
 
-static void PortLoad_DAT_004b55fc(void) {
+static void PortLoad_ClipPlanes(void) {
     unsigned int lim = 0xa600u;
-    PortLoadPtr(&DAT_004b55fc, 0xa5fcu, lim);
+    PortLoadPtr(&ClipPlanes, 0xa5fcu, lim);
 }
 
-static void PortLoad_DAT_004b5600(void) {
+static void PortLoad_ClipVertexLists(void) {
     unsigned int lim = 0xa608u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004b5600[i0], 0xa600u + i0 * 0x4, lim);
+        PortLoadPtr(&ClipVertexLists[i0], 0xa600u + i0 * 0x4, lim);
     }
 }
 
-static void PortLoad_DAT_004b5648(void) {
+static void PortLoad_FlatSpanFillers(void) {
     unsigned int lim = 0xa650u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004b5648[i0], 0xa648u + i0 * 0x4, lim);
+        PortLoadPtr(&FlatSpanFillers[i0], 0xa648u + i0 * 0x4, lim);
     }
 }
 
-static void PortLoad_DAT_004b5658(void) {
+static void PortLoad_GouraudSpanFillers(void) {
     unsigned int lim = 0xa660u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004b5658[i0], 0xa658u + i0 * 0x4, lim);
+        PortLoadPtr(&GouraudSpanFillers[i0], 0xa658u + i0 * 0x4, lim);
     }
 }
 
-static void PortLoad_DAT_004b58c8(void) {
+static void PortLoad_BoxSolidTemplate(void) {
     unsigned int lim = 0xa958u;
-    PortLoadBytes(&DAT_004b58c8.f0, 0xa8c8u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b58c8.f4, 0xa8c8u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b58c8.f8, 0xa8c8u + 0x8, 0x4u, lim);
-    PortLoadPtr(&DAT_004b58c8.verts, 0xa8c8u + 0xc, lim);
-    PortLoadPtr(&DAT_004b58c8.normals, 0xa8c8u + 0x10, lim);
-    PortLoadPtr(&DAT_004b58c8.xverts, 0xa8c8u + 0x14, lim);
-    PortLoadPtr(&DAT_004b58c8.faceA, 0xa8c8u + 0x18, lim);
-    PortLoadBytes(&DAT_004b58c8.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
-    PortLoadPtr(&DAT_004b58c8.faceB, 0xa8c8u + 0x20, lim);
-    PortLoadBytes(&DAT_004b58c8.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
-    PortLoadBytes(&DAT_004b58c8.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
+    PortLoadBytes(&BoxSolidTemplate.f0, 0xa8c8u, 0x4u, lim);
+    PortLoadBytes(&BoxSolidTemplate.f4, 0xa8c8u + 0x4, 0x4u, lim);
+    PortLoadBytes(&BoxSolidTemplate.f8, 0xa8c8u + 0x8, 0x4u, lim);
+    PortLoadPtr(&BoxSolidTemplate.verts, 0xa8c8u + 0xc, lim);
+    PortLoadPtr(&BoxSolidTemplate.normals, 0xa8c8u + 0x10, lim);
+    PortLoadPtr(&BoxSolidTemplate.xverts, 0xa8c8u + 0x14, lim);
+    PortLoadPtr(&BoxSolidTemplate.faceA, 0xa8c8u + 0x18, lim);
+    PortLoadBytes(&BoxSolidTemplate.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&BoxSolidTemplate.faceB, 0xa8c8u + 0x20, lim);
+    PortLoadBytes(&BoxSolidTemplate.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
+    PortLoadBytes(&BoxSolidTemplate.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
 }
 
-static void PortLoad_DAT_004b5988(void) {
+static void PortLoad_CastleVisitorInfo(void) {
     unsigned int lim = 0xa9c0u;
-    PortLoadBytes(&DAT_004b5988.sex, 0xa988u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5988.leg, 0xa988u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5988.arm, 0xa988u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5988.chest, 0xa988u + 0xc, 0x14u, lim);
-    PortLoadBytes(&DAT_004b5988.face, 0xa988u + 0x20, 0x14u, lim);
-    PortLoadPtr(&DAT_004b5988.bloke, 0xa988u + 0x34, lim);
+    PortLoadBytes(&CastleVisitorInfo.sex, 0xa988u, 0x4u, lim);
+    PortLoadBytes(&CastleVisitorInfo.leg, 0xa988u + 0x4, 0x4u, lim);
+    PortLoadBytes(&CastleVisitorInfo.arm, 0xa988u + 0x8, 0x4u, lim);
+    PortLoadBytes(&CastleVisitorInfo.chest, 0xa988u + 0xc, 0x14u, lim);
+    PortLoadBytes(&CastleVisitorInfo.face, 0xa988u + 0x20, 0x14u, lim);
+    PortLoadPtr(&CastleVisitorInfo.bloke, 0xa988u + 0x34, lim);
 }
 
-static void PortLoad_DAT_004b5b20(void) {
+static void PortLoad_CoasterSurfaceBits(void) {
     unsigned int lim = 0xab24u;
-    PortLoadPtr(&DAT_004b5b20, 0xab20u, lim);
+    PortLoadPtr(&CoasterSurfaceBits, 0xab20u, lim);
 }
 
-static void PortLoad_DAT_004b5b24(void) {
+static void PortLoad_CoasterDepthBuffer(void) {
     unsigned int lim = 0xab28u;
-    PortLoadPtr(&DAT_004b5b24, 0xab24u, lim);
+    PortLoadPtr(&CoasterDepthBuffer, 0xab24u, lim);
 }
 
-static void PortLoad_DAT_004b5b3c(void) {
+static void PortLoad_DepthSpanRecordEnd(void) {
     unsigned int lim = 0xab40u;
-    PortLoadPtr(&DAT_004b5b3c, 0xab3cu, lim);
+    PortLoadPtr(&DepthSpanRecordEnd, 0xab3cu, lim);
 }
 
-static void PortLoad_DAT_004b5b48(void) {
+static void PortLoad_CastlePieceClass(void) {
     unsigned int lim = 0xab80u;
-    PortLoadBytes(&DAT_004b5b48.flags, 0xab48u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5b48.f4, 0xab48u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5b48.f8, 0xab48u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5b48.door_a, 0xab48u + 0xc, 0x8u, lim);
-    PortLoadBytes(&DAT_004b5b48.door_b, 0xab48u + 0x14, 0x8u, lim);
-    PortLoadPtr(&DAT_004b5b48.method_1c, 0xab48u + 0x1c, lim);
-    PortLoadPtr(&DAT_004b5b48.method_20, 0xab48u + 0x20, lim);
-    PortLoadPtr(&DAT_004b5b48.method_24, 0xab48u + 0x24, lim);
-    PortLoadPtr(&DAT_004b5b48.method_28, 0xab48u + 0x28, lim);
-    PortLoadPtr(&DAT_004b5b48.method_2c, 0xab48u + 0x2c, lim);
-    PortLoadBytes(&DAT_004b5b48.field_30, 0xab48u + 0x30, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5b48.field_34, 0xab48u + 0x34, 0x4u, lim);
+    PortLoadBytes(&CastlePieceClass.flags, 0xab48u, 0x4u, lim);
+    PortLoadBytes(&CastlePieceClass.f4, 0xab48u + 0x4, 0x4u, lim);
+    PortLoadBytes(&CastlePieceClass.f8, 0xab48u + 0x8, 0x4u, lim);
+    PortLoadBytes(&CastlePieceClass.next_door, 0xab48u + 0xc, 0x8u, lim);
+    PortLoadBytes(&CastlePieceClass.prev_door, 0xab48u + 0x14, 0x8u, lim);
+    PortLoadPtr(&CastlePieceClass.fill_open_end, 0xab48u + 0x1c, lim);
+    PortLoadPtr(&CastlePieceClass.set_heights, 0xab48u + 0x20, lim);
+    PortLoadPtr(&CastlePieceClass.get_curve, 0xab48u + 0x24, lim);
+    PortLoadPtr(&CastlePieceClass.on_add, 0xab48u + 0x28, lim);
+    PortLoadPtr(&CastlePieceClass.on_remove, 0xab48u + 0x2c, lim);
+    PortLoadBytes(&CastlePieceClass.field_30, 0xab48u + 0x30, 0x4u, lim);
+    PortLoadBytes(&CastlePieceClass.field_34, 0xab48u + 0x34, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004b5d20(void) {
+static void PortLoad_SquareTrackPieceClass(void) {
     unsigned int lim = 0xad58u;
-    PortLoadBytes(&DAT_004b5d20.flags, 0xad20u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d20.f4, 0xad20u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d20.f8, 0xad20u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d20.door_a, 0xad20u + 0xc, 0x8u, lim);
-    PortLoadBytes(&DAT_004b5d20.door_b, 0xad20u + 0x14, 0x8u, lim);
-    PortLoadPtr(&DAT_004b5d20.method_1c, 0xad20u + 0x1c, lim);
-    PortLoadPtr(&DAT_004b5d20.method_20, 0xad20u + 0x20, lim);
-    PortLoadPtr(&DAT_004b5d20.method_24, 0xad20u + 0x24, lim);
-    PortLoadPtr(&DAT_004b5d20.method_28, 0xad20u + 0x28, lim);
-    PortLoadPtr(&DAT_004b5d20.method_2c, 0xad20u + 0x2c, lim);
-    PortLoadBytes(&DAT_004b5d20.field_30, 0xad20u + 0x30, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d20.field_34, 0xad20u + 0x34, 0x4u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.flags, 0xad20u, 0x4u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.f4, 0xad20u + 0x4, 0x4u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.f8, 0xad20u + 0x8, 0x4u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.next_door, 0xad20u + 0xc, 0x8u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.prev_door, 0xad20u + 0x14, 0x8u, lim);
+    PortLoadPtr(&SquareTrackPieceClass.fill_open_end, 0xad20u + 0x1c, lim);
+    PortLoadPtr(&SquareTrackPieceClass.set_heights, 0xad20u + 0x20, lim);
+    PortLoadPtr(&SquareTrackPieceClass.get_curve, 0xad20u + 0x24, lim);
+    PortLoadPtr(&SquareTrackPieceClass.on_add, 0xad20u + 0x28, lim);
+    PortLoadPtr(&SquareTrackPieceClass.on_remove, 0xad20u + 0x2c, lim);
+    PortLoadBytes(&SquareTrackPieceClass.field_30, 0xad20u + 0x30, 0x4u, lim);
+    PortLoadBytes(&SquareTrackPieceClass.field_34, 0xad20u + 0x34, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004b5d58(void) {
+static void PortLoad_HeightTrack25PieceClass(void) {
     unsigned int lim = 0xad90u;
-    PortLoadBytes(&DAT_004b5d58.flags, 0xad58u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d58.f4, 0xad58u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d58.f8, 0xad58u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d58.door_a, 0xad58u + 0xc, 0x8u, lim);
-    PortLoadBytes(&DAT_004b5d58.door_b, 0xad58u + 0x14, 0x8u, lim);
-    PortLoadPtr(&DAT_004b5d58.method_1c, 0xad58u + 0x1c, lim);
-    PortLoadPtr(&DAT_004b5d58.method_20, 0xad58u + 0x20, lim);
-    PortLoadPtr(&DAT_004b5d58.method_24, 0xad58u + 0x24, lim);
-    PortLoadPtr(&DAT_004b5d58.method_28, 0xad58u + 0x28, lim);
-    PortLoadPtr(&DAT_004b5d58.method_2c, 0xad58u + 0x2c, lim);
-    PortLoadBytes(&DAT_004b5d58.field_30, 0xad58u + 0x30, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d58.field_34, 0xad58u + 0x34, 0x4u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.flags, 0xad58u, 0x4u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.f4, 0xad58u + 0x4, 0x4u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.f8, 0xad58u + 0x8, 0x4u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.next_door, 0xad58u + 0xc, 0x8u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.prev_door, 0xad58u + 0x14, 0x8u, lim);
+    PortLoadPtr(&HeightTrack25PieceClass.fill_open_end, 0xad58u + 0x1c, lim);
+    PortLoadPtr(&HeightTrack25PieceClass.set_heights, 0xad58u + 0x20, lim);
+    PortLoadPtr(&HeightTrack25PieceClass.get_curve, 0xad58u + 0x24, lim);
+    PortLoadPtr(&HeightTrack25PieceClass.on_add, 0xad58u + 0x28, lim);
+    PortLoadPtr(&HeightTrack25PieceClass.on_remove, 0xad58u + 0x2c, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.field_30, 0xad58u + 0x30, 0x4u, lim);
+    PortLoadBytes(&HeightTrack25PieceClass.field_34, 0xad58u + 0x34, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004b5d90(void) {
+static void PortLoad_HeightTrack2PieceClass(void) {
     unsigned int lim = 0xadc8u;
-    PortLoadBytes(&DAT_004b5d90.flags, 0xad90u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d90.f4, 0xad90u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d90.f8, 0xad90u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d90.door_a, 0xad90u + 0xc, 0x8u, lim);
-    PortLoadBytes(&DAT_004b5d90.door_b, 0xad90u + 0x14, 0x8u, lim);
-    PortLoadPtr(&DAT_004b5d90.method_1c, 0xad90u + 0x1c, lim);
-    PortLoadPtr(&DAT_004b5d90.method_20, 0xad90u + 0x20, lim);
-    PortLoadPtr(&DAT_004b5d90.method_24, 0xad90u + 0x24, lim);
-    PortLoadPtr(&DAT_004b5d90.method_28, 0xad90u + 0x28, lim);
-    PortLoadPtr(&DAT_004b5d90.method_2c, 0xad90u + 0x2c, lim);
-    PortLoadBytes(&DAT_004b5d90.field_30, 0xad90u + 0x30, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5d90.field_34, 0xad90u + 0x34, 0x4u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.flags, 0xad90u, 0x4u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.f4, 0xad90u + 0x4, 0x4u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.f8, 0xad90u + 0x8, 0x4u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.next_door, 0xad90u + 0xc, 0x8u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.prev_door, 0xad90u + 0x14, 0x8u, lim);
+    PortLoadPtr(&HeightTrack2PieceClass.fill_open_end, 0xad90u + 0x1c, lim);
+    PortLoadPtr(&HeightTrack2PieceClass.set_heights, 0xad90u + 0x20, lim);
+    PortLoadPtr(&HeightTrack2PieceClass.get_curve, 0xad90u + 0x24, lim);
+    PortLoadPtr(&HeightTrack2PieceClass.on_add, 0xad90u + 0x28, lim);
+    PortLoadPtr(&HeightTrack2PieceClass.on_remove, 0xad90u + 0x2c, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.field_30, 0xad90u + 0x30, 0x4u, lim);
+    PortLoadBytes(&HeightTrack2PieceClass.field_34, 0xad90u + 0x34, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004b5dc8(void) {
+static void PortLoad_HeightTrackPathPieceClass(void) {
     unsigned int lim = 0xae00u;
-    PortLoadBytes(&DAT_004b5dc8.flags, 0xadc8u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5dc8.f4, 0xadc8u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5dc8.f8, 0xadc8u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5dc8.door_a, 0xadc8u + 0xc, 0x8u, lim);
-    PortLoadBytes(&DAT_004b5dc8.door_b, 0xadc8u + 0x14, 0x8u, lim);
-    PortLoadPtr(&DAT_004b5dc8.method_1c, 0xadc8u + 0x1c, lim);
-    PortLoadPtr(&DAT_004b5dc8.method_20, 0xadc8u + 0x20, lim);
-    PortLoadPtr(&DAT_004b5dc8.method_24, 0xadc8u + 0x24, lim);
-    PortLoadPtr(&DAT_004b5dc8.method_28, 0xadc8u + 0x28, lim);
-    PortLoadPtr(&DAT_004b5dc8.method_2c, 0xadc8u + 0x2c, lim);
-    PortLoadBytes(&DAT_004b5dc8.field_30, 0xadc8u + 0x30, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5dc8.field_34, 0xadc8u + 0x34, 0x4u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.flags, 0xadc8u, 0x4u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.f4, 0xadc8u + 0x4, 0x4u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.f8, 0xadc8u + 0x8, 0x4u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.next_door, 0xadc8u + 0xc, 0x8u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.prev_door, 0xadc8u + 0x14, 0x8u, lim);
+    PortLoadPtr(&HeightTrackPathPieceClass.fill_open_end, 0xadc8u + 0x1c, lim);
+    PortLoadPtr(&HeightTrackPathPieceClass.set_heights, 0xadc8u + 0x20, lim);
+    PortLoadPtr(&HeightTrackPathPieceClass.get_curve, 0xadc8u + 0x24, lim);
+    PortLoadPtr(&HeightTrackPathPieceClass.on_add, 0xadc8u + 0x28, lim);
+    PortLoadPtr(&HeightTrackPathPieceClass.on_remove, 0xadc8u + 0x2c, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.field_30, 0xadc8u + 0x30, 0x4u, lim);
+    PortLoadBytes(&HeightTrackPathPieceClass.field_34, 0xadc8u + 0x34, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004b5f50(void) {
+static void PortLoad_TexturedSpanFillers(void) {
     unsigned int lim = 0xaf58u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004b5f50[i0], 0xaf50u + i0 * 0x4, lim);
+        PortLoadPtr(&TexturedSpanFillers[i0], 0xaf50u + i0 * 0x4, lim);
     }
 }
 
-static void PortLoad_DAT_004b5f60(void) {
+static void PortLoad_RailTubeMesh(void) {
     unsigned int lim = 0xaf7cu;
-    PortLoadBytes(&DAT_004b5f60.palette, 0xaf60u, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5f60.pad_4, 0xaf60u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5f60.corner_count, 0xaf60u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004b5f60.face_count, 0xaf60u + 0xc, 0x4u, lim);
-    PortLoadPtr(&DAT_004b5f60.verts, 0xaf60u + 0x10, lim);
-    PortLoadPtr(&DAT_004b5f60.corners, 0xaf60u + 0x14, lim);
-    PortLoadPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
+    PortLoadBytes(&RailTubeMesh.palette, 0xaf60u, 0x4u, lim);
+    PortLoadBytes(&RailTubeMesh.pad_4, 0xaf60u + 0x4, 0x4u, lim);
+    PortLoadBytes(&RailTubeMesh.corner_count, 0xaf60u + 0x8, 0x4u, lim);
+    PortLoadBytes(&RailTubeMesh.face_count, 0xaf60u + 0xc, 0x4u, lim);
+    PortLoadPtr(&RailTubeMesh.verts, 0xaf60u + 0x10, lim);
+    PortLoadPtr(&RailTubeMesh.corners, 0xaf60u + 0x14, lim);
+    PortLoadPtr(&RailTubeMesh.faces, 0xaf60u + 0x18, lim);
 }
 
-static void PortLoad_DAT_004b6150(void) {
+static void PortLoad_SupportPostModel(void) {
     unsigned int lim = 0xb1e0u;
-    PortLoadBytes(&DAT_004b6150.pad_0, 0xb150u, 0xcu, lim);
-    PortLoadPtr(&DAT_004b6150.field_c, 0xb150u + 0xc, lim);
-    PortLoadPtr(&DAT_004b6150.field_10, 0xb150u + 0x10, lim);
-    PortLoadPtr(&DAT_004b6150.field_14, 0xb150u + 0x14, lim);
-    PortLoadPtr(&DAT_004b6150.field_18, 0xb150u + 0x18, lim);
-    PortLoadBytes(&DAT_004b6150.field_1c, 0xb150u + 0x1c, 0x4u, lim);
-    PortLoadPtr(&DAT_004b6150.field_20, 0xb150u + 0x20, lim);
-    PortLoadBytes(&DAT_004b6150.field_24, 0xb150u + 0x24, 0x4u, lim);
-    PortLoadPtr(&DAT_004b6150.field_28, 0xb150u + 0x28, lim);
-    PortLoadBytes(&DAT_004b6150.field_2c, 0xb150u + 0x2c, 0x4u, lim);
-    PortLoadBytes(&DAT_004b6150.box, 0xb150u + 0x30, 0x60u, lim);
+    PortLoadBytes(&SupportPostModel.pad_0, 0xb150u, 0xcu, lim);
+    PortLoadPtr(&SupportPostModel.field_c, 0xb150u + 0xc, lim);
+    PortLoadPtr(&SupportPostModel.field_10, 0xb150u + 0x10, lim);
+    PortLoadPtr(&SupportPostModel.field_14, 0xb150u + 0x14, lim);
+    PortLoadPtr(&SupportPostModel.flat_tris, 0xb150u + 0x18, lim);
+    PortLoadBytes(&SupportPostModel.flat_count, 0xb150u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&SupportPostModel.gouraud_tris, 0xb150u + 0x20, lim);
+    PortLoadBytes(&SupportPostModel.gouraud_count, 0xb150u + 0x24, 0x4u, lim);
+    PortLoadPtr(&SupportPostModel.tex_tris, 0xb150u + 0x28, lim);
+    PortLoadBytes(&SupportPostModel.tex_count, 0xb150u + 0x2c, 0x4u, lim);
+    PortLoadBytes(&SupportPostModel.box, 0xb150u + 0x30, 0x60u, lim);
 }
 
-static void PortLoad_DAT_004b6300(void) {
+static void PortLoad_TrackTieModel(void) {
     unsigned int lim = 0xb390u;
-    PortLoadBytes(&DAT_004b6300.pad_0, 0xb300u, 0xcu, lim);
-    PortLoadPtr(&DAT_004b6300.field_c, 0xb300u + 0xc, lim);
-    PortLoadPtr(&DAT_004b6300.field_10, 0xb300u + 0x10, lim);
-    PortLoadPtr(&DAT_004b6300.field_14, 0xb300u + 0x14, lim);
-    PortLoadPtr(&DAT_004b6300.field_18, 0xb300u + 0x18, lim);
-    PortLoadBytes(&DAT_004b6300.field_1c, 0xb300u + 0x1c, 0x4u, lim);
-    PortLoadPtr(&DAT_004b6300.field_20, 0xb300u + 0x20, lim);
-    PortLoadBytes(&DAT_004b6300.field_24, 0xb300u + 0x24, 0x4u, lim);
-    PortLoadPtr(&DAT_004b6300.field_28, 0xb300u + 0x28, lim);
-    PortLoadBytes(&DAT_004b6300.field_2c, 0xb300u + 0x2c, 0x4u, lim);
-    PortLoadBytes(&DAT_004b6300.box, 0xb300u + 0x30, 0x60u, lim);
+    PortLoadBytes(&TrackTieModel.pad_0, 0xb300u, 0xcu, lim);
+    PortLoadPtr(&TrackTieModel.field_c, 0xb300u + 0xc, lim);
+    PortLoadPtr(&TrackTieModel.field_10, 0xb300u + 0x10, lim);
+    PortLoadPtr(&TrackTieModel.field_14, 0xb300u + 0x14, lim);
+    PortLoadPtr(&TrackTieModel.flat_tris, 0xb300u + 0x18, lim);
+    PortLoadBytes(&TrackTieModel.flat_count, 0xb300u + 0x1c, 0x4u, lim);
+    PortLoadPtr(&TrackTieModel.gouraud_tris, 0xb300u + 0x20, lim);
+    PortLoadBytes(&TrackTieModel.gouraud_count, 0xb300u + 0x24, 0x4u, lim);
+    PortLoadPtr(&TrackTieModel.tex_tris, 0xb300u + 0x28, lim);
+    PortLoadBytes(&TrackTieModel.tex_count, 0xb300u + 0x2c, 0x4u, lim);
+    PortLoadBytes(&TrackTieModel.box, 0xb300u + 0x30, 0x60u, lim);
 }
 
-static void PortLoad_DAT_004b63fc(void) {
+static void PortLoad_RangeRootFinder(void) {
     unsigned int lim = 0xb400u;
-    PortLoadPtr(&DAT_004b63fc, 0xb3fcu, lim);
+    PortLoadPtr(&RangeRootFinder, 0xb3fcu, lim);
 }
 
 static void PortLoad_CAROUSSEL_SFX(void) {
@@ -6399,25 +6405,25 @@ static void PortLoad_DAT_004b7750(void) {
     PortLoadPtr(&DAT_004b7750.entries, 0xc750u + 0x4, lim);
 }
 
-static void PortLoad_DAT_004b7758(void) {
+static void PortLoad_SpaceTowerLayouts(void) {
     unsigned int lim = 0xc798u;
     int i0;
 
     for (i0 = 0; i0 < 8; i0++) {
-        PortLoadBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
-        PortLoadBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
-        PortLoadPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+        PortLoadBytes(&SpaceTowerLayouts[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
+        PortLoadBytes(&SpaceTowerLayouts[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
+        PortLoadPtr(&SpaceTowerLayouts[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
     }
 }
 
-static void PortLoad_DAT_004b79d0(void) {
+static void PortLoad_PlaneRideFX(void) {
     unsigned int lim = 0xc9e8u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004b79d0[i0].name, 0xc9d0u + i0 * 0xc, lim);
-        PortLoadBytes(&DAT_004b79d0[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
-        PortLoadPtr(&DAT_004b79d0[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
+        PortLoadPtr(&PlaneRideFX[i0].name, 0xc9d0u + i0 * 0xc, lim);
+        PortLoadBytes(&PlaneRideFX[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortLoadPtr(&PlaneRideFX[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -6654,13 +6660,13 @@ static void PortLoad_DAT_004bb6d4(void) {
     }
 }
 
-static void PortLoad_DAT_004bb6f8(void) {
+static void PortLoad_LevelScriptCommands(void) {
     unsigned int lim = 0x109e0u;
     int i0;
 
     for (i0 = 0; i0 < 93; i0++) {
-        PortLoadPtr(&DAT_004bb6f8[i0].name, 0x106f8u + i0 * 0x8, lim);
-        PortLoadPtr(&DAT_004bb6f8[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
+        PortLoadPtr(&LevelScriptCommands[i0].name, 0x106f8u + i0 * 0x8, lim);
+        PortLoadPtr(&LevelScriptCommands[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
     }
 }
 
@@ -6696,12 +6702,12 @@ static void PortLoad_PTR_s_Adams_004bd180(void) {
     }
 }
 
-static void PortLoad_PTR_FUN_004bd34c(void) {
+static void PortLoad_BlokeActionTable(void) {
     unsigned int lim = 0x1238cu;
     int i0;
 
     for (i0 = 0; i0 < 16; i0++) {
-        PortLoadPtr(&PTR_FUN_004bd34c[i0], 0x1234cu + i0 * 0x4, lim);
+        PortLoadPtr(&BlokeActionTable[i0], 0x1234cu + i0 * 0x4, lim);
     }
 }
 
@@ -6712,16 +6718,16 @@ static void PortLoad_Hover(void) {
     PortLoadBytes(&Hover.data, 0x12d00u + 0x8, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004bdeb8(void) {
+static void PortLoad_FreePlayObjectTable(void) {
     unsigned int lim = 0x13718u;
     int i0;
 
     for (i0 = 0; i0 < 134; i0++) {
-        PortLoadBytes(&DAT_004bdeb8[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
-        PortLoadBytes(&DAT_004bdeb8[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
-        PortLoadPtr(&DAT_004bdeb8[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
-        PortLoadBytes(&DAT_004bdeb8[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
-        PortLoadBytes(&DAT_004bdeb8[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
+        PortLoadBytes(&FreePlayObjectTable[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
+        PortLoadBytes(&FreePlayObjectTable[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
+        PortLoadPtr(&FreePlayObjectTable[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
+        PortLoadBytes(&FreePlayObjectTable[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
+        PortLoadBytes(&FreePlayObjectTable[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
     }
 }
 
@@ -6752,9 +6758,9 @@ static void PortLoad_ProgressScreenTables(void) {
     PortLoadBytes(&ProgressScreenTables.tail, 0x13b80u + 0x1ac, 0x14u, lim);
 }
 
-static void PortLoad_DAT_004c10d4(void) {
+static void PortLoad_DrivingSchoolCars(void) {
     unsigned int lim = 0x160d8u;
-    PortLoadPtr(&DAT_004c10d4, 0x160d4u, lim);
+    PortLoadPtr(&DrivingSchoolCars, 0x160d4u, lim);
 }
 
 static void PortLoad_CastleLevelRide(void) {
@@ -6767,14 +6773,14 @@ static void PortLoad_CastleLevelMatteSprite(void) {
     PortLoadPtr(&CastleLevelMatteSprite, 0x160e4u, lim);
 }
 
-static void PortLoad_DAT_004c10e8(void) {
+static void PortLoad_CastleLevelRiderRenderList(void) {
     unsigned int lim = 0x160ecu;
-    PortLoadPtr(&DAT_004c10e8, 0x160e8u, lim);
+    PortLoadPtr(&CastleLevelRiderRenderList, 0x160e8u, lim);
 }
 
-static void PortLoad_DAT_004c10f0(void) {
+static void PortLoad_CatapultLayer(void) {
     unsigned int lim = 0x160f4u;
-    PortLoadPtr(&DAT_004c10f0, 0x160f0u, lim);
+    PortLoadPtr(&CatapultLayer, 0x160f0u, lim);
 }
 
 static void PortLoad_ActiveCatapultRide(void) {
@@ -6782,14 +6788,14 @@ static void PortLoad_ActiveCatapultRide(void) {
     PortLoadPtr(&ActiveCatapultRide, 0x160f4u, lim);
 }
 
-static void PortLoad_DAT_004c1100(void) {
+static void PortLoad_CatapultSpriteInfo(void) {
     unsigned int lim = 0x16114u;
-    PortLoadPtr(&DAT_004c1100.sprite, 0x16100u, lim);
-    PortLoadBytes(&DAT_004c1100.x, 0x16100u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1100.y, 0x16100u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1100.id, 0x16100u + 0xc, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1100.pad_e, 0x16100u + 0xe, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1100.field_10, 0x16100u + 0x10, 0x4u, lim);
+    PortLoadPtr(&CatapultSpriteInfo.sprite, 0x16100u, lim);
+    PortLoadBytes(&CatapultSpriteInfo.x, 0x16100u + 0x4, 0x4u, lim);
+    PortLoadBytes(&CatapultSpriteInfo.y, 0x16100u + 0x8, 0x4u, lim);
+    PortLoadBytes(&CatapultSpriteInfo.id, 0x16100u + 0xc, 0x2u, lim);
+    PortLoadBytes(&CatapultSpriteInfo.pad_e, 0x16100u + 0xe, 0x2u, lim);
+    PortLoadBytes(&CatapultSpriteInfo.field_10, 0x16100u + 0x10, 0x4u, lim);
 }
 
 static void PortLoad_CatapultNodeList(void) {
@@ -6835,14 +6841,14 @@ static void PortLoad_DAT_004c1168(void) {
     PortLoadPtr(&DAT_004c1168, 0x16168u, lim);
 }
 
-static void PortLoad_DAT_004c1170(void) {
+static void PortLoad_CoptersSpriteInfo(void) {
     unsigned int lim = 0x16184u;
-    PortLoadPtr(&DAT_004c1170.sprite, 0x16170u, lim);
-    PortLoadBytes(&DAT_004c1170.x, 0x16170u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1170.y, 0x16170u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1170.id, 0x16170u + 0xc, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1170.pad_e, 0x16170u + 0xe, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1170.field_10, 0x16170u + 0x10, 0x4u, lim);
+    PortLoadPtr(&CoptersSpriteInfo.sprite, 0x16170u, lim);
+    PortLoadBytes(&CoptersSpriteInfo.x, 0x16170u + 0x4, 0x4u, lim);
+    PortLoadBytes(&CoptersSpriteInfo.y, 0x16170u + 0x8, 0x4u, lim);
+    PortLoadBytes(&CoptersSpriteInfo.id, 0x16170u + 0xc, 0x2u, lim);
+    PortLoadBytes(&CoptersSpriteInfo.pad_e, 0x16170u + 0xe, 0x2u, lim);
+    PortLoadBytes(&CoptersSpriteInfo.field_10, 0x16170u + 0x10, 0x4u, lim);
 }
 
 static void PortLoad_DAT_004c1188(void) {
@@ -6905,14 +6911,14 @@ static void PortLoad_DrivingSchoolCountList(void) {
     PortLoadPtr(&DrivingSchoolCountList, 0x161bcu, lim);
 }
 
-static void PortLoad_DAT_004c11c4(void) {
+static void PortLoad_RoadBfsFrontier(void) {
     unsigned int lim = 0x161c8u;
-    PortLoadPtr(&DAT_004c11c4, 0x161c4u, lim);
+    PortLoadPtr(&RoadBfsFrontier, 0x161c4u, lim);
 }
 
-static void PortLoad_DAT_004c11c8(void) {
+static void PortLoad_RoadBfsNextFrontier(void) {
     unsigned int lim = 0x161ccu;
-    PortLoadPtr(&DAT_004c11c8, 0x161c8u, lim);
+    PortLoadPtr(&RoadBfsNextFrontier, 0x161c8u, lim);
 }
 
 static void PortLoad_FortMaskSprite(void) {
@@ -6930,14 +6936,14 @@ static void PortLoad_FortRide(void) {
     PortLoadPtr(&FortRide, 0x161dcu, lim);
 }
 
-static void PortLoad_DAT_004c11e0(void) {
+static void PortLoad_FortRiderRenderList(void) {
     unsigned int lim = 0x161e4u;
-    PortLoadPtr(&DAT_004c11e0, 0x161e0u, lim);
+    PortLoadPtr(&FortRiderRenderList, 0x161e0u, lim);
 }
 
-static void PortLoad_DAT_004c11e4(void) {
+static void PortLoad_GoldRushQueueTable(void) {
     unsigned int lim = 0x161e8u;
-    PortLoadPtr(&DAT_004c11e4, 0x161e4u, lim);
+    PortLoadPtr(&GoldRushQueueTable, 0x161e4u, lim);
 }
 
 static void PortLoad_GoldRushLayer(void) {
@@ -7000,22 +7006,22 @@ static void PortLoad_JoustRide(void) {
     PortLoadPtr(&JoustRide, 0x1621cu, lim);
 }
 
-static void PortLoad_DAT_004c1228(void) {
+static void PortLoad_JoustSpriteInfo(void) {
     unsigned int lim = 0x1623cu;
-    PortLoadPtr(&DAT_004c1228.sprite, 0x16228u, lim);
-    PortLoadBytes(&DAT_004c1228.x, 0x16228u + 0x4, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1228.y, 0x16228u + 0x8, 0x4u, lim);
-    PortLoadBytes(&DAT_004c1228.id, 0x16228u + 0xc, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1228.pad_e, 0x16228u + 0xe, 0x2u, lim);
-    PortLoadBytes(&DAT_004c1228.field_10, 0x16228u + 0x10, 0x4u, lim);
+    PortLoadPtr(&JoustSpriteInfo.sprite, 0x16228u, lim);
+    PortLoadBytes(&JoustSpriteInfo.x, 0x16228u + 0x4, 0x4u, lim);
+    PortLoadBytes(&JoustSpriteInfo.y, 0x16228u + 0x8, 0x4u, lim);
+    PortLoadBytes(&JoustSpriteInfo.id, 0x16228u + 0xc, 0x2u, lim);
+    PortLoadBytes(&JoustSpriteInfo.pad_e, 0x16228u + 0xe, 0x2u, lim);
+    PortLoadBytes(&JoustSpriteInfo.field_10, 0x16228u + 0x10, 0x4u, lim);
 }
 
-static void PortLoad_DAT_004c123c(void) {
+static void PortLoad_JoustRiderSprites(void) {
     unsigned int lim = 0x16244u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortLoadPtr(&DAT_004c123c[i0], 0x1623cu + i0 * 0x4, lim);
+        PortLoadPtr(&JoustRiderSprites[i0], 0x1623cu + i0 * 0x4, lim);
     }
 }
 
@@ -7161,12 +7167,12 @@ static void PortCheck_SpiderRide_SFX(void) {
     }
 }
 
-static void PortCheck_DAT_004b4f08(void) {
+static void PortCheck_TempleSlidePathNames(void) {
     unsigned int lim = 0x9f18u;
     int i0;
 
     for (i0 = 0; i0 < 4; i0++) {
-        PortCheckPtr(&DAT_004b4f08[i0], 0x9f08u + i0 * 0x4, lim);
+        PortCheckPtr(&TempleSlidePathNames[i0], 0x9f08u + i0 * 0x4, lim);
     }
 }
 
@@ -7201,211 +7207,211 @@ static void PortCheck_DAT_004b5570(void) {
     PortCheckPtr(&DAT_004b5570.next, 0xa570u + 0x10, lim);
 }
 
-static void PortCheck_DAT_004b55fc(void) {
+static void PortCheck_ClipPlanes(void) {
     unsigned int lim = 0xa600u;
-    PortCheckPtr(&DAT_004b55fc, 0xa5fcu, lim);
+    PortCheckPtr(&ClipPlanes, 0xa5fcu, lim);
 }
 
-static void PortCheck_DAT_004b5600(void) {
+static void PortCheck_ClipVertexLists(void) {
     unsigned int lim = 0xa608u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004b5600[i0], 0xa600u + i0 * 0x4, lim);
+        PortCheckPtr(&ClipVertexLists[i0], 0xa600u + i0 * 0x4, lim);
     }
 }
 
-static void PortCheck_DAT_004b5648(void) {
+static void PortCheck_FlatSpanFillers(void) {
     unsigned int lim = 0xa650u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004b5648[i0], 0xa648u + i0 * 0x4, lim);
+        PortCheckPtr(&FlatSpanFillers[i0], 0xa648u + i0 * 0x4, lim);
     }
 }
 
-static void PortCheck_DAT_004b5658(void) {
+static void PortCheck_GouraudSpanFillers(void) {
     unsigned int lim = 0xa660u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004b5658[i0], 0xa658u + i0 * 0x4, lim);
+        PortCheckPtr(&GouraudSpanFillers[i0], 0xa658u + i0 * 0x4, lim);
     }
 }
 
-static void PortCheck_DAT_004b58c8(void) {
+static void PortCheck_BoxSolidTemplate(void) {
     unsigned int lim = 0xa958u;
-    PortCheckBytes(&DAT_004b58c8.f0, 0xa8c8u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b58c8.f4, 0xa8c8u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b58c8.f8, 0xa8c8u + 0x8, 0x4u, lim);
-    PortCheckPtr(&DAT_004b58c8.verts, 0xa8c8u + 0xc, lim);
-    PortCheckPtr(&DAT_004b58c8.normals, 0xa8c8u + 0x10, lim);
-    PortCheckPtr(&DAT_004b58c8.xverts, 0xa8c8u + 0x14, lim);
-    PortCheckPtr(&DAT_004b58c8.faceA, 0xa8c8u + 0x18, lim);
-    PortCheckBytes(&DAT_004b58c8.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
-    PortCheckPtr(&DAT_004b58c8.faceB, 0xa8c8u + 0x20, lim);
-    PortCheckBytes(&DAT_004b58c8.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
-    PortCheckBytes(&DAT_004b58c8.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
+    PortCheckBytes(&BoxSolidTemplate.f0, 0xa8c8u, 0x4u, lim);
+    PortCheckBytes(&BoxSolidTemplate.f4, 0xa8c8u + 0x4, 0x4u, lim);
+    PortCheckBytes(&BoxSolidTemplate.f8, 0xa8c8u + 0x8, 0x4u, lim);
+    PortCheckPtr(&BoxSolidTemplate.verts, 0xa8c8u + 0xc, lim);
+    PortCheckPtr(&BoxSolidTemplate.normals, 0xa8c8u + 0x10, lim);
+    PortCheckPtr(&BoxSolidTemplate.xverts, 0xa8c8u + 0x14, lim);
+    PortCheckPtr(&BoxSolidTemplate.faceA, 0xa8c8u + 0x18, lim);
+    PortCheckBytes(&BoxSolidTemplate.nFaceA, 0xa8c8u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&BoxSolidTemplate.faceB, 0xa8c8u + 0x20, lim);
+    PortCheckBytes(&BoxSolidTemplate.nFaceB, 0xa8c8u + 0x24, 0x4u, lim);
+    PortCheckBytes(&BoxSolidTemplate.pad_28, 0xa8c8u + 0x28, 0x68u, lim);
 }
 
-static void PortCheck_DAT_004b5988(void) {
+static void PortCheck_CastleVisitorInfo(void) {
     unsigned int lim = 0xa9c0u;
-    PortCheckBytes(&DAT_004b5988.sex, 0xa988u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5988.leg, 0xa988u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5988.arm, 0xa988u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5988.chest, 0xa988u + 0xc, 0x14u, lim);
-    PortCheckBytes(&DAT_004b5988.face, 0xa988u + 0x20, 0x14u, lim);
-    PortCheckPtr(&DAT_004b5988.bloke, 0xa988u + 0x34, lim);
+    PortCheckBytes(&CastleVisitorInfo.sex, 0xa988u, 0x4u, lim);
+    PortCheckBytes(&CastleVisitorInfo.leg, 0xa988u + 0x4, 0x4u, lim);
+    PortCheckBytes(&CastleVisitorInfo.arm, 0xa988u + 0x8, 0x4u, lim);
+    PortCheckBytes(&CastleVisitorInfo.chest, 0xa988u + 0xc, 0x14u, lim);
+    PortCheckBytes(&CastleVisitorInfo.face, 0xa988u + 0x20, 0x14u, lim);
+    PortCheckPtr(&CastleVisitorInfo.bloke, 0xa988u + 0x34, lim);
 }
 
-static void PortCheck_DAT_004b5b20(void) {
+static void PortCheck_CoasterSurfaceBits(void) {
     unsigned int lim = 0xab24u;
-    PortCheckPtr(&DAT_004b5b20, 0xab20u, lim);
+    PortCheckPtr(&CoasterSurfaceBits, 0xab20u, lim);
 }
 
-static void PortCheck_DAT_004b5b24(void) {
+static void PortCheck_CoasterDepthBuffer(void) {
     unsigned int lim = 0xab28u;
-    PortCheckPtr(&DAT_004b5b24, 0xab24u, lim);
+    PortCheckPtr(&CoasterDepthBuffer, 0xab24u, lim);
 }
 
-static void PortCheck_DAT_004b5b3c(void) {
+static void PortCheck_DepthSpanRecordEnd(void) {
     unsigned int lim = 0xab40u;
-    PortCheckPtr(&DAT_004b5b3c, 0xab3cu, lim);
+    PortCheckPtr(&DepthSpanRecordEnd, 0xab3cu, lim);
 }
 
-static void PortCheck_DAT_004b5b48(void) {
+static void PortCheck_CastlePieceClass(void) {
     unsigned int lim = 0xab80u;
-    PortCheckBytes(&DAT_004b5b48.flags, 0xab48u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5b48.f4, 0xab48u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5b48.f8, 0xab48u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5b48.door_a, 0xab48u + 0xc, 0x8u, lim);
-    PortCheckBytes(&DAT_004b5b48.door_b, 0xab48u + 0x14, 0x8u, lim);
-    PortCheckPtr(&DAT_004b5b48.method_1c, 0xab48u + 0x1c, lim);
-    PortCheckPtr(&DAT_004b5b48.method_20, 0xab48u + 0x20, lim);
-    PortCheckPtr(&DAT_004b5b48.method_24, 0xab48u + 0x24, lim);
-    PortCheckPtr(&DAT_004b5b48.method_28, 0xab48u + 0x28, lim);
-    PortCheckPtr(&DAT_004b5b48.method_2c, 0xab48u + 0x2c, lim);
-    PortCheckBytes(&DAT_004b5b48.field_30, 0xab48u + 0x30, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5b48.field_34, 0xab48u + 0x34, 0x4u, lim);
+    PortCheckBytes(&CastlePieceClass.flags, 0xab48u, 0x4u, lim);
+    PortCheckBytes(&CastlePieceClass.f4, 0xab48u + 0x4, 0x4u, lim);
+    PortCheckBytes(&CastlePieceClass.f8, 0xab48u + 0x8, 0x4u, lim);
+    PortCheckBytes(&CastlePieceClass.next_door, 0xab48u + 0xc, 0x8u, lim);
+    PortCheckBytes(&CastlePieceClass.prev_door, 0xab48u + 0x14, 0x8u, lim);
+    PortCheckPtr(&CastlePieceClass.fill_open_end, 0xab48u + 0x1c, lim);
+    PortCheckPtr(&CastlePieceClass.set_heights, 0xab48u + 0x20, lim);
+    PortCheckPtr(&CastlePieceClass.get_curve, 0xab48u + 0x24, lim);
+    PortCheckPtr(&CastlePieceClass.on_add, 0xab48u + 0x28, lim);
+    PortCheckPtr(&CastlePieceClass.on_remove, 0xab48u + 0x2c, lim);
+    PortCheckBytes(&CastlePieceClass.field_30, 0xab48u + 0x30, 0x4u, lim);
+    PortCheckBytes(&CastlePieceClass.field_34, 0xab48u + 0x34, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004b5d20(void) {
+static void PortCheck_SquareTrackPieceClass(void) {
     unsigned int lim = 0xad58u;
-    PortCheckBytes(&DAT_004b5d20.flags, 0xad20u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d20.f4, 0xad20u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d20.f8, 0xad20u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d20.door_a, 0xad20u + 0xc, 0x8u, lim);
-    PortCheckBytes(&DAT_004b5d20.door_b, 0xad20u + 0x14, 0x8u, lim);
-    PortCheckPtr(&DAT_004b5d20.method_1c, 0xad20u + 0x1c, lim);
-    PortCheckPtr(&DAT_004b5d20.method_20, 0xad20u + 0x20, lim);
-    PortCheckPtr(&DAT_004b5d20.method_24, 0xad20u + 0x24, lim);
-    PortCheckPtr(&DAT_004b5d20.method_28, 0xad20u + 0x28, lim);
-    PortCheckPtr(&DAT_004b5d20.method_2c, 0xad20u + 0x2c, lim);
-    PortCheckBytes(&DAT_004b5d20.field_30, 0xad20u + 0x30, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d20.field_34, 0xad20u + 0x34, 0x4u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.flags, 0xad20u, 0x4u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.f4, 0xad20u + 0x4, 0x4u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.f8, 0xad20u + 0x8, 0x4u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.next_door, 0xad20u + 0xc, 0x8u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.prev_door, 0xad20u + 0x14, 0x8u, lim);
+    PortCheckPtr(&SquareTrackPieceClass.fill_open_end, 0xad20u + 0x1c, lim);
+    PortCheckPtr(&SquareTrackPieceClass.set_heights, 0xad20u + 0x20, lim);
+    PortCheckPtr(&SquareTrackPieceClass.get_curve, 0xad20u + 0x24, lim);
+    PortCheckPtr(&SquareTrackPieceClass.on_add, 0xad20u + 0x28, lim);
+    PortCheckPtr(&SquareTrackPieceClass.on_remove, 0xad20u + 0x2c, lim);
+    PortCheckBytes(&SquareTrackPieceClass.field_30, 0xad20u + 0x30, 0x4u, lim);
+    PortCheckBytes(&SquareTrackPieceClass.field_34, 0xad20u + 0x34, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004b5d58(void) {
+static void PortCheck_HeightTrack25PieceClass(void) {
     unsigned int lim = 0xad90u;
-    PortCheckBytes(&DAT_004b5d58.flags, 0xad58u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d58.f4, 0xad58u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d58.f8, 0xad58u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d58.door_a, 0xad58u + 0xc, 0x8u, lim);
-    PortCheckBytes(&DAT_004b5d58.door_b, 0xad58u + 0x14, 0x8u, lim);
-    PortCheckPtr(&DAT_004b5d58.method_1c, 0xad58u + 0x1c, lim);
-    PortCheckPtr(&DAT_004b5d58.method_20, 0xad58u + 0x20, lim);
-    PortCheckPtr(&DAT_004b5d58.method_24, 0xad58u + 0x24, lim);
-    PortCheckPtr(&DAT_004b5d58.method_28, 0xad58u + 0x28, lim);
-    PortCheckPtr(&DAT_004b5d58.method_2c, 0xad58u + 0x2c, lim);
-    PortCheckBytes(&DAT_004b5d58.field_30, 0xad58u + 0x30, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d58.field_34, 0xad58u + 0x34, 0x4u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.flags, 0xad58u, 0x4u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.f4, 0xad58u + 0x4, 0x4u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.f8, 0xad58u + 0x8, 0x4u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.next_door, 0xad58u + 0xc, 0x8u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.prev_door, 0xad58u + 0x14, 0x8u, lim);
+    PortCheckPtr(&HeightTrack25PieceClass.fill_open_end, 0xad58u + 0x1c, lim);
+    PortCheckPtr(&HeightTrack25PieceClass.set_heights, 0xad58u + 0x20, lim);
+    PortCheckPtr(&HeightTrack25PieceClass.get_curve, 0xad58u + 0x24, lim);
+    PortCheckPtr(&HeightTrack25PieceClass.on_add, 0xad58u + 0x28, lim);
+    PortCheckPtr(&HeightTrack25PieceClass.on_remove, 0xad58u + 0x2c, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.field_30, 0xad58u + 0x30, 0x4u, lim);
+    PortCheckBytes(&HeightTrack25PieceClass.field_34, 0xad58u + 0x34, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004b5d90(void) {
+static void PortCheck_HeightTrack2PieceClass(void) {
     unsigned int lim = 0xadc8u;
-    PortCheckBytes(&DAT_004b5d90.flags, 0xad90u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d90.f4, 0xad90u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d90.f8, 0xad90u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d90.door_a, 0xad90u + 0xc, 0x8u, lim);
-    PortCheckBytes(&DAT_004b5d90.door_b, 0xad90u + 0x14, 0x8u, lim);
-    PortCheckPtr(&DAT_004b5d90.method_1c, 0xad90u + 0x1c, lim);
-    PortCheckPtr(&DAT_004b5d90.method_20, 0xad90u + 0x20, lim);
-    PortCheckPtr(&DAT_004b5d90.method_24, 0xad90u + 0x24, lim);
-    PortCheckPtr(&DAT_004b5d90.method_28, 0xad90u + 0x28, lim);
-    PortCheckPtr(&DAT_004b5d90.method_2c, 0xad90u + 0x2c, lim);
-    PortCheckBytes(&DAT_004b5d90.field_30, 0xad90u + 0x30, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5d90.field_34, 0xad90u + 0x34, 0x4u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.flags, 0xad90u, 0x4u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.f4, 0xad90u + 0x4, 0x4u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.f8, 0xad90u + 0x8, 0x4u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.next_door, 0xad90u + 0xc, 0x8u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.prev_door, 0xad90u + 0x14, 0x8u, lim);
+    PortCheckPtr(&HeightTrack2PieceClass.fill_open_end, 0xad90u + 0x1c, lim);
+    PortCheckPtr(&HeightTrack2PieceClass.set_heights, 0xad90u + 0x20, lim);
+    PortCheckPtr(&HeightTrack2PieceClass.get_curve, 0xad90u + 0x24, lim);
+    PortCheckPtr(&HeightTrack2PieceClass.on_add, 0xad90u + 0x28, lim);
+    PortCheckPtr(&HeightTrack2PieceClass.on_remove, 0xad90u + 0x2c, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.field_30, 0xad90u + 0x30, 0x4u, lim);
+    PortCheckBytes(&HeightTrack2PieceClass.field_34, 0xad90u + 0x34, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004b5dc8(void) {
+static void PortCheck_HeightTrackPathPieceClass(void) {
     unsigned int lim = 0xae00u;
-    PortCheckBytes(&DAT_004b5dc8.flags, 0xadc8u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5dc8.f4, 0xadc8u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5dc8.f8, 0xadc8u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5dc8.door_a, 0xadc8u + 0xc, 0x8u, lim);
-    PortCheckBytes(&DAT_004b5dc8.door_b, 0xadc8u + 0x14, 0x8u, lim);
-    PortCheckPtr(&DAT_004b5dc8.method_1c, 0xadc8u + 0x1c, lim);
-    PortCheckPtr(&DAT_004b5dc8.method_20, 0xadc8u + 0x20, lim);
-    PortCheckPtr(&DAT_004b5dc8.method_24, 0xadc8u + 0x24, lim);
-    PortCheckPtr(&DAT_004b5dc8.method_28, 0xadc8u + 0x28, lim);
-    PortCheckPtr(&DAT_004b5dc8.method_2c, 0xadc8u + 0x2c, lim);
-    PortCheckBytes(&DAT_004b5dc8.field_30, 0xadc8u + 0x30, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5dc8.field_34, 0xadc8u + 0x34, 0x4u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.flags, 0xadc8u, 0x4u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.f4, 0xadc8u + 0x4, 0x4u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.f8, 0xadc8u + 0x8, 0x4u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.next_door, 0xadc8u + 0xc, 0x8u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.prev_door, 0xadc8u + 0x14, 0x8u, lim);
+    PortCheckPtr(&HeightTrackPathPieceClass.fill_open_end, 0xadc8u + 0x1c, lim);
+    PortCheckPtr(&HeightTrackPathPieceClass.set_heights, 0xadc8u + 0x20, lim);
+    PortCheckPtr(&HeightTrackPathPieceClass.get_curve, 0xadc8u + 0x24, lim);
+    PortCheckPtr(&HeightTrackPathPieceClass.on_add, 0xadc8u + 0x28, lim);
+    PortCheckPtr(&HeightTrackPathPieceClass.on_remove, 0xadc8u + 0x2c, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.field_30, 0xadc8u + 0x30, 0x4u, lim);
+    PortCheckBytes(&HeightTrackPathPieceClass.field_34, 0xadc8u + 0x34, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004b5f50(void) {
+static void PortCheck_TexturedSpanFillers(void) {
     unsigned int lim = 0xaf58u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004b5f50[i0], 0xaf50u + i0 * 0x4, lim);
+        PortCheckPtr(&TexturedSpanFillers[i0], 0xaf50u + i0 * 0x4, lim);
     }
 }
 
-static void PortCheck_DAT_004b5f60(void) {
+static void PortCheck_RailTubeMesh(void) {
     unsigned int lim = 0xaf7cu;
-    PortCheckBytes(&DAT_004b5f60.palette, 0xaf60u, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5f60.pad_4, 0xaf60u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5f60.corner_count, 0xaf60u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004b5f60.face_count, 0xaf60u + 0xc, 0x4u, lim);
-    PortCheckPtr(&DAT_004b5f60.verts, 0xaf60u + 0x10, lim);
-    PortCheckPtr(&DAT_004b5f60.corners, 0xaf60u + 0x14, lim);
-    PortCheckPtr(&DAT_004b5f60.faces, 0xaf60u + 0x18, lim);
+    PortCheckBytes(&RailTubeMesh.palette, 0xaf60u, 0x4u, lim);
+    PortCheckBytes(&RailTubeMesh.pad_4, 0xaf60u + 0x4, 0x4u, lim);
+    PortCheckBytes(&RailTubeMesh.corner_count, 0xaf60u + 0x8, 0x4u, lim);
+    PortCheckBytes(&RailTubeMesh.face_count, 0xaf60u + 0xc, 0x4u, lim);
+    PortCheckPtr(&RailTubeMesh.verts, 0xaf60u + 0x10, lim);
+    PortCheckPtr(&RailTubeMesh.corners, 0xaf60u + 0x14, lim);
+    PortCheckPtr(&RailTubeMesh.faces, 0xaf60u + 0x18, lim);
 }
 
-static void PortCheck_DAT_004b6150(void) {
+static void PortCheck_SupportPostModel(void) {
     unsigned int lim = 0xb1e0u;
-    PortCheckBytes(&DAT_004b6150.pad_0, 0xb150u, 0xcu, lim);
-    PortCheckPtr(&DAT_004b6150.field_c, 0xb150u + 0xc, lim);
-    PortCheckPtr(&DAT_004b6150.field_10, 0xb150u + 0x10, lim);
-    PortCheckPtr(&DAT_004b6150.field_14, 0xb150u + 0x14, lim);
-    PortCheckPtr(&DAT_004b6150.field_18, 0xb150u + 0x18, lim);
-    PortCheckBytes(&DAT_004b6150.field_1c, 0xb150u + 0x1c, 0x4u, lim);
-    PortCheckPtr(&DAT_004b6150.field_20, 0xb150u + 0x20, lim);
-    PortCheckBytes(&DAT_004b6150.field_24, 0xb150u + 0x24, 0x4u, lim);
-    PortCheckPtr(&DAT_004b6150.field_28, 0xb150u + 0x28, lim);
-    PortCheckBytes(&DAT_004b6150.field_2c, 0xb150u + 0x2c, 0x4u, lim);
-    PortCheckBytes(&DAT_004b6150.box, 0xb150u + 0x30, 0x60u, lim);
+    PortCheckBytes(&SupportPostModel.pad_0, 0xb150u, 0xcu, lim);
+    PortCheckPtr(&SupportPostModel.field_c, 0xb150u + 0xc, lim);
+    PortCheckPtr(&SupportPostModel.field_10, 0xb150u + 0x10, lim);
+    PortCheckPtr(&SupportPostModel.field_14, 0xb150u + 0x14, lim);
+    PortCheckPtr(&SupportPostModel.flat_tris, 0xb150u + 0x18, lim);
+    PortCheckBytes(&SupportPostModel.flat_count, 0xb150u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&SupportPostModel.gouraud_tris, 0xb150u + 0x20, lim);
+    PortCheckBytes(&SupportPostModel.gouraud_count, 0xb150u + 0x24, 0x4u, lim);
+    PortCheckPtr(&SupportPostModel.tex_tris, 0xb150u + 0x28, lim);
+    PortCheckBytes(&SupportPostModel.tex_count, 0xb150u + 0x2c, 0x4u, lim);
+    PortCheckBytes(&SupportPostModel.box, 0xb150u + 0x30, 0x60u, lim);
 }
 
-static void PortCheck_DAT_004b6300(void) {
+static void PortCheck_TrackTieModel(void) {
     unsigned int lim = 0xb390u;
-    PortCheckBytes(&DAT_004b6300.pad_0, 0xb300u, 0xcu, lim);
-    PortCheckPtr(&DAT_004b6300.field_c, 0xb300u + 0xc, lim);
-    PortCheckPtr(&DAT_004b6300.field_10, 0xb300u + 0x10, lim);
-    PortCheckPtr(&DAT_004b6300.field_14, 0xb300u + 0x14, lim);
-    PortCheckPtr(&DAT_004b6300.field_18, 0xb300u + 0x18, lim);
-    PortCheckBytes(&DAT_004b6300.field_1c, 0xb300u + 0x1c, 0x4u, lim);
-    PortCheckPtr(&DAT_004b6300.field_20, 0xb300u + 0x20, lim);
-    PortCheckBytes(&DAT_004b6300.field_24, 0xb300u + 0x24, 0x4u, lim);
-    PortCheckPtr(&DAT_004b6300.field_28, 0xb300u + 0x28, lim);
-    PortCheckBytes(&DAT_004b6300.field_2c, 0xb300u + 0x2c, 0x4u, lim);
-    PortCheckBytes(&DAT_004b6300.box, 0xb300u + 0x30, 0x60u, lim);
+    PortCheckBytes(&TrackTieModel.pad_0, 0xb300u, 0xcu, lim);
+    PortCheckPtr(&TrackTieModel.field_c, 0xb300u + 0xc, lim);
+    PortCheckPtr(&TrackTieModel.field_10, 0xb300u + 0x10, lim);
+    PortCheckPtr(&TrackTieModel.field_14, 0xb300u + 0x14, lim);
+    PortCheckPtr(&TrackTieModel.flat_tris, 0xb300u + 0x18, lim);
+    PortCheckBytes(&TrackTieModel.flat_count, 0xb300u + 0x1c, 0x4u, lim);
+    PortCheckPtr(&TrackTieModel.gouraud_tris, 0xb300u + 0x20, lim);
+    PortCheckBytes(&TrackTieModel.gouraud_count, 0xb300u + 0x24, 0x4u, lim);
+    PortCheckPtr(&TrackTieModel.tex_tris, 0xb300u + 0x28, lim);
+    PortCheckBytes(&TrackTieModel.tex_count, 0xb300u + 0x2c, 0x4u, lim);
+    PortCheckBytes(&TrackTieModel.box, 0xb300u + 0x30, 0x60u, lim);
 }
 
-static void PortCheck_DAT_004b63fc(void) {
+static void PortCheck_RangeRootFinder(void) {
     unsigned int lim = 0xb400u;
-    PortCheckPtr(&DAT_004b63fc, 0xb3fcu, lim);
+    PortCheckPtr(&RangeRootFinder, 0xb3fcu, lim);
 }
 
 static void PortCheck_CAROUSSEL_SFX(void) {
@@ -7475,25 +7481,25 @@ static void PortCheck_DAT_004b7750(void) {
     PortCheckPtr(&DAT_004b7750.entries, 0xc750u + 0x4, lim);
 }
 
-static void PortCheck_DAT_004b7758(void) {
+static void PortCheck_SpaceTowerLayouts(void) {
     unsigned int lim = 0xc798u;
     int i0;
 
     for (i0 = 0; i0 < 8; i0++) {
-        PortCheckBytes(&DAT_004b7758[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
-        PortCheckBytes(&DAT_004b7758[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
-        PortCheckPtr(&DAT_004b7758[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
+        PortCheckBytes(&SpaceTowerLayouts[i0].field_0, 0xc758u + i0 * 0x8, 0x2u, lim);
+        PortCheckBytes(&SpaceTowerLayouts[i0].pad_2, 0xc758u + i0 * 0x8 + 0x2, 0x2u, lim);
+        PortCheckPtr(&SpaceTowerLayouts[i0].anim_layout, 0xc758u + i0 * 0x8 + 0x4, lim);
     }
 }
 
-static void PortCheck_DAT_004b79d0(void) {
+static void PortCheck_PlaneRideFX(void) {
     unsigned int lim = 0xc9e8u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004b79d0[i0].name, 0xc9d0u + i0 * 0xc, lim);
-        PortCheckBytes(&DAT_004b79d0[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
-        PortCheckPtr(&DAT_004b79d0[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
+        PortCheckPtr(&PlaneRideFX[i0].name, 0xc9d0u + i0 * 0xc, lim);
+        PortCheckBytes(&PlaneRideFX[i0].pad_4, 0xc9d0u + i0 * 0xc + 0x4, 0x4u, lim);
+        PortCheckPtr(&PlaneRideFX[i0].sample, 0xc9d0u + i0 * 0xc + 0x8, lim);
     }
 }
 
@@ -7730,13 +7736,13 @@ static void PortCheck_DAT_004bb6d4(void) {
     }
 }
 
-static void PortCheck_DAT_004bb6f8(void) {
+static void PortCheck_LevelScriptCommands(void) {
     unsigned int lim = 0x109e0u;
     int i0;
 
     for (i0 = 0; i0 < 93; i0++) {
-        PortCheckPtr(&DAT_004bb6f8[i0].name, 0x106f8u + i0 * 0x8, lim);
-        PortCheckPtr(&DAT_004bb6f8[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
+        PortCheckPtr(&LevelScriptCommands[i0].name, 0x106f8u + i0 * 0x8, lim);
+        PortCheckPtr(&LevelScriptCommands[i0].fn, 0x106f8u + i0 * 0x8 + 0x4, lim);
     }
 }
 
@@ -7772,12 +7778,12 @@ static void PortCheck_PTR_s_Adams_004bd180(void) {
     }
 }
 
-static void PortCheck_PTR_FUN_004bd34c(void) {
+static void PortCheck_BlokeActionTable(void) {
     unsigned int lim = 0x1238cu;
     int i0;
 
     for (i0 = 0; i0 < 16; i0++) {
-        PortCheckPtr(&PTR_FUN_004bd34c[i0], 0x1234cu + i0 * 0x4, lim);
+        PortCheckPtr(&BlokeActionTable[i0], 0x1234cu + i0 * 0x4, lim);
     }
 }
 
@@ -7788,16 +7794,16 @@ static void PortCheck_Hover(void) {
     PortCheckBytes(&Hover.data, 0x12d00u + 0x8, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004bdeb8(void) {
+static void PortCheck_FreePlayObjectTable(void) {
     unsigned int lim = 0x13718u;
     int i0;
 
     for (i0 = 0; i0 < 134; i0++) {
-        PortCheckBytes(&DAT_004bdeb8[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
-        PortCheckBytes(&DAT_004bdeb8[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
-        PortCheckPtr(&DAT_004bdeb8[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
-        PortCheckBytes(&DAT_004bdeb8[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
-        PortCheckBytes(&DAT_004bdeb8[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
+        PortCheckBytes(&FreePlayObjectTable[i0].id, 0x12eb8u + i0 * 0x10, 0x1u, lim);
+        PortCheckBytes(&FreePlayObjectTable[i0].pad_1, 0x12eb8u + i0 * 0x10 + 0x1, 0x3u, lim);
+        PortCheckPtr(&FreePlayObjectTable[i0].name, 0x12eb8u + i0 * 0x10 + 0x4, lim);
+        PortCheckBytes(&FreePlayObjectTable[i0].field_8, 0x12eb8u + i0 * 0x10 + 0x8, 0x4u, lim);
+        PortCheckBytes(&FreePlayObjectTable[i0].field_c, 0x12eb8u + i0 * 0x10 + 0xc, 0x4u, lim);
     }
 }
 
@@ -7828,9 +7834,9 @@ static void PortCheck_ProgressScreenTables(void) {
     PortCheckBytes(&ProgressScreenTables.tail, 0x13b80u + 0x1ac, 0x14u, lim);
 }
 
-static void PortCheck_DAT_004c10d4(void) {
+static void PortCheck_DrivingSchoolCars(void) {
     unsigned int lim = 0x160d8u;
-    PortCheckPtr(&DAT_004c10d4, 0x160d4u, lim);
+    PortCheckPtr(&DrivingSchoolCars, 0x160d4u, lim);
 }
 
 static void PortCheck_CastleLevelRide(void) {
@@ -7843,14 +7849,14 @@ static void PortCheck_CastleLevelMatteSprite(void) {
     PortCheckPtr(&CastleLevelMatteSprite, 0x160e4u, lim);
 }
 
-static void PortCheck_DAT_004c10e8(void) {
+static void PortCheck_CastleLevelRiderRenderList(void) {
     unsigned int lim = 0x160ecu;
-    PortCheckPtr(&DAT_004c10e8, 0x160e8u, lim);
+    PortCheckPtr(&CastleLevelRiderRenderList, 0x160e8u, lim);
 }
 
-static void PortCheck_DAT_004c10f0(void) {
+static void PortCheck_CatapultLayer(void) {
     unsigned int lim = 0x160f4u;
-    PortCheckPtr(&DAT_004c10f0, 0x160f0u, lim);
+    PortCheckPtr(&CatapultLayer, 0x160f0u, lim);
 }
 
 static void PortCheck_ActiveCatapultRide(void) {
@@ -7858,14 +7864,14 @@ static void PortCheck_ActiveCatapultRide(void) {
     PortCheckPtr(&ActiveCatapultRide, 0x160f4u, lim);
 }
 
-static void PortCheck_DAT_004c1100(void) {
+static void PortCheck_CatapultSpriteInfo(void) {
     unsigned int lim = 0x16114u;
-    PortCheckPtr(&DAT_004c1100.sprite, 0x16100u, lim);
-    PortCheckBytes(&DAT_004c1100.x, 0x16100u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1100.y, 0x16100u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1100.id, 0x16100u + 0xc, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1100.pad_e, 0x16100u + 0xe, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1100.field_10, 0x16100u + 0x10, 0x4u, lim);
+    PortCheckPtr(&CatapultSpriteInfo.sprite, 0x16100u, lim);
+    PortCheckBytes(&CatapultSpriteInfo.x, 0x16100u + 0x4, 0x4u, lim);
+    PortCheckBytes(&CatapultSpriteInfo.y, 0x16100u + 0x8, 0x4u, lim);
+    PortCheckBytes(&CatapultSpriteInfo.id, 0x16100u + 0xc, 0x2u, lim);
+    PortCheckBytes(&CatapultSpriteInfo.pad_e, 0x16100u + 0xe, 0x2u, lim);
+    PortCheckBytes(&CatapultSpriteInfo.field_10, 0x16100u + 0x10, 0x4u, lim);
 }
 
 static void PortCheck_CatapultNodeList(void) {
@@ -7911,14 +7917,14 @@ static void PortCheck_DAT_004c1168(void) {
     PortCheckPtr(&DAT_004c1168, 0x16168u, lim);
 }
 
-static void PortCheck_DAT_004c1170(void) {
+static void PortCheck_CoptersSpriteInfo(void) {
     unsigned int lim = 0x16184u;
-    PortCheckPtr(&DAT_004c1170.sprite, 0x16170u, lim);
-    PortCheckBytes(&DAT_004c1170.x, 0x16170u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1170.y, 0x16170u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1170.id, 0x16170u + 0xc, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1170.pad_e, 0x16170u + 0xe, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1170.field_10, 0x16170u + 0x10, 0x4u, lim);
+    PortCheckPtr(&CoptersSpriteInfo.sprite, 0x16170u, lim);
+    PortCheckBytes(&CoptersSpriteInfo.x, 0x16170u + 0x4, 0x4u, lim);
+    PortCheckBytes(&CoptersSpriteInfo.y, 0x16170u + 0x8, 0x4u, lim);
+    PortCheckBytes(&CoptersSpriteInfo.id, 0x16170u + 0xc, 0x2u, lim);
+    PortCheckBytes(&CoptersSpriteInfo.pad_e, 0x16170u + 0xe, 0x2u, lim);
+    PortCheckBytes(&CoptersSpriteInfo.field_10, 0x16170u + 0x10, 0x4u, lim);
 }
 
 static void PortCheck_DAT_004c1188(void) {
@@ -7981,14 +7987,14 @@ static void PortCheck_DrivingSchoolCountList(void) {
     PortCheckPtr(&DrivingSchoolCountList, 0x161bcu, lim);
 }
 
-static void PortCheck_DAT_004c11c4(void) {
+static void PortCheck_RoadBfsFrontier(void) {
     unsigned int lim = 0x161c8u;
-    PortCheckPtr(&DAT_004c11c4, 0x161c4u, lim);
+    PortCheckPtr(&RoadBfsFrontier, 0x161c4u, lim);
 }
 
-static void PortCheck_DAT_004c11c8(void) {
+static void PortCheck_RoadBfsNextFrontier(void) {
     unsigned int lim = 0x161ccu;
-    PortCheckPtr(&DAT_004c11c8, 0x161c8u, lim);
+    PortCheckPtr(&RoadBfsNextFrontier, 0x161c8u, lim);
 }
 
 static void PortCheck_FortMaskSprite(void) {
@@ -8006,14 +8012,14 @@ static void PortCheck_FortRide(void) {
     PortCheckPtr(&FortRide, 0x161dcu, lim);
 }
 
-static void PortCheck_DAT_004c11e0(void) {
+static void PortCheck_FortRiderRenderList(void) {
     unsigned int lim = 0x161e4u;
-    PortCheckPtr(&DAT_004c11e0, 0x161e0u, lim);
+    PortCheckPtr(&FortRiderRenderList, 0x161e0u, lim);
 }
 
-static void PortCheck_DAT_004c11e4(void) {
+static void PortCheck_GoldRushQueueTable(void) {
     unsigned int lim = 0x161e8u;
-    PortCheckPtr(&DAT_004c11e4, 0x161e4u, lim);
+    PortCheckPtr(&GoldRushQueueTable, 0x161e4u, lim);
 }
 
 static void PortCheck_GoldRushLayer(void) {
@@ -8076,22 +8082,22 @@ static void PortCheck_JoustRide(void) {
     PortCheckPtr(&JoustRide, 0x1621cu, lim);
 }
 
-static void PortCheck_DAT_004c1228(void) {
+static void PortCheck_JoustSpriteInfo(void) {
     unsigned int lim = 0x1623cu;
-    PortCheckPtr(&DAT_004c1228.sprite, 0x16228u, lim);
-    PortCheckBytes(&DAT_004c1228.x, 0x16228u + 0x4, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1228.y, 0x16228u + 0x8, 0x4u, lim);
-    PortCheckBytes(&DAT_004c1228.id, 0x16228u + 0xc, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1228.pad_e, 0x16228u + 0xe, 0x2u, lim);
-    PortCheckBytes(&DAT_004c1228.field_10, 0x16228u + 0x10, 0x4u, lim);
+    PortCheckPtr(&JoustSpriteInfo.sprite, 0x16228u, lim);
+    PortCheckBytes(&JoustSpriteInfo.x, 0x16228u + 0x4, 0x4u, lim);
+    PortCheckBytes(&JoustSpriteInfo.y, 0x16228u + 0x8, 0x4u, lim);
+    PortCheckBytes(&JoustSpriteInfo.id, 0x16228u + 0xc, 0x2u, lim);
+    PortCheckBytes(&JoustSpriteInfo.pad_e, 0x16228u + 0xe, 0x2u, lim);
+    PortCheckBytes(&JoustSpriteInfo.field_10, 0x16228u + 0x10, 0x4u, lim);
 }
 
-static void PortCheck_DAT_004c123c(void) {
+static void PortCheck_JoustRiderSprites(void) {
     unsigned int lim = 0x16244u;
     int i0;
 
     for (i0 = 0; i0 < 2; i0++) {
-        PortCheckPtr(&DAT_004c123c[i0], 0x1623cu + i0 * 0x4, lim);
+        PortCheckPtr(&JoustRiderSprites[i0], 0x1623cu + i0 * 0x4, lim);
     }
 }
 
@@ -8133,29 +8139,29 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_DAT_004b4858,
     PortLoad_SAFARI_SFX,
     PortLoad_SpiderRide_SFX,
-    PortLoad_DAT_004b4f08,
+    PortLoad_TempleSlidePathNames,
     PortLoad_WATERWORKS_SFX,
     PortLoad_PTR_s_Boat_Noise_wav,
     PortLoad_DAT_004b5570,
-    PortLoad_DAT_004b55fc,
-    PortLoad_DAT_004b5600,
-    PortLoad_DAT_004b5648,
-    PortLoad_DAT_004b5658,
-    PortLoad_DAT_004b58c8,
-    PortLoad_DAT_004b5988,
-    PortLoad_DAT_004b5b20,
-    PortLoad_DAT_004b5b24,
-    PortLoad_DAT_004b5b3c,
-    PortLoad_DAT_004b5b48,
-    PortLoad_DAT_004b5d20,
-    PortLoad_DAT_004b5d58,
-    PortLoad_DAT_004b5d90,
-    PortLoad_DAT_004b5dc8,
-    PortLoad_DAT_004b5f50,
-    PortLoad_DAT_004b5f60,
-    PortLoad_DAT_004b6150,
-    PortLoad_DAT_004b6300,
-    PortLoad_DAT_004b63fc,
+    PortLoad_ClipPlanes,
+    PortLoad_ClipVertexLists,
+    PortLoad_FlatSpanFillers,
+    PortLoad_GouraudSpanFillers,
+    PortLoad_BoxSolidTemplate,
+    PortLoad_CastleVisitorInfo,
+    PortLoad_CoasterSurfaceBits,
+    PortLoad_CoasterDepthBuffer,
+    PortLoad_DepthSpanRecordEnd,
+    PortLoad_CastlePieceClass,
+    PortLoad_SquareTrackPieceClass,
+    PortLoad_HeightTrack25PieceClass,
+    PortLoad_HeightTrack2PieceClass,
+    PortLoad_HeightTrackPathPieceClass,
+    PortLoad_TexturedSpanFillers,
+    PortLoad_RailTubeMesh,
+    PortLoad_SupportPostModel,
+    PortLoad_TrackTieModel,
+    PortLoad_RangeRootFinder,
     PortLoad_CAROUSSEL_SFX,
     PortLoad_ENTRANCE_SFX,
     PortLoad_RESTAURANT_SFX,
@@ -8163,8 +8169,8 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_SPACE_TOWER_SFX,
     PortLoad_DAT_004b76b8,
     PortLoad_DAT_004b7750,
-    PortLoad_DAT_004b7758,
-    PortLoad_DAT_004b79d0,
+    PortLoad_SpaceTowerLayouts,
+    PortLoad_PlaneRideFX,
     PortLoad_DAT_004b7e9c,
     PortLoad_GraphicsPath,
     PortLoad_GraphicsPathPrefix,
@@ -8195,22 +8201,22 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_DAT_004bb688,
     PortLoad_DAT_004bb6bc,
     PortLoad_DAT_004bb6d4,
-    PortLoad_DAT_004bb6f8,
+    PortLoad_LevelScriptCommands,
     PortLoad_lpConfig,
     PortLoad_PTR_s_Aaron_004bcecc,
     PortLoad_PTR_s_Abbie_004bd018,
     PortLoad_PTR_s_Adams_004bd180,
-    PortLoad_PTR_FUN_004bd34c,
+    PortLoad_BlokeActionTable,
     PortLoad_Hover,
-    PortLoad_DAT_004bdeb8,
+    PortLoad_FreePlayObjectTable,
     PortLoad_ProgressScreenTables,
-    PortLoad_DAT_004c10d4,
+    PortLoad_DrivingSchoolCars,
     PortLoad_CastleLevelRide,
     PortLoad_CastleLevelMatteSprite,
-    PortLoad_DAT_004c10e8,
-    PortLoad_DAT_004c10f0,
+    PortLoad_CastleLevelRiderRenderList,
+    PortLoad_CatapultLayer,
     PortLoad_ActiveCatapultRide,
-    PortLoad_DAT_004c1100,
+    PortLoad_CatapultSpriteInfo,
     PortLoad_CatapultNodeList,
     PortLoad_CopterBaseMatteSprite,
     PortLoad_CopterQueueTables,
@@ -8218,7 +8224,7 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_CopterModelSprites,
     PortLoad_DAT_004c1164,
     PortLoad_DAT_004c1168,
-    PortLoad_DAT_004c1170,
+    PortLoad_CoptersSpriteInfo,
     PortLoad_DAT_004c1188,
     PortLoad_DAT_004c1190,
     PortLoad_DAT_004c1194,
@@ -8231,13 +8237,13 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_DAT_004c11b0,
     PortLoad_CopterNodeList,
     PortLoad_DrivingSchoolCountList,
-    PortLoad_DAT_004c11c4,
-    PortLoad_DAT_004c11c8,
+    PortLoad_RoadBfsFrontier,
+    PortLoad_RoadBfsNextFrontier,
     PortLoad_FortMaskSprite,
     PortLoad_FortLayer,
     PortLoad_FortRide,
-    PortLoad_DAT_004c11e0,
-    PortLoad_DAT_004c11e4,
+    PortLoad_FortRiderRenderList,
+    PortLoad_GoldRushQueueTable,
     PortLoad_GoldRushLayer,
     PortLoad_GoldRushRide,
     PortLoad_GoldMaskSprite,
@@ -8250,8 +8256,8 @@ static void (*const port_typed_loads[])(void) = {
     PortLoad_JoustLayer,
     PortLoad_JoustRideBnv,
     PortLoad_JoustRide,
-    PortLoad_DAT_004c1228,
-    PortLoad_DAT_004c123c,
+    PortLoad_JoustSpriteInfo,
+    PortLoad_JoustRiderSprites,
     PortLoad_JoustFMaskSprite,
     PortLoad_JoustSpecRMSprite,
     PortLoad_JoustSpecLMSprite,
@@ -8273,29 +8279,29 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_DAT_004b4858,
     PortCheck_SAFARI_SFX,
     PortCheck_SpiderRide_SFX,
-    PortCheck_DAT_004b4f08,
+    PortCheck_TempleSlidePathNames,
     PortCheck_WATERWORKS_SFX,
     PortCheck_PTR_s_Boat_Noise_wav,
     PortCheck_DAT_004b5570,
-    PortCheck_DAT_004b55fc,
-    PortCheck_DAT_004b5600,
-    PortCheck_DAT_004b5648,
-    PortCheck_DAT_004b5658,
-    PortCheck_DAT_004b58c8,
-    PortCheck_DAT_004b5988,
-    PortCheck_DAT_004b5b20,
-    PortCheck_DAT_004b5b24,
-    PortCheck_DAT_004b5b3c,
-    PortCheck_DAT_004b5b48,
-    PortCheck_DAT_004b5d20,
-    PortCheck_DAT_004b5d58,
-    PortCheck_DAT_004b5d90,
-    PortCheck_DAT_004b5dc8,
-    PortCheck_DAT_004b5f50,
-    PortCheck_DAT_004b5f60,
-    PortCheck_DAT_004b6150,
-    PortCheck_DAT_004b6300,
-    PortCheck_DAT_004b63fc,
+    PortCheck_ClipPlanes,
+    PortCheck_ClipVertexLists,
+    PortCheck_FlatSpanFillers,
+    PortCheck_GouraudSpanFillers,
+    PortCheck_BoxSolidTemplate,
+    PortCheck_CastleVisitorInfo,
+    PortCheck_CoasterSurfaceBits,
+    PortCheck_CoasterDepthBuffer,
+    PortCheck_DepthSpanRecordEnd,
+    PortCheck_CastlePieceClass,
+    PortCheck_SquareTrackPieceClass,
+    PortCheck_HeightTrack25PieceClass,
+    PortCheck_HeightTrack2PieceClass,
+    PortCheck_HeightTrackPathPieceClass,
+    PortCheck_TexturedSpanFillers,
+    PortCheck_RailTubeMesh,
+    PortCheck_SupportPostModel,
+    PortCheck_TrackTieModel,
+    PortCheck_RangeRootFinder,
     PortCheck_CAROUSSEL_SFX,
     PortCheck_ENTRANCE_SFX,
     PortCheck_RESTAURANT_SFX,
@@ -8303,8 +8309,8 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_SPACE_TOWER_SFX,
     PortCheck_DAT_004b76b8,
     PortCheck_DAT_004b7750,
-    PortCheck_DAT_004b7758,
-    PortCheck_DAT_004b79d0,
+    PortCheck_SpaceTowerLayouts,
+    PortCheck_PlaneRideFX,
     PortCheck_DAT_004b7e9c,
     PortCheck_GraphicsPath,
     PortCheck_GraphicsPathPrefix,
@@ -8335,22 +8341,22 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_DAT_004bb688,
     PortCheck_DAT_004bb6bc,
     PortCheck_DAT_004bb6d4,
-    PortCheck_DAT_004bb6f8,
+    PortCheck_LevelScriptCommands,
     PortCheck_lpConfig,
     PortCheck_PTR_s_Aaron_004bcecc,
     PortCheck_PTR_s_Abbie_004bd018,
     PortCheck_PTR_s_Adams_004bd180,
-    PortCheck_PTR_FUN_004bd34c,
+    PortCheck_BlokeActionTable,
     PortCheck_Hover,
-    PortCheck_DAT_004bdeb8,
+    PortCheck_FreePlayObjectTable,
     PortCheck_ProgressScreenTables,
-    PortCheck_DAT_004c10d4,
+    PortCheck_DrivingSchoolCars,
     PortCheck_CastleLevelRide,
     PortCheck_CastleLevelMatteSprite,
-    PortCheck_DAT_004c10e8,
-    PortCheck_DAT_004c10f0,
+    PortCheck_CastleLevelRiderRenderList,
+    PortCheck_CatapultLayer,
     PortCheck_ActiveCatapultRide,
-    PortCheck_DAT_004c1100,
+    PortCheck_CatapultSpriteInfo,
     PortCheck_CatapultNodeList,
     PortCheck_CopterBaseMatteSprite,
     PortCheck_CopterQueueTables,
@@ -8358,7 +8364,7 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_CopterModelSprites,
     PortCheck_DAT_004c1164,
     PortCheck_DAT_004c1168,
-    PortCheck_DAT_004c1170,
+    PortCheck_CoptersSpriteInfo,
     PortCheck_DAT_004c1188,
     PortCheck_DAT_004c1190,
     PortCheck_DAT_004c1194,
@@ -8371,13 +8377,13 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_DAT_004c11b0,
     PortCheck_CopterNodeList,
     PortCheck_DrivingSchoolCountList,
-    PortCheck_DAT_004c11c4,
-    PortCheck_DAT_004c11c8,
+    PortCheck_RoadBfsFrontier,
+    PortCheck_RoadBfsNextFrontier,
     PortCheck_FortMaskSprite,
     PortCheck_FortLayer,
     PortCheck_FortRide,
-    PortCheck_DAT_004c11e0,
-    PortCheck_DAT_004c11e4,
+    PortCheck_FortRiderRenderList,
+    PortCheck_GoldRushQueueTable,
     PortCheck_GoldRushLayer,
     PortCheck_GoldRushRide,
     PortCheck_GoldMaskSprite,
@@ -8390,8 +8396,8 @@ static void (*const port_typed_checks[])(void) = {
     PortCheck_JoustLayer,
     PortCheck_JoustRideBnv,
     PortCheck_JoustRide,
-    PortCheck_DAT_004c1228,
-    PortCheck_DAT_004c123c,
+    PortCheck_JoustSpriteInfo,
+    PortCheck_JoustRiderSprites,
     PortCheck_JoustFMaskSprite,
     PortCheck_JoustSpecRMSprite,
     PortCheck_JoustSpecLMSprite,

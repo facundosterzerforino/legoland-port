@@ -1,6 +1,7 @@
 #pragma once
 
 #include "legoland.h"
+#include "math.h"
 
 // Per-TU header for bricks.c — canonical declarations for the brick currency.
 
@@ -10,7 +11,7 @@ LEGO_EXPORT void AddBricks(unsigned int param_1);
 LEGO_EXPORT void UseBricks(unsigned int param_1);
 LEGO_EXPORT int GetBrickCount(void);
 void SetBrickCount(unsigned int param_1);
-int IsFootprintClear(int dx, int dy);
+int IsFootprintClear(struct Point off);
 void FUN_00457a70(void);
 int SaveCurrency(void);
 int LoadCurrency(void);

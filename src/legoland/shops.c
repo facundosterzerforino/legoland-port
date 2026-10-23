@@ -170,8 +170,8 @@ void LegoShop1Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 1:
@@ -179,8 +179,8 @@ void LegoShop1Update(Element *obj) {
                 bloke->dest.y = (rand() % 2 + y + 3) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->field_58 = rand() % 50;
                 bloke->param_action++;
                 break;
@@ -200,8 +200,8 @@ void LegoShop1Update(Element *obj) {
                 bloke->dest.y = (rand() % 3 + y) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->field_58 = rand() % 30;
                 bloke->param_action++;
                 break;
@@ -215,8 +215,8 @@ void LegoShop1Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 6:
@@ -353,8 +353,8 @@ void LegoShop2Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 2:
@@ -364,8 +364,8 @@ void LegoShop2Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 3:
@@ -387,8 +387,8 @@ void LegoShop2Update(Element *obj) {
                 }
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 4:
@@ -426,8 +426,8 @@ void LegoShop2Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 10:
@@ -437,8 +437,8 @@ void LegoShop2Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 11:
@@ -448,8 +448,8 @@ void LegoShop2Update(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
             case 12:
                 RemoveBlokeFromRide(ride, node);
@@ -594,8 +594,8 @@ void LegoMediaShopUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 1:
@@ -617,8 +617,8 @@ void LegoMediaShopUpdate(Element *obj) {
                 }
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 2:
@@ -647,8 +647,8 @@ void LegoMediaShopUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 5:
@@ -658,8 +658,8 @@ void LegoMediaShopUpdate(Element *obj) {
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 6:
@@ -738,17 +738,17 @@ void ExplorersInstituteUpdate(struct Element *obj) {
                 bloke->flags |= 8;
                 bloke->dest.x = elem->tile.pos.x << 8;
                 bloke->dest.y = (1 + elem->tile.pos.y) << 8;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+                bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 1:
                 bloke->dest.x = elem->tile.pos.x << 8;
                 bloke->dest.y = (elem->tile.pos.y + 2) << 8;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+                bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 bloke->field_58 = rand() % 70 + 20;
                 break;
@@ -761,9 +761,9 @@ void ExplorersInstituteUpdate(struct Element *obj) {
             case 3:
                 bloke->dest.x = elem->tile.pos.x << 8;
                 bloke->dest.y = (1 + elem->tile.pos.y) << 8;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+                bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                ptmp55 = bloke->field_73;
+                ptmp55 = bloke->target_dir;
                 NewDirForAction(bloke, (ptmp55 >> 5) + 3);
                 bloke->param_action++;
                 break;
@@ -772,9 +772,9 @@ void ExplorersInstituteUpdate(struct Element *obj) {
                 bloke->dest.y = ((ride->y + ptmp911) << 8) + 0x80;
                 ptmp54 = elem->tile.pos.x;
                 bloke->dest.x = ((ride->x + ptmp54) << 8) + 0x80;
-                bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+                bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
                 bloke->low_level_action = 7;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 5:

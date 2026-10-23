@@ -420,7 +420,7 @@ LEGO_EXPORT int SaveGame(char *filename) {
             BlokeSaveBuffer.pos.y = bloke->pos.y;
             BlokeSaveBuffer.height = bloke->height;
             BlokeSaveBuffer.dir = bloke->dir;
-            BlokeSaveBuffer.field_73 = bloke->field_73;
+            BlokeSaveBuffer.target_dir = bloke->target_dir;
             BlokeSaveBuffer.frame = bloke->frame;
             BlokeSaveBuffer.field_75 = bloke->field_75;
             BlokeSaveBuffer.nav = bloke->nav;
@@ -962,7 +962,7 @@ LEGO_EXPORT int LoadGame(char *path) {
         bloke->pos.y = BlokeSaveBuffer.pos.y;
         bloke->height = BlokeSaveBuffer.height;
         bloke->dir = BlokeSaveBuffer.dir;
-        bloke->field_73 = BlokeSaveBuffer.field_73;
+        bloke->target_dir = BlokeSaveBuffer.target_dir;
         bloke->frame = BlokeSaveBuffer.frame;
         bloke->field_75 = BlokeSaveBuffer.field_75;
         bloke->nav = BlokeSaveBuffer.nav;
@@ -1160,8 +1160,8 @@ LEGO_EXPORT int LoadGame(char *path) {
     entrance = Entrance1Elem->ride;
     first = GetFirstObjectMatching(Entrance1Elem);
     if (first != 0) {
-        DAT_004b8320.x = (first->field_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
-        DAT_004b8320.y = (((entrance->footprint.v[3] - entrance->footprint.v[1]) << 7) & ~0xff) + ((first->field_5 + entrance->footprint.v[1]) << 8);
+        ParkExitPos.x = (first->field_4 + entrance->footprint.v[0]) * 0x100 + -0x100;
+        ParkExitPos.y = (((entrance->footprint.v[3] - entrance->footprint.v[1]) << 7) & ~0xff) + ((first->field_5 + entrance->footprint.v[1]) << 8);
     }
     FUN_00475f10();
     SetMapLoaded(1);

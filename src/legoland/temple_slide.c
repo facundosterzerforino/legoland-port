@@ -285,7 +285,7 @@ void TempleSlideUpdate(Element *obj) {
     int tw;
     RideNode *node;
 
-    int field_73;
+    int target_dir;
     int ptmp227;
     node;
     ride = obj->ride;
@@ -310,8 +310,8 @@ void TempleSlideUpdate(Element *obj) {
                     bloke->dest.y = y;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
-                    NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                    bloke->target_dir = dir + 0x10;
+                    NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                     bloke->param_action++;
                 } else {
                     y -= 5;
@@ -321,9 +321,9 @@ void TempleSlideUpdate(Element *obj) {
                     bloke->dest.y = y;
                     dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                     bloke->low_level_action = 7;
-                    bloke->field_73 = dir + 0x10;
-                    field_73 = bloke->field_73;
-                    NewDirForAction(bloke, (field_73 >> 5) + 3);
+                    bloke->target_dir = dir + 0x10;
+                    target_dir = bloke->target_dir;
+                    NewDirForAction(bloke, (target_dir >> 5) + 3);
                     bloke->param_action = 3;
                 }
                 break;
@@ -332,8 +332,8 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->dest.y = (ride->footprint.y0 + tile->pos.y + 2) << 8;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = dir + 0x10;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = dir + 0x10;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 3:
@@ -422,8 +422,8 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->dest.y = (y << 8) + 0x80;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
-                bloke->field_73 = 0x10 + dir;
-                NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+                bloke->target_dir = 0x10 + dir;
+                NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
                 bloke->param_action++;
                 break;
             case 6:

@@ -220,16 +220,16 @@ void Entrance1Update(Element *elem) {
                 table = ENTRANCE_DEST_LEFT;
             }
             bloke->dest.y = table[bloke->field_3a] + (y << 8);
-            bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+            bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
             bloke->low_level_action = 7;
-            NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+            NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
             break;
         case 0x32:
             bloke->param_action = 1;
             bloke->dest.x = (x1 - 3) << 8;
-            bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+            bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
             bloke->low_level_action = 7;
-            NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+            NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
             break;
         case 1:
             if (bloke->field_36 == 1) {
@@ -242,9 +242,9 @@ void Entrance1Update(Element *elem) {
                 bloke->dest.x = x1 << 8;
             }
             bloke->dest.y = table[bloke->field_3a] + (y << 8);
-            bloke->field_73 = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
+            bloke->target_dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav) + 0x10;
             bloke->low_level_action = 7;
-            NewDirForAction(bloke, (bloke->field_73 >> 5) + 3);
+            NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
             bloke->param_action++;
             break;
         case 2:

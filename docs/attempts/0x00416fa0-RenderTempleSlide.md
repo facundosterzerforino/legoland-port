@@ -22,3 +22,11 @@
 
 - A single `struct Point off[2]` array (changes the addressing, so it may give a different slot order).
 - Reading `bloke->screen_x` and the `DAT_004cbf8*` globals into locals before the first `AdjustOffsetForViewMode` call.
+
+## 2026-10-21 (Opus 5.5): still 96.67
+The remaining diff is the operand order of the off1/off2 adds (the original adds off1 first in both sums).
+| Change | Result |
+|---|---|
+| `struct Point off[2]` (both index orders) | 89.17-90.00 |
+| off2 at function scope, off1 in the block | 96.67 |
+| all locals at function scope, ~150 random declaration orders | 96.67 |

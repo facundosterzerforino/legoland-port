@@ -710,10 +710,12 @@ void FlushTextCells(int evict_all) {
     }
 }
 
+/* Draw hover-help text with an optional visitor mood/status icon. Index 0 omits
+   the icon; screens.c uses this for the hovered visitor's name. */
 // FUNCTION: LEGOLAND 0x00455fc0
-void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood) {
-    /* [port] the original indexes (&DAT_008139e0)[mood], relying on the eleven bubble-help sprites being laid out
-     * one after another; list them explicitly instead (mood is 1..5 or 10) */
+void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood_icon) {
+    /* [port] the original indexes (&DAT_008139e0)[mood_icon], relying on the eleven bubble-help sprites being laid out
+     * one after another; list them explicitly instead (mood_icon is 1..5 or 10) */
     static struct Sprite **const mood_sprites[11] = {
         &DAT_008139e0,
         &MiHungrySprite,
@@ -728,101 +730,98 @@ void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood) {
         &MiBoredSprite,
     };
     RECT box;
-    register RECT frame;
-    HDC hdc;
-    HDC ddhdc;
+    RECT frame;
+    HDC measure_dc;
+    HDC surface_dc;
     HGDIOBJ old_font;
     struct TextCell *cell;
-    unsigned int block_color;
-    int cx;
-    volatile int mood_pad;
-    int text_h;
-    int half_mood;
+    unsigned int background_color;
+    int center_x;
+    int icon_width;
+    int text_height;
+    int half_icon_width;
 
-    volatile int ptmp23;
-    volatile int ptmp24;
-    volatile int ptmp25;
-    volatile int ptmp42;
-    int ptmp74;
+    /* Keep the RECT initialization in field order, as in HTBubbleHelp. */
+    box.left = 0;
+    box.top = 0;
     box.right = 0;
     box.bottom = 0;
-    box.top = 0;
-    box.left = 0;
-    block_color = GetNearestColour(0xda, 0xc6, 0x96);
-    mood_pad = 0;
-    if (mood) {
-        mood_pad = 0x28;
+    background_color = GetNearestColour(0xda, 0xc6, 0x96);
+    icon_width = 0;
+    if (mood_icon) {
+        icon_width = 0x28;
     }
-    if (NULL != text) {
-        { box.right = 200; }
+    if (text != NULL) {
+        box.right = 200;
+        /* Reuse the measured text cell; otherwise measure it with GDI and cache it. */
         cell = FindTextCellByStyle(text, font, 0x10, 0x96c6da, 0);
-        if (!cell) {
-            hdc = CreateCompatibleDC(NULL);
-            SetBkMode(hdc, 1);
-            old_font = SelectFont(hdc, font);
-            text_h = DrawTextA(hdc, text, strlen(text), &box, 0x410);
+        if (cell == NULL) {
+            measure_dc = CreateCompatibleDC(NULL);
+            SetBkMode(measure_dc, 1);
+            old_font = SelectFont(measure_dc, font);
+            text_height = DrawTextA(measure_dc, text, strlen(text), &box, 0x410);
             box.top = rect->top;
-            box.bottom = text_h + box.top;
-            SelectObject(hdc, old_font);
-            DeleteDC(hdc);
-            CreateTextCell((char *)text, box.right - box.left, text_h, font, 0x10, 0x96c6da, 0);
+            box.bottom = text_height + box.top;
+            SelectObject(measure_dc, old_font);
+            DeleteDC(measure_dc);
+            CreateTextCell((char *)text, box.right - box.left, text_height, font, 0x10, 0x96c6da, 0);
         } else {
             box.left = 0;
             box.top = 0;
             box.right = cell->width;
             box.bottom = cell->height;
-            text_h = cell->height;
+            text_height = cell->height;
         }
-        cx = (rect->right + rect->left) >> 1;
-        if (cx < 0) {
-            cx = 0;
-        } else if ((int)(unsigned int)lpConfig->screen_width < cx) {
-            cx = (unsigned int)lpConfig->screen_width;
+        center_x = (rect->right + rect->left) >> 1;
+        if (center_x < 0) {
+            center_x = 0;
+        } else if (center_x > (int)(unsigned int)lpConfig->screen_width) {
+            center_x = (unsigned int)lpConfig->screen_width;
         }
         {
             int width = box.right - box.left;
-            int right;
-            box.left = cx - (width >> 1);
-            right = ((width + 1) >> 1) + cx + mood_pad;
+            /* Store the text-only bounds first. The icon allowance belongs in the
+               screen-edge test, not in this initial right edge (MSVC6 match). */
+            box.left = center_x - (width >> 1);
+            box.right = ((width + 1) >> 1) + center_x;
             if (box.left < 0) {
                 box.left = 0;
-            } else if (right >= (int)(unsigned int)lpConfig->screen_width) {
-                ptmp23 = lpConfig->screen_width;
-                box.left = ((unsigned int)ptmp23 - width) - mood_pad;
+            } else if (box.right + icon_width >= (int)(unsigned int)lpConfig->screen_width) {
+                box.left = ((unsigned int)lpConfig->screen_width - width) - icon_width;
             }
-            half_mood = mood_pad / 2;
-            ptmp42 = box.left;
-            box.right = half_mood + width + ptmp42;
+            /* The original reserves 40 pixels at the edge, then extends this box by 20. */
+            half_icon_width = icon_width / 2;
+            box.right = half_icon_width + width + box.left;
         }
+        /* Prefer above the hovered rectangle, falling below it when space is tight. */
         if (rect->top < (box.bottom - box.top) + 8) {
             box.top = rect->bottom + 6;
-            box.bottom = text_h + box.top;
+            box.bottom = text_height + box.top;
         } else {
             box.bottom = rect->top + -6;
-            box.top = box.bottom - text_h;
+            box.top = box.bottom - text_height;
         }
+        /* Beige fill and a one-pixel black border around the padded text rectangle. */
         frame.left = box.left - 4;
         frame.top = box.top - 4;
         frame.right = box.right + 4;
         frame.bottom = 4 + box.bottom;
-        RenderBlock(frame.left + 1, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1, block_color);
+        RenderBlock(frame.left + 1, frame.top + 1, frame.right - frame.left, frame.bottom - frame.top - 1, background_color);
         RenderBlock(frame.left, frame.top, frame.right - frame.left, 1, 0);
-        ptmp74 = frame.left;
-        RenderBlock(ptmp74, frame.bottom, frame.right - frame.left, 1, 0);
-        ptmp24 = frame.left;
-        ptmp25 = frame.top;
-        RenderBlock(ptmp24, ptmp25, 1, frame.bottom - frame.top, 0);
+        RenderBlock(frame.left, frame.bottom, frame.right - frame.left, 1, 0);
+        RenderBlock(frame.left, frame.top, 1, frame.bottom - frame.top, 0);
         RenderBlock(frame.right, frame.top, 1, frame.bottom - frame.top, 0);
-        if (mood != 0) {
-            PrintSprite(*mood_sprites[mood], frame.right - half_mood, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);
+        if (mood_icon != 0) {
+            PrintSprite(*mood_sprites[mood_icon], frame.right - half_icon_width, (frame.top + frame.bottom) / 2 - 0x14, 0, 0);
         }
+        /* DrawText needs a GDI DC: unlock the render surface, then restore its status. */
         PushRenderingStatusAndUnlockVideoSurface();
-        ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->GetDC((LPDIRECTDRAWSURFACE)renderEngine, &ddhdc);
-        SetBkMode(ddhdc, 1);
-        old_font = SelectFont(ddhdc, font);
-        DrawTextA(ddhdc, text, strlen(text), &box, 0x10);
-        SelectObject(ddhdc, old_font);
-        ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->ReleaseDC((LPDIRECTDRAWSURFACE)renderEngine, ddhdc);
+        ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->GetDC((LPDIRECTDRAWSURFACE)renderEngine, &surface_dc);
+        SetBkMode(surface_dc, 1);
+        old_font = SelectFont(surface_dc, font);
+        DrawTextA(surface_dc, text, strlen(text), &box, 0x10);
+        SelectObject(surface_dc, old_font);
+        ((LPDIRECTDRAWSURFACE)renderEngine)->lpVtbl->ReleaseDC((LPDIRECTDRAWSURFACE)renderEngine, surface_dc);
         PopRenderingStatus();
     }
 }

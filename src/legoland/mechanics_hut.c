@@ -55,7 +55,7 @@ void MechanicsHutUpdate(Element *obj) {
             bloke->flags |= 8;
             bloke->dest.y += 0x300;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -64,7 +64,7 @@ void MechanicsHutUpdate(Element *obj) {
             bloke->dest.x += 0x400;
             bloke->dest.y += 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -72,7 +72,7 @@ void MechanicsHutUpdate(Element *obj) {
         case 2:
             bloke->dest.y += 0x400;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -87,7 +87,7 @@ void MechanicsHutUpdate(Element *obj) {
             bloke->flags |= 8;
             bloke->dest.y -= 0x300;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -96,7 +96,7 @@ void MechanicsHutUpdate(Element *obj) {
             bloke->dest.x -= 0x480;
             bloke->dest.y -= 0x100;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;
@@ -104,7 +104,7 @@ void MechanicsHutUpdate(Element *obj) {
         case 102:
             bloke->dest.y -= 0x300;
             dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
-            bloke->field_73 = dir + 0x10;
+            bloke->target_dir = dir + 0x10;
             bloke->low_level_action = 7;
             NewDirForAction(bloke, ((unsigned char)(dir + 0x10) >> 5) + 3);
             bloke->param_action++;

@@ -317,10 +317,10 @@ static const struct {
     unsigned int variety_flag;
     int *variety;
 } Targets[CAT_COUNT] = {
-    {0x4000, &DAT_00666020, 0x8000, &DAT_00666028}, /* NUM_ATTRACTIONS, VAR_ATTRACTIONS */
-    {0x8000000, &DAT_00666070, 0x10000000, &DAT_00666078}, /* NUM_SCENERY, VAR_SCENERY */
-    {0x40000000, &DAT_00666088, 0x80000000, &DAT_00666090}, /* NUM_SHOPS, VAR_SHOPS */
-    {0x10000, &DAT_00666040, 0x20000, &DAT_00666048}, /* NUM_FOOD, VAR_FOOD */
+    {0x4000, &ReportType1Or3ObjectCountGoal, 0x8000, &ReportType1Or3ClassCountGoal}, /* NUM_ATTRACTIONS, VAR_ATTRACTIONS */
+    {0x8000000, &ReportType2ObjectCountGoal, 0x10000000, &ReportType2ClassCountGoal}, /* NUM_SCENERY, VAR_SCENERY */
+    {0x40000000, &ReportType4ObjectCountGoal, 0x80000000, &ReportType4ClassCountGoal}, /* NUM_SHOPS, VAR_SHOPS */
+    {0x10000, &ReportFoodStallObjectCountGoal, 0x20000, &ReportFoodStallClassCountGoal}, /* NUM_FOOD, VAR_FOOD */
 };
 
 static const char *ClassName(const struct Ride *cls) {
@@ -592,7 +592,7 @@ static void CmdObjectives(void) {
         } else if (node->type >= 0x30 && node->type <= 0x35) {
             /* the coverage checks (nerps.c ScriptEvent*Coverage, ScriptEventPathScenery): target % in field_14 */
             static int *const now[6] = {
-                &DAT_00667cf8, &DAT_00667d08, &DAT_00667ce4, &DAT_00667ce8, &DAT_00667cec, &DAT_00667ce0};
+                &SceneryCoveredSquares, &PathSceneryPercent, &RideCoveredSquares, &ShopCoveredSquares, &FoodCoveredSquares, &TotalCoveredSquares};
             size_t len = strlen(what);
             snprintf(what + len, sizeof(what) - len, " %d%% (now %d%%)", (int)node->field_14, *now[node->type - 0x30]);
         } else if (node->type != 0x45 && node->type != 0x41 && node->type != 0x42 && node->type != 0x43) {
@@ -834,9 +834,9 @@ static void RunCommand(char *line) {
             CurrentProfile.flags[i] = 1;
         }
         /* Free play lists an object once its byte in field_46 is set, which the game does the first time the
-         * object is built in a level (FUN_0048a6e0): set it for every object in that table. */
+         * object is built in a level (UnlockFreePlayObject): set it for every object in that table. */
         unlocked = 0;
-        for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
+        for (entry = FreePlayObjectTable; entry < FreePlayObjectTable + 0x86 && entry->name != NULL && entry->name[0] != '\0';
             entry++) {
             if (entry->id < sizeof(CurrentProfile.field_46)) {
                 unlocked += CurrentProfile.field_46[entry->id] == 0;
@@ -852,9 +852,9 @@ static void RunCommand(char *line) {
              * give every object, as the script's ENABLE command does (ScriptCmdEnable), then enable all four
              * theme tabs and rebuild the menu. */
             given = 0;
-            for (entry = DAT_004bdeb8; entry < DAT_004bdeb8 + 0x86 && entry->name != NULL && entry->name[0] != '\0';
+            for (entry = FreePlayObjectTable; entry < FreePlayObjectTable + 0x86 && entry->name != NULL && entry->name[0] != '\0';
                 entry++) {
-                if (FUN_00478b20(entry->name) == 0) {
+                if (EnableObjectClass(entry->name) == 0) {
                     ConPrintf("  not given: %s (its class failed to load)", entry->name);
                     continue;
                 }
