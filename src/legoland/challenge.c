@@ -156,7 +156,7 @@ struct Image *LoadBmpImage(const char *param_1, unsigned char param_2) {
 
 // FUNCTION: LEGOLAND 0x00443710
 unsigned int GetLoadedTextureCount(void) {
-    return DAT_00665e8c;
+    return LoadedTextureCount;
 }
 
 // FUNCTION: LEGOLAND 0x00443720
@@ -173,12 +173,12 @@ void LoadTextureBitmaps(struct LocFile *param_1, const char *param_2) {
             // STRING: LEGOLAND 0x004b7d3c
             DBPrintf("Failed to load texture %s", filename);
         } else {
-            LoadTextureNode(image, DAT_00665e8c);
-            DAT_0081c0c0[DAT_00665e8c * 2] = image->width;
-            DAT_0081c0c0[DAT_00665e8c * 2 + 1] = image->height;
+            LoadTextureNode(image, LoadedTextureCount);
+            TextureSizes[LoadedTextureCount * 2] = image->width;
+            TextureSizes[LoadedTextureCount * 2 + 1] = image->height;
             KillImage(image);
         }
-        DAT_00665e8c = DAT_00665e8c + 1;
+        LoadedTextureCount = LoadedTextureCount + 1;
     }
 }
 
@@ -313,7 +313,7 @@ struct AnimHandle *OpenAviAnim(const char *filename) {
     int height;
     int i;
 
-    if (DAT_00665f48 == 0) {
+    if (AviAnimOpenCount == 0) {
         AVIFileInit();
     }
     found = NULL;
@@ -347,13 +347,13 @@ struct AnimHandle *OpenAviAnim(const char *filename) {
                 result->stream = found;
                 result->open_cb = NULL;
                 result->callback = NULL;
-                DAT_00665f48 = DAT_00665f48 + 1;
+                AviAnimOpenCount = AviAnimOpenCount + 1;
                 return result;
             }
         }
         AVIFileRelease(file);
     }
-    if (DAT_00665f48 == 0) {
+    if (AviAnimOpenCount == 0) {
         AVIFileExit();
     }
     return NULL;
@@ -371,8 +371,8 @@ void CloseAviAnim(struct AnimHandle *handle) {
         AVIStreamRelease(handle->stream);
     }
     free(handle);
-    DAT_00665f48 = DAT_00665f48 - 1;
-    if (DAT_00665f48 == 0) {
+    AviAnimOpenCount = AviAnimOpenCount - 1;
+    if (AviAnimOpenCount == 0) {
         AVIFileExit();
     }
 }
@@ -392,16 +392,16 @@ void SetAdvisorVidAnim(struct AnimHandle *handle) {
     DAT_00665f68 = 0;
     DAT_00665f6c = 0;
     DAT_00665f64 = 0;
-    DAT_00665eec = 0;
+    AdvisorAnimFrame = 0;
     if (handle->open_cb != NULL) {
         handle->open_cb(handle);
     }
-    current = (struct AnimHandle *)DAT_00665f5c;
+    current = (struct AnimHandle *)CurrentAdvisorAnim;
     if (current != NULL) {
         AVIStreamGetFrameClose(current->getframe);
-        ((struct AnimHandle *)DAT_00665f5c)->getframe = NULL;
+        ((struct AnimHandle *)CurrentAdvisorAnim)->getframe = NULL;
     }
-    DAT_00665f5c = handle;
+    CurrentAdvisorAnim = handle;
     if (handle != NULL) {
         handle->getframe = AVIStreamGetFrameOpen(handle->stream, &DAT_004b7d70);
     }
@@ -417,35 +417,35 @@ unsigned int RenderAdvisorIcon(struct IconNode *param_1) {
     state.ptr = param_1;
     state.field_8 = 0;
     if (IsScriptStopped() == 0) {
-        anim = (struct AnimHandle *)DAT_00665f5c;
+        anim = (struct AnimHandle *)CurrentAdvisorAnim;
         if (anim != NULL) {
-            if (DAT_00665eec >= anim->length) {
+            if (AdvisorAnimFrame >= anim->length) {
                 if (anim->callback != NULL) {
                     anim->callback();
-                    anim = (struct AnimHandle *)DAT_00665f5c;
+                    anim = (struct AnimHandle *)CurrentAdvisorAnim;
                 }
-                if (DAT_00665f60 == NULL) {
-                    DAT_00665f60 = anim;
+                if (NextAdvisorAnim == NULL) {
+                    NextAdvisorAnim = anim;
                 }
                 // STRING: LEGOLAND 0x004b7dc4
-                DAT_00667c40 = "SetVidAnim";
-                SetAdvisorVidAnim((struct AnimHandle *)DAT_00665f60);
-                anim = (struct AnimHandle *)DAT_00665f5c;
-                DAT_00665f60 = NULL;
+                AdvisorDebugStage = "SetVidAnim";
+                SetAdvisorVidAnim((struct AnimHandle *)NextAdvisorAnim);
+                anim = (struct AnimHandle *)CurrentAdvisorAnim;
+                NextAdvisorAnim = NULL;
             }
             // STRING: LEGOLAND 0x004b7db4
-            DAT_00667c40 = "AVI GetFrame";
+            AdvisorDebugStage = "AVI GetFrame";
             /* [library:movie] the advisor animations are Indeo 5 AVIs: without that codec (not on Windows 11) there
              * is no frame decompressor and no frame, which the original dereferenced. The port decodes them itself
              * (port_movie.c). */
-            frame = anim->getframe != NULL ? (struct AviFrame *)AVIStreamGetFrame(anim->getframe, DAT_00665eec) : NULL;
+            frame = anim->getframe != NULL ? (struct AviFrame *)AVIStreamGetFrame(anim->getframe, AdvisorAnimFrame) : NULL;
 #ifdef LEGOLAND_PORT
             if (frame == NULL) {
-                frame = (struct AviFrame *)PortMovieGetFrame(anim->stream, DAT_00665eec); /* [library:movie] */
+                frame = (struct AviFrame *)PortMovieGetFrame(anim->stream, AdvisorAnimFrame); /* [library:movie] */
             }
 #endif
             // STRING: LEGOLAND 0x004b7da8
-            DAT_00667c40 = "BltAdvisor";
+            AdvisorDebugStage = "BltAdvisor";
             if (frame != NULL) {
                 PushRenderingStatusAndLockVideoSurface();
                 FUN_004659a0(frame, param_1->x, param_1->y);
@@ -468,9 +468,9 @@ unsigned int RenderAdvisorIcon(struct IconNode *param_1) {
                 }
                 PopRenderingStatus();
             }
-            DAT_00665eec++;
+            AdvisorAnimFrame++;
             // STRING: LEGOLAND 0x004b7d98
-            DAT_00667c40 = "Exit Advisor";
+            AdvisorDebugStage = "Exit Advisor";
             if (frame != NULL && (int)MousePos.x >= param_1->x && (int)MousePos.y >= param_1->y &&
                 (int)MousePos.x < frame->width + param_1->x && (int)MousePos.y < frame->height + param_1->y) {
                 Hover.type = state.type;
@@ -525,22 +525,22 @@ unsigned int GetNextAdvisorAnimState(unsigned int param_1) {
 void *OnAdvisorAnimEnd(void) {
     unsigned int handle;
 
-    if (DAT_00665fec == DAT_00665fe8) {
-        DAT_00665fec = GetNextAdvisorAnimState(DAT_00665fe8);
+    if (NextAdvisorAnimState == AdvisorAnimState) {
+        NextAdvisorAnimState = GetNextAdvisorAnimState(AdvisorAnimState);
     }
-    handle = DAT_00665fec;
-    DAT_00665fe8 = handle;
-    DAT_0081c088 = DAT_0081c09c;
-    DAT_0081c09c = 0;
-    DAT_00665f60 = GetAdvisorAnimForState(handle);
-    return DAT_00665f60;
+    handle = NextAdvisorAnimState;
+    AdvisorAnimState = handle;
+    AdvisorAnimStateParam = NextAdvisorAnimStateParam;
+    NextAdvisorAnimStateParam = 0;
+    NextAdvisorAnim = GetAdvisorAnimForState(handle);
+    return NextAdvisorAnim;
 }
 
 // FUNCTION: LEGOLAND 0x00444070
 void SetNextAdvisorAnimState(unsigned int param_1, unsigned int param_2) {
-    DAT_00665fec = param_1;
-    DAT_0081c09c = param_2;
-    DAT_0081c088 = 0;
+    NextAdvisorAnimState = param_1;
+    NextAdvisorAnimStateParam = param_2;
+    AdvisorAnimStateParam = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00444090
@@ -748,7 +748,7 @@ void FUN_00444440(unsigned int param_1, unsigned int param_2) {
 void SetReportCastleScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 4;
-        DAT_0066600c = param_1;
+        CastleScoreGoal = param_1;
     } else {
         ReportFlags = (ReportFlags & 0xffffff00) | (ReportFlags & 0xcf);
     }
@@ -758,7 +758,7 @@ void SetReportCastleScoreGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportDrivingSchoolScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 6;
-        DAT_00666010 = param_1;
+        DrivingSchoolScoreGoal = param_1;
     } else {
         ReportFlags = (ReportFlags & 0xffffff00) | (ReportFlags & 0x3f);
     }
@@ -768,7 +768,7 @@ void SetReportDrivingSchoolScoreGoal(unsigned int param_1, unsigned int param_2)
 void SetReportLogFlumeScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 8;
-        DAT_00666014 = param_1;
+        LogFlumeScoreGoal = param_1;
     } else {
         ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xfc) << 8);
     }
@@ -778,7 +778,7 @@ void SetReportLogFlumeScoreGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportBoatingSchoolScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 10;
-        DAT_00666018 = param_1;
+        BoatingSchoolScoreGoal = param_1;
     } else {
         ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xf3) << 8);
     }
@@ -788,7 +788,7 @@ void SetReportBoatingSchoolScoreGoal(unsigned int param_1, unsigned int param_2)
 void SetReportJungleCruiseScoreGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= (param_2 & 3) << 12;
-        DAT_0066601c = param_1;
+        JungleCruiseScoreGoal = param_1;
     } else {
         ReportFlags = (ReportFlags & 0xffff00ff) | ((ReportFlags >> 8 & 0xcf) << 8);
     }
@@ -798,8 +798,8 @@ void SetReportJungleCruiseScoreGoal(unsigned int param_1, unsigned int param_2) 
 void SetReportType1Or3ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x4000;
-        DAT_00666020 = param_1;
-        DAT_00666024 = param_2;
+        ReportType1Or3ObjectCountGoal = param_1;
+        ReportType1Or3ObjectCountMax = param_2;
     } else {
         ReportFlags &= ~0x4000;
     }
@@ -809,8 +809,8 @@ void SetReportType1Or3ObjectCountGoal(unsigned int param_1, unsigned int param_2
 void SetReportType1Or3ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x8000;
-        DAT_00666028 = param_1;
-        DAT_0066602c = param_2;
+        ReportType1Or3ClassCountGoal = param_1;
+        ReportType1Or3ClassCountMax = param_2;
     } else {
         ReportFlags &= ~0x8000;
     }
@@ -820,8 +820,8 @@ void SetReportType1Or3ClassCountGoal(unsigned int param_1, unsigned int param_2)
 void SetReportLinkedObjectPercentGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x40000;
-        DAT_00666030 = param_1;
-        DAT_00666034 = param_2;
+        ReportLinkedObjectPercentGoal = param_1;
+        ReportLinkedObjectPercentMax = param_2;
     } else {
         ReportFlags &= 0xfffbffff;
     }
@@ -831,8 +831,8 @@ void SetReportLinkedObjectPercentGoal(unsigned int param_1, unsigned int param_2
 void SetReportType2ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x8000000;
-        DAT_00666070 = param_1;
-        DAT_00666074 = param_2;
+        ReportType2ObjectCountGoal = param_1;
+        ReportType2ObjectCountMax = param_2;
     } else {
         ReportFlags &= 0xf7ffffff;
     }
@@ -842,8 +842,8 @@ void SetReportType2ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportType2ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x10000000;
-        DAT_00666078 = param_1;
-        DAT_0066607c = param_2;
+        ReportType2ClassCountGoal = param_1;
+        ReportType2ClassCountMax = param_2;
     } else {
         ReportFlags &= 0xefffffff;
     }
@@ -864,8 +864,8 @@ void FUN_004446f0(unsigned int param_1, unsigned int param_2) {
 void SetReportFoodStallObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x10000;
-        DAT_00666040 = param_1;
-        DAT_00666044 = param_2;
+        ReportFoodStallObjectCountGoal = param_1;
+        ReportFoodStallObjectCountMax = param_2;
     } else {
         ReportFlags &= 0xfffeffff;
     }
@@ -875,8 +875,8 @@ void SetReportFoodStallObjectCountGoal(unsigned int param_1, unsigned int param_
 void SetReportFoodStallClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x20000;
-        DAT_00666048 = param_1;
-        DAT_0066604c = param_2;
+        ReportFoodStallClassCountGoal = param_1;
+        ReportFoodStallClassCountMax = param_2;
     } else {
         ReportFlags &= 0xfffdffff;
     }
@@ -886,8 +886,8 @@ void SetReportFoodStallClassCountGoal(unsigned int param_1, unsigned int param_2
 void SetReportType4ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x40000000;
-        DAT_00666088 = param_1;
-        DAT_0066608c = param_2;
+        ReportType4ObjectCountGoal = param_1;
+        ReportType4ObjectCountMax = param_2;
     } else {
         ReportFlags &= 0xbfffffff;
     }
@@ -897,8 +897,8 @@ void SetReportType4ObjectCountGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportType4ClassCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x80000000;
-        DAT_00666090 = param_1;
-        DAT_00666094 = param_2;
+        ReportType4ClassCountGoal = param_1;
+        ReportType4ClassCountMax = param_2;
     } else {
         ReportFlags &= 0x7fffffff;
     }
@@ -908,8 +908,8 @@ void SetReportType4ClassCountGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportVisitorCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x80000;
-        DAT_00666038 = param_1;
-        DAT_0066603c = param_2;
+        ReportVisitorCountGoal = param_1;
+        ReportVisitorCountMax = param_2;
     } else {
         ReportFlags &= 0xfff7ffff;
     }
@@ -919,8 +919,8 @@ void SetReportVisitorCountGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportVisitorHappinessGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x1000000;
-        DAT_00666050 = param_1;
-        DAT_00666054 = param_2;
+        ReportVisitorHappinessGoal = param_1;
+        ReportVisitorHappinessMax = param_2;
     } else {
         ReportFlags &= 0xfeffffff;
     }
@@ -930,8 +930,8 @@ void SetReportVisitorHappinessGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportVisitorFullnessGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x4000000;
-        DAT_00666050 = param_1;
-        DAT_00666054 = param_2;
+        ReportVisitorHappinessGoal = param_1;
+        ReportVisitorHappinessMax = param_2;
     } else {
         ReportFlags &= 0xfbffffff;
     }
@@ -941,8 +941,8 @@ void SetReportVisitorFullnessGoal(unsigned int param_1, unsigned int param_2) {
 void SetReportPowerSupplyGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x200000;
-        DAT_00666058 = param_1;
-        DAT_0066605c = param_2;
+        ReportPowerSupplyGoal = param_1;
+        ReportPowerSupplyMax = param_2;
     } else {
         ReportFlags &= 0xffdfffff;
     }
@@ -963,8 +963,8 @@ void FUN_00444930(unsigned int param_1, unsigned int param_2) {
 void SetReportMapTileCountGoal(unsigned int param_1, unsigned int param_2) {
     if ((param_1 | param_2) != 0) {
         ReportFlags |= 0x800000;
-        DAT_00666068 = param_1;
-        DAT_0066606c = param_2;
+        ReportMapTileCountGoal = param_1;
+        ReportMapTileCountMax = param_2;
     } else {
         ReportFlags &= 0xff7fffff;
     }
@@ -1346,14 +1346,14 @@ void InitAppraisalScreen(int pages) {
     icon->string = GetString(0xde);
     icon->flags |= 0x6002;
     icon->event_handler = (void *)AppraisalBackClicked;
-    DAT_006687c0 = AppraisalBackClicked;
+    CancelKeyHandler = AppraisalBackClicked;
     AppraisalNextIcon = InsertIcon(0x1b9, 0x1ae, 1, NextPageSprite);
     AppraisalNextIcon->string_id = 0xdc;
     AppraisalNextIcon->string = GetString(0xdc);
     AppraisalNextIcon->flags |= 0x2000;
     AppraisalNextIcon->flags |= 0x4002;
     AppraisalNextIcon->event_handler = (void *)AppraisalNextPageClicked;
-    DAT_006687bc = AppraisalNextPageClicked;
+    OkKeyHandler = AppraisalNextPageClicked;
     AppraisalPrevIcon = InsertIcon(6, 0x1ae, 1, PreviousPageSprite);
     AppraisalPrevIcon->string_id = 0xdd;
     AppraisalPrevIcon->string = GetString(0xdd);
@@ -1620,7 +1620,7 @@ s1:
         CountClassesOfType1Or3(&bf0_total, &bf0_count);
         if (ReportFlags & 0x4000) {
             total++;
-            ok = bf0_total >= DAT_00666020;
+            ok = bf0_total >= ReportType1Or3ObjectCountGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1641,15 +1641,15 @@ s1:
             recs[i].arg = 0;
             recs[i].bar = 1;
             recs[i].value = bf0_total;
-            recs[i].goal = DAT_00666020;
-            recs[i].max = DAT_00666024;
+            recs[i].goal = ReportType1Or3ObjectCountGoal;
+            recs[i].max = ReportType1Or3ObjectCountMax;
             recs[i].nids = 0;
             i++;
             y += 0x18;
         }
         if (ReportFlags & 0x8000) {
             total++;
-            ok = bf0_count >= DAT_00666028;
+            ok = bf0_count >= ReportType1Or3ClassCountGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1670,8 +1670,8 @@ s1:
             recs[i].arg = 0;
             recs[i].bar = 1;
             recs[i].value = bf0_count;
-            recs[i].goal = DAT_00666028;
-            recs[i].max = DAT_0066602c;
+            recs[i].goal = ReportType1Or3ClassCountGoal;
+            recs[i].max = ReportType1Or3ClassCountMax;
             recs[i].nids = 0;
             i++;
             y += 0x18;
@@ -1679,7 +1679,7 @@ s1:
         if (ReportFlags & 0x40000) {
             val = GetLinkedObjectPercent();
             total++;
-            ok = val >= DAT_00666030;
+            ok = val >= ReportLinkedObjectPercentGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1700,15 +1700,15 @@ s1:
             recs[i].arg = 0;
             recs[i].bar = 1;
             recs[i].value = val;
-            recs[i].goal = DAT_00666030;
-            recs[i].max = DAT_00666034;
+            recs[i].goal = ReportLinkedObjectPercentGoal;
+            recs[i].max = ReportLinkedObjectPercentMax;
             recs[i].nids = 0;
             i++;
             y += 0x18;
         }
         if (ReportFlags & 0x30) {
             total++;
-            ok = GetCastleScore() >= DAT_0066600c;
+            ok = GetCastleScore() >= CastleScoreGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1783,7 +1783,7 @@ s1:
         }
         if (ReportFlags & 0xc0) {
             total++;
-            ok = GetDrivingSchoolScore() >= DAT_00666010;
+            ok = GetDrivingSchoolScore() >= DrivingSchoolScoreGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1858,7 +1858,7 @@ s1:
         }
         if (ReportFlags & 0x300) {
             total++;
-            ok = GetLogFlumeScore() >= DAT_00666014;
+            ok = GetLogFlumeScore() >= LogFlumeScoreGoal;
             if (ok) {
                 pass++;
             } else {
@@ -1933,7 +1933,7 @@ s1:
         }
         if (ReportFlags & 0xc00) {
             total++;
-            ok = GetBoatingSchoolScore() >= DAT_00666018;
+            ok = GetBoatingSchoolScore() >= BoatingSchoolScoreGoal;
             if (ok) {
                 pass++;
             } else {
@@ -2008,7 +2008,7 @@ s1:
         }
         if (ReportFlags & 0x3000) {
             total++;
-            ok = GetJungleCruiseScore() >= DAT_0066601c;
+            ok = GetJungleCruiseScore() >= JungleCruiseScoreGoal;
             if (ok) {
                 pass++;
             } else {
@@ -2121,7 +2121,7 @@ s1:
             CountType2ClassesExceptRideParts(&c70_total, &c70_count);
             if (ReportFlags & 0x8000000) {
                 total++;
-                ok = c70_total >= DAT_00666070;
+                ok = c70_total >= ReportType2ObjectCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2142,15 +2142,15 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = c70_total;
-                recs[i].goal = DAT_00666070;
-                recs[i].max = DAT_00666074;
+                recs[i].goal = ReportType2ObjectCountGoal;
+                recs[i].max = ReportType2ObjectCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
             }
             if (ReportFlags & 0x10000000) {
                 total++;
-                ok = c70_count >= DAT_00666078;
+                ok = c70_count >= ReportType2ClassCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2172,8 +2172,8 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = c70_count;
-                recs[i].goal = DAT_00666078;
-                recs[i].max = DAT_0066607c;
+                recs[i].goal = ReportType2ClassCountGoal;
+                recs[i].max = ReportType2ClassCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -2218,7 +2218,7 @@ s1:
             CountClassesOfType4(&cd0_total, &cd0_count);
             if (ReportFlags & 0x40000000) {
                 total++;
-                ok = cd0_total >= DAT_00666088;
+                ok = cd0_total >= ReportType4ObjectCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2239,15 +2239,15 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = cd0_total;
-                recs[i].goal = DAT_00666088;
-                recs[i].max = DAT_0066608c;
+                recs[i].goal = ReportType4ObjectCountGoal;
+                recs[i].max = ReportType4ObjectCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
             }
             if (ReportFlags & 0x80000000) {
                 total++;
-                ok = cd0_count >= DAT_00666090;
+                ok = cd0_count >= ReportType4ClassCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2269,8 +2269,8 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = cd0_count;
-                recs[i].goal = DAT_00666090;
-                recs[i].max = DAT_00666094;
+                recs[i].goal = ReportType4ClassCountGoal;
+                recs[i].max = ReportType4ClassCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -2315,7 +2315,7 @@ s1:
             CountFoodStallClasses(&d20_total, &d20_count);
             if (ReportFlags & 0x10000) {
                 total++;
-                ok = d20_total >= DAT_00666040;
+                ok = d20_total >= ReportFoodStallObjectCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2336,15 +2336,15 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = d20_total;
-                recs[i].goal = DAT_00666040;
-                recs[i].max = DAT_00666044;
+                recs[i].goal = ReportFoodStallObjectCountGoal;
+                recs[i].max = ReportFoodStallObjectCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
             }
             if (ReportFlags & 0x20000) {
                 total++;
-                ok = d20_count >= DAT_00666048;
+                ok = d20_count >= ReportFoodStallClassCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2365,9 +2365,9 @@ s1:
                 APPR_ROW(ok, 0x133);
                 recs[i].arg = 0;
                 recs[i].bar = 1;
-                recs[i].goal = DAT_00666048;
+                recs[i].goal = ReportFoodStallClassCountGoal;
                 recs[i].value = d20_count;
-                recs[i].max = DAT_0066604c;
+                recs[i].max = ReportFoodStallClassCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -2413,7 +2413,7 @@ s1:
             SurveyBlokes(&d70_count, &d70_p2, &d70_p3);
             if (ReportFlags & 0x80000) {
                 total++;
-                ok = d70_count >= DAT_00666038;
+                ok = d70_count >= ReportVisitorCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2423,7 +2423,7 @@ s1:
             }
             if (ReportFlags & 0x1000000) {
                 total++;
-                ok = d70_p2 >= DAT_00666050;
+                ok = d70_p2 >= ReportVisitorHappinessGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2444,15 +2444,15 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = d70_p2;
-                recs[i].goal = DAT_00666050;
-                recs[i].max = DAT_00666054;
+                recs[i].goal = ReportVisitorHappinessGoal;
+                recs[i].max = ReportVisitorHappinessMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
             }
             if (ReportFlags & 0x4000000) {
                 total++;
-                ok = d70_p3 >= DAT_00666050;
+                ok = d70_p3 >= ReportVisitorHappinessGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2474,8 +2474,8 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = d70_p3;
-                recs[i].goal = DAT_00666050;
-                recs[i].max = DAT_00666054;
+                recs[i].goal = ReportVisitorHappinessGoal;
+                recs[i].max = ReportVisitorHappinessMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -2519,7 +2519,7 @@ s1:
             x += 0x30;
             if (ReportFlags & 0x200000) {
                 total++;
-                ok = MapStats.power_supply >= DAT_00666058;
+                ok = MapStats.power_supply >= ReportPowerSupplyGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2540,8 +2540,8 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = MapStats.power_supply;
-                recs[i].goal = DAT_00666058;
-                recs[i].max = DAT_0066605c;
+                recs[i].goal = ReportPowerSupplyGoal;
+                recs[i].max = ReportPowerSupplyMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -2586,7 +2586,7 @@ s1:
             if (ReportFlags & 0x800000) {
                 tiles = GetMapTileCount();
                 total++;
-                ok = tiles >= DAT_00666068;
+                ok = tiles >= ReportMapTileCountGoal;
                 if (ok) {
                     lpass++;
                 } else {
@@ -2608,8 +2608,8 @@ s1:
                 recs[i].arg = 0;
                 recs[i].bar = 1;
                 recs[i].value = tiles;
-                recs[i].goal = DAT_00666068;
-                recs[i].max = DAT_0066606c;
+                recs[i].goal = ReportMapTileCountGoal;
+                recs[i].max = ReportMapTileCountMax;
                 recs[i].nids = 0;
                 i++;
                 y += 0x18;
@@ -4942,7 +4942,7 @@ int CheckAppraisalDue(void) {
             }
             SetScriptStopped(1);
             lpConfig->field_30 = 1;
-            FUN_0048a750();
+            UnlockAllFreePlayObjects();
         } else {
             if (MapStats.appraisal_streak < 0) {
                 MapStats.appraisal_streak = MapStats.appraisal_streak - 1;

@@ -42,14 +42,14 @@ struct RideQueueEntry {
     /* 0x1e */ unsigned char pad_1e[0x2];
 };
 
-unsigned int FUN_00411e60(struct Queue *queue);
+unsigned int IsQueueFull(struct Queue *queue);
 unsigned int QueueHasNodes(struct Queue *queue);
-int FUN_00411ea0(struct Queue *queue);
+int IsQueueHeadAtFront(struct Queue *queue);
 void FreeAllQueueNodes(struct Queue *queue);
 void QueueUnlinkHead(struct Queue *queue);
 struct RideNode;
-void FUN_00412060(struct Queue *queue, struct RideNode **out);
-void FUN_004120a0(struct Queue *queue, unsigned int param_2, unsigned int param_3);
+void LeaveQueueHead(struct Queue *queue, struct RideNode **out);
+void StepQueueRiders(struct Queue *queue, unsigned int param_2, unsigned int param_3);
 void FreeIfNotNull(void *param_1);
 struct Bloke;
 void StartQueueTableBackward(struct QueueTable *param_1, struct Bloke *slot);
@@ -57,9 +57,9 @@ void StartQueueTableForward(struct QueueTable *param_1, struct Bloke *slot);
 struct QueueTable *GetBlokeQueueTable(struct Bloke *slot);
 void MoveBlokeAlongQueueTable(struct QueueTable *table, int x, int y, struct Bloke *bloke);
 void *FindQueueEntryAtTile(unsigned int a, unsigned int b);
-struct RideQueueEntry *FUN_004125a0(int x, int y);
+struct RideQueueEntry *FindRoadEntryAt(int x, int y);
 struct RideQueueEntry *FindQueueEntryById(unsigned short param_1);
-void FUN_00412680(int x, int y, int param_3, int param_4);
-void FUN_00411f20(struct Queue *queue, struct RideNode *mid);
+void PlaceRoadTiles(int x, int y, int param_3, int param_4);
+void JoinQueue(struct Queue *queue, struct RideNode *mid);
 
 extern unsigned short DAT_004b4c08[15][4];

@@ -8,7 +8,7 @@ void ResetEditState(void);
 void StartLevelGame(void);
 void UnloadMap(void);
 void SetMapLoaded(unsigned int param_1);
-void FUN_00458be0(void);
+void MarkLevelComplete(void);
 void FUN_00459520(void);
 void FUN_004597e0(int param0, const char *param1);
 void EndLevel(unsigned int a1);

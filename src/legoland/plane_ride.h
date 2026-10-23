@@ -22,8 +22,8 @@ struct PlaneRideNode {
 struct Element;
 
 struct PlaneRideNode;
-void FUN_0043d9f0(struct PlaneRideNode *node);
-void FUN_0043d990(struct PlaneRideNode *node);
+void ResetPlaneRide(struct PlaneRideNode *node);
+void StartPlaneRide(struct PlaneRideNode *node);
 void PlaneRideUpdate(struct Element *elem);
 
 struct Ride;

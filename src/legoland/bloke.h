@@ -230,23 +230,23 @@ struct BlokeSave {
 /* A per-state low-level AI handler (indexed by Bloke.field_e). */
 typedef void (*BlokeAction)(Bloke *bloke);
 
-/* Low-level AI handlers (PTR_FUN_004bd34c). */
+/* Low-level AI handlers (BlokeActionTable). */
 void LogBlokeRethinking(Bloke *bloke);
 void BlokeActionWait(Bloke *bloke);
-void FUN_00483ef0(Bloke *bloke);
-void FUN_00484090(Bloke *bloke);
-void FUN_00483d10(Bloke *bloke);
+void BlokeActionWalkPath(Bloke *bloke);
+void BlokeActionWalkPathStraight(Bloke *bloke);
+void BlokeActionRandomWalk(Bloke *bloke);
 void BlokeActionTurn(Bloke *bloke);
-void FUN_00484220(Bloke *bloke);
+void BlokeActionMoveToDestOnPath(Bloke *bloke);
 void BlokeActionMoveToDest(Bloke *bloke);
 void BlokeActionBounce(Bloke *bloke);
-void FUN_00484790(Bloke *bloke);
-void FUN_00483e20(Bloke *bloke);
-void FUN_00484470(Bloke *bloke);
-void FUN_00484520(Bloke *bloke);
+void BlokeActionPassThroughTile(Bloke *bloke);
+void BlokeActionWalkUntilPath(Bloke *bloke);
+void BlokeActionMoveToDestAvoiding(Bloke *bloke);
+void BlokeActionMoveToDestStayOnPath(Bloke *bloke);
 void BlokeActionWaitWhileHovered(Bloke *bloke);
-void FUN_00483d90(Bloke *bloke);
-void FUN_00484350(Bloke *bloke);
+void BlokeActionRandomWalkDelayed(Bloke *bloke);
+void BlokeActionMoveUntilPath(Bloke *bloke);
 
 struct ActionState;
 struct BNVPerson;

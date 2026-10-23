@@ -203,9 +203,9 @@ LEGO_EXPORT void ScanMouse(void) {
         }
     }
     if (MouseState.lZ <= -mouse_granularity) {
-        FUN_0046db40();
+        ScrollActiveIconRegionBack();
     } else if (MouseState.lZ >= mouse_granularity) {
-        FUN_0046dac0();
+        ScrollActiveIconRegionForward();
     }
 }
 
@@ -616,10 +616,10 @@ LEGO_EXPORT char GetInputChar(void) {
     result = 0;
     i = 0;
     do {
-        prev = (char)DAT_00668da8[i];
+        prev = (char)PrevKeyState[i];
         state = KeyboardState[CheatKeyMap[i].flags];
         prev = (prev >> 7) & 1;
-        DAT_00668da8[i] = state;
+        PrevKeyState[i] = state;
         if ((state & 0x80) != 0 && prev == 0) {
 #ifdef LEGOLAND_PORT
             alt = MiniwinCapsLock(); /* [library:input] Caps Lock from SDL3 */
@@ -665,14 +665,14 @@ char ReadCheatKey(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00474190
-void FUN_00474190(void) {
+void SaveInputState(void) {
     SaveGameWrite(&DAT_004baff8, 4);
     SaveGameWrite(&DAT_00668e34, 4);
     SaveGameWrite(&DAT_007fdd80, 16);
 }
 
 // FUNCTION: LEGOLAND 0x004741c0
-void FUN_004741c0(void) {
+void LoadInputState(void) {
     SaveGameRead(&DAT_004baff8, 4);
     SaveGameRead(&DAT_00668e34, 4);
     SaveGameRead(&DAT_007fdd80, 16);

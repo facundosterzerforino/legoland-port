@@ -50,7 +50,7 @@ LEGO_EXPORT void SetObjRectFlags(Element *editObj, struct Point *pos, unsigned s
 void ResetCursorBuildable(struct Cursor *cursor);
 void SetCursorBlocked(struct Cursor *cursor, int param);
 void PropagateCursorBlocked(struct Cursor *cursor);
-struct Cursor *FUN_0045f540(struct Cursor *cursor);
+struct Cursor *GetOrAddPathCursor(struct Cursor *cursor);
 void FUN_0045fad0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count);
 void FUN_0045fca0(struct VideoArg *surface, int dir, int px, int py, unsigned char *color, int count);
 LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int param_3);

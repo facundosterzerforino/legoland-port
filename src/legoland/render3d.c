@@ -28,45 +28,45 @@ LEGO_EXPORT void Render_SetViewport(struct tagRECT *viewport) {
 }
 
 // FUNCTION: LEGOLAND 0x00441830
-struct RideNode *FUN_00441830(void *param_1, short *param_2) {
-    struct RideNode *node = (struct RideNode *)DAT_0081c8cc;
+struct RideNode *FindRiderAt(void *param_1, short *param_2) {
+    struct RideNode *node = (struct RideNode *)RiderSearchCursor;
     while (node != NULL) {
         if (memcmp(&node->tile.id, param_2, sizeof(node->tile.id)) == 0) {
-            DAT_0081c8cc = node;
+            RiderSearchCursor = node;
             return node;
         }
         node = node->next;
     }
-    DAT_0081c8cc = NULL;
+    RiderSearchCursor = NULL;
     return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x00441870
-struct RideNode *FUN_00441870(struct Ride *param_1, short *param_2) {
-    DAT_0081c8cc = param_1->riders;
-    return FUN_00441830(param_1, param_2);
+struct RideNode *FindFirstRiderAt(struct Ride *param_1, short *param_2) {
+    RiderSearchCursor = param_1->riders;
+    return FindRiderAt(param_1, param_2);
 }
 
 // FUNCTION: LEGOLAND 0x00441890
-struct RideNode *FUN_00441890(void *param_1, short *param_2) {
-    struct RideNode *node = (struct RideNode *)DAT_0081c8cc;
+struct RideNode *FindNextRiderAt(void *param_1, short *param_2) {
+    struct RideNode *node = (struct RideNode *)RiderSearchCursor;
     if (node != NULL) {
-        DAT_0081c8cc = node->next;
-        return FUN_00441830(param_1, param_2);
+        RiderSearchCursor = node->next;
+        return FindRiderAt(param_1, param_2);
     }
     return NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004418c0
-struct RideNode *FUN_004418c0(int param_1, struct Ride *param_2, short *param_3) {
-    struct RideNode *node = FUN_00441870(param_2, param_3);
+struct RideNode *FindRiderAtIndex(int param_1, struct Ride *param_2, short *param_3) {
+    struct RideNode *node = FindFirstRiderAt(param_2, param_3);
     int i = 0;
     if (node != NULL) {
         for (; i < param_2->seats; i++) {
             if (i == param_1) {
                 return node;
             }
-            node = FUN_00441890(param_2, param_3);
+            node = FindNextRiderAt(param_2, param_3);
         }
     }
     return NULL;
@@ -126,7 +126,7 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct Ride *param_1, unsigned char *param_2,
     i = 0;
     if (param_4->count > 0) {
         do {
-            struct RideNode *node = (struct RideNode *)FUN_004418c0(i, param_1, (short *)param_2);
+            struct RideNode *node = (struct RideNode *)FindRiderAtIndex(i, param_1, (short *)param_2);
             if (node != NULL && (node->rider->flags & 0x80) != 0) {
                 Put3DBlokeOnRide(param_4, i, param_3, node->person, coords.x, coords.y);
             }
@@ -137,10 +137,10 @@ LEGO_EXPORT void Put3DBlokesOnRide(struct Ride *param_1, unsigned char *param_2,
 
 // FUNCTION: LEGOLAND 0x00441ad0
 LEGO_EXPORT void Put3DBlokesOnRide2(struct Ride *ride, void *obj) {
-    struct RideNode *node = (struct RideNode *)FUN_00441870(ride, (short *)obj);
+    struct RideNode *node = (struct RideNode *)FindFirstRiderAt(ride, (short *)obj);
     if (node != NULL) {
         while ((node->rider->flags & 0x80) != 0) {
-            node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
+            node = (struct RideNode *)FindNextRiderAt(ride, (short *)obj);
             if (node == NULL) {
                 return;
             }
@@ -149,12 +149,12 @@ LEGO_EXPORT void Put3DBlokesOnRide2(struct Ride *ride, void *obj) {
             if (node->person != 0) {
                 FUN_004401b0((struct Person *)node->person, (struct Bloke *)node->rider);
             }
-            node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
+            node = (struct RideNode *)FindNextRiderAt(ride, (short *)obj);
             if (node == NULL) {
                 return;
             }
             while ((node->rider->flags & 0x80) != 0) {
-                node = (struct RideNode *)FUN_00441890(ride, (short *)obj);
+                node = (struct RideNode *)FindNextRiderAt(ride, (short *)obj);
                 if (node == NULL) {
                     return;
                 }
@@ -293,10 +293,10 @@ LEGO_EXPORT void RenderUsingRin(struct RinData *param_1, int param_2, struct Rid
         struct RideNode *node;
         int *frame;
         if (param_1->data_table == NULL) {
-            node = (struct RideNode *)FUN_004418c0(sprite_id, param_3, (short *)param_4);
+            node = (struct RideNode *)FindRiderAtIndex(sprite_id, param_3, (short *)param_4);
         } else {
             remap = param_1->remap_table[sprite_id];
-            node = (struct RideNode *)FUN_004418c0(param_1->data_table[remap], param_3, (short *)param_4);
+            node = (struct RideNode *)FindRiderAtIndex(param_1->data_table[remap], param_3, (short *)param_4);
         }
         if (node != NULL && (node->rider->flags & 0x80) != 0) {
             IP_RenderBlokeIn3DNow((struct Bloke *)node->rider);
@@ -436,8 +436,8 @@ void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, str
                 if (u2 > 1.0) u2 = 1.0f;
                 if (v2 < FLOAT_004ab390) v2 = FLOAT_004ab390;
                 if (v2 > 1.0) v2 = 1.0f;
-                w = DAT_0081c0c0[idx1 * 2];
-                h = DAT_0081c0c0[idx1 * 2 + 1];
+                w = TextureSizes[idx1 * 2];
+                h = TextureSizes[idx1 * 2 + 1];
                 u0 = w * u0;
                 u1 = w * u1;
                 u2 = w * u2;
@@ -447,8 +447,8 @@ void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, str
                 if (u0 >= lo_x && u0 <= hi_x && u1 >= lo_x && u1 <= hi_x && u2 >= lo_x && u2 <= hi_x &&
                     v0 >= lo_y && v0 <= hi_y && v1 >= lo_y && v1 <= hi_y && sv2 >= lo_y && sv2 <= hi_y) {
                     /* texture size of the destination cell */
-                    w = DAT_0081c0c0[idx2 * 2];
-                    h = DAT_0081c0c0[idx2 * 2 + 1];
+                    w = TextureSizes[idx2 * 2];
+                    h = TextureSizes[idx2 * 2 + 1];
                     /* map from the source cell's rectangle to the destination cell's, normalized */
                     u0 = ((u0 - entry1->x) / entry1->field_4 * entry2->field_4 + entry2->x) / w;
                     v0 = ((v0 - entry1->y) / entry1->field_5 * entry2->field_5 + entry2->y) / h;
@@ -818,7 +818,7 @@ void FUN_00442980(const char *param_1, const char *param_2, const char *param_3,
 }
 
 // FUNCTION: LEGOLAND 0x00442c70
-unsigned int FUN_00442c70(void) {
+unsigned int FreeRender3DBuffers(void) {
     if (DAT_00655a38) {
         free(DAT_00655a38);
     }
@@ -942,14 +942,14 @@ LEGO_EXPORT int TMNegParity(float *param_1) {
 
 /* the render item pools (2048 and 20 nodes) */
 // GLOBAL: LEGOLAND 0x00630108
-struct RenderItemNode DAT_00630108[0x800];
+struct RenderItemNode RenderItemPool[0x800];
 
 // GLOBAL: LEGOLAND 0x00638218
-struct RenderItemNode DAT_00638218[20];
+struct RenderItemNode RenderItem2Pool[20];
 
 // FUNCTION: LEGOLAND 0x00442e90
 LEGO_EXPORT void RenderItems_New(void) {
-    DAT_0062feec[0] = DAT_00630108;
+    RenderItemPoolNext[0] = RenderItemPool;
     RenderItemCount = 0;
 }
 
@@ -996,8 +996,8 @@ LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct RideN
 
 // FUNCTION: LEGOLAND 0x00442f50
 struct RenderItemNode *AllocRenderItem(void) {
-    struct RenderItemNode *result = DAT_0062feec[0];
-    DAT_0062feec[0] = DAT_0062feec[0] + 1;
+    struct RenderItemNode *result = RenderItemPoolNext[0];
+    RenderItemPoolNext[0] = RenderItemPoolNext[0] + 1;
     RenderItemCount = RenderItemCount + 1;
     return result;
 }
@@ -1053,7 +1053,7 @@ LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1) {
 
 // FUNCTION: LEGOLAND 0x00443060
 LEGO_EXPORT void RenderItems2_New(void) {
-    DAT_0062fef0 = DAT_00638218;
+    RenderItem2PoolNext = RenderItem2Pool;
     RenderItem2Count = 0;
 }
 
@@ -1092,16 +1092,16 @@ LEGO_EXPORT void RenderItem2_Link(struct RenderItemNode **head, struct RenderIte
 
 // FUNCTION: LEGOLAND 0x004430f0
 LEGO_EXPORT void RenderItem2_AddItem(struct RenderItemNode **head, void *param_2, int key) {
-    struct RenderItemNode *item = FUN_00443120();
+    struct RenderItemNode *item = AllocRenderItem2();
     item->item = param_2;
     item->key = key;
     RenderItem2_Link(head, (struct RenderItemNode *)item, key);
 }
 
 // FUNCTION: LEGOLAND 0x00443120
-struct RenderItemNode *FUN_00443120(void) {
-    struct RenderItemNode *result = DAT_0062fef0;
-    DAT_0062fef0 = DAT_0062fef0 + 1;
+struct RenderItemNode *AllocRenderItem2(void) {
+    struct RenderItemNode *result = RenderItem2PoolNext;
+    RenderItem2PoolNext = RenderItem2PoolNext + 1;
     RenderItem2Count = RenderItem2Count + 1;
     return result;
 }

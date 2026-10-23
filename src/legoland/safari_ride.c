@@ -20,14 +20,14 @@
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004149c0
-void FUN_004149c0(struct SafariNode *param) {
+void AddSafariNode(struct SafariNode *param) {
     struct SafariNode *s = (struct SafariNode *)malloc(sizeof(struct SafariNode));
     if (s) {
         memset(s, 0, sizeof(struct SafariNode));
         s->tile_id = param->tile_id;
         s->next = SafariNodeList;
         SafariNodeList = s;
-        FUN_00414b10(s);
+        ResetSafariRide(s);
     }
 }
 
@@ -56,7 +56,7 @@ void RemoveSafariNode(struct SafariNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00414a60
-void FUN_00414a60(void) {
+void FreeAllSafariNodes(void) {
     while (SafariNodeList != NULL) {
         RemoveSafariNode(SafariNodeList);
     }
@@ -68,7 +68,7 @@ struct SafariKey {
 };
 
 // FUNCTION: LEGOLAND 0x00414a80
-void *FUN_00414a80(struct SafariKey *key) {
+void *FindSafariNode(struct SafariKey *key) {
     struct SafariNode *cur = SafariNodeList;
 
     if (cur != NULL) {
@@ -83,7 +83,7 @@ void *FUN_00414a80(struct SafariKey *key) {
 }
 
 // FUNCTION: LEGOLAND 0x00414ab0
-void FUN_00414ab0(struct SafariNode *a1) {
+void StartSafariRide(struct SafariNode *a1) {
     struct SampleSource src;
 
     src.type = 2;
@@ -98,7 +98,7 @@ void FUN_00414ab0(struct SafariNode *a1) {
 }
 
 // FUNCTION: LEGOLAND 0x00414b10
-void FUN_00414b10(struct SafariNode *node) {
+void ResetSafariRide(struct SafariNode *node) {
     struct SafariNode *a1 = (struct SafariNode *)node;
     struct SampleSource src;
 
@@ -122,10 +122,10 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     struct Point pos;
     char found = 0;
 
-    sn = FUN_00414a80((struct SafariKey *)tile);
+    sn = FindSafariNode((struct SafariKey *)tile);
     if (sn != NULL) {
         RenderItems_New();
-        DAT_004cbecc = NULL;
+        SafariRiderRenderList = NULL;
         pos = GetScreenCoordsForObject((TileId *)tile, ride);
         for (; node != NULL; node = node->next) {
             if (*tile == node->tile.id) {
@@ -159,14 +159,14 @@ void RenderSafari(Element *obj, unsigned int param_2, unsigned int param_3, unsi
                         person->screen.y = bloke->screen_y + (off2.y + off1.y) + pos.y;
                         AdjustBlokePosition(&person->screen);
                     }
-                    AddBlokeToRenderList(&DAT_004cbecc, node, node->person->field_20);
+                    AddBlokeToRenderList(&SafariRiderRenderList, node, node->person->field_20);
                 }
             }
         } else {
             LLSSetFrame(GetLLSForLayer(SafariLayer, 0), sn->frame);
             PrintSprite(GetSpriteForLayer(SafariLayer, 0), pos.x, pos.y, clip, 0);
         }
-        RenderBlokeList((struct RenderItemNode **)&DAT_004cbecc);
+        RenderBlokeList((struct RenderItemNode **)&SafariRiderRenderList);
     }
 }
 
@@ -194,19 +194,19 @@ void SafariRideLoad(struct Element *a1) {
     DAT_004cbef8 = SafariRunBNV;
     DAT_004cbefc = DAT_004cbf04[0];
     DAT_004cbf00 = SafariOffBNV;
-    DAT_004cbf08 = ZSafariSprite;
+    SafariRiderSprite = ZSafariSprite;
     Load_FXList(SAFARI_SFX, 1);
 }
 
 // FUNCTION: LEGOLAND 0x00414ea0
 void SafariRideUnload(struct Element *a1) {
     SafariRide = a1->ride;
-    FUN_00414a60();
+    FreeAllSafariNodes();
     Kill_FXList(SAFARI_SFX, 1);
     FreeBinV(DAT_004cbef8);
     FreeBinV(DAT_004cbefc);
     FreeBinV(DAT_004cbf00);
-    KillSprite(DAT_004cbf08);
+    KillSprite(SafariRiderSprite);
 }
 
 // FUNCTION: LEGOLAND 0x00414f00
@@ -219,7 +219,7 @@ void SafariSetEditMode(void) {
 
 // FUNCTION: LEGOLAND 0x00414f40
 void SafariRemoveObject(struct Element *obj, TileId key, struct Cursor *coords, unsigned int cursor) {
-    void *node = FUN_00414a80((struct SafariKey *)&key);
+    void *node = FindSafariNode((struct SafariKey *)&key);
     struct SampleSource src;
 
     if (node == 0) {
@@ -248,18 +248,18 @@ void SafariAddObject(struct Element *uid, struct SafariBasicObject *a1) {
     *(unsigned char *)&local = a1->field_0;
     *((unsigned char *)&local + 1) = a1->field_4;
     AddBasicObject(uid, (int *)a1);
-    FUN_004149c0((struct SafariNode *)&local);
+    AddSafariNode((struct SafariNode *)&local);
 }
 
 // FUNCTION: LEGOLAND 0x00414ff0
 struct RideSpriteInfo *GetSafariRideSpriteInfo(struct Element *p1, unsigned short arg2) {
     struct Ride *pB = p1->ride;
-    DAT_004cbed0.sprite = pB->layer;
-    DAT_004cbed0.x = pB->field_14;
-    DAT_004cbed0.y = pB->field_18;
-    DAT_004cbed0.id = arg2;
+    SafariSpriteInfo.sprite = pB->layer;
+    SafariSpriteInfo.x = pB->field_14;
+    SafariSpriteInfo.y = pB->field_18;
+    SafariSpriteInfo.id = arg2;
     pB->layer->flags |= 0x2000;
-    return &DAT_004cbed0;
+    return &SafariSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00415030
@@ -280,7 +280,7 @@ void SafariRideGetInterfaces(struct Element *name, struct Ride *interfaces) {
 }
 
 // FUNCTION: LEGOLAND 0x004150c0
-void FUN_004150c0(struct SafariNode *node) {
+void UpdateSafariNode(struct SafariNode *node) {
     struct SafariNode *s = (struct SafariNode *)node;
     struct RideNode *r = ((struct Ride *)SafariRide)->riders;
     unsigned int flags = s->field_14;
@@ -292,7 +292,7 @@ void FUN_004150c0(struct SafariNode *node) {
             if (GetAllBlokesOffRide((struct Ride *)SafariRide, s->tile_id) == 0) {
                 return;
             }
-            FUN_00414b10(node);
+            ResetSafariRide(node);
             return;
         }
         if (v >= 2) {
@@ -308,7 +308,7 @@ void FUN_004150c0(struct SafariNode *node) {
         if (flags & 0x4000) {
             if (cur == s->field_20) {
                 s->field_14 = flags & 0xffffbfff;
-                FUN_00414ab0((struct SafariNode *)s);
+                StartSafariRide((struct SafariNode *)s);
                 return;
             }
         } else if (cur != 0) {
@@ -324,8 +324,8 @@ void FUN_004150c0(struct SafariNode *node) {
     for (; r != NULL; r = r->next) {
         if (s->tile_id == r->tile.id && r->rider->field_35 == 1) {
             // STRING: LEGOLAND 0x004b4704
-            sprintf(DAT_004b4cac + 6, "%02d", r->rider->field_36 + 1);
-            SetBlokePositionFromBNV(SafariRunBNV, r->rider, DAT_004b4cac, s->frame, -1617787.0f, -1618006.0f, 0);
+            sprintf(SafariManboxName + 6, "%02d", r->rider->field_36 + 1);
+            SetBlokePositionFromBNV(SafariRunBNV, r->rider, SafariManboxName, s->frame, -1617787.0f, -1618006.0f, 0);
         }
     }
     *(short *)*ZSafariSprite->lls = (short)s->frame;
@@ -333,11 +333,11 @@ void FUN_004150c0(struct SafariNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00415200
-void FUN_00415200(void) {
+void UpdateSafariNodes(void) {
     struct SafariNode *current = SafariNodeList;
     if (current != NULL) {
         while (current != NULL) {
-            FUN_004150c0(current);
+            UpdateSafariNode(current);
             current = current->next;
         }
     }
@@ -359,13 +359,13 @@ void SafariRideUpdate(Element *obj) {
     int coords2[3]; /* BNV start position (leaving path) */
     char dir;
 
-    FUN_00415200();
+    UpdateSafariNodes();
     node = ride->riders;
     while (node != NULL) {
         next = node->next;
         bloke = node->rider;
         tile = &node->tile;
-        s = (struct SafariNode *)FUN_00414a80((struct SafariKey *)tile);
+        s = (struct SafariNode *)FindSafariNode((struct SafariKey *)tile);
         if (s == NULL) {
             return;
         }
@@ -392,13 +392,13 @@ void SafariRideUpdate(Element *obj) {
                 x = x + (lpConfig->view_y - (short)Get_YScroll());
                 coords[1] = (x - DAT_0082c670.y / 2 - sc.y) * 2;
                 coords[0] = (ox - DAT_0082c670.x / 2 - sc.x) * 2;
-                bloke->person->sprite = DAT_004cbf08;
+                bloke->person->sprite = SafariRiderSprite;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617787.0f, -1618006.0f);
                 node->rider->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(DAT_004b4cac + 6, "%02d", (FUN_00415760((struct RideNode *)node, &node->tile.id) >> 1) + 1);
-                node->rider->path = NewBNVPath(DAT_004cbefc, 1, DAT_004b4cac, -1617787.0f, -1618006.0f, coords);
+                sprintf(SafariManboxName + 6, "%02d", (GetSafariRiderIndex((struct RideNode *)node, &node->tile.id) >> 1) + 1);
+                node->rider->path = NewBNVPath(DAT_004cbefc, 1, SafariManboxName, -1617787.0f, -1618006.0f, coords);
                 UpdateBlokeFromBNVPath(bloke, node->rider->path);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 bloke->param_action++;
@@ -428,7 +428,7 @@ void SafariRideUpdate(Element *obj) {
                 bloke->param_action++;
                 s->field_4++;
                 if (s->field_4 == ((struct Ride *)SafariRide)->seats) {
-                    FUN_00414ab0((struct SafariNode *)s);
+                    StartSafariRide((struct SafariNode *)s);
                 }
                 break;
             case 7:
@@ -437,12 +437,12 @@ void SafariRideUpdate(Element *obj) {
                 coords2[1] = bloke->screen_y * 2;
                 BlokeWalkAnim(bloke);
                 BlokeSetFrame(bloke, 0);
-                bloke->person->sprite = DAT_004cbf08;
+                bloke->person->sprite = SafariRiderSprite;
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617787.0f, -1618006.0f);
                 bloke->field_35 = 2;
-                sprintf(DAT_004b4cac + 6, "%02d", (bloke->field_36 >> 1) + 1);
-                node->rider->path = NewBNVPath(DAT_004cbf00, 2, DAT_004b4cac, -1617787.0f, -1618006.0f, coords2);
+                sprintf(SafariManboxName + 6, "%02d", (bloke->field_36 >> 1) + 1);
+                node->rider->path = NewBNVPath(DAT_004cbf00, 2, SafariManboxName, -1617787.0f, -1618006.0f, coords2);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -499,7 +499,7 @@ struct SafariSlotData {
 };
 
 // FUNCTION: LEGOLAND 0x00415760
-int FUN_00415760(struct RideNode *node, unsigned short *key) {
+int GetSafariRiderIndex(struct RideNode *node, unsigned short *key) {
     struct RideNode *cur;
     int n = 0;
 
@@ -572,7 +572,7 @@ LEGO_EXPORT int LoadSafariRide(struct Element *arg) {
         car = list->person;
         if (car->field_30 != 0) {
             /* [port] the original reads DAT_004cbf04[field_30]; field_30 is 1 here, the global after it */
-            car->sprite = car->field_30 == 1 ? DAT_004cbf08 : DAT_004cbf04[car->field_30];
+            car->sprite = car->field_30 == 1 ? SafariRiderSprite : DAT_004cbf04[car->field_30];
         } else {
             car->sprite = NULL;
             list->person->field_30 = 0;

@@ -127,10 +127,10 @@ void FUN_00481e60(struct PathQuery *query, struct BestNode *box) {
 }
 
 // FUNCTION: LEGOLAND 0x00481ee0
-void FUN_00481ee0(void) {
+void ClearBestNodeVisited(void) {
     struct BestNode *node;
 
-    node = (struct BestNode *)DAT_0066b44c;
+    node = (struct BestNode *)BestNodeList;
     if (node) {
         while (node) {
             node->field_20 = node->field_20 & 0xfffffffe;
@@ -198,10 +198,10 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
     int lo_y;
     int hi_y;
 
-    DAT_004bcec0.x = goal->x >> 8;
-    DAT_004bcec0.y = goal->y >> 8;
-    start = FUN_004817d0((int *)pos);
-    end = FUN_004817d0((int *)goal);
+    PathGoalTile.x = goal->x >> 8;
+    PathGoalTile.y = goal->y >> 8;
+    start = FindBestNodeAtPixel((int *)pos);
+    end = FindBestNodeAtPixel((int *)goal);
     if (start == 0) {
         return -2;
     }
@@ -214,7 +214,7 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
         out->y += 0x80;
         return 2;
     }
-    FUN_00481ee0();
+    ClearBestNodeVisited();
     if (!FUN_00481f00(start, end, &prev)) {
         return -1;
     }
@@ -263,7 +263,7 @@ void ClearDirSearchGrid(void) {
     int i;
 
     for (i = 0; i < 1152; i = i + 1) {
-        DAT_00669258[i] = 0;
+        PathVisitedBits[i] = 0;
     }
 }
 
@@ -296,7 +296,7 @@ void FreeDirPathNodes(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00482240
-void FUN_00482240(int x, int y, struct DirNode *parent) {
+void AddPTPSearchNode(int x, int y, struct DirNode *parent) {
     struct MapElement *tile;
     struct DirNode *node;
     int word_index;
@@ -314,7 +314,7 @@ void FUN_00482240(int x, int y, struct DirNode *parent) {
     }
 
     word_index = (x >> 5) + y * 6;
-    if ((1u << (x & 0x1f)) & DAT_00669258[word_index]) {
+    if ((1u << (x & 0x1f)) & PathVisitedBits[word_index]) {
         return;
     }
 
@@ -329,11 +329,11 @@ void FUN_00482240(int x, int y, struct DirNode *parent) {
     node->x = x;
     node->y = y;
     DAT_00669250++;
-    DAT_00669258[word_index] |= 1u << (x & 0x1f);
+    PathVisitedBits[word_index] |= 1u << (x & 0x1f);
 }
 
 // FUNCTION: LEGOLAND 0x00482300
-struct DirNode *FUN_00482300(unsigned int x, unsigned int y) {
+struct DirNode *AllocDirNode(unsigned int x, unsigned int y) {
     struct DirNode *node;
 
     node = malloc(sizeof(struct DirNode));
@@ -411,14 +411,14 @@ int FUN_00482430(void) {
     switch (dir) {
     case 0:
         if (p2 != 0) {
-            FUN_00482300(p2->x, p2->y);
+            AllocDirNode(p2->x, p2->y);
         }
         return p4 == 0;
     case 1:
-        FUN_00482300(p3->x, p3->y);
+        AllocDirNode(p3->x, p3->y);
         return p4 == 0;
     case 2:
-        FUN_00482300(p4->x, p4->y);
+        AllocDirNode(p4->x, p4->y);
         break;
     }
     return p4 == 0;
@@ -444,7 +444,7 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
 
     DAT_00669250 = 0;
     DAT_0066b454 = 0;
-    FUN_00482240(start_x, start_y, 0);
+    AddPTPSearchNode(start_x, start_y, 0);
 
     while (DAT_00669250 != 0) {
         wave = DAT_00669250;
@@ -466,10 +466,10 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
                 FreeDirPathNodes();
                 return 1;
             }
-            FUN_00482240(node->x, node->y - 1, node);
-            FUN_00482240(node->x + 1, node->y, node);
-            FUN_00482240(node->x, node->y + 1, node);
-            FUN_00482240(node->x - 1, node->y, node);
+            AddPTPSearchNode(node->x, node->y - 1, node);
+            AddPTPSearchNode(node->x + 1, node->y, node);
+            AddPTPSearchNode(node->x, node->y + 1, node);
+            AddPTPSearchNode(node->x - 1, node->y, node);
             node = node->next;
         }
     }
@@ -480,7 +480,7 @@ LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct
 }
 
 // FUNCTION: LEGOLAND 0x00482620
-void FUN_00482620(int x, int y, struct DirNode *parent) {
+void AddWorkerSearchNode(int x, int y, struct DirNode *parent) {
     struct MapElement *tile;
     struct DirNode *node;
     int word_index;
@@ -500,7 +500,7 @@ void FUN_00482620(int x, int y, struct DirNode *parent) {
     }
 
     word_index = (x >> 5) + y * 6;
-    if ((1u << (x & 0x1f)) & DAT_00669258[word_index]) {
+    if ((1u << (x & 0x1f)) & PathVisitedBits[word_index]) {
         return;
     }
 
@@ -511,11 +511,11 @@ void FUN_00482620(int x, int y, struct DirNode *parent) {
     node->x = x;
     node->y = y;
     DAT_00669250++;
-    DAT_00669258[word_index] |= 1u << (x & 0x1f);
+    PathVisitedBits[word_index] |= 1u << (x & 0x1f);
 }
 
 // FUNCTION: LEGOLAND 0x00482710
-int FUN_00482710(int *a, int *b, int *out) {
+int WorkerSuggestNextMove(int *a, int *b, int *out) {
     int start_x;
     int start_y;
     int goal_x;
@@ -534,7 +534,7 @@ int FUN_00482710(int *a, int *b, int *out) {
 
     DAT_00669250 = 0;
     DAT_0066b454 = 0;
-    FUN_00482620(start_x, start_y, 0);
+    AddWorkerSearchNode(start_x, start_y, 0);
 
     while (DAT_00669250 != 0) {
         wave = DAT_00669250;
@@ -556,10 +556,10 @@ int FUN_00482710(int *a, int *b, int *out) {
                 FreeDirPathNodes();
                 return 1;
             }
-            FUN_00482620(node->x, node->y - 1, node);
-            FUN_00482620(node->x + 1, node->y, node);
-            FUN_00482620(node->x, node->y + 1, node);
-            FUN_00482620(node->x - 1, node->y, node);
+            AddWorkerSearchNode(node->x, node->y - 1, node);
+            AddWorkerSearchNode(node->x + 1, node->y, node);
+            AddWorkerSearchNode(node->x, node->y + 1, node);
+            AddWorkerSearchNode(node->x - 1, node->y, node);
             node = node->next;
         }
     }
@@ -575,8 +575,8 @@ unsigned int SaveBestNodeList(void) {
     struct BestNode *node;
 
     count = 0;
-    if (DAT_0066b44c != NULL) {
-        node = (struct BestNode *)DAT_0066b44c;
+    if (BestNodeList != NULL) {
+        node = (struct BestNode *)BestNodeList;
         while (node != NULL) {
             count++;
             node = node->next;
@@ -587,7 +587,7 @@ unsigned int SaveBestNodeList(void) {
         return 0;
     }
 
-    node = (struct BestNode *)DAT_0066b44c;
+    node = (struct BestNode *)BestNodeList;
     while (node != NULL) {
         if (SaveGameWrite(&node->x_min, 20) == 0) {
             return 0;
@@ -607,10 +607,10 @@ unsigned int SaveBestNodeList(void) {
 // FUNCTION: LEGOLAND 0x004828f0
 void FreeBestNodeList(void) {
     struct BestNode *next;
-    while (DAT_0066b44c != 0) {
-        next = ((struct BestNode *)DAT_0066b44c)->next;
-        free(DAT_0066b44c);
-        DAT_0066b44c = next;
+    while (BestNodeList != 0) {
+        next = ((struct BestNode *)BestNodeList)->next;
+        free(BestNodeList);
+        BestNodeList = next;
     }
     ClearEntrance1();
 }
@@ -628,8 +628,8 @@ int LoadBestNodeList(void) {
 
     while (count-- != 0) {
         node = malloc(sizeof(struct BestNode));
-        node->next = DAT_0066b44c;
-        DAT_0066b44c = node;
+        node->next = BestNodeList;
+        BestNodeList = node;
         if (SaveGameRead(&node->x_min, 0x14) == 0) {
             return 0;
         }
@@ -752,12 +752,12 @@ void MarkConnectedNodes(struct BestNode *node) {
 #endif
 
 // FUNCTION: LEGOLAND 0x00482a40
-void FUN_00482a40(struct Point *pos) {
+void UpdateConnectedNodes(struct Point *pos) {
     struct BestNode *node;
     struct BestNode *found;
 
-    if (DAT_0066b44c != NULL) {
-        node = (struct BestNode *)DAT_0066b44c;
+    if (BestNodeList != NULL) {
+        node = (struct BestNode *)BestNodeList;
         while (node != NULL) {
             node->field_20 &= 0xfffffffd;
             node = node->next;

@@ -56,7 +56,7 @@ done:
 }
 
 // FUNCTION: LEGOLAND 0x00489ee0
-void FUN_00489ee0(void) {
+void ClearObjInstanceTable(void) {
     struct ObjTableEntry *entry;
 
     for (entry = ObjInstanceTable; entry < ObjInstanceTable + 128; entry++) {
@@ -65,7 +65,7 @@ void FUN_00489ee0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00489f00
-int FUN_00489f00(const struct Point *pos) {
+int AddObjInstance(const struct Point *pos) {
     int index;
     struct ObjTableEntry *entry;
 
@@ -82,7 +82,7 @@ int FUN_00489f00(const struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00489f50
-int FUN_00489f50(const struct Point *pos) {
+int RemoveObjInstance(const struct Point *pos) {
     int index;
     unsigned short target;
     struct ObjTableEntry *entry;
@@ -100,7 +100,7 @@ int FUN_00489f50(const struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00489f90
-int FUN_00489f90(const struct Point *pos) {
+int IncObjInstanceCount(const struct Point *pos) {
     int index;
     unsigned short target;
     struct ObjTableEntry *entry;
@@ -118,7 +118,7 @@ int FUN_00489f90(const struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00489fd0
-unsigned short FUN_00489fd0(const struct Point *pos) {
+unsigned short GetObjInstanceCount(const struct Point *pos) {
     int index;
     unsigned short target;
     struct ObjTableEntry *entry;

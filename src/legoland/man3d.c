@@ -568,9 +568,9 @@ LEGO_EXPORT void Render3DPerson(struct Person *person) {
              * around this; the port's float math is SSE's, which it doesn't affect */
             FUN_00440a30(person);
 #else
-            __asm { fstcw word ptr [DAT_00638358] }
+            __asm { fstcw word ptr [SavedFPUControlWord] }
             __asm {fldcw word ptr[DAT_004b7abc]} FUN_00440a30(person);
-            __asm { fldcw word ptr [DAT_00638358] }
+            __asm { fldcw word ptr [SavedFPUControlWord] }
 #endif
             if (DAT_007feb14 != 0) {
                 if (DAT_00668954 != 0 && person->bloke == GetWorkerOnMouse()) {
@@ -877,7 +877,7 @@ LEGO_EXPORT void UnInitMan(void) {
     if (TracyWalkMesh != 0) {
         FreeMesh(TracyWalkMesh);
     }
-    FUN_00442c70();
+    FreeRender3DBuffers();
     FreeCursorCache();
     FreeTextureNodes();
     FreeZBuffer();

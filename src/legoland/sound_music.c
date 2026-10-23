@@ -469,7 +469,7 @@ LEGO_EXPORT int KillSoundSystem(void) {
 int CalcDistanceVolume(int param_1) {
     int result;
 
-    result = DAT_007988a0 - param_1 / 0x3c;
+    result = SfxDSVolume - param_1 / 0x3c;
     if (result < -3000 || result > 0) {
         result = -10000;
     }
@@ -533,7 +533,7 @@ int ApplySampleVolume(struct Sample *sample) {
     if (sample->active == 0) {
         return 0;
     }
-    sample->buffer->vtable->method_0x3c(sample->buffer, DAT_007988a0); /* Apply: same vtable slot, return ignored */
+    sample->buffer->vtable->method_0x3c(sample->buffer, SfxDSVolume); /* Apply: same vtable slot, return ignored */
     return 1;
 }
 

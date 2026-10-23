@@ -24,15 +24,15 @@ int FUN_00477400(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00477410
-void FUN_00477410(void) {
-    if (DAT_00668fb8 != NULL) {
-        free(DAT_00668fb8);
-        DAT_00668fb8 = NULL;
+void FreeMoviePool(void) {
+    if (ActiveMoviePool != NULL) {
+        free(ActiveMoviePool);
+        ActiveMoviePool = NULL;
     }
 }
 
 // FUNCTION: LEGOLAND 0x00477440
-struct MoviePoolElem *FUN_00477440(void) {
+struct MoviePoolElem *AllocMoviePoolElem(void) {
     INT_PTR var6; /* how far realloc moved the pool */
     struct MoviePoolElem *var5;
     struct MoviePool *var4;
@@ -40,34 +40,34 @@ struct MoviePoolElem *FUN_00477440(void) {
     struct MoviePoolElem *var2;
     int var1;
 
-    if (DAT_00668fb8 == NULL) {
+    if (ActiveMoviePool == NULL) {
         return NULL;
     }
-    if (DAT_00668fb8->array == NULL) {
-        var4 = (struct MoviePool *)realloc(DAT_00668fb8, (DAT_00668fb8->count + 0x400) * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
+    if (ActiveMoviePool->array == NULL) {
+        var4 = (struct MoviePool *)realloc(ActiveMoviePool, (ActiveMoviePool->count + 0x400) * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
         if (var4 == NULL) {
             return NULL;
         }
-        var6 = (INT_PTR)var4 - (INT_PTR)DAT_00668fb8;
+        var6 = (INT_PTR)var4 - (INT_PTR)ActiveMoviePool;
         var4->free_elem = (struct MoviePoolElem *)((INT_PTR)var4->free_elem + var6);
         var5 = var4->free_elem;
         while (var5->next != NULL) {
             var5->next = (struct MoviePoolElem *)((INT_PTR)var5->next + var6);
             var5 = var5->next;
         }
-        DAT_00668fb8 = var4;
-        var2 = (struct MoviePoolElem *)((char *)DAT_00668fb8 + DAT_00668fb8->count * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
+        ActiveMoviePool = var4;
+        var2 = (struct MoviePoolElem *)((char *)ActiveMoviePool + ActiveMoviePool->count * sizeof(struct MoviePoolElem) + sizeof(struct MoviePool));
         memset(var2, 0, 0x400 * sizeof(struct MoviePoolElem));
-        DAT_00668fb8->array = var2;
+        ActiveMoviePool->array = var2;
         for (var1 = 0; var1 < 0x3ff; var1++) {
-            DAT_00668fb8->array[var1].next = &DAT_00668fb8->array[var1 + 1];
+            ActiveMoviePool->array[var1].next = &ActiveMoviePool->array[var1 + 1];
         }
     }
-    var3 = DAT_00668fb8->free_elem;
-    DAT_00668fb8->free_elem = DAT_00668fb8->array;
-    DAT_00668fb8->array = DAT_00668fb8->array->next;
-    DAT_00668fb8->free_elem->next = var3;
-    return DAT_00668fb8->free_elem;
+    var3 = ActiveMoviePool->free_elem;
+    ActiveMoviePool->free_elem = ActiveMoviePool->array;
+    ActiveMoviePool->array = ActiveMoviePool->array->next;
+    ActiveMoviePool->free_elem->next = var3;
+    return ActiveMoviePool->free_elem;
 }
 
 // FUNCTION: LEGOLAND 0x004775b0
@@ -85,7 +85,7 @@ void FUN_004775f0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00477600
-int FUN_00477600(unsigned int *total_out, unsigned int *count_out) {
+int GetMoviePoolStats(unsigned int *total_out, unsigned int *count_out) {
     unsigned int var3;
     unsigned int var2;
     struct MoviePoolElem *var1;
@@ -95,8 +95,8 @@ int FUN_00477600(unsigned int *total_out, unsigned int *count_out) {
     if (total_out == NULL || count_out == NULL) {
         return 0;
     }
-    if (DAT_00668fb8 != NULL) {
-        var1 = DAT_00668fb8->free_elem;
+    if (ActiveMoviePool != NULL) {
+        var1 = ActiveMoviePool->free_elem;
         while (var1 != NULL) {
             var3 = var3 + var1->field_8;
             var2 = var2 + 1;

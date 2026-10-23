@@ -19,7 +19,7 @@
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x004700c0
-unsigned int FUN_004700c0(void *object) {
+unsigned int IsBlokeHovered(void *object) {
     if (DAT_007fdf9c == 0x306) {
         if (DAT_007fdf8c == object) {
             return 1;
@@ -216,8 +216,8 @@ LEGO_EXPORT void CheckWorkerOnMouseStatus(int a) {
     WorkOrder *order;
     MapElement *elem;
 
-    if (!(DAT_00813a60 & 2) && a == 0) {
-        if (DAT_00813a50 & 2) {
+    if (!(MapRightClickFlags & 2) && a == 0) {
+        if (MapLeftClickFlags & 2) {
             DAT_00667c48 = 1;
             DAT_00668954 = 0;
             for (;;) {
@@ -343,7 +343,7 @@ LEGO_EXPORT void ResetMoveAWorkerStruct(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00470950
-void FUN_00470950(void *a, void *b) {
+void CreatePopUpInfoButtons(void *a, void *b) {
     unsigned int temp_val, temp_val2;
 
     if (!PUOKSprite) {

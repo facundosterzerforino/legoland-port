@@ -203,14 +203,14 @@ LEGO_EXPORT void InitPopUpInfo(void) {
     // STRING: LEGOLAND 0x004baa7c
     PuCornerMaskIcon = LoadSpriteIcon("PU_CornerMask.lls", 4, 0, 0, 0x2c3);
     PuCornerMaskIcon->flags |= 0x400;
-    DAT_007fdfcc = InsertIcon(0, 0, 0x2c3, PuDeleteObjectSprite);
-    DAT_007fdfcc->string_id = 0xa1;
-    DAT_007fdfcc->string = GetString(0xa1);
-    DAT_007fdfcc->flags |= 0x2000;
-    DAT_007fdfcc->flags |= 0x4002;
-    DAT_007fdfcc->flags |= 0x400;
-    DAT_007fdfcc->event_handler = (void *)DeleteWorkOrderEventHandler;
-    FUN_00470950(PopUpOkEventHandler, CBCloseEventHandler);
+    PopUpDeleteIcon = InsertIcon(0, 0, 0x2c3, PuDeleteObjectSprite);
+    PopUpDeleteIcon->string_id = 0xa1;
+    PopUpDeleteIcon->string = GetString(0xa1);
+    PopUpDeleteIcon->flags |= 0x2000;
+    PopUpDeleteIcon->flags |= 0x4002;
+    PopUpDeleteIcon->flags |= 0x400;
+    PopUpDeleteIcon->event_handler = (void *)DeleteWorkOrderEventHandler;
+    CreatePopUpInfoButtons(PopUpOkEventHandler, CBCloseEventHandler);
 }
 
 // FUNCTION: LEGOLAND 0x00471170
@@ -352,7 +352,7 @@ void DisablePopUpIconHandlers(void) {
     DeleteObjectIcon->event_handler = NULL;
     AddGardenerIcon->event_handler = NULL;
     AddMechanicsIcon->event_handler = NULL;
-    DAT_007fdfcc->event_handler = NULL;
+    PopUpDeleteIcon->event_handler = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004714a0
@@ -361,7 +361,7 @@ void EnablePopUpIconHandlers(void) {
     ClosePopUpIcon->event_handler = (void *)ClosePopUpEventHandler;
     AddGardenerIcon->event_handler = (void *)AddGardenerEventHandler;
     AddMechanicsIcon->event_handler = (void *)AddMechanicsEventHandler;
-    DAT_007fdfcc->event_handler = (void *)DeleteWorkOrderEventHandler;
+    PopUpDeleteIcon->event_handler = (void *)DeleteWorkOrderEventHandler;
 }
 
 // FUNCTION: LEGOLAND 0x004714e0
@@ -373,7 +373,7 @@ void RemoveAllNewObjects(void) {
 
 // FUNCTION: LEGOLAND 0x00471510
 LEGO_EXPORT void ResetInfoStruct(void) {
-    DAT_007fdf7c = 0;
+    PopUpInfoRide = 0;
     DAT_007fdf8c = 0;
     DAT_007fdf84 = 0;
     DAT_007fdf9c = 0;
@@ -410,7 +410,7 @@ LEGO_EXPORT void DisableInfoPopUPIcons(void) {
     CBCloseIcon->flags |= 0x400;
     AddGardenerIcon->flags |= 0x400;
     AddMechanicsIcon->flags |= 0x400;
-    DAT_007fdfcc->flags |= 0x400;
+    PopUpDeleteIcon->flags |= 0x400;
     NextPopUpIcon->flags |= 0x400;
     PrevPopUpIcon->flags |= 0x400;
 }
@@ -423,7 +423,7 @@ void SetPopUpIconSprites(void) {
     SetIconSprite((struct IconNode *)ClosePopUpIcon, PuClosePopUpSprite);
     SetIconSprite((struct IconNode *)AddGardenerIcon, PuAddGardenerSprite);
     SetIconSprite((struct IconNode *)AddMechanicsIcon, PuAddMechanicsSprite);
-    SetIconSprite((struct IconNode *)DAT_007fdfcc, PuDeleteObjectSprite);
+    SetIconSprite((struct IconNode *)PopUpDeleteIcon, PuDeleteObjectSprite);
 }
 
 // FUNCTION: LEGOLAND 0x004716a0
@@ -580,9 +580,9 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
             return;
         }
         if (((struct Element *)t.ptr != PathControlHandle) && ((struct Element *)t.ptr != Entrance1Handle)) {
-            DAT_007fdf7c = ((struct Element *)t.ptr)->ride;
+            PopUpInfoRide = ((struct Element *)t.ptr)->ride;
             DAT_007fdf84 = iVar4;
-            if (DAT_007fdf7c->element == PottingShedHandle) {
+            if (PopUpInfoRide->element == PottingShedHandle) {
                 DAT_007fdfa0 = 0;
                 DAT_007fdf9c = 10;
                 /* [port] the decomp builds the hut's {x, y} in param_4 and (&param_4)[1] (param_5's stack slot,
@@ -596,7 +596,7 @@ LEGO_EXPORT void PopUpInfoSetUp(struct HoverInfo t, unsigned int param_4, unsign
                 GenerateGardener(hut, 1);
                 return;
             }
-            if (DAT_007fdf7c->element == MechanicsHutHandle) {
+            if (PopUpInfoRide->element == MechanicsHutHandle) {
                 DAT_007fdfa0 = 0;
                 DAT_007fdf9c = 0x14;
                 hut[0] = iVar4[4]; /* [port] as for the gardener */
@@ -966,7 +966,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     memset(buf_a + 1, 0, 255);
     buf_b[0] = 0;
     memset(buf_b + 1, 0, 255);
-    ride = (struct Ride *)DAT_007fdf7c;
+    ride = (struct Ride *)PopUpInfoRide;
     bloke = (struct Bloke *)DAT_007fdf8c;
     GetNearestColour(0xda, 0xc6, 0x96);
     DAT_0066895c = 0;
@@ -981,7 +981,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     if (DAT_007fdfa0 == 0) {
         return;
     }
-    if (DAT_00813a60 & 2) {
+    if (MapRightClickFlags & 2) {
         ResetInfoStruct();
         return;
     }
@@ -1047,7 +1047,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         DAT_0066895c = 1;
         break;
     case 0x10b:
-        info = DAT_007fdf80;
+        info = PopUpInfoData;
         if (info->field_18 != 0 && info->field_1c->field_60 >= 0x6b) {
             DAT_007fdec0.type = 0x104;
             PopUpInfoSetUp(DAT_007fdec0, PopUpInfoX, PopUpInfoY);
@@ -1058,7 +1058,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         show_close = 1;
         break;
     case 0x10c:
-        info = DAT_007fdf80;
+        info = PopUpInfoData;
         if (info->field_18 != 0 && info->field_1c->field_60 >= 0x6b) {
             DAT_007fdec0.type = 0x104;
             PopUpInfoSetUp(DAT_007fdec0, PopUpInfoX, PopUpInfoY);
@@ -1159,7 +1159,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
             if (entry_index >= 0x100) {
                 return;
             }
-            frac = (float)BuildObjArray[entry_index].elapsed / GetBuildTime(DAT_007fdf7c);
+            frac = (float)BuildObjArray[entry_index].elapsed / GetBuildTime(PopUpInfoRide);
             if (frac == 1.0f) {
                 DAT_007fdec0.type = 0x103;
                 PopUpInfoSetUp(DAT_007fdec0, PopUpInfoX, PopUpInfoY);
@@ -1183,10 +1183,10 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
     ClosePopUpIcon->y = icon_y;
     last_x = ClosePopUpIcon->x;
     if (show_close != 0) {
-        DAT_007fdfcc->flags = DAT_007fdfcc->flags & 0xfffffbff;
-        DAT_007fdfcc->x = icon_x - 0x4e;
-        DAT_007fdfcc->y = icon_y;
-        last_x = DAT_007fdfcc->x;
+        PopUpDeleteIcon->flags = PopUpDeleteIcon->flags & 0xfffffbff;
+        PopUpDeleteIcon->x = icon_x - 0x4e;
+        PopUpDeleteIcon->y = icon_y;
+        last_x = PopUpDeleteIcon->x;
     }
     if (can_delete != 0) {
         if (FUN_004723f0() != 0) {
@@ -1260,7 +1260,7 @@ unsigned int TryClosePopUp(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00473160
-unsigned int FUN_00473160(void) {
+unsigned int HandlePopUpOkKey(void) {
     unsigned int state = DAT_007fdfa0;
 
     if (state == 1) {
@@ -1411,13 +1411,13 @@ unsigned char DeleteWorkOrderEventHandler(void *param_1, unsigned char param_2) 
     SetIconSprite(param_1, PuDeleteObjectOnSprite);
     if ((param_2 & 2) != 0) {
         if (DAT_007fdf9c == 0x10b) {
-            SetObjRectFlags(DAT_007fdf80->field_4, (struct Point *)&DAT_007fdf80->field_8, 0);
-            RemoveGardenersWorkOrderAt(DAT_007fdf80->field_8, DAT_007fdf80->field_c);
+            SetObjRectFlags(PopUpInfoData->field_4, (struct Point *)&PopUpInfoData->field_8, 0);
+            RemoveGardenersWorkOrderAt(PopUpInfoData->field_8, PopUpInfoData->field_c);
             ResetInfoStruct();
             return 1;
         }
-        SetObjRectFlags(DAT_007fdf80->field_4, (struct Point *)&DAT_007fdf80->field_8, 0);
-        RemoveMechanicsWorkOrderAt(DAT_007fdf80->field_8, DAT_007fdf80->field_c);
+        SetObjRectFlags(PopUpInfoData->field_4, (struct Point *)&PopUpInfoData->field_8, 0);
+        RemoveMechanicsWorkOrderAt(PopUpInfoData->field_8, PopUpInfoData->field_c);
         ResetInfoStruct();
     }
     return 1;
@@ -1449,7 +1449,7 @@ unsigned int TryPlayAdviceSpeech(unsigned int param) {
 
 // FUNCTION: LEGOLAND 0x00473640
 unsigned int PlayCantBuildAdvice(unsigned int param_1) {
-    return TryPlayAdviceSpeech(DAT_004ba9ac[param_1]);
+    return TryPlayAdviceSpeech(AdviceSpeechIds[param_1]);
 }
 
 // FUNCTION: LEGOLAND 0x00473660
@@ -1464,33 +1464,33 @@ void UpdateAdvicePriority(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00473680
-void FUN_00473680(int param_1, int param_2, char *param_3, void *param_4, void *param_5) {
-    strcpy(DAT_00668968, param_3);
-    DAT_007fe010 = param_1;
-    DAT_007fe014 = param_2;
-    FUN_00470950(param_4, param_5);
-    DAT_00668d68 = 1;
+void ShowPopUpMessage(int param_1, int param_2, char *param_3, void *param_4, void *param_5) {
+    strcpy(PopUpMessageText, param_3);
+    PopUpMessageX = param_1;
+    PopUpMessageY = param_2;
+    CreatePopUpInfoButtons(param_4, param_5);
+    PopUpMessageShown = 1;
 }
 
 // FUNCTION: LEGOLAND 0x004736e0
-void FUN_004736e0(void) {
+void HidePopUpMessage(void) {
     KillPUOKAndCBSprites();
-    DAT_00668d68 = 0;
+    PopUpMessageShown = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004736f0
-void FUN_004736f0(void) {
+void DrawPopUpMessage(void) {
     int x;
     int y;
     int i;
     RECT rc;
     RECT hit;
 
-    if (DAT_00668d68 != 0) {
+    if (PopUpMessageShown != 0) {
         struct PrintCtx ctx = {1};
 
-        y = DAT_007fe014;
-        x = DAT_007fe010;
+        y = PopUpMessageY;
+        x = PopUpMessageX;
         /* the bar: left end, DAT_00668964 centre pieces, right end */
         PrintSprite(CBBGLeftSprite, x, y, 0, (int *)&ctx);
         x += 0x7a;
@@ -1502,15 +1502,15 @@ void FUN_004736f0(void) {
         x += 0x4e;
         PopUpInfoOkIcon->flags &= ~0x400;
         PopUpInfoOkIcon->x = (short)(x - 0x4b);
-        PopUpInfoOkIcon->y = (short)DAT_007fe014 + 3;
+        PopUpInfoOkIcon->y = (short)PopUpMessageY + 3;
         CBCloseIcon->flags &= ~0x400;
         CBCloseIcon->x = (short)(x - 0x27);
-        CBCloseIcon->y = (short)DAT_007fe014 + 3;
-        rc.left = DAT_007fe010 + 0xc;
-        rc.top = DAT_007fe014 + 6;
+        CBCloseIcon->y = (short)PopUpMessageY + 3;
+        rc.left = PopUpMessageX + 0xc;
+        rc.top = PopUpMessageY + 6;
         rc.right = rc.left + DAT_00668964 * 0x14 + 0x7a;
         rc.bottom = rc.top + 0x1b;
-        PrintTextBox(DAT_00668968, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
+        PrintTextBox(PopUpMessageText, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 1, 5, 0xff0000, 0xffffff);
         /* hit box of the bar: outside it, reset the OK/close icons */
         hit.left = PopUpInfoOkIcon->x;
         hit.right = CBCloseIcon->x + 0x24;

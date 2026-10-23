@@ -74,7 +74,7 @@ LEGO_EXPORT void LLIDB_FreeILFTable(struct SpriteSet *table);
 LEGO_EXPORT unsigned int LLIDB_GetCount(void);
 LEGO_EXPORT int LLIDB_GetElement(unsigned int index, struct Element **output);
 struct Sprite;
-struct Sprite *FUN_0047c7f0(struct Element *elem, char **name2, int *key, char ***after);
+struct Sprite *LoadObjDescFile(struct Element *elem, char **name2, int *key, char ***after);
 LEGO_EXPORT int LLIDB_FindElement(const char *name, struct Element **out, unsigned int *index_out);
 LEGO_EXPORT int LLIDB_FindElementFromDataPtr(void *data, struct Element **out, unsigned int *index_out);
 LEGO_EXPORT struct Element *ElemID(const char *name);

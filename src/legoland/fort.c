@@ -51,13 +51,13 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
     int frame;
 
     RenderItems_New();
-    DAT_004c11e0 = NULL;
+    FortRiderRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && (node->rider->pos.x >> 8) <= base - 4) {
-            AddBlokeToRenderList(&DAT_004c11e0, node, node->person->field_20);
+            AddBlokeToRenderList(&FortRiderRenderList, node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
+    RenderBlokeList((struct RenderItemNode **)&FortRiderRenderList);
     if (FortLayer != NULL) {
         struct Point off;
         sprite = GetSpriteForLayer(FortLayer, 2);
@@ -72,13 +72,13 @@ void RenderFort(Element *elem, unsigned int param_2, unsigned int param_3, TileI
         PrintSprite(GetSpriteForLayer(FortLayer, 2), pos.x + off.x, pos.y + off.y, clip, 0);
     }
     RenderItems_New();
-    DAT_004c11e0 = NULL;
+    FortRiderRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (tile->id == node->tile.id && (node->rider->pos.x >> 8) > base - 4) {
-            AddBlokeToRenderList(&DAT_004c11e0, node, node->person->field_20);
+            AddBlokeToRenderList(&FortRiderRenderList, node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct RenderItemNode **)&DAT_004c11e0);
+    RenderBlokeList((struct RenderItemNode **)&FortRiderRenderList);
     if (FortMaskSprite != NULL) {
         struct Point off2;
         off2.x = 0x173;

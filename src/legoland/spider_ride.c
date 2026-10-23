@@ -51,7 +51,7 @@ int AddSpiderNode(TileId *key) {
     node->tile_id = key->id;
     node->next = SpiderNodeList;
     SpiderNodeList = node;
-    return FUN_00415a90(node);
+    return ResetSpiderRide(node);
 }
 
 // FUNCTION: LEGOLAND 0x00415930
@@ -103,7 +103,7 @@ struct SpiderNode *FindSpiderNode(TileId *key) {
 }
 
 // FUNCTION: LEGOLAND 0x004159e0
-void FUN_004159e0(const unsigned char *arg0) {
+void PlaySpiderRideSfx(const unsigned char *arg0) {
     struct SampleSource params;
     params.type = 0x2;
     params.x = arg0[0];
@@ -112,7 +112,7 @@ void FUN_004159e0(const unsigned char *arg0) {
 }
 
 // FUNCTION: LEGOLAND 0x00415a20
-void FUN_00415a20(TileId *tile) {
+void FadeSpiderRideSfx(TileId *tile) {
     struct SampleSource params;
     params.type = 2;
     params.x = tile->pos.x;
@@ -121,17 +121,17 @@ void FUN_00415a20(TileId *tile) {
 }
 
 // FUNCTION: LEGOLAND 0x00415a60
-void FUN_00415a60(struct SpiderState *a) {
+void StartSpiderRide(struct SpiderState *a) {
     a->field_3 = a->field_2;
     a->field_2 = 0;
     a->field_8 = (a->field_8 & 0xffffbfff) | 0x1;
     a->frame = 0;
     a->field_10 = 0;
-    FUN_004159e0((const unsigned char *)a);
+    PlaySpiderRideSfx((const unsigned char *)a);
 }
 
 // FUNCTION: LEGOLAND 0x00415a90
-int FUN_00415a90(struct SpiderNode *node) {
+int ResetSpiderRide(struct SpiderNode *node) {
     struct SpiderState *a = (struct SpiderState *)node;
     a->field_10 = 0;
     a->frame = 0;
@@ -139,7 +139,7 @@ int FUN_00415a90(struct SpiderNode *node) {
     a->field_8 &= 0xffffbffe;
     a->field_14 = 0;
     a->field_2 = 0;
-    FUN_00415a20((TileId *)node);
+    FadeSpiderRideSfx((TileId *)node);
 }
 
 // FUNCTION: LEGOLAND 0x00415ae0
@@ -225,9 +225,9 @@ void RenderSpider(Element *obj, void *param_2, void *param_3, TileId *tile, void
 
 // FUNCTION: LEGOLAND 0x00415e80
 void SpiderRideLoad(struct Element *param_1) {
-    DAT_004cbf20 = param_1->ride;
-    DAT_004cbf20->flags |= 0x420;
-    SpiderRideLayer = DAT_004cbf20->layer;
+    ActiveSpiderRide = param_1->ride;
+    ActiveSpiderRide->flags |= 0x420;
+    SpiderRideLayer = ActiveSpiderRide->layer;
     SpiderRideLayer->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b4ea0
     SpiderRunBinV = LoadBinV("Zbuffers\\spiderrun.bnv");
@@ -241,11 +241,11 @@ void SpiderRideLoad(struct Element *param_1) {
     SpiderHutMask2Sprite = LoadSprite("SpiderHutMask2.lls", 1);
     // STRING: LEGOLAND 0x004b4e38
     ZSpiderSprite = LoadSprite("z_spider.lls", 1);
-    DAT_004cbf30[0] = SpiderRunBinV;
+    SpiderRideBinVs[0] = SpiderRunBinV;
     DAT_0082c660.x = -1;
     DAT_0082c660.y = 2;
     DAT_004cbf38[1] = ZSpiderSprite;
-    DAT_004cbf30[1] = SpiderOnBinV;
+    SpiderRideBinVs[1] = SpiderOnBinV;
     DAT_004cbf38[0] = SpiderOffBinV;
     HideLayer(SpiderRideLayer, 2);
     StopLayerPlaying(SpiderRideLayer, 2);
@@ -258,7 +258,7 @@ void SpiderRideLoad(struct Element *param_1) {
 
 // FUNCTION: LEGOLAND 0x00415fd0
 void SpiderRideUnload(struct Element *param_1) {
-    DAT_004cbf20 = param_1->ride;
+    ActiveSpiderRide = param_1->ride;
 
     if (ZSpiderSprite != NULL) {
         KillSprite(ZSpiderSprite);
@@ -281,7 +281,7 @@ void SpiderRideUnload(struct Element *param_1) {
 // FUNCTION: LEGOLAND 0x00416060
 void SpiderSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = (void *)DAT_004cbf20;
+    EditMode.unk8 = (void *)ActiveSpiderRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
@@ -293,7 +293,7 @@ void SpiderRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) {
     if (node != NULL) {
         RemoveSpiderNode(node);
     }
-    FUN_00415a20(&tile);
+    FadeSpiderRideSfx(&tile);
     StandardRemoveObject(obj, tile, cursor);
     RemoveAllBlokesFromRide(obj->ride, tile);
 }
@@ -311,12 +311,12 @@ void SpiderAddObject(Element *editObj, int *coords) {
 // FUNCTION: LEGOLAND 0x00416120
 struct RideSpriteInfo *GetSpiderRideSpriteInfo(struct Element *a1, unsigned short a2) {
     struct Ride *ride = a1->ride;
-    DAT_004cbf40.sprite = ride->layer;
-    DAT_004cbf40.x = ride->field_14;
-    DAT_004cbf40.y = ride->field_18;
-    DAT_004cbf40.id = a2;
+    SpiderRideSpriteInfo.sprite = ride->layer;
+    SpiderRideSpriteInfo.x = ride->field_14;
+    SpiderRideSpriteInfo.y = ride->field_18;
+    SpiderRideSpriteInfo.id = a2;
     ride->layer->flags = ride->layer->flags | 0x2000;
-    return &DAT_004cbf40;
+    return &SpiderRideSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00416160
@@ -337,9 +337,9 @@ void SpiderRide(struct Element *name_ptr, struct Ride *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x004161f0
-void FUN_004161f0(struct SpiderNode *node) {
+void UpdateSpiderNode(struct SpiderNode *node) {
     struct SpiderState *s = (struct SpiderState *)node;
-    struct RideNode *r = DAT_004cbf20->riders;
+    struct RideNode *r = ActiveSpiderRide->riders;
     unsigned int flags = s->field_8;
 
     if (flags & 1) {
@@ -347,10 +347,10 @@ void FUN_004161f0(struct SpiderNode *node) {
         int v = ++s->field_10;
         c = s->field_c;
         if (c == 0) {
-            if (GetAllBlokesOffRide((struct Ride *)DAT_004cbf20, s->id) == 0) {
+            if (GetAllBlokesOffRide((struct Ride *)ActiveSpiderRide, s->id) == 0) {
                 return;
             }
-            FUN_00415a90(node);
+            ResetSpiderRide(node);
             return;
         }
         if (v >= 2) {
@@ -364,7 +364,7 @@ void FUN_004161f0(struct SpiderNode *node) {
     } else if (flags & 0x4000) {
         if (s->field_2 == s->field_14) {
             s->field_8 = flags & 0xffffbfff;
-            FUN_00415a60(s);
+            StartSpiderRide(s);
             return;
         }
     } else if (s->field_2 != 0) {
@@ -384,10 +384,10 @@ void FUN_004161f0(struct SpiderNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00416310
-void FUN_00416310(void) {
+void UpdateSpiderNodes(void) {
     struct SpiderNode *node = SpiderNodeList;
     while (node != NULL) {
-        FUN_004161f0(node);
+        UpdateSpiderNode(node);
         node = node->next;
     }
 }
@@ -409,7 +409,7 @@ void SpiderRideUpdate(Element *obj) {
     int walk[3]; /* BNV start position (leaving path) */
     char dir;
 
-    FUN_00416310();
+    UpdateSpiderNodes();
     while (elem != NULL) {
         next = elem->next;
         bloke = elem->rider;
@@ -441,8 +441,8 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct RideNode *)elem, (struct SlotArray *)state, DAT_004cbf20->seats));
-                bloke->path = NewBNVPath(DAT_004cbf30[1], 1, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, coords);
+                sprintf(SpiderBnvInfo.name + 6, "%02d", FUN_00416830((struct RideNode *)elem, (struct SlotArray *)state, ActiveSpiderRide->seats));
+                bloke->path = NewBNVPath(SpiderRideBinVs[1], 1, SpiderBnvInfo.name, -1617787.75f, -1618096.5f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->field_58 = 0;
                 bloke->param_action++;
@@ -473,8 +473,8 @@ void SpiderRideUpdate(Element *obj) {
                 bloke->person->depth = GetUnitDepth(-1617787.75f, -1618096.5f);
                 bloke->param_action++;
                 state->field_2++;
-                if ((short)(char)state->field_2 == DAT_004cbf20->seats) {
-                    FUN_00415a60(state);
+                if ((short)(char)state->field_2 == ActiveSpiderRide->seats) {
+                    StartSpiderRide(state);
                 }
                 break;
             case 7:
@@ -621,7 +621,7 @@ LEGO_EXPORT int LoadSpider(struct Element *arg) {
         data = list->rider;
         tc = data->bnv;
         if (tc != NULL) {
-            tc->file = DAT_004cbf30[tc->index];
+            tc->file = SpiderRideBinVs[tc->index];
         }
         list = list->next;
     }

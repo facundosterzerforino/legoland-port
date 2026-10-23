@@ -28,7 +28,7 @@ void UnloadHedgeImages(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004324d0
-void FUN_004324d0(void) {
+void SetHedgeEditCursor(void) {
     void *var = HedgeObjectClass;
     EditMode.unk0 = 1;
     EditMode.unk8 = var;
@@ -196,7 +196,7 @@ void GardenGetInterfaces(struct Element *head, struct Ride *iface) {
     // STRING: LEGOLAND 0x004b7138
     if (strcmp(head->name, "HEDGE") == 0) {
         iface->cb_a4 = LoadHedgeImages;
-        iface->cb_8c = FUN_004324d0;
+        iface->cb_8c = SetHedgeEditCursor;
         iface->cb_98 = HedgeAddObject;
         iface->cb_9c = HedgeRemoveObject;
         iface->cb_sprite = (struct RideSpriteInfo * (*)(struct Element *, unsigned short)) GetHedgeSpriteInfo; /* takes the tile id as a TileId */

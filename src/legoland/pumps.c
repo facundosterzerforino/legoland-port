@@ -34,7 +34,7 @@ void DrivingSchoolPumpsSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00411aa0
-struct PumpNode *FUN_00411aa0(unsigned int arg1, unsigned int arg2) {
+struct PumpNode *FindPumpAt(unsigned int arg1, unsigned int arg2) {
     struct PumpNode *node;
 
     node = (struct PumpNode *)PumpList;
@@ -48,7 +48,7 @@ struct PumpNode *FUN_00411aa0(unsigned int arg1, unsigned int arg2) {
 }
 
 // FUNCTION: LEGOLAND 0x00411ad0
-void FUN_00411ad0(struct PumpNode *node) {
+void FreePump(struct PumpNode *node) {
     struct PumpNode *next;
     struct PumpNode *current;
 
@@ -72,7 +72,7 @@ void FUN_00411ad0(struct PumpNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00411b20
-void FUN_00411b20(struct PumpNode *node) {
+void RemovePump(struct PumpNode *node) {
     struct Cursor cursor;
     TileId tile;
     struct Ride *ride;
@@ -84,11 +84,11 @@ void FUN_00411b20(struct PumpNode *node) {
     cursor.tile_x = node->var_4;
     cursor.tile_y = node->var_8;
     StandardRemoveObject(ride->element, tile, &cursor);
-    FUN_00411ad0(node);
+    FreePump(node);
 }
 
 // FUNCTION: LEGOLAND 0x00411ba0
-void FUN_00411ba0(unsigned short param) {
+void RemovePumpsWithId(unsigned short param) {
     struct PumpNode *cur;
     struct PumpNode *next;
 
@@ -97,7 +97,7 @@ void FUN_00411ba0(unsigned short param) {
         do {
             next = cur->next;
             if (cur->var_2 == param) {
-                FUN_00411b20(cur);
+                RemovePump(cur);
             }
             cur = next;
         } while (cur);
@@ -105,7 +105,7 @@ void FUN_00411ba0(unsigned short param) {
 }
 
 // FUNCTION: LEGOLAND 0x00411bd0
-void FUN_00411bd0(void) {
+void RemoveAllPumps(void) {
     struct PumpNode *current;
     struct PumpNode *next;
 
@@ -115,7 +115,7 @@ void FUN_00411bd0(void) {
     }
     while (current != NULL) {
         next = current->next;
-        FUN_00411b20(current);
+        RemovePump(current);
         current = next;
     }
 }
@@ -146,10 +146,10 @@ void DrivingSchoolPumpsRemoveObject(void *param_1, TileId tile, struct Cursor *c
     struct PumpNode *node;
 
     BGFullUpdate = 1;
-    node = FUN_00411aa0(tile.pos.x, tile.pos.y);
+    node = FindPumpAt(tile.pos.x, tile.pos.y);
     if (node) {
         StandardRemoveObject((DrivingSchoolPumpsRide)->element, tile, cursor);
-        FUN_00411ad0(node);
+        FreePump(node);
     }
 }
 
@@ -162,7 +162,7 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
     EditCursor.footprint = ride->footprint;
     EditCursor.field_1830 = 0;
     ScreenToMapRef(screen, &EditCursor.tile_x, param_3);
-    tile = FUN_00411dc0(&EditCursor);
+    tile = SnapCursorToRoadForPump(&EditCursor);
     ValidateCursor(&EditCursor, ride);
     if (GetBrickCount() < GetObjCost(ride)) {
         SetCursorBlocked(&EditCursor, 2);
@@ -182,7 +182,7 @@ void DrivingSchoolPumpsCalcCursor(Element *obj, int *screen, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x00411dc0
-struct RideQueueEntry *FUN_00411dc0(struct Cursor *cursor) {
+struct RideQueueEntry *SnapCursorToRoadForPump(struct Cursor *cursor) {
     struct RideQueueEntry *tile;
     INT_PTR y; /* the original keeps the result in the same register */
 

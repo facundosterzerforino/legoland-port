@@ -16,5 +16,5 @@ int CreateMouseDevice(void);
 unsigned int IsLeftShiftDown(void);
 unsigned int IsRightShiftDown(void);
 char ReadCheatKey(void);
-void FUN_00474190(void);
-void FUN_004741c0(void);
+void SaveInputState(void);
+void LoadInputState(void);

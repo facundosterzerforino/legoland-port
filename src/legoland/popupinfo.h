@@ -19,7 +19,7 @@ LEGO_EXPORT int UnLoad_PopUpInfo(void);
 void RemoveAllNewObjects(void);
 LEGO_EXPORT void ResetInfoStruct(void);
 unsigned int TryClosePopUp(void);
-unsigned int FUN_00473160(void);
+unsigned int HandlePopUpOkKey(void);
 void ClearAdvicePriority(void);
 void UpdateAdvicePriority(void);
 

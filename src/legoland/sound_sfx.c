@@ -154,7 +154,7 @@ LEGO_EXPORT struct Sample *CreateSampleFromWAV(const char *path) {
                                     if (buffer->lpVtbl->Lock(buffer, 0, 0, &locked, &lockedSize, NULL, NULL, 2) == 0) {
                                         memcpy(locked, converted, lockedSize);
                                         buffer->lpVtbl->Unlock(buffer, locked, lockedSize, NULL, 0);
-                                        sample = (struct Sample *)FUN_004920e0();
+                                        sample = (struct Sample *)AllocSample();
                                         if (sample != NULL) {
                                             sample->refcount++;
                                             sample->active = NULL;
@@ -210,7 +210,7 @@ LEGO_EXPORT struct Sample *CreatePlayableSample(struct Sample *def) {
                     (LPDIRECTSOUNDBUFFER *)&def) != 0) {
             break;
         }
-        sample = FUN_00492110();
+        sample = NewSample();
         if (sample == 0) {
             ((LPDIRECTSOUNDBUFFER)def)->lpVtbl->Release((LPDIRECTSOUNDBUFFER)def);
             break;
@@ -329,7 +329,7 @@ LEGO_EXPORT void Mute_SFX(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004928a0
-int FUN_004928a0(struct Sample *sample) {
+int UnMuteSample(struct Sample *sample) {
     if (SoundAvailable == 0) {
         return 0;
     }
@@ -357,7 +357,7 @@ LEGO_EXPORT int ResumeSinglyPausedSample(struct Sample *sample) {
     if (SoundAvailable != 0 && sample != 0 && (sample->flags & 1) != 0) {
         sample->flags &= 0xfffe;
         if (SfxMuted == 0) {
-            FUN_004928a0(sample);
+            UnMuteSample(sample);
         }
         return 1;
     }
@@ -370,7 +370,7 @@ LEGO_EXPORT void UnMute_FX(void) {
 
     sample = SampleListHead;
     while (sample != 0) {
-        FUN_004928a0(sample);
+        UnMuteSample(sample);
         sample = sample->next;
     }
     SfxMuted = 0;
@@ -573,7 +573,7 @@ void ResumeMusicThread(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00492ca0
-void FUN_00492ca0(int param_1) {
+void RequestMusicTheme(int param_1) {
     if (MusicState == 1 || MusicState == 2) {
         MusicCommand = 3;
         NextMusicTheme = param_1 % 5;
@@ -584,7 +584,7 @@ void FUN_00492ca0(int param_1) {
 // FUNCTION: LEGOLAND 0x00492ce0
 void SetInteractiveMusicTheme(int theme) {
     if (MusicState == 1 || MusicState == 2) {
-        FUN_00492ca0(theme);
+        RequestMusicTheme(theme);
     } else if (theme == CurrentMusicTheme) {
         // STRING: LEGOLAND 0x004bf7cc
         DBPrintf("IMT:Theme was same %d, continuing\n", CurrentMusicTheme);
@@ -624,16 +624,16 @@ void FUN_00492da0(void) {
 // STRING: LEGOLAND 0x004bfa78
 #define IMT_MSG_GET_FAILED "Error Getting music object (Call %d) (Ret = %d) (Error = %d)\n"
 
-/* Reads music file n into DAT_00799c1c[n] (DAT_0079a608[n] bytes). As in the original,
+/* Reads music file n into MusicFileData[n] (MusicFileSizes[n] bytes). As in the original,
  * "got" is the result of `read != size`, not the number of bytes read. */
 #define IMT_LOAD(n, file) \
     fd = _open(file, _O_BINARY); \
-    DAT_0079a608[n] = _filelength(fd); \
-    DAT_00799c1c[n] = malloc(DAT_0079a608[n]); \
-    if (DAT_00799c1c[n] != NULL) { \
-        got = _read(fd, DAT_00799c1c[n], DAT_0079a608[n]) != DAT_0079a608[n]; \
+    MusicFileSizes[n] = _filelength(fd); \
+    MusicFileData[n] = malloc(MusicFileSizes[n]); \
+    if (MusicFileData[n] != NULL) { \
+        got = _read(fd, MusicFileData[n], MusicFileSizes[n]) != MusicFileSizes[n]; \
         if (got != 0) { \
-            DBPrintf(IMT_MSG_SHORT_READ, file, DAT_0079a608[n], got); \
+            DBPrintf(IMT_MSG_SHORT_READ, file, MusicFileSizes[n], got); \
         } \
     } else { \
         DBPrintf(IMT_MSG_NO_MEMORY, file); \
@@ -646,17 +646,17 @@ void FUN_00492da0(void) {
     desc.dwSize = sizeof(desc); \
     desc.dwValidData = DMUS_OBJ_CLASS | DMUS_OBJ_NAME | DMUS_OBJ_MEMORY; \
     desc.guidClass = CLSID_DirectMusicSegment; \
-    desc.llMemLength = DAT_0079a608[n]; \
-    desc.pbMemData = DAT_00799c1c[n]; \
+    desc.llMemLength = MusicFileSizes[n]; \
+    desc.pbMemData = MusicFileData[n]; \
     wcscpy(desc.wszName, name); \
     hr = DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicSegment, (void **)&(seg)); \
     if (hr != S_OK) { \
         DBPrintf(IMT_MSG_GET_FAILED, DAT_0079a6b0, hr, GetLastError()); \
     } \
-    free(DAT_00799c1c[n])
+    free(MusicFileData[n])
 
 /* Interactive music thread (IMT). Sets up DirectMusic, loads the five themes (two segments each)
- * and the 5x5 transition segments, then serves the commands posted by FUN_00492ca0/SetInteractiveMusicTheme/
+ * and the 5x5 transition segments, then serves the commands posted by RequestMusicTheme/SetInteractiveMusicTheme/
  * StopInteractiveMusic (MusicCommand, signalled through MusicCommandEvent) and DirectMusic notifications.
  * Setup failures jump into one release chain, as in the original. */
 
@@ -682,7 +682,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
     int k;
 
     if (MusicEnabled == 0) {
-        DAT_007988bc = 1;
+        MusicThreadReady = 1;
         return 0;
     }
     desc.dwSize = sizeof(desc);
@@ -745,7 +745,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
             // STRING: LEGOLAND 0x004bfd84
             DBPrintf("Loading Styles\n");
             for (i = 0; DMusicLoader->vtable->EnumObject(DMusicLoader, &CLSID_DirectMusicStyle, i, &desc) == S_OK; i++) {
-                DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicStyle, &DAT_007988d0[i]);
+                DMusicLoader->vtable->GetObject(DMusicLoader, &desc, &IID_IDirectMusicStyle, &DMusicStyles[i]);
             }
         }
         // STRING: LEGOLAND 0x004bfd70
@@ -885,7 +885,7 @@ DWORD WINAPI MusicThreadProc(LPVOID param) {
             }
         }
     }
-    DAT_007988bc = 1;
+    MusicThreadReady = 1;
     DMusicInitialised = 1;
     events[0] = DMusicNotificationEvent;
     events[1] = MusicCommandEvent;
@@ -997,7 +997,7 @@ release_composer:
     DMusicComposer->vtable->Release(DMusicComposer);
 fail:
     DMusicInitialised = 0;
-    DAT_007988bc = 1;
+    MusicThreadReady = 1;
     return 0;
 }
 
@@ -1007,12 +1007,12 @@ int StartMusicThread(void *hwnd) {
         MusicThread = CreateThread(0, 0x4000, MusicThreadProc, 0, 0, (LPDWORD)&MusicThreadId);
         return 1;
     }
-    DAT_007988bc = 1;
+    MusicThreadReady = 1;
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00495a50
-int FUN_00495a50(int param_1) {
+int VolumePercentToDSVolume(int param_1) {
     int v;
 
     v = param_1 * 4000 / 100 - 4000;
@@ -1027,12 +1027,12 @@ LEGO_EXPORT int UpdateSoundVols(void) {
 
     if (SoundAvailable != 0) {
         if (MusicEnabled != 0 && DMusicInitialised != 0) {
-            vol = FUN_00495a50(CurrentProfile.music_volume);
+            vol = VolumePercentToDSVolume(CurrentProfile.music_volume);
             ((struct SampleBuffer *)DMusicSoundBuffer)->vtable->method_0x3c((struct SampleBuffer *)DMusicSoundBuffer, vol);
         }
-        DAT_007988a0 = FUN_00495a50(CurrentProfile.fx_volume);
+        SfxDSVolume = VolumePercentToDSVolume(CurrentProfile.fx_volume);
         RefreshSampleVolumes();
-        SpeechSetVolume(FUN_00495a50(CurrentProfile.speech_volume));
+        SpeechSetVolume(VolumePercentToDSVolume(CurrentProfile.speech_volume));
     }
     return 0;
 }

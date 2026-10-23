@@ -27,14 +27,14 @@ struct SafariNode {
 
 struct SafariKey;
 
-void *FUN_00414a80(struct SafariKey *key);
-void FUN_00414b10(struct SafariNode *node);
+void *FindSafariNode(struct SafariKey *key);
+void ResetSafariRide(struct SafariNode *node);
 struct Ride;
 void SafariRideGetInterfaces(struct Element *name, struct Ride *interfaces);
 struct Element;
 void SafariRideUpdate(struct Element *obj);
-int FUN_00415760(struct RideNode *node, unsigned short *key);
+int GetSafariRiderIndex(struct RideNode *node, unsigned short *key);
 struct SafariSample;
-void FUN_00414ab0(struct SafariNode *a1);
+void StartSafariRide(struct SafariNode *a1);
 LEGO_EXPORT int SaveSafariRide(struct Element *element);
 LEGO_EXPORT int LoadSafariRide(struct Element *arg);

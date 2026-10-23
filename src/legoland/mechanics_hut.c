@@ -197,14 +197,14 @@ void MechanicsHutSetEditMode(void) {
 struct RideSpriteInfo *GetMechanicsHutSpriteInfo(struct Element *ptr, unsigned short arg2) {
     struct Ride *ride = ptr->ride;
 
-    DAT_0062fe30.sprite = ride->layer;
-    DAT_0062fe30.x = ride->field_14;
-    DAT_0062fe30.y = ride->field_18;
-    DAT_0062fe30.id = arg2;
+    MechanicsHutSpriteInfo.sprite = ride->layer;
+    MechanicsHutSpriteInfo.x = ride->field_14;
+    MechanicsHutSpriteInfo.y = ride->field_18;
+    MechanicsHutSpriteInfo.id = arg2;
 
     ride->layer->flags |= 0x2000;
 
-    return &DAT_0062fe30;
+    return &MechanicsHutSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x0043d7c0

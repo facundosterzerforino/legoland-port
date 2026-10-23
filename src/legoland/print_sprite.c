@@ -888,7 +888,7 @@ void FUN_00485fc0(unsigned int param_1) {
     *(unsigned int *)&DAT_007cb5e0 = param_1;
     FUN_004860f0();
     AllocZBuffer();
-    FUN_00486540();
+    InitReciprocalTables();
 }
 
 // FUNCTION: LEGOLAND 0x00485fe0

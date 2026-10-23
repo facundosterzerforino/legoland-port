@@ -27,7 +27,7 @@ struct TempleRide {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x00416ec0
-void FUN_00416ec0(TileId *key) {
+void AddSlideNode(TileId *key) {
     struct SlideNode *node = (struct SlideNode *)malloc(sizeof(struct SlideNode));
     if (node != NULL) {
         memset(node, 0, sizeof(struct SlideNode));
@@ -98,7 +98,7 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
     }
     PrintSprite(TempSlideMatteSprite, pos.x, pos.y, clip, 0);
     RenderItems_New();
-    DAT_004cbf84 = NULL;
+    TempleSlideRiderRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id && (node->rider->flags & 0x80) != 0) {
             struct Bloke *bloke = node->rider;
@@ -121,10 +121,10 @@ void RenderTempleSlide(Element *obj, unsigned int param_2, unsigned int param_3,
             person->screen.x = bloke->screen_x + off1.x + off2.x + pos.x;
             person->screen.y = bloke->screen_y + off1.y + off2.y + pos.y;
             AdjustBlokePosition(&person->screen);
-            AddBlokeToRenderList(&DAT_004cbf84, node, node->person->field_20);
+            AddBlokeToRenderList(&TempleSlideRiderRenderList, node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct RenderItemNode **)&DAT_004cbf84);
+    RenderBlokeList((struct RenderItemNode **)&TempleSlideRiderRenderList);
 }
 
 // FUNCTION: LEGOLAND 0x00417130
@@ -135,17 +135,17 @@ void FUN_00417130(struct TempleRide *arg) {
 
 // FUNCTION: LEGOLAND 0x00417150
 void TempleSlideLoad(struct Element *arg) {
-    DAT_004cbf80 = arg->ride;
-    DAT_004cbf80->flags |= 0x20;
-    DAT_004cbf7c = DAT_004cbf80->layer;
-    DAT_004cbf7c->flags |= 0x2000;
+    ActiveTempleSlideRide = arg->ride;
+    ActiveTempleSlideRide->flags |= 0x20;
+    TempleSlideLayer = ActiveTempleSlideRide->layer;
+    TempleSlideLayer->flags |= 0x2000;
     ZTempSlideSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f7c
         "z_tempslide.lls", 1);
     TempSlideBinV = LoadBinV(
         // STRING: LEGOLAND 0x004b4f64
         "Zbuffers\\tempslide.bnv");
-    GetLLSForSprite((struct Sprite *)DAT_004cbf80->layer);
+    GetLLSForSprite((struct Sprite *)ActiveTempleSlideRide->layer);
     DAT_004cbfc8 = 0;
     DAT_004cbfcc[0] = 1;
     DAT_004cbf88 = 13;
@@ -153,12 +153,12 @@ void TempleSlideLoad(struct Element *arg) {
     TempSlideMatteSprite = LoadSprite(
         // STRING: LEGOLAND 0x004b4f50
         "tempslide_matte.lls", 1);
-    DAT_004cbfb8[0] = TempSlideBinV;
+    TempleSlideBinVs[0] = TempSlideBinV;
 }
 
 // FUNCTION: LEGOLAND 0x00417200
 void TempleSlideUnload(struct Element *arg) {
-    DAT_004cbf80 = arg->ride;
+    ActiveTempleSlideRide = arg->ride;
     if (TempSlideMatteSprite != 0) {
         KillSprite(TempSlideMatteSprite);
     }
@@ -169,7 +169,7 @@ void TempleSlideUnload(struct Element *arg) {
 // FUNCTION: LEGOLAND 0x00417240
 void TempleSlideSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = (void *)DAT_004cbf80;
+    EditMode.unk8 = (void *)ActiveTempleSlideRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
@@ -190,7 +190,7 @@ void TempleSlideAddObject(Element *obj, int *coords) {
     tile.pos.x = (unsigned char)coords[0];
     tile.pos.y = (unsigned char)coords[1];
     AddBasicObject(obj, coords);
-    FUN_00416ec0(&tile);
+    AddSlideNode(&tile);
 }
 
 // FUNCTION: LEGOLAND 0x00417300
@@ -198,19 +198,19 @@ struct RideSpriteInfo *GetTempleSlideSpriteInfo(struct Element *ctx, unsigned sh
     struct Ride *track = ctx->ride;
     struct Sprite *car = track->layer;
 
-    DAT_004cbf98.sprite = car;
-    DAT_004cbf98.x = track->field_14;
-    DAT_004cbf98.y = track->field_18;
-    DAT_004cbf98.id = param;
+    TempleSlideSpriteInfo.sprite = car;
+    TempleSlideSpriteInfo.x = track->field_14;
+    TempleSlideSpriteInfo.y = track->field_18;
+    TempleSlideSpriteInfo.id = param;
 
     car = track->layer;
     car->flags |= 0x2000;
 
-    return &DAT_004cbf98;
+    return &TempleSlideSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00417340
-void FUN_00417340(void *arg) {
+void UpdateSlideAvailability(void *arg) {
     unsigned int *array = FindSlideNode(arg)->slots;
     int i = 0;
 
@@ -243,24 +243,24 @@ int FUN_00417380(void *arg) {
         if (count != 0) {
             pick = avail[0];
             node->slots[pick] = 1;
-            FUN_00417340(arg);
+            UpdateSlideAvailability(arg);
             return pick;
         }
         node->slots[0] = 1;
-        FUN_00417340(arg);
+        UpdateSlideAvailability(arg);
         return 0;
     }
     return -1;
 }
 
 // FUNCTION: LEGOLAND 0x00417400
-void FUN_00417400(unsigned int index, void *arg) {
+void ReleaseSlideSlot(unsigned int index, void *arg) {
     struct SlideNode *result = FindSlideNode(arg);
 
     if (result != NULL) {
         result->slots[index] = 0;
     }
-    FUN_00417340(arg);
+    UpdateSlideAvailability(arg);
 }
 
 // FUNCTION: LEGOLAND 0x00417430
@@ -360,7 +360,7 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->person->field_30 = 1;
                 bloke->person->depth = GetUnitDepth(-1617664.875f, -1617913.0f);
                 bloke->field_35 = 0;
-                bloke->path = NewBNVPath(DAT_004cbfb8[0], 0, DAT_004b4f08[bloke->field_36], -1617664.875f, -1617913.0f, off);
+                bloke->path = NewBNVPath(TempleSlideBinVs[0], 0, TempleSlidePathNames[bloke->field_36], -1617664.875f, -1617913.0f, off);
                 BNVPath_SetDFrame(bloke, bloke->path, 0);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;
@@ -427,7 +427,7 @@ void TempleSlideUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 6:
-                FUN_00417400(bloke->field_36, tile);
+                ReleaseSlideSlot(bloke->field_36, tile);
                 RemoveBlokeFromRide(ride, node);
                 bloke->flags &= 0xfff7;
                 break;
@@ -501,7 +501,7 @@ LEGO_EXPORT int LoadTempleSlide(struct Element *obj) {
         bloke = node->rider;
         path = bloke->bnv;
         if (path != NULL) {
-            path->file = DAT_004cbfb8[path->index];
+            path->file = TempleSlideBinVs[path->index];
         }
     }
 

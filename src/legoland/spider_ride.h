@@ -14,8 +14,8 @@ struct SpiderNode {
     struct SpiderNode *next;
 };
 
-int FUN_00415a90(struct SpiderNode *node);
-void FUN_004161f0(struct SpiderNode *node);
+int ResetSpiderRide(struct SpiderNode *node);
+void UpdateSpiderNode(struct SpiderNode *node);
 struct SpiderNode *FindSpiderNode(TileId *key);
 void SpiderRideUpdate(Element *obj);
 LEGO_EXPORT int SaveSpider(struct Element *element);

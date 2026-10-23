@@ -206,7 +206,7 @@ void LegoShop1Update(Element *obj) {
                 bloke->param_action++;
                 break;
             case 4:
-                FUN_00437570(node, obj, tile, 1);
+                BrowseAndBuyItem(node, obj, tile, 1);
                 break;
             case 5:
                 x <<= 8;
@@ -392,7 +392,7 @@ void LegoShop2Update(Element *obj) {
                 bloke->param_action++;
                 break;
             case 4:
-                FUN_00437570(node, obj, tile, 1);
+                BrowseAndBuyItem(node, obj, tile, 1);
                 break;
             case 5:
                 r = rand() % 3;
@@ -622,7 +622,7 @@ void LegoMediaShopUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 2:
-                FUN_00437570(node, obj, tile, 1);
+                BrowseAndBuyItem(node, obj, tile, 1);
                 break;
             case 3:
                 r = rand() % 3;

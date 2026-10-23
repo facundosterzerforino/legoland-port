@@ -53,7 +53,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         GamePad &= ~0x20;
         return;
     }
-    DAT_00798664 = 0;
+    ProgressShowsTutorials = 0;
     // STRING: LEGOLAND 0x004bef44
     SPRITE_TitleScreenBk = LoadSprite("Progress_ScreenBK.lls", 4);
     flags = 0x6002;
@@ -67,7 +67,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         icon->string_id = 0x262;
         icon->string = GetString(0x262);
         icon->flags |= flags;
-        icon->event_handler = (void *)FUN_0048bc20;
+        icon->event_handler = (void *)ProgressPlayClicked;
         // STRING: LEGOLAND 0x004bef14
         icon = LoadSpriteIcon("GoBack_on_Progress.lls", 4, 0x208, 0xb, 0x23);
         icon->string_id = 0x26;
@@ -83,7 +83,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
             icon->event_handler = (void *)FUN_0048c090;
         }
     }
-    FUN_0048b740();
+    ReferenceProgressLevelSprites();
     RemoveIconGroup(0x1c);
     if (MapStats.level_end == 1) {
         flags = 0x200a;
@@ -96,7 +96,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
                     icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
-                    icon->event_handler = (void *)FUN_0048bb60;
+                    icon->event_handler = (void *)ProgressLevelClicked;
                     icon->flags |= flags;
                 }
             } else if (i + 5 < (int)lpConfig->level - 1) {
@@ -117,7 +117,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
                     icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
-                    icon->event_handler = (void *)FUN_0048bb60;
+                    icon->event_handler = (void *)ProgressLevelClicked;
                     icon->flags |= 0x600a;
                 }
             } else if (CurrentProfile.flags[4 + i + 5] == 1) {
@@ -126,27 +126,27 @@ LEGO_EXPORT void InitProgressScreen(void) {
                     icon->string_id = ProgressScreenTables.levels[i].id;
                     icon->string = GetString(icon->string_id);
                     icon->field_18 = i + 5;
-                    icon->event_handler = (void *)FUN_0048bb60;
+                    icon->event_handler = (void *)ProgressLevelClicked;
                     icon->flags |= flags;
                 }
             }
         }
     }
-    DAT_006687bc = FUN_0048bc20;
-    DAT_006687c0 = FUN_0048c020;
+    OkKeyHandler = ProgressPlayClicked;
+    CancelKeyHandler = FUN_0048c020;
 }
 
 // FUNCTION: LEGOLAND 0x0048bb60
-unsigned char FUN_0048bb60(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
+unsigned char ProgressLevelClicked(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
     DAT_00798660 = 1;
     if ((arg1 & 2) != 0) {
-        if ((int)(GetTicks() - DAT_0079866c) < 500 && arg0[0x18] == ProgressScreenTables.last_clicked) {
-            if (DAT_00798664 != 0) {
-                return FUN_0048bf90(arg0, arg1, arg2, arg3);
+        if ((int)(GetTicks() - ProgressLastClickTicks) < 500 && arg0[0x18] == ProgressScreenTables.last_clicked) {
+            if (ProgressShowsTutorials != 0) {
+                return TutorialPlayClicked(arg0, arg1, arg2, arg3);
             }
-            return FUN_0048bc20(arg0, arg1, arg2, arg3);
+            return ProgressPlayClicked(arg0, arg1, arg2, arg3);
         }
-        DAT_0079866c = GetTicks();
+        ProgressLastClickTicks = GetTicks();
         ProgressScreenTables.last_clicked = arg0[0x18];
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         lpConfig->level = arg0[0x18] + 1;
@@ -156,11 +156,11 @@ unsigned char FUN_0048bb60(unsigned char *arg0, unsigned int arg1, unsigned int 
 }
 
 // FUNCTION: LEGOLAND 0x0048bc20
-unsigned char FUN_0048bc20(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
+unsigned char ProgressPlayClicked(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
     if ((arg1 & 2) != 0) {
         do {
-            DAT_006687c0 = 0;
-            DAT_006687bc = 0;
+            CancelKeyHandler = 0;
+            OkKeyHandler = 0;
             SpeechCloseFile();
             DAT_006687b0 = 4;
             PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -211,7 +211,7 @@ void LoadTutorialSprites(void) {
 // FUNCTION: LEGOLAND 0x0048bd40
 // [port:rewrite] loops over the 5 tutorial entries by index; the original's loop bound was the address
 // one past the table (0x4bed44, DAT_004bed44 in the decomp)
-void FUN_0048bd40(void) {
+void ReferenceTutorialSprites(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -248,7 +248,7 @@ void InitTutorialScreen(void) {
 
     // STRING: LEGOLAND 0x004bef88
     SPRITE_TitleScreenBk = LoadSprite("TutorialBK.lls", 0);
-    DAT_00798664 = 1;
+    ProgressShowsTutorials = 1;
     if (DAT_00798660 == 0) {
         LoadTutorialSprites();
         // STRING: LEGOLAND 0x004bef70
@@ -256,8 +256,8 @@ void InitTutorialScreen(void) {
         icon->string_id = 0x262;
         icon->string = GetString(0x262);
         icon->flags |= 0x6002;
-        icon->event_handler = (void *)FUN_0048bf90;
-        DAT_006687bc = FUN_0048bf90;
+        icon->event_handler = (void *)TutorialPlayClicked;
+        OkKeyHandler = TutorialPlayClicked;
         // STRING: LEGOLAND 0x004bef5c
         icon = LoadSpriteIcon("GoBack_on_Tut.lls", 4, 0x20a, 0xf5, 0x23);
         icon->string_id = 0x26;
@@ -272,9 +272,9 @@ void InitTutorialScreen(void) {
             icon->event_handler = (void *)FUN_0048c020;
         }
         icon->flags |= 0x6002;
-        DAT_006687c0 = icon->event_handler;
+        CancelKeyHandler = icon->event_handler;
     }
-    FUN_0048bd40();
+    ReferenceTutorialSprites();
     RemoveIconGroup(0x1c);
     i = 0;
     mapping = DAT_007cb380;
@@ -292,7 +292,7 @@ void InitTutorialScreen(void) {
             icon->string = GetString(0x276);
             icon->string_id = entry->id;
             icon->field_18 = i;
-            icon->event_handler = (void *)FUN_0048bb60;
+            icon->event_handler = (void *)ProgressLevelClicked;
             icon->flags |= 0x6002;
         }
         i++;
@@ -302,10 +302,10 @@ void InitTutorialScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048bf90
-unsigned char FUN_0048bf90(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
+unsigned char TutorialPlayClicked(unsigned char *arg0, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
     if ((arg1 & 2) != 0) {
-        DAT_006687c0 = 0;
-        DAT_006687bc = 0;
+        CancelKeyHandler = 0;
+        OkKeyHandler = 0;
         SpeechCloseFile();
         DAT_006687b0 = 4;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -328,10 +328,10 @@ unsigned char FUN_0048c020(unsigned int a1, unsigned int a2, unsigned int a3, un
     unsigned int temp;
 
     if ((a2 & 2) != 0) {
-        DAT_006687c0 = 0;
-        DAT_006687bc = 0;
+        CancelKeyHandler = 0;
+        OkKeyHandler = 0;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        temp = DAT_00798664;
+        temp = ProgressShowsTutorials;
         DAT_00798660 = 0;
         DAT_00798668 = 0;
         if (temp != 0) {
@@ -351,7 +351,7 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
         DAT_00798668 = 1;
         DAT_0080ff80.unk4 = 0xffffffff;
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
-        if (DAT_00798664 != 0) {
+        if (ProgressShowsTutorials != 0) {
             KillTutorialScreenSprites();
             lpConfig->level = 6;
         } else {
@@ -363,14 +363,14 @@ unsigned char FUN_0048c090(void *param1, unsigned char param2) {
 }
 
 // FUNCTION: LEGOLAND 0x0048c100
-void FUN_0048c100(void) {
+void DrawTutorialList(void) {
     RECT rc;
     struct IconNode **mapping;
     int *entry;
     int i;
     char *text;
 
-    if (DAT_00798664 != 0) {
+    if (ProgressShowsTutorials != 0) {
         rc.top = 0x45;
         rc.bottom = 0x6c;
         rc.left = 10;

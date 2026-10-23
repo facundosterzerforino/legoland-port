@@ -114,23 +114,23 @@ struct ListNode;
 struct FlumeDims;
 struct LinkList;
 
-void FUN_004113d0(void);
+void InitLogFlumeShapes(void);
 struct FlumeSlot;
-int FUN_00411650(struct FlumeSlot *slot);
+int IsFlumeSlotOnDrop(struct FlumeSlot *slot);
 int AdvanceFlumeMover(struct FlumeSlot *mover);
-void FUN_00411810(struct FlumeSlot *m);
-void FUN_0040d090(struct FlumeEntry *entry, struct Footprint **out, TileId *tile);
+void UpdateFlumeDropSlot(struct FlumeSlot *m);
+void GetFlumePieceFootprint(struct FlumeEntry *entry, struct Footprint **out, TileId *tile);
 
 struct FlumeDims FUN_004112c0(void);
 
-void FUN_0040da10(struct FlumeEntry *a, struct LinkList *list);
-void FUN_004119a0(struct FlumeEntry *param_1, unsigned int param_2);
+void DropUnlinkedFlumeNeighbours(struct FlumeEntry *a, struct LinkList *list);
+void AddFlumeScore(struct FlumeEntry *param_1, unsigned int param_2);
 
-struct FlumeEntry *FUN_0040d210(int x, int y);
+struct FlumeEntry *FindFlumePieceAt(int x, int y);
 
-struct Point FUN_0040cfd0(struct FlumeEntry *entry);
+struct Point GetFlumePieceScreenPos(struct FlumeEntry *entry);
 
-int FUN_004119c0(Element *obj, int filter);
+int GetBestFlumeScore(Element *obj, int filter);
 
 struct Ride;
 void LogFlume_GetInterfaces(struct Element *flume, struct Ride *vtbl);

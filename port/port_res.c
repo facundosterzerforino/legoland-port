@@ -410,14 +410,14 @@ static void PortResCheckMusicStart(void) {
         return;
     }
     MusicEnabled = 1;
-    DAT_007988bc = 0;
+    MusicThreadReady = 0;
     start = GetTickCount();
     StartMusicThread(NULL);
-    while (DAT_007988bc == 0 && GetTickCount() - start < 120000) {
+    while (MusicThreadReady == 0 && GetTickCount() - start < 120000) {
         Sleep(20);
     }
     took = GetTickCount() - start;
-    if (DAT_007988bc == 0) {
+    if (MusicThreadReady == 0) {
         fprintf(PortResReport, "music thread: not started after %lu ms\n", (unsigned long)took);
         PortResProblems++;
         return;

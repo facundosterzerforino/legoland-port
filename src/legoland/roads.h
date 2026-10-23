@@ -18,27 +18,27 @@ struct RoadLights {
     int *off_y;
 };
 
-unsigned int FUN_00413970(unsigned short param_1);
-void FUN_004132a0(TileId tile, int param_2, int param_3, unsigned int param_4, unsigned int param_5);
-void FUN_004133e0(int param_1, int param_2);
+unsigned int CountRoadEntriesWithId(unsigned short param_1);
+void AddRoadEntry(TileId tile, int param_2, int param_3, unsigned int param_4, unsigned int param_5);
+void RemoveRoadEntry(int param_1, int param_2);
 void UpdateQueuePathShape(unsigned short param_1, int param_2, int param_3);
 
 struct RideQueueEntry;
-int FUN_00413450(int x, int y, struct RideQueueEntry **out);
+int GetDiagonalRoadNeighbours(int x, int y, struct RideQueueEntry **out);
 struct RideQueueEntry *FUN_004134f0(int arg1, int arg2, struct RideQueueEntry *tile);
 int FUN_00413520(int x, int y, struct NeighborResult *out);
-int FUN_004135d0(int x, int y, struct NeighborResult *out);
+int GetRoadNeighbours(int x, int y, struct NeighborResult *out);
 
 void LoadDrivingSchoolRoadsResources(struct Element *head);
 void UnloadDrivingSchoolRoadsResources();
 void DrivingSchoolRoadsSetEditMode();
 void DrivingSchoolRoadsCalcCursor(Element *obj, int *param_2, unsigned int param_3);
 struct Cursor;
-struct RideQueueEntry *FUN_00413e30(struct Cursor *cur);
-void FUN_00413fa0(struct Element *dummy, struct RoadPlaceArg *param);
+struct RideQueueEntry *SnapCursorToRoadNeighbour(struct Cursor *cur);
+void RoadSetQueryCursor(struct Element *dummy, struct RoadPlaceArg *param);
 void DrivingSchoolRoadsAddObject(struct Element *edit, struct RoadPlaceArg *place);
-void FUN_00414220(Element *edit, TileId tile, struct Cursor *cursor);
-void FUN_00414440(void);
+void RoadRemoveObject(Element *edit, TileId tile, struct Cursor *cursor);
+void UpdateTrafficLights(void);
 void ZebraCrossingSetEditMode();
 void ZebraCrossingCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3);
 void InitZebraCrossing(struct Element *param_1);

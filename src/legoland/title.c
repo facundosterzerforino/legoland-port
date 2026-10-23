@@ -44,12 +44,12 @@ LEGO_EXPORT void InitTitleScreen(void) {
     if (FUN_0048fc30() == 0) {
         // STRING: LEGOLAND 0x004bf548
         icon->alt_sprite = LoadSprite("Dark_New_On_Title.lls", 4);
-        icon->render_func = (void *)FUN_0046e920;
+        icon->render_func = (void *)RenderBlinkIcon;
         icon->flags |= 8;
     } else {
         icon->alt_sprite = NULL;
     }
-    DAT_006687bc = FUN_0048feb0;
+    OkKeyHandler = FUN_0048feb0;
 
     // STRING: LEGOLAND 0x004bf534
     icon = LoadSpriteIcon("Free_on_Title.lls", 4, 0x9a, 8, 7);
@@ -74,7 +74,7 @@ LEGO_EXPORT void InitTitleScreen(void) {
     icon->string = GetString(1000);
     icon->flags |= 0x6002;
     icon->event_handler = OptionsExitIconHandler;
-    DAT_006687c0 = OptionsExitIconHandler;
+    CancelKeyHandler = OptionsExitIconHandler;
 
     // STRING: LEGOLAND 0x004bf4f8
     icon = LoadSpriteIcon("Load_on_Title.lls", 4, 0x19, 0x118, 7);
@@ -218,8 +218,8 @@ void InitAdvertScreen(void) {
     icon->string = GetString(0x26);
     icon->flags |= 0x6002;
     icon->event_handler = AdvertGoBackHandler;
-    DAT_006687c0 = AdvertGoBackHandler;
-    DAT_006687bc = 0;
+    CancelKeyHandler = AdvertGoBackHandler;
+    OkKeyHandler = 0;
 
     // STRING: LEGOLAND 0x004bf5cc
     icon = LoadSpriteIcon("California.lls", 4, 0x1c, 0x24, 7);
@@ -360,11 +360,11 @@ void FUN_00490600(unsigned int param_1) {
 // FUNCTION: LEGOLAND 0x00490610
 void SetPendingMovie(const char *param_1) {
     if (strlen(param_1) > 0xff) {
-        strncpy(DAT_00798778, param_1, 0x100);
-        DAT_00798778[0xff] = 0;
+        strncpy(IntervalMovieName, param_1, 0x100);
+        IntervalMovieName[0xff] = 0;
     } else {
-        strcpy(DAT_00798778, param_1);
-        DAT_00798778[strlen(param_1)] = 0; /* original: (&DAT_00798777)[strlen + 1] */
+        strcpy(IntervalMovieName, param_1);
+        IntervalMovieName[strlen(param_1)] = 0; /* original: (&DAT_00798777)[strlen + 1] */
     }
 }
 
@@ -415,7 +415,7 @@ void SetIntervalReportSpeechPrefix(const char *param_1) {
 
     _splitpath(param_1, 0, 0, fname, 0);
     // STRING: LEGOLAND 0x004bf674
-    sprintf(DAT_007cae80, "%s_", fname);
+    sprintf(IntervalReportSpeechPrefix, "%s_", fname);
 }
 
 // FUNCTION: LEGOLAND 0x00490770
@@ -423,7 +423,7 @@ void SetIntervalHintSpeechPrefix(const char *param_1) {
     char fname[64];
 
     _splitpath(param_1, 0, 0, fname, 0);
-    sprintf(DAT_007cb1e0, "%s_", fname);
+    sprintf(IntervalHintSpeechPrefix, "%s_", fname);
 }
 
 // FUNCTION: LEGOLAND 0x004907a0
@@ -452,7 +452,7 @@ void LoadIntervalHints(const char *param_1) {
     SetIntervalHintSpeechPrefix(param_1);
     FreeIntervalHints();
     sprintf(buffer, "Intervals\\%s", param_1);
-    DAT_00798880 = ReadResourceLines(buffer, (void **)DAT_007cb140, 32);
+    IntervalHintCount = ReadResourceLines(buffer, (void **)DAT_007cb140, 32);
 }
 
 // FUNCTION: LEGOLAND 0x00490850
@@ -465,10 +465,10 @@ void FreeIntervalReport(void) {
 
 // FUNCTION: LEGOLAND 0x00490880
 void FreeIntervalHints(void) {
-    if (DAT_00798880 != 0) {
+    if (IntervalHintCount != 0) {
         free(DAT_007cb140[0]);
     }
-    DAT_00798880 = 0;
+    IntervalHintCount = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004908b0
@@ -515,9 +515,9 @@ unsigned char IntervalScreenCloseHandler(unsigned int param_1, unsigned char par
         FreeIntervalReport();
         FreeIntervalHints();
         FUN_00490600(0);
-        if (DAT_00798778[0] != 0) {
+        if (IntervalMovieName[0] != 0) {
             SetPointer(0);
-            PlayMovie(DAT_00798778, 1, 1);
+            PlayMovie(IntervalMovieName, 1, 1);
             SetPointer(6);
             SetPendingMovie(DAT_004d8bb0);
         }
@@ -536,7 +536,7 @@ void PlayIntervalReportSpeech(unsigned int param_1) {
     char buffer[256];
 
     // STRING: LEGOLAND 0x004bf688
-    sprintf(buffer, "%s%02d.wav", DAT_007cae80, param_1 + 1);
+    sprintf(buffer, "%s%02d.wav", IntervalReportSpeechPrefix, param_1 + 1);
     SpeechCloseFile();
     SpeechLoadWavFile(buffer);
     SpeechPlay();
@@ -547,7 +547,7 @@ void PlayIntervalReportSpeech(unsigned int param_1) {
 void PlayIntervalHintSpeech(unsigned int param_1) {
     char buffer[256];
 
-    sprintf(buffer, "%s%02d.wav", DAT_007cb1e0, param_1 + 1);
+    sprintf(buffer, "%s%02d.wav", IntervalHintSpeechPrefix, param_1 + 1);
     SpeechCloseFile();
     SpeechLoadWavFile(buffer);
     SpeechPlay();
@@ -558,23 +558,23 @@ void PlayIntervalHintSpeech(unsigned int param_1) {
 void ShowIntervalReportPage(void) {
     if ((int)DAT_004bf670 <= 1) {
         DAT_004bf670 = 1;
-        DAT_007cb2e0->flags = DAT_007cb2e0->flags | 0x400;
+        TitlePreviousPageIcon->flags = TitlePreviousPageIcon->flags | 0x400;
     } else {
-        DAT_007cb2e0->flags = DAT_007cb2e0->flags & 0xfffffbff;
+        TitlePreviousPageIcon->flags = TitlePreviousPageIcon->flags & 0xfffffbff;
     }
     if ((int)(DAT_004bf670 + 0xe) > (int)DAT_0079887c) {
-        DAT_007cb2e4->flags |= 0x400;
+        TitleNextPageIcon->flags |= 0x400;
     } else {
-        DAT_007cb2e4->flags &= 0xfffffbff;
+        TitleNextPageIcon->flags &= 0xfffffbff;
     }
     PlayIntervalReportSpeech((int)DAT_004bf670 / 0xe);
 }
 
 // FUNCTION: LEGOLAND 0x00490b20
 unsigned char IntervalNextPageHandler(unsigned int param_1, unsigned int param_2) {
-    SetIconSprite(DAT_007cb2e4, NextPageLitSprite);
+    SetIconSprite(TitleNextPageIcon, NextPageLitSprite);
     if ((param_2 & 2) != 0) {
-        if ((DAT_007cb2e4->flags & 0x400) != 0) {
+        if ((TitleNextPageIcon->flags & 0x400) != 0) {
             return IntervalScreenCloseHandler(0, param_2, 0, 0);
         }
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -586,7 +586,7 @@ unsigned char IntervalNextPageHandler(unsigned int param_1, unsigned int param_2
 
 // FUNCTION: LEGOLAND 0x00490b90
 unsigned char IntervalPreviousPageHandler(unsigned int param_1, unsigned int param_2) {
-    SetIconSprite(DAT_007cb2e0, PreviousPageLitSprite);
+    SetIconSprite(TitlePreviousPageIcon, PreviousPageLitSprite);
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_004bf670 -= 14;
@@ -601,13 +601,13 @@ unsigned char IntervalHintHandler(struct IconNode *param_1, unsigned int param_2
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         do {
-            DAT_00798884 = DAT_00798884 + 1;
-            if ((int)DAT_00798884 >= (int)DAT_00798880) {
-                DAT_00798884 = 0;
+            IntervalHintIndex = IntervalHintIndex + 1;
+            if ((int)IntervalHintIndex >= (int)IntervalHintCount) {
+                IntervalHintIndex = 0;
             }
-        } while (strlen(DAT_007cb140[DAT_00798884]) == 0);
-        DAT_00798888 = GetTicks() + 8000;
-        PlayIntervalHintSpeech(DAT_00798884);
+        } while (strlen(DAT_007cb140[IntervalHintIndex]) == 0);
+        IntervalHintBubbleEndTime = GetTicks() + 8000;
+        PlayIntervalHintSpeech(IntervalHintIndex);
     }
     return 1;
 }
@@ -645,7 +645,7 @@ void InitIntervalScreen(void) {
     }
     accept->flags |= 0x6002;
     accept->event_handler = IntervalScreenCloseHandler;
-    DAT_006687c0 = IntervalScreenCloseHandler;
+    CancelKeyHandler = IntervalScreenCloseHandler;
 
     icon = InsertIcon(0x1b9, 0x50, 7, RepHint1Sprite);
     icon->string_id = 0x2d0;
@@ -653,26 +653,26 @@ void InitIntervalScreen(void) {
     icon->event_handler = (void *)IntervalHintHandler;
     icon->flags |= 0x6002;
     RepHint1Icon = icon;
-    if (DAT_00798880 == 0) {
+    if (IntervalHintCount == 0) {
         icon->flags |= 0x400;
     }
 
-    DAT_00798888 = 0;
-    DAT_00798884 = 0xffffffff;
-    DAT_007cb2e4 = InsertIcon(0x1b9, 0x1ae, 7, NextPageSprite);
-    DAT_007cb2e4->string_id = 0x88e;
-    DAT_007cb2e4->string = GetString(0x88e);
-    DAT_007cb2e4->flags |= 0x2000;
-    DAT_007cb2e4->flags |= 0x4002;
-    DAT_007cb2e4->event_handler = (void *)IntervalNextPageHandler;
-    DAT_006687bc = IntervalNextPageHandler;
+    IntervalHintBubbleEndTime = 0;
+    IntervalHintIndex = 0xffffffff;
+    TitleNextPageIcon = InsertIcon(0x1b9, 0x1ae, 7, NextPageSprite);
+    TitleNextPageIcon->string_id = 0x88e;
+    TitleNextPageIcon->string = GetString(0x88e);
+    TitleNextPageIcon->flags |= 0x2000;
+    TitleNextPageIcon->flags |= 0x4002;
+    TitleNextPageIcon->event_handler = (void *)IntervalNextPageHandler;
+    OkKeyHandler = IntervalNextPageHandler;
 
-    DAT_007cb2e0 = InsertIcon(6, 0x1ae, 7, PreviousPageSprite);
-    DAT_007cb2e0->string_id = 0x88f;
-    DAT_007cb2e0->string = GetString(0x88f);
-    DAT_007cb2e0->flags |= 0x2000;
-    DAT_007cb2e0->flags |= 0x4002;
-    DAT_007cb2e0->event_handler = (void *)IntervalPreviousPageHandler;
+    TitlePreviousPageIcon = InsertIcon(6, 0x1ae, 7, PreviousPageSprite);
+    TitlePreviousPageIcon->string_id = 0x88f;
+    TitlePreviousPageIcon->string = GetString(0x88f);
+    TitlePreviousPageIcon->flags |= 0x2000;
+    TitlePreviousPageIcon->flags |= 0x4002;
+    TitlePreviousPageIcon->event_handler = (void *)IntervalPreviousPageHandler;
     DAT_004bf670 = 1;
     ShowIntervalReportPage();
 }
@@ -681,21 +681,21 @@ void InitIntervalScreen(void) {
 void UpdateIntervalScreenIcons(void) {
     unsigned int _x = MousePos.x;
     unsigned int _y = MousePos.y;
-    if ((int)_x < DAT_007cb2e4->x ||
-        (int)MousePos.x > DAT_007cb2e4->width + DAT_007cb2e4->x ||
-        (int)MousePos.y < DAT_007cb2e4->y ||
-        (int)MousePos.y > DAT_007cb2e4->height + DAT_007cb2e4->y) {
+    if ((int)_x < TitleNextPageIcon->x ||
+        (int)MousePos.x > TitleNextPageIcon->width + TitleNextPageIcon->x ||
+        (int)MousePos.y < TitleNextPageIcon->y ||
+        (int)MousePos.y > TitleNextPageIcon->height + TitleNextPageIcon->y) {
         if (GetBlink() != 0) {
-            SetIconSprite(DAT_007cb2e4, NextPageSprite);
+            SetIconSprite(TitleNextPageIcon, NextPageSprite);
         } else {
-            SetIconSprite(DAT_007cb2e4, NextPageLitSprite);
+            SetIconSprite(TitleNextPageIcon, NextPageLitSprite);
         }
     }
-    if ((int)MousePos.x < DAT_007cb2e0->x ||
-        (int)MousePos.x > DAT_007cb2e0->width + DAT_007cb2e0->x ||
-        (int)MousePos.y < DAT_007cb2e0->y ||
-        (int)MousePos.y > DAT_007cb2e0->height + DAT_007cb2e0->y) {
-        SetIconSprite(DAT_007cb2e0, PreviousPageSprite);
+    if ((int)MousePos.x < TitlePreviousPageIcon->x ||
+        (int)MousePos.x > TitlePreviousPageIcon->width + TitlePreviousPageIcon->x ||
+        (int)MousePos.y < TitlePreviousPageIcon->y ||
+        (int)MousePos.y > TitlePreviousPageIcon->height + TitlePreviousPageIcon->y) {
+        SetIconSprite(TitlePreviousPageIcon, PreviousPageSprite);
     }
     if ((int)MousePos.x < RepHint1Icon->x ||
         (int)MousePos.x > RepHint1Icon->width + RepHint1Icon->x ||
@@ -765,15 +765,15 @@ void RenderIntervalScreen(void) {
         y = y + 0x18;
     }
     UpdateIntervalScreenIcons();
-    if (DAT_00798888 != 0) {
+    if (IntervalHintBubbleEndTime != 0) {
         rc[0] = 0x1db;
         rc[1] = 5;
         rc[2] = 0x280;
         rc[3] = 0x78;
-        if ((int)GetTicks() > (int)DAT_00798888) {
-            DAT_00798888 = 0;
+        if ((int)GetTicks() > (int)IntervalHintBubbleEndTime) {
+            IntervalHintBubbleEndTime = 0;
         }
-        BubbleHelp(rc, DAT_007cb140[DAT_00798884], 2);
+        BubbleHelp(rc, DAT_007cb140[IntervalHintIndex], 2);
     }
 }
 

@@ -39,7 +39,7 @@ void FUN_00432ac0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00432b90
-int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct Bloke *bloke2) {
+int AddJungleRide(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct Bloke *bloke2) {
     struct JungleScore *score;
     struct JungleRide *node = JungleRideList;
     struct JungleRide *fresh;
@@ -85,7 +85,7 @@ int FUN_00432b90(TileId tile, struct Bloke *bloke0, struct Bloke *bloke1, struct
 }
 
 // FUNCTION: LEGOLAND 0x00432cb0
-void FUN_00432cb0(struct JungleRide *ride) {
+void RemoveJungleRide(struct JungleRide *ride) {
     struct JungleRide *prev = NULL;
     struct JungleRide *node = JungleRideList;
 
@@ -295,7 +295,7 @@ unsigned int FUN_004332c0(unsigned short *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x004332f0
-void FUN_004332f0(void) {
+void UpdateJungleRides(void) {
     struct JungleRide *node = JungleRideList;
     struct JungleRide *cur;
 
@@ -346,7 +346,7 @@ struct JungleRide *FUN_004333e0(struct JungleRide *param_1) {
 
     if (param_1->field_3e4 == 0) {
         result = param_1->next;
-        FUN_00432cb0(param_1);
+        RemoveJungleRide(param_1);
         return result;
     }
     JungleCruiseBuildStepPath(param_1, 1, 4);
@@ -685,15 +685,15 @@ void MonkeyTreeAddObject(struct Element *param_1, int *param_2) {
     temp[0] = (unsigned char)param_2[0];
     temp[1] = (unsigned char)param_2[1];
     coord = *(unsigned short *)temp;
-    FUN_00436fb0(param_2[0], param_2[1], (unsigned short *)&local_4);
+    GetJunglePathNeighbourMask(param_2[0], param_2[1], (unsigned short *)&local_4);
     obj = (struct JungleObj *)malloc(sizeof(struct JungleObj));
     if (obj != NULL) {
         obj->tile.id = coord;
         obj->owner = (unsigned short)local_4;
-        obj->next = DAT_00629c2c;
-        DAT_00629c2c = obj;
+        obj->next = JungleObjList;
+        JungleObjList = obj;
         AddBasicObject(param_1, param_2);
-        FUN_00436130((unsigned short)local_4, 1);
+        AddJungleScore((unsigned short)local_4, 1);
     }
 }
 
@@ -711,7 +711,7 @@ void JungleCruiseMonkeyTreeCalcCursor(Element *obj, int *param_2, unsigned int p
     ride = obj->ride;
     memcpy(EditCursor.field_1414, &ride->footprint, sizeof(struct Footprint));
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
-    mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
+    mask = GetJunglePathNeighbourMask(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
         SetCursorBlocked(&EditCursor, 0xe);
@@ -781,7 +781,7 @@ unsigned int JungleCruiseMonkeyTreeDCalcCursor(struct Element *param_1, struct P
 
 // FUNCTION: LEGOLAND 0x00433fc0
 void MonkeyTreeRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) {
-    struct JungleObj *node = DAT_00629c2c;
+    struct JungleObj *node = JungleObjList;
     struct JungleObj *prev = NULL;
 
     StandardRemoveObject(param_1, tile, param_3);
@@ -793,13 +793,13 @@ void MonkeyTreeRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) 
         }
     }
     if (node != NULL) {
-        FUN_00436130(node->owner, -1);
+        AddJungleScore(node->owner, -1);
         if (prev != NULL) {
             prev->next = node->next;
             free(node);
             return;
         }
-        DAT_00629c2c = node->next;
+        JungleObjList = node->next;
         free(node);
     }
 }
@@ -847,8 +847,8 @@ void MonkeyFishAddObject(struct Element *obj, int *coords) {
 
     tile.pos.x = coords[0];
     tile.pos.y = coords[1];
-    if (FUN_00436fb0(coords[0], coords[1], &owner) == 0) {
-        FUN_00436fb0(coords[0], coords[1] - 5, &owner);
+    if (GetJunglePathNeighbourMask(coords[0], coords[1], &owner) == 0) {
+        GetJunglePathNeighbourMask(coords[0], coords[1] - 5, &owner);
     }
     fish = (struct JungleFish *)malloc(sizeof(struct JungleFish));
     if (fish == NULL) {
@@ -859,7 +859,7 @@ void MonkeyFishAddObject(struct Element *obj, int *coords) {
     fish->next = JungleFishList;
     fish->field_4 = 0;
     JungleFishList = fish;
-    FUN_00436130(fish->owner, 2);
+    AddJungleScore(fish->owner, 2);
     AddBasicObject(obj, coords);
     for (y = MFish2Ride->footprint.v[1]; y <= MFish2Ride->footprint.v[3]; y++) {
         for (x = MFish2Ride->footprint.v[0]; x <= MFish2Ride->footprint.v[2]; x++) {
@@ -903,7 +903,7 @@ void JungleCruiseMonkeyFishCalcCursor(Element *obj, int *param_2, unsigned int p
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
     EditCursor.field_1830 = 0;
     for (; row < 2; row++) {
-        mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y - row * 5, &owners[row].id);
+        mask = GetJunglePathNeighbourMask(EditCursor.tile_x, EditCursor.tile_y - row * 5, &owners[row].id);
         if (row == 1 && owners[0].id != owners[1].id && owners[0].pos.x != 0) {
             return;
         }
@@ -988,7 +988,7 @@ void MonkeyFishRemoveObject(void *param_1, TileId tile, struct Cursor *param_3) 
         }
     }
     if (node != NULL) {
-        FUN_00436130(node->owner, -2);
+        AddJungleScore(node->owner, -2);
         if (prev != NULL) {
             prev->next = node->next;
             free(node);
@@ -1146,7 +1146,7 @@ void UnloadJungleCruiseResources(Element *obj) {
         JungleScoreList = score;
     }
     while (JungleRideList != NULL) {
-        FUN_00432cb0(JungleRideList);
+        RemoveJungleRide(JungleRideList);
     }
     while (JunglePathList != NULL) {
         path = JunglePathList->next;
@@ -1199,8 +1199,8 @@ void JungleCruiseAddObject(struct Element *obj, int *coords) {
     score->next = JungleScoreList;
     JungleScoreList = score;
     AddBasicObject(obj, coords);
-    FUN_00436dc0(coords[0] + JungleCruiseStartFootprint.v[0] + 2, coords[1] + JungleCruiseStartFootprint.v[1] + 2, 1, &score->tile.id);
-    FUN_00436dc0(coords[0] + DAT_004b7260.v[0] + 2, coords[1] + DAT_004b7260.v[1] + 2, 4, &score->tile.id);
+    AddJunglePathTile(coords[0] + JungleCruiseStartFootprint.v[0] + 2, coords[1] + JungleCruiseStartFootprint.v[1] + 2, 1, &score->tile.id);
+    AddJunglePathTile(coords[0] + DAT_004b7260.v[0] + 2, coords[1] + DAT_004b7260.v[1] + 2, 4, &score->tile.id);
     for (y = JungleCruiseFootprint.v[1]; y <= JungleCruiseFootprint.v[3]; y++) {
         for (x = JungleCruiseFootprint.v[0]; x <= JungleCruiseFootprint.v[2] - 1; x++) {
             if (x == JungleCruiseFootprint.v[0]) {
@@ -1243,11 +1243,11 @@ void JungleCruiseDCalcCursor(struct Element *param_1, struct Point *param_2) {
     struct JunglePath *p1 = JunglePathList;
     struct JungleFish *p3 = JungleFishList;
     struct JungleObj *p4 = DAT_00629c34;
-    struct JungleObj *p2 = DAT_00629c2c;
+    struct JungleObj *p2 = JungleObjList;
 
     BasicObjectDCalcCursor(param_1, param_2);
     DefaultCursor(&DAT_0082ae20);
-    memcpy(DAT_0082ae20.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
+    memcpy(DAT_0082ae20.field_1414, &JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint));
     for (; p1 != NULL; p1 = p1->next) {
         if (p1->owner.id == QueryObj.id) {
             DAT_0082ae20.tile_x = p1->tile.pos.x;
@@ -1326,23 +1326,23 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) 
         }
     }
     if (score != NULL) {
-        fake.ride = DAT_0081cb54;
-        IncrementObjectCount(DAT_0081cb54);
-        IncrementObjectCount(DAT_0081cb54);
-        memcpy(DAT_0082ae20.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
+        fake.ride = ActiveJungleCruiseRide;
+        IncrementObjectCount(ActiveJungleCruiseRide);
+        IncrementObjectCount(ActiveJungleCruiseRide);
+        memcpy(DAT_0082ae20.field_1414, &JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint));
         path = JunglePathList;
         while (path != NULL) {
             if (path->owner.id == tile.id) {
                 DAT_0082ae20.tile_x = path->tile.pos.x;
                 DAT_0082ae20.tile_y = path->tile.pos.y;
-                FUN_00436f30(&fake, path->tile, &DAT_0082ae20);
+                RemoveJunglePath(&fake, path->tile, &DAT_0082ae20);
                 path = JunglePathList;
             } else {
                 path = path->next;
             }
         }
         fake.ride = MonkeyTreeRide;
-        thing = DAT_00629c2c;
+        thing = JungleObjList;
         while (thing != NULL) {
             if (thing->owner == tile.id) {
                 savedX = cursor->tile_x;
@@ -1352,7 +1352,7 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) 
                 MonkeyTreeRemoveObject(&fake, thing->tile, cursor);
                 cursor->tile_x = savedX;
                 cursor->tile_y = savedY;
-                thing = DAT_00629c2c;
+                thing = JungleObjList;
             } else {
                 thing = thing->next;
             }
@@ -1396,7 +1396,7 @@ void JungleCruiseRemoveObject(Element *obj, TileId tile, struct Cursor *cursor) 
         }
         while (ride != NULL) {
             if (ride->tile.id == tile.id) {
-                FUN_00432cb0(ride);
+                RemoveJungleRide(ride);
                 ride = JungleRideList;
             } else {
                 ride = ride->next;
@@ -1424,7 +1424,7 @@ void JungleCruiseUpdate(void) {
 
     if (++JungleCruiseStep == 0x50) {
         JungleCruiseStep = 0;
-        FUN_004332f0();
+        UpdateJungleRides();
     }
     DrawJungleCruiseBoats(0);
     /* launch boats whose seats are filled and whose wait timer ran out */
@@ -1432,7 +1432,7 @@ void JungleCruiseUpdate(void) {
         tile.id = boat->tile.id;
         if (boat->seats[0] != NULL && --boat->timer <= 0 && boat->connected != 0 &&
             boat->field_40 > (int)FUN_004332c0(&boat->tile.id) * 6 &&
-            FUN_00432b90(tile, boat->seats[0], boat->seats[1], boat->seats[2]) != 0) {
+            AddJungleRide(tile, boat->seats[0], boat->seats[1], boat->seats[2]) != 0) {
             boat->seats[0]->flags |= 0x80;
             boat->seats[0]->param_action++;
             BlokeSitAnim(boat->seats[0]);
@@ -1631,10 +1631,10 @@ int JungleCruise_Save(struct Element *element) {
         fish = fish->next;
     }
     count = 0;
-    for (thingCur = DAT_00629c2c; thingCur != NULL; thingCur = thingCur->next) {
+    for (thingCur = JungleObjList; thingCur != NULL; thingCur = thingCur->next) {
         count++;
     }
-    thing = DAT_00629c2c;
+    thing = JungleObjList;
     SaveGameWrite(&count, 4);
     while (count--) {
         SaveGameWrite(thing, sizeof(*thing));
@@ -1718,8 +1718,8 @@ int JungleCruise_Load(struct Element *element) {
     SaveGameRead(&count, 4);
     while (count--) {
         if (prevThing == NULL) {
-            DAT_00629c2c = (struct JungleObj *)malloc(sizeof(struct JungleObj));
-            prevThing = DAT_00629c2c;
+            JungleObjList = (struct JungleObj *)malloc(sizeof(struct JungleObj));
+            prevThing = JungleObjList;
         } else {
             thing = (struct JungleObj *)malloc(sizeof(struct JungleObj));
             prevThing->next = thing;
@@ -1744,13 +1744,13 @@ int JungleCruise_Load(struct Element *element) {
         }
     }
     for (score = JungleScoreList; score != NULL; score = score->next) {
-        FUN_004373c0(score->tile.id);
+        ComputeJunglePathDistances(score->tile.id);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00436130
-void FUN_00436130(unsigned short param_1, int param_2) {
+void AddJungleScore(unsigned short param_1, int param_2) {
     struct JungleScore *node = JungleScoreList;
     while (node != NULL) {
         if (node->tile.id == param_1) {
@@ -1764,7 +1764,7 @@ void FUN_00436130(unsigned short param_1, int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00436160
-int FUN_00436160(Element *obj, int param_2) {
+int GetBestJungleScore(Element *obj, int param_2) {
     struct JungleScore *node;
     int best = 0;
 
@@ -1778,14 +1778,14 @@ int FUN_00436160(Element *obj, int param_2) {
 
 // FUNCTION: LEGOLAND 0x00436190
 void InitJungleCruiseWater(Element *obj) {
-    DAT_0081cb54 = obj->ride;
+    ActiveJungleCruiseRide = obj->ride;
 }
 
 // FUNCTION: LEGOLAND 0x004361a0
 void JungleCruiseWaterSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb54;
-    DAT_0081cb54->footprint = DAT_004b7478;
+    EditMode.unk8 = ActiveJungleCruiseRide;
+    ActiveJungleCruiseRide->footprint = JungleCruiseDefaultFootprint;
     DefaultCursor(&EditCursor);
     EditCursor.field_1828 |= 0x8;
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
@@ -1803,9 +1803,9 @@ void JungleCruiseWaterCalcCursor(Element *obj, int *param_2, unsigned int param_
     struct MapRect rect;
 
     n = 0;
-    memcpy(EditCursor.field_1414, &DAT_004b7478, sizeof(DAT_004b7478));
+    memcpy(EditCursor.field_1414, &JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint));
     ScreenToMapRef(param_2, &EditCursor.tile_x, param_3);
-    mask = FUN_00436fb0(EditCursor.tile_x, EditCursor.tile_y, &owner);
+    mask = GetJunglePathNeighbourMask(EditCursor.tile_x, EditCursor.tile_y, &owner);
     EditCursor.field_1830 = n;
     if (mask == 0) {
         SetCursorBlocked(&EditCursor, 0xe);
@@ -1911,7 +1911,7 @@ void JungleCruiseWaterDCalcCursor(struct Element *param_1, int *coords) {
         }
     }
     ride = JungleRideList;
-    memcpy(&QueryClass->footprint, &DAT_004b7478, sizeof(DAT_004b7478));
+    memcpy(&QueryClass->footprint, &JungleCruiseDefaultFootprint, sizeof(JungleCruiseDefaultFootprint));
     BasicObjectDCalcCursor(param_1, (struct Point *)coords);
     for (; ride != NULL; ride = ride->next) {
         if ((tile.pos.x == ride->cur_x && tile.pos.y == ride->cur_y) || (tile.pos.x == ride->next_x && tile.pos.y == ride->next_y)) {
@@ -1931,25 +1931,25 @@ void JungleCruiseWaterAddObject(Element *obj, int *coords) {
     int x1;
     int y1;
 
-    mask = FUN_00436fb0(coords[0], coords[1], &owner);
-    FUN_00436dc0(coords[0], coords[1], mask, &owner);
+    mask = GetJunglePathNeighbourMask(coords[0], coords[1], &owner);
+    AddJunglePathTile(coords[0], coords[1], mask, &owner);
     IncrementObjectCount(obj->ride);
-    FUN_004367b0(coords[0], coords[1], &owner);
+    FillJungleWaterCorners(coords[0], coords[1], &owner);
     if ((mask & 1) != 0) {
-        FUN_00436dc0(coords[0], coords[1] - 5, FUN_00436fb0(coords[0], coords[1] - 5, &owner), NULL);
-        FUN_004367b0(coords[0], coords[1] - 5, &owner);
+        AddJunglePathTile(coords[0], coords[1] - 5, GetJunglePathNeighbourMask(coords[0], coords[1] - 5, &owner), NULL);
+        FillJungleWaterCorners(coords[0], coords[1] - 5, &owner);
     }
     if ((mask & 2) != 0) {
-        FUN_00436dc0(coords[0] + 5, coords[1], FUN_00436fb0(coords[0] + 5, coords[1], &owner), NULL);
-        FUN_004367b0(coords[0] + 5, coords[1], &owner);
+        AddJunglePathTile(coords[0] + 5, coords[1], GetJunglePathNeighbourMask(coords[0] + 5, coords[1], &owner), NULL);
+        FillJungleWaterCorners(coords[0] + 5, coords[1], &owner);
     }
     if ((mask & 4) != 0) {
-        FUN_00436dc0(coords[0], coords[1] + 5, FUN_00436fb0(coords[0], coords[1] + 5, &owner), NULL);
-        FUN_004367b0(coords[0], coords[1] + 5, &owner);
+        AddJunglePathTile(coords[0], coords[1] + 5, GetJunglePathNeighbourMask(coords[0], coords[1] + 5, &owner), NULL);
+        FillJungleWaterCorners(coords[0], coords[1] + 5, &owner);
     }
     if ((mask & 8) != 0) {
-        FUN_00436dc0(coords[0] - 5, coords[1], FUN_00436fb0(coords[0] - 5, coords[1], &owner), NULL);
-        FUN_004367b0(coords[0] - 5, coords[1], &owner);
+        AddJunglePathTile(coords[0] - 5, coords[1], GetJunglePathNeighbourMask(coords[0] - 5, coords[1], &owner), NULL);
+        FillJungleWaterCorners(coords[0] - 5, coords[1], &owner);
     }
     for (; score != NULL; score = score->next) {
         if (score->tile.id == owner) {
@@ -1959,7 +1959,7 @@ void JungleCruiseWaterAddObject(Element *obj, int *coords) {
             y1 = score->end.pos.y;
             score->connected = AreJunglePathsConnected(x0, y0, x1, y1);
             if (score->connected != 0) {
-                FUN_004373c0(owner);
+                ComputeJunglePathDistances(owner);
             }
             return;
         }
@@ -1967,7 +1967,7 @@ void JungleCruiseWaterAddObject(Element *obj, int *coords) {
 }
 
 // FUNCTION: LEGOLAND 0x004367b0
-void FUN_004367b0(int param_1, int param_2, unsigned short *param_3) {
+void FillJungleWaterCorners(int param_1, int param_2, unsigned short *param_3) {
     struct JungleScore *score = JungleScoreList;
     struct JunglePath *path;
     struct JunglePath *other;
@@ -2042,78 +2042,78 @@ void JungleCruiseWaterRemoveObject(Element *obj, TileId tile, struct Cursor *cur
     } else {
         elem = NULL;
     }
-    if (elem->field_0 != DAT_0081cb54->element) {
+    if (elem->field_0 != ActiveJungleCruiseRide->element) {
         fake.ride = JungleCruiseRide;
         JungleCruiseRemoveObject(&fake, tile, cursor);
         return;
     }
-    mask = FUN_00436fb0(cursor->tile_x, cursor->tile_y, &owner);
-    FUN_00436f30(obj, tile, cursor);
+    mask = GetJunglePathNeighbourMask(cursor->tile_x, cursor->tile_y, &owner);
+    RemoveJunglePath(obj, tile, cursor);
     if ((mask & 1) != 0) {
         y = cursor->tile_y - 5;
         x = cursor->tile_x;
-        dir = FUN_00436fb0(x, y, &other);
-        FUN_00436dc0(x, y, dir, &owner);
-        FUN_004367b0(x, y, &owner);
+        dir = GetJunglePathNeighbourMask(x, y, &other);
+        AddJunglePathTile(x, y, dir, &owner);
+        FillJungleWaterCorners(x, y, &owner);
     }
     if ((mask & 2) != 0) {
         x = cursor->tile_x + 5;
         y = cursor->tile_y;
-        dir = FUN_00436fb0(x, y, &other);
-        FUN_00436dc0(x, y, dir, &owner);
-        FUN_004367b0(x, y, &owner);
+        dir = GetJunglePathNeighbourMask(x, y, &other);
+        AddJunglePathTile(x, y, dir, &owner);
+        FillJungleWaterCorners(x, y, &owner);
     }
     if ((mask & 4) != 0) {
         y = cursor->tile_y + 5;
         x = cursor->tile_x;
-        dir = FUN_00436fb0(x, y, &other);
-        FUN_00436dc0(x, y, dir, &owner);
-        FUN_004367b0(x, y, &owner);
+        dir = GetJunglePathNeighbourMask(x, y, &other);
+        AddJunglePathTile(x, y, dir, &owner);
+        FillJungleWaterCorners(x, y, &owner);
     }
     if ((mask & 8) != 0) {
         x = cursor->tile_x - 5;
         y = cursor->tile_y;
-        dir = FUN_00436fb0(x, y, &other);
-        FUN_00436dc0(x, y, dir, &owner);
-        FUN_004367b0(x, y, &owner);
+        dir = GetJunglePathNeighbourMask(x, y, &other);
+        AddJunglePathTile(x, y, dir, &owner);
+        FillJungleWaterCorners(x, y, &owner);
     }
     if ((mask & 1) != 0 && (mask & 8) != 0) {
         x = cursor->tile_x - 5;
         y = cursor->tile_y - 5;
         if (FindJunglePathAt(x, y) != NULL) {
-            dir = FUN_00436fb0(x, y, &other);
-            FUN_00436dc0(x, y, dir, &owner);
-            FUN_004367b0(x, y, &owner);
+            dir = GetJunglePathNeighbourMask(x, y, &other);
+            AddJunglePathTile(x, y, dir, &owner);
+            FillJungleWaterCorners(x, y, &owner);
         }
     }
     if ((mask & 1) != 0 && (mask & 2) != 0) {
         x = cursor->tile_x + 5;
         y = cursor->tile_y - 5;
         if (FindJunglePathAt(x, y) != NULL) {
-            dir = FUN_00436fb0(x, y, &other);
-            FUN_00436dc0(x, y, dir, &owner);
-            FUN_004367b0(x, y, &owner);
+            dir = GetJunglePathNeighbourMask(x, y, &other);
+            AddJunglePathTile(x, y, dir, &owner);
+            FillJungleWaterCorners(x, y, &owner);
         }
     }
     if ((mask & 4) != 0 && (mask & 8) != 0) {
         x = cursor->tile_x - 5;
         y = cursor->tile_y + 5;
         if (FindJunglePathAt(x, y) != NULL) {
-            dir = FUN_00436fb0(x, y, &other);
-            FUN_00436dc0(x, y, dir, &owner);
-            FUN_004367b0(x, y, &owner);
+            dir = GetJunglePathNeighbourMask(x, y, &other);
+            AddJunglePathTile(x, y, dir, &owner);
+            FillJungleWaterCorners(x, y, &owner);
         }
     }
     if ((mask & 4) != 0 && (mask & 2) != 0) {
         x = cursor->tile_x + 5;
         y = cursor->tile_y + 5;
         if (FindJunglePathAt(x, y) != NULL) {
-            dir = FUN_00436fb0(x, y, &other);
-            FUN_00436dc0(x, y, dir, &owner);
-            FUN_004367b0(x, y, &owner);
+            dir = GetJunglePathNeighbourMask(x, y, &other);
+            AddJunglePathTile(x, y, dir, &owner);
+            FillJungleWaterCorners(x, y, &owner);
         }
     }
-    FUN_004373c0(owner);
+    ComputeJunglePathDistances(owner);
     for (; score != NULL; score = score->next) {
         if (score->tile.id == owner) {
             x0 = score->start.pos.x;
@@ -2127,7 +2127,7 @@ void JungleCruiseWaterRemoveObject(Element *obj, TileId tile, struct Cursor *cur
 }
 
 // FUNCTION: LEGOLAND 0x00436dc0
-void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
+void AddJunglePathTile(int x, int y, int mask, unsigned short *owner) {
     TileId tile;
     struct JunglePath *node;
     struct MapElement *elem;
@@ -2146,7 +2146,7 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
         node->next = JunglePathList;
         node->parent = NULL;
         JunglePathList = node;
-        FUN_00436130(*owner, 1);
+        AddJungleScore(*owner, 1);
     }
     node->tile = tile;
     node->dir_mask = mask;
@@ -2165,7 +2165,7 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
             }
             elem->flags = 8;
             elem->field_10 = 2;
-            elem->field_0 = DAT_0081cb54->element;
+            elem->field_0 = ActiveJungleCruiseRide->element;
             *(unsigned short *)&elem->field_4 = tile.id;
             SetMapTile(pt.x, pt.y, *BoatingSchoolTileMap[DAT_004b72e4[mask * 25 + row * 5 + col] >> 8].tiles + (unsigned char)DAT_004b72e4[mask * 25 + row * 5 + col]);
         }
@@ -2173,7 +2173,7 @@ void FUN_00436dc0(int x, int y, int mask, unsigned short *owner) {
 }
 
 // FUNCTION: LEGOLAND 0x00436f30
-void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
+void RemoveJunglePath(void *param_1, TileId tile, struct Cursor *param_3) {
     struct JunglePath *node = JunglePathList;
     struct JunglePath *prev = NULL;
 
@@ -2186,7 +2186,7 @@ void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
         }
     }
     if (node != NULL) {
-        FUN_00436130(node->owner.id, -1);
+        AddJungleScore(node->owner.id, -1);
         if (prev != NULL) {
             prev->next = node->next;
             free(node);
@@ -2198,7 +2198,7 @@ void FUN_00436f30(void *param_1, TileId tile, struct Cursor *param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x00436fb0
-unsigned int FUN_00436fb0(int x, int y, unsigned short *owner) {
+unsigned int GetJunglePathNeighbourMask(int x, int y, unsigned short *owner) {
     struct JungleScore *score;
     struct JunglePath *node;
     unsigned int mask;
@@ -2342,7 +2342,7 @@ void SearchJunglePathConnected(int x, int y, int tx, int ty, TileId *owner, int 
 }
 
 // FUNCTION: LEGOLAND 0x004373c0
-void FUN_004373c0(unsigned short param_1) {
+void ComputeJunglePathDistances(unsigned short param_1) {
     struct JungleScore *score = JungleScoreList;
     struct JunglePath *node;
     struct JunglePath *tmp;
@@ -2358,25 +2358,25 @@ void FUN_004373c0(unsigned short param_1) {
     node = FindJunglePathAt(score->end.pos.x, score->end.pos.y);
     node->field_8 = 0;
     node->bfs_next = NULL;
-    DAT_0062fd30 = node;
+    JungleBfsFrontier = node;
     JungleBfsNextFrontier = NULL;
     do {
-        FUN_00437440(param_1);
+        ComputeJunglePathDistancesStep(param_1);
         tmp = JungleBfsNextFrontier;
-        DAT_0062fd30 = tmp;
+        JungleBfsFrontier = tmp;
         JungleBfsNextFrontier = NULL;
     } while (tmp != NULL);
 }
 
 // FUNCTION: LEGOLAND 0x00437440
-void FUN_00437440(short param_1) {
+void ComputeJunglePathDistancesStep(short param_1) {
     struct JunglePath *p;
     struct JunglePath *n1;
     struct JunglePath *n2;
     struct JunglePath *n3;
     struct JunglePath *n4;
 
-    for (p = DAT_0062fd30; p != NULL; p = p->bfs_next) {
+    for (p = JungleBfsFrontier; p != NULL; p = p->bfs_next) {
         n1 = FindJunglePathAt(p->tile.pos.x, p->tile.pos.y - 5);
         n2 = FindJunglePathAt(p->tile.pos.x + 5, p->tile.pos.y);
         n3 = FindJunglePathAt(p->tile.pos.x, p->tile.pos.y + 5);
@@ -2409,7 +2409,7 @@ void FUN_00437440(short param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00437570
-void FUN_00437570(struct RideNode *node, Element *obj, TileId *tile, int sfx) {
+void BrowseAndBuyItem(struct RideNode *node, Element *obj, TileId *tile, int sfx) {
     struct Bloke *bloke = node->rider;
 
     if (bloke->field_58 == 0) {

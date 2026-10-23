@@ -15,7 +15,7 @@ LEGO_EXPORT unsigned int GetGameTimer(void) {
     } else {
         now = GetTickCount();
     }
-    return now - DAT_0079a898;
+    return now - GameTimerBaseTicks;
 }
 
 // FUNCTION: LEGOLAND 0x00499460
@@ -27,7 +27,7 @@ unsigned int GetGameTimerFrames(void) {
     } else {
         now = FrameCounter;
     }
-    return now - DAT_0079a8a0;
+    return now - GameTimerBaseFrame;
 }
 
 // FUNCTION: LEGOLAND 0x00499450

@@ -50,13 +50,13 @@ void RenderTemple(Element *obj, unsigned int param_2, unsigned int param_3, unsi
     struct Point offset;
 
     RenderItems_New();
-    DAT_004cbf70 = NULL;
+    TempleRiderRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*coords == node->tile.id) {
-            AddBlokeToRenderList(&DAT_004cbf70, node, node->person->field_20);
+            AddBlokeToRenderList(&TempleRiderRenderList, node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct RenderItemNode **)&DAT_004cbf70);
+    RenderBlokeList((struct RenderItemNode **)&TempleRiderRenderList);
     pos = GetScreenCoordsForObject((TileId *)coords, ride);
     offset = GetRenderOffsetForLayer(TempleLayer, 0);
     AdjustOffsetForViewMode(&offset);

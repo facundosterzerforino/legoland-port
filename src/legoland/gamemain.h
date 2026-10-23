@@ -13,12 +13,12 @@ struct CommandArgs {
 };
 
 int IsInMapBounds(int a, int b);
-void ReleasePathNode(struct GameMainNode *node);
+void AddToClosedList(struct GameMainNode *node);
 void InsertOpenListSorted(struct GameMainNode *node);
-struct GameMainNode *FUN_00477730(struct Point *ctx);
-struct GameMainNode *FUN_004777c0(struct Point *arg);
-struct GameMainNode *FUN_004777f0(struct Point *pos, int *result);
-void RemoveQueryNode(struct GameMainNode *ctx);
+struct GameMainNode *FindClosedPathNode(struct Point *ctx);
+struct GameMainNode *FindOpenPathNode(struct Point *arg);
+struct GameMainNode *GetPathNodeAt(struct Point *pos, int *result);
+void RemoveFromClosedList(struct GameMainNode *ctx);
 void RemoveFromOpenList(struct GameMainNode *param_1);
 
 void RemoveObjectAtPoint(struct Point *p);

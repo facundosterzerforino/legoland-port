@@ -198,14 +198,14 @@ void FUN_004864e0(void *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00486540
-int FUN_00486540(void) {
+int InitReciprocalTables(void) {
     int i;
     float f;
 
     for (i = 1; i < 100; i++) {
         f = (float)i;
-        DAT_00797e70[i] = 1.0f / f;
-        DAT_00798000[i] = (int)(DOUBLE_004ab558 / f);
+        ReciprocalTable[i] = 1.0f / f;
+        ScaledReciprocalTable[i] = (int)(DOUBLE_004ab558 / f);
     }
     return 0;
 }
@@ -221,7 +221,7 @@ int FUN_00486540(void) {
  * pixel also sets DAT_007feb14 when it is the pixel under the mouse (DAT_007fe9a8).
  *
  * Quirks kept from the original: the z-buffer address is zbuf + y * 512 + x * 4 (rows 512 bytes apart,
- * although a sprite is up to 160 pixels = 640 bytes wide); the reciprocal table DAT_00798000 only has
+ * although a sprite is up to 160 pixels = 640 bytes wide); the reciprocal table ScaledReciprocalTable only has
  * entries 1..99 (the original reads past it for taller triangles, here the index is clamped). */
 #define PORT_NV 5
 
@@ -242,7 +242,7 @@ static __inline int PortRecip(int n) {
     if (n > 99) {
         n = 99;
     }
-    return DAT_00798000[n];
+    return ScaledReciprocalTable[n];
 }
 
 static void PortEdgeInit(struct PortEdge *e, const struct PortVert *from, const struct PortVert *to, int inv, int nv) {
@@ -564,17 +564,17 @@ unsigned short FUN_00488730(unsigned int p1, unsigned int p2, unsigned int p3) {
 }
 
 // FUNCTION: LEGOLAND 0x004887a0
-void FUN_004887a0(void) {
+void InitZBufferImageSprite(void) {
     DAT_00798590 = (void *)1;
-    DAT_0066be50 = CreateSourceImage(DAT_004d8bb0, 0);
-    DAT_0066be50->data = DAT_00701e68;
-    DAT_0066be50->width = 0x280;
-    DAT_0066be50->height = 0x1e0;
-    DAT_0066be50->refcount = 1;
-    DAT_0066be50->aux = NULL;
-    DAT_0066be50->field_14 = 1;
-    DAT_00701e64 = CreateSprite(DAT_0066be50);
-    DAT_00701e64->flags = DAT_00701e64->flags | 0x208;
+    ZBufferSourceImage = CreateSourceImage(DAT_004d8bb0, 0);
+    ZBufferSourceImage->data = ZBufferImagePixels;
+    ZBufferSourceImage->width = 0x280;
+    ZBufferSourceImage->height = 0x1e0;
+    ZBufferSourceImage->refcount = 1;
+    ZBufferSourceImage->aux = NULL;
+    ZBufferSourceImage->field_14 = 1;
+    ZBufferImageSprite = CreateSprite(ZBufferSourceImage);
+    ZBufferImageSprite->flags = ZBufferImageSprite->flags | 0x208;
 }
 
 // FUNCTION: LEGOLAND 0x00488820
@@ -594,10 +594,10 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
     int yy;
 
     if (!DAT_00798590) {
-        FUN_004887a0();
+        InitZBufferImageSprite();
     }
-    DAT_0066b5b0 = CurrentSurfaceDesc;
-    DAT_0066b620 = SoftPrintClip;
+    ZBufferSavedSurfaceDesc = CurrentSurfaceDesc;
+    ZBufferSavedSoftPrintClip = SoftPrintClip;
     CurrentSurfaceDesc.lpSurface = DAT_0066be54;
     CurrentSurfaceDesc.dwWidth = w;
     CurrentSurfaceDesc.dwHeight = h;
@@ -627,17 +627,17 @@ LEGO_EXPORT struct Sprite *GenerateNewImageFromZBuffer(struct Sprite *sprite, st
             } else {
                 px = transp;
             }
-            ((unsigned short *)DAT_00701e68)[yy * w + row] = px;
+            ((unsigned short *)ZBufferImagePixels)[yy * w + row] = px;
         }
         yy = 1 + yy;
     }
-    DAT_0066be50->width = (short)w;
-    DAT_0066be50->height = (short)h;
-    DAT_00701e64->width = (short)w;
-    DAT_00701e64->height = (short)h;
-    CurrentSurfaceDesc = DAT_0066b5b0;
-    SoftPrintClip = DAT_0066b620;
-    return DAT_00701e64;
+    ZBufferSourceImage->width = (short)w;
+    ZBufferSourceImage->height = (short)h;
+    ZBufferImageSprite->width = (short)w;
+    ZBufferImageSprite->height = (short)h;
+    CurrentSurfaceDesc = ZBufferSavedSurfaceDesc;
+    SoftPrintClip = ZBufferSavedSoftPrintClip;
+    return ZBufferImageSprite;
 }
 
 // FUNCTION: LEGOLAND 0x00488a10

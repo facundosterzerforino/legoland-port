@@ -11,7 +11,7 @@
 #include "stream.h"
 
 // FUNCTION: LEGOLAND 0x00497f60
-unsigned int FUN_00497f60(void) {
+unsigned int SpeechRawFreeSpace(void) {
     int head;
     int tail;
 
@@ -69,7 +69,7 @@ void SpeechFillRawBuffer(void) {
     if (SpeechBytesRemaining == 0) {
         return;
     }
-    n = FUN_00497f60();
+    n = SpeechRawFreeSpace();
     if (n == 0) {
         return;
     }
@@ -99,7 +99,7 @@ void SpeechFillRawBuffer(void) {
             }
             n -= r;
         }
-        n = FUN_00497f60();
+        n = SpeechRawFreeSpace();
     }
 }
 
@@ -149,7 +149,7 @@ int SpeechReadRawBuffer(unsigned char *dst, int count) {
 }
 
 // FUNCTION: LEGOLAND 0x004981e0
-unsigned int FUN_004981e0(void) {
+unsigned int SpeechPcmFreeSpace(void) {
     int head;
     int tail;
 
@@ -189,7 +189,7 @@ void SpeechFillPcmBuffer(void) {
     int len;
 
     SpeechFillRawBuffer();
-    n = FUN_004981e0();
+    n = SpeechPcmFreeSpace();
     while (n != 0) {
         while (n != 0) {
             chunk = SpeechConvertedSize - SpeechConvertedUsed;
@@ -224,7 +224,7 @@ void SpeechFillPcmBuffer(void) {
             n -= chunk;
             SpeechConvertedUsed += chunk;
         }
-        n = FUN_004981e0();
+        n = SpeechPcmFreeSpace();
     }
     SpeechFillRawBuffer();
 }

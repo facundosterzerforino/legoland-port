@@ -8,12 +8,12 @@ struct ScreenMode;
 
 LEGO_EXPORT void InitExitCheckBox(unsigned int param_1, unsigned int param_2);
 LEGO_EXPORT void KillTitleScreenSprites(void);
-unsigned char FUN_0048ef90(unsigned int param_1, unsigned int param_2);
+unsigned char ExitCheckBoxOkClicked(unsigned int param_1, unsigned int param_2);
 unsigned char OptionsAcceptIconHandler(unsigned int param_1, unsigned int param_2);
 unsigned char OptionsSaveIconHandler(unsigned int param_1, unsigned int param_2);
 unsigned char OptionsExitIconHandler(unsigned int param_1, unsigned int param_2);
-unsigned char FUN_0048f440(unsigned int param_1, unsigned int param_2);
-unsigned char FUN_0048f4b0(unsigned int param_1, unsigned int param_2);
+unsigned char ExitLevelOkClicked(unsigned int param_1, unsigned int param_2);
+unsigned char ExitCheckBoxCloseClicked(unsigned int param_1, unsigned int param_2);
 unsigned char OptionsLoadIconHandler(unsigned int param_1, unsigned int param_2);
 unsigned char SaveGameScreenSaveHandler(unsigned int param_1, unsigned int param_2);
 unsigned char OptionsUpIconHandler(struct IconNode *, unsigned int);

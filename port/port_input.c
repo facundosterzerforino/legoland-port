@@ -40,8 +40,8 @@ int PortWheelTake(int step) {
 
 /* ---- touch gestures ---- */
 
-/* the scrolling object lists, by their icon group: the build menu's (0xd2) and the ones FUN_0046dac0 picks in the
- * other edit modes; each group's icon +3 is its "scroll up" arrow, whose field_30 is the list's panel (FUN_0046d980) */
+/* the scrolling object lists, by their icon group: the build menu's (0xd2) and the ones ScrollActiveIconRegionForward picks in the
+ * other edit modes; each group's icon +3 is its "scroll up" arrow, whose field_30 is the list's panel (ScrollIconRegionForward) */
 static const unsigned short ListGroups[] = {0xd2, 0xc8, 0x1f4, 0x12c, 0x190};
 
 #define LIST_STEP 40.0f /* the game's pixels of a list drag per object scrolled (they're 56 to 66 high) */

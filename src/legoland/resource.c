@@ -114,7 +114,7 @@ LEGO_EXPORT struct MasterVolNode *GetMasterVolPtr(const char *name) {
 }
 
 // FUNCTION: LEGOLAND 0x00489550
-struct MasterDirNode *FUN_00489550(const char *vol_name, const char *file_name, struct ResVolEntry **out_entry) {
+struct MasterDirNode *FindVolumeDirEntry(const char *vol_name, const char *file_name, struct ResVolEntry **out_entry) {
     struct MasterVolNode *master;
     struct ResVolEntry *entry;
 
@@ -141,8 +141,8 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
 
     if (node->is_dir == 0) {
         entry = (struct ResVolEntry *)malloc(sizeof(struct ResVolEntry));
-        entry->next_all = (struct ResVolEntry *)DAT_0079862c;
-        DAT_0079862c = entry;
+        entry->next_all = (struct ResVolEntry *)AllResVolEntries;
+        AllResVolEntries = entry;
         entry->next_dir = (struct ResVolEntry *)master->entries;
         master->entries = entry;
         entry->next = volume->dir;
@@ -331,7 +331,7 @@ LEGO_EXPORT struct ResFile *RES_OpenFileFromVolume(const char *path, const char 
         last_bs = path_copy;
     }
 
-    dir = FUN_00489550(vol_name, prefix, &entry);
+    dir = FindVolumeDirEntry(vol_name, prefix, &entry);
     if (dir == 0) {
         return 0;
     }

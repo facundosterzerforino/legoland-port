@@ -694,13 +694,13 @@ void JoustFreeResources(void) {
 struct RideSpriteInfo *GetJoustSpriteInfo(struct Element *param1, unsigned short param2) {
     struct Ride *block = param1->ride;
 
-    DAT_004c1228.sprite = block->layer;
-    DAT_004c1228.x = block->field_14;
-    DAT_004c1228.y = block->field_18;
-    DAT_004c1228.id = param2;
+    JoustSpriteInfo.sprite = block->layer;
+    JoustSpriteInfo.x = block->field_14;
+    JoustSpriteInfo.y = block->field_18;
+    JoustSpriteInfo.id = param2;
     block->layer->flags |= 0x2000;
 
-    return &DAT_004c1228;
+    return &JoustSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00408c90

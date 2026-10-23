@@ -232,7 +232,7 @@ void ReplaceExtension(char *path, char *ext) {
 }
 
 // FUNCTION: LEGOLAND 0x00499190
-void FUN_00499190(char *path, char *dir) {
+void PrependDirIfNoPath(char *path, char *dir) {
     char tmp[200];
     int i = strlen(path);
     while (path[i] != '\\' && path[i] != ':' && i > 0) {
@@ -246,7 +246,7 @@ void FUN_00499190(char *path, char *dir) {
 }
 
 // FUNCTION: LEGOLAND 0x00499240
-void FUN_00499240(char *path, char *dir) {
+void ReplacePathDir(char *path, char *dir) {
     char tmp[200];
     int i = strlen(path);
     while (path[i] != '\\' && path[i] != ':' && i > 0) {
@@ -291,8 +291,8 @@ void ResumeGameTimer(void) {
         return;
     }
     GameTimerPaused = 0;
-    DAT_0079a898 += GetTickCount() - GameTimerPausedTicks;
-    DAT_0079a8a0 += FrameCounter - GameTimerPausedFrame;
+    GameTimerBaseTicks += GetTickCount() - GameTimerPausedTicks;
+    GameTimerBaseFrame += FrameCounter - GameTimerPausedFrame;
 }
 
 // FUNCTION: LEGOLAND 0x00499410
@@ -302,8 +302,8 @@ void ResetGameTimer(void) {
 
     ticks = GetTicks();
     GameTimerPausedTicks = ticks;
-    DAT_0079a898 = ticks;
+    GameTimerBaseTicks = ticks;
     counter = FrameCounter;
     GameTimerPausedFrame = counter;
-    DAT_0079a8a0 = counter;
+    GameTimerBaseFrame = counter;
 }

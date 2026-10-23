@@ -181,7 +181,7 @@ LEGO_EXPORT void GetSpriteSize(struct Sprite *sprite, unsigned short *pWidth, un
 }
 
 // FUNCTION: LEGOLAND 0x004015e0
-void FUN_004015e0(struct NewBloke *param_1) {
+void AddDrivingSchoolStraightWaypoint(struct NewBloke *param_1) {
     struct Point local;
     unsigned int frame;
 
@@ -362,13 +362,13 @@ LEGO_EXPORT void SPLeave(unsigned int param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00401970
-int *FUN_00401970(int *param_1, int param_2, int param_3) {
+int *FindDrivingSchoolCarNear(int *param_1, int param_2, int param_3) {
     int *piVar1;
 
-    if (DAT_004c10d4 == 0) {
+    if (DrivingSchoolCars == 0) {
         return 0;
     }
-    piVar1 = (int *)DAT_004c10d4;
+    piVar1 = (int *)DrivingSchoolCars;
     do {
         if ((piVar1[6] <= param_2 + 1) && (param_2 <= piVar1[6] + 1) &&
             (piVar1[7] <= param_3 + 1) && (param_3 <= piVar1[7] + 1) &&
@@ -381,7 +381,7 @@ int *FUN_00401970(int *param_1, int param_2, int param_3) {
 }
 
 // FUNCTION: LEGOLAND 0x004019c0
-void FUN_004019c0(struct NewBloke *m) {
+void UpdateDrivingSchoolCarVelocity(struct NewBloke *m) {
     unsigned char oldDir = m->f_b8;
     volatile unsigned char moving = m->f_bb;
     int dy, dx, dist, diff, vx, vy;
@@ -426,7 +426,7 @@ void FUN_004019c0(struct NewBloke *m) {
 }
 
 // FUNCTION: LEGOLAND 0x00401ae0
-int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
+int AddDrivingSchoolCar(unsigned short id, struct Bloke *bloke) {
     struct RideQueueEntry *e;
     struct NewBloke *b;
     int t;
@@ -448,12 +448,12 @@ int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
     b->py = e->y + 4;
     b->t = b->p;
     b->fy = (e->y + 4) << 16;
-    if (FUN_00401970((int *)b, b->px, b->ty) != 0) {
+    if (FindDrivingSchoolCarNear((int *)b, b->px, b->ty) != 0) {
         free(b);
         return -2;
     }
-    b->next = (struct NewBloke *)DAT_004c10d4;
-    DAT_004c10d4 = b;
+    b->next = (struct NewBloke *)DrivingSchoolCars;
+    DrivingSchoolCars = b;
     b->f_bb = 0;
     b->f_b8 = 0;
     b->f_c2 = 1;
@@ -478,13 +478,13 @@ int FUN_00401ae0(unsigned short id, struct Bloke *bloke) {
     b->f_be = 9000;
     b->f_c0 = 1200;
     FUN_00401080(b);
-    FUN_004019c0((struct NewBloke *)b);
+    UpdateDrivingSchoolCarVelocity((struct NewBloke *)b);
     return 0;
 }
 
 // FUNCTION: LEGOLAND 0x00401c40
-unsigned int FUN_00401c40(unsigned short arg0) {
-    struct NewBloke *current = DAT_004c10d4;
+unsigned int CountNewBlokesWithId(unsigned short arg0) {
+    struct NewBloke *current = DrivingSchoolCars;
     unsigned int count = 0;
 
     while (current != NULL) {
@@ -498,7 +498,7 @@ unsigned int FUN_00401c40(unsigned short arg0) {
 }
 
 // FUNCTION: LEGOLAND 0x00401c60
-void FUN_00401c60(struct NewBloke *b) {
+void RemoveDrivingSchoolCar(struct NewBloke *b) {
     struct SampleSource ss;
     struct NewBloke *next;
     struct NewBloke *cur;
@@ -511,10 +511,10 @@ void FUN_00401c60(struct NewBloke *b) {
         KillAllSamplesFromSource(&ss);
         free(b);
 
-        if (b == DAT_004c10d4) {
-            DAT_004c10d4 = next;
+        if (b == DrivingSchoolCars) {
+            DrivingSchoolCars = next;
         } else {
-            cur = DAT_004c10d4;
+            cur = DrivingSchoolCars;
             while (cur->next != b) {
                 cur = cur->next;
             }
@@ -524,7 +524,7 @@ void FUN_00401c60(struct NewBloke *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00401cd0
-void FUN_00401cd0(struct NewBloke *p) {
+void PopDrivingSchoolCarWaypoint(struct NewBloke *p) {
     unsigned char temp_bb = p->f_bb;
     if (temp_bb == 0) {
         return;
@@ -608,20 +608,20 @@ int PickQueueTurn(unsigned short id, struct PathPair *p, int dir) {
         return 0;
     }
     StepPointByDirection(&e->x, &pt.a, dir);
-    q = FUN_004125a0(pt.a, pt.b);
+    q = FindRoadEntryAt(pt.a, pt.b);
     if (q != NULL && q->id == id && (q->field_14 & 0xf) != 6) {
         StepPointByDirection(&q->x, &pt.a, dir);
-        t1 = FUN_004125a0(pt.a, pt.b);
+        t1 = FindRoadEntryAt(pt.a, pt.b);
         if (t1 != NULL && (t1->id != id || (0xf & t1->field_14) == 6)) {
             t1 = NULL;
         }
         StepPointByDirection(&q->x, &pt.a, (dir - 2) & 7);
-        t2 = FUN_004125a0(pt.a, pt.b);
+        t2 = FindRoadEntryAt(pt.a, pt.b);
         if (t2 != NULL && (t2->id != id || (t2->field_14 & 0xf) == 6)) {
             t2 = NULL;
         }
         StepPointByDirection(&q->x, &pt.a, (dir + 2) & 7);
-        t3 = FUN_004125a0(pt.a, pt.b);
+        t3 = FindRoadEntryAt(pt.a, pt.b);
         if (t3 != NULL && (t3->id != id || (0xf & t3->field_14) == 6)) {
             t3 = NULL;
         }
@@ -676,7 +676,7 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
         ptmp102 = pt.b;
         { ptmp99 = ptmp102; }
         ptmp310 = pt.a;
-        q = FUN_004125a0(ptmp310, ptmp99);
+        q = FindRoadEntryAt(ptmp310, ptmp99);
         if (q == NULL) {
             return PickQueueTurn(id, p, dir);
         }
@@ -716,16 +716,16 @@ int GetQueueTurn(unsigned short id, struct PathPair *p, int dir) {
 }
 
 // FUNCTION: LEGOLAND 0x00402340
-int FUN_00402340(int a1) {
-    if (DAT_004cbeb0 != 0) {
+int IsTrafficLightRedForDir(int a1) {
+    if (TrafficLightA != 0) {
         if (a1 == 7 || a1 == 3)
             return 0;
     }
-    if (DAT_004cbeb4 != 0) {
+    if (TrafficLightB != 0) {
         if (a1 == 1 || a1 == 5)
             return 0;
     }
-    if (DAT_004cbeb0 == 0 && DAT_004cbeb4 == 0)
+    if (TrafficLightA == 0 && TrafficLightB == 0)
         return 0;
     return 1;
 }
@@ -742,9 +742,9 @@ int FUN_00402390(struct NewBloke *param_1) {
     local.x = iVar1->x;
     local.y = iVar1->y;
     StepPointByDirection((int *)&local, (int *)&local, DAT_004b4034[(unsigned int)param_1->f_b8]);
-    iVar1 = FUN_004125a0(local.x, local.y);
+    iVar1 = FindRoadEntryAt(local.x, local.y);
     if ((iVar1 != 0) && ((iVar1->field_14 & 0xf) == 5)) {
-        return FUN_00402340(DAT_004b4034[(unsigned int)param_1->f_b8]);
+        return IsTrafficLightRedForDir(DAT_004b4034[(unsigned int)param_1->f_b8]);
     }
     return 1;
 }
@@ -772,12 +772,12 @@ int FUN_00402430(struct PairArg *a, struct PairArg *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00402490
-struct NewBloke *FUN_00402490(struct NewBloke *b) {
+struct NewBloke *FindDrivingSchoolCarAhead(struct NewBloke *b) {
     struct NewBloke *cur;
     struct NewBloke *result = NULL;
     int dx, dy, x, y;
 
-    for (cur = (struct NewBloke *)DAT_004c10d4; cur != NULL; cur = cur->next) {
+    for (cur = (struct NewBloke *)DrivingSchoolCars; cur != NULL; cur = cur->next) {
         if (cur == b) {
             continue;
         }
@@ -798,7 +798,7 @@ struct NewBloke *FUN_00402490(struct NewBloke *b) {
 }
 
 // FUNCTION: LEGOLAND 0x00402550
-void FUN_00402550(struct NewBloke *arg) {
+void DrawDrivingSchoolCar(struct NewBloke *arg) {
     IP_RenderBlokeIn3DNow(arg->bloke);
 
     switch (arg->f_c3) {
@@ -875,7 +875,7 @@ void SetPersonYawFromDir16(struct Person *person, unsigned int direction) {
 }
 
 // FUNCTION: LEGOLAND 0x00402780
-void FUN_00402780(struct NewBloke *b) {
+void UpdateDrivingSchoolCar(struct NewBloke *b) {
     struct HitInfo hit;
     struct Point pos;
     struct Point old_f;
@@ -918,7 +918,7 @@ void FUN_00402780(struct NewBloke *b) {
         break;
     }
     SetOverrideFrame(b->f_b9 = b->f_b8);
-    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (void (*)(void *))FUN_00402550, b, &hit);
+    SortSpriteWithCallback(DSCarSprite, b->sx, b->sy, key, 0, (void (*)(void *))DrawDrivingSchoolCar, b, &hit);
     ClearOverridePalette();
     ClearOverrideFrame();
 
@@ -933,7 +933,7 @@ void FUN_00402780(struct NewBloke *b) {
     AdjustBlokePosition(&person->screen);
     SetPersonYawFromDir16(person, b->bloke->dir);
 
-    if (FUN_00402490((struct NewBloke *)b) != NULL) {
+    if (FindDrivingSchoolCarAhead((struct NewBloke *)b) != NULL) {
         /* blocked by another car: slow down and wait */
         b->f_c8 = b->f_c6 >> 1;
         b->f_bc++;
@@ -945,7 +945,7 @@ void FUN_00402780(struct NewBloke *b) {
         if (b->f_c8 < b->f_c6) {
             b->f_c8 += 0x40;
         }
-        FUN_004019c0((struct NewBloke *)b);
+        UpdateDrivingSchoolCarVelocity((struct NewBloke *)b);
         b->fx += b->velX;
         b->fy += b->velY;
         b->px = (b->fx + 0x10000) >> 16;
@@ -987,7 +987,7 @@ void FUN_00402780(struct NewBloke *b) {
     case 2:
         if (FUN_00402390(b) != 0) {
             b->f_c4 = 0;
-            FUN_004015e0(b);
+            AddDrivingSchoolStraightWaypoint(b);
         }
         break;
     case 3:
@@ -1002,18 +1002,18 @@ void FUN_00402780(struct NewBloke *b) {
         break;
     case 5:
         FUN_00401320(b);
-        FUN_004015e0(b);
+        AddDrivingSchoolStraightWaypoint(b);
         b->f_c4 = 0;
         break;
     }
     if (queued == 0) {
-        FUN_00401cd0((struct NewBloke *)b);
+        PopDrivingSchoolCarWaypoint((struct NewBloke *)b);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00402c10
-void FUN_00402c10(void) {
-    struct NewBloke *cur = (struct NewBloke *)DAT_004c10d4;
+void UpdateDrivingSchoolCars(void) {
+    struct NewBloke *cur = (struct NewBloke *)DrivingSchoolCars;
     struct NewBloke *next;
     struct RideQueueEntry *tile;
 
@@ -1030,12 +1030,12 @@ void FUN_00402c10(void) {
         tile = (struct RideQueueEntry *)FindQueueEntryAtTile(cur->px, cur->py);
 
         if ((tile == 0 && cur->f_c2 == 0) || cur->f_be == 0) {
-            FUN_00401c60((struct NewBloke *)cur);
+            RemoveDrivingSchoolCar((struct NewBloke *)cur);
             if (tile != 0) {
                 tile->field_1c--;
             }
         } else {
-            FUN_00402780((struct NewBloke *)cur);
+            UpdateDrivingSchoolCar((struct NewBloke *)cur);
         }
 
         cur = next;

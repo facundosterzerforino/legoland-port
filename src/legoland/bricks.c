@@ -337,7 +337,7 @@ void FUN_00457a70(void) {
                 }
             }
         } else {
-            FUN_00452030();
+            UpdateEditSelection();
             QueryCursor = EditCursor;
         }
         if (DAT_00810144 == 0) {
@@ -355,7 +355,7 @@ void FUN_00457a70(void) {
                 DAT_00667cd8 = 1;
                 DAT_00667cdc = 0;
                 for (y = DAT_00813a88; y <= DAT_00813a90; y += DAT_00813a3c) {
-                    for (x = DAT_00813a84; x <= DAT_00813a8c; x += DAT_00813a38) {
+                    for (x = SelectionRect; x <= DAT_00813a8c; x += DAT_00813a38) {
                         QueryCursor.field_1414[4] = 0;
                         QueryCursor.tile_x = x;
                         QueryCursor.tile_y = y;
@@ -413,7 +413,7 @@ void FUN_00457a70(void) {
                 DAT_0080ff6c = NULL;
             }
         }
-        if (DAT_00813acc & 2) {
+        if (RightClickFlags & 2) {
             EditMode.unk0 = 0;
             GamePad &= ~0x1400;
         }
@@ -440,7 +440,7 @@ void FUN_00457a70(void) {
                     DAT_00667cdc = 0;
                     if (EditMode.unk8 == PathControlObject) {
                         for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
-                            for (x = DAT_00813a84; x <= DAT_00813a8c; x += FootprintWidth) {
+                            for (x = SelectionRect; x <= DAT_00813a8c; x += FootprintWidth) {
                                 pt.x = x - EditMode.unk8->footprint.x0;
                                 pt.y = y - EditMode.unk8->footprint.y0;
                                 if (pt.x >= 0 && pt.x < lpConfig->width && pt.y >= 0 && pt.y < lpConfig->height) {
@@ -455,7 +455,7 @@ void FUN_00457a70(void) {
                         }
                     }
                     for (y = DAT_00813a88; y <= DAT_00813a90; y += FootprintHeight) {
-                        for (x = DAT_00813a84; x <= DAT_00813a8c; x += FootprintWidth) {
+                        for (x = SelectionRect; x <= DAT_00813a8c; x += FootprintWidth) {
                             pt.x = x - EditMode.unk8->footprint.x0;
                             pt.y = y - EditMode.unk8->footprint.y0;
                             if (IsFootprintClear(pt.x, pt.y)) {
@@ -483,7 +483,7 @@ void FUN_00457a70(void) {
         } else {
             RenderCursor(&EditCursor);
         }
-        if (DAT_00813acc & 2) {
+        if (RightClickFlags & 2) {
             EditMode.unk0 = 0;
             GamePad &= ~0x1400;
         }
@@ -516,7 +516,7 @@ void FUN_00457a70(void) {
         RenderCursor(&QueryCursor);
         break;
     }
-    if ((DAT_00813a50 & 2) && DAT_00667c48 == 0 && EditMode.unk0 == 0 && DAT_00668954 == 0) {
+    if ((MapLeftClickFlags & 2) && DAT_00667c48 == 0 && EditMode.unk0 == 0 && DAT_00668954 == 0) {
         PopUpInfoSetUp(Hover, MousePos.x, MousePos.y);
         DAT_00667c48 = 1;
     }

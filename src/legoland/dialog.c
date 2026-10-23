@@ -20,7 +20,7 @@
 #include "wndenv.h"
 
 // FUNCTION: LEGOLAND 0x0043e930
-int FUN_0043e930(RECT *rc, int min, int max, int value, int step) {
+int DialogSlider(RECT *rc, int min, int max, int value, int step) {
     int pos;
 
     pos = (rc->bottom - rc->top) * value / (max - min);
@@ -111,7 +111,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
     bar.bottom = clip.bottom;
     while (ProcessSystemEvents()) {
         ReadGameButtons();
-        if ((DAT_00813ad4 & 1) || (DAT_00813acc & 1)) {
+        if ((CancelKeyState & 1) || (RightClickFlags & 1)) {
             return -1;
         }
         if (MousePos.x >= clip.left && MousePos.x <= clip.right && MousePos.y >= clip.top && MousePos.y <= clip.bottom) {
@@ -143,7 +143,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
         RenderBlock(box->left + 2, box->top + 2, box->right - 4, 0x18, GetNearestColour(0, 0x3f, 0x7f));
         PrintLimitedText(box->left + 2, box->top + 2, box->right - 4, title, 0, 0xefefef, 0);
         if (retry) {
-            DialogListScrollY = FUN_0043e930(&bar, 0, over, DialogListScrollY, 0x10);
+            DialogListScrollY = DialogSlider(&bar, 0, over, DialogListScrollY, 0x10);
         }
         GetClipping(&saved);
         SetClipping(&clip);
@@ -172,7 +172,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
 }
 
 // FUNCTION: LEGOLAND 0x0043eee0
-struct Element *FUN_0043eee0(char *title, struct Sprite *bg, RECT *box, unsigned int mask, int flag) {
+struct Element *SelectElementDialog(char *title, struct Sprite *bg, RECT *box, unsigned int mask, int flag) {
     struct Sprite *happy;
     struct Sprite *poor;
     struct Element *e;
@@ -378,7 +378,7 @@ char *FileSelectDialog(char *title, struct Sprite *bg, RECT *box, char *path) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f460
-int FUN_0043f460(RECT *rc, int unused, char *buf, int maxlen, int *pos) {
+int DialogTextInput(RECT *rc, int unused, char *buf, int maxlen, int *pos) {
     char c;
 
     c = GetInputChar();
@@ -408,7 +408,7 @@ int FUN_0043f460(RECT *rc, int unused, char *buf, int maxlen, int *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x0043f4f0
-int FUN_0043f4f0(struct Sprite *bg, RECT *box, char *title, char *buf, int maxlen) {
+int RunTextInputDialog(struct Sprite *bg, RECT *box, char *title, char *buf, int maxlen) {
     int pos;
     RECT rc;
     int done;
@@ -428,7 +428,7 @@ int FUN_0043f4f0(struct Sprite *bg, RECT *box, char *title, char *buf, int maxle
         RenderBlock(box->left + 2, box->top + 2, box->right - 4, 0x18, GetNearestColour(0, 0x3f, 0x7f));
         PrintLimitedText(box->left + 2, box->top + 2, box->right - 4, title, 0, 0xefefef, 0);
         RenderThickBox(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 2, 0);
-        done = FUN_0043f460(&rc, 0, buf, maxlen, &pos);
+        done = DialogTextInput(&rc, 0, buf, maxlen, &pos);
         RenderingComplete();
         PopRenderingStatus();
     }

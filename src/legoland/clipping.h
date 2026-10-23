@@ -13,17 +13,17 @@ struct ClipQueryResult {
     unsigned int field_8;
     unsigned int field_c;
 };
-extern struct ClipQueryResult DAT_004bdeb8[0x86];
+extern struct ClipQueryResult FreePlayObjectTable[0x86];
 
 struct Element;
 
-void FUN_0048a6e0(struct Element *object);
+void UnlockFreePlayObject(struct Element *object);
 LEGO_EXPORT void SetClipping(RECT *rect);
 LEGO_EXPORT void GetClipping(RECT *dest);
 LEGO_EXPORT void StoreClipping(void);
 LEGO_EXPORT void RestoreClipping(void);
-void FUN_0048a750(void);
+void UnlockAllFreePlayObjects(void);
 void FUN_0048a780(void *arg);
 void FUN_0048a790(void);
-void FUN_0048a800(void);
-unsigned int FUN_0048a840(const char *arg, struct ClipQueryResult **out);
+void ClearFreePlaySelection(void);
+unsigned int GetFreePlayObjectCost(const char *arg, struct ClipQueryResult **out);

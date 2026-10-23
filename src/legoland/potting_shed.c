@@ -146,13 +146,13 @@ struct RideSpriteInfo *GetPottingShedSpriteInfo(struct Element *param1, unsigned
     struct Ride *s2 = param1->ride;
     struct Sprite *s3;
 
-    DAT_0062fe10.sprite = s2->layer;
-    DAT_0062fe10.x = s2->field_14;
-    DAT_0062fe10.y = s2->field_18;
-    DAT_0062fe10.id = param2;
+    PottingShedSpriteInfo.sprite = s2->layer;
+    PottingShedSpriteInfo.x = s2->field_14;
+    PottingShedSpriteInfo.y = s2->field_18;
+    PottingShedSpriteInfo.id = param2;
 
     s3 = s2->layer;
     s3->flags |= 0x2000;
 
-    return &DAT_0062fe10;
+    return &PottingShedSpriteInfo;
 }

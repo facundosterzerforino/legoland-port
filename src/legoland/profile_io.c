@@ -487,7 +487,7 @@ char FUN_004920a0(unsigned int param1, unsigned char flags) {
 }
 
 // FUNCTION: LEGOLAND 0x004920e0
-struct Sample *FUN_004920e0(void) {
+struct Sample *AllocSample(void) {
     struct Sample *v = (struct Sample *)malloc(sizeof(struct Sample));
     v->next = 0;
     v->refcount = 0;
@@ -504,8 +504,8 @@ struct Sample *FUN_004920e0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00492110
-void *FUN_00492110(void) {
-    struct Sample *obj = FUN_004920e0();
+void *NewSample(void) {
+    struct Sample *obj = AllocSample();
     obj->next = (struct Sample *)SampleListHead;
     SampleListHead = obj;
     return obj;

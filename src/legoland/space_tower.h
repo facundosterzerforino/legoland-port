@@ -49,7 +49,7 @@ struct AnimLayout {
     /* 0x04 */ struct AnimEntry **entries;
 };
 
-unsigned int FUN_0043acb0(struct RideNode *param_1, struct SpaceTowerCar *param_2);
+unsigned int TakeRandomSpaceTowerSlot(struct RideNode *param_1, struct SpaceTowerCar *param_2);
 void SpaceTowerUpdate(struct Element *param_1);
 
 struct Ride;

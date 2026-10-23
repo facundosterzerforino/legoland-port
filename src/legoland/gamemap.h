@@ -95,9 +95,9 @@ typedef struct Cursor Cursor;
 
 struct Point;
 
-void FUN_004598d0(struct Point *coord, int *param_2, int *param_3);
+void CountPathEdgeScenery(struct Point *coord, int *param_2, int *param_3);
 void ResetPathSceneryTimer(void);
-void FUN_00459970(void);
+void UpdatePathSceneryPercent(void);
 LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct Point *pos);
 LEGO_EXPORT int FindObjectsPower(struct Ride *ride);
 void MarkObjectUnpowered(int power, struct MapElement *object);
@@ -115,7 +115,7 @@ LEGO_EXPORT struct MapElement *GetNextRenderObject(struct MapElement *object);
 LEGO_EXPORT struct MapElement *GetFirstObjectMatching(struct Element *cls);
 LEGO_EXPORT struct MapElement *GetNextObjectMatching(struct MapElement *object, struct Element *cls);
 LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId tile, void *cursor);
-void FUN_00459880(void);
+void ResetCoverageCounters(void);
 LEGO_EXPORT struct Point PlayfieldToMap(struct Point pos);
 LEGO_EXPORT void InitGameMap(void);
 LEGO_EXPORT void KillGameMap(void);

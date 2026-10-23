@@ -9,7 +9,7 @@
 #include "profile_io.h"
 
 // GLOBAL: LEGOLAND 0x004bdeb8
-struct ClipQueryResult DAT_004bdeb8[0x86];
+struct ClipQueryResult FreePlayObjectTable[0x86];
 
 struct ClipNode;
 
@@ -63,10 +63,10 @@ LEGO_EXPORT int ClipThisRect(RECT *lpRect) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a6e0
-void FUN_0048a6e0(struct Element *object) {
+void UnlockFreePlayObject(struct Element *object) {
     struct ClipQueryResult *entry;
 
-    for (entry = DAT_004bdeb8; strlen(entry->name) != 0; entry++) {
+    for (entry = FreePlayObjectTable; strlen(entry->name) != 0; entry++) {
         if (_stricmp(object->name, entry->name) == 0) {
             if (CurrentProfile.field_46[entry->id] == 0) {
                 CurrentProfile.field_46[entry->id] = 1;
@@ -78,12 +78,12 @@ void FUN_0048a6e0(struct Element *object) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a750
-void FUN_0048a750(void) {
+void UnlockAllFreePlayObjects(void) {
     struct Ride *current = (struct Ride *)ObjectClassList;
     while (current != NULL) {
         struct Element *object = current->element;
         if ((object->flags & 0x2) == 0) {
-            FUN_0048a6e0(object);
+            UnlockFreePlayObject(object);
         }
         current = current->next;
     }
@@ -102,7 +102,7 @@ void FUN_0048a790(void) {
         unsigned short type = node->field_14;
         if (type == 0xc8 || type == 0x1f4 || type == 0x190 || type == 0x12c) {
             struct ClipQueryResult *result;
-            FUN_0048a840(node->field_1c, &result);
+            GetFreePlayObjectCost(node->field_1c, &result);
             if (result->field_c) {
                 node->field_2c(node, 2, 0, 0);
             }
@@ -114,13 +114,13 @@ void FUN_0048a790(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a800
-void FUN_0048a800(void) {
+void ClearFreePlaySelection(void) {
     struct ClipQueryResult *entry;
 
-    if (strlen(DAT_004bdeb8[0].name) == 0)
+    if (strlen(FreePlayObjectTable[0].name) == 0)
         return;
 
-    entry = DAT_004bdeb8;
+    entry = FreePlayObjectTable;
     do {
         entry->field_c = 0;
         entry++;
@@ -128,10 +128,10 @@ void FUN_0048a800(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048a840
-unsigned int FUN_0048a840(const char *arg, struct ClipQueryResult **out) {
+unsigned int GetFreePlayObjectCost(const char *arg, struct ClipQueryResult **out) {
     struct ClipQueryResult *entry;
 
-    for (entry = DAT_004bdeb8; strlen(entry->name) != 0; entry++) {
+    for (entry = FreePlayObjectTable; strlen(entry->name) != 0; entry++) {
         if (_stricmp(arg, entry->name) == 0) {
             if (out != NULL) {
                 *out = entry;

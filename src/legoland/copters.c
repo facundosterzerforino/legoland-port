@@ -439,10 +439,10 @@ void CoptersSetEditMode(void) {
 struct RideSpriteInfo *GetCoptersSpriteInfo(struct Element *editobj, unsigned short uid) {
     struct Ride *ride = editobj->ride;
 
-    DAT_004c1170.sprite = ride->layer;
-    DAT_004c1170.x = ride->field_14;
-    DAT_004c1170.y = ride->field_18;
-    DAT_004c1170.id = uid;
+    CoptersSpriteInfo.sprite = ride->layer;
+    CoptersSpriteInfo.x = ride->field_14;
+    CoptersSpriteInfo.y = ride->field_18;
+    CoptersSpriteInfo.id = uid;
     ride->layer->flags |= 0x2000;
 
     if (CoptersFindNode((struct CopterSource *)&uid) != 0) {
@@ -458,7 +458,7 @@ struct RideSpriteInfo *GetCoptersSpriteInfo(struct Element *editobj, unsigned sh
         HideLayer(CopterModelLayers, 4);
     }
 
-    return &DAT_004c1170;
+    return &CoptersSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00404580

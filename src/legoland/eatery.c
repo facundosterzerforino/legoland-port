@@ -131,8 +131,8 @@ void ChuckWagonUpdate(Element *obj) {
 
 // FUNCTION: LEGOLAND 0x0042e460
 void LoadBrollyImages(struct Element *obj) {
-    DAT_0081cd38 = obj->ride;
-    DAT_0081cd38->flags |= 0x400;
+    ActiveEateryRide = obj->ride;
+    ActiveEateryRide->flags |= 0x400;
     // STRING: LEGOLAND 0x004b6ec8
     if (LLIDB_FindElement("BROLLY IMAGES", &BrollyImagesHandle, 0) == 0) {
         BrollyImagesData = (struct BrollyData *)LLIDB_LoadData((void *)BrollyImagesHandle);
@@ -146,7 +146,7 @@ void UnloadBrollyImages(void) {
 
 // FUNCTION: LEGOLAND 0x0042e4c0
 void BrollySetEditMode(void) {
-    struct Ride *temp = DAT_0081cd38;
+    struct Ride *temp = ActiveEateryRide;
     EditMode.unk0 = 1;
     EditMode.unk8 = temp;
     DefaultCursor(&EditCursor);
@@ -579,10 +579,10 @@ struct BrollyNode *AllocBrollyNode(unsigned short *param_1) {
     if (node != NULL) {
         memset(node, 0, sizeof(struct BrollyNode));
         node->value = *param_1;
-        node->next = DAT_00616144;
+        node->next = BrollyNodeList;
         memset(&node->seats, 0, sizeof(node->seats));
         node->field_9 = 0;
-        DAT_00616144 = node;
+        BrollyNodeList = node;
     }
     return node;
 }
@@ -598,7 +598,7 @@ void Restaurant1AddObject(struct Element *param_1, unsigned char *param_2) {
 
 // FUNCTION: LEGOLAND 0x0042ef40
 struct BrollyNode *FindBrollyNode(unsigned short *param_1) {
-    struct BrollyNode *node = DAT_00616144;
+    struct BrollyNode *node = BrollyNodeList;
     if (node == NULL) {
         return NULL;
     }
@@ -613,9 +613,9 @@ struct BrollyNode *FindBrollyNode(unsigned short *param_1) {
 
 // FUNCTION: LEGOLAND 0x0042ef70
 void RemoveBrollyNode(struct BrollyNode *node) {
-    struct BrollyNode *head = DAT_00616144;
+    struct BrollyNode *head = BrollyNodeList;
     if (head == node) {
-        DAT_00616144 = node->next;
+        BrollyNodeList = node->next;
     } else {
         struct BrollyNode *current = head;
         if (current->next != node) {
@@ -1430,13 +1430,13 @@ void Restaurant2Update(Element *obj) {
 struct RideSpriteInfo *GetRestaurant2SpriteInfo(struct Element *obj, unsigned short a2) {
     struct Ride *fx = obj->ride;
     struct Sprite *inner = fx->layer;
-    DAT_00616120.sprite = inner;
-    DAT_00616120.x = fx->field_14;
-    DAT_00616120.y = fx->field_18;
-    DAT_00616120.id = a2;
+    EaterySpriteInfo.sprite = inner;
+    EaterySpriteInfo.x = fx->field_14;
+    EaterySpriteInfo.y = fx->field_18;
+    EaterySpriteInfo.id = a2;
     inner = fx->layer;
     inner->flags |= 0x2000;
-    return &DAT_00616120;
+    return &EaterySpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x004304e0
@@ -2192,7 +2192,7 @@ void RenderOctopusCafe(struct Element *param_1, unsigned int param_2, unsigned i
 int Restaurant1_Save(struct Element *element) {
     unsigned int one = 1;
     unsigned int zero = 0;
-    struct BrollyNode *node = DAT_00616144;
+    struct BrollyNode *node = BrollyNodeList;
     while (node != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
@@ -2225,7 +2225,7 @@ int Restaurant1_Load(struct Element *element) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            DAT_00616144 = node;
+            BrollyNodeList = node;
         }
         prev = node;
         if (!SaveGameRead(&count, 4)) {

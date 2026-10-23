@@ -263,7 +263,7 @@ unsigned int ScriptEventBridges(struct ObjectiveEvent *arg) {
 // FUNCTION: LEGOLAND 0x0046a480
 unsigned int ScriptEventBriefingFile(struct ObjectiveEvent *arg) {
     /* TODO: fold into NerpsArg — field_8 is used both as unsigned int (SetHintsFileName) and a string ptr here */
-    FUN_004687f0(arg->text);
+    SetBriefingFile(arg->text);
     return 1;
 }
 
@@ -666,7 +666,7 @@ unsigned int ScriptEventRideVisitors(struct ObjectiveEvent *arg) {
             (robj = (struct MapElement *)GetFirstObjectMatching((Element *)node->iface->element)) != NULL) {
             pt.x = robj->field_4;
             pt.y = robj->field_5;
-            value = FUN_00489fd0(&pt) & 0xffff;
+            value = GetObjInstanceCount(&pt) & 0xffff;
             if ((int)value >= (int)arg->field_1c) {
                 return 1;
             }
@@ -682,8 +682,8 @@ unsigned int ScriptEventRideVisitors(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046ad00
 unsigned int ScriptEventSceneryCoverage(struct ObjectiveEvent *arg) {
-    if (DAT_00667cf8 < (int)arg->field_14) {
-        QueueCoverSquaresHint(arg, 2, arg->field_14 - DAT_00667cf8);
+    if (SceneryCoveredSquares < (int)arg->field_14) {
+        QueueCoverSquaresHint(arg, 2, arg->field_14 - SceneryCoveredSquares);
         return 0;
     }
     return 1;
@@ -691,9 +691,9 @@ unsigned int ScriptEventSceneryCoverage(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046ad30
 unsigned int ScriptEventPathScenery(struct ObjectiveEvent *arg) {
-    FUN_00459970();
-    if (DAT_00667d08 < (int)arg->field_14) {
-        QueuePathSceneryHint(arg, arg->field_14 - DAT_00667d08);
+    UpdatePathSceneryPercent();
+    if (PathSceneryPercent < (int)arg->field_14) {
+        QueuePathSceneryHint(arg, arg->field_14 - PathSceneryPercent);
         return 0;
     }
     return 1;
@@ -701,8 +701,8 @@ unsigned int ScriptEventPathScenery(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046ad60
 unsigned int ScriptEventRideCoverage(struct ObjectiveEvent *arg) {
-    if (DAT_00667ce4 < (int)arg->field_14) {
-        QueueCoverSquaresHint(arg, 1, arg->field_14 - DAT_00667ce4);
+    if (RideCoveredSquares < (int)arg->field_14) {
+        QueueCoverSquaresHint(arg, 1, arg->field_14 - RideCoveredSquares);
         return 0;
     }
     return 1;
@@ -710,8 +710,8 @@ unsigned int ScriptEventRideCoverage(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046ad90
 unsigned int ScriptEventShopCoverage(struct ObjectiveEvent *arg) {
-    if (DAT_00667ce8 < (int)arg->field_14) {
-        QueueCoverSquaresHint(arg, 4, arg->field_14 - DAT_00667ce8);
+    if (ShopCoveredSquares < (int)arg->field_14) {
+        QueueCoverSquaresHint(arg, 4, arg->field_14 - ShopCoveredSquares);
         return 0;
     }
     return 1;
@@ -719,8 +719,8 @@ unsigned int ScriptEventShopCoverage(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046adc0
 unsigned int ScriptEventFoodCoverage(struct ObjectiveEvent *arg) {
-    if (DAT_00667cec < (int)arg->field_14) {
-        QueueCoverSquaresHint(arg, 5, arg->field_14 - DAT_00667cec);
+    if (FoodCoveredSquares < (int)arg->field_14) {
+        QueueCoverSquaresHint(arg, 5, arg->field_14 - FoodCoveredSquares);
         return 0;
     }
     return 1;
@@ -728,8 +728,8 @@ unsigned int ScriptEventFoodCoverage(struct ObjectiveEvent *arg) {
 
 // FUNCTION: LEGOLAND 0x0046adf0
 unsigned int ScriptEventTotalCoverage(struct ObjectiveEvent *arg) {
-    if (DAT_00667ce0 < (int)arg->field_14) {
-        QueueCoverSquaresHint(arg, 0, arg->field_14 - DAT_00667ce0);
+    if (TotalCoveredSquares < (int)arg->field_14) {
+        QueueCoverSquaresHint(arg, 0, arg->field_14 - TotalCoveredSquares);
         return 0;
     }
     return 1;
@@ -1005,7 +1005,7 @@ void SetScriptStopped(unsigned int param_1) {
     MapStats.script_stopped = param_1;
     UpdateScriptEndIcon((void *)1);
     if (param_1 != 0) {
-        FUN_00458be0();
+        MarkLevelComplete();
         if (MapStats.field_3a8 != 0) {
             return;
         }
@@ -1372,7 +1372,7 @@ void PostScriptSectionIntro(struct NerpsListNode *ctx, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0046b700
-unsigned int FUN_0046b700(void) {
+unsigned int RepeatCurrentObjective(void) {
     if (CurrentScriptSection != 0) {
         if (DAT_00668614 != 0) {
             PostObjectiveMessage(PercentSFormat, ScriptStringTable[DAT_00668614]);
@@ -2121,7 +2121,7 @@ void AppendSectionRewards(struct NerpsListNode *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c5c0
-void FUN_0046c5c0(void) {
+void FreeAllScriptLists(void) {
     FreeObjectiveEventList(ObjectiveEventList);
     ObjectiveEventList = NULL;
     FreeObjectiveEventList(DAT_00668724);
@@ -2155,7 +2155,7 @@ unsigned int SaveGameWriteString(char *str) {
 }
 
 // FUNCTION: LEGOLAND 0x0046c680
-void *FUN_0046c680(void) {
+void *ReadSaveString(void) {
     int len;
     char *buffer; /* a string: len bytes, then the 0 added here */
 
@@ -2236,7 +2236,7 @@ struct ObjectiveEvent *LoadObjectiveEventList(void) {
         node->timestamp += DAT_007fe994;
         // STRING: LEGOLAND 0x004ba828
         DBPrintf("Fixed up to %d\n", node->timestamp);
-        str = (char *)FUN_0046c680();
+        str = (char *)ReadSaveString();
         if (ScriptLoadErrorCount != 0) {
             free(node);
             FreeObjectiveEventList(head);
@@ -2248,7 +2248,7 @@ struct ObjectiveEvent *LoadObjectiveEventList(void) {
         } else {
             node->field_4 = 0;
         }
-        node->text = FUN_0046c680();
+        node->text = ReadSaveString();
         if (node->field_8 != 0) {
             node->flags_10 |= 0x20;
         }
@@ -2282,10 +2282,10 @@ unsigned int SaveScripts(void) {
     if (SaveObjectiveIcons() == 0) {
         return 0;
     }
-    if (SaveGameWrite(DAT_0066861c, 0x80) == 0) {
+    if (SaveGameWrite(BriefingFileName, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameWrite(DAT_0066869c, 0x80) == 0) {
+    if (SaveGameWrite(HintsFileName, 0x80) == 0) {
         return 0;
     }
     if (SaveGameWrite(&ScriptStringCount, 4) == 0) {
@@ -2296,7 +2296,7 @@ unsigned int SaveScripts(void) {
             return 0;
         }
     }
-    scratch = DAT_007fe994 - DAT_00668780;
+    scratch = DAT_007fe994 - ObjectiveHintTimer;
     if (SaveGameWrite(&scratch, 4) == 0) {
         return 0;
     }
@@ -2337,7 +2337,7 @@ unsigned int SaveScripts(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0046cb20
-unsigned int FUN_0046cb20(void) {
+unsigned int UnloadLevelData(void) {
     DAT_00668614 = 0;
     if (DAT_00810140 != 0) {
         UnloadSaveGameMap();
@@ -2345,7 +2345,7 @@ unsigned int FUN_0046cb20(void) {
         UnloadBaseMap();
     }
     FreeScriptStrings();
-    FUN_0046c5c0();
+    FreeAllScriptLists();
     ClearAdvisorHelp();
     FUN_0046ce00();
     return 1;
@@ -2475,17 +2475,17 @@ unsigned int LoadScripts(void) {
     if (LoadObjectiveIcons() == 0) {
         return 0;
     }
-    if (SaveGameRead(DAT_0066861c, 0x80) == 0) {
+    if (SaveGameRead(BriefingFileName, 0x80) == 0) {
         return 0;
     }
-    if (SaveGameRead(DAT_0066869c, 0x80) == 0) {
+    if (SaveGameRead(HintsFileName, 0x80) == 0) {
         return 0;
     }
     if (SaveGameRead(&ScriptStringCount, 4) == 0) {
         return 0;
     }
     for (i = 0; i < (int)ScriptStringCount; i++) {
-        ScriptStringTable[i] = (char *)FUN_0046c680();
+        ScriptStringTable[i] = (char *)ReadSaveString();
         if (ScriptLoadErrorCount != 0) {
             return 0;
         }
@@ -2496,7 +2496,7 @@ unsigned int LoadScripts(void) {
     if (SaveGameRead(&base, 4) == 0) {
         return 0;
     }
-    DAT_00668780 = DAT_007fe994 + base;
+    ObjectiveHintTimer = DAT_007fe994 + base;
     DAT_00668614 = 0;
     UpdateScriptEndIcon((void *)1);
     if (SaveGameRead(&i, 4) == 0) {
@@ -2539,7 +2539,7 @@ unsigned int LoadScripts(void) {
         if (ScriptLoadErrorCount != 0) {
             return 0;
         }
-        node->field_8 = FUN_0046c680();
+        node->field_8 = ReadSaveString();
         if (ScriptLoadErrorCount != 0) {
             return 0;
         }
@@ -2567,6 +2567,6 @@ unsigned int LoadScripts(void) {
 // FUNCTION: LEGOLAND 0x0046ce00
 void FUN_0046ce00(void) {
     ResetObjectiveHintTimer();
-    DAT_007fe050 = 0;
+    AdvisorHelpClearTime = 0;
     DAT_007fe054 = 0;
 }

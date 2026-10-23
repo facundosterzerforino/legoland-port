@@ -100,7 +100,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
         iface->save_hook = DrivingSchool_Save;
         iface->load_hook = DrivingSchool_Load;
         iface->cb_ac = UnloadDrivingSchoolResources;
-        iface->cb_c0 = FUN_00406050;
+        iface->cb_c0 = GetBestDrivingSchoolScore;
     }
     // STRING: LEGOLAND 0x004b89cc
     else if (_stricmp("DRIVING SCHOOL ROADS", head->name) == 0) {
@@ -108,18 +108,18 @@ LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
         iface->cb_ac = UnloadDrivingSchoolRoadsResources;
         iface->cb_8c = DrivingSchoolRoadsSetEditMode;
         iface->cb_90 = DrivingSchoolRoadsCalcCursor;
-        iface->cb_94 = FUN_00413fa0;
+        iface->cb_94 = RoadSetQueryCursor;
         iface->cb_98 = DrivingSchoolRoadsAddObject;
-        iface->cb_9c = FUN_00414220;
+        iface->cb_9c = RoadRemoveObject;
     }
     // STRING: LEGOLAND 0x004b89bc
     else if (_stricmp("ZEBRA CROSSING", head->name) == 0) {
         iface->cb_a4 = InitZebraCrossing;
         iface->cb_8c = ZebraCrossingSetEditMode;
         iface->cb_90 = ZebraCrossingCalcCursor;
-        iface->cb_94 = FUN_00413fa0;
+        iface->cb_94 = RoadSetQueryCursor;
         iface->cb_98 = ZebraCrossingAddObject;
-        iface->cb_9c = FUN_00414220;
+        iface->cb_9c = RoadRemoveObject;
     } else if (_stricmp("ENTRANCE 1", head->name) == 0) {
         iface->cb_a4 = LoadEntranceResources;
         iface->cb_ac = UnloadEntranceResources;
@@ -290,7 +290,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
     } else if (_stricmp("BOATING SCHOOL", head->name) == 0) {
         iface->cb_a4 = LoadBoatingSchoolResources;
         iface->cb_ac = UnloadBoatingSchoolResources;
-        iface->cb_8c = FUN_0041a000;
+        iface->cb_8c = SetBoatingSchoolEditCursor;
         iface->cb_90 = BoatingSchoolCalcCursor;
         iface->cb_94 = BoatingSchoolDCalcCursor;
         iface->cb_98 = BoatingSchoolAddObject;
@@ -299,7 +299,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
         iface->cb_b0 = RenderBoatingSchool;
         iface->save_hook = BoatingSchool_Save;
         iface->load_hook = BoatingSchool_Load;
-        iface->cb_c0 = FUN_0041b100;
+        iface->cb_c0 = GetBestBoatRideScore;
     }
     // STRING: LEGOLAND 0x004b5354
     else if (_stricmp("BOATING SCHOOL MERMAID", head->name) == 0) {
@@ -330,7 +330,7 @@ LEGO_EXPORT void SetCustomCallbacks(struct Element *head) {
         iface->cb_b0 = RenderJungleCruise;
         iface->save_hook = JungleCruise_Save;
         iface->load_hook = JungleCruise_Load;
-        iface->cb_c0 = FUN_00436160;
+        iface->cb_c0 = GetBestJungleScore;
     }
     // STRING: LEGOLAND 0x004b88b8
     else if (_stricmp("JUNGLE CRUISE MONKEY TREE", head->name) == 0) {

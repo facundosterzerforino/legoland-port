@@ -364,7 +364,7 @@ LEGO_EXPORT void BubbleHelp(int *rect, char *text, int font) {
     box.top = 0;
     box.bottom = 0;
     box.right = 200;
-    cell = FUN_00455d40(text, font, 0x10, 0xd6dede, 0);
+    cell = FindTextCellByStyle(text, font, 0x10, 0xd6dede, 0);
     if (!cell) {
         hdc = CreateCompatibleDC(NULL);
         SetBkMode(hdc, 1);
@@ -487,7 +487,7 @@ LEGO_EXPORT void HTBubbleHelp(RECT *rect, char *text, int font) {
     block_color = GetNearestColour(0xda, 0xc6, 0x96);
     if (text != NULL) {
         box.right = 200;
-        cell = FUN_00455d40(text, font, 0x10, 0x96c6da, 0);
+        cell = FindTextCellByStyle(text, font, 0x10, 0x96c6da, 0);
         if (cell == NULL) {
             hdc = CreateCompatibleDC(NULL);
             SetBkMode(hdc, 1);
@@ -634,7 +634,7 @@ struct TextCell *FindTextCell(char *name, int width, int height, int font, unsig
 }
 
 // FUNCTION: LEGOLAND 0x00455d40
-struct TextCell *FUN_00455d40(const char *name, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
+struct TextCell *FindTextCellByStyle(const char *name, int font, unsigned int format, unsigned int bg_color, unsigned int text_color) {
     int i;
     struct TextCell *cell = TextCells;
 
@@ -711,7 +711,7 @@ void FlushTextCells(int evict_all) {
 }
 
 // FUNCTION: LEGOLAND 0x00455fc0
-void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
+void HTBubbleHelpWithMood(RECT *rect, const char *text, int font, int mood) {
     /* [port] the original indexes (&DAT_008139e0)[mood], relying on the eleven bubble-help sprites being laid out
      * one after another; list them explicitly instead (mood is 1..5 or 10) */
     static struct Sprite **const mood_sprites[11] = {
@@ -755,7 +755,7 @@ void FUN_00455fc0(RECT *rect, const char *text, int font, int mood) {
     }
     if (NULL != text) {
         { box.right = 200; }
-        cell = FUN_00455d40(text, font, 0x10, 0x96c6da, 0);
+        cell = FindTextCellByStyle(text, font, 0x10, 0x96c6da, 0);
         if (!cell) {
             hdc = CreateCompatibleDC(NULL);
             SetBkMode(hdc, 1);

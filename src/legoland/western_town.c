@@ -224,7 +224,7 @@ void GeneralStoreUpdate(struct Element *param_1) {
                 bloke->param_action++;
                 break;
             case 7:
-                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
+                BrowseAndBuyItem((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
                 break;
             case 8:
                 bloke->dest.x = x * 0x100 + 0x80;
@@ -367,7 +367,7 @@ void SheriffUpdate(struct Element *param_1) {
                 bloke->dir = 8;
                 break;
             case 3:
-                FUN_00437570((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
+                BrowseAndBuyItem((struct RideNode *)node, (Element *)param_1, (TileId *)&node->tile, 1);
                 break;
             case 4:
                 bloke->dest.x = (x - 3) * 0x100;
@@ -410,7 +410,7 @@ void SheriffUpdate(struct Element *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00437f10
-void FUN_00437f10(unsigned short *param) {
+void AddJailCell(unsigned short *param) {
     struct JailCell *cell = malloc(sizeof(struct JailCell));
     if (cell != NULL) {
         memset(cell, 0, sizeof(struct JailCell));
@@ -432,11 +432,11 @@ void JailCellAddObject(struct Element *editObj, int *coords) {
     key[0] = (unsigned char)coords[0];
     key[1] = (unsigned char)coords[1];
     AddBasicObject(editObj, coords);
-    FUN_00437f10((unsigned short *)key);
+    AddJailCell((unsigned short *)key);
 }
 
 // FUNCTION: LEGOLAND 0x00437f90
-struct JailCell *FUN_00437f90(unsigned short *key) {
+struct JailCell *FindJailCell(unsigned short *key) {
     struct JailCell *cell;
 
     cell = JailCellList;
@@ -453,7 +453,7 @@ struct JailCell *FUN_00437f90(unsigned short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x00437fc0
-void FUN_00437fc0(struct JailCell *cell) {
+void FreeJailCell(struct JailCell *cell) {
     struct JailCell *cur;
     struct JailCell *prev;
 
@@ -477,17 +477,17 @@ void FUN_00437fc0(struct JailCell *cell) {
 }
 
 // FUNCTION: LEGOLAND 0x00438000
-void FUN_00438000(void) {
+void FreeAllJailCells(void) {
     while (JailCellList != NULL) {
-        FUN_00437fc0(JailCellList);
+        FreeJailCell(JailCellList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00438020
 void JailCellRemoveObject(struct Element *editObj, TileId coords, struct Cursor *cursor) {
-    struct JailCell *cell = FUN_00437f90(&coords.id);
+    struct JailCell *cell = FindJailCell(&coords.id);
     if (cell != NULL) {
-        FUN_00437fc0(cell);
+        FreeJailCell(cell);
     }
     StandardRemoveObject(editObj, coords, cursor);
     RemoveAllBlokesFromRide((struct Ride *)editObj->ride, coords);
@@ -496,27 +496,27 @@ void JailCellRemoveObject(struct Element *editObj, TileId coords, struct Cursor 
 // FUNCTION: LEGOLAND 0x00438070
 void JailCellLoad(struct Element *obj) {
     struct Ride *building = obj->ride;
-    DAT_0081cb10 = building;
+    ActiveWesternTownRide = building;
     building->flags |= 0x420;
-    DAT_0062fd40 = DAT_0081cb10->layer;
-    DAT_0081cb10->flags |= 0x2000;
+    WesternTownLayer = ActiveWesternTownRide->layer;
+    ActiveWesternTownRide->flags |= 0x2000;
     // STRING: LEGOLAND 0x004b74d0
     JailCellMaskSprite = LoadSprite("JailCellMask.LLS", 1);
-    HideLayer(DAT_0062fd40, 1);
-    StopLayerPlaying((struct Sprite *)DAT_0062fd40, 1);
-    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), 9);
+    HideLayer(WesternTownLayer, 1);
+    StopLayerPlaying((struct Sprite *)WesternTownLayer, 1);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)WesternTownLayer, 1), 9);
 }
 
 // FUNCTION: LEGOLAND 0x004380f0
 void JailCellUnload(void) {
     KillSprite(JailCellMaskSprite);
-    FUN_00438000();
+    FreeAllJailCells();
 }
 
 // FUNCTION: LEGOLAND 0x00438110
 void JailCellSetEditMode(void) {
     EditMode.unk0 = 1;
-    EditMode.unk8 = DAT_0081cb10;
+    EditMode.unk8 = ActiveWesternTownRide;
     DefaultCursor(&EditCursor);
     SetEditCursorFootPrint(&EditMode.unk8->footprint);
 }
@@ -533,7 +533,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
     struct JailCell *cell;
 
     pos = GetScreenCoordsForObject((TileId *)tile, ride);
-    cell = FUN_00437f90(tile);
+    cell = FindJailCell(tile);
     if (cell == NULL) {
         return;
     }
@@ -554,10 +554,10 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
-        offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 1);
+        LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)WesternTownLayer, 1), (char)cell->frame);
+        offset = GetRenderOffsetForLayer((struct Sprite *)WesternTownLayer, 1);
         AdjustOffsetForViewMode(&offset);
-        PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
+        PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)WesternTownLayer, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
         for (i = 0; i < count; i++) {
             if (blokes[i]->param_action == 1) {
                 IP_RenderBlokeIn3DNow(blokes[i]);
@@ -573,7 +573,7 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
                 IP_RenderBlokeIn3DNow(blokes[i]);
             }
         }
-        offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 0);
+        offset = GetRenderOffsetForLayer((struct Sprite *)WesternTownLayer, 0);
         AdjustOffsetForViewMode(&offset);
         PrintSprite(JailCellMaskSprite, pos.x + offset.x, pos.y + offset.y, param_6, NULL);
         for (i = 0; i < count; i++) {
@@ -593,10 +593,10 @@ void RenderJailCell(Element *obj, unsigned int param_2, unsigned int param_3, un
         }
         return;
     }
-    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)DAT_0062fd40, 1), (char)cell->frame);
-    offset = GetRenderOffsetForLayer((struct Sprite *)DAT_0062fd40, 1);
+    LLSSetFrame((struct LLS *)GetLLSForLayer((struct Sprite *)WesternTownLayer, 1), (char)cell->frame);
+    offset = GetRenderOffsetForLayer((struct Sprite *)WesternTownLayer, 1);
     AdjustOffsetForViewMode(&offset);
-    PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)DAT_0062fd40, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
+    PrintSprite((struct Sprite *)GetSpriteForLayer((struct Sprite *)WesternTownLayer, 1), pos.x + offset.x, pos.y + offset.y, param_6, NULL);
 }
 
 // FUNCTION: LEGOLAND 0x00438430
@@ -622,7 +622,7 @@ void JailCellUpdate(Element *obj) {
         next = node->next;
         bloke = node->rider;
         tile = &node->tile;
-        cell = FUN_00437f90(&tile->id);
+        cell = FindJailCell(&tile->id);
         if (cell == NULL) {
             return;
         }
@@ -1128,7 +1128,7 @@ void SaloonUpdate(Element *obj) {
                 bloke->param_action++;
                 break;
             case 4:
-                FUN_00437570(node, obj, tile, 1);
+                BrowseAndBuyItem(node, obj, tile, 1);
                 break;
             case 5:
                 bloke->dest.x = (x - 4) * 0x100;

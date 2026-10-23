@@ -23,7 +23,7 @@ struct BarrelSource {
 #include "image_sprite.h"
 
 // FUNCTION: LEGOLAND 0x0043bdb0
-void FUN_0043bdb0(void *param1) {
+void AddBarrelNode(void *param1) {
     struct BarrelNode *block = (struct BarrelNode *)malloc(sizeof(struct BarrelNode));
     if (block == NULL) {
         return;
@@ -33,11 +33,11 @@ void FUN_0043bdb0(void *param1) {
     block->frame = 0;
     block->next = SpinningBarrelList;
     SpinningBarrelList = block;
-    FUN_0043c2f0(block);
+    ResetBarrelRide(block);
 }
 
 // FUNCTION: LEGOLAND 0x0043be00
-void FUN_0043be00(struct BarrelNode *node) {
+void FreeBarrelNode(struct BarrelNode *node) {
     struct BarrelNode *prev;
     struct BarrelNode *cur;
 
@@ -61,7 +61,7 @@ void FUN_0043be00(struct BarrelNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043be40
-struct BarrelNode *FUN_0043be40(unsigned short *key) {
+struct BarrelNode *FindBarrelNode(unsigned short *key) {
     struct BarrelNode *cur = SpinningBarrelList;
 
     if (cur != NULL) {
@@ -92,7 +92,7 @@ void RenderSpinningBarrels(Element *obj, void *param_2, void *param_3, TileId *t
     LayerResult layer;
     char i;
 
-    state = FUN_0043be40(&tile->id);
+    state = FindBarrelNode(&tile->id);
     if (state == NULL) {
         return;
     }
@@ -174,7 +174,7 @@ void RenderSpinningBarrels(Element *obj, void *param_2, void *param_3, TileId *t
 }
 
 // FUNCTION: LEGOLAND 0x0043c2f0
-void FUN_0043c2f0(struct BarrelNode *node) {
+void ResetBarrelRide(struct BarrelNode *node) {
     node->frame_ticks = 0;
     node->frame = 0;
     node->boarding_count = 0;
@@ -184,7 +184,7 @@ void FUN_0043c2f0(struct BarrelNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c320
-void FUN_0043c320(struct BarrelNode *node) {
+void StartBarrelRide(struct BarrelNode *node) {
     unsigned int packed = node->flags;
     unsigned char prev = node->seated_count;
     packed &= 0xffffbfff;
@@ -205,11 +205,11 @@ void SpinningBarrelsRideLoad(struct Element *elem) {
     // STRING: LEGOLAND 0x004b7960
     DAT_0062fe00[1] = DAT_0062fe00[0] = LoadSprite("z_SpinningBarrels.lls", 1);
     // STRING: LEGOLAND 0x004b7944
-    BoxBlokesOn1BNV = DAT_0062fdf0[0] = LoadBinV("Zbuffers\\BoxBlokesOn1.bnv");
+    BoxBlokesOn1BNV = SpinningBarrelsBinVs[0] = LoadBinV("Zbuffers\\BoxBlokesOn1.bnv");
     // STRING: LEGOLAND 0x004b7924
-    SpinningBarrelsBNV = DAT_0062fdf0[1] = LoadBinV("Zbuffers\\SpinningBarrels.bnv");
+    SpinningBarrelsBNV = SpinningBarrelsBinVs[1] = LoadBinV("Zbuffers\\SpinningBarrels.bnv");
     // STRING: LEGOLAND 0x004b7908
-    BoxBlokesOffBNV = DAT_0062fdf0[2] = LoadBinV("Zbuffers\\BoxBlokesOff.bnv");
+    BoxBlokesOffBNV = SpinningBarrelsBinVs[2] = LoadBinV("Zbuffers\\BoxBlokesOff.bnv");
     HideLayer(SpinningBarrelsLayer, 3);
     StopLayerPlaying(SpinningBarrelsLayer, 3);
     LLSSetFrame(GetLLSForLayer(SpinningBarrelsLayer, 3), 0);
@@ -234,17 +234,17 @@ void SpinningBarrelsSetEditMode(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c4d0
-void FUN_0043c4d0(void) {
+void FreeAllBarrelNodes(void) {
     while (SpinningBarrelList != NULL) {
-        FUN_0043be00(SpinningBarrelList);
+        FreeBarrelNode(SpinningBarrelList);
     }
 }
 
 // FUNCTION: LEGOLAND 0x0043c4f0
 void SpinningBarrelsRemoveObject(Element *editObj, TileId tile, struct Cursor *cursor) {
-    struct BarrelNode *node = FUN_0043be40(&tile.id);
+    struct BarrelNode *node = FindBarrelNode(&tile.id);
     if (node != NULL) {
-        FUN_0043be00(node);
+        FreeBarrelNode(node);
     }
     StandardRemoveObject(editObj, tile, cursor);
     RemoveAllBlokesFromRide(editObj->ride, tile);
@@ -256,7 +256,7 @@ void SpinningBarrelsAddObject(Element *editObj, int *coords) {
     tile.pos.x = (unsigned char)coords[0];
     tile.pos.y = (unsigned char)coords[1];
     AddBasicObject(editObj, coords);
-    FUN_0043bdb0(&tile);
+    AddBarrelNode(&tile);
 }
 
 // FUNCTION: LEGOLAND 0x0043c570
@@ -264,14 +264,14 @@ struct RideSpriteInfo *GetSpinningBarrelsRideSpriteInfo(struct Element *ride, un
     struct Ride *target = ride->ride;
     struct Sprite *layer;
 
-    DAT_0062fdb0.sprite = target->layer;
-    DAT_0062fdb0.x = target->field_14;
-    DAT_0062fdb0.y = target->field_18;
-    DAT_0062fdb0.id = param2;
+    SpinningBarrelsSpriteInfo.sprite = target->layer;
+    SpinningBarrelsSpriteInfo.x = target->field_14;
+    SpinningBarrelsSpriteInfo.y = target->field_18;
+    SpinningBarrelsSpriteInfo.id = param2;
 
     layer = target->layer;
     layer->flags |= 0x2000;
-    return &DAT_0062fdb0;
+    return &SpinningBarrelsSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x0043c5b0
@@ -288,7 +288,7 @@ void SpinningBarrelsRideUnload(void) {
     if (BoxBlokesOffBNV != NULL) {
         FreeBinV(BoxBlokesOffBNV);
     }
-    FUN_0043c4d0();
+    FreeAllBarrelNodes();
 }
 
 // FUNCTION: LEGOLAND 0x0043c620
@@ -356,7 +356,7 @@ LEGO_EXPORT int LoadSBarrel(struct Element *arg) {
         data = list->rider;
         tc = data->bnv;
         if (tc != NULL) {
-            tc->file = DAT_0062fdf0[tc->index];
+            tc->file = SpinningBarrelsBinVs[tc->index];
         }
         list = list->next;
     }
@@ -381,7 +381,7 @@ void SpinningBarrelsGetInterfaces(struct Element *str, struct Ride *ride) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c7f0
-void FUN_0043c7f0(struct BarrelNode *node) {
+void UpdateBarrelNode(struct BarrelNode *node) {
     struct RideNode *r = SpinningBarrelsRide->riders;
     unsigned int flags;
 
@@ -398,7 +398,7 @@ void FUN_0043c7f0(struct BarrelNode *node) {
             if (GetAllBlokesOffRide(SpinningBarrelsRide, node->tile_id) == 0) {
                 return;
             }
-            FUN_0043c2f0(node);
+            ResetBarrelRide(node);
             return;
         }
         if (v > 2) {
@@ -412,7 +412,7 @@ void FUN_0043c7f0(struct BarrelNode *node) {
     } else if (flags & 0x4000) {
         if (node->seated_count == node->boarding_count) {
             node->flags = flags & 0xffffbfff;
-            FUN_0043c320(node);
+            StartBarrelRide(node);
             return;
         }
     } else if (node->seated_count != 0) {
@@ -433,10 +433,10 @@ void FUN_0043c7f0(struct BarrelNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x0043c930
-void FUN_0043c930(void) {
+void UpdateBarrelNodes(void) {
     struct BarrelNode *node = SpinningBarrelList;
     while (node != NULL) {
-        FUN_0043c7f0(node);
+        UpdateBarrelNode(node);
         node = node->next;
     }
 }
@@ -460,7 +460,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
         next = rn->next;
         bloke = rn->rider;
         pos = &rn->tile;
-        node = FUN_0043be40(&pos->id);
+        node = FindBarrelNode(&pos->id);
         if (node == NULL) {
             return;
         }
@@ -504,7 +504,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
                 sprintf(BoxBlokeBnvName + 8, "%02d", PickBarrelSeat(rn, node, (char)SpinningBarrelsRide->seats));
-                bloke->path = NewBNVPath(DAT_0062fdf0[0], 0, BoxBlokeBnvName, -1617922.25f, -1618065.75f, coords);
+                bloke->path = NewBNVPath(SpinningBarrelsBinVs[0], 0, BoxBlokeBnvName, -1617922.25f, -1618065.75f, coords);
                 bloke->param_action++;
                 break;
             }
@@ -522,7 +522,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 BlokeSetFrame(bloke, 0);
                 bloke->param_action++;
                 if ((short)(signed char)++node->seated_count == SpinningBarrelsRide->seats) {
-                    FUN_0043c320(node);
+                    StartBarrelRide(node);
                 }
                 break;
             case 8:
@@ -535,7 +535,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
                 bloke->person->depth = GetUnitDepth(-1617922.25f, -1618065.75f);
                 bloke->field_35 = 2;
                 sprintf(BoxBlokeBnvName + 8, "%02d", bloke->field_36);
-                bloke->path = NewBNVPath(DAT_0062fdf0[2], 2, BoxBlokeBnvName, -1617922.25f, -1618065.75f, coords2);
+                bloke->path = NewBNVPath(SpinningBarrelsBinVs[2], 2, BoxBlokeBnvName, -1617922.25f, -1618065.75f, coords2);
                 bloke->param_action++;
                 break;
             case 9:
@@ -581,7 +581,7 @@ void SpinningBarrelsUpdate(struct Element *elem) {
         }
         rn = next;
     }
-    FUN_0043c930();
+    UpdateBarrelNodes();
 }
 
 // FUNCTION: LEGOLAND 0x0043ce10

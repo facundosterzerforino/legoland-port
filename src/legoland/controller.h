@@ -28,4 +28,4 @@ struct CtrlBuffer {
 LEGO_EXPORT int SetupControllers(void);
 LEGO_EXPORT void ReadGameButtons(void);
 void FreeControllers(void);
-void FUN_00452030(void);
+void UpdateEditSelection(void);

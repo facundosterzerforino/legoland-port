@@ -275,14 +275,14 @@ LEGO_EXPORT void LoadColourTable(void) {
 
     // STRING: LEGOLAND 0x004b82f4
     file = RES_OpenFile(".\\graphics\\colours.tga");
-    RES_ReadFile(file, DAT_00813b20, 0x12);
-    RES_ReadFile(file, DAT_00813b20, 0x300);
+    RES_ReadFile(file, PaletteReadBuffer, 0x12);
+    RES_ReadFile(file, PaletteReadBuffer, 0x300);
 
     for (i = 0; i < 256; i++) {
-        entries[i].peRed = DAT_00813b20[i * 3 + 2];
-        entries[i].peGreen = DAT_00813b20[i * 3 + 1];
-        entries[i].peBlue = DAT_00813b20[i * 3];
-        DAT_00813e20[i] = (unsigned short)((((entries[i].peRed & 0xf8) << 5 | (entries[i].peGreen & 0xf8)) << 2) |
+        entries[i].peRed = PaletteReadBuffer[i * 3 + 2];
+        entries[i].peGreen = PaletteReadBuffer[i * 3 + 1];
+        entries[i].peBlue = PaletteReadBuffer[i * 3];
+        Palette16Bit[i] = (unsigned short)((((entries[i].peRed & 0xf8) << 5 | (entries[i].peGreen & 0xf8)) << 2) |
             (entries[i].peBlue >> 3));
         entries[i].peFlags = 4;
     }

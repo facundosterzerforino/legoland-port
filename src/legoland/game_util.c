@@ -31,7 +31,7 @@ int IsStringEmpty(char **pp_str) {
 }
 
 // FUNCTION: LEGOLAND 0x004787d0
-void FUN_004787d0(void) {
+void EndScriptSection(void) {
     if (CurrentScriptSection != 0) {
         /* TODO: fold into struct SortNode/NerpsListNode views of CurrentScriptSection */
         InsertScriptSection(CurrentScriptSection);
@@ -40,15 +40,15 @@ void FUN_004787d0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004787f0
-void FUN_004787f0(void) {
-    unsigned int id = DAT_00669098;
-    DAT_00669098 = DAT_00669098 + 1;
+void BeginScriptSection(void) {
+    unsigned int id = NextScriptSectionId;
+    NextScriptSectionId = NextScriptSectionId + 1;
     CurrentScriptSection = AllocScriptSection(id);
     DAT_007fdca4 = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00478820
-int FUN_00478820(void) {
+int SetUninitialisedScriptSection(void) {
     // STRING: LEGOLAND 0x004bc0a4
     SetScriptSectionType("Uninitialised", 0);
     return 1;
@@ -58,7 +58,7 @@ int FUN_00478820(void) {
 int ScriptCmdEnd(void) {
     // STRING: LEGOLAND 0x004bc0b4
     SetScriptSectionType("Closed", 0);
-    FUN_004787d0();
+    EndScriptSection();
     CurrentScriptSection = 0;
     return 1;
 }
@@ -102,8 +102,8 @@ int ScriptCmdObjective(struct CommandArgs *param_1, unsigned int param_2) {
         }
         SetScriptSectionType(param_1->name, 2);
         SetScriptObjectiveKind(1);
-        FUN_004787d0();
-        FUN_004787f0();
+        EndScriptSection();
+        BeginScriptSection();
     }
     return 1;
 }
@@ -190,7 +190,7 @@ int ScriptCmdMap(struct CommandArgs *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x00478b20
-int FUN_00478b20(char *arg) {
+int EnableObjectClass(char *arg) {
     struct Element *obj = (struct Element *)ElemID(arg);
 
     if (obj != NULL) {
@@ -214,7 +214,7 @@ int ScriptCmdLoad(struct CommandArgs *param_1, unsigned int param_2) {
     if (CheckScriptCommand(param_1, param_2, 1, 1) == 0) {
         return 0;
     }
-    return FUN_00478b20(GetScriptArg1(param_1, param_2)) != 0;
+    return EnableObjectClass(GetScriptArg1(param_1, param_2)) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x00478bc0
@@ -234,7 +234,7 @@ unsigned int ScriptCmdEnable(struct CommandArgs *param_1, unsigned int param_2, 
     }
     if (DAT_00669054 == 1) {
         name = GetScriptArg1(param_1, param_2);
-        if (FUN_00478b20(name) != 0) {
+        if (EnableObjectClass(name) != 0) {
             GiveRewardObject(ElemID(name), 0, 1);
         }
         return 1;
@@ -322,7 +322,7 @@ int ScriptCmdBriefingFile(struct CommandArgs *param_1, int param_2) {
             name = param_1->arg1;
         }
         if (DAT_00669054 == 1) {
-            FUN_004687f0(name);
+            SetBriefingFile(name);
             return 1;
         }
         NewScriptBriefingFileEvent(name);
@@ -1731,14 +1731,14 @@ int ScriptCmdEndLevel(struct CommandArgs *param_1, unsigned int param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0047afb0
-int FUN_0047afb0(const char *param_1) {
+int LoadLevelScript(const char *param_1) {
     int result;
     int v1;
 
     FUN_00492980();
     LLIDB_ClearOnLevel();
     ResetLevelScriptState();
-    result = ParseScriptFile(param_1, DAT_004bb6f8, 0x5d, 0);
+    result = ParseScriptFile(param_1, LevelScriptCommands, 0x5d, 0);
     FUN_00492990();
     v1 = (result >= 0) - 1;
     return v1 & 2;

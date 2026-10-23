@@ -50,7 +50,7 @@ LEGO_EXPORT void InitListProfiles(void) {
     // STRING: LEGOLAND 0x004bf050
     RegProfileOff8Sprite = LoadSprite("RegProfileOff_8.lls", 4);
     // STRING: LEGOLAND 0x004bf038
-    DAT_007986b8 = LoadSprite("Reg_Delete_PopUp.lls", 4);
+    RegDeletePopUpSprite = LoadSprite("Reg_Delete_PopUp.lls", 4);
     // STRING: LEGOLAND 0x004bf024
     RegDiffPopUpSprite = LoadSprite("Reg_Diff_PopUp.lls", 4);
     // STRING: LEGOLAND 0x004bf014
@@ -74,8 +74,8 @@ LEGO_EXPORT void InitListProfiles(void) {
     ((struct IconNode *)AcceptIcon)->flags |= 0x4002;
     ((struct IconNode *)AcceptIcon)->flags |= 0x400;
     ((struct IconNode *)AcceptIcon)->event_handler = (void *)AcceptProfileClick;
-    DAT_006687bc = AcceptProfileClick;
-    DAT_006687c0 = FUN_004920a0;
+    OkKeyHandler = AcceptProfileClick;
+    CancelKeyHandler = FUN_004920a0;
     strcpy(DAT_007cb340, GetString(0x84));
 
     for (; node != NULL; node = node->next) {
@@ -150,7 +150,7 @@ LEGO_EXPORT void EnterNewProfileCheckBoxIcons(struct IconNode *param_1) {
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
     PopUpCloseIcon->event_handler = (void *)FUN_004920a0;
-    DAT_006687c0 = PopUpCloseIcon->event_handler;
+    CancelKeyHandler = PopUpCloseIcon->event_handler;
 }
 
 // FUNCTION: LEGOLAND 0x0048c720
@@ -287,10 +287,10 @@ LEGO_EXPORT void KillListProfileSprite(void) {
         KillSprite(sprite);
         RegProfileOnSprite = NULL;
     }
-    sprite = DAT_007986b8;
+    sprite = RegDeletePopUpSprite;
     if (sprite != NULL) {
         KillSprite(sprite);
-        DAT_007986b8 = 0;
+        RegDeletePopUpSprite = 0;
     }
     sprite = RegDiffPopUpSprite;
     if (sprite != NULL) {
@@ -504,12 +504,12 @@ __declspec(naked) LEGO_EXPORT void PrintProfileDetails(void) {
         cmp dl, al
         jne not_selected
         //             if (DeletePopUpShown) {
-        //                 SetIconSprite(icon, DAT_007986b8); last = icon;
+        //                 SetIconSprite(icon, RegDeletePopUpSprite); last = icon;
         //                 icon->y = icon->slot * 0x26 + 0x6b; rc.top = icon->y + 0x22;
         mov eax, dword ptr [DeletePopUpShown]
         test eax, eax
         je not_deleting
-        mov eax, dword ptr [DAT_007986b8]
+        mov eax, dword ptr [RegDeletePopUpSprite]
         push eax
         push esi
         call SetIconSprite
@@ -777,7 +777,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
             }
             if (CurrentProfile.profile_slot == (int)icon->slot) {
                 if (DeletePopUpShown != 0) {
-                    SetIconSprite(icon, DAT_007986b8);
+                    SetIconSprite(icon, RegDeletePopUpSprite);
                     last = icon;
                     icon->y = icon->slot * 0x26 + 0x6b;
                     rc.top = icon->y + 0x22;
@@ -889,7 +889,7 @@ unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
 unsigned char FUN_0048d390(struct IconNode *profile, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 0x2) != 0) {
         CurrentProfile.profile_slot = profile->field_1cb;
-        FUN_0048a800();
+        ClearFreePlaySelection();
     }
     return 1;
 }
@@ -933,12 +933,12 @@ unsigned char DeletePopUpCancelHandler(unsigned int param_1, unsigned int param_
 
 // FUNCTION: LEGOLAND 0x0048d470
 void FUN_0048d470(void) {
-    DAT_007986f8 = DAT_006687bc;
-    DAT_007986f4 = DAT_006687c0;
+    DAT_007986f8 = OkKeyHandler;
+    DAT_007986f4 = CancelKeyHandler;
 }
 
 // FUNCTION: LEGOLAND 0x0048d490
 void FUN_0048d490(void) {
-    DAT_006687bc = DAT_007986f8;
-    DAT_006687c0 = DAT_007986f4;
+    OkKeyHandler = DAT_007986f8;
+    CancelKeyHandler = DAT_007986f4;
 }

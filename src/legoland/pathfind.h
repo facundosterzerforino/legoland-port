@@ -6,12 +6,12 @@ struct Point;
 
 struct Point;
 
-int FUN_00482710(int *a, int *b, int *out);
+int WorkerSuggestNextMove(int *a, int *b, int *out);
 LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Point *out);
 LEGO_EXPORT int PTPSuggestNextMove(struct Point *pos, struct Point *goal, struct Point *out);
 LEGO_EXPORT void AddPathSquare(struct Point *pos);
 LEGO_EXPORT void RemovePathSquare(struct Point *pos);
-void FUN_00482a40(struct Point *pos);
+void UpdateConnectedNodes(struct Point *pos);
 void ClearEntrance1(void);
 void InitEntrance1Point(void);
 void FreeBestNodeList(void);

@@ -286,21 +286,21 @@ LEGO_EXPORT void UnLoad_Interface_Icons(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00474820
-unsigned char FUN_00474820(unsigned int dummy, unsigned char flags) {
+unsigned char DefaultOkKeyHandler(unsigned int dummy, unsigned char flags) {
     if ((flags & 2) != 0) {
-        FUN_00473160();
+        HandlePopUpOkKey();
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x00474830
-unsigned char FUN_00474830(unsigned int a, unsigned int flags, unsigned int c, unsigned int d) {
+unsigned char DefaultCancelKeyHandler(unsigned int a, unsigned int flags, unsigned int c, unsigned int d) {
     if ((flags & 2) != 0) {
         if (TryClosePopUp() == 0) {
             if (DAT_00668954 != 0) {
                 CheckWorkerOnMouseStatus(1);
             } else {
-                return FUN_00475120(a, flags, c, d);
+                return InterfaceOptionsClicked(a, flags, c, d);
             }
         }
     }
@@ -309,8 +309,8 @@ unsigned char FUN_00474830(unsigned int a, unsigned int flags, unsigned int c, u
 
 // FUNCTION: LEGOLAND 0x00474880
 void SetDefaultMouseHandlers(void) {
-    DAT_006687bc = FUN_00474820;
-    DAT_006687c0 = FUN_00474830;
+    OkKeyHandler = DefaultOkKeyHandler;
+    CancelKeyHandler = DefaultCancelKeyHandler;
 }
 
 // FUNCTION: LEGOLAND 0x004748a0
@@ -376,7 +376,7 @@ LEGO_EXPORT int InitGameInterface(int a) {
         LLIDB_FindElement(PathControlName, &element, 0);
         obj = element->obj;
         PathControlObject = obj;
-        icon = InsertIcon((short)DAT_004bb04c[8], (short)DAT_004bb04c[9], 0x93, IfPathIconSprite);
+        icon = InsertIcon((short)InterfaceIconPos[8], (short)InterfaceIconPos[9], 0x93, IfPathIconSprite);
         icon->string = (char *)obj->field_7c;
         icon->string_id = 0xffffffff;
         icon->field_18 = 1;
@@ -387,25 +387,25 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->event_handler = (void *)SetEditObjectIconHandler;
         icon->flags = (icon->flags & 0xfffffdff) | 0x300a;
 
-        icon = InsertIcon((short)DAT_004bb04c[10], (short)DAT_004bb04c[11], 0x93, IfQueryiconSprite);
+        icon = InsertIcon((short)InterfaceIconPos[10], (short)InterfaceIconPos[11], 0x93, IfQueryiconSprite);
         icon->string_id = 0x5a;
         icon->string = GetString(0x5a);
         icon->flags |= 0x6002;
-        icon->event_handler = (void *)FUN_00475000;
+        icon->event_handler = (void *)InterfaceQueryClicked;
         icon->field_18 = 2;
         icon->field_1c = IfQueryIconPressedSprite;
         icon->field_20p = IfQueryiconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[12], (short)DAT_004bb04c[13], 0x93, IfEraserIconSprite);
+        icon = InsertIcon((short)InterfaceIconPos[12], (short)InterfaceIconPos[13], 0x93, IfEraserIconSprite);
         icon->string_id = 0x5b;
         icon->string = GetString(0x5b);
         icon->flags |= 0x6002;
-        icon->event_handler = (void *)FUN_00475040;
+        icon->event_handler = (void *)InterfaceEraserClicked;
         icon->field_18 = 3;
         icon->field_1c = IfEraserIconPressedSprite;
         icon->field_20p = IfEraserIconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[14], (short)DAT_004bb04c[15], 0x93, IfMapiconSprite);
+        icon = InsertIcon((short)InterfaceIconPos[14], (short)InterfaceIconPos[15], 0x93, IfMapiconSprite);
         icon->string_id = 0x5c;
         icon->string = GetString(0x5c);
         icon->flags |= 0x6002;
@@ -414,21 +414,21 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->field_1c = IfMapIconPressedSprite;
         icon->field_20p = IfMapiconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[16], (short)DAT_004bb04c[17], 0x93, IfOptionsIconSprite);
+        icon = InsertIcon((short)InterfaceIconPos[16], (short)InterfaceIconPos[17], 0x93, IfOptionsIconSprite);
         icon->string_id = 0x5d;
         icon->string = GetString(0x5d);
         icon->flags |= 0x6002;
-        icon->event_handler = (void *)FUN_00475120;
+        icon->event_handler = (void *)InterfaceOptionsClicked;
         icon->field_20p = IfOptionsIconSprite;
 
-        icon = InsertIcon((short)DAT_004bb04c[0], (short)DAT_004bb04c[1], 0x9a, LegolandThemeOffSprite);
+        icon = InsertIcon((short)InterfaceIconPos[0], (short)InterfaceIconPos[1], 0x9a, LegolandThemeOffSprite);
         icon->string_id = 0x5e;
         icon->string = GetString(0x5e);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)LegolandThemeIconHandler;
         DAT_007fdd70[0] = (struct IconNode *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[2], (short)DAT_004bb04c[3], 0x9a, WesternThemeOffSprite);
+        icon = InsertIcon((short)InterfaceIconPos[2], (short)InterfaceIconPos[3], 0x9a, WesternThemeOffSprite);
         DAT_00668e3c = icon;
         icon->string_id = 0x5f;
         icon->string = GetString(0x5f);
@@ -436,14 +436,14 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->event_handler = (void *)WesternThemeIconHandler;
         DAT_007fdd70[1] = (struct IconNode *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[4], (short)DAT_004bb04c[5], 0x9a, CastleThemeOffSprite);
+        icon = InsertIcon((short)InterfaceIconPos[4], (short)InterfaceIconPos[5], 0x9a, CastleThemeOffSprite);
         icon->string_id = 0x60;
         icon->string = GetString(0x60);
         icon->flags |= 0x6002;
         icon->event_handler = (void *)CastleThemeIconHandler;
         DAT_007fdd70[2] = (struct IconNode *)icon;
 
-        icon = InsertIcon((short)DAT_004bb04c[6], (short)DAT_004bb04c[7], 0x9a, AdventurersThemeOffSprite);
+        icon = InsertIcon((short)InterfaceIconPos[6], (short)InterfaceIconPos[7], 0x9a, AdventurersThemeOffSprite);
         icon->string_id = 0x61;
         icon->string = GetString(0x61);
         icon->flags |= 0x6002;
@@ -465,18 +465,18 @@ LEGO_EXPORT int InitGameInterface(int a) {
         icon->string = GetString(0x24e);
         icon->field_18p = BriefIconSprite;
         icon->flags |= 0x600a;
-        icon->event_handler = (void *)FUN_00474f40;
+        icon->event_handler = (void *)InterfaceBriefingClicked;
         icon->render_func = (void *)RenderFocusableIcon;
         DAT_00668e9c = icon;
         icon->flags |= 0x400;
-        HasIntervalReport(DAT_0066861c);
+        HasIntervalReport(BriefingFileName);
 
         icon = InsertIcon(0x20a, 0x17a, 0x93, ScriptEndSprite);
         icon->field_20p = NULL;
         icon->field_1c = NULL;
         icon->string_id = 0x24f;
         icon->string = GetString(0x24f);
-        icon->event_handler = (void *)FUN_00474fa0;
+        icon->event_handler = (void *)InterfaceAdvisorClicked;
         icon->flags |= 0x4008;
         icon->render_func = (void *)RenderAdvisorIcon;
         ScriptEndIcon = icon;
@@ -527,7 +527,7 @@ void UnloadGameInterface(void) {
         ScriptEndIcon = 0;
         RemoveIconGroup(0x9a);
         DAT_00668e9c = NULL;
-        FUN_0046d590(0xd2);
+        RemoveIconRange(0xd2);
         UnLoad_PopUpInfo();
         DAT_007fdd80 = 2;
         DAT_007fdd84 = 1;
@@ -537,12 +537,12 @@ void UnloadGameInterface(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00474f40
-unsigned char FUN_00474f40(void *context, unsigned int flags, const char *a, const char *b) {
+unsigned char InterfaceBriefingClicked(void *context, unsigned int flags, const char *a, const char *b) {
     if (EditMode.unk4 != 1) {
         if (flags & 2) {
             EditMode.unk0 = 0;
             FUN_00490600(1);
-            ShowIntervalScreen(DAT_0066861c, DAT_0066869c);
+            ShowIntervalScreen(BriefingFileName, HintsFileName);
         }
     }
     return 1;
@@ -557,10 +557,10 @@ unsigned char ScriptEndIconHandler(unsigned int a, unsigned int flags) {
 }
 
 // FUNCTION: LEGOLAND 0x00474fa0
-unsigned char FUN_00474fa0(unsigned int a, unsigned char flags) {
+unsigned char InterfaceAdvisorClicked(unsigned int a, unsigned char flags) {
     if (EditMode.unk4 != 1) {
         if ((flags & 2) != 0) {
-            FUN_0046b700();
+            RepeatCurrentObjective();
         }
     }
     return 1;
@@ -579,7 +579,7 @@ unsigned char SetEditObjectIconHandler(struct IconNode *a, unsigned int flags) {
 }
 
 // FUNCTION: LEGOLAND 0x00475000
-unsigned char FUN_00475000(unsigned int a, unsigned int flags) {
+unsigned char InterfaceQueryClicked(unsigned int a, unsigned int flags) {
     if (EditMode.unk4 != 1) {
         if (flags & 2) {
             PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -591,7 +591,7 @@ unsigned char FUN_00475000(unsigned int a, unsigned int flags) {
 }
 
 // FUNCTION: LEGOLAND 0x00475040
-unsigned char FUN_00475040(unsigned int a, unsigned int flags) {
+unsigned char InterfaceEraserClicked(unsigned int a, unsigned int flags) {
     if (EditMode.unk4 == 1) {
         return 1;
     }
@@ -629,7 +629,7 @@ unsigned char ToggleMapScreen(unsigned int a, unsigned char flags) {
 }
 
 // FUNCTION: LEGOLAND 0x00475120
-unsigned char FUN_00475120(unsigned int a, unsigned int flags, unsigned int c, unsigned int d) {
+unsigned char InterfaceOptionsClicked(unsigned int a, unsigned int flags, unsigned int c, unsigned int d) {
     if ((flags & 2) != 0 && EditMode.unk4 != 1) {
         if (DAT_00668954 == 0) {
             PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
@@ -1317,7 +1317,7 @@ void DrawFlashingButtons(void) {
     played = 0;
     FUN_00476020();
     if (EditMode.unk4 == 3) {
-        coords = DAT_004bb04c;
+        coords = InterfaceIconPos;
         i = 0;
         do {
             if (ButtonFlashStates[i] != 0) {
@@ -1330,7 +1330,7 @@ void DrawFlashingButtons(void) {
             }
             coords = coords + 2;
             i = i + 1;
-        } while (coords < DAT_004bb04c + 18);
+        } while (coords < InterfaceIconPos + 18);
         if (played != 0 && DAT_00668ec0 == 0) {
             PlayInstanceOfSample(GameFX[FX_WARNING].sample, 0, 1, 0);
         }
@@ -1532,7 +1532,7 @@ struct MovieHandle *OpenAviMovie(const char *filename) {
                     rate = stream_info.rate / stream_info.scale;
                     height = stream_info.frame_bottom - stream_info.frame_top;
                 } else if (stream_info.type == 0x73647561) {
-                    DAT_00668fa4 = 0x16;
+                    AviSoundBufferFrames = 0x16;
                     audio_stream = stream;
                     AVIStreamAddRef(stream);
                 }
@@ -1657,11 +1657,11 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
         return 0;
     }
     audio = OpenMovieAudio(handle);
-    DAT_004bb4e0.biBitCount = 0x10;
-    DAT_004bb4e0.biWidth = handle->width;
-    DAT_004bb4e0.biHeight = handle->height;
-    DAT_004bb4e0.biSizeImage = DAT_004bb4e0.biHeight * DAT_004bb4e0.biWidth * 2;
-    handle->frame = AVIStreamGetFrameOpen(handle->video_stream, &DAT_004bb4e0);
+    AviFrameFormat.biBitCount = 0x10;
+    AviFrameFormat.biWidth = handle->width;
+    AviFrameFormat.biHeight = handle->height;
+    AviFrameFormat.biSizeImage = AviFrameFormat.biHeight * AviFrameFormat.biWidth * 2;
+    handle->frame = AVIStreamGetFrameOpen(handle->video_stream, &AviFrameFormat);
     while ((int)target < (int)handle->frame_count) {
         if (param_3 != 0) {
             if (ProcessSystemEvents() == 0) {
@@ -1681,7 +1681,7 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
                 if ((MouseClickFlags & 1) != 0) {
                     break;
                 }
-                if ((DAT_00813ad4 & 7) != 0) {
+                if ((CancelKeyState & 7) != 0) {
                     DAT_00668fb0 = 1;
                     break;
                 }
@@ -1705,7 +1705,7 @@ int PlayMovieFrames(struct MovieHandle *handle, void *param_2, int param_3) {
             return 0;
         }
         PushRenderingStatusAndLockVideoSurface();
-        FUN_00465850(frame);
+        DrawMovieFrameDoubled(frame);
         PopRenderingStatus();
         if (started == 0) {
             if (audio != 0) {
@@ -1782,17 +1782,17 @@ int OpenMovieAudio(struct MovieHandle *handle) {
     AviPcmFormat.wBitsPerSample = 0x10;
     AviPcmFormat.cbSize = 0;
     if (fmt->wFormatTag != 2 && fmt->wFormatTag != 0x11) {
-        DAT_00668ee0 = 0;
-        DAT_00668f9c = 0;
-        DAT_00668f50 = DAT_00668fa4;
+        AviAudioNeedsAcm = 0;
+        AviAudioReady = 0;
+        AviSoundBufferSlotCount = AviSoundBufferFrames;
         AviSoundBytesPerFrame = fmt->nAvgBytesPerSec / handle->frame_rate;
-        DAT_00668f90 = fmt->nSamplesPerSec / handle->frame_rate;
-        DAT_00668f4c = fmt->wBitsPerSample;
+        AviSamplesPerFrame = fmt->nSamplesPerSec / handle->frame_rate;
+        AviAudioBitsPerSample = fmt->wBitsPerSample;
         AviAudioStream = handle->audio_stream;
-        AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(fmt, AviSoundBytesPerFrame * DAT_00668fa4);
+        AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(fmt, AviSoundBytesPerFrame * AviSoundBufferFrames);
         return 1;
     }
-    DAT_00668ee0 = 1;
+    AviAudioNeedsAcm = 1;
     AviPcmFormat.wFormatTag = 1;
     AviPcmFormat.nChannels = fmt->nChannels;
     AviPcmFormat.nSamplesPerSec = fmt->nSamplesPerSec;
@@ -1804,13 +1804,13 @@ int OpenMovieAudio(struct MovieHandle *handle) {
     if (AcmStreamOpenResult != 0) {
         return 0;
     }
-    DAT_00668f9c = 0;
-    DAT_00668f50 = DAT_00668fa4;
+    AviAudioReady = 0;
+    AviSoundBufferSlotCount = AviSoundBufferFrames;
     AviSoundBytesPerFrame = AviPcmFormat.nAvgBytesPerSec / handle->frame_rate;
-    DAT_00668f90 = AviPcmFormat.nSamplesPerSec / handle->frame_rate;
-    DAT_00668f4c = AviPcmFormat.wBitsPerSample;
+    AviSamplesPerFrame = AviPcmFormat.nSamplesPerSec / handle->frame_rate;
+    AviAudioBitsPerSample = AviPcmFormat.wBitsPerSample;
     AviAudioStream = handle->audio_stream;
-    AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(&AviPcmFormat, AviSoundBytesPerFrame * DAT_00668fa4);
+    AviSoundBuffer = KLIBAUDIO_CreateAVISoundBuffer(&AviPcmFormat, AviSoundBytesPerFrame * AviSoundBufferFrames);
     p = (unsigned int *)&AviAcmStreamHeader;
     for (i = sizeof(AviAcmStreamHeader) / 4; i != 0; i--) {
         *p = 0;
@@ -1822,7 +1822,7 @@ int OpenMovieAudio(struct MovieHandle *handle) {
     AviAcmStreamHeader.pbSrc = malloc(AviAcmStreamHeader.cbSrcLength);
     AviAcmStreamHeader.pbDst = malloc(AviAcmStreamHeader.cbDstLength * 3);
     AviAcmDstBase = AviAcmStreamHeader.pbDst;
-    DAT_00668f54 = 0;
+    AviAcmDstOffset = 0;
     if (AviAcmStreamHeader.pbSrc != NULL && AviAcmStreamHeader.pbDst != NULL) {
         return 1;
     }
@@ -1847,7 +1847,7 @@ int StartMovieAudio(struct MovieHandle *handle) {
         DAT_00668f58 = start;
         AviAudioSamplePos = start;
         DAT_00668f88 = len_start;
-        DAT_00668f9c = 1;
+        AviAudioReady = 1;
         UpdateAviAudioBuffer(0, 0);
         KLIBAUDIO_SetAVIVolume(AviSoundBuffer, (int)DAT_004bb4dc);
         KLIBAUDIO_PlayAVISoundBuffer(AviSoundBuffer, 0);
@@ -1858,10 +1858,10 @@ int StartMovieAudio(struct MovieHandle *handle) {
 
 // FUNCTION: LEGOLAND 0x00476c90
 int StopMovieAudio(void) {
-    if (DAT_00668f9c != 0) {
-        DAT_00668f9c = 0;
+    if (AviAudioReady != 0) {
+        AviAudioReady = 0;
         KLIBAUDIO_StopAVISoundBuffer(AviSoundBuffer);
-        if (DAT_00668ee0 != 0) {
+        if (AviAudioNeedsAcm != 0) {
             if (AviAcmStreamHeader.pbSrc != NULL) {
                 free(AviAcmStreamHeader.pbSrc);
                 AviAcmStreamHeader.pbSrc = NULL;
@@ -1889,23 +1889,23 @@ int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
     unsigned int count;
 
     play = 0;
-    if (DAT_00668f9c == 0 || AviAudioStream == NULL) {
+    if (AviAudioReady == 0 || AviAudioStream == NULL) {
         return 0;
     }
     do {
         if (param_1 == 0 && param_2 == 0) {
             loops = 0xb;
             AviAudioSamplePos = 0;
-            DAT_00668fa0 = 0;
+            AviSoundBufferSlot = 0;
         } else {
             loops = param_1 - param_2;
-            if (loops >= DAT_00668f50) {
+            if (loops >= AviSoundBufferSlotCount) {
                 KLIBAUDIO_StopAVISoundBuffer(AviSoundBuffer);
-                AviAudioSamplePos = DAT_00668f90 * param_1;
+                AviAudioSamplePos = AviSamplesPerFrame * param_1;
                 play = 1;
                 loops = 0xb;
-                DAT_00668fa0 = param_1 % DAT_00668f50;
-                play_pos = DAT_00668f90 * DAT_00668fa0;
+                AviSoundBufferSlot = param_1 % AviSoundBufferSlotCount;
+                play_pos = AviSamplesPerFrame * AviSoundBufferSlot;
 #ifdef LEGOLAND_PORT
                 play_pos = ExtPauseMoviesResync(param_1, play_pos); /* [port] extensions/ext_movie.h */
 #endif
@@ -1915,81 +1915,81 @@ int UpdateAviAudioBuffer(unsigned int param_1, int param_2) {
         }
         count = loops;
         do {
-            dst = (char *)KLIBAUDIO_LockAVISoundBuffer(AviSoundBuffer, AviSoundBytesPerFrame * DAT_00668fa0, AviSoundBytesPerFrame);
+            dst = (char *)KLIBAUDIO_LockAVISoundBuffer(AviSoundBuffer, AviSoundBytesPerFrame * AviSoundBufferSlot, AviSoundBytesPerFrame);
             if (AviAudioSamplePos < DAT_00668f88 && AviAudioSamplePos >= 0) {
-                if (DAT_00668ee0 != 0) {
+                if (AviAudioNeedsAcm != 0) {
                     produced = 0;
-                    if (DAT_00668fb4 != 0) {
-                        if (DAT_00668fb4 < AviSoundBytesPerFrame) {
-                            memcpy(dst, (char *)AviAcmDstBase + DAT_00668f54, DAT_00668fb4);
-                            rem = AviSoundBytesPerFrame - DAT_00668fb4;
-                            DAT_00668fb4 = 0;
-                            DAT_00668f54 = 0;
+                    if (AviAcmDstBytes != 0) {
+                        if (AviAcmDstBytes < AviSoundBytesPerFrame) {
+                            memcpy(dst, (char *)AviAcmDstBase + AviAcmDstOffset, AviAcmDstBytes);
+                            rem = AviSoundBytesPerFrame - AviAcmDstBytes;
+                            AviAcmDstBytes = 0;
+                            AviAcmDstOffset = 0;
                             if (AviAudioSamplePos >= DAT_00668f88) {
-                                if (DAT_00668f4c == 8) {
+                                if (AviAudioBitsPerSample == 8) {
                                     memset(dst + (AviSoundBytesPerFrame - rem), 0x80, rem);
                                 } else {
                                     memset(dst + (AviSoundBytesPerFrame - rem), 0, rem);
                                 }
                             } else {
-                                while (DAT_00668fb4 < AviSoundBytesPerFrame) {
+                                while (AviAcmDstBytes < AviSoundBytesPerFrame) {
                                     AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, AviAcmStreamHeader.pbSrc, AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
                                     AviAcmStreamHeader.pbDst = (unsigned char *)AviAcmDstBase + produced;
                                     acmStreamPrepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
                                     acmStreamConvert(AviAcmStream, &AviAcmStreamHeader, 0x10);
                                     acmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
                                     produced += AviAcmStreamHeader.cbDstLengthUsed;
-                                    DAT_00668fb4 += AviAcmStreamHeader.cbDstLengthUsed;
+                                    AviAcmDstBytes += AviAcmStreamHeader.cbDstLengthUsed;
                                     AviAudioSamplePos++;
                                 }
                                 memcpy(dst + (AviSoundBytesPerFrame - rem), AviAcmDstBase, rem);
-                                DAT_00668f54 += rem;
-                                DAT_00668fb4 -= rem;
+                                AviAcmDstOffset += rem;
+                                AviAcmDstBytes -= rem;
                             }
                         } else {
-                            memcpy(dst, (char *)AviAcmDstBase + DAT_00668f54, AviSoundBytesPerFrame);
-                            DAT_00668fb4 -= AviSoundBytesPerFrame;
-                            if (DAT_00668fb4 != 0) {
-                                DAT_00668f54 += AviSoundBytesPerFrame;
+                            memcpy(dst, (char *)AviAcmDstBase + AviAcmDstOffset, AviSoundBytesPerFrame);
+                            AviAcmDstBytes -= AviSoundBytesPerFrame;
+                            if (AviAcmDstBytes != 0) {
+                                AviAcmDstOffset += AviSoundBytesPerFrame;
                             } else {
-                                DAT_00668f54 = 0;
+                                AviAcmDstOffset = 0;
                             }
                         }
                     } else {
-                        while (DAT_00668fb4 < AviSoundBytesPerFrame) {
+                        while (AviAcmDstBytes < AviSoundBytesPerFrame) {
                             AVIStreamRead(AviAudioStream, AviAudioSamplePos, 0x100, AviAcmStreamHeader.pbSrc, AviSoundBytesPerFrame >> 2, &bytes_out, &param_2);
                             AviAcmStreamHeader.pbDst = (unsigned char *)AviAcmDstBase + produced;
                             acmStreamPrepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
                             acmStreamConvert(AviAcmStream, &AviAcmStreamHeader, 0x10);
                             acmStreamUnprepareHeader(AviAcmStream, &AviAcmStreamHeader, 0);
                             produced += AviAcmStreamHeader.cbDstLengthUsed;
-                            DAT_00668fb4 += AviAcmStreamHeader.cbDstLengthUsed;
+                            AviAcmDstBytes += AviAcmStreamHeader.cbDstLengthUsed;
                             AviAudioSamplePos++;
                         }
-                        memcpy(dst, (char *)AviAcmDstBase + DAT_00668f54, AviSoundBytesPerFrame);
-                        DAT_00668f54 += AviSoundBytesPerFrame;
-                        DAT_00668fb4 -= AviSoundBytesPerFrame;
+                        memcpy(dst, (char *)AviAcmDstBase + AviAcmDstOffset, AviSoundBytesPerFrame);
+                        AviAcmDstOffset += AviSoundBytesPerFrame;
+                        AviAcmDstBytes -= AviSoundBytesPerFrame;
                     }
                 } else {
-                    AVIStreamRead(AviAudioStream, AviAudioSamplePos, DAT_00668f90, dst, AviSoundBytesPerFrame, &bytes_out, &param_2);
+                    AVIStreamRead(AviAudioStream, AviAudioSamplePos, AviSamplesPerFrame, dst, AviSoundBytesPerFrame, &bytes_out, &param_2);
                 }
             } else {
-                if (DAT_00668f4c == 8) {
+                if (AviAudioBitsPerSample == 8) {
                     memset(dst, 0x80, AviSoundBytesPerFrame);
                 } else {
                     memset(dst, 0, AviSoundBytesPerFrame);
                 }
-                if (DAT_00668ee0 != 0) {
+                if (AviAudioNeedsAcm != 0) {
                     AviAudioSamplePos++;
                 }
             }
             KLIBAUDIO_UnLockAVISoundBuffer(AviSoundBuffer);
-            if (DAT_00668ee0 == 0) {
-                AviAudioSamplePos += DAT_00668f90;
+            if (AviAudioNeedsAcm == 0) {
+                AviAudioSamplePos += AviSamplesPerFrame;
             }
-            DAT_00668fa0++;
-            if (DAT_00668fa0 >= DAT_00668f50) {
-                DAT_00668fa0 = 0;
+            AviSoundBufferSlot++;
+            if (AviSoundBufferSlot >= AviSoundBufferSlotCount) {
+                AviSoundBufferSlot = 0;
             }
             count--;
         } while (count != 0);
@@ -2056,7 +2056,7 @@ int PlayMovie(char *filename, unsigned int param_2, int param_3) {
             do {
                 ProcessSystemEvents();
                 ReadGameButtons();
-            } while ((DAT_00813ad4 & 7) != 0);
+            } while ((CancelKeyState & 7) != 0);
             ResumeAllSamples();
             FUN_00492da0();
             return result;

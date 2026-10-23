@@ -57,10 +57,10 @@ void ReleaseWaterWorksSfx(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00417ae0
-void thunk_FUN_00417ac0(void) { ReleaseWaterWorksSfx(); }
+void WaterWorksEntranceUnload(void) { ReleaseWaterWorksSfx(); }
 
 // FUNCTION: LEGOLAND 0x00417af0
-void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
+void PlayWaterWorksSfxAtTile(unsigned char *src, int index, unsigned int looping) {
     struct SampleSource params;
 
     params.type = 2;
@@ -70,7 +70,7 @@ void FUN_00417af0(unsigned char *src, int index, unsigned int looping) {
 }
 
 // FUNCTION: LEGOLAND 0x00417b40
-void FUN_00417b40(unsigned char *src) {
+void FadeWaterWorksSfxAtTile(unsigned char *src) {
     struct SampleSource source;
 
     source.type = 2;
@@ -102,7 +102,7 @@ struct WaterNode *FindWaterNodeByKey(struct WaterNode *list, short *key) {
 }
 
 // FUNCTION: LEGOLAND 0x00417bd0
-void FUN_00417bd0(struct WaterNode **head, struct WaterNode *node) {
+void UnlinkWaterNode(struct WaterNode **head, struct WaterNode *node) {
     struct WaterNode *cur;
 
     cur = *head;
@@ -123,8 +123,8 @@ void FUN_00417bd0(struct WaterNode **head, struct WaterNode *node) {
 
 // FUNCTION: LEGOLAND 0x00417c00
 unsigned int WaterWorksEntranceLoad(struct Element *arg) {
-    DAT_004cbfe4 = arg;
-    DAT_004cc01c = arg->ride;
+    WaterWorksEntranceElement = arg;
+    WaterWorksEntranceRide = arg->ride;
     return AcquireWaterWorksSfx();
 }
 
@@ -145,34 +145,34 @@ void WaterWorksEntranceRemoveObject(struct Element *a, unsigned int b, struct Cu
 }
 
 // FUNCTION: LEGOLAND 0x00417c90
-unsigned int FUN_00417c90(void) {
-    // DAT_004cbfe4 is an int-typed global that stores an object pointer (set to a
+unsigned int WaterWorksEntranceExists(void) {
+    // WaterWorksEntranceElement is an int-typed global that stores an object pointer (set to a
     // WaterArg*); pass it as the match vtable. Cast justified: the global is genuinely
     // used as both an int and various struct pointers, so it stays unsigned int.
-    return GetFirstObjectMatching((Element *)DAT_004cbfe4) != 0;
+    return GetFirstObjectMatching((Element *)WaterWorksEntranceElement) != 0;
 }
 
 // FUNCTION: LEGOLAND 0x00417cb0
-void FUN_00417cb0(unsigned short key) {
+void AddWaterBlockNode(unsigned short key) {
     struct WaterNode *node;
 
     node = (struct WaterNode *)malloc(sizeof(struct WaterNode));
     if (node != NULL) {
         memset(node, 0, sizeof(struct WaterNode));
         node->key = key;
-        InsertWaterNodeAtHead(&WaterNodeList, node);
+        InsertWaterNodeAtHead(&WaterBlockList, node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00417cf0
-void FUN_00417cf0(struct WaterNode *node) {
-    FUN_00417bd0(&WaterNodeList, node);
+void FreeWaterBlockNode(struct WaterNode *node) {
+    UnlinkWaterNode(&WaterBlockList, node);
     free(node);
 }
 
 // FUNCTION: LEGOLAND 0x00417d10
-struct WaterNode *FUN_00417d10(unsigned short *key) {
-    return FindWaterNodeByKey(WaterNodeList, key);
+struct WaterNode *FindWaterBlockNode(unsigned short *key) {
+    return FindWaterNodeByKey(WaterBlockList, key);
 }
 
 // FUNCTION: LEGOLAND 0x00417d30
@@ -203,7 +203,7 @@ void WaterWorksWaterBlockCalcCursor(struct Element *arg, int *a, unsigned int b)
     EditCursor.field_1830 = 0;
     ScreenToMapRef(a, &EditCursor.tile_x, b);
     ValidateCursor(&EditCursor, context);
-    if (FUN_00417c90() != 0) {
+    if (WaterWorksEntranceExists() != 0) {
         return;
     }
     SetCursorBlocked(&EditCursor, 0xc);
@@ -253,16 +253,16 @@ unsigned int IsPointInBlokeGardenerOrMechanicList(unsigned char *point) {
 }
 
 // FUNCTION: LEGOLAND 0x00417f40
-void FUN_00417f40(void) {
+void TriggerWaterBlocksUnderBlokes(void) {
     struct WaterNode *node;
 
-    node = (struct WaterNode *)WaterNodeList;
+    node = (struct WaterNode *)WaterBlockList;
     while (node != NULL) {
         if (IsPointInBlokeGardenerOrMechanicList((unsigned char *)&node->key) != 0) {
             if (node->field_8 == 0) {
                 node->field_8 = 1;
                 node->frame = 0;
-                FUN_00417af0((unsigned char *)&node->key, 0, 0);
+                PlayWaterWorksSfxAtTile((unsigned char *)&node->key, 0, 0);
             }
         }
         node = node->next;
@@ -288,8 +288,8 @@ void WaterWorksWaterBlockUpdate(Element *obj) {
 
     char dir;
 
-    FUN_00417f40();
-    node = (struct WaterNode *)WaterNodeList;
+    TriggerWaterBlocksUnderBlokes();
+    node = (struct WaterNode *)WaterBlockList;
     while (node != NULL) {
         if (node->field_8 == 1) {
             limit = 0;
@@ -359,18 +359,18 @@ struct RideSpriteInfo *GetWaterWorksWaterBlockSpriteInfo(struct Element *arg1, u
     struct WaterNode *node;
     int idx;
 
-    node = FUN_00417d10(&arg2);
+    node = FindWaterBlockNode(&arg2);
     if (node != NULL) {
         idx = node->block_index;
-        DAT_004cbff0.id = arg2;
-        DAT_004cbff0.sprite = WaterWorksImageListData->sprites[(unsigned char)idx];
-        DAT_004cbff0.x = WaterWorksImageListData->offset_x[(unsigned char)idx] >> 1;
-        DAT_004cbff0.y = WaterWorksImageListData->offset_y[(unsigned char)idx] >> 1;
-        DAT_004cbff0.field_10 = 0;
-        ((struct Sprite *)DAT_004cbff0.sprite)->flags |= 0x2000;
+        WaterWorksSpriteInfo.id = arg2;
+        WaterWorksSpriteInfo.sprite = WaterWorksImageListData->sprites[(unsigned char)idx];
+        WaterWorksSpriteInfo.x = WaterWorksImageListData->offset_x[(unsigned char)idx] >> 1;
+        WaterWorksSpriteInfo.y = WaterWorksImageListData->offset_y[(unsigned char)idx] >> 1;
+        WaterWorksSpriteInfo.field_10 = 0;
+        ((struct Sprite *)WaterWorksSpriteInfo.sprite)->flags |= 0x2000;
         SetOverrideFrame(node->frame);
     }
-    return &DAT_004cbff0;
+    return &WaterWorksSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x004181a0
@@ -394,8 +394,8 @@ void WaterBlockAddObject(struct Element *editObj, unsigned char *coords) {
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
     AddBasicObject(editObj, (int *)coords);
-    FUN_00417cb0(key);
-    node = FUN_00417d10(&key);
+    AddWaterBlockNode(key);
+    node = FindWaterBlockNode(&key);
     if (node != NULL) {
         node->block_index = (char)(rand() % WaterWorksImageListData->count);
     }
@@ -406,33 +406,33 @@ void WaterBlockRemoveObject(struct Element *a, unsigned int b, struct Cursor *c)
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
-    node = FUN_00417d10((unsigned short *)&b);
+    node = FindWaterBlockNode((unsigned short *)&b);
     if (node != NULL) {
-        FUN_00417cf0(node);
+        FreeWaterBlockNode(node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00418260
-void FUN_00418260(unsigned short key) {
+void AddShowerNode(unsigned short key) {
     struct WaterNode *node;
 
     node = (struct WaterNode *)malloc(sizeof(struct WaterNode));
     if (node != NULL) {
         memset(node, 0, sizeof(struct WaterNode));
         node->key = key;
-        InsertWaterNodeAtHead(&DAT_004cc030, node);
+        InsertWaterNodeAtHead(&ShowerList, node);
     }
 }
 
 // FUNCTION: LEGOLAND 0x004182a0
-void FUN_004182a0(struct WaterNode *node) {
-    FUN_00417bd0(&DAT_004cc030, node);
+void FreeShowerNode(struct WaterNode *node) {
+    UnlinkWaterNode(&ShowerList, node);
     free(node);
 }
 
 // FUNCTION: LEGOLAND 0x004182c0
-struct WaterNode *FUN_004182c0(unsigned short *key) {
-    return FindWaterNodeByKey(DAT_004cc030, key);
+struct WaterNode *FindShowerNode(unsigned short *key) {
+    return FindWaterNodeByKey(ShowerList, key);
 }
 
 // FUNCTION: LEGOLAND 0x004182e0
@@ -455,16 +455,16 @@ void ShowerUnload(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00418350
-void FUN_00418350(void) {
+void TriggerShowersUnderBlokes(void) {
     struct WaterNode *node;
 
-    node = (struct WaterNode *)DAT_004cc030;
+    node = (struct WaterNode *)ShowerList;
     while (node != NULL) {
         if (IsPointInBlokeGardenerOrMechanicList((unsigned char *)&node->key) != 0) {
             if (node->field_8 == 0) {
                 node->field_8 = 1;
                 node->frame = 0;
-                FUN_00417af0((unsigned char *)&node->key, 0, 0);
+                PlayWaterWorksSfxAtTile((unsigned char *)&node->key, 0, 0);
             }
         }
         node = node->next;
@@ -477,8 +477,8 @@ void WaterWorksShowerUpdate(void) {
     struct LLS *lls;
     int limit;
 
-    FUN_00418350();
-    for (node = DAT_004cc030; node != NULL; node = node->next) {
+    TriggerShowersUnderBlokes();
+    for (node = ShowerList; node != NULL; node = node->next) {
         if (node->field_8 == 1 && (unsigned char)(node->frame += 1) >= 0xb) {
             node->field_8 = 2;
             node->frame = 0;
@@ -516,7 +516,7 @@ void RenderShower(struct Element *render, unsigned int p2, unsigned int p3, unsi
     struct LLS *lls;
 
     ctx = render->ride;
-    node = FUN_004182c0((unsigned short *)coords);
+    node = FindShowerNode((unsigned short *)coords);
     if (node != NULL && node->field_8 == 2) {
         offset.x = -8;
         offset.y = 0x14;
@@ -535,7 +535,7 @@ void ShowerAddObject(struct Element *editObj, unsigned char *coords) {
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
     AddBasicObject(editObj, (int *)coords);
-    FUN_00418260(key);
+    AddShowerNode(key);
 }
 
 // FUNCTION: LEGOLAND 0x00418510
@@ -543,9 +543,9 @@ void ShowerRemoveObject(struct Element *a, unsigned int b, struct Cursor *c) {
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
-    node = FUN_004182c0((unsigned short *)&b);
+    node = FindShowerNode((unsigned short *)&b);
     if (node != NULL) {
-        FUN_004182a0(node);
+        FreeShowerNode(node);
     }
 }
 
@@ -555,12 +555,12 @@ struct RideSpriteInfo *GetWaterWorksShowerSpriteInfo(struct Element *arg1, unsig
     struct WaterListNode *node;
 
     sub = (struct Ride *)arg1->ride;
-    DAT_004cbff0.id = arg2;
-    DAT_004cbff0.sprite = sub->layer;
-    DAT_004cbff0.x = sub->field_14;
-    DAT_004cbff0.y = sub->field_18;
-    DAT_004cbff0.field_10 = 0;
-    node = (struct WaterListNode *)FUN_004182c0(&arg2);
+    WaterWorksSpriteInfo.id = arg2;
+    WaterWorksSpriteInfo.sprite = sub->layer;
+    WaterWorksSpriteInfo.x = sub->field_14;
+    WaterWorksSpriteInfo.y = sub->field_18;
+    WaterWorksSpriteInfo.field_10 = 0;
+    node = (struct WaterListNode *)FindShowerNode(&arg2);
     if (node != NULL) {
         if (node->field_8 == 2) {
             SetOverrideFrame(0xb);
@@ -568,7 +568,7 @@ struct RideSpriteInfo *GetWaterWorksShowerSpriteInfo(struct Element *arg1, unsig
             SetOverrideFrame(node->field_9);
         }
     }
-    return &DAT_004cbff0;
+    return &WaterWorksSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x004185c0
@@ -580,7 +580,7 @@ void WaterWorksShowerCalcCursor(struct Element *arg, int *a, unsigned int b) {
     *(struct Footprint *)EditCursor.field_1414 = *(struct Footprint *)&context->footprint.x0;
     EditCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, context);
-    if (FUN_00417c90() != 0) {
+    if (WaterWorksEntranceExists() != 0) {
         return;
     }
     SetCursorBlocked(&EditCursor, 0xc);
@@ -588,7 +588,7 @@ void WaterWorksShowerCalcCursor(struct Element *arg, int *a, unsigned int b) {
 }
 
 // FUNCTION: LEGOLAND 0x00418630
-void FUN_00418630(unsigned short key) {
+void AddElephantFountainNode(unsigned short key) {
     struct WaterNode *node;
 
     node = (struct WaterNode *)malloc(sizeof(struct WaterNode));
@@ -600,13 +600,13 @@ void FUN_00418630(unsigned short key) {
 }
 
 // FUNCTION: LEGOLAND 0x00418670
-void FUN_00418670(struct WaterNode *node) {
-    FUN_00417bd0(&ElephantFountainList, node);
+void FreeElephantFountainNode(struct WaterNode *node) {
+    UnlinkWaterNode(&ElephantFountainList, node);
     free(node);
 }
 
 // FUNCTION: LEGOLAND 0x00418690
-struct WaterNode *FUN_00418690(unsigned short *key) {
+struct WaterNode *FindElephantFountainNode(unsigned short *key) {
     return FindWaterNodeByKey(ElephantFountainList, key);
 }
 
@@ -629,7 +629,7 @@ void ElephantFountainUnload(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00418710
-unsigned int FUN_00418710(unsigned char *coords, int *base) {
+unsigned int IsBlokeNearElephantFountain(unsigned char *coords, int *base) {
     struct WaterRect rect;
 
     rect.x0 = coords[0] + base[0];
@@ -646,12 +646,12 @@ unsigned int FUN_00418710(unsigned char *coords, int *base) {
 }
 
 // FUNCTION: LEGOLAND 0x004187b0
-void FUN_004187b0(void) {
+void TriggerElephantFountainsNearBlokes(void) {
     struct WaterNode *node;
 
     node = (struct WaterNode *)ElephantFountainList;
     while (node != NULL) {
-        if (FUN_00418710((unsigned char *)&node->key, (int *)&ElephantFountainRide->footprint.x0) != 0) {
+        if (IsBlokeNearElephantFountain((unsigned char *)&node->key, (int *)&ElephantFountainRide->footprint.x0) != 0) {
             if (node->field_8 == 0) {
                 node->field_8 = 1;
                 node->frame = 0;
@@ -670,7 +670,7 @@ void WaterWorksElephantFountainUpdate(void) {
     int y;
     struct Point sc;
 
-    FUN_004187b0();
+    TriggerElephantFountainsNearBlokes();
     for (node = ElephantFountainList; node != NULL; node = node->next) {
         if (node->field_8 == 1) {
             limit = 0;
@@ -707,8 +707,8 @@ void ElephantFountainAddObject(struct Element *editObj, unsigned char *coords) {
     *(unsigned char *)&key = coords[0];
     *((unsigned char *)&key + 1) = coords[4];
     AddBasicObject(editObj, (int *)coords);
-    FUN_00418630(key);
-    FUN_00417af0((unsigned char *)&key, 2, 1);
+    AddElephantFountainNode(key);
+    PlayWaterWorksSfxAtTile((unsigned char *)&key, 2, 1);
 }
 
 // FUNCTION: LEGOLAND 0x00418910
@@ -716,11 +716,11 @@ void ElephantFountainRemoveObject(struct Element *a, unsigned int b, struct Curs
     struct WaterNode *node;
 
     StandardRemoveObject(a, *(TileId *)&b, c);
-    node = FUN_00418690((unsigned short *)&b);
+    node = FindElephantFountainNode((unsigned short *)&b);
     if (node != NULL) {
-        FUN_00418670(node);
+        FreeElephantFountainNode(node);
     }
-    FUN_00417b40((unsigned char *)&b);
+    FadeWaterWorksSfxAtTile((unsigned char *)&b);
 }
 
 // FUNCTION: LEGOLAND 0x00418950
@@ -732,7 +732,7 @@ void WaterWorksElephantFountainCalcCursor(struct Element *arg, int *a, unsigned 
     ScreenToMapRef(a, &EditCursor.tile_x, b);
     EditCursor.field_1830 = 0;
     ValidateCursor(&EditCursor, context);
-    if (FUN_00417c90() != 0) {
+    if (WaterWorksEntranceExists() != 0) {
         return;
     }
     SetCursorBlocked(&EditCursor, 0xc);
@@ -764,7 +764,7 @@ void WaterWorksCrocodileFountainCalcCursor(struct Element *arg, int *a, unsigned
     EditCursor.field_1830 = 0;
     ScreenToMapRef(a, &EditCursor.tile_x, b);
     ValidateCursor(&EditCursor, data);
-    if (FUN_00417c90() != 0) {
+    if (WaterWorksEntranceExists() != 0) {
         return;
     }
     SetCursorBlocked(&EditCursor, 0xc);
@@ -779,7 +779,7 @@ LEGO_EXPORT int Save_WaterBlock(struct Element *element) {
 
     one = 1;
     zero = 0;
-    current = WaterNodeList;
+    current = WaterBlockList;
     while (current != NULL) {
         if (SaveGameWrite(&one, 4) == 0) {
             return 0;
@@ -811,7 +811,7 @@ LEGO_EXPORT int Load_WaterBlock(struct Element *element) {
         if (prev != NULL) {
             prev->next = node;
         } else {
-            WaterNodeList = node;
+            WaterBlockList = node;
         }
         prev = node;
         if (SaveGameRead(&count, 4) == 0) {
@@ -876,7 +876,7 @@ void WaterWorksGetInterfaces(struct Element *name, struct Ride *ci) {
     // STRING: LEGOLAND 0x004b50f4
     if (_stricmp("WATER WORKS ENTRANCE", name->name) == 0) {
         ci->cb_a4 = (void (*)())WaterWorksEntranceLoad;
-        ci->cb_ac = thunk_FUN_00417ac0;
+        ci->cb_ac = WaterWorksEntranceUnload;
         ci->cb_98 = WaterWorksEntranceAddObject;
         ci->cb_9c = WaterWorksEntranceRemoveObject;
         return;

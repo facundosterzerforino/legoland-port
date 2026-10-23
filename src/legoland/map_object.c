@@ -941,7 +941,7 @@ void PropagateCursorBlocked(struct Cursor *cursor) {
 }
 
 // FUNCTION: LEGOLAND 0x0045f540
-struct Cursor *FUN_0045f540(struct Cursor *cursor) {
+struct Cursor *GetOrAddPathCursor(struct Cursor *cursor) {
     struct Cursor *node;
     struct Cursor *last;
 
@@ -984,7 +984,7 @@ LEGO_EXPORT void BuildCursorPtr(struct Cursor *cursor, unsigned int param_2, int
     while (1) {
         rect = *(struct Footprint *)&cursor->field_1414[0];
         if (param_3 != 0) {
-            FUN_0045f540(cursor);
+            GetOrAddPathCursor(cursor);
         }
         sprite = (struct Sprite *)TileSpriteArray[DAT_00667ca4];
         size = sprite->height;
@@ -1054,7 +1054,7 @@ LEGO_EXPORT void ValidateCursor(struct Cursor *cursor, void *param) {
     int x1;
     first = cursor;
     if (FUN_0045ead0((struct Ride *)param) != 0 && (cursor->field_1828 & 0x4000) == 0) {
-        FUN_0045f540(cursor);
+        GetOrAddPathCursor(cursor);
     }
     ResetCursorBuildable(cursor);
     for (; cursor != 0; cursor = cursor->next) {
@@ -1705,22 +1705,22 @@ void DrawMapTiles(struct Point *pos, RECT *clip) {
         if ((frame & 0xff) == 0) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + DAT_004b9218,
-                oy + DAT_004b921c);
+            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + Bridge0SpriteOffsetX,
+                oy + Bridge0SpriteOffsetY);
             k = (ov->field_10 + 4) & 0xff;
             if (BridgesData->count > k) {
                 sprite = BridgesData->sprites[k];
-                SortSprite(sprite, ox + DAT_00805f40, oy + DAT_00805f44, (short)sprite->height + oy + DAT_00805f44, 0, 0);
+                SortSprite(sprite, ox + Bridge0OverlayOffsetX, oy + Bridge0OverlayOffsetY, (short)sprite->height + oy + Bridge0OverlayOffsetY, 0, 0);
             }
         } else if ((frame & 0xff) == 1) {
             ox = ov->x - dx;
             oy = ov->y - dy;
-            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + DAT_004b9210,
-                oy + DAT_004b9214);
+            PrintSpriteSimple(BridgesData->sprites[(frame + 2) & 0xff], ox + Bridge1SpriteOffsetX,
+                oy + Bridge1SpriteOffsetY);
             k = (ov->field_10 + 4) & 0xff;
             if (BridgesData->count > k) {
                 sprite = BridgesData->sprites[k];
-                SortSprite(sprite, ox + DAT_00801a60, oy + DAT_00801a64, (short)sprite->height + oy + DAT_00801a64, 0, 0);
+                SortSprite(sprite, ox + Bridge1OverlayOffsetX, oy + Bridge1OverlayOffsetY, (short)sprite->height + oy + Bridge1OverlayOffsetY, 0, 0);
             }
         }
     }
@@ -2142,38 +2142,38 @@ LEGO_EXPORT void *GetObjectClassAndInstance(int *coords, unsigned short *out) {
 void SetBridgeParamsByName(const char *param_1) {
     // STRING: LEGOLAND 0x004b9c14
     if (strcmp(param_1, "CASTLE BRIDGES") == 0) {
-        DAT_004b9210 = 4;
-        DAT_004b9214 = 0x6d;
-        DAT_004b9218 = 0x3b;
-        DAT_004b921c = 0x6d;
-        DAT_00801a60 = 0;
-        DAT_00801a64 = 0;
-        DAT_00805f40 = 0;
-        DAT_00805f44 = 0;
+        Bridge1SpriteOffsetX = 4;
+        Bridge1SpriteOffsetY = 0x6d;
+        Bridge0SpriteOffsetX = 0x3b;
+        Bridge0SpriteOffsetY = 0x6d;
+        Bridge1OverlayOffsetX = 0;
+        Bridge1OverlayOffsetY = 0;
+        Bridge0OverlayOffsetX = 0;
+        Bridge0OverlayOffsetY = 0;
         return;
     }
     // STRING: LEGOLAND 0x004b9c00
     if (strcmp(param_1, "EXPLORER BRIDGES") == 0) {
-        DAT_004b9214 = 0x6a;
-        DAT_004b921c = 0x6a;
-        DAT_004b9210 = 1;
-        DAT_004b9218 = 0x40;
-        DAT_00801a60 = 0xe;
-        DAT_00801a64 = 0x89;
-        DAT_00805f40 = 0x86;
-        DAT_00805f44 = 0x89;
+        Bridge1SpriteOffsetY = 0x6a;
+        Bridge0SpriteOffsetY = 0x6a;
+        Bridge1SpriteOffsetX = 1;
+        Bridge0SpriteOffsetX = 0x40;
+        Bridge1OverlayOffsetX = 0xe;
+        Bridge1OverlayOffsetY = 0x89;
+        Bridge0OverlayOffsetX = 0x86;
+        Bridge0OverlayOffsetY = 0x89;
         return;
     }
     // STRING: LEGOLAND 0x004b9bf0
     if (strcmp(param_1, "WESTERN BRIDGES") == 0) {
-        DAT_004b9210 = 2;
-        DAT_004b9214 = 0x5b;
-        DAT_004b921c = 0x5b;
-        DAT_004b9218 = 0x3e;
-        DAT_00801a60 = 0xe;
-        DAT_00801a64 = 0x79;
-        DAT_00805f40 = 0x85;
-        DAT_00805f44 = 0x79;
+        Bridge1SpriteOffsetX = 2;
+        Bridge1SpriteOffsetY = 0x5b;
+        Bridge0SpriteOffsetY = 0x5b;
+        Bridge0SpriteOffsetX = 0x3e;
+        Bridge1OverlayOffsetX = 0xe;
+        Bridge1OverlayOffsetY = 0x79;
+        Bridge0OverlayOffsetX = 0x85;
+        Bridge0OverlayOffsetY = 0x79;
     }
 }
 
@@ -2215,7 +2215,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
         return 0xfffffffd;
     }
     LoadInProgress = 1;
-    FUN_00459880();
+    ResetCoverageCounters();
     RES_ReadFile(file, &len, 4);
     RES_ReadFile(file, namebuf, len);
     RES_ReadFile(file, &len, 4);
@@ -2247,14 +2247,14 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
             col++;
         }
     }
-    DAT_00801a68 = malloc(DAT_00801b28 * sizeof(*DAT_00801a68));
+    MapObjectElements = malloc(DAT_00801b28 * sizeof(*MapObjectElements));
     for (i = 0; i < DAT_00801b28; i++) {
         DrawWatchSprite();
         RES_ReadFile(file, &len, 4);
         RES_ReadFile(file, strbuf, len);
         strbuf[len] = 0;
         LLIDB_FindElement(strbuf, &elem, 0);
-        DAT_00801a68[i] = elem;
+        MapObjectElements[i] = elem;
         LLIDB_LoadData((void *)elem);
         if (elem->data != 0) {
             elem->flags = elem->flags | 4;
@@ -2269,14 +2269,14 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
         DrawWatchSprite();
         RES_ReadFile(file, &idx, 4);
         RES_ReadFile(file, &pos, 8);
-        DAT_00801a68[idx]->ride->footprint.next = NULL;
-        obj = DAT_00801a68[idx];
+        MapObjectElements[idx]->ride->footprint.next = NULL;
+        obj = MapObjectElements[idx];
         PutObjOnMap(obj->ride, obj, &pos);
         i++;
     }
     RES_ReadFile(file, &curx, 4);
     DAT_00801a74 = curx;
-    DAT_00801a70 = malloc(sizeof(*DAT_00801a70) * curx);
+    MapTileSets = malloc(sizeof(*MapTileSets) * curx);
     for (i = 0; i < curx; i++) {
         DrawWatchSprite();
         RES_ReadFile(file, &len, 4);
@@ -2284,8 +2284,8 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
         strbuf[len] = 0;
         LLIDB_FindElement(strbuf, &elem, 0);
         LLIDB_LoadData((void *)elem);
-        DAT_00801a70[i] = elem->data;
-        obj = DAT_00801a70[i]->element;
+        MapTileSets[i] = elem->data;
+        obj = MapTileSets[i]->element;
         if (obj != NULL && obj->data != NULL) {
             obj->flags = obj->flags | 4;
         }
@@ -2326,7 +2326,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
                         } else {
                             tile = 0;
                         }
-                        obj = DAT_00801a70[prev & 0x1f]->element;
+                        obj = MapTileSets[prev & 0x1f]->element;
                         tile->field_0 = obj;
                         PutObjOnMap(obj->ride, obj, &pos);
                         phase++;
@@ -2353,7 +2353,7 @@ LEGO_EXPORT unsigned int LoadBaseMap(const char *param_1) {
                         } else {
                             tile = 0;
                         }
-                        obj = DAT_00801a70[prev & 0x1f]->element;
+                        obj = MapTileSets[prev & 0x1f]->element;
                         tile->field_0 = obj;
                         PutObjOnMap(obj->ride, obj, &pos);
                     } else {
@@ -2647,7 +2647,7 @@ unsigned int UnloadBaseMap(void) {
     if (MapDataLoaded == 0) {
         return 0;
     }
-    FUN_00459880();
+    ResetCoverageCounters();
     row = 0;
     if (lpConfig->height > 0) {
         do {
@@ -2680,17 +2680,17 @@ unsigned int UnloadBaseMap(void) {
             i = i + 1;
         } while (i < count);
     }
-    free(DAT_00801a68);
+    free(MapObjectElements);
     i = 0;
     if (0 < DAT_00801a74) {
         do {
-            LLIDB_FindElementFromDataPtr(DAT_00801a70[i], &elem2, 0);
+            LLIDB_FindElementFromDataPtr(MapTileSets[i], &elem2, 0);
             elem2->flags = elem2->flags & 0xfffcfff1;
             LLIDB_UnLoadData(elem2);
             i = i + 1;
         } while (i < DAT_00801a74);
     }
-    free(DAT_00801a70);
+    free(MapTileSets);
     ClearOverlays();
     FreeBestNodeList();
     MapDataLoaded = 0;

@@ -46,13 +46,13 @@ void RenderCastleLevel(Element *obj, unsigned int param_2, unsigned int param_3,
     struct Point offset;
 
     RenderItems_New();
-    DAT_004c10e8 = NULL;
+    CastleLevelRiderRenderList = NULL;
     for (node = ride->riders; node != NULL; node = node->next) {
         if (*tile == node->tile.id) {
-            AddBlokeToRenderList(&DAT_004c10e8, node, node->person->field_20);
+            AddBlokeToRenderList(&CastleLevelRiderRenderList, node, node->person->field_20);
         }
     }
-    RenderBlokeList((struct RenderItemNode **)&DAT_004c10e8);
+    RenderBlokeList((struct RenderItemNode **)&CastleLevelRiderRenderList);
     if (CastleLevelMatteSprite != NULL) {
         pos = GetScreenCoordsForObject((TileId *)tile, ride);
         offset = GetRenderOffsetForLayer((struct Sprite *)ride->layer, 2);

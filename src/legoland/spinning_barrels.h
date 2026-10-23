@@ -21,7 +21,7 @@ struct BarrelNode {
     signed char slots[0x34 - 0x21];
 };
 
-void FUN_0043c2f0(struct BarrelNode *node);
+void ResetBarrelRide(struct BarrelNode *node);
 void SpinningBarrelsUpdate(struct Element *elem);
 unsigned int PickBarrelSeat(struct RideNode *rn, struct BarrelNode *node, signed char n);
 

@@ -35,5 +35,5 @@ struct ProfileNode *FindProfileNodeBySlot(unsigned char slot);
 char FUN_004920a0(unsigned int param1, unsigned char flags);
 int InitDirectSound(void *hwnd);
 LEGO_EXPORT void ResetTempProfile(void);
-void *FUN_00492110(void);
-struct Sample *FUN_004920e0(void);
+void *NewSample(void);
+struct Sample *AllocSample(void);

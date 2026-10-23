@@ -59,24 +59,24 @@ struct MermaidNode {
 };
 
 /* LLIDB "BOATING SCHOOL BOATS" data: boat sprites with per-frame screen offsets. */
-int FUN_00418e60(TileId tile, struct Bloke *bloke);
+int AddBoatRide(TileId tile, struct Bloke *bloke);
 void FUN_00418fe0(int param_1);
-void FUN_00419300(void);
+void UpdateBoatRides(void);
 void FUN_004193c0(struct BoatRide *param_1);
 struct BoatRide *FUN_00419420(struct BoatRide *param_1);
 void FUN_00419520(struct BoatRide *param_1, int param_2);
 void BoatingSchoolBuildStepPath(struct BoatRide *ride, int from, int to);
 unsigned int FUN_004192d0(void *param_1);
-void FUN_00418f90(struct BoatRide *param_1);
-void FUN_0041b0d0(unsigned short id, unsigned int value);
+void RemoveBoatRide(struct BoatRide *param_1);
+void AddBoatRideNodeValue(unsigned short id, unsigned int value);
 struct PathNode *FindBoatPathAt(unsigned int a, unsigned int b);
-unsigned int FUN_0041c690(int param_1, int param_2, unsigned short *param_3);
-void FUN_0041c4c0(int param_1, int param_2, int param_3, unsigned short *param_4);
-void FUN_0041c620(void *param_1, TileId tile, struct Cursor *param_3);
-void FUN_0041bab0(int param_1, int param_2, unsigned short *param_3);
-void FUN_0041caa0(unsigned short param_1);
-void FUN_0041cb20(short param_1);
-int FUN_0041c8c0(int a, int b, int c, int d);
+unsigned int GetBoatPathNeighbourMask(int param_1, int param_2, unsigned short *param_3);
+void AddBoatPathTile(int param_1, int param_2, int param_3, unsigned short *param_4);
+void RemoveBoatPath(void *param_1, TileId tile, struct Cursor *param_3);
+void FillBoatingWaterCorners(int param_1, int param_2, unsigned short *param_3);
+void ComputeBoatPathDistances(unsigned short param_1);
+void ComputeBoatPathDistancesStep(short param_1);
+int IsBoatPathConnected(int a, int b, int c, int d);
 void SearchBoatPathConnected(int x, int y, int tx, int ty, TileId *owner, int *found);
 void BoatingSchoolMermaidRemoveObject(void *param_1, TileId tile, struct Cursor *param_3);
 struct Point;
@@ -85,7 +85,7 @@ void BoatingSchoolRemoveObject(Element *obj, TileId tile, struct Cursor *cursor)
 
 void LoadBoatingSchoolResources(Element *obj);
 void UnloadBoatingSchoolResources();
-void FUN_0041a000();
+void SetBoatingSchoolEditCursor();
 struct Ride;
 void BoatingSchoolAddObject(struct Element *obj, int *coords);
 void BoatingSchoolCalcCursor(struct Element *param_1, int *param_2, unsigned int param_3);
@@ -93,7 +93,7 @@ void BoatingSchoolUpdate();
 void RenderBoatingSchool(Element *obj, unsigned int param_2, unsigned int param_3, unsigned short *tile, void *param_5, unsigned int clip);
 int BoatingSchool_Save(struct Element *element);
 int BoatingSchool_Load(struct Element *element);
-int FUN_0041b100(struct Element *dummy, int arg);
+int GetBestBoatRideScore(struct Element *dummy, int arg);
 void InitBoatingSchoolMermaid(Element *param_1);
 void BoatingSchoolMermaidSetEditMode();
 void BoatingSchoolMermaidAddObject(struct Element *obj, int *coords);

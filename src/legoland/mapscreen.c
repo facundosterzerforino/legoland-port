@@ -30,14 +30,14 @@ struct MapPoint {
 
 // FUNCTION: LEGOLAND 0x004562c0
 void SaveMouseHandlers(void) {
-    DAT_00667c10 = DAT_006687bc;
-    DAT_00667c28 = DAT_006687c0;
+    DAT_00667c10 = OkKeyHandler;
+    DAT_00667c28 = CancelKeyHandler;
 }
 
 // FUNCTION: LEGOLAND 0x004562e0
 void RestoreMouseHandlers(void) {
-    DAT_006687bc = DAT_00667c10;
-    DAT_006687c0 = DAT_00667c28;
+    OkKeyHandler = DAT_00667c10;
+    CancelKeyHandler = DAT_00667c28;
 }
 
 // FUNCTION: LEGOLAND 0x00456300
@@ -54,8 +54,8 @@ LEGO_EXPORT void InitMapScreen(void) {
         FullMapSprite->src_y = 0;
     }
     SaveMouseHandlers();
-    DAT_006687c0 = ToggleMapScreen;
-    DAT_006687bc = ToggleMapScreen;
+    CancelKeyHandler = ToggleMapScreen;
+    OkKeyHandler = ToggleMapScreen;
 }
 
 // FUNCTION: LEGOLAND 0x00456370
@@ -446,7 +446,7 @@ LEGO_EXPORT void RenderFullMap(void) {
 
                 piece.x = elem.field_4;
                 piece.y = elem.field_5;
-                if (FUN_00424050(&piece, &height, &dest, &dest_height, &flag)) {
+                if (GetCoasterPieceMapLine(&piece, &height, &dest, &dest_height, &flag)) {
                     struct Point pt;
                     int x1;
                     int y1;

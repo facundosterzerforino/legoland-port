@@ -30,10 +30,10 @@ void AddCarouselNode(unsigned short *param_1);
 void RemoveCarouselNode(struct CarouselNode *node);
 void FreeAllCarouselNodes(void);
 struct CarouselNode *FindCarouselNode(unsigned short *param_1);
-void FUN_0042bc90(struct CarouselNode *node);
-void FUN_0042c210(struct CarouselNode *node);
-void FUN_0042c800(void);
-int FUN_0042cd20(struct RideNode *elem, struct CarouselNode *node, signed char divisor);
+void StartCarouselRide(struct CarouselNode *node);
+void ResetCarouselRide(struct CarouselNode *node);
+void UpdateCarouselNodes(void);
+int TakeRandomCarouselSeat(struct RideNode *elem, struct CarouselNode *node, signed char divisor);
 
 void RenderCarousel(struct Element *param_1, unsigned int param_2, unsigned int param_3, unsigned short *param_4, void *param_5, unsigned int param_6);
 void LoadCarouselResources(struct Element *param_1);

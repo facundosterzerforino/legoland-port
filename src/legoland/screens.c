@@ -92,8 +92,8 @@ void CloseFrontEndScreen(void) {
         default:
             break;
         }
-        DAT_006687bc = 0;
-        DAT_006687c0 = 0;
+        OkKeyHandler = 0;
+        CancelKeyHandler = 0;
     }
 }
 
@@ -181,7 +181,7 @@ void RenderFrontEndScreen(unsigned char param_1) {
         RenderCertificateScreen();
         break;
     case 6:
-        FUN_0048c100();
+        DrawTutorialList();
         break;
     default:
         break;
@@ -289,18 +289,18 @@ void StartLevelGame(void) {
         sprintf(buf, "objlist%d.txt", lpConfig->level);
         SetBricksLimited(0);
         ResetMapAI();
-        DAT_00667c4c = FUN_0047afb0(buf);
+        DAT_00667c4c = LoadLevelScript(buf);
         SetBricksLimited(1);
         AllocBlokeCounters(lpConfig->max_blokes);
         ResetEditState();
-        FUN_00489ee0();
+        ClearObjInstanceTable();
         MapStats.level_end = 0;
         UpdateMenu();
         FUN_00490600(1);
-        ShowIntervalScreen(DAT_0066861c, 0);
+        ShowIntervalScreen(BriefingFileName, 0);
         MapLoaded = 1;
         ResumeGameTimer();
-        FUN_0048a800();
+        ClearFreePlaySelection();
     }
 }
 
@@ -313,15 +313,15 @@ void UnloadMap(void) {
         FreeBlokeCounters();
         FreeAllObjectClassInstances();
         DAT_00667cd8 = 1;
-        FUN_0046cb20();
+        UnloadLevelData();
         DAT_00667cd8 = 0;
         SetBricksLimited(0);
-        FUN_00489ee0();
+        ClearObjInstanceTable();
         DestroyAllBlokes();
         RemoveAllNewObjects();
         ResetInfoStruct();
         ClearBuildObjList();
-        FUN_0049cfc0();
+        FreeAllWorkOrdersAndWorkers();
         UnloadGameInterface();
         SetBricksLimited(1);
         GamePad = (GamePad & 0xffff00ff) | (((GamePad >> 8) & 0xeb) << 8);
@@ -340,13 +340,13 @@ void FUN_00458bc0(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00458be0
-void FUN_00458be0(void) {
+void MarkLevelComplete(void) {
     int slot = ((struct ScreenConfig *)lpConfig)->slot;
 
     if (slot < 0xf) {
         CurrentProfile.flags[4 + slot] = 1;
     }
-    FUN_0048a750();
+    UnlockAllFreePlayObjects();
     UpDateCurrentProfile();
 }
 
@@ -358,18 +358,18 @@ int FUN_00458c00(void) {
     if (MapScreenOpenPending != 0) {
         PauseGameTimer();
         PauseAllSamples();
-        DAT_006687bc = 0;
+        OkKeyHandler = 0;
         GamePad = GamePad & 0xffffffdf;
-        DAT_006687c0 = 0;
+        CancelKeyHandler = 0;
         InitMapScreen();
         DisableInfoPopUPIcons();
         DisableSidePanelIcons();
         MapScreenOpenPending = 0;
     } else if (MapScreenClosePending != 0) {
         ResumeAllSamples();
-        DAT_006687bc = 0;
+        OkKeyHandler = 0;
         GamePad = GamePad | 0x20;
-        DAT_006687c0 = 0;
+        CancelKeyHandler = 0;
         KillMapScreen();
         SetDefaultMouseHandlers();
         EnableSidePanelIcons();
@@ -379,8 +379,8 @@ int FUN_00458c00(void) {
         PauseGameTimer();
         ResetGameTimer();
         MarkGameTimer();
-        DAT_006687bc = 0;
-        DAT_006687c0 = 0;
+        OkKeyHandler = 0;
+        CancelKeyHandler = 0;
         CastlePlacedFlag = 0;
         SamplesPaused = 1;
         PauseAllSamples();
@@ -394,7 +394,7 @@ int FUN_00458c00(void) {
             InitGameInterface(0);
             SetDefaultMouseHandlers();
         } else {
-            FUN_0046c5c0();
+            FreeAllScriptLists();
             StartLevelGame();
         }
         UpdateSoundVols();
@@ -428,14 +428,14 @@ int FUN_00458c00(void) {
 
     if (DAT_00667c64 == 0) {
         // STRING: LEGOLAND 0x004b9160
-        DAT_00667c40 = "SFX";
+        AdvisorDebugStage = "SFX";
         UpdateSound();
         ReadGameButtons();
         FrameCounter = FrameCounter + 1;
         if (MapStats.level_end != 0 && EditMode.unk4 == 3) {
             if (MapStats.field_3ac != 0) {
                 SetPointer(0);
-                PlayMovie(DAT_008100c0, 1, 1);
+                PlayMovie(LevelEndMovieName, 1, 1);
                 MapStats.field_3ac = 0;
                 SetPointer(5);
             }
@@ -443,7 +443,7 @@ int FUN_00458c00(void) {
                 if (MapStats.level_end == 1) {
                     ((struct ScreenConfig *)lpConfig)->slot += 1;
                 }
-                FUN_0048a750();
+                UnlockAllFreePlayObjects();
                 UnloadMap();
                 DAT_00668e38 = 1;
                 EditMode.unk4 = 2;
@@ -470,7 +470,7 @@ void GameProc(void) {
     struct HoverInfo saved;
 
     // STRING: LEGOLAND 0x004b91e4
-    DAT_00667c40 = "AI";
+    AdvisorDebugStage = "AI";
     HandleRideAI();
     DoMapAI();
     ControlPeople();
@@ -479,16 +479,16 @@ void GameProc(void) {
         CheckWorkerOnMouseStatus(0);
     }
     // STRING: LEGOLAND 0x004b91d4
-    DAT_00667c40 = "ProcessStuff";
+    AdvisorDebugStage = "ProcessStuff";
     ProcessBuildingTimes();
     ProcessDamage();
     saved.type = Hover.type;
     SetPointer(5);
     // STRING: LEGOLAND 0x004b91cc
-    DAT_00667c40 = "Zoning";
+    AdvisorDebugStage = "Zoning";
     ResetHitInfo();
     // STRING: LEGOLAND 0x004b91c0
-    DAT_00667c40 = "Rendering";
+    AdvisorDebugStage = "Rendering";
     PushRenderingStatusAndLockVideoSurface();
     RenderView();
     if ((saved.type & 0x100) != 0 || (GamePad & 0x1000) != 0) {
@@ -497,13 +497,13 @@ void GameProc(void) {
     saved = Hover;
     PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit.type);
     FUN_0046f100(0x2c3);
-    FUN_0046ee00();
+    UpdateEditModeButtonSprites();
     // STRING: LEGOLAND 0x004b91b0
-    DAT_00667c40 = "In Game Help";
+    AdvisorDebugStage = "In Game Help";
     ProcessInGameHelp();
     DrawPopUpInfo();
     RenderIcons2(0x2c3, 0, 0);
-    FUN_0046cff0();
+    ShowFocusedIconHelp();
     if ((GamePad & 0x1000) != 0) {
         Hover = saved;
     }
@@ -518,43 +518,43 @@ void GameProc(void) {
                 SetPointer(8);
                 if (QueryClass != NULL) {
                     HTBubbleHelp(&help_rect, QueryClass->name, 2);
-                    FUN_0046d340(QueryClass->element->name);
+                    ShowHelpText(QueryClass->element->name);
                 }
                 break;
             case 0x10a:
                 HTBubbleHelp(&help_rect, GetString(0xd4), 2);
-                FUN_0046d230(0xd4);
+                ShowHelpById(0xd4);
                 SetPointer(8);
                 break;
             case 0x10b:
                 HTBubbleHelp(&help_rect, GetString(0xd2), 2);
-                FUN_0046d230(0xd2);
+                ShowHelpById(0xd2);
                 SetPointer(7);
                 break;
             case 0x10c:
                 HTBubbleHelp(&help_rect, GetString(0xd3), 2);
-                FUN_0046d230(0xd3);
+                ShowHelpById(0xd3);
                 SetPointer(7);
                 break;
             case 0x10d:
                 HTBubbleHelp(&help_rect, GetString(0x7e4), 2);
-                FUN_0046d230(0x7e4);
+                ShowHelpById(0x7e4);
                 SetPointer(8);
                 break;
             case 0x306:
-                FUN_00455fc0(&help_rect, GetVisitorName(Hover.ptr), 2, FUN_00482cb0(Hover.ptr));
+                HTBubbleHelpWithMood(&help_rect, GetVisitorName(Hover.ptr), 2, FUN_00482cb0(Hover.ptr));
                 SetPointer(8);
                 FUN_00450a40(Hover.ptr);
                 break;
             case 0x307:
                 HTBubbleHelp(&help_rect, GetString(0x90), 2);
-                FUN_0046d230(0x90);
+                ShowHelpById(0x90);
                 SetPointer(8);
                 FUN_00450a40(Hover.ptr);
                 break;
             case 0x308:
                 HTBubbleHelp(&help_rect, GetString(0x92), 2);
-                FUN_0046d230(0x92);
+                ShowHelpById(0x92);
                 SetPointer(8);
                 FUN_00450a40(Hover.ptr);
                 break;
@@ -565,7 +565,7 @@ void GameProc(void) {
         } else {
             if (QueryClass != NULL) {
                 HTBubbleHelp(&help_rect, QueryClass->name, 2);
-                FUN_0046d340(QueryClass->element->name);
+                ShowHelpText(QueryClass->element->name);
             }
         }
     }
@@ -574,10 +574,10 @@ void GameProc(void) {
         DAT_00667c48 = 1;
     }
     // STRING: LEGOLAND 0x004b91a4
-    DAT_00667c40 = "Appraisals";
+    AdvisorDebugStage = "Appraisals";
     CheckAppraisalDue();
     // STRING: LEGOLAND 0x004b9194
-    DAT_00667c40 = "Appraisals Over";
+    AdvisorDebugStage = "Appraisals Over";
     UpdateFocussedIconPtr();
     if ((GamePad & 0x1000) == 0 && DAT_00667c48 == 0) {
         if (FocussedIconPtr != NULL && DAT_00668954 == 0) {
@@ -596,7 +596,7 @@ void GameProc(void) {
     }
     RenderingComplete();
     // STRING: LEGOLAND 0x004b9180
-    DAT_00667c40 = "Exiting GameProc";
+    AdvisorDebugStage = "Exiting GameProc";
 }
 
 // One frame of the map screen: draws the map, the interface background and the icons. While the
@@ -638,8 +638,8 @@ __declspec(naked) void RenderMapScreenFrame(void) {
         push edx
         call PrintSprite
         add esp, 0x18
-        // FUN_0046ee00(); RenderIcons(); CheckFocussedIcon();
-        call FUN_0046ee00
+        // UpdateEditModeButtonSprites(); RenderIcons(); CheckFocussedIcon();
+        call UpdateEditModeButtonSprites
         call RenderIcons
         call CheckFocussedIcon
         // if (Hover.type == 2) { SetPointer(6); finish the frame; return; }
@@ -757,7 +757,7 @@ void RenderMapScreenFrame(void) {
     DrawMapScreen();
     SetPointer(5);
     PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit_info.type);
-    FUN_0046ee00();
+    UpdateEditModeButtonSprites();
     RenderIcons();
     CheckFocussedIcon();
     if (Hover.type == 2) {
@@ -853,8 +853,8 @@ void FUN_00459520(void) {
     LoadWatchSprite(0, 0);
     DebugTrace("boot: after LoadWatchSprite(0, 0)");
 
-    DebugTrace("boot: waiting for lmi.avi, DAT_007988bc=%d", DAT_007988bc);
-    while (DAT_007988bc == 0) {
+    DebugTrace("boot: waiting for lmi.avi, MusicThreadReady=%d", MusicThreadReady);
+    while (MusicThreadReady == 0) {
         PeekMessageA(&msg, NULL, 0, 0, 0);
         Sleep(100);
         DrawWatchSprite();
@@ -872,7 +872,7 @@ void FUN_00459520(void) {
     // STRING: LEGOLAND 0x004b91f4
     PlayMovie("Intro.avi", 1, 0);
     DebugTrace("boot: after PlayMovie Intro.avi");
-    FUN_00492ca0(0);
+    RequestMusicTheme(0);
     SetPointer(5);
     FrameCounter = 0;
     Load_Interface_ControlIcons();
@@ -929,7 +929,7 @@ void FUN_00459520(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459710
-void FUN_00459710(char *s) {
+void ShowLevelEndScreens(char *s) {
     char buffer[0x80];
     char *semicolon;
     char *source;
@@ -942,7 +942,7 @@ void FUN_00459710(char *s) {
         semicolon++;
         semicolon[-1] = ';';
         if (strlen(semicolon) != 0) {
-            strcpy(DAT_008100c0, semicolon);
+            strcpy(LevelEndMovieName, semicolon);
             MapStats.field_3ac = 1;
         }
     }
@@ -980,10 +980,10 @@ void EndLevel(unsigned int a1) {
 #endif
     MapStats.level_end = a1;
     if (a1 == 1) {
-        FUN_00459710(MapStats.field_198);
+        ShowLevelEndScreens(MapStats.field_198);
         return;
     }
     if (a1 == 2) {
-        FUN_00459710(MapStats.field_298);
+        ShowLevelEndScreens(MapStats.field_298);
     }
 }

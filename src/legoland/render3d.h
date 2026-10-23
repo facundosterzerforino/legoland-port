@@ -79,7 +79,7 @@ LEGO_EXPORT struct Sprite *GetSpriteForLayer(struct Sprite *sprite, unsigned int
 LEGO_EXPORT void MatrixMultiply(float *A, float *B, float *C);
 LEGO_EXPORT void BuildYRotationMatrix(float angle, float *out);
 LEGO_EXPORT void CopyMatrix(struct Matrix3x3 *src, struct Matrix3x3 *dest);
-unsigned int FUN_00442c70(void);
+unsigned int FreeRender3DBuffers(void);
 struct RenderItemNode *AllocRenderItem(void);
 struct ResFile;
 char *RES_ReadLine(struct ResFile *param_1, char *param_2, int param_3);
@@ -90,7 +90,7 @@ LEGO_EXPORT void AdjustBlokePosition(struct Point *pos);
 LEGO_EXPORT void UnAdjustBlokePosition(struct Point *pos);
 LEGO_EXPORT void Ride_SetFlagToNotLetAnyoneOn(void *param_1);
 LEGO_EXPORT void Ride_ClearFlagToNotLetAnyoneOn(void *param_1);
-struct RenderItemNode *FUN_00443120(void);
+struct RenderItemNode *AllocRenderItem2(void);
 LEGO_EXPORT void AdjustOffsetForViewMode(struct Point *param_1);
 LEGO_EXPORT void RenderItems_New(void);
 LEGO_EXPORT void AddBlokeToRenderList(struct RenderItemNode **head, struct RideNode *src, int key);

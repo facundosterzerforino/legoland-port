@@ -97,11 +97,11 @@ void LoadCatapultResources(struct Element *param1) {
         inner = ActiveCatapultRide->layer;
         if (inner != NULL) {
             inner->flags |= 0x2000;
-            DAT_004c10f0 = ActiveCatapultRide->layer;
+            CatapultLayer = ActiveCatapultRide->layer;
         }
     }
-    HideLayer(DAT_004c10f0, 0);
-    HideLayer(DAT_004c10f0, 1);
+    HideLayer(CatapultLayer, 0);
+    HideLayer(CatapultLayer, 1);
     Load_FXList(Catapult_SFX, 4);
 }
 
@@ -127,23 +127,23 @@ void RenderCatapult(struct Element *obj, int unused, int unused2, TileId *tile, 
     if (item != NULL) {
         pos = GetScreenCoordsForObject(tile, ride);
         if (item->field_8 & 1) {
-            LLSSetFrame(GetLLSForLayer(DAT_004c10f0, 1), item->field_d);
-            off = GetRenderOffsetForLayer(DAT_004c10f0, 1);
+            LLSSetFrame(GetLLSForLayer(CatapultLayer, 1), item->field_d);
+            off = GetRenderOffsetForLayer(CatapultLayer, 1);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(GetSpriteForLayer(DAT_004c10f0, 1), pos.x + off.x, pos.y + off.y, arg5, 0);
+            PrintSprite(GetSpriteForLayer(CatapultLayer, 1), pos.x + off.x, pos.y + off.y, arg5, 0);
         } else {
-            LLSSetFrame(GetLLSForLayer(DAT_004c10f0, 0), item->mode);
-            off = GetRenderOffsetForLayer(DAT_004c10f0, 0);
+            LLSSetFrame(GetLLSForLayer(CatapultLayer, 0), item->mode);
+            off = GetRenderOffsetForLayer(CatapultLayer, 0);
             AdjustOffsetForViewMode(&off);
-            PrintSprite(GetSpriteForLayer(DAT_004c10f0, 0), pos.x + off.x, pos.y + off.y, arg5, 0);
+            PrintSprite(GetSpriteForLayer(CatapultLayer, 0), pos.x + off.x, pos.y + off.y, arg5, 0);
         }
         lp = DAT_004b40a4;
         fp = item->active;
         for (i = 4; i != 0; i--) {
             if (*fp & 1) {
-                off = GetRenderOffsetForLayer(DAT_004c10f0, *lp);
+                off = GetRenderOffsetForLayer(CatapultLayer, *lp);
                 AdjustOffsetForViewMode(&off);
-                PrintSprite(GetSpriteForLayer(DAT_004c10f0, *lp), pos.x + off.x, pos.y + off.y, arg5, 0);
+                PrintSprite(GetSpriteForLayer(CatapultLayer, *lp), pos.x + off.x, pos.y + off.y, arg5, 0);
             }
             fp++;
             lp++;
@@ -176,7 +176,7 @@ void FUN_00403430(struct CatapultNode *node) {
 // FUNCTION: LEGOLAND 0x00403480
 void FUN_00403480(struct CatapultNode *item) {
     if (item->field_8 & 0x1) {
-        GetSpriteForLayer(DAT_004c10f0, 1);
+        GetSpriteForLayer(CatapultLayer, 1);
         item->field_d++;
         if (item->field_d >= 0x20) {
             item->field_8 &= 0xfffffffe;
@@ -210,18 +210,18 @@ void FUN_00403530(struct CatapultNode *node, unsigned int index) {
         if (++node->frame[index] >= 32) {
             node->active[index] = 0;
         }
-        LLSSetFrame(GetLLSForLayer(DAT_004c10f0, DAT_004b40a4[index]), node->frame[index]);
+        LLSSetFrame(GetLLSForLayer(CatapultLayer, DAT_004b40a4[index]), node->frame[index]);
     }
 }
 
 // FUNCTION: LEGOLAND 0x00403580
-void FUN_00403580(struct CatapultNode *arg, unsigned int index) {
+void ClearCatapultSlot(struct CatapultNode *arg, unsigned int index) {
     arg->flags[index] = 0;
     arg->slots[index] = NULL;
 }
 
 // FUNCTION: LEGOLAND 0x004035a0
-void FUN_004035a0(struct CatapultNode *node) {
+void UpdateCatapultNode(struct CatapultNode *node) {
     int i;
     struct RideNode *entry;
 
@@ -258,7 +258,7 @@ void FUN_004035a0(struct CatapultNode *node) {
             continue;
         }
         entry->rider->param_action = entry->rider->param_action + 1;
-        FUN_00403580(node, i);
+        ClearCatapultSlot(node, i);
     }
 
     FUN_00403480(node);
@@ -269,16 +269,16 @@ void FUN_004035a0(struct CatapultNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00403690
-void FUN_00403690(void) {
+void UpdateCatapultNodes(void) {
     struct CatapultNode *node = CatapultNodeList;
     while (node != NULL) {
-        FUN_004035a0(node);
+        UpdateCatapultNode(node);
         node = node->next;
     }
 }
 
 // FUNCTION: LEGOLAND 0x004036b0
-signed char FUN_004036b0(struct CatapultNode *node) {
+signed char PickFreeCatapultSlot(struct CatapultNode *node) {
     signed char i = rand() % 4;
 
     while (node->slots[i] != NULL) {
@@ -291,7 +291,7 @@ signed char FUN_004036b0(struct CatapultNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x004036f0
-void FUN_004036f0(const unsigned short *key, struct RideNode *entry, int x, int y) {
+void SendRiderToCatapultSlot(const unsigned short *key, struct RideNode *entry, int x, int y) {
     struct Bloke *bloke = entry->rider;
     struct CatapultNode *node = Catapult_FindNode(key);
     signed char slot;
@@ -300,7 +300,7 @@ void FUN_004036f0(const unsigned short *key, struct RideNode *entry, int x, int 
     if (node == NULL) {
         return;
     }
-    slot = FUN_004036b0(node);
+    slot = PickFreeCatapultSlot(node);
     node->slots[slot] = entry;
     bloke->field_3a = 3;
     bloke->dest.x = (x << 8) - (rand() % 2 ? 0x10 : -0x10) - 0xe0;
@@ -337,7 +337,7 @@ void CatapultUpdate(struct Element *elem) {
     struct RideNode *node;
     struct RideNode *next;
 
-    FUN_00403690();
+    UpdateCatapultNodes();
     for (node = ride->riders; node != NULL; node = next) {
         struct Bloke *bloke = node->rider;
         TileId *tile = &node->tile;
@@ -353,7 +353,7 @@ void CatapultUpdate(struct Element *elem) {
         switch (bloke->param_action) {
         case 0:
             bloke->flags |= 8;
-            FUN_004036f0(&tile->id, node, x, y);
+            SendRiderToCatapultSlot(&tile->id, node, x, y);
             break;
         case 1:
             FUN_004037d0(&tile->id, node);
@@ -411,14 +411,14 @@ void CatapultRemoveObject(struct Element *edit, TileId key, void *cursor, unsign
 struct RideSpriteInfo *GetCatapultSpriteInfo(struct Element *arg1, unsigned short arg2) {
     struct Ride *sprite = arg1->ride;
 
-    DAT_004c1100.sprite = sprite->layer;
-    DAT_004c1100.x = sprite->field_14;
-    DAT_004c1100.y = sprite->field_18;
-    DAT_004c1100.id = arg2;
+    CatapultSpriteInfo.sprite = sprite->layer;
+    CatapultSpriteInfo.x = sprite->field_14;
+    CatapultSpriteInfo.y = sprite->field_18;
+    CatapultSpriteInfo.id = arg2;
 
     sprite->layer->flags |= 0x2000;
 
-    return &DAT_004c1100;
+    return &CatapultSpriteInfo;
 }
 
 // FUNCTION: LEGOLAND 0x00403a20

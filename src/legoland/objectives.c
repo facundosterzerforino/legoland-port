@@ -42,14 +42,14 @@ struct SweepInstance {
 
 // FUNCTION: LEGOLAND 0x00468810
 void SetHintsFileName(char *name) {
-    strncpy(DAT_0066869c, name, 0x80);
-    DAT_0066869c[0x7f] = 0;
+    strncpy(HintsFileName, name, 0x80);
+    HintsFileName[0x7f] = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00468830
 void ClearBriefingAndHintsFileNames(void) {
-    DAT_0066869c[0] = 0;
-    DAT_0066861c[0] = 0;
+    HintsFileName[0] = 0;
+    BriefingFileName[0] = 0;
 }
 
 // FUNCTION: LEGOLAND 0x00468840
@@ -230,8 +230,8 @@ struct ObjectiveEvent *PostObjectiveMessage(const char *format, ...) {
     event = AllocObjectiveEvent(0, 1);
     if (event != NULL) {
         va_start(args, format);
-        vsprintf(DAT_0066820c, format, args);
-        SetObjectiveEventText(event, (char *)DAT_0066820c, 1);
+        vsprintf(ObjectiveTextBuffer, format, args);
+        SetObjectiveEventText(event, (char *)ObjectiveTextBuffer, 1);
         InsertObjectiveMessageSorted(event);
     }
     return event;
@@ -285,7 +285,7 @@ void InsertObjectiveEventSorted(struct ObjectiveEvent *event) {
         ObjectiveEventList = event;
         event->next = NULL;
     }
-    DAT_0066872c[event->type] += 1;
+    ObjectiveEventTypeCounts[event->type] += 1;
 }
 
 // FUNCTION: LEGOLAND 0x00468cd0
@@ -301,12 +301,12 @@ struct ObjectiveEvent *AllocTimestampedObjectiveEvent(unsigned int type, int sor
 
 // FUNCTION: LEGOLAND 0x00468d00
 void ResetObjectiveHintTimer(void) {
-    DAT_00668780 = GetGameTimer();
+    ObjectiveHintTimer = GetGameTimer();
 }
 
 // FUNCTION: LEGOLAND 0x00468d10
 int IsObjectiveHintDue(void) {
-    if ((int)(GetGameTimer() - DAT_00668780) > 0xc350) {
+    if ((int)(GetGameTimer() - ObjectiveHintTimer) > 0xc350) {
         ResetObjectiveHintTimer();
         return 1;
     }
@@ -923,7 +923,7 @@ void GiveRewardObject(struct Element *object, unsigned int a, unsigned int b) {
         if ((flags & 1) != 0) {
             if ((flags & 0x10002) != 2) {
                 obj->flags = (flags & 0xfffeffff) | 2;
-                FUN_0048a6e0((struct Element *)obj);
+                UnlockFreePlayObject((struct Element *)obj);
                 if (a != 0) {
                     AddNewObjectIcon(obj->data);
                 }

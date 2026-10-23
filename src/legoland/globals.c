@@ -151,7 +151,7 @@ double DAT_004ab4b0;
 float FLOAT_004ab4b8;
 
 // GLOBAL: LEGOLAND 0x004ab430
-float DAT_004ab430;
+float TrainCarMass;
 
 // GLOBAL: LEGOLAND 0x004ab43c
 float FLOAT_004ab43c;
@@ -349,7 +349,7 @@ unsigned char DAT_004b4bd0[0x14];
 unsigned int DAT_004b4bf0[5];
 
 // GLOBAL: LEGOLAND 0x004b4c04
-int DAT_004b4c04;
+int TrafficLightTimer;
 
 // GLOBAL: LEGOLAND 0x004b4c08
 unsigned short DAT_004b4c08[15][4];
@@ -373,7 +373,7 @@ struct SpiderBnv SpiderBnvInfo = {"manbox??", {0, 0x20, 0x1c, 0x14, 0x18, 0x0c, 
 Point DAT_004b4e20;
 
 // GLOBAL: LEGOLAND 0x004b4f08
-char *DAT_004b4f08[4] = {
+char *TempleSlidePathNames[4] = {
     // STRING: LEGOLAND 0x004b4f44
     "manbox01",
     // STRING: LEGOLAND 0x004b4f38
@@ -427,25 +427,25 @@ unsigned char DAT_004b53d4[0x190];
 struct AreaNode DAT_004b5570;
 
 // GLOBAL: LEGOLAND 0x004b5584
-short DAT_004b5584[4][2] = {{0, -2}, {2, 0}, {0, 2}, {-2, 0}};
+short PieceNeighbourOffsets[4][2] = {{0, -2}, {2, 0}, {0, 2}, {-2, 0}};
 
 // GLOBAL: LEGOLAND 0x004b55f4
-unsigned int DAT_004b55f4;
+unsigned int MapObjectsEnabled;
 
 // GLOBAL: LEGOLAND 0x004b5608
-unsigned int DAT_004b5608;
+unsigned int ClipVertexStride;
 
 // GLOBAL: LEGOLAND 0x004b560c
-int DAT_004b560c;
+int ClipVertexLastField;
 
 // GLOBAL: LEGOLAND 0x004b5b20
-void *DAT_004b5b20;
+void *CoasterSurfaceBits;
 
 // GLOBAL: LEGOLAND 0x004b5b24
-unsigned short *DAT_004b5b24;
+unsigned short *CoasterDepthBuffer;
 
 // GLOBAL: LEGOLAND 0x004b5b28
-int DAT_004b5b28;
+int CoasterSurfacePitch;
 
 // GLOBAL: LEGOLAND 0x004b59e8
 char SitLoGirlSitName[16] = "sit.logirlsit";
@@ -457,42 +457,42 @@ char LanguageName[36] = "english";
 char SitLoManSitName[] = "sit.lomansit";
 
 // GLOBAL: LEGOLAND 0x004b5abc
-float DAT_004b5abc[4][4];
+float HermiteBasis[4][4];
 
 // GLOBAL: LEGOLAND 0x004b5b3c
-struct RecBuf *DAT_004b5b3c;
+struct RecBuf *DepthSpanRecordEnd;
 
 // GLOBAL: LEGOLAND 0x004b5988
-struct BlokeInfo DAT_004b5988;
+struct BlokeInfo CastleVisitorInfo;
 
 // GLOBAL: LEGOLAND 0x004b5964
-unsigned int DAT_004b5964[2] = {0x191919, 0xf11a22};
+unsigned int ManVisitorColours[2] = {0x191919, 0xf11a22};
 
 // GLOBAL: LEGOLAND 0x004b596c
-const char *DAT_004b596c[2] = {
+const char *ManVisitorTextures[2] = {
     // STRING: LEGOLAND 0x004b59d8
     "Chest visitor1",
     // STRING: LEGOLAND 0x004b59d0
     "Face01"};
 
 // GLOBAL: LEGOLAND 0x004b5974
-unsigned int DAT_004b5974[2] = {0xf11a22, 0x8b4a};
+unsigned int GirlVisitorColours[2] = {0xf11a22, 0x8b4a};
 
 // GLOBAL: LEGOLAND 0x004b597c
-const char *DAT_004b597c[2] = {
+const char *GirlVisitorTextures[2] = {
     // STRING: LEGOLAND 0x004b59c0
     "Chest girly2",
     // STRING: LEGOLAND 0x004b59d0
     "Face01"};
 
 // GLOBAL: LEGOLAND 0x004b5c1c
-struct FMat4 DAT_004b5c1c[2];
+struct FMat4 CastleIsoProjections[2];
 
 // GLOBAL: LEGOLAND 0x004b5c9c
 unsigned int DAT_004b5c9c;
 
 // GLOBAL: LEGOLAND 0x004b5ca0
-unsigned int DAT_004b5ca0;
+unsigned int CastleLightDir;
 
 // GLOBAL: LEGOLAND 0x004b5ca4
 unsigned int DAT_004b5ca4;
@@ -504,7 +504,7 @@ unsigned int DAT_004b5ca8;
 float DAT_004b5cac;
 
 // GLOBAL: LEGOLAND 0x004b5cb0
-unsigned int DAT_004b5cb0;
+unsigned int TrackLightDir;
 
 // GLOBAL: LEGOLAND 0x004b5cb4
 unsigned int DAT_004b5cb4;
@@ -516,7 +516,7 @@ unsigned int DAT_004b5cb8;
 float DAT_004b5cbc;
 
 // GLOBAL: LEGOLAND 0x004b5cc0
-unsigned int DAT_004b5cc0;
+unsigned int ModelLightDir;
 
 // GLOBAL: LEGOLAND 0x004b5cc4
 unsigned int DAT_004b5cc4;
@@ -528,16 +528,16 @@ unsigned int DAT_004b5cc8;
 char RollerCoasterSavePath[32] = "RollerCoaster\\RollerCoaster.sav";
 
 // GLOBAL: LEGOLAND 0x004b5d20
-struct PieceClass DAT_004b5d20; /* filled from the original */
+struct PieceClass SquareTrackPieceClass; /* filled from the original */
 
 // GLOBAL: LEGOLAND 0x004b5d58
-struct PieceClass DAT_004b5d58;
+struct PieceClass HeightTrack25PieceClass;
 
 // GLOBAL: LEGOLAND 0x004b5d90
-struct PieceClass DAT_004b5d90;
+struct PieceClass HeightTrack2PieceClass;
 
 // GLOBAL: LEGOLAND 0x004b5dc8
-struct PieceClass DAT_004b5dc8;
+struct PieceClass HeightTrackPathPieceClass;
 
 // GLOBAL: LEGOLAND 0x004b5e00
 float DAT_004b5e00[4][3] = {{1.0f, 0.0f, 0.0f}, {2.0f, 1.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {0.0f, 1.0f, 0.0f}};
@@ -564,19 +564,19 @@ unsigned int DAT_004b5ef4[4][2] = {{0, 3}, {2, 3}, {2, 1}, {0, 1}};
 unsigned int DAT_004b5f14[4][2] = {{0x3fc00000, 0x3f000000}, {0x3f000000, 0x3fc00000}, {0x3fc00000, 0x3f000000}, {0x3f000000, 0x3fc00000}};
 
 // GLOBAL: LEGOLAND 0x004b5f60
-struct TexMesh DAT_004b5f60 = {0, 0, 0, 0, (struct MeshVert *)DAT_006139c8, DAT_006148b8, (unsigned int (*)[3])DAT_00612708};
+struct TexMesh RailTubeMesh = {0, 0, 0, 0, (struct MeshVert *)DAT_006139c8, DAT_006148b8, (unsigned int (*)[3])DAT_00612708};
 
 // GLOBAL: LEGOLAND 0x004b6150
-struct LmsFile DAT_004b6150 = {0};
+struct LmsFile SupportPostModel = {0};
 
 // GLOBAL: LEGOLAND 0x004b61e0
-struct CastleFloatEnt DAT_004b61e0[8] = {0};
+struct CastleFloatEnt TrackTieShape[8] = {0};
 
 // GLOBAL: LEGOLAND 0x004b62f0
 unsigned int DAT_004b62f0[4];
 
 // GLOBAL: LEGOLAND 0x004b6300
-struct LmsFile DAT_004b6300;
+struct LmsFile TrackTieModel;
 
 // GLOBAL: LEGOLAND 0x004b6398
 float DAT_004b6398[4][3] = {{20.0f, 0.0f, 0.0f}, {40.0f, 20.0f, 0.0f}, {20.0f, 40.0f, 0.0f}, {0.0f, 20.0f, 0.0f}};
@@ -584,7 +584,7 @@ float DAT_004b6398[4][3] = {{20.0f, 0.0f, 0.0f}, {40.0f, 20.0f, 0.0f}, {20.0f, 4
 // GLOBAL: LEGOLAND 0x004b63c8
 float DAT_004b63c8[4][3] = {{10.0f, 0.0f, 0.0f}, {0.0f, 10.0f, 0.0f}, {-10.0f, 0.0f, 0.0f}, {0.0f, -10.0f, 0.0f}};
 // GLOBAL: LEGOLAND 0x004b6408
-int DAT_004b6408[3] = {0, 2, 1};
+int WheelCurvePairs[3] = {0, 2, 1};
 
 // GLOBAL: LEGOLAND 0x004ab490
 float FLOAT_004ab490;
@@ -684,7 +684,7 @@ struct Footprint DAT_004b7248;
 unsigned char DAT_004b72e4[0x190];
 
 // GLOBAL: LEGOLAND 0x004b7478
-struct Footprint DAT_004b7478;
+struct Footprint JungleCruiseDefaultFootprint;
 
 // GLOBAL: LEGOLAND 0x004b7618
 struct FXItem SPACE_TOWER_SFX[1];
@@ -696,10 +696,10 @@ struct AnimLayout DAT_004b76b8;
 struct AnimLayout DAT_004b7750;
 
 // GLOBAL: LEGOLAND 0x004b7758
-struct SpaceTowerLayout DAT_004b7758[8];
+struct SpaceTowerLayout SpaceTowerLayouts[8];
 
 // GLOBAL: LEGOLAND 0x004b7798
-struct SpaceTowerSeatData DAT_004b7798[4];
+struct SpaceTowerSeatData SpaceTowerSeats[4];
 
 // GLOBAL: LEGOLAND 0x004b77e8
 struct Point DAT_004b77e8[8];
@@ -708,10 +708,10 @@ struct Point DAT_004b77e8[8];
 char BoxBlokeBnvName[] = "BoxBloke??";
 
 // GLOBAL: LEGOLAND 0x004b79bc
-char DAT_004b79bc[] = "manbox??";
+char PlaneRideManboxName[] = "manbox??";
 
 // GLOBAL: LEGOLAND 0x004b79d0
-struct FXItem DAT_004b79d0[2];
+struct FXItem PlaneRideFX[2];
 
 // GLOBAL: LEGOLAND 0x004b7abc
 unsigned short DAT_004b7abc;
@@ -789,10 +789,10 @@ struct Point DAT_004b8320; /* park exit (goal of leaving blokes) */
 struct Point DAT_004b8328; /* step past the exit */
 
 // GLOBAL: LEGOLAND 0x004b8334
-int DAT_004b8334[4] = {0}; /* bloke tiredness thresholds */
+int BlokeTirednessThresholds[4] = {0}; /* bloke tiredness thresholds */
 
 // GLOBAL: LEGOLAND 0x004b8344
-char DAT_004b8344 = 0;
+char NextBlokeLetter = 0;
 
 // GLOBAL: LEGOLAND 0x004b8348
 char *PTR_DAT_004b8348[8] = {0};
@@ -826,16 +826,16 @@ unsigned int BrickCount;
 unsigned int UnlimitedBricks;
 
 // GLOBAL: LEGOLAND 0x004b9210
-int DAT_004b9210;
+int Bridge1SpriteOffsetX;
 
 // GLOBAL: LEGOLAND 0x004b9214
-int DAT_004b9214;
+int Bridge1SpriteOffsetY;
 
 // GLOBAL: LEGOLAND 0x004b9218
-int DAT_004b9218;
+int Bridge0SpriteOffsetX;
 
 // GLOBAL: LEGOLAND 0x004b921c
-int DAT_004b921c;
+int Bridge0SpriteOffsetY;
 
 // GLOBAL: LEGOLAND 0x004b9220
 LEGO_EXPORT unsigned int BGFullUpdate;
@@ -923,13 +923,13 @@ const char BltFastNoSpriteFmt[] = "BltFast:Sprite Not Available:%s\n";
 unsigned int ScriptEventCategories[71];
 
 // GLOBAL: LEGOLAND 0x004b9f78
-int DAT_004b9f78[4] = {0x1f4, 0x190, 0x280, 0x1e0};
+int AdvisorHelpRect[4] = {0x1f4, 0x190, 0x280, 0x1e0};
 
 // GLOBAL: LEGOLAND 0x004b9f88
-unsigned int DAT_004b9f88;
+unsigned int HelpChanged;
 
 // GLOBAL: LEGOLAND 0x004b9f8c
-UINT_PTR DAT_004b9f8c = (UINT_PTR)-1; /* nothing spoken yet */
+UINT_PTR CurrentHelpKey = (UINT_PTR)-1; /* nothing spoken yet */
 
 // GLOBAL: LEGOLAND 0x004ba87c
 void *PTR_some_list_head_004ba87c;
@@ -944,7 +944,7 @@ unsigned int DAT_004ba884 = 0xff000000;
 struct InfoTimedEntry DAT_004ba8e0[17];
 
 // GLOBAL: LEGOLAND 0x004ba9ac
-unsigned int DAT_004ba9ac[234];
+unsigned int AdviceSpeechIds[234];
 
 // GLOBAL: LEGOLAND 0x004bad54
 int mouse_granularity;
@@ -962,7 +962,7 @@ unsigned int DAT_004baff8;
 char DAT_004baffc[4][0x14];
 
 // GLOBAL: LEGOLAND 0x004bb04c
-int DAT_004bb04c[18];
+int InterfaceIconPos[18];
 
 // GLOBAL: LEGOLAND 0x004bb094
 unsigned int DAT_004bb094;
@@ -986,7 +986,7 @@ unsigned int DAT_004bb18c[4];
 float DAT_004bb4dc;
 
 // GLOBAL: LEGOLAND 0x004bb4e0
-BITMAPINFOHEADER DAT_004bb4e0;
+BITMAPINFOHEADER AviFrameFormat;
 
 // GLOBAL: LEGOLAND 0x004bb598
 struct Point DAT_004bb598;
@@ -1031,7 +1031,7 @@ char *DAT_004bb6bc[6]; /* keyword table for FindStringNoCase */
 char *DAT_004bb6d4[9]; /* keyword table for FindStringNoCase */
 
 // GLOBAL: LEGOLAND 0x004bb6f8
-struct ScriptCommand DAT_004bb6f8[0x5d];
+struct ScriptCommand LevelScriptCommands[0x5d];
 
 // GLOBAL: LEGOLAND 0x004b86e0
 const char LegoFontName[] = "Lego";
@@ -1056,7 +1056,7 @@ const char *ResourceFileNames[3] = {
 LEGO_EXPORT struct LegoConfig *lpConfig;
 
 // GLOBAL: LEGOLAND 0x004bcec0
-struct Point DAT_004bcec0;
+struct Point PathGoalTile;
 
 // GLOBAL: LEGOLAND 0x004bcecc
 char *PTR_s_Aaron_004bcecc[0x53];
@@ -1068,7 +1068,7 @@ char *PTR_s_Abbie_004bd018[0x5a];
 char *PTR_s_Adams_004bd180[0x6b];
 
 // GLOBAL: LEGOLAND 0x004bd32c
-short DAT_004bd32c[8][2] = {
+short BlokeDirVectors[8][2] = {
     {-181, -181},
     {0, -256},
     {181, -181},
@@ -1080,23 +1080,23 @@ short DAT_004bd32c[8][2] = {
 };
 
 // GLOBAL: LEGOLAND 0x004bd34c
-BlokeAction PTR_FUN_004bd34c[16] = {
+BlokeAction BlokeActionTable[16] = {
     LogBlokeRethinking,
     BlokeActionWait,
-    FUN_00483ef0,
-    FUN_00484090,
-    FUN_00483d10,
+    BlokeActionWalkPath,
+    BlokeActionWalkPathStraight,
+    BlokeActionRandomWalk,
     BlokeActionTurn,
-    FUN_00484220,
+    BlokeActionMoveToDestOnPath,
     BlokeActionMoveToDest,
     BlokeActionBounce,
-    FUN_00484790,
-    FUN_00483e20,
-    FUN_00484470,
-    FUN_00484520,
+    BlokeActionPassThroughTile,
+    BlokeActionWalkUntilPath,
+    BlokeActionMoveToDestAvoiding,
+    BlokeActionMoveToDestStayOnPath,
     BlokeActionWaitWhileHovered,
-    FUN_00483d90,
-    FUN_00484350,
+    BlokeActionRandomWalkDelayed,
+    BlokeActionMoveUntilPath,
 };
 
 // GLOBAL: LEGOLAND 0x004bdd00
@@ -1134,7 +1134,7 @@ const int DAT_004bff28[12][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {0, 2}, {0, -
     {2, 0}, {-2, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
 // GLOBAL: LEGOLAND 0x004c10d4
-struct NewBloke *DAT_004c10d4;
+struct NewBloke *DrivingSchoolCars;
 
 // GLOBAL: LEGOLAND 0x004c10dc
 struct Ride *CastleLevelRide;
@@ -1143,16 +1143,16 @@ struct Ride *CastleLevelRide;
 struct Sprite *CastleLevelMatteSprite;
 
 // GLOBAL: LEGOLAND 0x004c10e8
-struct RenderItemNode *DAT_004c10e8;
+struct RenderItemNode *CastleLevelRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004c10f0
-void *DAT_004c10f0;
+void *CatapultLayer;
 
 // GLOBAL: LEGOLAND 0x004c10f4
 struct Ride *ActiveCatapultRide;
 
 // GLOBAL: LEGOLAND 0x004c1100
-struct RideSpriteInfo DAT_004c1100;
+struct RideSpriteInfo CatapultSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004c1118
 struct CatapultNode *CatapultNodeList;
@@ -1176,7 +1176,7 @@ struct RenderItemNode **DAT_004c1164;
 struct RenderItemNode **DAT_004c1168;
 
 // GLOBAL: LEGOLAND 0x004c1170
-struct RideSpriteInfo DAT_004c1170;
+struct RideSpriteInfo CoptersSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004c1188
 struct RenderItemNode **DAT_004c1188;
@@ -1218,10 +1218,10 @@ struct CountNode *DrivingSchoolCountList;
 int DAT_004c11c0;
 
 // GLOBAL: LEGOLAND 0x004c11c4
-struct RideQueueEntry *DAT_004c11c4;
+struct RideQueueEntry *RoadBfsFrontier;
 
 // GLOBAL: LEGOLAND 0x004c11c8
-struct RideQueueEntry *DAT_004c11c8;
+struct RideQueueEntry *RoadBfsNextFrontier;
 
 // GLOBAL: LEGOLAND 0x004c11cc
 struct Sprite *FortMaskSprite;
@@ -1233,10 +1233,10 @@ struct Sprite *FortLayer;
 struct Ride *FortRide;
 
 // GLOBAL: LEGOLAND 0x004c11e0
-struct RenderItemNode *DAT_004c11e0;
+struct RenderItemNode *FortRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004c11e4
-struct Sprite *DAT_004c11e4;
+struct Sprite *GoldRushQueueTable;
 
 // GLOBAL: LEGOLAND 0x004c11e8
 struct Sprite *GoldRushLayer;
@@ -1275,7 +1275,7 @@ void *JoustRideBnv;
 struct Ride *JoustRide;
 
 // GLOBAL: LEGOLAND 0x004c1228
-struct RideSpriteInfo DAT_004c1228;
+struct RideSpriteInfo JoustSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004c123c
 void *DAT_004c123c[2]; /* rider sprite by field_30: [1] is the joust z-sprite */
@@ -1308,7 +1308,7 @@ struct Sprite *LogFlumeHup1M2Sprite;
 struct Footprint DAT_004c2aa8;
 
 // GLOBAL: LEGOLAND 0x004c2aa0
-struct Ride *DAT_004c2aa0;
+struct Ride *LogFlumeSpecialCorner2Ride;
 
 // GLOBAL: LEGOLAND 0x004c2abc
 struct Sprite *LogFlumeTrackSprites[10];
@@ -1317,7 +1317,7 @@ struct Sprite *LogFlumeTrackSprites[10];
 struct Sprite *DAT_004c2ae4;
 
 // GLOBAL: LEGOLAND 0x004c2ae8
-struct QueueTable *DAT_004c2ae8;
+struct QueueTable *FlumeQueueTable0;
 
 // GLOBAL: LEGOLAND 0x004c2aec
 struct Sprite *LogFlumeDrop2MSprite;
@@ -1326,25 +1326,25 @@ struct Sprite *LogFlumeDrop2MSprite;
 struct Sprite *LogFlumeDrop1MSprite;
 
 // GLOBAL: LEGOLAND 0x004c2af4
-unsigned int DAT_004c2af4;
+unsigned int FlumeSpecialCornerIndex;
 
 // GLOBAL: LEGOLAND 0x004c2af8
-struct QueueTable *DAT_004c2af8;
+struct QueueTable *FlumeQueueTable1;
 
 // GLOBAL: LEGOLAND 0x004c2afc
 struct Element *LogFlumeImageListId;
 
 // GLOBAL: LEGOLAND 0x004c2b0c
-struct Ride *DAT_004c2b0c;
+struct Ride *LogFlumeSpecialCorner3Ride;
 
 // GLOBAL: LEGOLAND 0x004c2b10
 struct Element *LogFlumeTrackEndyListId;
 
 // GLOBAL: LEGOLAND 0x004c2b50
-struct Element *DAT_004c2b50;
+struct Element *LogFlumeHoldUpElement;
 
 // GLOBAL: LEGOLAND 0x004c2b60
-struct Ride *DAT_004c2b60;
+struct Ride *LogFlumeHoldUpRide;
 
 // GLOBAL: LEGOLAND 0x004c2b64
 struct Sprite *LogFlumeSplashSprite;
@@ -1359,7 +1359,7 @@ struct Sprite *LogFlumeFc1M1Sprite;
 struct Sprite *LogFlumeFc1M2Sprite;
 
 // GLOBAL: LEGOLAND 0x004c2b98
-struct Element *DAT_004c2b98;
+struct Element *LogFlumeSpecialCorner1Element;
 
 // GLOBAL: LEGOLAND 0x004c2b9c
 struct Ride *LogFlumeEntranceRide;
@@ -1368,16 +1368,16 @@ struct Ride *LogFlumeEntranceRide;
 struct Cursor DAT_004c2c18;
 
 // GLOBAL: LEGOLAND 0x004c2ba0
-struct Element *DAT_004c2ba0;
+struct Element *LogFlumeSpecialCorner4Element;
 
 // GLOBAL: LEGOLAND 0x004c2bf0
-struct Ride *DAT_004c2bf0;
+struct Ride *LogFlumeCsaw2Ride;
 
 // GLOBAL: LEGOLAND 0x004c445c
-struct Ride *DAT_004c445c;
+struct Ride *LogFlumeSpecialCorner1Ride;
 
 // GLOBAL: LEGOLAND 0x004c4460
-struct Element *DAT_004c4460;
+struct Element *LogFlumeCsaw2Element;
 
 // GLOBAL: LEGOLAND 0x004c4468
 struct Cursor DAT_004c4468;
@@ -1392,7 +1392,7 @@ struct Element *DAT_004c74f4;
 struct Cursor LogFlumeCursor;
 
 // GLOBAL: LEGOLAND 0x004c74d4
-struct Ride *DAT_004c74d4;
+struct Ride *LogFlumeSpecialCorner4Ride;
 
 // GLOBAL: LEGOLAND 0x004c74d8
 struct RideSpriteInfo DAT_004c74d8;
@@ -1404,10 +1404,10 @@ struct Sprite *LogFlumeFc2M1Sprite;
 struct Footprint DAT_004c8d38;
 
 // GLOBAL: LEGOLAND 0x004c8d4c
-struct Element *DAT_004c8d4c;
+struct Element *LogFlumeDropElement;
 
 // GLOBAL: LEGOLAND 0x004c8d50
-struct Element *DAT_004c8d50;
+struct Element *LogFlumeSpecialCorner3Element;
 
 // GLOBAL: LEGOLAND 0x004c8d54
 struct Sprite *LogFlumeEntranceLayer;
@@ -1419,7 +1419,7 @@ struct Cursor DAT_004c8d78;
 struct Sprite *LogFlumeFc3M3Sprite;
 
 // GLOBAL: LEGOLAND 0x004c8d6c
-struct Ride *DAT_004c8d6c;
+struct Ride *LogFlumeDropRide;
 
 // GLOBAL: LEGOLAND 0x004c8d70
 struct Sprite *LogFlumeFc4MSprite;
@@ -1440,13 +1440,13 @@ struct Sprite *LogFlumeFc3M2Sprite;
 struct Sprite *LogFlumeFc3M1Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbe10
-struct Element *DAT_004cbe10;
+struct Element *LogFlumeSpecialCorner2Element;
 
 // GLOBAL: LEGOLAND 0x004cbe14
 struct Sprite *LogFlumeCsaw2MSprite;
 
 // GLOBAL: LEGOLAND 0x004cbe18
-struct Ride *DAT_004cbe18;
+struct Ride *LogFlumeTunnelRide;
 
 // GLOBAL: LEGOLAND 0x004cbe1c
 struct Sprite *LogFlumeFc1M3Sprite;
@@ -1458,7 +1458,7 @@ struct FlumeEntry *DAT_004cbe20[4]; /* the 4 neighbours of a log flume tile (up,
 struct Ride *LogFlumeTrackRide;
 
 // GLOBAL: LEGOLAND 0x004cbe48
-struct Element *DAT_004cbe48;
+struct Element *LogFlumeTunnelElement;
 
 // GLOBAL: LEGOLAND 0x004cbe4c
 struct Sprite *LogFlumeEnta3MSprite;
@@ -1470,7 +1470,7 @@ struct SpriteSet *LogFlumeTrackEndyList;
 struct RideSpriteInfo DAT_004cbe58;
 
 // GLOBAL: LEGOLAND 0x004cbe70
-struct RenderItemNode *DAT_004cbe70;
+struct RenderItemNode *FlumeRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004cbe74
 struct Sprite *LogFlumeBarrelSprite;
@@ -1509,16 +1509,16 @@ struct Ride *DrivingSchoolPumpsRide;
 struct PumpNode *PumpList;
 
 // GLOBAL: LEGOLAND 0x004cbeac
-struct RideQueueEntry *DAT_004cbeac;
+struct RideQueueEntry *RoadEntryList;
 
 // GLOBAL: LEGOLAND 0x004cbeb0
-int DAT_004cbeb0;
+int TrafficLightA;
 
 // GLOBAL: LEGOLAND 0x004cbeb4
-int DAT_004cbeb4;
+int TrafficLightB;
 
 // GLOBAL: LEGOLAND 0x004cbeb8
-unsigned int DAT_004cbeb8;
+unsigned int TrafficLightPhase;
 
 // GLOBAL: LEGOLAND 0x004cbec4
 struct Ride *SafariRide;
@@ -1530,10 +1530,10 @@ void *SafariOffBNV;
 struct Sprite *SafariLayer;
 
 // GLOBAL: LEGOLAND 0x004cbecc
-struct RenderItemNode *DAT_004cbecc;
+struct RenderItemNode *SafariRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004cbed0
-struct RideSpriteInfo DAT_004cbed0;
+struct RideSpriteInfo SafariSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004cbee8
 int DAT_004cbee8;
@@ -1545,7 +1545,7 @@ int DAT_004cbeec;
 void *SafariRunBNV;
 
 // GLOBAL: LEGOLAND 0x007988d0
-void *DAT_007988d0[600];
+void *DMusicStyles[600];
 
 // GLOBAL: LEGOLAND 0x00799230
 struct DirectMusicSegment *MusicIntroSegments[5]; /* seg<theme>1.sgt */
@@ -1557,10 +1557,10 @@ struct DirectMusicSegment *MusicLoopSegments[5]; /* seg<theme>2.sgt */
 struct DirectMusicSegment *MusicTransitionSegments[5][5]; /* [from][to] */
 
 // GLOBAL: LEGOLAND 0x00799c1c
-unsigned char *DAT_00799c1c[35];
+unsigned char *MusicFileData[35];
 
 // GLOBAL: LEGOLAND 0x0079a608
-int DAT_0079a608[35];
+int MusicFileSizes[35];
 
 // GLOBAL: LEGOLAND 0x0079a69c
 void *DMusicNotificationEvent;
@@ -1608,7 +1608,7 @@ void *DAT_004cbf00;
 void *DAT_004cbf04[1];
 
 // GLOBAL: LEGOLAND 0x004cbf08
-struct Sprite *DAT_004cbf08;
+struct Sprite *SafariRiderSprite;
 
 // GLOBAL: LEGOLAND 0x004cbf0c
 struct SafariNode *SafariNodeList;
@@ -1626,7 +1626,7 @@ void *SpiderOffBinV;
 struct Sprite *SpiderHutMask2Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbf20
-struct Ride *DAT_004cbf20;
+struct Ride *ActiveSpiderRide;
 
 // GLOBAL: LEGOLAND 0x004cbf24
 void *SpiderOnBinV;
@@ -1638,13 +1638,13 @@ struct Sprite *SpiderRideLayer;
 Point DAT_0082c660;
 
 // GLOBAL: LEGOLAND 0x004cbf30
-void *DAT_004cbf30[2];
+void *SpiderRideBinVs[2];
 
 // GLOBAL: LEGOLAND 0x004cbf38
 void *DAT_004cbf38[2];
 
 // GLOBAL: LEGOLAND 0x004cbf40
-struct RideSpriteInfo DAT_004cbf40;
+struct RideSpriteInfo SpiderRideSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004cbf58
 struct SpiderNode *SpiderNodeList;
@@ -1662,19 +1662,19 @@ struct Sprite *TempleMatte1Sprite;
 struct Sprite *TempleMatte2Sprite;
 
 // GLOBAL: LEGOLAND 0x004cbf70
-struct RenderItemNode *DAT_004cbf70;
+struct RenderItemNode *TempleRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004cbf7c
-struct Sprite *DAT_004cbf7c;
+struct Sprite *TempleSlideLayer;
 
 // GLOBAL: LEGOLAND 0x004cbf78
 struct Sprite *TempSlideMatteSprite;
 
 // GLOBAL: LEGOLAND 0x004cbf80
-struct Ride *DAT_004cbf80;
+struct Ride *ActiveTempleSlideRide;
 
 // GLOBAL: LEGOLAND 0x004cbf84
-struct RenderItemNode *DAT_004cbf84;
+struct RenderItemNode *TempleSlideRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x004cbf88
 unsigned int DAT_004cbf88;
@@ -1683,10 +1683,10 @@ unsigned int DAT_004cbf88;
 unsigned int DAT_004cbf8c;
 
 // GLOBAL: LEGOLAND 0x004cbf98
-struct RideSpriteInfo DAT_004cbf98;
+struct RideSpriteInfo TempleSlideSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004cbfb8
-struct BinVFile *DAT_004cbfb8[3];
+struct BinVFile *TempleSlideBinVs[3];
 
 // GLOBAL: LEGOLAND 0x004cbfc4
 void *TempSlideBinV;
@@ -1713,7 +1713,7 @@ struct Ride *ElephantFountainRide;
 struct Sprite *ShowerLayer;
 
 // GLOBAL: LEGOLAND 0x004cbfe4
-struct Element *DAT_004cbfe4;
+struct Element *WaterWorksEntranceElement;
 
 // GLOBAL: LEGOLAND 0x004cbfe8
 struct Element *WaterWorksImageListHandle;
@@ -1722,7 +1722,7 @@ struct Element *WaterWorksImageListHandle;
 struct Sprite *ElephantFountainLayer;
 
 // GLOBAL: LEGOLAND 0x004cbff0
-struct RideSpriteInfo DAT_004cbff0;
+struct RideSpriteInfo WaterWorksSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004cc008
 struct Ride *WaterBlockRide;
@@ -1734,7 +1734,7 @@ struct Sprite *ShowerSprite;
 struct SpriteSet *WaterWorksImageListData;
 
 // GLOBAL: LEGOLAND 0x004cc01c
-struct Ride *DAT_004cc01c;
+struct Ride *WaterWorksEntranceRide;
 
 // GLOBAL: LEGOLAND 0x004cc020
 struct Sprite *WwElsquirtSprite;
@@ -1746,10 +1746,10 @@ struct Ride *ShowerRide;
 unsigned int WaterWorksSfxRefCount;
 
 // GLOBAL: LEGOLAND 0x004cc02c
-struct WaterNode *WaterNodeList;
+struct WaterNode *WaterBlockList;
 
 // GLOBAL: LEGOLAND 0x004cc030
-struct WaterNode *DAT_004cc030;
+struct WaterNode *ShowerList;
 
 // GLOBAL: LEGOLAND 0x004cc034
 struct WaterNode *ElephantFountainList;
@@ -1792,34 +1792,34 @@ struct Cursor DAT_004d2168[4];
 struct PathNode *BoatPathList;
 
 // GLOBAL: LEGOLAND 0x004d8240
-struct PathNode *DAT_004d8240;
+struct PathNode *BoatBfsFrontier;
 
 // GLOBAL: LEGOLAND 0x004d8244
-struct PathNode *DAT_004d8244;
+struct PathNode *BoatBfsNextFrontier;
 
 // GLOBAL: LEGOLAND 0x004d8250
-struct SprEnt DAT_004d8250;
+struct SprEnt CoasterPlacement;
 
 // GLOBAL: LEGOLAND 0x004d8268
-unsigned int DAT_004d8268;
+unsigned int CoasterPieceCount;
 
 // GLOBAL: LEGOLAND 0x004d8270
-struct VecMath DAT_004d8270;
+struct VecMath TrainVecMath;
 
 // GLOBAL: LEGOLAND 0x004d829c
-float DAT_004d829c[64];
+float TrainInertiaHistory[64];
 
 // GLOBAL: LEGOLAND 0x004d83c0
-unsigned int DAT_004d83c0;
+unsigned int TrainInertiaHistoryIndex;
 
 // GLOBAL: LEGOLAND 0x004d88f4
-unsigned char DAT_004d88f4[0xc0];
+unsigned char ShadeClampTable[0xc0];
 
 // GLOBAL: LEGOLAND 0x004d89b4
 unsigned int DAT_004d89b4[4];
 
 // GLOBAL: LEGOLAND 0x004d89c4
-void *DAT_004d89c4;
+void *ShadeClamp;
 
 // GLOBAL: LEGOLAND 0x004d89c8
 void *LtxFileTable[30];
@@ -1843,70 +1843,70 @@ char DAT_004d8bb0[0x100];
 float DAT_004dcbb8[3];
 
 // GLOBAL: LEGOLAND 0x004dcbd0
-struct VecMath DAT_004dcbd0;
+struct VecMath VecMathOps;
 
 // GLOBAL: LEGOLAND 0x004dcc00
 struct FloatArray DAT_004dcc00[30];
 
 // GLOBAL: LEGOLAND 0x004dd5d8
-unsigned int DAT_004dd5d8;
+unsigned int VecScratchTop;
 
 // GLOBAL: LEGOLAND 0x004dd5e0
-void *DAT_004dd5e0[24];
+void *CurveFunctionTable[24];
 
 // GLOBAL: LEGOLAND 0x004dd758
 struct CoasterTextFile CoasterTxtFile;
 
 // GLOBAL: LEGOLAND 0x004dd760
-char DAT_004dd760[256];
+char CoasterObjBaseName[256];
 
 // GLOBAL: LEGOLAND 0x004dd860
 struct CoasterTextFile CoasterObjFile;
 
 // GLOBAL: LEGOLAND 0x004dd868
-unsigned int DAT_004dd868;
+unsigned int CoasterObjLineCount;
 
 // GLOBAL: LEGOLAND 0x004dd86c
-unsigned int DAT_004dd86c;
+unsigned int CoasterTxtLineCount;
 
 // GLOBAL: LEGOLAND 0x004dd870
-unsigned char DAT_004dd870[0x6000];
+unsigned char DepthSpanRecords[0x6000];
 
 // GLOBAL: LEGOLAND 0x0060f908
-int DAT_0060f908;
+int DepthSpanRecordCount;
 
 // GLOBAL: LEGOLAND 0x0060f90c
-int DAT_0060f90c;
+int DepthSpanRecordsOverflow;
 
 // GLOBAL: LEGOLAND 0x004e3870
 char DAT_004e3870[0x96000]; /* 640x480 16-bit depth buffer */
 
 // GLOBAL: LEGOLAND 0x0060f914
-struct LSub DAT_0060f914[21];
+struct LSub CastleTrackCells[21];
 
 // GLOBAL: LEGOLAND 0x006102f8
-struct SegBlob DAT_006102f8[3];
+struct SegBlob CastleCurves[3];
 
 // GLOBAL: LEGOLAND 0x00610a04
-unsigned int DAT_00610a04;
+unsigned int CastleCoasterPlaced;
 
 // GLOBAL: LEGOLAND 0x00610a08
-unsigned int DAT_00610a08;
+unsigned int CastleTrackCellCount;
 
 // GLOBAL: LEGOLAND 0x00610a18
-struct RenderItemNode *DAT_00610a18;
+struct RenderItemNode *CastleRiderRenderList;
 
 // GLOBAL: LEGOLAND 0x00610a20
-float sqrtf_table[128];
+float rsqrtf_mantissa_table[128];
 
 // GLOBAL: LEGOLAND 0x00610c40
-float invsqrtf_table[128];
+float sqrtf_mantissa_table[128];
 
 // GLOBAL: LEGOLAND 0x00610e44
-float invsqrtf_exp_table[256];
+float sqrtf_exp_table[256];
 
 // GLOBAL: LEGOLAND 0x00611244
-float sqrtf_exp_table[256];
+float rsqrtf_exp_table[256];
 
 // GLOBAL: LEGOLAND 0x00611648
 unsigned int DAT_00611648;
@@ -1924,13 +1924,13 @@ float DAT_00611654 = 0;
 Vector3 DAT_00611658[4] = {0};
 
 // GLOBAL: LEGOLAND 0x00611688
-struct KeyValuePair DAT_00611688[11] = {0};
+struct KeyValuePair ElementPieceClasses[11] = {0};
 
 // GLOBAL: LEGOLAND 0x006116e0
 Vector3 DAT_006116e0[4] = {0};
 
 // GLOBAL: LEGOLAND 0x00611710
-unsigned int DAT_00611710[16] = {0};
+unsigned int RailDrawOrder[16] = {0};
 
 // GLOBAL: LEGOLAND 0x00611750
 Vector3 DAT_00611750[4] = {0};
@@ -1942,7 +1942,7 @@ unsigned char DAT_00611780[0x40] = {0};
 Vector3 DAT_006117c0[34] = {0};
 
 // GLOBAL: LEGOLAND 0x00611958
-unsigned int DAT_00611958;
+unsigned int ElementPieceClassCount;
 
 // GLOBAL: LEGOLAND 0x0061195c
 unsigned int DAT_0061195c;
@@ -1954,14 +1954,14 @@ unsigned char DAT_00611960[0x800];
 unsigned int DAT_00612160[6];
 
 // GLOBAL: LEGOLAND 0x00612178
-int DAT_00612178[20];
+int RailSplitPoints[20];
 
 // GLOBAL: LEGOLAND 0x006122a0
 float DAT_006122a0[90][3];
 
 
 // GLOBAL: LEGOLAND 0x00614858
-struct CastleFloatEnt DAT_00614858[8] = {0};
+struct CastleFloatEnt TrackTieVerts[8] = {0};
 
 // GLOBAL: LEGOLAND 0x00616180
 struct Cursor DAT_00616180[8];
@@ -1973,19 +1973,19 @@ struct Cursor JungleCruiseCursors[4];
 int DAT_006159c8[90][4];
 
 // GLOBAL: LEGOLAND 0x00615f6c
-unsigned int DAT_00615f6c;
+unsigned int RailSplitCount;
 
 // GLOBAL: LEGOLAND 0x00615f70
 unsigned int DAT_00615f70[5];
 
 // GLOBAL: LEGOLAND 0x00615f80
-struct CurveWalker *DAT_00615f80;
+struct CurveWalker *ArcLengthWalker;
 
 // GLOBAL: LEGOLAND 0x00615ff0
-int DAT_00615ff0;
+int ArcLengthCurvePair;
 
 // GLOBAL: LEGOLAND 0x00615ff4
-float DAT_00615ff4;
+float ArcLengthDepth;
 
 // GLOBAL: LEGOLAND 0x004b5f80
 struct CastleFloatEnt DAT_004b5f80[3][4];
@@ -2006,16 +2006,16 @@ int DAT_00615fc8;
 int DAT_00615fcc;
 
 // GLOBAL: LEGOLAND 0x00615fd0
-float DAT_00615fd0;
+float RangeRadius;
 
 // GLOBAL: LEGOLAND 0x00615fd8
-float DAT_00615fd8;
+float RangeRadiusSq;
 
 // GLOBAL: LEGOLAND 0x00615fdc
-float DAT_00615fdc;
+float RangeOuterSq;
 
 // GLOBAL: LEGOLAND 0x00615fe0
-float DAT_00615fe0;
+float RangeInnerSq;
 
 // GLOBAL: LEGOLAND 0x00615fe4
 int DAT_00615fe4;
@@ -2027,22 +2027,22 @@ int DAT_00615fe8;
 int DAT_00615fec;
 
 // GLOBAL: LEGOLAND 0x00615f8c
-float *DAT_00615f8c;
+float *RangeCentre;
 
 // GLOBAL: LEGOLAND 0x004b63fc
-int (*DAT_004b63fc)(float (*fn)(unsigned int), float lo, float hi, float *out);
+int (*RangeRootFinder)(float (*fn)(unsigned int), float lo, float hi, float *out);
 
 // GLOBAL: LEGOLAND 0x00615f84
-struct CurveWalker *DAT_00615f84;
+struct CurveWalker *RangeWalker;
 
 // GLOBAL: LEGOLAND 0x00615f90
 int DAT_00615f90;
 
 // GLOBAL: LEGOLAND 0x00615fd4
-float DAT_00615fd4;
+float RangeDepth;
 
 // GLOBAL: LEGOLAND 0x00615f98
-struct VecMath DAT_00615f98;
+struct VecMath CurveVecMath;
 
 // GLOBAL: LEGOLAND 0x00616000
 struct LmsFile *CoasterTrainWheelLms;
@@ -2054,7 +2054,7 @@ struct LmsRec *CoasterTrainWheelLfm;
 struct BinVFile *BalloonzBinV;
 
 // GLOBAL: LEGOLAND 0x00616018
-struct BinVFile *DAT_00616018[4];
+struct BinVFile *BalloonzBinVs[4];
 
 // GLOBAL: LEGOLAND 0x0061603c
 struct Sprite *DAT_0061603c[2]; /* rider sprite by field_30: [1] is ZBalloon2Sprite */
@@ -2114,10 +2114,10 @@ void *DAT_00616090[3]; /* carousel BinVs (on, ride, off), indexed by the saved p
 struct Sprite *ZCarouselSprite;
 
 // GLOBAL: LEGOLAND 0x006160bc
-struct Ride *DAT_006160bc;
+struct Ride *ActiveCarouselRide;
 
 // GLOBAL: LEGOLAND 0x006160c0
-struct Sprite *DAT_006160c0;
+struct Sprite *CarouselRiderSprite;
 
 // GLOBAL: LEGOLAND 0x006160c4
 struct CarouselNode *CarouselNodeList;
@@ -2177,7 +2177,7 @@ struct Sprite *Booth1Sprite;
 struct Sprite *EateryLayerOwner;
 
 // GLOBAL: LEGOLAND 0x00616120
-struct RideSpriteInfo DAT_00616120;
+struct RideSpriteInfo EaterySpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0061613c
 struct Element *BrollyImagesHandle;
@@ -2186,7 +2186,7 @@ struct Element *BrollyImagesHandle;
 struct BrollyData *BrollyImagesData;
 
 // GLOBAL: LEGOLAND 0x00616144
-struct BrollyNode *DAT_00616144;
+struct BrollyNode *BrollyNodeList;
 
 // GLOBAL: LEGOLAND 0x00616148
 struct SaveBlock *SaveBlockList;
@@ -2207,7 +2207,7 @@ struct Element *HedgeImagesHandle;
 struct JungleRide *JungleRideList;
 
 // GLOBAL: LEGOLAND 0x00629c2c
-struct JungleObj *DAT_00629c2c;
+struct JungleObj *JungleObjList;
 
 // GLOBAL: LEGOLAND 0x00629c30
 struct JungleFish *JungleFishList;
@@ -2231,7 +2231,7 @@ struct Cursor DAT_00629c58[4];
 struct JunglePath *JunglePathList;
 
 // GLOBAL: LEGOLAND 0x0062fd30
-struct JunglePath *DAT_0062fd30;
+struct JunglePath *JungleBfsFrontier;
 
 // GLOBAL: LEGOLAND 0x0062fd34
 struct JunglePath *JungleBfsNextFrontier;
@@ -2240,10 +2240,10 @@ struct JunglePath *JungleBfsNextFrontier;
 struct JailCell *JailCellList;
 
 // GLOBAL: LEGOLAND 0x0062fd40
-void *DAT_0062fd40;
+void *WesternTownLayer;
 
 // GLOBAL: LEGOLAND 0x0062fd48
-struct RideSpriteInfo DAT_0062fd48;
+struct RideSpriteInfo SpaceTowerSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0062fd60
 struct Sprite *SpaceTowerLayers;
@@ -2261,13 +2261,13 @@ struct Sprite *SpaceTowerMatte2Sprite;
 struct Sprite *SpaceTowerMatte1Sprite;
 
 // GLOBAL: LEGOLAND 0x0062fd88
-struct Point DAT_0062fd88[4];
+struct Point SpaceTowerLayerOffsets[4];
 
 // GLOBAL: LEGOLAND 0x0062fda8
 struct SpaceTowerCar *SpaceTowerCarList;
 
 // GLOBAL: LEGOLAND 0x0062fdb0
-struct RideSpriteInfo DAT_0062fdb0;
+struct RideSpriteInfo SpinningBarrelsSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0062fdc8
 void *BoxBlokesOffBNV;
@@ -2291,7 +2291,7 @@ struct Point DAT_0062fdd8;
 void *SpinningBarrelsBNV;
 
 // GLOBAL: LEGOLAND 0x0062fdf0
-void *DAT_0062fdf0[3];
+void *SpinningBarrelsBinVs[3];
 
 // GLOBAL: LEGOLAND 0x0062fdfc
 void *BoxBlokesOn1BNV;
@@ -2318,7 +2318,7 @@ struct Sprite *MechHutMaskSprite;
 struct Ride *PlaneRide;
 
 // GLOBAL: LEGOLAND 0x0062fe60
-struct RideSpriteInfo DAT_0062fe60;
+struct RideSpriteInfo PlaneRideSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0062fe78
 void *Zoomer0ffBinV;
@@ -2327,10 +2327,10 @@ void *Zoomer0ffBinV;
 struct Sprite *PlaneRideLayer;
 
 // GLOBAL: LEGOLAND 0x0062fe98
-struct Sprite *DAT_0062fe98;
+struct Sprite *PlaneRideRiderSprite;
 
 // GLOBAL: LEGOLAND 0x0062fe84
-void *DAT_0062fe84[3];
+void *PlaneRideBinVs[3];
 
 // GLOBAL: LEGOLAND 0x0062fe90
 void *ZoomerideBinV;
@@ -2366,10 +2366,10 @@ void *ManMeshes[6];
 void *WomanMeshes[6];
 
 // GLOBAL: LEGOLAND 0x0062feec
-struct RenderItemNode *DAT_0062feec[1];
+struct RenderItemNode *RenderItemPoolNext[1];
 
 // GLOBAL: LEGOLAND 0x0062fef0
-struct RenderItemNode *DAT_0062fef0;
+struct RenderItemNode *RenderItem2PoolNext;
 
 // GLOBAL: LEGOLAND 0x0062fef4
 void *TracyWalkMesh;
@@ -2381,7 +2381,7 @@ int *DAT_0062fef8;
 void *AltManFileData;
 
 // GLOBAL: LEGOLAND 0x00638358
-unsigned short DAT_00638358;
+unsigned short SavedFPUControlWord;
 
 // GLOBAL: LEGOLAND 0x0064cd8c
 int *DAT_0064cd8c;
@@ -2399,19 +2399,19 @@ unsigned int RenderItemCount;
 unsigned int RenderItem2Count;
 
 // GLOBAL: LEGOLAND 0x00665e8c
-unsigned int DAT_00665e8c;
+unsigned int LoadedTextureCount;
 
 // GLOBAL: LEGOLAND 0x00665eec
-int DAT_00665eec;
+int AdvisorAnimFrame;
 
 // GLOBAL: LEGOLAND 0x00665f48
-unsigned int DAT_00665f48;
+unsigned int AviAnimOpenCount;
 
 // GLOBAL: LEGOLAND 0x00665f5c
-void *DAT_00665f5c;
+void *CurrentAdvisorAnim;
 
 // GLOBAL: LEGOLAND 0x00665f60
-void *DAT_00665f60;
+void *NextAdvisorAnim;
 
 // GLOBAL: LEGOLAND 0x00665f64
 unsigned int DAT_00665f64;
@@ -2423,10 +2423,10 @@ unsigned int DAT_00665f68;
 unsigned int DAT_00665f6c;
 
 // GLOBAL: LEGOLAND 0x00665fe8
-unsigned int DAT_00665fe8;
+unsigned int AdvisorAnimState;
 
 // GLOBAL: LEGOLAND 0x00665fec
-unsigned int DAT_00665fec;
+unsigned int NextAdvisorAnimState;
 
 // GLOBAL: LEGOLAND 0x00665ff8
 unsigned int ReportFlags;
@@ -2444,67 +2444,67 @@ int DAT_00666004;
 int DAT_00666008;
 
 // GLOBAL: LEGOLAND 0x0066600c
-int DAT_0066600c;
+int CastleScoreGoal;
 
 // GLOBAL: LEGOLAND 0x00666010
-int DAT_00666010;
+int DrivingSchoolScoreGoal;
 
 // GLOBAL: LEGOLAND 0x00666014
-int DAT_00666014;
+int LogFlumeScoreGoal;
 
 // GLOBAL: LEGOLAND 0x00666018
-int DAT_00666018;
+int BoatingSchoolScoreGoal;
 
 // GLOBAL: LEGOLAND 0x0066601c
-int DAT_0066601c;
+int JungleCruiseScoreGoal;
 
 // GLOBAL: LEGOLAND 0x00666020
-int DAT_00666020;
+int ReportType1Or3ObjectCountGoal;
 
 // GLOBAL: LEGOLAND 0x00666024
-int DAT_00666024;
+int ReportType1Or3ObjectCountMax;
 
 // GLOBAL: LEGOLAND 0x00666028
-int DAT_00666028;
+int ReportType1Or3ClassCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066602c
-int DAT_0066602c;
+int ReportType1Or3ClassCountMax;
 
 // GLOBAL: LEGOLAND 0x00666030
-int DAT_00666030;
+int ReportLinkedObjectPercentGoal;
 
 // GLOBAL: LEGOLAND 0x00666034
-int DAT_00666034;
+int ReportLinkedObjectPercentMax;
 
 // GLOBAL: LEGOLAND 0x00666038
-int DAT_00666038;
+int ReportVisitorCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066603c
-int DAT_0066603c;
+int ReportVisitorCountMax;
 
 // GLOBAL: LEGOLAND 0x00666040
-int DAT_00666040;
+int ReportFoodStallObjectCountGoal;
 
 // GLOBAL: LEGOLAND 0x00666044
-int DAT_00666044;
+int ReportFoodStallObjectCountMax;
 
 // GLOBAL: LEGOLAND 0x00666048
-int DAT_00666048;
+int ReportFoodStallClassCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066604c
-int DAT_0066604c;
+int ReportFoodStallClassCountMax;
 
 // GLOBAL: LEGOLAND 0x00666050
-int DAT_00666050;
+int ReportVisitorHappinessGoal;
 
 // GLOBAL: LEGOLAND 0x00666054
-int DAT_00666054;
+int ReportVisitorHappinessMax;
 
 // GLOBAL: LEGOLAND 0x00666058
-int DAT_00666058;
+int ReportPowerSupplyGoal;
 
 // GLOBAL: LEGOLAND 0x0066605c
-int DAT_0066605c;
+int ReportPowerSupplyMax;
 
 // GLOBAL: LEGOLAND 0x00666060
 int DAT_00666060;
@@ -2513,22 +2513,22 @@ int DAT_00666060;
 int DAT_00666064;
 
 // GLOBAL: LEGOLAND 0x00666068
-int DAT_00666068;
+int ReportMapTileCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066606c
-int DAT_0066606c;
+int ReportMapTileCountMax;
 
 // GLOBAL: LEGOLAND 0x00666070
-int DAT_00666070;
+int ReportType2ObjectCountGoal;
 
 // GLOBAL: LEGOLAND 0x00666074
-int DAT_00666074;
+int ReportType2ObjectCountMax;
 
 // GLOBAL: LEGOLAND 0x00666078
-int DAT_00666078;
+int ReportType2ClassCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066607c
-int DAT_0066607c;
+int ReportType2ClassCountMax;
 
 // GLOBAL: LEGOLAND 0x00666080
 int DAT_00666080;
@@ -2537,16 +2537,16 @@ int DAT_00666080;
 int DAT_00666084;
 
 // GLOBAL: LEGOLAND 0x00666088
-int DAT_00666088;
+int ReportType4ObjectCountGoal;
 
 // GLOBAL: LEGOLAND 0x0066608c
-int DAT_0066608c;
+int ReportType4ObjectCountMax;
 
 // GLOBAL: LEGOLAND 0x00666090
-int DAT_00666090;
+int ReportType4ClassCountGoal;
 
 // GLOBAL: LEGOLAND 0x00666094
-int DAT_00666094;
+int ReportType4ClassCountMax;
 
 // GLOBAL: LEGOLAND 0x00666098
 unsigned int AppraisalDeadline;
@@ -2579,7 +2579,7 @@ struct Element *SharkCafeBrollyElem;
 struct Element *Entrance1Elem;
 
 // GLOBAL: LEGOLAND 0x006661c8
-int DAT_006661c8;
+int VisitorSpawnCounter;
 
 // GLOBAL: LEGOLAND 0x006661cc
 char DAT_006661cc[8][100];
@@ -2678,7 +2678,7 @@ struct Sprite *MapSpannerSprite;
 int DAT_00667c3c;
 
 // GLOBAL: LEGOLAND 0x00667c40
-const char *DAT_00667c40;
+const char *AdvisorDebugStage;
 
 // GLOBAL: LEGOLAND 0x00667c48
 unsigned int DAT_00667c48;
@@ -2777,43 +2777,43 @@ unsigned int DAT_00667cd8;
 unsigned int DAT_00667cdc;
 
 // GLOBAL: LEGOLAND 0x00667ce0
-int DAT_00667ce0;
+int TotalCoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667ce4
-int DAT_00667ce4;
+int RideCoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667ce8
-int DAT_00667ce8;
+int ShopCoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667cec
-int DAT_00667cec;
+int FoodCoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667cf0
-int DAT_00667cf0;
+int Type3CoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667cf4
-int DAT_00667cf4;
+int PathSquareCount;
 
 // GLOBAL: LEGOLAND 0x00667cf8
-int DAT_00667cf8;
+int SceneryCoveredSquares;
 
 // GLOBAL: LEGOLAND 0x00667cfc
 int DAT_00667cfc;
 
 // GLOBAL: LEGOLAND 0x00667d00
-int DAT_00667d00;
+int PathEdgeSquareTotal;
 
 // GLOBAL: LEGOLAND 0x00667d04
-int DAT_00667d04;
+int PathEdgeScenerySquares;
 
 // GLOBAL: LEGOLAND 0x00667d08
-int DAT_00667d08;
+int PathSceneryPercent;
 
 // GLOBAL: LEGOLAND 0x00667d0c
-int DAT_00667d0c;
+int PathSceneryDirty;
 
 // GLOBAL: LEGOLAND 0x00667d10
-unsigned int DAT_00667d10;
+unsigned int PathSceneryLastUpdate;
 
 // GLOBAL: LEGOLAND 0x00667d3c
 int DAT_00667d3c;
@@ -2900,7 +2900,7 @@ LPDIRECTDRAWSURFACE renderEngineTargets[10];
 int VideoSurfaceLocked;
 
 // GLOBAL: LEGOLAND 0x00668148
-struct Sprite *DAT_00668148;
+struct Sprite *CurrentPointerSprite;
 
 // GLOBAL: LEGOLAND 0x0066814c
 unsigned int DAT_0066814c;
@@ -2909,7 +2909,7 @@ unsigned int DAT_0066814c;
 unsigned int DAT_00668160;
 
 // GLOBAL: LEGOLAND 0x00668164
-int DAT_00668164[32];
+int RenderingStatusLockedStack[32];
 
 // GLOBAL: LEGOLAND 0x006681e4
 int RenderingStatusStackDepth;
@@ -2942,7 +2942,7 @@ unsigned int WatchActive;
 struct Sprite *WatchSprite;
 
 // GLOBAL: LEGOLAND 0x0066820c
-char DAT_0066820c[0x404];
+char ObjectiveTextBuffer[0x404];
 
 // GLOBAL: LEGOLAND 0x00668610
 unsigned int ScriptDirtyCategories;
@@ -2954,10 +2954,10 @@ unsigned int DAT_00668614;
 unsigned int DAT_00668618;
 
 // GLOBAL: LEGOLAND 0x0066861c
-char DAT_0066861c[128];
+char BriefingFileName[128];
 
 // GLOBAL: LEGOLAND 0x0066869c
-char DAT_0066869c[128];
+char HintsFileName[128];
 
 // GLOBAL: LEGOLAND 0x0066871c
 unsigned int DAT_0066871c;
@@ -2972,10 +2972,10 @@ struct ObjectiveEvent *DAT_00668724;
 struct ObjectiveEvent *ObjectiveEventList;
 
 // GLOBAL: LEGOLAND 0x0066872c
-unsigned int DAT_0066872c[0x15];
+unsigned int ObjectiveEventTypeCounts[0x15];
 
 // GLOBAL: LEGOLAND 0x00668780
-unsigned int DAT_00668780;
+unsigned int ObjectiveHintTimer;
 
 // GLOBAL: LEGOLAND 0x00668784
 struct ObjectiveEvent *ScriptEventList;
@@ -3002,10 +3002,10 @@ struct NerpsListNode *CurrentScriptSection;
 unsigned int ScriptLoadErrorCount;
 
 // GLOBAL: LEGOLAND 0x006687a4
-unsigned int DAT_006687a4;
+unsigned int CurrentHelpKind;
 
 // GLOBAL: LEGOLAND 0x006687a8
-unsigned int DAT_006687a8;
+unsigned int HelpRequested;
 
 // GLOBAL: LEGOLAND 0x006687ac
 unsigned int DAT_006687ac;
@@ -3017,10 +3017,10 @@ unsigned int DAT_006687b0;
 unsigned int DAT_006687b4;
 
 // GLOBAL: LEGOLAND 0x006687bc
-void *DAT_006687bc;
+void *OkKeyHandler;
 
 // GLOBAL: LEGOLAND 0x006687c0
-void *DAT_006687c0;
+void *CancelKeyHandler;
 
 // GLOBAL: LEGOLAND 0x006687c8
 struct IconNode *IconListHead;
@@ -3050,16 +3050,16 @@ short DAT_00668840;
 short DAT_0066884c;
 
 // GLOBAL: LEGOLAND 0x00668858
-struct IconNode DAT_00668858;
+struct IconNode DefaultIconNode;
 
 // GLOBAL: LEGOLAND 0x006688a8
 void *DAT_006688a8;
 
 // GLOBAL: LEGOLAND 0x006688ac
-void *DAT_006688ac;
+void *NewGroupRenderFunc;
 
 // GLOBAL: LEGOLAND 0x006688b0
-void *DAT_006688b0;
+void *NewGroupEventHandler;
 
 // GLOBAL: LEGOLAND 0x006688b4
 unsigned int LastScrollIconTick;
@@ -3086,7 +3086,7 @@ unsigned int DAT_006688cc;
 unsigned int GBarSpritesLoaded;
 
 // GLOBAL: LEGOLAND 0x006688d4
-void *DAT_006688d4;
+void *IndicatorList;
 
 // GLOBAL: LEGOLAND 0x006688d8
 void *ActiveIndicators;
@@ -3194,10 +3194,10 @@ unsigned int DAT_00668960;
 int DAT_00668964;
 
 // GLOBAL: LEGOLAND 0x00668968
-char DAT_00668968[0x400];
+char PopUpMessageText[0x400];
 
 // GLOBAL: LEGOLAND 0x00668d68
-unsigned int DAT_00668d68;
+unsigned int PopUpMessageShown;
 
 // GLOBAL: LEGOLAND 0x00668d78
 DIMOUSESTATE MouseState;
@@ -3215,7 +3215,7 @@ void *dintput_mouse;
 char CheatKeyBuffer[0x14];
 
 // GLOBAL: LEGOLAND 0x00668da8
-unsigned char DAT_00668da8[0x3b];
+unsigned char PrevKeyState[0x3b];
 
 // GLOBAL: LEGOLAND 0x00668de4
 unsigned char CheatKeyState[0x3b];
@@ -3308,7 +3308,7 @@ unsigned int DAT_00668ec0;
 struct InterfaceResearchNode *ResearchList;
 
 // GLOBAL: LEGOLAND 0x00668ee0
-int DAT_00668ee0;
+int AviAudioNeedsAcm;
 
 // GLOBAL: LEGOLAND 0x00668ee8
 struct AcmHeader AviAcmStreamHeader;
@@ -3323,13 +3323,13 @@ int AcmStreamOpenResult;
 void *AviSoundBuffer;
 
 // GLOBAL: LEGOLAND 0x00668f4c
-unsigned int DAT_00668f4c;
+unsigned int AviAudioBitsPerSample;
 
 // GLOBAL: LEGOLAND 0x00668f50
-unsigned int DAT_00668f50;
+unsigned int AviSoundBufferSlotCount;
 
 // GLOBAL: LEGOLAND 0x00668f54
-int DAT_00668f54;
+int AviAcmDstOffset;
 
 // GLOBAL: LEGOLAND 0x00668f58
 unsigned int DAT_00668f58;
@@ -3356,19 +3356,19 @@ int DAT_00668f88;
 void *AviAcmDstBase;
 
 // GLOBAL: LEGOLAND 0x00668f90
-unsigned int DAT_00668f90;
+unsigned int AviSamplesPerFrame;
 
 // GLOBAL: LEGOLAND 0x00668f9c
-int DAT_00668f9c;
+int AviAudioReady;
 
 // GLOBAL: LEGOLAND 0x00668fa0
-unsigned int DAT_00668fa0;
+unsigned int AviSoundBufferSlot;
 
 // GLOBAL: LEGOLAND 0x00668f98
 unsigned int AviOpenCount;
 
 // GLOBAL: LEGOLAND 0x00668fa4
-unsigned int DAT_00668fa4;
+unsigned int AviSoundBufferFrames;
 
 // GLOBAL: LEGOLAND 0x00668fac
 unsigned int PerfCounterState;
@@ -3377,16 +3377,16 @@ unsigned int PerfCounterState;
 unsigned int DAT_00668fb0;
 
 // GLOBAL: LEGOLAND 0x00668fb4
-unsigned int DAT_00668fb4;
+unsigned int AviAcmDstBytes;
 
 // GLOBAL: LEGOLAND 0x00668fb8
-struct MoviePool *DAT_00668fb8;
+struct MoviePool *ActiveMoviePool;
 
 // GLOBAL: LEGOLAND 0x00668fc0
-void *DAT_00668fc0;
+void *OpenPathNodeList;
 
 // GLOBAL: LEGOLAND 0x00668fc4
-struct GameMainNode *DAT_00668fc4;
+struct GameMainNode *ClosedPathNodeList;
 
 // GLOBAL: LEGOLAND 0x00668fcc
 int DAT_00668fcc;
@@ -3404,7 +3404,7 @@ unsigned int DAT_00669054;
 char DAT_00669058[0x40];
 
 // GLOBAL: LEGOLAND 0x00669098
-unsigned int DAT_00669098;
+unsigned int NextScriptSectionId;
 
 // GLOBAL: LEGOLAND 0x006691a0
 unsigned int LLIDB_Capacity;
@@ -3467,13 +3467,13 @@ int DAT_00669250;
 unsigned int AdjacentNodeCount;
 
 // GLOBAL: LEGOLAND 0x00669258
-unsigned int DAT_00669258[1152];
+unsigned int PathVisitedBits[1152];
 
 // GLOBAL: LEGOLAND 0x0066a45c
 void *AdjacentNodes[1020];
 
 // GLOBAL: LEGOLAND 0x0066b44c
-void *DAT_0066b44c;
+void *BestNodeList;
 
 // GLOBAL: LEGOLAND 0x0066b450
 struct DirNode *DirSearchNodeList;
@@ -3515,13 +3515,13 @@ unsigned int PrintListBytesUsed;
 unsigned int DAT_0066b5ac;
 
 // GLOBAL: LEGOLAND 0x0066b5b0
-DDSURFACEDESC DAT_0066b5b0;
+DDSURFACEDESC ZBufferSavedSurfaceDesc;
 
 // GLOBAL: LEGOLAND 0x0066b61c
 void *DAT_0066b61c;
 
 // GLOBAL: LEGOLAND 0x0066b620
-RECT DAT_0066b620;
+RECT ZBufferSavedSoftPrintClip;
 
 // GLOBAL: LEGOLAND 0x0066b630
 void *DAT_0066b630;
@@ -3539,7 +3539,7 @@ unsigned int DAT_0066be48;
 unsigned int DAT_0066be4c;
 
 // GLOBAL: LEGOLAND 0x0066be50
-struct Image *DAT_0066be50;
+struct Image *ZBufferSourceImage;
 
 // GLOBAL: LEGOLAND 0x0066be54
 unsigned short DAT_0066be54[0x4b002];
@@ -3554,10 +3554,10 @@ unsigned char *DAT_00701e5c;
 unsigned int DAT_00701e60;
 
 // GLOBAL: LEGOLAND 0x00701e64
-struct Sprite *DAT_00701e64;
+struct Sprite *ZBufferImageSprite;
 
 // GLOBAL: LEGOLAND 0x00701e68
-unsigned short DAT_00701e68[0x4b000];
+unsigned short ZBufferImagePixels[0x4b000];
 
 // GLOBAL: LEGOLAND 0x00797e68
 unsigned char *DAT_00797e68;
@@ -3566,10 +3566,10 @@ unsigned char *DAT_00797e68;
 void *DAT_00797e6c;
 
 // GLOBAL: LEGOLAND 0x00797e70
-float DAT_00797e70[100];
+float ReciprocalTable[100];
 
 // GLOBAL: LEGOLAND 0x00798000
-int DAT_00798000[100];
+int ScaledReciprocalTable[100];
 
 // GLOBAL: LEGOLAND 0x00798190
 void *DAT_00798190[256];
@@ -3596,7 +3596,7 @@ void *MasterDirList;
 void *MasterVolList;
 
 // GLOBAL: LEGOLAND 0x0079862c
-void *DAT_0079862c;
+void *AllResVolEntries;
 
 // GLOBAL: LEGOLAND 0x00798630
 unsigned int SavedClipLeft;
@@ -3623,10 +3623,10 @@ unsigned int DAT_00798650;
 unsigned int DAT_00798660;
 
 // GLOBAL: LEGOLAND 0x00798664
-unsigned int DAT_00798664;
+unsigned int ProgressShowsTutorials;
 
 // GLOBAL: LEGOLAND 0x0079866c
-unsigned long DAT_0079866c;
+unsigned long ProgressLastClickTicks;
 
 // GLOBAL: LEGOLAND 0x00798668
 unsigned int DAT_00798668;
@@ -3683,7 +3683,7 @@ struct Sprite *RegProfileOff8Sprite;
 struct Sprite *RegProfileOnSprite;
 
 // GLOBAL: LEGOLAND 0x007986b8
-struct Sprite *DAT_007986b8;
+struct Sprite *RegDeletePopUpSprite;
 
 // GLOBAL: LEGOLAND 0x007986bc
 struct Sprite *RegDiffPopUpSprite;
@@ -3809,7 +3809,7 @@ unsigned int DAT_00798770;
 char DAT_00798777;
 
 // GLOBAL: LEGOLAND 0x00798778
-char DAT_00798778[0x100];
+char IntervalMovieName[0x100];
 
 // GLOBAL: LEGOLAND 0x00798878
 unsigned int DAT_00798878;
@@ -3818,13 +3818,13 @@ unsigned int DAT_00798878;
 unsigned int DAT_0079887c;
 
 // GLOBAL: LEGOLAND 0x00798880
-unsigned int DAT_00798880;
+unsigned int IntervalHintCount;
 
 // GLOBAL: LEGOLAND 0x00798884
-unsigned int DAT_00798884;
+unsigned int IntervalHintIndex;
 
 // GLOBAL: LEGOLAND 0x00798888
-unsigned int DAT_00798888;
+unsigned int IntervalHintBubbleEndTime;
 
 // GLOBAL: LEGOLAND 0x00798890
 void *ProfileListHead;
@@ -3839,7 +3839,7 @@ unsigned int AviLockBytes1;
 unsigned int AviLockBytes2;
 
 // GLOBAL: LEGOLAND 0x007988a0
-unsigned int DAT_007988a0;
+unsigned int SfxDSVolume;
 
 // GLOBAL: LEGOLAND 0x007988a4
 void *AviLockPtr1;
@@ -3851,7 +3851,7 @@ void *AviLockPtr2;
 void *SoundHwnd;
 
 // GLOBAL: LEGOLAND 0x007988bc
-volatile unsigned int DAT_007988bc;
+volatile unsigned int MusicThreadReady;
 
 // GLOBAL: LEGOLAND 0x007988c0
 unsigned int SoundAvailable;
@@ -3932,13 +3932,13 @@ unsigned int GameTimerPaused;
 unsigned int GameTimerPausedTicks;
 
 // GLOBAL: LEGOLAND 0x0079a898
-unsigned int DAT_0079a898;
+unsigned int GameTimerBaseTicks;
 
 // GLOBAL: LEGOLAND 0x0079a89c
 unsigned int GameTimerPausedFrame;
 
 // GLOBAL: LEGOLAND 0x0079a8a0
-unsigned int DAT_0079a8a0;
+unsigned int GameTimerBaseFrame;
 
 // GLOBAL: LEGOLAND 0x0079a8a8
 LEGO_EXPORT struct Bloke *GardenerList;
@@ -3953,7 +3953,7 @@ struct WorkOrder *GardenerOrderHead;
 struct WorkOrder *GardenerOrderTail;
 
 // GLOBAL: LEGOLAND 0x0079a8b8
-int DAT_0079a8b8;
+int GardenerOrderCount;
 
 // GLOBAL: LEGOLAND 0x0079a8bc
 int GardenerCount;
@@ -3965,7 +3965,7 @@ struct WorkOrder *MechanicOrderHead;
 struct WorkOrder *MechanicOrderTail;
 
 // GLOBAL: LEGOLAND 0x0079a8c8
-int DAT_0079a8c8;
+int MechanicOrderCount;
 
 // GLOBAL: LEGOLAND 0x0079a8cc
 int MechanicCount;
@@ -4052,7 +4052,7 @@ void *DMusicSoundBuffer;
 struct ProfileData TempProfile;
 
 // GLOBAL: LEGOLAND 0x007cae80
-char DAT_007cae80[0x100];
+char IntervalReportSpeechPrefix[0x100];
 
 // GLOBAL: LEGOLAND 0x007caf80
 struct Sprite *RepHint1Sprite;
@@ -4070,13 +4070,13 @@ struct IconNode *RepHint1Icon;
 struct Sprite *RepHint2Sprite;
 
 // GLOBAL: LEGOLAND 0x007cb1e0
-char DAT_007cb1e0[0x100];
+char IntervalHintSpeechPrefix[0x100];
 
 // GLOBAL: LEGOLAND 0x007cb2e0
-struct IconNode *DAT_007cb2e0;
+struct IconNode *TitlePreviousPageIcon;
 
 // GLOBAL: LEGOLAND 0x007cb2e4
-struct IconNode *DAT_007cb2e4;
+struct IconNode *TitleNextPageIcon;
 
 // GLOBAL: LEGOLAND 0x007cb2f0
 struct EditState DAT_007cb2f0; /* EditMode saved by SaveScreenState */
@@ -4091,19 +4091,19 @@ unsigned int DAT_007cb30c; /* DAT_00668e38 saved */
 unsigned int DAT_007cb310;
 
 // GLOBAL: LEGOLAND 0x007cb314
-char DAT_007cb314;
+char SavedSpeechVolume;
 
 // GLOBAL: LEGOLAND 0x007cb315
-char DAT_007cb315;
+char SavedFxVolume;
 
 // GLOBAL: LEGOLAND 0x007cb318
 unsigned int DAT_007cb318;
 
 // GLOBAL: LEGOLAND 0x007cb31c
-char DAT_007cb31c;
+char SavedMusicVolume;
 
 // GLOBAL: LEGOLAND 0x007cb320
-unsigned int DAT_007cb320;
+unsigned int ExitCheckBoxShown;
 
 // GLOBAL: LEGOLAND 0x007cb324
 unsigned int DAT_007cb324;
@@ -4127,13 +4127,13 @@ unsigned int DAT_007cb394;
 struct Sprite *FreePlayTickSprite;
 
 // GLOBAL: LEGOLAND 0x007cb39c
-struct PanelNode *DAT_007cb39c;
+struct PanelNode *FreePlayPanelList4;
 
 // GLOBAL: LEGOLAND 0x007cb3a0
-unsigned int DAT_007cb3a0;
+unsigned int FreePlayCostTotal;
 
 // GLOBAL: LEGOLAND 0x007cb3a4
-struct PanelNode *DAT_007cb3a4;
+struct PanelNode *FreePlayPanelList2;
 
 // GLOBAL: LEGOLAND 0x007cb3a8
 struct Sprite *FreePlayDown4Sprite;
@@ -4148,7 +4148,7 @@ struct Sprite *FreePlayDown3Sprite;
 struct Sprite *FreePlayDown1Sprite;
 
 // GLOBAL: LEGOLAND 0x007cb3b8
-struct PanelNode *DAT_007cb3b8;
+struct PanelNode *FreePlayPanelList3;
 
 // GLOBAL: LEGOLAND 0x007cb3bc
 struct Element *DAT_007cb3bc;
@@ -4166,7 +4166,7 @@ struct Sprite *FreePlayUp4Sprite;
 struct Sprite *FreePlayUp3Sprite;
 
 // GLOBAL: LEGOLAND 0x007cb3d0
-struct PanelNode *DAT_007cb3d0;
+struct PanelNode *FreePlayPanelList1;
 
 // GLOBAL: LEGOLAND 0x007cb3d4
 struct Sprite *FreePlayCoverSprite;
@@ -4328,10 +4328,10 @@ int PopUpInfoY;
 struct NewObjTable NewObjects;
 
 // GLOBAL: LEGOLAND 0x007fdf7c
-struct Ride *DAT_007fdf7c;
+struct Ride *PopUpInfoRide;
 
 // GLOBAL: LEGOLAND 0x007fdf80
-struct InfoObjData *DAT_007fdf80;
+struct InfoObjData *PopUpInfoData;
 
 // GLOBAL: LEGOLAND 0x007fdf84
 unsigned char *DAT_007fdf84;
@@ -4388,7 +4388,7 @@ struct IconNode *NextPopUpIcon;
 struct Sprite *ISadSprite;
 
 // GLOBAL: LEGOLAND 0x007fdfcc
-struct IconNode *DAT_007fdfcc;
+struct IconNode *PopUpDeleteIcon;
 
 // GLOBAL: LEGOLAND 0x007fdfd0
 struct Sprite *IHungrySprite;
@@ -4430,10 +4430,10 @@ struct Sprite *ObjectRepairOkSprite;
 struct Sprite *IPeckishSprite;
 
 // GLOBAL: LEGOLAND 0x007fe010
-int DAT_007fe010;
+int PopUpMessageX;
 
 // GLOBAL: LEGOLAND 0x007fe014
-int DAT_007fe014;
+int PopUpMessageY;
 
 // GLOBAL: LEGOLAND 0x007fe018
 struct Sprite *IHappySprite;
@@ -4442,7 +4442,7 @@ struct Sprite *IHappySprite;
 RECT ScreenRect;
 
 // GLOBAL: LEGOLAND 0x007fe040
-unsigned int DAT_007fe040;
+unsigned int AdvisorHelpFlags;
 
 // GLOBAL: LEGOLAND 0x007fe044
 unsigned int DAT_007fe044;
@@ -4454,7 +4454,7 @@ char *AdvisorHelpText;
 unsigned int AdvisorHelpStartTime;
 
 // GLOBAL: LEGOLAND 0x007fe050
-unsigned int DAT_007fe050;
+unsigned int AdvisorHelpClearTime;
 
 // GLOBAL: LEGOLAND 0x007fe054
 unsigned int DAT_007fe054;
@@ -4475,7 +4475,7 @@ unsigned char AdventurersThemeCount;
 char *ScriptStringTable[512];
 
 // GLOBAL: LEGOLAND 0x007fe920
-unsigned int DAT_007fe920;
+unsigned int HelpShownTick;
 
 // GLOBAL: LEGOLAND 0x007fe930
 unsigned char ObjectiveCounters[10];
@@ -4535,7 +4535,7 @@ LEGO_EXPORT struct MapElement **GameMap;
 struct Element *BridgesHandle;
 
 // GLOBAL: LEGOLAND 0x00801408
-unsigned int DAT_00801408;
+unsigned int MapRenderOrderCount;
 
 // GLOBAL: LEGOLAND 0x0080140c
 struct Element *LevelTileMapHandle;
@@ -4547,19 +4547,19 @@ struct Element *OverlayILFHandle;
 struct DeferredSprite DAT_00801420[100];
 
 // GLOBAL: LEGOLAND 0x00801a60
-int DAT_00801a60;
+int Bridge1OverlayOffsetX;
 
 // GLOBAL: LEGOLAND 0x00801a64
-int DAT_00801a64;
+int Bridge1OverlayOffsetY;
 
 // GLOBAL: LEGOLAND 0x00801a68
-struct Element **DAT_00801a68;
+struct Element **MapObjectElements;
 
 // GLOBAL: LEGOLAND 0x00801a6c
 int *DAT_00801a6c;
 
 // GLOBAL: LEGOLAND 0x00801a70
-struct MapTileSet **DAT_00801a70;
+struct MapTileSet **MapTileSets;
 
 // GLOBAL: LEGOLAND 0x00801a74
 int DAT_00801a74;
@@ -4583,10 +4583,10 @@ int ObjectPartKey[256];
 LEGO_EXPORT struct TileSpriteEntry TileSpriteInfo[2048];
 
 // GLOBAL: LEGOLAND 0x00805f40
-int DAT_00805f40;
+int Bridge0OverlayOffsetX;
 
 // GLOBAL: LEGOLAND 0x00805f44
-int DAT_00805f44;
+int Bridge0OverlayOffsetY;
 
 // GLOBAL: LEGOLAND 0x00805f48
 unsigned int DAT_00805f48;
@@ -4625,7 +4625,7 @@ struct ScreenMode DAT_0080ff80;
 struct ScreenState CurrentProfile;
 
 // GLOBAL: LEGOLAND 0x008100c0
-char DAT_008100c0[0x80];
+char LevelEndMovieName[0x80];
 
 // GLOBAL: LEGOLAND 0x00810140
 unsigned int DAT_00810140;
@@ -4736,19 +4736,19 @@ LEGO_EXPORT unsigned int GamePad;
 struct Point MousePos;
 
 // GLOBAL: LEGOLAND 0x00813a4c
-unsigned int DAT_00813a4c;
+unsigned int MapLeftButtonMask;
 
 // GLOBAL: LEGOLAND 0x00813a50
-unsigned int DAT_00813a50;
+unsigned int MapLeftClickFlags;
 
 // GLOBAL: LEGOLAND 0x00813a54
 unsigned int DAT_00813a54;
 
 // GLOBAL: LEGOLAND 0x00813a5c
-unsigned int DAT_00813a5c;
+unsigned int MapRightButtonMask;
 
 // GLOBAL: LEGOLAND 0x00813a60
-unsigned int DAT_00813a60;
+unsigned int MapRightClickFlags;
 
 // GLOBAL: LEGOLAND 0x00813a64
 unsigned int MouseTileX;
@@ -4763,19 +4763,19 @@ int FootprintWidth;
 int FootprintHeight;
 
 // GLOBAL: LEGOLAND 0x00813a74
-int DAT_00813a74;
+int DragStartTileX;
 
 // GLOBAL: LEGOLAND 0x00813a78
-int DAT_00813a78;
+int DragStartTileY;
 
 // GLOBAL: LEGOLAND 0x00813a7c
-int DAT_00813a7c;
+int DragEndTileX;
 
 // GLOBAL: LEGOLAND 0x00813a80
-int DAT_00813a80;
+int DragEndTileY;
 
 // GLOBAL: LEGOLAND 0x00813a84
-int DAT_00813a84;
+int SelectionRect;
 
 // GLOBAL: LEGOLAND 0x00813a88
 int DAT_00813a88;
@@ -4787,31 +4787,31 @@ int DAT_00813a8c;
 int DAT_00813a90;
 
 // GLOBAL: LEGOLAND 0x00813a94
-unsigned int DAT_00813a94;
+unsigned int PrevHeldButtons;
 
 // GLOBAL: LEGOLAND 0x00813a98
-unsigned int DAT_00813a98;
+unsigned int ScrollUpKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813a9c
-unsigned int DAT_00813a9c;
+unsigned int ScrollUpKeyState;
 
 // GLOBAL: LEGOLAND 0x00813aa0
-unsigned int DAT_00813aa0;
+unsigned int ScrollRightKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813aa4
-unsigned int DAT_00813aa4;
+unsigned int ScrollRightKeyState;
 
 // GLOBAL: LEGOLAND 0x00813aa8
-unsigned int DAT_00813aa8;
+unsigned int ScrollDownKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813aac
-unsigned int DAT_00813aac;
+unsigned int ScrollDownKeyState;
 
 // GLOBAL: LEGOLAND 0x00813ab0
-unsigned int DAT_00813ab0;
+unsigned int ScrollLeftKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813ab4
-unsigned int DAT_00813ab4;
+unsigned int ScrollLeftKeyState;
 
 // GLOBAL: LEGOLAND 0x00813ab8
 unsigned int DAT_00813ab8;
@@ -4820,28 +4820,28 @@ unsigned int DAT_00813ab8;
 unsigned int DAT_00813abc;
 
 // GLOBAL: LEGOLAND 0x00813ac0
-unsigned int DAT_00813ac0;
+unsigned int LeftButtonMask;
 
 // GLOBAL: LEGOLAND 0x00813ac4
 unsigned int MouseClickFlags;
 
 // GLOBAL: LEGOLAND 0x00813ac8
-unsigned int DAT_00813ac8;
+unsigned int RightButtonMask;
 
 // GLOBAL: LEGOLAND 0x00813acc
-unsigned int DAT_00813acc;
+unsigned int RightClickFlags;
 
 // GLOBAL: LEGOLAND 0x00813ad0
-unsigned int DAT_00813ad0;
+unsigned int CancelKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813ad4
-unsigned int DAT_00813ad4;
+unsigned int CancelKeyState;
 
 // GLOBAL: LEGOLAND 0x00813ad8
-unsigned int DAT_00813ad8;
+unsigned int OkKeyMask;
 
 // GLOBAL: LEGOLAND 0x00813adc
-unsigned int DAT_00813adc;
+unsigned int OkKeyState;
 
 // GLOBAL: LEGOLAND 0x00813ae0
 unsigned int DAT_00813ae0;
@@ -4866,13 +4866,13 @@ LEGO_EXPORT struct CtrlBuffer *CONTROLLERBUFFER;
 char CdDrivePath[4];
 
 // GLOBAL: LEGOLAND 0x00813b08
-unsigned int DAT_00813b08;
+unsigned int CurrentBlokeLetter;
 
 // GLOBAL: LEGOLAND 0x00813b20
-unsigned char DAT_00813b20[0x300] = {0};
+unsigned char PaletteReadBuffer[0x300] = {0};
 
 // GLOBAL: LEGOLAND 0x00813e20
-unsigned short DAT_00813e20[256] = {0};
+unsigned short Palette16Bit[256] = {0};
 
 // GLOBAL: LEGOLAND 0x00814020
 unsigned char ColourLookupTable[0x8000];
@@ -4911,7 +4911,7 @@ struct Sprite *PreviousPageSprite;
 struct Sprite *PreviousPageLitSprite;
 
 // GLOBAL: LEGOLAND 0x0081c088
-unsigned int DAT_0081c088;
+unsigned int AdvisorAnimStateParam;
 
 // GLOBAL: LEGOLAND 0x0081c08c
 void *AdBlinkAnim;
@@ -4926,7 +4926,7 @@ void *AdLRAnim;
 void *AdPhoneDownAnim;
 
 // GLOBAL: LEGOLAND 0x0081c09c
-unsigned int DAT_0081c09c;
+unsigned int NextAdvisorAnimStateParam;
 
 // GLOBAL: LEGOLAND 0x0081c0a0
 void *AdPhoneAnim;
@@ -4935,7 +4935,7 @@ void *AdPhoneAnim;
 void *AdPhoneGestureAnim;
 
 // GLOBAL: LEGOLAND 0x0081c0c0
-int DAT_0081c0c0[0x200];
+int TextureSizes[0x200];
 
 // GLOBAL: LEGOLAND 0x0081c4c0
 unsigned int DAT_0081c4c0[0x100];
@@ -4950,7 +4950,7 @@ struct LocFile *TracyLocData;
 struct LocFile *GeoffLocData;
 
 // GLOBAL: LEGOLAND 0x0081c8cc
-void *DAT_0081c8cc;
+void *RiderSearchCursor;
 
 // GLOBAL: LEGOLAND 0x0081c8d0
 unsigned int ViewportLeft;
@@ -4995,7 +4995,7 @@ struct Sprite *GStoreMatteSprite;
 struct Sprite *JailCellMaskSprite;
 
 // GLOBAL: LEGOLAND 0x0081cb10
-struct Ride *DAT_0081cb10;
+struct Ride *ActiveWesternTownRide;
 
 // GLOBAL: LEGOLAND 0x0081cb14
 struct Ride *SheriffBuilding;
@@ -5046,7 +5046,7 @@ struct Ride *LegoShop2Building;
 struct Sprite *LegMediaShopMask2Sprite;
 
 // GLOBAL: LEGOLAND 0x0081cb54
-struct Ride *DAT_0081cb54;
+struct Ride *ActiveJungleCruiseRide;
 
 // GLOBAL: LEGOLAND 0x0081cb58
 struct TileMap *BoatingSchoolTileMap;
@@ -5115,7 +5115,7 @@ struct Ride *Restaurant2Ride;
 struct Sprite *R2FdoormSprite;
 
 // GLOBAL: LEGOLAND 0x0081cd38
-struct Ride *DAT_0081cd38;
+struct Ride *ActiveEateryRide;
 
 // GLOBAL: LEGOLAND 0x0081cd3c
 struct Ride *FoodcartFoodRide;
@@ -5229,87 +5229,87 @@ struct Ride *BalloonzRide;
 struct Sprite *ZBalloon2Sprite;
 
 // GLOBAL: LEGOLAND 0x0081cdec
-void *DAT_0081cdec;
+void *CoasterPieceToRemove;
 
 // GLOBAL: LEGOLAND 0x0081ce00
-struct Cursor DAT_0081ce00[8];
+struct Cursor FreeSpotCursors[8];
 
 // GLOBAL: LEGOLAND 0x00828fe0
-unsigned int DAT_00828fe0[28 * 22]; /* 28 records of 0x58 bytes */
+unsigned int TrackPieceCurves[28 * 22]; /* 28 records of 0x58 bytes */
 
 // GLOBAL: LEGOLAND 0x00829980
 void *BasicTilesData;
 
 // GLOBAL: LEGOLAND 0x00829990
-float DAT_00829990[3];
+float CastleViewDir[3];
 
 // GLOBAL: LEGOLAND 0x0082999c
-float DAT_0082999c;
+float CastleLightScale;
 
 // GLOBAL: LEGOLAND 0x008299a0
-float DAT_008299a0[3];
+float CastleCameraPos[3];
 
 // GLOBAL: LEGOLAND 0x008299bc
-struct FMat4 DAT_008299bc;
+struct FMat4 CastleViewMatrix;
 
 // GLOBAL: LEGOLAND 0x008299fc
-struct FMat4 DAT_008299fc;
+struct FMat4 CastleWorldToScreen;
 
 // GLOBAL: LEGOLAND 0x008299ac
 int DAT_008299ac[4]; /* view rect: left, top, right, bottom */
 
 // GLOBAL: LEGOLAND 0x00829a3c
-struct ListLink DAT_00829a3c;
+struct ListLink CastleLinkList;
 
 // GLOBAL: LEGOLAND 0x00829a58
-void (*DAT_00829a58)(void);
+void (*lego_sqrtf_impl)(void);
 
 // GLOBAL: LEGOLAND 0x00829a5c
-void (*DAT_00829a5c)(void);
+void (*lego_rsqrtf_impl)(void);
 
 // GLOBAL: LEGOLAND 0x00829a60
-float DAT_00829a60;
+float CastleLightBias;
 
 // GLOBAL: LEGOLAND 0x00829a64
-struct Ride *DAT_00829a64;
+struct Ride *HeightTrack2Ride;
 
 // GLOBAL: LEGOLAND 0x00829a80
-struct Footprint DAT_00829a80;
+struct Footprint CastleCoasterFootprint;
 
 // GLOBAL: LEGOLAND 0x00829abc
-struct Element *DAT_00829abc;
+struct Element *CastleObjElement;
 
 // One object of 0x118 bytes (0x10c of data, then three methods): the castle code reaches its parts both by name and through struct
 // views of its address (sentinel list node at +4, anims, list hosts), so they must keep these offsets.
 // GLOBAL: LEGOLAND 0x00829ae0
-struct CastleState DAT_00829ae0;
+struct CastleState CastleCoaster;
 
 // GLOBAL: LEGOLAND 0x004b5b48
-struct PieceClass DAT_004b5b48;
+struct PieceClass CastlePieceClass;
 
 // GLOBAL: LEGOLAND 0x00829bf8
-struct Ride *DAT_00829bf8;
+struct Ride *CastleCoasterRide;
 
 // GLOBAL: LEGOLAND 0x00829bfc
-struct Ride *DAT_00829bfc;
+struct Ride *HeightTrack25Ride;
 
 // GLOBAL: LEGOLAND 0x00829c00
-struct Element *DAT_00829c00;
+struct Element *CastleDummyElement;
 
 // GLOBAL: LEGOLAND 0x00829c04
 struct Sprite *CastleMatteSprite;
 
 // GLOBAL: LEGOLAND 0x00829c08
-struct Ride *DAT_00829c08;
+struct Ride *SquareTrackRide;
 
 // GLOBAL: LEGOLAND 0x00829c34
-struct Ride *DAT_00829c34;
+struct Ride *CastleDummyRide;
 
 // GLOBAL: LEGOLAND 0x00829c54
-char *DAT_00829c54;
+char *CoasterShadeTableData;
 
 // GLOBAL: LEGOLAND 0x00829c60
-void *DAT_00829c60[1024];
+void *CoasterShadeTables[1024];
 
 // GLOBAL: LEGOLAND 0x0082ac60
 struct FloatArray *DAT_0082ac60[48];
@@ -5318,7 +5318,7 @@ struct FloatArray *DAT_0082ac60[48];
 struct DispatchRow CastleDispatchTable[6];
 
 // GLOBAL: LEGOLAND 0x0082adb0
-struct Element *DAT_0082adb0[6];
+struct Element *CastleDispatchTableEnd[6];
 
 // GLOBAL: LEGOLAND 0x0082add0
 struct LmsFile *CoasterTrainCarLms[3]; /* head, mid, tail; indexed by car type */
@@ -5327,7 +5327,7 @@ struct LmsFile *CoasterTrainCarLms[3]; /* head, mid, tail; indexed by car type *
 struct LmsRec *CoasterTrainCarLfm[3]; /* head, mid, tail; indexed by car type */
 
 // GLOBAL: LEGOLAND 0x0082adec
-struct PathSeg *DAT_0082adec;
+struct PathSeg *TrainDrawPiece;
 
 // GLOBAL: LEGOLAND 0x0082adf0
 struct Ride *BoatingSchoolWaterRide;
@@ -5425,40 +5425,40 @@ LEGO_EXPORT void *PathSprite;
 struct RideSpriteInfo RideSpriteInfoBuffer;
 
 // GLOBAL: LEGOLAND 0x00616028
-struct RideSpriteInfo DAT_00616028;
+struct RideSpriteInfo BalloonzSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x006160a0
-struct RideSpriteInfo DAT_006160a0;
+struct RideSpriteInfo CarouselSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0062fe30
-struct RideSpriteInfo DAT_0062fe30;
+struct RideSpriteInfo MechanicsHutSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x0062fe10
-struct RideSpriteInfo DAT_0062fe10;
+struct RideSpriteInfo PottingShedSpriteInfo;
 
 // GLOBAL: LEGOLAND 0x004ab404
 float FLOAT_004ab404;
 
 // GLOBAL: LEGOLAND 0x004b55fc
-struct PlaneSet *DAT_004b55fc;
+struct PlaneSet *ClipPlanes;
 
 // GLOBAL: LEGOLAND 0x004d83b4
-struct Train *DAT_004d83b4;
+struct Train *DerivTrain;
 
 // GLOBAL: LEGOLAND 0x004d83a0
-struct CurveWalker DAT_004d83a0;
+struct CurveWalker DerivTrainWalker;
 
 // GLOBAL: LEGOLAND 0x004b5634
-float FLOAT_004b5634;
+float ScalarDerivThirdDiffWeight;
 
 // GLOBAL: LEGOLAND 0x004b559c
-float DAT_004b559c[3];
+float TrainCarSeatX[3];
 
 // GLOBAL: LEGOLAND 0x004b55a8
-float FLOAT_004b55a8;
+float TrainSeatSpacing;
 
 // GLOBAL: LEGOLAND 0x004b4cac
-char DAT_004b4cac[] = "manbox??";
+char SafariManboxName[] = "manbox??";
 
 // GLOBAL: LEGOLAND 0x00641000
 int DAT_00641000;
@@ -5488,52 +5488,52 @@ int DAT_00638110;
 int DAT_00638108;
 
 // GLOBAL: LEGOLAND 0x004b5600
-int **DAT_004b5600[2];
+int **ClipVertexLists[2];
 
 // GLOBAL: LEGOLAND 0x004b5610
-float DAT_004b5610;
+float DerivThirdDiffWeight;
 
 // GLOBAL: LEGOLAND 0x004b5614
-float DAT_004b5614;
+float Deriv4PointFirstOffset;
 
 // GLOBAL: LEGOLAND 0x004b5618
-float DAT_004b5618[3];
+float Deriv4PointOffsets[3];
 
 // GLOBAL: LEGOLAND 0x004b5624
-float DAT_004b5624;
+float Deriv4PointFirstWeight;
 
 // GLOBAL: LEGOLAND 0x004b5628
-float DAT_004b5628[3];
+float Deriv4PointWeights[3];
 
 // GLOBAL: LEGOLAND 0x004d83c4
-int DAT_004d83c4[0x100];
+int ClipVertexPool[0x100];
 
 // GLOBAL: LEGOLAND 0x004d87c4
-int *DAT_004d87c4;
+int *ClipVertexPoolNext;
 
 // GLOBAL: LEGOLAND 0x004d87cc
-int *DAT_004d87cc[32]; /* second clip vertex buffer; DAT_004b5600[1] points here */
+int *DAT_004d87cc[32]; /* second clip vertex buffer; ClipVertexLists[1] points here */
 
 // GLOBAL: LEGOLAND 0x004d884c
-int *DAT_004d884c[32];
+int *ClipVertsIn[32];
 
 // GLOBAL: LEGOLAND 0x004d88cc
-struct FloatArray **DAT_004d88cc[5];
+struct FloatArray **DifferenceTableRows[5];
 
 // GLOBAL: LEGOLAND 0x004b5660
-float DAT_004b5660[4][2];
+float RK4Coefficients[4][2];
 
 // GLOBAL: LEGOLAND 0x004dd644
-struct Struct1e40 *DAT_004dd644;
+struct Struct1e40 *SplitCurveStart;
 
 // GLOBAL: LEGOLAND 0x004dd648
-struct Struct1e40 *DAT_004dd648;
+struct Struct1e40 *SplitCurve;
 
 // GLOBAL: LEGOLAND 0x004dd64c
-float *DAT_004dd64c;
+float *SplitPointsNext;
 
 // GLOBAL: LEGOLAND 0x004dd650
-int DAT_004dd650;
+int SplitPointCount;
 
 // GLOBAL: LEGOLAND 0x004ab438
 float FLOAT_004ab438;
@@ -5578,16 +5578,16 @@ int DAT_00610904[64];
 unsigned int DAT_00610a10;
 
 // GLOBAL: LEGOLAND 0x0060f900
-int DAT_0060f900;
+int FilledTriangleCount;
 
 // GLOBAL: LEGOLAND 0x0060f904
-int DAT_0060f904;
+int CoasterShadeTableCount;
 
 // GLOBAL: LEGOLAND 0x00579878
 char DAT_00579878[0x80];
 
 // GLOBAL: LEGOLAND 0x0060f8fc
-int DAT_0060f8fc;
+int EdgeMeshDrawCycles;
 
 // GLOBAL: LEGOLAND 0x00611644
 int DAT_00611644;
@@ -5596,13 +5596,13 @@ int DAT_00611644;
 int DAT_00615f68;
 
 // GLOBAL: LEGOLAND 0x004dcbc8
-int DAT_004dcbc8;
+int LmsDrawCycles;
 
 // GLOBAL: LEGOLAND 0x004d83bc
-int DAT_004d83bc;
+int TrainStepCycles;
 
 // GLOBAL: LEGOLAND 0x0060f910
-int DAT_0060f910;
+int DepthClearCycles;
 
 // GLOBAL: LEGOLAND 0x006126d8
 float DAT_006126d8[6][2];

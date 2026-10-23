@@ -84,19 +84,19 @@ LEGO_EXPORT void KillGameMap(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459880
-void FUN_00459880(void) {
-    DAT_00667ce0 = 0;
-    DAT_00667ce4 = 0;
-    DAT_00667ce8 = 0;
-    DAT_00667cec = 0;
-    DAT_00667cf0 = 0;
-    DAT_00667cf4 = 0;
-    DAT_00667cf8 = 0;
+void ResetCoverageCounters(void) {
+    TotalCoveredSquares = 0;
+    RideCoveredSquares = 0;
+    ShopCoveredSquares = 0;
+    FoodCoveredSquares = 0;
+    Type3CoveredSquares = 0;
+    PathSquareCount = 0;
+    SceneryCoveredSquares = 0;
     DAT_00667cfc = 0;
 }
 
 // FUNCTION: LEGOLAND 0x004598d0
-void FUN_004598d0(struct Point *coord, int *param_2, int *param_3) {
+void CountPathEdgeScenery(struct Point *coord, int *param_2, int *param_3) {
     struct MapCell *cell;
     short kind;
 
@@ -127,11 +127,11 @@ void FUN_004598d0(struct Point *coord, int *param_2, int *param_3) {
 
 // FUNCTION: LEGOLAND 0x00459960
 void ResetPathSceneryTimer(void) {
-    DAT_00667d10 = GetGameTimer();
+    PathSceneryLastUpdate = GetGameTimer();
 }
 
 // FUNCTION: LEGOLAND 0x00459970
-void FUN_00459970(void) {
+void UpdatePathSceneryPercent(void) {
     int now;
     struct RectListNode *node;
     int total;
@@ -139,37 +139,37 @@ void FUN_00459970(void) {
     struct Point coord;
 
     now = GetGameTimer();
-    if (10000 < now - (int)DAT_00667d10) {
-        DAT_00667d0c = 0;
+    if (10000 < now - (int)PathSceneryLastUpdate) {
+        PathSceneryDirty = 0;
         matched = 0;
         total = 0;
-        DAT_00667d10 = now;
+        PathSceneryLastUpdate = now;
         for (node = (struct RectListNode *)GetBestNodeList(); node != NULL; node = node->next) {
             total = total + 4 + (((node->y1 - node->x0) - node->y0) + node->x1) * 2;
             coord.x = node->x0;
             while (coord.x <= node->x1) {
                 coord.y = node->y0 + -1;
-                FUN_004598d0(&coord, &total, &matched);
+                CountPathEdgeScenery(&coord, &total, &matched);
                 coord.y = node->y1 + 1;
-                FUN_004598d0(&coord, &total, &matched);
+                CountPathEdgeScenery(&coord, &total, &matched);
                 coord.x++;
             }
             coord.y = node->y0;
             while (coord.y <= node->y1) {
                 coord.x = node->x0 + -1;
-                FUN_004598d0(&coord, &total, &matched);
+                CountPathEdgeScenery(&coord, &total, &matched);
                 coord.x = node->x1 + 1;
-                FUN_004598d0(&coord, &total, &matched);
+                CountPathEdgeScenery(&coord, &total, &matched);
                 coord.y++;
             }
         }
-        DAT_00667d00 = total;
-        DAT_00667d04 = matched;
+        PathEdgeSquareTotal = total;
+        PathEdgeScenerySquares = matched;
         if (total != 0) {
-            DAT_00667d08 = (matched * 100) / total;
+            PathSceneryPercent = (matched * 100) / total;
             return;
         }
-        DAT_00667d08 = 0;
+        PathSceneryPercent = 0;
     }
 }
 
@@ -184,32 +184,32 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct P
     }
     obj->cb_98(classid, pos);
     if (obj == PathControlObject) {
-        DAT_00667cf4 = DAT_00667cf4 + 1;
-        DAT_00667ce0 = DAT_00667ce0 + 1;
-        DAT_00667d0c = 1;
+        PathSquareCount = PathSquareCount + 1;
+        TotalCoveredSquares = TotalCoveredSquares + 1;
+        PathSceneryDirty = 1;
     } else {
         area = GetRectArea((struct RectNode *)&obj->footprint);
         switch (obj->type) {
         case 1:
-            FUN_00489f00(pos);
-            DAT_00667ce4 = DAT_00667ce4 + area;
+            AddObjInstance(pos);
+            RideCoveredSquares = RideCoveredSquares + area;
             break;
         case 2:
-            DAT_00667d0c = 1;
-            DAT_00667cf8 = DAT_00667cf8 + area;
+            PathSceneryDirty = 1;
+            SceneryCoveredSquares = SceneryCoveredSquares + area;
             break;
         case 3:
-            DAT_00667cf0 = DAT_00667cf0 + area;
+            Type3CoveredSquares = Type3CoveredSquares + area;
             break;
         case 4:
-            FUN_00489f00(pos);
-            DAT_00667ce8 = DAT_00667ce8 + area;
+            AddObjInstance(pos);
+            ShopCoveredSquares = ShopCoveredSquares + area;
             break;
         case 5:
-            FUN_00489f00(pos);
-            DAT_00667cec = DAT_00667cec + area;
+            AddObjInstance(pos);
+            FoodCoveredSquares = FoodCoveredSquares + area;
         }
-        DAT_00667ce0 = DAT_00667ce0 + area;
+        TotalCoveredSquares = TotalCoveredSquares + area;
         AddObjectsPowerStats(classid, pos);
     }
     if (classid == ElemID("ENTRANCE 1")) {
@@ -250,32 +250,32 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId
     RemoveObjectsPowerStats(classid, tile);
     obj->cb_9c(classid, tile, cursor);
     if (obj == PathControlObject) {
-        DAT_00667cf4 = DAT_00667cf4 + -1;
-        DAT_00667ce0 = DAT_00667ce0 + -1;
-        DAT_00667d0c = 1;
+        PathSquareCount = PathSquareCount + -1;
+        TotalCoveredSquares = TotalCoveredSquares + -1;
+        PathSceneryDirty = 1;
     } else {
         area = GetRectArea((struct RectNode *)&obj->footprint);
         switch (obj->type) {
         case 1:
-            FUN_00489f50((struct Point *)&blk);
-            DAT_00667ce4 = DAT_00667ce4 - area;
+            RemoveObjInstance((struct Point *)&blk);
+            RideCoveredSquares = RideCoveredSquares - area;
             break;
         case 2:
-            DAT_00667d0c = 1;
-            DAT_00667cf8 = DAT_00667cf8 - area;
+            PathSceneryDirty = 1;
+            SceneryCoveredSquares = SceneryCoveredSquares - area;
             break;
         case 3:
-            DAT_00667cf0 = DAT_00667cf0 - area;
+            Type3CoveredSquares = Type3CoveredSquares - area;
             break;
         case 4:
-            FUN_00489f50((struct Point *)&blk);
-            DAT_00667ce8 = DAT_00667ce8 - area;
+            RemoveObjInstance((struct Point *)&blk);
+            ShopCoveredSquares = ShopCoveredSquares - area;
             break;
         case 5:
-            FUN_00489f50((struct Point *)&blk);
-            DAT_00667cec = DAT_00667cec - area;
+            RemoveObjInstance((struct Point *)&blk);
+            FoodCoveredSquares = FoodCoveredSquares - area;
         }
-        DAT_00667ce0 = DAT_00667ce0 - area;
+        TotalCoveredSquares = TotalCoveredSquares - area;
     }
     x = tile.pos.x;
     y = tile.pos.y;
@@ -592,7 +592,7 @@ LEGO_EXPORT void CalculateMapRenderOrder(void) {
 
     pt.x = 0;
     pt.y = 0;
-    DAT_00801408 = 0;
+    MapRenderOrderCount = 0;
     link = &DAT_007febb8;
     memset(MapRenderOrderList, 0, sizeof(MapRenderOrderList));
     while (pt.x < lpConfig->width) {
@@ -612,10 +612,10 @@ LEGO_EXPORT void CalculateMapRenderOrder(void) {
                 origin = NULL;
             }
             ride = origin->field_0->ride;
-            entry = &MapRenderOrderList[DAT_00801408];
-            DAT_00801408++;
-            if (DAT_00801408 == 0x1000) {
-                DAT_00801408 = 0;
+            entry = &MapRenderOrderList[MapRenderOrderCount];
+            MapRenderOrderCount++;
+            if (MapRenderOrderCount == 0x1000) {
+                MapRenderOrderCount = 0;
             }
             entry->coords = cell->anchor.id;
             entry->x = (unsigned char)pt.x;
@@ -658,7 +658,7 @@ void FUN_0045a660(void) {
     pt.x = 0;
     pt.y = 0;
     roads = ElemID("DRIVING SCHOOL ROADS");
-    DAT_00801408 = 0;
+    MapRenderOrderCount = 0;
     memset(MapRenderOrderList, 0, sizeof(MapRenderOrderList));
     while (pt.x < lpConfig->width) {
         if (pt.x >= 0 && pt.x < lpConfig->width && pt.y >= 0 && pt.y < lpConfig->height) {
@@ -677,10 +677,10 @@ void FUN_0045a660(void) {
                 origin = NULL;
             }
             ride = origin->field_0->ride;
-            entry = &MapRenderOrderList[DAT_00801408];
-            DAT_00801408++;
-            if (DAT_00801408 == 0x1000) {
-                DAT_00801408 = 0;
+            entry = &MapRenderOrderList[MapRenderOrderCount];
+            MapRenderOrderCount++;
+            if (MapRenderOrderCount == 0x1000) {
+                MapRenderOrderCount = 0;
             }
             entry->coords = cell->anchor.id;
             entry->x = (unsigned char)pt.x;
