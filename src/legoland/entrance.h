@@ -5,7 +5,7 @@
 struct Cursor;
 struct Element;
 
-void FUN_0042d970(TileId *tile, struct Bloke *arg);
+void PlayEntranceArrivalSounds(TileId *tile, struct Bloke *arg);
 void RenderEntrance(struct Element *obj, unsigned int param_2, unsigned int param_3, TileId *tile, void *param_5, unsigned int clip);
 void LoadEntranceResources(struct Element *param);
 void UnloadEntranceResources(struct Element *param);

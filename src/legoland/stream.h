@@ -31,7 +31,7 @@ struct KLIBAUDIO_Object {
 };
 
 int SpeechFillSoundBuffer(void);
-void FUN_00498100(void);
+void RewindSpeechStream(void);
 void SpeechRewindToData(void);
 int SpeechLoadWavFile(const char *param_1);
 void SpeechResetBuffers(void);

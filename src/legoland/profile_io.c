@@ -381,7 +381,7 @@ LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite) {
     rc.bottom = rc.top + 0x13;
     rc.right = rc.left + 0xc0;
     if (count != 0) {
-        center_x = FUN_00491e40(TempProfile.name, 2, rc, 1);
+        center_x = DrawCenteredTextAndGetRightEdge(TempProfile.name, 2, rc, 1);
     } else {
         center_x = (rc.right + rc.left) >> 1;
     }
@@ -422,7 +422,7 @@ LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, INT_PTR color_flag)
 }
 
 // FUNCTION: LEGOLAND 0x00491e40
-int FUN_00491e40(char *text, int font, RECT rc, INT_PTR color_flag) {
+int DrawCenteredTextAndGetRightEdge(char *text, int font, RECT rc, INT_PTR color_flag) {
     RECT measured;
     HRGN region;
     HDC hdc;
@@ -475,7 +475,7 @@ unsigned char FUN_00491f90(struct RideState *state, unsigned char flags) {
 }
 
 // FUNCTION: LEGOLAND 0x004920a0
-char FUN_004920a0(unsigned int param1, unsigned char flags) {
+char CancelProfileSelectionClicked(unsigned int param1, unsigned char flags) {
     if ((flags & 0x2) != 0 && (void *)ScanForProfiles != 0) {
         RemoveIconGroup(0x15);
         CloseFontEndCheckBox();

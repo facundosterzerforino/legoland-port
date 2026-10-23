@@ -2058,7 +2058,7 @@ int PlayMovie(char *filename, unsigned int param_2, int param_3) {
                 ReadGameButtons();
             } while ((CancelKeyState & 7) != 0);
             ResumeAllSamples();
-            FUN_00492da0();
+            ReloadCurrentInteractiveMusicTheme();
             return result;
         }
         return 1;

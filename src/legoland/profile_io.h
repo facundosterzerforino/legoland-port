@@ -18,7 +18,7 @@ LEGO_EXPORT char SaveProfileToDisk(void);
 LEGO_EXPORT int RemoveProfile(unsigned char index);
 LEGO_EXPORT void DeleteProfileList(void);
 LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, INT_PTR color_flag);
-int FUN_00491e40(char *text, int font, RECT rc, INT_PTR color_flag);
+int DrawCenteredTextAndGetRightEdge(char *text, int font, RECT rc, INT_PTR color_flag);
 
 struct IconNode;
 LEGO_EXPORT void EnterNewProfile(struct IconNode *sprite);
@@ -32,7 +32,7 @@ struct ProfileNode {
 };
 
 struct ProfileNode *FindProfileNodeBySlot(unsigned char slot);
-char FUN_004920a0(unsigned int param1, unsigned char flags);
+char CancelProfileSelectionClicked(unsigned int param1, unsigned char flags);
 int InitDirectSound(void *hwnd);
 LEGO_EXPORT void ResetTempProfile(void);
 void *NewSample(void);

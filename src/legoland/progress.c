@@ -73,14 +73,14 @@ LEGO_EXPORT void InitProgressScreen(void) {
         icon->string_id = 0x26;
         icon->string = GetString(0x26);
         icon->flags |= flags;
-        icon->event_handler = (void *)FUN_0048c020;
+        icon->event_handler = (void *)ProgressGoBackClicked;
         if (MapStats.level_end != 1) {
             // STRING: LEGOLAND 0x004beef8
             icon = LoadSpriteIcon("Tutorial_On_Progress.lls", 4, 0x174, 0x16d, 0x23);
             icon->string_id = 0x258;
             icon->string = GetString(0x258);
             icon->flags |= flags;
-            icon->event_handler = (void *)FUN_0048c090;
+            icon->event_handler = (void *)ToggleProgressTutorialScreenClicked;
         }
     }
     ReferenceProgressLevelSprites();
@@ -133,7 +133,7 @@ LEGO_EXPORT void InitProgressScreen(void) {
         }
     }
     OkKeyHandler = ProgressPlayClicked;
-    CancelKeyHandler = FUN_0048c020;
+    CancelKeyHandler = ProgressGoBackClicked;
 }
 
 // FUNCTION: LEGOLAND 0x0048bb60
@@ -265,11 +265,11 @@ void InitTutorialScreen(void) {
         if (CurrentProfile.flags[9] == 1) {
             icon->string_id = 0x26c;
             icon->string = GetString(0x26c);
-            icon->event_handler = (void *)FUN_0048c090;
+            icon->event_handler = (void *)ToggleProgressTutorialScreenClicked;
         } else {
             icon->string_id = 0x26;
             icon->string = GetString(0x26);
-            icon->event_handler = (void *)FUN_0048c020;
+            icon->event_handler = (void *)ProgressGoBackClicked;
         }
         icon->flags |= 0x6002;
         CancelKeyHandler = icon->event_handler;
@@ -324,7 +324,7 @@ unsigned char TutorialPlayClicked(unsigned char *arg0, unsigned int arg1, unsign
 }
 
 // FUNCTION: LEGOLAND 0x0048c020
-unsigned char FUN_0048c020(unsigned int a1, unsigned int a2, unsigned int a3, unsigned int a4) {
+unsigned char ProgressGoBackClicked(unsigned int a1, unsigned int a2, unsigned int a3, unsigned int a4) {
     unsigned int temp;
 
     if ((a2 & 2) != 0) {
@@ -339,13 +339,13 @@ unsigned char FUN_0048c020(unsigned int a1, unsigned int a2, unsigned int a3, un
         } else {
             KillProgressScreenSprites();
         }
-        return FUN_0048fb80(a1, a2, a3, a4);
+        return ReturnToTitleClicked(a1, a2, a3, a4);
     }
     return 1;
 }
 
 // FUNCTION: LEGOLAND 0x0048c090
-unsigned char FUN_0048c090(void *param1, unsigned char param2) {
+unsigned char ToggleProgressTutorialScreenClicked(void *param1, unsigned char param2) {
     if (param2 & 2) {
         DAT_00798660 = 0;
         DAT_00798668 = 1;

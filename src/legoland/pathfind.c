@@ -92,7 +92,7 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x00481e60
-void FUN_00481e60(struct PathQuery *query, struct BestNode *box) {
+void SetPathNodeDistanceSquared(struct PathQuery *query, struct BestNode *box) {
     int px = query->x;
     int lower_x = (box->x_min << 8) + 128;
     int upper_x = (box->x_max << 8) + 128;
@@ -218,7 +218,7 @@ LEGO_EXPORT int SuggestNextMove(struct Point *pos, struct Point *goal, struct Po
     if (!FUN_00481f00(start, end, &prev)) {
         return -1;
     }
-    FUN_00481e60((struct PathQuery *)pos, (struct BestNode *)prev);
+    SetPathNodeDistanceSquared((struct PathQuery *)pos, (struct BestNode *)prev);
     lo_x = prev->x_min << 8;
     hi_x = prev->x_max << 8;
     lo_y = prev->y_min << 8;

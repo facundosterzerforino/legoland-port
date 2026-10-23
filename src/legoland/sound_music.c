@@ -1016,7 +1016,7 @@ LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count) {
 }
 
 // FUNCTION: LEGOLAND 0x00496e60
-void FUN_00496e60(int param_1, int param_2) {
+void FadeOutSpeechAndEffects(int param_1, int param_2) {
     int savedC4;
     int savedCC;
     unsigned int start;

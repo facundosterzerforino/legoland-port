@@ -1202,7 +1202,7 @@ int ScriptEventExtendPark(struct ObjectiveEvent *arg) {
 int ScriptEventFmv(struct ObjectiveEvent *arg) {
     PauseGameTimer();
     SetPointer(0);
-    FUN_00496e60(1, 0xf);
+    FadeOutSpeechAndEffects(1, 0xf);
     PlayMovie(arg->text, 1, 1);
     ResumeGameTimer();
     ClearAdvisorHelp();

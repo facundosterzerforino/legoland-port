@@ -268,7 +268,7 @@ void BuildTextureNodeFromImage(struct Image *param_1, struct TextureNode *param_
                 index = src[x];
                 out[x] = index;
                 if (param_2->data_c[index] == 0) {
-                    param_2->data_c[index] = FUN_00486280(0x40, &DAT_0081c4c0[index]);
+                    param_2->data_c[index] = GetOrCreateColorRamp(0x40, &DAT_0081c4c0[index]);
                 }
             }
         }

@@ -224,7 +224,7 @@ LEGO_EXPORT int KillSoundSampleSystem(void);
 void FreeSample(struct Sample *sample);
 void SetInteractiveMusicTheme(int param_1);
 BOOL StopInteractiveMusic(void);
-void FUN_00492da0(void);
+void ReloadCurrentInteractiveMusicTheme(void);
 int VolumePercentToDSVolume(int param_1);
 int StartMusicThread(void *hwnd);
 int ShutDownDirectMusic(void);

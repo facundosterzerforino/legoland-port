@@ -8,10 +8,10 @@ struct IconNode;
 
 LEGO_EXPORT void InitTitleScreen(void);
 unsigned char TitleLoadGameHandler(unsigned int param_1, unsigned char param_2);
-unsigned char FUN_0048feb0(unsigned int param_1, unsigned int param_2);
-unsigned char FUN_0048ff20(unsigned int param_1, unsigned int param_2);
-unsigned char FUN_0048ff70(unsigned int param_1, unsigned int param_2);
-unsigned char FUN_0048ffe0(unsigned int param_1, unsigned int param_2);
+unsigned char TitleNewGameHandler(unsigned int param_1, unsigned int param_2);
+unsigned char TitleFreePlayHandler(unsigned int param_1, unsigned int param_2);
+unsigned char TitleRegistrationHandler(unsigned int param_1, unsigned int param_2);
+unsigned char TitleMovieHandler(unsigned int param_1, unsigned int param_2);
 struct Sprite *InitCertificateScreen(void);
 void InitAdvertScreen(void);
 void RenderCertificateScreen(void);

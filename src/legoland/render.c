@@ -60,7 +60,7 @@ struct TextureDesc {
 };
 
 // FUNCTION: LEGOLAND 0x004860f0
-void FUN_004860f0(void) {
+void InitPackedColorLookupTable(void) {
     int i;
     unsigned int n;
     unsigned int sh;
@@ -136,7 +136,7 @@ void FreeCursorCache(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00486280
-void *FUN_00486280(int param_1, void *param_2) {
+void *GetOrCreateColorRamp(int param_1, void *param_2) {
     struct CursorKey *key = (struct CursorKey *)param_2;
     struct TextureFrame *frame;
     void *cached;

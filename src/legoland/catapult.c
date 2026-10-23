@@ -158,7 +158,7 @@ void RenderCatapult(struct Element *obj, int unused, int unused2, TileId *tile, 
 }
 
 // FUNCTION: LEGOLAND 0x00403430
-void FUN_00403430(struct CatapultNode *node) {
+void StartCatapultMainAnimation(struct CatapultNode *node) {
     struct SampleSource params;
 
     if (node->field_8 != 0) {
@@ -174,7 +174,7 @@ void FUN_00403430(struct CatapultNode *node) {
 }
 
 // FUNCTION: LEGOLAND 0x00403480
-void FUN_00403480(struct CatapultNode *item) {
+void UpdateCatapultMainAnimation(struct CatapultNode *item) {
     if (item->field_8 & 0x1) {
         GetSpriteForLayer(CatapultLayer, 1);
         item->field_d++;
@@ -185,7 +185,7 @@ void FUN_00403480(struct CatapultNode *item) {
 }
 
 // FUNCTION: LEGOLAND 0x004034c0
-void FUN_004034c0(struct CatapultNode *node, unsigned int index) {
+void StartCatapultSlotAnimation(struct CatapultNode *node, unsigned int index) {
     struct SampleSource params;
     struct FXItem *fx = Catapult_SFX;
 
@@ -205,7 +205,7 @@ void FUN_004034c0(struct CatapultNode *node, unsigned int index) {
 }
 
 // FUNCTION: LEGOLAND 0x00403530
-void FUN_00403530(struct CatapultNode *node, unsigned int index) {
+void UpdateCatapultSlotAnimation(struct CatapultNode *node, unsigned int index) {
     if (node->active[index] & 1) {
         if (++node->frame[index] >= 32) {
             node->active[index] = 0;
@@ -248,9 +248,9 @@ void UpdateCatapultNode(struct CatapultNode *node) {
         entry->rider->field_58 = rand() % 0x14 + 0x32;
         entry->rider->field_3a = entry->rider->field_3a - 1;
         if ((rand() % 0x64) <= 0x2d) {
-            FUN_004034c0(node, i);
+            StartCatapultSlotAnimation(node, i);
             if (node->field_8 == 0) {
-                FUN_00403430(node);
+                StartCatapultMainAnimation(node);
             }
         }
         entry->rider->field_3a = entry->rider->field_3a - 1;
@@ -261,10 +261,10 @@ void UpdateCatapultNode(struct CatapultNode *node) {
         ClearCatapultSlot(node, i);
     }
 
-    FUN_00403480(node);
+    UpdateCatapultMainAnimation(node);
 
     for (i = 0; i < 4; i++) {
-        FUN_00403530(node, i);
+        UpdateCatapultSlotAnimation(node, i);
     }
 }
 
@@ -313,7 +313,7 @@ void SendRiderToCatapultSlot(const unsigned short *key, struct RideNode *entry, 
 }
 
 // FUNCTION: LEGOLAND 0x004037d0
-void FUN_004037d0(const unsigned short *key, struct RideNode *entry) {
+void MarkCatapultRiderReady(const unsigned short *key, struct RideNode *entry) {
     struct CatapultNode *node = Catapult_FindNode(key);
     int i;
 
@@ -356,7 +356,7 @@ void CatapultUpdate(struct Element *elem) {
             SendRiderToCatapultSlot(&tile->id, node, x, y);
             break;
         case 1:
-            FUN_004037d0(&tile->id, node);
+            MarkCatapultRiderReady(&tile->id, node);
             bloke->param_action++;
             break;
         case 3:

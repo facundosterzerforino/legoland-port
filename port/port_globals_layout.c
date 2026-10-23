@@ -1233,7 +1233,7 @@ const struct PortLayoutGlobal PortLayoutGlobals[] = {
     {0x00668fb8, "ActiveMoviePool", (const void *)&ActiveMoviePool, sizeof(ActiveMoviePool)},
     {0x00668fc0, "OpenPathNodeList", (const void *)&OpenPathNodeList, sizeof(OpenPathNodeList)},
     {0x00668fc4, "ClosedPathNodeList", (const void *)&ClosedPathNodeList, sizeof(ClosedPathNodeList)},
-    {0x00668fcc, "DAT_00668fcc", (const void *)&DAT_00668fcc, sizeof(DAT_00668fcc)},
+    {0x00668fcc, "ScriptResourceLineNumber", (const void *)&ScriptResourceLineNumber, sizeof(ScriptResourceLineNumber)},
     {0x00668fd0, "DAT_00668fd0", (const void *)&DAT_00668fd0, sizeof(DAT_00668fd0)},
     {0x00669050, "CurrentObjectiveEventFlags", (const void *)&CurrentObjectiveEventFlags, sizeof(CurrentObjectiveEventFlags)},
     {0x00669054, "DAT_00669054", (const void *)&DAT_00669054, sizeof(DAT_00669054)},

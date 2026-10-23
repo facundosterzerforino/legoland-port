@@ -40,7 +40,7 @@ int SpeechRawContiguousBytes(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00497fb0
-int FUN_00497fb0(void) {
+int GetSpeechChunkReadableBytes(void) {
     int used;
     int limit;
 
@@ -93,7 +93,7 @@ void SpeechFillRawBuffer(void) {
                     return;
                 }
                 if (SpeechBytesRemaining == 0) {
-                    FUN_00498100();
+                    RewindSpeechStream();
                     SpeechChunkIndex++;
                 }
             }
@@ -104,7 +104,7 @@ void SpeechFillRawBuffer(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00498100
-void FUN_00498100(void) {
+void RewindSpeechStream(void) {
     SpeechRewindToData();
     SpeechFlags |= 8;
 }
@@ -121,11 +121,11 @@ int SpeechReadRawBuffer(unsigned char *dst, int count) {
     int chunk;
     int n;
 
-    avail = FUN_00497fb0();
+    avail = GetSpeechChunkReadableBytes();
     n = count;
     if (n > avail) {
         SpeechFillRawBuffer();
-        avail = FUN_00497fb0();
+        avail = GetSpeechChunkReadableBytes();
         if (n > avail) {
             n = avail;
         }

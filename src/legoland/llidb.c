@@ -235,7 +235,7 @@ LEGO_EXPORT void LLIDB_ClearOnLevel(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0047b500
-unsigned int FUN_0047b500(unsigned int param_1) {
+unsigned int LLIDB_RemoveElementAtIndex(unsigned int param_1) {
     unsigned int slot;
     unsigned int page;
     unsigned int count;

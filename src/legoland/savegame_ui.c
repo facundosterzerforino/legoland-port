@@ -88,7 +88,7 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
     icon = (struct IconNode *)LoadSpriteIcon("GoBack_on_SavedGame.lls", 4, 0x1c2, 0x13, 7);
     icon->flags |= 0x6002;
     if (DAT_007cb324) {
-        icon->event_handler = (void *)FUN_0048fb80;
+        icon->event_handler = (void *)ReturnToTitleClicked;
         icon->string_id = 0x26;
         icon->string = GetString(0x26);
     } else {
@@ -124,7 +124,7 @@ LEGO_EXPORT void InitSavedGameScreen(void) {
     }
     OkKeyHandler = AcceptIcon->event_handler;
 
-    FUN_0048d470();
+    SaveProfileKeyHandlers();
     DeleteSavedGameList();
     LoadSavedGamesList(CurrentProfile.profile_slot);
 
@@ -657,7 +657,7 @@ LEGO_EXPORT void EnterSaveGameDetails(struct IconNode *sprite) {
         rc.right = right;
         rc.bottom = bottom;
         name = TempProfile.name;
-        center_x = FUN_00491e40(name, 2, rc, 1);
+        center_x = DrawCenteredTextAndGetRightEdge(name, 2, rc, 1);
     } else {
         center_x = (right + left) >> 1;
     }
@@ -704,7 +704,7 @@ unsigned char NewSaveGameOkClicked(struct IconNode *icon, unsigned int a2, unsig
             sprintf(buf, "%s%d", GetString(0x87), *(unsigned int *)&CurrentProfile.save_slot & 0xff);
             strcpy(TempProfile.name, buf);
             TempProfile.name_len = (unsigned char)strlen(buf);
-            FUN_0048d490();
+            RestoreProfileKeyHandlers();
             return 1;
         }
         SpeechCloseFile();
@@ -713,7 +713,7 @@ unsigned char NewSaveGameOkClicked(struct IconNode *icon, unsigned int a2, unsig
         DAT_0080ff80.unk4 = 0xffffffff;
         DAT_00798700 = 0;
         DAT_004bef9c = 1;
-        FUN_0048d490();
+        RestoreProfileKeyHandlers();
     }
     return 1;
 }
@@ -731,7 +731,7 @@ unsigned char NewSaveGameCloseClicked(struct IconNode *icon, unsigned char flags
         InitSavedGameScreen();
         DAT_00798700 = 0;
         DAT_004bef9c = 1;
-        FUN_0048d490();
+        RestoreProfileKeyHandlers();
     }
     return 1;
 }

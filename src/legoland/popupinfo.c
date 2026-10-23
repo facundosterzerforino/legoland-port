@@ -709,7 +709,7 @@ void SetPopUpOkCloseIconSprites(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00471d90
-void FUN_00471d90(void) {
+void DrawInfoPopupFooter(void) {
     int iVar1;
     short sVar2;
     char *str;
@@ -895,7 +895,7 @@ void DrawNewObjectPopup(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004723f0
-int FUN_004723f0(void) {
+int IsPopupObjectBuildable(void) {
     int result;
     unsigned int local_8[2];
     struct Cursor local_cursor;
@@ -1189,7 +1189,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         last_x = PopUpDeleteIcon->x;
     }
     if (can_delete != 0) {
-        if (FUN_004723f0() != 0) {
+        if (IsPopupObjectBuildable() != 0) {
             DeleteObjectIcon->flags = 0xfffffbff & DeleteObjectIcon->flags;
             DeleteObjectIcon->x = icon_x - 0x4e;
             DeleteObjectIcon->y = icon_y;
@@ -1228,7 +1228,7 @@ LEGO_EXPORT void DrawPopUpInfo(void) {
         SetPopUpIconSprites();
     }
     if (DAT_007fdfa4 != 0) {
-        FUN_00471d90();
+        DrawInfoPopupFooter();
     }
     FUN_00472090();
 }

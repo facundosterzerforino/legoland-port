@@ -301,7 +301,7 @@ int MeasureTextHeight(const char *text, int font, int width) {
 }
 
 // FUNCTION: LEGOLAND 0x00455220
-void FUN_00455220(int x, int y, const char *text, int font, int width) {
+void DrawWrappedTextAt(int x, int y, const char *text, int font, int width) {
     RECT rc;
     HDC hdc;
     HRGN region;
@@ -561,7 +561,7 @@ struct TextCell *FindTextCellBySprite(struct Sprite *sprite, int *out_index) {
 }
 
 // FUNCTION: LEGOLAND 0x00455a50
-int FUN_00455a50(struct Sprite *sprite) {
+int RenderTextCellSprite(struct Sprite *sprite) {
     RECT rc = {0};
     struct TextCell *cell;
     HDC hdc;
@@ -614,7 +614,7 @@ struct TextCell *CreateTextCell(char *name, int width, int height, int font, uns
     cell->bg_color = bg_color;
     cell->text_color = text_color;
     cell->font = font;
-    cell->sprite = CreateFunctionBasedSprite(FUN_00455a50, (unsigned short)width, (unsigned short)height);
+    cell->sprite = CreateFunctionBasedSprite(RenderTextCellSprite, (unsigned short)width, (unsigned short)height);
     cell->sprite->flags = cell->sprite->flags | 0x40;
     return cell;
 }

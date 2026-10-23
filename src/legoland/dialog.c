@@ -162,7 +162,7 @@ int ListBoxDialog(char **names, char *title, struct Sprite *bg, RECT *box, void 
             } else {
                 RenderBox(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, items[i].right - items[i].left + 1, items[i].bottom - items[i].top + 1, GetNearestColour(0xcf, 0xcf, 0xcf));
             }
-            FUN_00455220(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, names[i], 2, itemW);
+            DrawWrappedTextAt(items[i].left + clip.left, items[i].top - DialogListScrollY + clip.top, names[i], 2, itemW);
         }
         SetClipping(&saved);
         RenderingComplete();

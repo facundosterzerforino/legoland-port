@@ -131,7 +131,7 @@ struct MasterDirNode *FindVolumeDirEntry(const char *vol_name, const char *file_
 }
 
 // FUNCTION: LEGOLAND 0x004895a0
-void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct ResDirRecord *base, char *path) {
+void RegisterResourceDirectoryTree(struct ResDirRecord *node, struct ResVolume *volume, struct ResDirRecord *base, char *path) {
     char buffer[0x104];
     struct MasterDirNode *master;
     struct ResVolEntry *entry;
@@ -159,10 +159,10 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
 #ifdef LEGOLAND_PORT
         /* [port] the record's offsets aren't turned into pointers in place (a 64-bit pointer doesn't fit them;
            the directory buffer is freed after this walk anyway) */
-        FUN_004895a0((struct ResDirRecord *)((char *)base + node->sibling), volume, base, buffer);
+        RegisterResourceDirectoryTree((struct ResDirRecord *)((char *)base + node->sibling), volume, base, buffer);
 #else
         node->sibling += (int)base;
-        FUN_004895a0((struct ResDirRecord *)node->sibling, volume, base, buffer);
+        RegisterResourceDirectoryTree((struct ResDirRecord *)node->sibling, volume, base, buffer);
 #endif
     }
 
@@ -171,10 +171,10 @@ void FUN_004895a0(struct ResDirRecord *node, struct ResVolume *volume, struct Re
         // STRING: LEGOLAND 0x004bdd7c
         strcat(buffer, "\\");
 #ifdef LEGOLAND_PORT
-        FUN_004895a0((struct ResDirRecord *)((char *)base + node->child), volume, base, buffer); /* [port] as above */
+        RegisterResourceDirectoryTree((struct ResDirRecord *)((char *)base + node->child), volume, base, buffer); /* [port] as above */
 #else
         node->child += (int)base;
-        FUN_004895a0((struct ResDirRecord *)node->child, volume, base, buffer);
+        RegisterResourceDirectoryTree((struct ResDirRecord *)node->child, volume, base, buffer);
 #endif
     }
 }
@@ -187,7 +187,7 @@ LEGO_EXPORT unsigned int RES_GetResourcePath(void) {
 // RES_OpenVolume: opens the resource volume <path's file name>.res, from .\volumes\ first and then from the CD.
 // The volume's name is the file name upper-cased (20 chars, zero padded); if a volume with that name is already
 // open it is returned instead. A volume file starts with the offset of its directory, which runs to the end of the
-// file; the directory is read and turned into entries (FUN_004895a0), and the volume goes to the front of
+// file; the directory is read and turned into entries (RegisterResourceDirectoryTree), and the volume goes to the front of
 // MasterVolList with one reference. Returns NULL (and frees everything) if the file can't be opened or read.
 // FUNCTION: LEGOLAND 0x00489750
 LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
@@ -285,7 +285,7 @@ LEGO_EXPORT struct ResVolume *RES_OpenVolume(const char *path) {
     // STRING: LEGOLAND 0x004bdd80
     DebugTrace("Directory read OK");
     volume->dir = 0;
-    FUN_004895a0(dir_data, volume, dir_data, DAT_004d8bb0);
+    RegisterResourceDirectoryTree(dir_data, volume, dir_data, DAT_004d8bb0);
     free(dir_data);
 
     volume->next = MasterVolList;

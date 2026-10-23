@@ -609,7 +609,7 @@ BOOL StopInteractiveMusic(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00492da0
-void FUN_00492da0(void) {
+void ReloadCurrentInteractiveMusicTheme(void) {
     SetInteractiveMusicTheme(CurrentMusicTheme);
 }
 

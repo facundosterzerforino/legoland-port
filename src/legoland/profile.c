@@ -75,7 +75,7 @@ LEGO_EXPORT void InitListProfiles(void) {
     ((struct IconNode *)AcceptIcon)->flags |= 0x400;
     ((struct IconNode *)AcceptIcon)->event_handler = (void *)AcceptProfileClick;
     OkKeyHandler = AcceptProfileClick;
-    CancelKeyHandler = FUN_004920a0;
+    CancelKeyHandler = CancelProfileSelectionClicked;
     strcpy(DAT_007cb340, GetString(0x84));
 
     for (; node != NULL; node = node->next) {
@@ -85,7 +85,7 @@ LEGO_EXPORT void InitListProfiles(void) {
             str = GetString(0);
             icon->flags |= 0x6002;
             icon->string = str;
-            icon->event_handler = (void *)FUN_0048d390;
+            icon->event_handler = (void *)ProfileSelectHandler;
             icon->field_18p = &node->data;
             icon->slot = node->slot;
         } else {
@@ -149,7 +149,7 @@ LEGO_EXPORT void EnterNewProfileCheckBoxIcons(struct IconNode *param_1) {
     PopUpCloseIcon->string = GetString(4);
     PopUpCloseIcon->flags |= 0x2000;
     PopUpCloseIcon->flags |= 0x4002;
-    PopUpCloseIcon->event_handler = (void *)FUN_004920a0;
+    PopUpCloseIcon->event_handler = (void *)CancelProfileSelectionClicked;
     CancelKeyHandler = PopUpCloseIcon->event_handler;
 }
 
@@ -507,7 +507,7 @@ LEGO_EXPORT void PrintProfileDetails(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048d230
-void FUN_0048d230(void) {
+void LoadCurrentProfileFromList(void) {
     struct ProfileNode *node = (struct ProfileNode *)ProfileListHead;
 
     while (node != NULL) {
@@ -548,7 +548,7 @@ unsigned char AcceptProfileClick(unsigned int dummy, unsigned char arg_0) {
 }
 
 // FUNCTION: LEGOLAND 0x0048d390
-unsigned char FUN_0048d390(struct IconNode *profile, unsigned char param_2) {
+unsigned char ProfileSelectHandler(struct IconNode *profile, unsigned char param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 0x2) != 0) {
         CurrentProfile.profile_slot = profile->field_1cb;
         ClearFreePlaySelection();
@@ -594,13 +594,13 @@ unsigned char DeletePopUpCancelHandler(unsigned int param_1, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x0048d470
-void FUN_0048d470(void) {
+void SaveProfileKeyHandlers(void) {
     DAT_007986f8 = OkKeyHandler;
     DAT_007986f4 = CancelKeyHandler;
 }
 
 // FUNCTION: LEGOLAND 0x0048d490
-void FUN_0048d490(void) {
+void RestoreProfileKeyHandlers(void) {
     OkKeyHandler = DAT_007986f8;
     CancelKeyHandler = DAT_007986f4;
 }

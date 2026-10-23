@@ -70,7 +70,7 @@ void ExtLevelMusicPoll(void) {
     }
     if (MusicState == 1) {
         /* stopped while a movie plays: SetInteractiveMusicTheme would start it now, so only choose the theme the
-         * game resumes with afterwards (FUN_00492da0 plays CurrentMusicTheme) */
+         * game resumes with afterwards (ReloadCurrentInteractiveMusicTheme plays CurrentMusicTheme) */
         CurrentMusicTheme = want;
     } else {
         SetInteractiveMusicTheme(want);

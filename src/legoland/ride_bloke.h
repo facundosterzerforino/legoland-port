@@ -76,7 +76,7 @@ struct HistBuf {
     /* 0xbb */ unsigned char count;
 };
 
-void FUN_00401e00(struct HistBuf *p);
+void ShiftDrivingHistory(struct HistBuf *p);
 struct PathPair;
 int PickQueueTurn(unsigned short id, struct PathPair *p, int dir);
 int GetQueueTurn(unsigned short id, struct PathPair *p, int dir);

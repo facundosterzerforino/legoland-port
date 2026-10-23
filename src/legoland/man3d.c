@@ -342,7 +342,7 @@ void *Load3DMesh(const char *name, const char *dir, unsigned int ctx) {
                 rgb[0] = faces[i].rgb[0];
                 rgb[1] = faces[i].rgb[1];
                 rgb[2] = faces[i].rgb[2];
-                faces[i].ramp = FUN_00486280(0x40, rgb);
+                faces[i].ramp = GetOrCreateColorRamp(0x40, rgb);
             } else {
                 faces[i].texture += ctx;
             }

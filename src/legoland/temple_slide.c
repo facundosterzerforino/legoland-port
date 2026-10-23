@@ -225,7 +225,7 @@ void UpdateSlideAvailability(void *arg) {
 }
 
 // FUNCTION: LEGOLAND 0x00417380
-int FUN_00417380(void *arg) {
+int ReserveTempleSlideLane(void *arg) {
     int avail[4];
     int count;
     int pick;
@@ -302,7 +302,7 @@ void TempleSlideUpdate(Element *obj) {
             case 0:
                 bloke->flags |= 8;
                 bloke->param_action++;
-                bloke->field_36 = FUN_00417380(tile);
+                bloke->field_36 = ReserveTempleSlideLane(tile);
                 if (bloke->field_36 > 1) {
                     x = (x << 8) + 0x380;
                     y = (y << 8) - 0x280;

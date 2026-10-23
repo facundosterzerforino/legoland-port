@@ -136,4 +136,4 @@ struct Ride;
 void LogFlume_GetInterfaces(struct Element *flume, struct Ride *vtbl);
 
 struct Cursor;
-void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first);
+void AppendFlumeNeighbourCursors(struct FlumeEntry **list, struct Cursor *first);

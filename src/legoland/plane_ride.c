@@ -296,7 +296,7 @@ struct RideSpriteInfo *GetPlaneRideSpriteInfo(struct Element *param1, unsigned s
 }
 
 // FUNCTION: LEGOLAND 0x0043e050
-unsigned int FUN_0043e050(struct RideNode *rn, struct PlaneRideNode *node, signed char n) {
+unsigned int ReservePlaneRideSeat(struct RideNode *rn, struct PlaneRideNode *node, signed char n) {
     int count = n;
     int eax = rand();
     int index = eax % count;
@@ -519,7 +519,7 @@ void PlaneRideUpdate(struct Element *elem) {
                 bloke->person->depth = GetUnitDepth(-1617706.75f, -1617948.625f);
                 bloke->field_35 = 0;
                 // STRING: LEGOLAND 0x004b4704
-                sprintf(PlaneRideManboxName + 6, "%02d", FUN_0043e050(rn, node, (char)PlaneRide->seats));
+                sprintf(PlaneRideManboxName + 6, "%02d", ReservePlaneRideSeat(rn, node, (char)PlaneRide->seats));
                 bloke->path = NewBNVPath(PlaneRideBinVs[1], 1, PlaneRideManboxName, -1617706.75f, -1617948.625f, coords);
                 UpdateBlokeFromBNVPath(bloke, bloke->path);
                 bloke->param_action++;

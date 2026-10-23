@@ -238,7 +238,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e300
-void FUN_0045e300(Element *editObj, struct Point *pos) {
+void RemovePathsUnderObjectFootprint(Element *editObj, struct Point *pos) {
     struct Ride *obj;
     struct Cursor *node;
     struct LegoConfig *cfg;
@@ -296,7 +296,7 @@ void FUN_0045e300(Element *editObj, struct Point *pos) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e4a0
-void FUN_0045e4a0(Element *editObj, struct Point *pos) {
+void SetObjectFootprintMapTiles(Element *editObj, struct Point *pos) {
     struct Ride *obj;
     TileId coords;
     struct Cursor *node;
@@ -480,7 +480,7 @@ int IsTileFreeOrPath(struct MapElement *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0045e960
-int FUN_0045e960(struct Element *node, int *offset) {
+int IsObjectEntranceOffsetClear(struct Element *node, int *offset) {
     struct Ride *obj;
     struct MapElement *tile;
     int x;

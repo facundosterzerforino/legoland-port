@@ -91,6 +91,6 @@ int RenderFocusableIcon(struct IconNode *node);
 LEGO_EXPORT struct IconNode *AddGBarIcons(struct InterfacePanel *param_1, unsigned int param_2, int param_3, int param_4, int param_5, int param_6);
 unsigned char ObjectListIconHandler(struct IconNode *node, unsigned char buttons);
 LEGO_EXPORT struct IconNode *GetIconAtPos(struct Point *param_1, unsigned char *param_2);
-void FUN_0046f100(short param_1);
+void RenderIconsExceptId(short param_1);
 void LoadGBarSprites(void);
 void UnloadGBarSprites(void);

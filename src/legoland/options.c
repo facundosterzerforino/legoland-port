@@ -346,7 +346,7 @@ unsigned char ExitCheckBoxCloseClicked(unsigned int param_1, unsigned int param_
 }
 
 // FUNCTION: LEGOLAND 0x0048f4f0
-unsigned char FUN_0048f4f0(unsigned int param_1, unsigned int param_2) {
+unsigned char ExitCheckBoxSaveClicked(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         ExitCheckBoxShown = 0;
@@ -615,7 +615,7 @@ LEGO_EXPORT void RenderScreen(void) {
 }
 
 // FUNCTION: LEGOLAND 0x0048fb80
-unsigned char FUN_0048fb80(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
+unsigned char ReturnToTitleClicked(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         if (DAT_00668e38 != 0) {
@@ -627,7 +627,7 @@ unsigned char FUN_0048fb80(unsigned int param_1, unsigned int param_2, unsigned 
 }
 
 // FUNCTION: LEGOLAND 0x0048fbd0
-unsigned char FUN_0048fbd0(unsigned int param_1, unsigned int param_2) {
+unsigned char OpenOptionsScreenClicked(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
         PlayInstanceOfSample(GameFX[FX_BUTTON4].sample, 0, 1, 0);
         DAT_0080ff80.unk8 = 5;

@@ -31,7 +31,7 @@ struct PersonFace {
     /* 0x08 */ union {
         int cell; /* texture cell index */
         unsigned int texture; /* the texture id */
-        void *ramp; /* solid colour: FUN_00486280's colour ramp */
+        void *ramp; /* solid colour: GetOrCreateColorRamp's colour ramp */
     };
     /* 0x0c */ float uv[6]; /* u0 v0 u1 v1 u2 v2 */
 };

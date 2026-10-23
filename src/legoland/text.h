@@ -20,6 +20,6 @@ void PrintTextCell(struct TextCell *cell, unsigned int x, unsigned int y);
 LEGO_EXPORT void Print(int x, int y, const char *text, int font);
 LEGO_EXPORT void PrintLimitedText(int x, int y, int width, const char *text, int font, COLORREF color, UINT format);
 int MeasureTextHeight(const char *text, int font, int width);
-void FUN_00455220(int x, int y, const char *text, int font, int width);
+void DrawWrappedTextAt(int x, int y, const char *text, int font, int width);
 void UnloadBubbleHelpGFX(void);
 LEGO_EXPORT void LoadBubbleHelpGFX(void);

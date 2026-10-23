@@ -531,7 +531,7 @@ static void PortResCheckPeople(void) {
     }
     DisplayPixelFormat = 2; /* InitScreen's: 16-bit, 5-6-5 */
     InitMan();
-    /* the colour table the ramps are made from (FUN_004860f0), and what it's made from */
+    /* the colour table the ramps are made from (InitPackedColorLookupTable), and what it's made from */
     fprintf(out, "colours: green bits %u, constants %g %g, ColorLut[128] %04x %04x %04x, [255] %04x %04x %04x\n",
         *(unsigned int *)&DAT_007cb5e0, FLOAT_004ab550, FLOAT_004ab444, ColorLut[128].shifted, ColorLut[128].scaled,
         ColorLut[128].value, ColorLut[255].shifted, ColorLut[255].scaled, ColorLut[255].value);
@@ -651,11 +651,11 @@ static void PortResCheckTextPath(void) {
     DrawTextOnRenderSurface((char *)line, 3, rc, RGB(255, 255, 255));
     counts[3] = PortResTextCount();
     PortResTextFill();
-    FUN_00455220(4, 4, line, 2, 300);
+    DrawWrappedTextAt(4, 4, line, 2, 300);
     counts[4] = PortResTextCount();
     fprintf(PortResReport,
         "text on a surface: Print %d pixels, PrintCent %d, PrintLimitedText %d, DrawTextOnRenderSurface %d, "
-        "FUN_00455220 %d\n",
+        "DrawWrappedTextAt %d\n",
         counts[0], counts[1], counts[2], counts[3], counts[4]);
     for (i = 0; i < 5; i++) {
         if (counts[i] <= 0) {
@@ -663,7 +663,7 @@ static void PortResCheckTextPath(void) {
         }
     }
     /* a text cell, as BubbleHelp makes the advisor's speech bubble (the tutorial's messages): a function-based sprite
-     * the sprite engine renders by FUN_00455a50 into its own surface; the pixels that aren't the background counted */
+     * the sprite engine renders by RenderTextCellSprite into its own surface; the pixels that aren't the background counted */
     cell = CreateTextCell("Build the Small Power Station in the park.", 200, 40, 0, 0x10, 0xd6dede, 0);
     if (cell != NULL && RecreateSprite(cell->sprite) && MakeSprite(cell->sprite) && cell->sprite->surface != NULL) {
         LPDIRECTDRAWSURFACE s = (LPDIRECTDRAWSURFACE)cell->sprite->surface;

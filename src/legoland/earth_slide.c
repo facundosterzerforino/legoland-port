@@ -101,7 +101,7 @@ void EarthNodeAppendQueueEntry(struct EarthNode *p, struct EarthQueue *value) {
 }
 
 // FUNCTION: LEGOLAND 0x0042cec0
-void FUN_0042cec0(struct Ride *param_1, unsigned char *param_2, int *param_3) {
+void GetEarthSlideQueuePosition(struct Ride *param_1, unsigned char *param_2, int *param_3) {
     struct EarthNode *node = FindEarthNode((unsigned short *)param_2);
     struct EarthQueue *q = node->queue_head;
     int x = param_1->x + param_2[0];
@@ -133,7 +133,7 @@ int IsEarthQueueHead(struct EarthNode *param_1, void *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0042cf70
-void FUN_0042cf70(struct EarthNode *param_1) {
+void AdvanceEarthSlideQueue(struct EarthNode *param_1) {
     struct Bloke *bloke;
     struct EarthQueue *q;
     int x;
@@ -426,7 +426,7 @@ void EarthSlideRideUpdate(Element *obj) {
     int tx, ty;
     int x, y; /* map tile of the bloke's slide entrance */
     Point exit; /* map tile where the bloke leaves the ride */
-    Point target; /* boarding spot, from FUN_0042cec0 */
+    Point target; /* boarding spot, from GetEarthSlideQueuePosition */
     char dir;
 
     UpdateEarthNodes();
@@ -450,7 +450,7 @@ void EarthSlideRideUpdate(Element *obj) {
             case 0:
                 /* walk to the boarding spot */
                 bloke->flags |= 8;
-                FUN_0042cec0(ride, &tile->pos.x, &target.x);
+                GetEarthSlideQueuePosition(ride, &tile->pos.x, &target.x);
                 EnqueueEarthRider(node, (struct RideNode *)elem);
                 bloke->dest.x = target.x;
                 bloke->dest.y = target.y;
@@ -463,7 +463,7 @@ void EarthSlideRideUpdate(Element *obj) {
             case 1:
                 /* wait for a free slide */
                 if ((node->field_10 & 0x8000) == 0 && IsEarthQueueHead(node, bloke) != 0) {
-                    FUN_0042cf70(node);
+                    AdvanceEarthSlideQueue(node);
                     if (++node->field_9 == 1) {
                         node->field_10 |= 0x8000;
                     }

@@ -76,7 +76,7 @@ void CloseFrontEndScreen(void) {
     if (DAT_0080ff80.unk4 != 0xffffffff) {
         switch (DAT_0080ff80.unk4) {
         case 0:
-            FUN_0048d230();
+            LoadCurrentProfileFromList();
             UpdateSoundVols();
             DeleteProfileList();
             KillListProfileSprite();
@@ -333,7 +333,7 @@ void UnloadMap(void) {
 void SetMapLoaded(unsigned int param_1) { MapLoaded = param_1; }
 
 // FUNCTION: LEGOLAND 0x00458bc0
-void FUN_00458bc0(void) {
+void SelectInitialFrontEndScreen(void) {
     EditMode.unk4 = 2;
     DAT_0080ff80.unk4 = 0xffffffff;
     DAT_0080ff80.unk8 = 0;
@@ -351,7 +351,7 @@ void MarkLevelComplete(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00458c00
-int FUN_00458c00(void) {
+int UpdateApplicationFrame(void) {
     char path[256];
 
     SpeechStreamUpdate();
@@ -496,7 +496,7 @@ void GameProc(void) {
     }
     saved = Hover;
     PrintSprite(InterfaceBgSprite, 0, 0, 0, &hit.type);
-    FUN_0046f100(0x2c3);
+    RenderIconsExceptId(0x2c3);
     UpdateEditModeButtonSprites();
     // STRING: LEGOLAND 0x004b91b0
     AdvisorDebugStage = "In Game Help";
@@ -653,7 +653,7 @@ void RenderMapScreenFrame(void) {
 }
 
 // FUNCTION: LEGOLAND 0x004594e0
-void FUN_004594e0(void) {
+void CloseActiveApplicationScreen(void) {
     switch (EditMode.unk4) {
     case 2:
         CloseFrontEndScreen();
@@ -677,7 +677,7 @@ void InitDefaultProfile(void) {
 }
 
 // FUNCTION: LEGOLAND 0x00459520
-void FUN_00459520(void) {
+void RunGameApplication(void) {
     HMODULE ir50;
     MSG msg;
 
@@ -746,7 +746,7 @@ void FUN_00459520(void) {
     CreateObjectClasses();
     DebugTrace("boot: after CreateObjectClasses()");
     DrawWatchSprite();
-    FUN_00458bc0();
+    SelectInitialFrontEndScreen();
     DrawWatchSprite();
     // STRING: LEGOLAND 0x004b91e8
     ir50 = LoadLibraryA("Ir50_32.dll");
@@ -758,10 +758,10 @@ void FUN_00459520(void) {
     DebugTrace("boot: after UnloadWatchSprite()");
     ResumeMusicThread();
     DebugTrace("boot: entering main loop");
-    while (FUN_00458c00() != 0) {
+    while (UpdateApplicationFrame() != 0) {
     }
     DebugTrace("boot: main loop ended");
-    FUN_004594e0();
+    CloseActiveApplicationScreen();
     SpeechCloseFile();
     if (SPRITE_TitleScreenBk != NULL) {
         KillSprite(SPRITE_TitleScreenBk);

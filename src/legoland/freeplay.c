@@ -82,8 +82,8 @@ LEGO_EXPORT void InitFreePlayScreen(void) {
     icon->string_id = 0x26;
     icon->string = GetString(0x26);
     icon->flags |= 0x6002;
-    icon->event_handler = (void *)FUN_0048fb80;
-    CancelKeyHandler = FUN_0048fb80;
+    icon->event_handler = (void *)ReturnToTitleClicked;
+    CancelKeyHandler = ReturnToTitleClicked;
 
     // STRING: LEGOLAND 0x004bea70
     icon = LoadSpriteIcon("Accept_On_FreePlay.lls", 4, 0x1e4, 0x14b, 7);

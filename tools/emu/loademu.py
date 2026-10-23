@@ -115,7 +115,7 @@ def main():
         (port, Loader(port, {'sprintf': pb + rva['sprintf'], 'open': pb + rva['RES_OpenFile'],
                              'read': pb + rva['RES_ReadFile'], 'close': pb + rva['RES_CloseFile'],
                              'malloc': pb + rva['malloc'], 'calloc': pb + rva['calloc'],
-                             'colour': pb + rva['FUN_00486280']}),
+                             'colour': pb + rva['GetOrCreateColorRamp']}),
          pb + rva['Load3DMesh']),
     )
     bad = 0

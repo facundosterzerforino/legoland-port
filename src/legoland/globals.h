@@ -2733,7 +2733,7 @@ extern void *OpenPathNodeList;
 // 0x00668fc4
 extern struct GameMainNode *ClosedPathNodeList;
 // 0x00668fcc
-extern int DAT_00668fcc;
+extern int ScriptResourceLineNumber;
 // 0x00668fd0
 extern char DAT_00668fd0[128];
 // 0x00669050

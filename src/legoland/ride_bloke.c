@@ -571,7 +571,7 @@ void PopDrivingSchoolCarWaypoint(struct NewBloke *p) {
 }
 
 // FUNCTION: LEGOLAND 0x00401e00
-void FUN_00401e00(struct HistBuf *p) {
+void ShiftDrivingHistory(struct HistBuf *p) {
     p->e[16] = p->e[15];
     p->e[15] = p->e[14];
     p->e[14] = p->e[13];
@@ -755,7 +755,7 @@ int FUN_00402390(struct NewBloke *param_1) {
 }
 
 // FUNCTION: LEGOLAND 0x00402430
-int FUN_00402430(struct PairArg *a, struct PairArg *b) {
+int TransferDrivingQueueOccupancy(struct PairArg *a, struct PairArg *b) {
     struct RideQueueEntry *p1 = FindQueueEntryAtTile(a->var_0, a->var_4);
     struct RideQueueEntry *p2 = FindQueueEntryAtTile(b->var_0, b->var_4);
 
@@ -955,7 +955,7 @@ void UpdateDrivingSchoolCar(struct NewBloke *b) {
         b->fy += b->velY;
         b->px = (b->fx + 0x10000) >> 16;
         b->py = (b->fy + 0x10000) >> 16;
-        if (FUN_00402430((struct PairArg *)&b->p, (struct PairArg *)&old_p) == 0) {
+        if (TransferDrivingQueueOccupancy((struct PairArg *)&b->p, (struct PairArg *)&old_p) == 0) {
             b->p = old_p;
             b->f = old_f;
             return;

@@ -1718,7 +1718,7 @@ int IsFlumeSlotOwnedBy(struct FlumeSlot *param_1, void *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040b290
-void FUN_0040b290(struct FlumeEntry *entry, int x, int y, struct FlumeStageList *list, int reverse) {
+void DrawFlumeBarrelsByStage(struct FlumeEntry *entry, int x, int y, struct FlumeStageList *list, int reverse) {
     struct FlumeEntry *set = (struct FlumeEntry *)entry->slotset;
     int i = 0;
     int j;
@@ -2102,7 +2102,7 @@ void UpdateFlumeSlot(struct FlumeEntry *set, int index) {
 }
 
 // FUNCTION: LEGOLAND 0x0040bd40
-void FUN_0040bd40(struct FlumeEntry *set, int index) {
+void UpdateFlumeBoatSlot(struct FlumeEntry *set, int index) {
     struct FlumeSlot *slot = &set->slots[index];
 
     if (slot != NULL) {
@@ -2329,7 +2329,7 @@ void LogFlumeEntranceUpdate(Element *obj) {
 }
 
 // FUNCTION: LEGOLAND 0x0040c250
-int FUN_0040c250(struct FlumeEntry *entry) {
+int TransferFlumeSlotsToNextPiece(struct FlumeEntry *entry) {
     struct FlumeEntry *set = (struct FlumeEntry *)entry->slotset;
     /* Original bug: target is read uninitialised when entry has no alt/next (its stack slot then holds entry). */
     struct FlumeEntry *target;
@@ -2517,7 +2517,7 @@ void LogFlumeTrackCalcCursor(Element *elem, int *param_2, unsigned int param_3) 
             DropForeignFlumeTrackNeighbours(key, list);
             code = FlumeNeighbourMask(list);
             if (FUN_00409580(code, (struct StateSlots *)list)) {
-                FUN_0040d520((struct FlumeEntry **)list, &EditCursor);
+                AppendFlumeNeighbourCursors((struct FlumeEntry **)list, &EditCursor);
                 ResetCursorBuildable(&EditCursor);
             }
         }
@@ -3090,7 +3090,7 @@ unsigned int SetFlumeEditCursor(void *param_1, unsigned int *param_2) {
 }
 
 // FUNCTION: LEGOLAND 0x0040d420
-void FUN_0040d420(unsigned int *res) {
+void BuildFlumeConnectionCursors(unsigned int *res) {
     unsigned int flags = res[0];
     struct Cursor *cur = NULL;
     int n;
@@ -3129,7 +3129,7 @@ void FUN_0040d420(unsigned int *res) {
 }
 
 // FUNCTION: LEGOLAND 0x0040d520
-void FUN_0040d520(struct FlumeEntry **list, struct Cursor *first) {
+void AppendFlumeNeighbourCursors(struct FlumeEntry **list, struct Cursor *first) {
     int flags;
     struct Cursor *cur;
     int i;
@@ -3207,7 +3207,7 @@ unsigned int LogFlumePieceCalcCursor(struct Ride *param_1, int *param_2, unsigne
     u.t.pos.x = (unsigned char)EditCursor.tile_x;
     u.t.pos.y = (unsigned char)EditCursor.tile_y;
     param_5(u.t, buf);
-    FUN_0040d420(buf);
+    BuildFlumeConnectionCursors(buf);
     EditCursor.next = &DAT_004c4468;
     cost = GetObjCost((struct Ride *)param_1);
     if (GetBrickCount() < cost) {
@@ -3229,7 +3229,7 @@ unsigned int LogFlumePieceCalcCursor(struct Ride *param_1, int *param_2, unsigne
                 SetCursorBlocked(&EditCursor, 0xe);
             } else if (param_6(u.list)) {
                 ResetCursorBuildable(&EditCursor);
-                FUN_0040d520((struct FlumeEntry **)u.list, EditCursor.next->next);
+                AppendFlumeNeighbourCursors((struct FlumeEntry **)u.list, EditCursor.next->next);
             } else {
                 SetCursorBlocked(&EditCursor, 0xd);
             }
@@ -4141,7 +4141,7 @@ void RenderLogFlumeSpecialCorner1(Element *elem, unsigned int param_2, unsigned 
     DrawFlumeBarrelsAtTile(tile);
     entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
-        FUN_0040b290(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4808, 0);
+        DrawFlumeBarrelsByStage(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4808, 0);
         DrawFlumeTrackEnds((struct FlumeEntry *)entry, 1);
     }
 }
@@ -4200,7 +4200,7 @@ void RenderLogFlumeSpecialCorner3(Element *elem, unsigned int param_2, unsigned 
     DrawFlumeBarrelsAtTile(tile);
     entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
-        FUN_0040b290(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4828, 1);
+        DrawFlumeBarrelsByStage(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4828, 1);
         DrawFlumeTrackEnds((struct FlumeEntry *)entry, 1);
     }
 }
@@ -4747,7 +4747,7 @@ void RenderLogFlumeHoldUp(Element *elem, unsigned int param_2, unsigned int para
     DrawFlumeBarrelsAtTile(tile);
     entry = FindFlumeSubEntryByTile(tile);
     if (entry != NULL) {
-        FUN_0040b290(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4858, 0);
+        DrawFlumeBarrelsByStage(entry, pos.x, pos.y, (struct FlumeStageList *)&DAT_004b4858, 0);
         DrawFlumeTrackEnds((struct FlumeEntry *)entry, 1);
     }
 }

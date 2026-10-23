@@ -515,7 +515,7 @@ void FUN_004424e0(struct ColourRef *param_1, struct ColourRef *param_2, struct C
                     rgb = *(int *)param_4;
 #endif
                 }
-                entry->ramp = FUN_00486280(0x40, &rgb);
+                entry->ramp = GetOrCreateColorRamp(0x40, &rgb);
                 count = param_6;
             }
             entry++;

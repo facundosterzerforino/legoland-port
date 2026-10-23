@@ -591,14 +591,14 @@ int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int
     char found;
     struct ScriptCommand *cmd;
 
-    DAT_00668fcc = 0;
+    ScriptResourceLineNumber = 0;
     cmd = commands;
     r = 0;
     // STRING: LEGOLAND 0x004bbdcc
     if (strcmp(cmd->name, "none") == 0)
         deflt = cmd->fn;
     while (ReadResFileLine(file, line, 1024)) {
-        DAT_00668fcc++;
+        ScriptResourceLineNumber++;
         DrawWatchSprite();
         p = strchr(line, '#');
         if (p)

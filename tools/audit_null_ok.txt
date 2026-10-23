@@ -42,7 +42,7 @@ render3d.c:Ride_ClearFlagToNotLetAnyoneOn baseline
 render3d.c:Ride_SetFlagToNotLetAnyoneOn baseline
 worker.c:AddRepairOrderForObject baseline
 worker.c:CreateMechanicWorkOrder baseline
-worker.c:FUN_0049b350 baseline
+worker.c:FindNearbyRepairTarget baseline
 worker.c:Garderner_Repair baseline
 worker.c:IterateNoneWorkersRepairOrders baseline
 worker.c:Mechanic_Build baseline
