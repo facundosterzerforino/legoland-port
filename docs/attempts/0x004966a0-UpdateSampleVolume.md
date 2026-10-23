@@ -42,3 +42,12 @@ below kept that duplication:
 A jump table cannot be written in naked asm here, so the remaining path is C. Idea not tried yet: find a statement
 form that makes MSVC6 treat the post-switch call as too big to duplicate. The original's tail is no bigger than
 ours, so the source must differ before the switch, or in how the coord values are produced.
+
+## Additional typed/shared-tail checks
+
+Refreshed current main baseline: harness 65.31, full verify 70.44.
+Scalar x-then-y stores in cases 1/3 score 62.16. Replacing int-array
+pointer arithmetic with RideNode->rider->pos (including the owning headers)
+also scores 62.16. An explicit source_y temporary and named shared apply
+label score 65.31 in the scalar form, 63.95 in the typed form. A shared-call
+label alone scores 62.16. None removes the duplicated call tail; none kept.

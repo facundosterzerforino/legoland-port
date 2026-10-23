@@ -578,6 +578,8 @@ int ParseScriptFile(const char *name, struct ScriptCommand *commands, int count,
     return 0;
 }
 
+/* Reads resource-script lines, strips hash comments, tokenizes them and dispatches matching or default command
+ * handlers. Counts zero-status failures and optionally calls the final check handler. */
 // FUNCTION: LEGOLAND 0x00478280
 int ParseScriptResFile(struct ResFile *file, struct ScriptCommand *commands, int count, int flags) {
     char line[1024];

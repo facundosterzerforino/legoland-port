@@ -22,3 +22,12 @@
 
 - Fall through the other way: keep `case 4` as the first body and put `case 0`'s `flags |= 8` in front of it with `if (param_action == 0)`, so the tail is shared without changing the switch shape.
 - Swap the `== 2` and `== 1` arms in the case 1 and case 3 `rand()` chains.
+
+## Additional source-shape checks
+
+Refreshed current main before scoring: harness 81.07, full verify 80.11.
+Changing case 5 to assign dest.x directly, assigning case 1/r==1 through x,
+or combining the two changes all tie at 81.07. Duplicating the movement call
+inside the three random-position arms moves the shared tail to the wrong
+block and drops to 56.64. None retained. An old fn.c was stale and initially
+scored 56.64, so do not trust it as the repo baseline.

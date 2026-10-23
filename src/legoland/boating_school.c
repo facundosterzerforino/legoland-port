@@ -1932,6 +1932,8 @@ int IsBoatPathConnected(int a, int b, int c, int d) {
     return result;
 }
 
+/* Marks and searches connected boat-path nodes in five-tile steps for the target position, restricted to the
+ * supplied owner. Stops recursively when the shared found flag is set. */
 // FUNCTION: LEGOLAND 0x0041c940
 void SearchBoatPathConnected(int x, int y, int tx, int ty, TileId *owner, int *found) {
     struct PathNode *node;

@@ -237,6 +237,7 @@ void FUN_0045e080(Element *editObj, struct Point *pos, unsigned short flags) {
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
 }
 
+/* Temporarily builds the object cursor, removes path tiles covered by its footprints, and restores the edit cursor. */
 // FUNCTION: LEGOLAND 0x0045e300
 void RemovePathsUnderObjectFootprint(Element *editObj, struct Point *pos) {
     struct Ride *obj;
@@ -295,6 +296,8 @@ void RemovePathsUnderObjectFootprint(Element *editObj, struct Point *pos) {
     memcpy(&EditCursor, saved, 0x60d * sizeof(unsigned int));
 }
 
+/* Temporarily builds the object cursor and assigns its footprint tiles to the object and anchor tile, clearing
+ * their flags. Restores the edit cursor afterwards. */
 // FUNCTION: LEGOLAND 0x0045e4a0
 void SetObjectFootprintMapTiles(Element *editObj, struct Point *pos) {
     struct Ride *obj;
@@ -479,6 +482,8 @@ int IsTileFreeOrPath(struct MapElement *obj) {
     return 1;
 }
 
+/* Checks the translated entrance position, and the separate-exit check when required, rejecting in-bounds tiles
+ * that are neither free nor path tiles. */
 // FUNCTION: LEGOLAND 0x0045e960
 int IsObjectEntranceOffsetClear(struct Element *node, int *offset) {
     struct Ride *obj;

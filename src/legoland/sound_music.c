@@ -537,6 +537,8 @@ int ApplySampleVolume(struct Sample *sample) {
     return 1;
 }
 
+/* Updates an active sample using its source type: non-positional volume, a rider position, a tile center, or a
+ * screen position adjusted by the scroll offset. */
 // FUNCTION: LEGOLAND 0x004966a0
 int UpdateSampleVolume(struct Sample *sample) {
     int coord[2];
@@ -1015,6 +1017,8 @@ LEGO_EXPORT void Kill_FXList(struct FXItem *list, int count) {
     } while (count != 0);
 }
 
+/* Fades speech and effects volumes to zero in timed steps, pauses samples and closes speech, then restores the
+ * configured volume settings. */
 // FUNCTION: LEGOLAND 0x00496e60
 void FadeOutSpeechAndEffects(int param_1, int param_2) {
     int savedC4;

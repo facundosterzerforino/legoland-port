@@ -91,6 +91,8 @@ LEGO_EXPORT void RemovePathSquare(struct Point *pos) {
     }
 }
 
+/* Stores the squared distance from the fixed-point query position to the nearest tile center within the path node
+ * bounds. */
 // FUNCTION: LEGOLAND 0x00481e60
 void SetPathNodeDistanceSquared(struct PathQuery *query, struct BestNode *box) {
     int px = query->x;

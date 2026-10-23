@@ -103,6 +103,8 @@ unsigned char TitleLoadGameHandler(unsigned int param_1, unsigned char param_2) 
     return 1;
 }
 
+/* Handles the title screen New button: closes speech and title graphics, marks a new game, and opens the
+ * level-selection screen. */
 // FUNCTION: LEGOLAND 0x0048feb0
 unsigned char TitleNewGameHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
@@ -119,6 +121,7 @@ unsigned char TitleNewGameHandler(unsigned int param_1, unsigned int param_2) {
     return 1;
 }
 
+/* Handles the title screen Free Play button: closes speech and switches the front end to the free-play screen. */
 // FUNCTION: LEGOLAND 0x0048ff20
 unsigned char TitleFreePlayHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
@@ -131,6 +134,7 @@ unsigned char TitleFreePlayHandler(unsigned int param_1, unsigned int param_2) {
     return 1;
 }
 
+/* Handles the title screen registration button by selecting front-end screen zero. */
 // FUNCTION: LEGOLAND 0x0048ff70
 unsigned char TitleRegistrationHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
@@ -149,6 +153,7 @@ void KillTitleScreenBkSpriteAndRemoveIconGroup7(void) {
     RemoveIconGroup(7);
 }
 
+/* Handles the title screen movie button: saves the current screen state and requests front-end screen nine. */
 // FUNCTION: LEGOLAND 0x0048ffe0
 unsigned char TitleMovieHandler(unsigned int param_1, unsigned int param_2) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {

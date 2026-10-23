@@ -570,6 +570,8 @@ void PopDrivingSchoolCarWaypoint(struct NewBloke *p) {
     p->f_bb = temp_bb;
 }
 
+/* Shifts the seventeen stored driving-history points one entry toward the end and increments the history count;
+ * entry zero is left unchanged. */
 // FUNCTION: LEGOLAND 0x00401e00
 void ShiftDrivingHistory(struct HistBuf *p) {
     p->e[16] = p->e[15];
@@ -754,6 +756,8 @@ int FUN_00402390(struct NewBloke *param_1) {
     return 1;
 }
 
+/* On crossing into another queue tile, rejects a blocked destination; otherwise decrements the old tile occupancy
+ * when nonzero and increments the destination occupancy. */
 // FUNCTION: LEGOLAND 0x00402430
 int TransferDrivingQueueOccupancy(struct PairArg *a, struct PairArg *b) {
     struct RideQueueEntry *p1 = FindQueueEntryAtTile(a->var_0, a->var_4);

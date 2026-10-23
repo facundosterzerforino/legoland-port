@@ -64,6 +64,8 @@ struct Point GetAnimLayoutOffset(struct AnimLayout *layout, int seg, int step) {
     return sum;
 }
 
+/* Builds the next rider destination from the tower animation layout and ride origin, starts movement, and
+ * increments the layout waypoint index. */
 // FUNCTION: LEGOLAND 0x0043a820
 void MoveSpaceTowerRiderToNextWaypoint(struct AnimEntry *param_1, struct RideNode *param_2) {
     struct Bloke *bloke;
@@ -85,6 +87,8 @@ void MoveSpaceTowerRiderToNextWaypoint(struct AnimEntry *param_1, struct RideNod
     param_2->rider->field_38++;
 }
 
+/* Advances the rider through the current layout entry and its waypoints, advancing the action when the selected
+ * entry range is complete. */
 // FUNCTION: LEGOLAND 0x0043a8c0
 void AdvanceSpaceTowerRiderLayout(struct RideNode *param_1) {
     struct Bloke *bloke;
@@ -143,6 +147,7 @@ void UpdateSpaceTowerSeat(struct SpaceTowerSeat *seat) {
     }
 }
 
+/* Clears all four seat states, then activates each seat with at least one occupied rider slot and resets its motion state. */
 // FUNCTION: LEGOLAND 0x0043a9b0
 void SyncSpaceTowerSeatsFromOccupancy(struct SpaceTowerCar *arg) {
     int i;
@@ -307,6 +312,8 @@ unsigned int TakeRandomSpaceTowerSlot(struct RideNode *param_1, struct SpaceTowe
     return slot;
 }
 
+/* Returns the projected screen Y of a tower seat base, offsetting the ride tile by two tiles according to the seat
+ * index and subtracting vertical scroll. */
 // FUNCTION: LEGOLAND 0x0043ad00
 int GetSpaceTowerSeatScreenY(unsigned char *param_1, int param_2) {
     int y;

@@ -17,3 +17,12 @@ differ between the copies), so MSVC does not merge them.
 ## Ideas not tried yet
 
 - make both print copies load Head/Tail the same way so the tail merge happens
+
+## 2026-10-23 Opus 5.5
+
+Original layout: the head branch falls into ONE shared START print (Head/Tail reloaded from memory, 0x499dcc).
+The search loop and the not-found print come after the `ret`; the found path jumps back to the shared print
+(`jne -0x4d` / `jmp -0x55`). Both candidate forms reach the original's 68 instructions but score lower: a
+`goto done` label inside the head branch scores 73.53 (MSVC moves the labeled block to the end), and if/else
+with the print after the join scores 74.45 (else body before the print). Inverted condition: 56.16; for+break
+inside the else: 71.23.

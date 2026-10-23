@@ -295,6 +295,8 @@ struct RideSpriteInfo *GetPlaneRideSpriteInfo(struct Element *param1, unsigned s
     return &PlaneRideSpriteInfo;
 }
 
+/* Searches cyclically from a random seat for a free slot, marks it occupied, and stores and returns its one-based
+ * seat number for the rider. */
 // FUNCTION: LEGOLAND 0x0043e050
 unsigned int ReservePlaneRideSeat(struct RideNode *rn, struct PlaneRideNode *node, signed char n) {
     int count = n;

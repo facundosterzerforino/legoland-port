@@ -3397,6 +3397,7 @@ void *OpenPathNodeList;
 // GLOBAL: LEGOLAND 0x00668fc4
 struct GameMainNode *ClosedPathNodeList;
 
+/* Number of resource-script lines read by the current parse. */
 // GLOBAL: LEGOLAND 0x00668fcc
 int ScriptResourceLineNumber;
 

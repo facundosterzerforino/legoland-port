@@ -13,6 +13,8 @@
 #include "port_input.h"
 #endif
 
+/* Allocates and resets the controller buffer, initializes mouse/key masks and default tile footprint values, and
+ * marks controllers initialized. */
 // FUNCTION: LEGOLAND 0x00451e70
 LEGO_EXPORT int SetupControllers(void) {
     if (ControllersInitialized != 0) {
@@ -179,6 +181,8 @@ void UpdateEditSelection(void) {
     }
 }
 
+/* Initializes the selection drag from the queried object footprint or current mouse tile, sets the drag end to the
+ * mouse tile, and consumes a pending left click. */
 // FUNCTION: LEGOLAND 0x00452390
 void BeginTileSelectionDrag(void) {
     struct Ride *cls;

@@ -130,6 +130,8 @@ void ResetPathSceneryTimer(void) {
     PathSceneryLastUpdate = GetGameTimer();
 }
 
+/* Periodically counts scenery along the perimeter of each path rectangle and updates the total, matched count and
+ * coverage percentage. */
 // FUNCTION: LEGOLAND 0x00459970
 void UpdatePathSceneryPercent(void) {
     int now;
@@ -230,6 +232,7 @@ LEGO_EXPORT void PutObjOnMap(struct Ride *obj, struct Element *classid, struct P
 LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId tile, void *cursor) {
     int area;
     struct MapCell *cell;
+    unsigned short *flags;
     struct Cursor *query;
     int x;
     int y;
@@ -241,8 +244,8 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId
     }
     if (DAT_00667cd8 == 0) {
         blk.f8 = tile.pos.x;
-        blk.fc = tile.pos.y;
         blk.f0 = 2;
+        blk.fc = tile.pos.y;
         PlayInstanceOfSample(GameFX[FX_PUNCH].sample, 0, 1, &blk);
     } else {
         DAT_00667cdc = 1;
@@ -292,12 +295,10 @@ LEGO_EXPORT void RemObjFromMap(struct Ride *obj, struct Element *classid, TileId
     while (query != NULL) {
         if ((query->field_1828 & 0x1000) != 0) {
             if (query != NULL) {
-                for (blk.f4 = query->field_1414[1] + query->tile_y;
-                    blk.f4 <= (int)(query->tile_y + query->field_1414[3]); blk.f4 = blk.f4 + 1) {
-                    for (blk.f0 = query->tile_x + query->field_1414[0];
-                        blk.f0 <= (int)(query->tile_x + query->field_1414[2]); blk.f0 = blk.f0 + 1) {
-                        cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];
-                        cell->flags.word = cell->flags.word & 0xffe7;
+                for (blk.f4 = query->footprint.y0 + query->tile_y; blk.f4 <= query->tile_y + query->footprint.y1; blk.f4++) {
+                    for (blk.f0 = query->footprint.x0 + query->tile_x; blk.f0 <= query->tile_x + query->footprint.x1; blk.f0++) {
+                        flags = &((struct MapCell *)&GameMap[blk.f4][blk.f0])->flags.word;
+                        *flags &= 0xffe7;
                         cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];
                         cell->byte_10 = 0;
                         cell = (struct MapCell *)&GameMap[blk.f4][blk.f0];

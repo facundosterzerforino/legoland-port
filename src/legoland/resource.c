@@ -130,6 +130,8 @@ struct MasterDirNode *FindVolumeDirEntry(const char *vol_name, const char *file_
     return 0;
 }
 
+/* Recursively resolves sibling and child offsets in a resource-volume directory and registers its files in the
+ * master-directory and volume lists. */
 // FUNCTION: LEGOLAND 0x004895a0
 void RegisterResourceDirectoryTree(struct ResDirRecord *node, struct ResVolume *volume, struct ResDirRecord *base, char *path) {
     char buffer[0x104];

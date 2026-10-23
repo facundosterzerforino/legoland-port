@@ -30,3 +30,9 @@
 
 The rule that allowed a documented naked `__asm` transcription for compiler choices C cannot reach was withdrawn.
 The function is the plain C that was the `#else` branch again: 99.62%. Matching has to come from C now.
+
+## 2026-10-23 Opus 5.5
+
+Pointer-compare loop forms aimed at the `jb` (`&ResourceVolumes[i] < &ResourceVolumes[3]`, a `vol` pointer loop
+with `i` alongside, `i = vol - ResourceVolumes`, `&ResourceFileNames[i] < &ResourceFileNames[3]`) restructure
+the loop: harness 75-79.

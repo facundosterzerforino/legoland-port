@@ -421,6 +421,8 @@ LEGO_EXPORT void NewPrintCent(char *text, int font, RECT rc, INT_PTR color_flag)
     DeleteObject(region);
 }
 
+/* Measures and draws centered text in the supplied rectangle with sprite clipping and optional white text, then
+ * returns the horizontal coordinate of its measured right edge. */
 // FUNCTION: LEGOLAND 0x00491e40
 int DrawCenteredTextAndGetRightEdge(char *text, int font, RECT rc, INT_PTR color_flag) {
     RECT measured;
@@ -474,6 +476,8 @@ unsigned char FUN_00491f90(struct RideState *state, unsigned char flags) {
     }
 }
 
+/* Closes the profile popup and confirmation box, invalidates the front-end screen, and clears the selected profile
+ * slot on activation. */
 // FUNCTION: LEGOLAND 0x004920a0
 char CancelProfileSelectionClicked(unsigned int param1, unsigned char flags) {
     if ((flags & 0x2) != 0 && (void *)ScanForProfiles != 0) {

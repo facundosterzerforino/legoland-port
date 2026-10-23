@@ -708,6 +708,8 @@ void SetPopUpOkCloseIconSprites(void) {
     SetIconSprite((struct IconNode *)CBCloseIcon, CBCloseSprite);
 }
 
+/* Draws the variable-width popup footer, positions the OK and Close icons, draws its label, and refreshes their
+ * idle sprites when the mouse leaves the button area. */
 // FUNCTION: LEGOLAND 0x00471d90
 void DrawInfoPopupFooter(void) {
     int iVar1;
@@ -894,6 +896,8 @@ void DrawNewObjectPopup(void) {
     }
 }
 
+/* Temporarily configures the query class and cursor for the popup object, runs its cursor setup and buildability
+ * test, then restores the previous query state. */
 // FUNCTION: LEGOLAND 0x004723f0
 int IsPopupObjectBuildable(void) {
     int result;

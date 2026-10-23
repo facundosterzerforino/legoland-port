@@ -4391,7 +4391,7 @@ void ClearCoasterDepth(int param_1) {
 // FUNCTION: LEGOLAND 0x00423200
 void RecordDepthSpans(int n, int x, struct RecIdx *idx, struct RecSrc *src) {
     short *p = (short *)DepthSpanRecordEnd;
-    struct RecBuf *saved = (struct RecBuf *)p;
+    struct RecBuf *saved = DepthSpanRecordEnd;
     int i;
 
     DepthSpanRecordCount++;
@@ -7845,17 +7845,15 @@ unsigned int GetTrackPieceCurveIndex(struct PieceHead *pair) {
 // FUNCTION: LEGOLAND 0x004284d0
 void BuildTrackPieceCurves(void) {
     struct ArcCurve *base;
-    register struct ArcCurve *cur;
+    struct ArcCurve *cur;
     struct Words3 *p;
     struct Words3 *q;
     int x;
     unsigned int y;
     int j;
-    register int qi;
-    register unsigned int i;
+    unsigned int i;
     unsigned int k;
     int n;
-    int ptmp22;
     n = 0;
 
     for (i = 0; i <= 3; i++) {
@@ -7868,44 +7866,34 @@ void BuildTrackPieceCurves(void) {
         DAT_00611658[i].y = DAT_004b5e30[i][1] * 20.0f;
         DAT_00611658[i].z = DAT_004b5e30[i][2] * 20.0f;
     }
-    i = 0;
-    while (3 >= i) {
+    for (i = 0; i <= 3; i++) {
         DAT_00611750[i].x = DAT_004b5e60[i][0] * 20.0f;
         DAT_00611750[i].y = DAT_004b5e60[i][1] * 20.0f;
         DAT_00611750[i].z = DAT_004b5e60[i][2] * 20.0f;
-        i++;
     }
-    i = 0;
-    while (i <= 3) {
+    for (i = 0; i <= 3; i++) {
         DAT_006116e0[i].x = DAT_004b5e90[i][0] * 20.0f;
         DAT_006116e0[i].y = DAT_004b5e90[i][1] * 20.0f;
-        { DAT_006116e0[i].z = DAT_004b5e90[i][2] * 20.0f; }
-        ++i;
+        DAT_006116e0[i].z = DAT_004b5e90[i][2] * 20.0f;
     }
-    i = 0;
-    while (3 >= i) {
-        ptmp22 = DAT_004b5ef4[i][1];
-        qi = ptmp22;
-        q = (struct Words3 *)&DAT_00611750[qi];
+    for (i = 0; i <= 3; i++) {
+        q = (struct Words3 *)&DAT_00611750[DAT_004b5ef4[i][1]];
         y = DAT_004b5f14[i][1];
         p = (struct Words3 *)&DAT_00611750[DAT_004b5ef4[i][0]];
         x = DAT_004b5f14[i][0];
         InitArcCurve(p, q, (struct Words3 *)&DAT_006116e0[i], &((struct ArcCurve *)TrackPieceCurves)[n++], x, y);
-        if (5 == n) {
+        if (5 == n) { /* the original has a test with an empty body here (cmp n, 5; jne +0) */
             n = 5;
         }
         InitArcCurve(q, p, (struct Words3 *)&DAT_006116e0[i], &((struct ArcCurve *)TrackPieceCurves)[n++], y, x);
-        i++;
     }
-    j = 0;
     base = &((struct ArcCurve *)TrackPieceCurves)[n];
-    while (j <= 3) {
+    for (j = 0; j <= 3; j++) {
         cur = base;
-        base = 5 + base;
+        base += 5;
         for (k = 0; k < 5; k++) {
             InitStraightPieceCurve(DAT_004b5ec0[j], (DAT_004b5ec0[j] - 2) & 3, DAT_004b5ee0[k], (struct LineCurve *)cur++, j);
         }
-        j++;
     }
 }
 

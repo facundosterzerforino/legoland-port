@@ -37,3 +37,13 @@ also moves the branch displacements earlier in the function.
 
 - `Point adj = {0, 0};` brace initialisation at declaration instead of two assignments.
 - Splitting the `if (b->field_35 == 1)` block so `adj` is zeroed inside the if/else.
+
+## 2026-10-23 (Opus 5.5): still 98.62
+`adj` zeroed before the `base` copy (any of: `Point adj = {0, 0}; Point base = DAT_0082c660;`, or plain statements
+`p = ...; adj.x = 0; adj.y = 0; base = DAT_0082c660;`) now gives the original's exact load/store sequence for the
+whole block (`ecx = DAT.y`, `xor eax`, `esi = person`, adj stores, `eax = DAT.x`, base stores). Only one difference is
+left: ours splits the `field_35 == 1` test into `mov al,[edi+0x35]; cmp al,1` and pairs the load with the `base.y`
+store; the original keeps `cmp byte ptr [edi+0x35], 1` after both stores. 97.06 (one instruction longer, so every
+later jump shifts). No effect on the split: casts / `1 == x` / `!= 1` with else / local copy / goto label / byte
+pointer reads / `volatile` read (96.37) / `volatile` base (93.45); 36 orders of p/adj/base statements; 12-minute
+permuter on that version.

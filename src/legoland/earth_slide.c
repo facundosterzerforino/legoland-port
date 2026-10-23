@@ -100,6 +100,8 @@ void EarthNodeAppendQueueEntry(struct EarthNode *p, struct EarthQueue *value) {
     }
 }
 
+/* Returns the fixed-point waiting position for a new earth-slide rider, using the queue length to select an offset
+ * from the queue-position table. */
 // FUNCTION: LEGOLAND 0x0042cec0
 void GetEarthSlideQueuePosition(struct Ride *param_1, unsigned char *param_2, int *param_3) {
     struct EarthNode *node = FindEarthNode((unsigned short *)param_2);
@@ -132,6 +134,8 @@ int IsEarthQueueHead(struct EarthNode *param_1, void *param_2) {
     return 0;
 }
 
+/* Releases and advances the first queued earth-slide rider, removes its queue entry, and moves the remaining riders
+ * to their updated waiting positions. */
 // FUNCTION: LEGOLAND 0x0042cf70
 void AdvanceEarthSlideQueue(struct EarthNode *param_1) {
     struct Bloke *bloke;

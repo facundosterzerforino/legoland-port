@@ -332,6 +332,7 @@ void UnloadMap(void) {
 // FUNCTION: LEGOLAND 0x00458bb0
 void SetMapLoaded(unsigned int param_1) { MapLoaded = param_1; }
 
+/* Selects front-end mode, invalidates the previous screen, and requests initial screen zero. */
 // FUNCTION: LEGOLAND 0x00458bc0
 void SelectInitialFrontEndScreen(void) {
     EditMode.unk4 = 2;
@@ -350,6 +351,8 @@ void MarkLevelComplete(void) {
     UpDateCurrentProfile();
 }
 
+/* Processes pending map-screen and level changes, dispatches the active game/front-end/map screen, and updates
+ * input and sound. Returns zero when application mode is zero. */
 // FUNCTION: LEGOLAND 0x00458c00
 int UpdateApplicationFrame(void) {
     char path[256];
@@ -652,6 +655,7 @@ void RenderMapScreenFrame(void) {
     RenderingComplete();
 }
 
+/* Closes the front-end screen when the application is in front-end mode. */
 // FUNCTION: LEGOLAND 0x004594e0
 void CloseActiveApplicationScreen(void) {
     switch (EditMode.unk4) {
@@ -676,6 +680,8 @@ void InitDefaultProfile(void) {
     CurrentProfile.fx_volume = 0x4b;
 }
 
+/* Initializes shared game resources, runs the application frame loop, then releases controllers, graphics,
+ * visitors, sound and input. */
 // FUNCTION: LEGOLAND 0x00459520
 void RunGameApplication(void) {
     HMODULE ir50;

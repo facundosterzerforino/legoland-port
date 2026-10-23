@@ -224,6 +224,8 @@ void UpdateSlideAvailability(void *arg) {
     Ride_SetFlagToNotLetAnyoneOn(arg);
 }
 
+/* Reserves the first free entrance lane among slots zero and three, updates ride availability, and returns its
+ * index. Falls back to slot zero when both are busy; returns minus one if the slide is absent. */
 // FUNCTION: LEGOLAND 0x00417380
 int ReserveTempleSlideLane(void *arg) {
     int avail[4];

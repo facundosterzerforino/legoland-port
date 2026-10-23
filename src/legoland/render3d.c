@@ -398,6 +398,8 @@ struct CellEntry {
     unsigned char field_5;
 };
 
+/* Remaps qualifying faces from the source texture-cell rectangle into the destination cell, normalizing UVs by the
+ * destination texture size. */
 // FUNCTION: LEGOLAND 0x00442040
 void RemapTexCoordsToCell(struct LocFile *param_1, int param_2, int param_3, struct PersonFace *faces, int count) {
     struct CellEntry *entry1 = (struct CellEntry *)((char *)param_1->cells + param_2 * 6);

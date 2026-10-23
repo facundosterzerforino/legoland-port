@@ -1717,6 +1717,8 @@ int IsFlumeSlotOwnedBy(struct FlumeSlot *param_1, void *param_2) {
     return (void *)param_1->owner == param_2;
 }
 
+/* Walks the flume run in either direction, draws barrel slots on each piece, and interleaves the stage sprites at
+ * their recorded counts. */
 // FUNCTION: LEGOLAND 0x0040b290
 void DrawFlumeBarrelsByStage(struct FlumeEntry *entry, int x, int y, struct FlumeStageList *list, int reverse) {
     struct FlumeEntry *set = (struct FlumeEntry *)entry->slotset;
@@ -2101,6 +2103,8 @@ void UpdateFlumeSlot(struct FlumeEntry *set, int index) {
     }
 }
 
+/* Advances one boat slot when the piece ahead is clear, releases its rider at the exit, and maintains the stop
+ * timer and movement flag. */
 // FUNCTION: LEGOLAND 0x0040bd40
 void UpdateFlumeBoatSlot(struct FlumeEntry *set, int index) {
     struct FlumeSlot *slot = &set->slots[index];
@@ -2328,6 +2332,8 @@ void LogFlumeEntranceUpdate(Element *obj) {
     }
 }
 
+/* Retargets slots owned by this entry or its sub-piece chain to the next or alternate entry, preferring that
+ * destination's sub-piece. Returns zero if no destination is found. */
 // FUNCTION: LEGOLAND 0x0040c250
 int TransferFlumeSlotsToNextPiece(struct FlumeEntry *entry) {
     struct FlumeEntry *set = (struct FlumeEntry *)entry->slotset;
@@ -3089,6 +3095,8 @@ unsigned int SetFlumeEditCursor(void *param_1, unsigned int *param_2) {
     return 0x2034;
 }
 
+/* Initializes two linked cursors from the connection mask and coordinates, using the inset log-flume footprint, and
+ * resets their buildability checks. */
 // FUNCTION: LEGOLAND 0x0040d420
 void BuildFlumeConnectionCursors(unsigned int *res) {
     unsigned int flags = res[0];
@@ -3128,6 +3136,8 @@ void BuildFlumeConnectionCursors(unsigned int *res) {
     }
 }
 
+/* Appends up to two cursors for the occupied flume neighbours, copying each piece footprint and tile position and
+ * resetting buildability checks. */
 // FUNCTION: LEGOLAND 0x0040d520
 void AppendFlumeNeighbourCursors(struct FlumeEntry **list, struct Cursor *first) {
     int flags;

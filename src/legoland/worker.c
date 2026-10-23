@@ -252,6 +252,8 @@ WorkOrder *CreateMechanicWorkOrder(Element *element, int *coords, int mode) {
     return order;
 }
 
+/* Returns a fixed-point point centered on the longer dimension of the first work-order footprint, on its top or
+ * left edge, translated by the order origin. */
 // FUNCTION: LEGOLAND 0x00499a70
 Point GetWorkOrderApproachPoint(WorkOrder *order) {
     Footprint *fp = order->footprints;
@@ -1286,6 +1288,8 @@ LEGO_EXPORT int SetGardenerWorkOrderAtPostion(Bloke *worker, int x, int y) {
     return 1;
 }
 
+/* Searches the twelve configured offsets for an object below its class durability whose repair flags permit work
+ * and whose anchor is not already marked for repair. */
 // FUNCTION: LEGOLAND 0x0049b350
 MapElement *FindNearbyRepairTarget(Bloke *worker, int x, int y) {
     const int *offset;

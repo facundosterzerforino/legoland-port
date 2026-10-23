@@ -345,6 +345,7 @@ unsigned char ExitCheckBoxCloseClicked(unsigned int param_1, unsigned int param_
     return 1;
 }
 
+/* Closes the exit confirmation and opens the saved-game screen in save mode after playing the button sound. */
 // FUNCTION: LEGOLAND 0x0048f4f0
 unsigned char ExitCheckBoxSaveClicked(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {
@@ -614,6 +615,8 @@ LEGO_EXPORT void RenderScreen(void) {
     }
 }
 
+/* Handles a front-end Back action by playing the button sound, clearing the overlay state, and selecting the title
+ * screen. */
 // FUNCTION: LEGOLAND 0x0048fb80
 unsigned char ReturnToTitleClicked(unsigned int param_1, unsigned int param_2, unsigned int param_3, unsigned int param_4) {
     if (DAT_004bef9c != 0 && (param_2 & 2) != 0) {
@@ -626,6 +629,7 @@ unsigned char ReturnToTitleClicked(unsigned int param_1, unsigned int param_2, u
     return 1;
 }
 
+/* Handles activation by playing the button sound and requesting the options screen. */
 // FUNCTION: LEGOLAND 0x0048fbd0
 unsigned char OpenOptionsScreenClicked(unsigned int param_1, unsigned int param_2) {
     if ((param_2 & 2) != 0) {

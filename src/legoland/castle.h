@@ -345,6 +345,11 @@ struct EdgeMesh {
     struct MEdge *edges;
     struct MTri *tris;
 };
+/* 0x004b5f60: the rail tube built for each track stretch before it is drawn. Declared here, not in globals.h:
+ * the struct EdgeMesh tag there shifts MSVC codegen in MusicThreadProc. */
+#ifndef LEGOLAND_PORT
+extern struct EdgeMesh RailTubeMesh;
+#endif /* [port] declared in globals.h as the TexMesh the port uses, with its buffer pointers (globals.c) */
 struct EdgeMesh *EdgeMeshRemoveBackfaces(struct EdgeMesh *src);
 struct FVec3;
 struct PiecePlacement;

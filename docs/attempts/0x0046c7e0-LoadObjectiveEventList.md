@@ -25,3 +25,10 @@
   two epilogue copies).
 - Try moving the counter increment before `FreeObjectiveEventList` (check that the callee never reads
   `ScriptLoadErrorCount`).
+
+## 2026-10-23 Opus 5.5
+
+The two diffs are one: the original sinks the `ScriptLoadErrorCount` store past `pop edi; pop esi`. That makes
+the end tail differ from the free-branch exit, so `prev == NULL` jumps forward to the later return-NULL block
+instead of back to the shared tail. These score 98.29 and do not move it: for(;;) with the read failure inside,
+`+= 1`, `head = NULL; return head;`, `return 0`.

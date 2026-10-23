@@ -234,6 +234,8 @@ LEGO_EXPORT void LLIDB_ClearOnLevel(void) {
     }
 }
 
+/* Removes the indexed element by shifting subsequent paged entries toward it and decrementing the element count.
+ * Returns the not-found error for an invalid index. */
 // FUNCTION: LEGOLAND 0x0047b500
 unsigned int LLIDB_RemoveElementAtIndex(unsigned int param_1) {
     unsigned int slot;

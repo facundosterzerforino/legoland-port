@@ -608,6 +608,7 @@ BOOL StopInteractiveMusic(void) {
     return SetEvent(MusicCommandEvent);
 }
 
+/* Reissues the current music theme to the interactive music system. */
 // FUNCTION: LEGOLAND 0x00492da0
 void ReloadCurrentInteractiveMusicTheme(void) {
     SetInteractiveMusicTheme(CurrentMusicTheme);

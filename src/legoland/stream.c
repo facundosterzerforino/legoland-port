@@ -39,6 +39,8 @@ int SpeechRawContiguousBytes(void) {
     return head - tail;
 }
 
+/* Returns the buffered raw-speech byte count limited to the current chunk size. Discards an exhausted chunk
+ * descriptor and adjusts the chunk index. */
 // FUNCTION: LEGOLAND 0x00497fb0
 int GetSpeechChunkReadableBytes(void) {
     int used;
@@ -103,6 +105,7 @@ void SpeechFillRawBuffer(void) {
     }
 }
 
+/* Rewinds speech to its data section and sets speech flag eight. */
 // FUNCTION: LEGOLAND 0x00498100
 void RewindSpeechStream(void) {
     SpeechRewindToData();

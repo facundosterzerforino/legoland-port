@@ -23,3 +23,11 @@
 - Keep the direct `tile->field_4/5` reads but move the `lpConfig` load so its register is pinned to ebx
   (e.g. read `lpConfig->height` / `width` before the switch).
 - Reorder the case 0/1/2 bodies only in the source (not the switch) to influence coloring.
+
+## 2026-10-23 Opus 5.5
+
+Harness 93.77. The only real difference: `tx`/`ty` get stack homes (`mov byte [esp+N], al; mov edx, [esp+N];
+and edx, 0xff`), while the original keeps them in al/dl (`mov edx, eax; and edx, 0xff`). These did not change it
+(93.73-93.77): block-scoped tx/ty, nested ifs, `char`, declaring them first, swapped id stores, reordering
+sum/v, and a 203-order declaration search. Reading `tile->field_4/5` directly gives 81.54, assigning `id.pos`
+before the compare 73.49, and loading both before the test 90.18.

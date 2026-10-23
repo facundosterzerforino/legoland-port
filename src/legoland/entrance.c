@@ -18,6 +18,8 @@
 #include "print_sprite.h"
 #include "render3d.h"
 
+/* Plays the entrance sound attached to the arriving visitor and, when the entrance fee is nonzero, plays the money
+ * sound at the entrance tile. */
 // FUNCTION: LEGOLAND 0x0042d970
 void PlayEntranceArrivalSounds(TileId *tile, struct Bloke *arg) {
     struct SampleSource config;

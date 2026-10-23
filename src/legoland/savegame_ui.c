@@ -598,25 +598,22 @@ unsigned char SaveSlotClicked(struct IconNode *icon, unsigned int a2, unsigned i
     return 1;
 }
 
+/* Updates the save-name input, draws the centered name and blinking cursor using one rectangle,
+ * and resets the OK icon when the mouse is outside its precomputed bounds. */
 // FUNCTION: LEGOLAND 0x0048e550
 LEGO_EXPORT void EnterSaveGameDetails(struct IconNode *sprite) {
     char cursor_str[2];
     unsigned char count;
     char input;
-    int field_e;
     char *name;
-    int sprite_y;
     unsigned char zero;
-    int left;
-    register int right;
-    unsigned int bottom;
+    RECT rc;
     int center_x;
-    int top;
-    register char *blink;
+    char *blink;
     struct IconNode *focus;
     int fx;
     int fy;
-    int ptmp192;
+    int hover_bottom;
     zero = 0;
 
     *(short *)cursor_str = *(short *)"|";
@@ -645,47 +642,32 @@ LEGO_EXPORT void EnterSaveGameDetails(struct IconNode *sprite) {
             }
         }
     }
-    ptmp192 = sprite->y;
-    top = 0x24 + ptmp192;
-    left = 0x28 + sprite->x;
-    bottom = top + 0x11;
-    right = left + 0xd7;
+    rc.top = 0x24 + sprite->y;
+    rc.left = 0x28 + sprite->x;
+    rc.bottom = rc.top + 0x11;
+    rc.right = rc.left + 0xd7;
     if (count != zero) {
-        register RECT rc;
-        rc.left = left;
-        rc.top = top;
-        rc.right = right;
-        rc.bottom = bottom;
         name = TempProfile.name;
         center_x = DrawCenteredTextAndGetRightEdge(name, 2, rc, 1);
     } else {
-        center_x = (right + left) >> 1;
+        center_x = (rc.right + rc.left) >> 1;
     }
-    DAT_00798738 = (center_x - ((right + left) >> 1)) * 2;
-    sprite_y = sprite->y;
-    field_e = sprite_y;
-    top = field_e + 0x20;
-    blink = "|";
-    if (GetBlink() == 0) {
-        blink = " ";
-    }
+    DAT_00798738 = (center_x - ((rc.right + rc.left) >> 1)) * 2;
+    rc.top = sprite->y + 0x20;
+    blink = GetBlink() ? "|" : " ";
     strcpy(cursor_str, blink);
-    {
-        register RECT rc;
-        rc.left = center_x;
-        rc.top = top;
-        rc.right = center_x + 100;
-        rc.bottom = bottom;
-        DrawClippedText(cursor_str, 2, rc, 1);
-    }
+    rc.left = center_x;
+    rc.right = center_x + 100;
+    DrawClippedText(cursor_str, 2, rc, 1);
     TempProfile.name_len = count;
     focus = (struct IconNode *)PopUpOkIcon;
     fy = focus->y;
     fx = focus->x;
+    hover_bottom = fy + 0x1b;
     if (fx + 0x48 < (int)MousePos.x || (int)MousePos.x < fx) {
         ResetPopUpIconSprites();
     }
-    if (fy + 0x1b < (int)MousePos.y || (int)MousePos.y < fy) {
+    if (hover_bottom < (int)MousePos.y || (int)MousePos.y < fy) {
         ResetPopUpIconSprites();
     }
 }

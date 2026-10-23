@@ -334,6 +334,8 @@ unsigned int ScriptEventNeedAt(struct ObjectiveEvent *arg) {
     return 0;
 }
 
+/* Counts anchored instances of the requested object within the objective rectangle. Returns success at the target
+ * count; otherwise queues a build-more hint. */
 // FUNCTION: LEGOLAND 0x0046a5b0
 unsigned int ScriptEventNeedIn(struct ObjectiveEvent *arg) {
     struct MapElement *tile;

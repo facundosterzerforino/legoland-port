@@ -542,6 +542,8 @@ void SpiderRideUpdate(Element *obj) {
     }
 }
 
+/* Searches cyclically from a random seat for a free slot, marks it occupied, and stores and returns its one-based
+ * seat number for the rider. */
 // FUNCTION: LEGOLAND 0x00416830
 int ReserveSpiderRideSeat(struct RideNode *owner, struct SlotArray *arr, signed char count) {
     int n = count;

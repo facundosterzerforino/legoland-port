@@ -36,6 +36,7 @@ void LoadLegoShop1MatteSpriteAndMoneySFX(struct Element *obj) {
     LoadMoneySFX();
 }
 
+/* Adds the current path graphics to every tile in the shop footprint translated by the supplied origin. */
 // FUNCTION: LEGOLAND 0x00439230
 void AddShopFootprintPathGraphics(struct Ride *area, struct Point *origin) {
     int xend = area->footprint.x1 + origin->x;
@@ -61,6 +62,7 @@ void AddShopFootprintPathGraphics(struct Ride *area, struct Point *origin) {
     } while (x <= xend);
 }
 
+/* Removes roller-coaster paths from every tile in the shop footprint translated by the supplied origin. */
 // FUNCTION: LEGOLAND 0x004392b0
 void RemoveShopFootprintCoasterPaths(struct Ride *area, struct Point *origin) {
     int xend = area->footprint.x1 + origin->x;
@@ -338,11 +340,11 @@ void LegoShop2Update(Element *obj) {
     int r;
 
     while (node != NULL) {
-        bloke = node->rider;
-        tile = &node->tile;
-        y = tile->pos.y + ride->y;
-        x = tile->pos.x + ride->x;
         next = node->next;
+        tile = &node->tile;
+        bloke = node->rider;
+        x = tile->pos.x + ride->x;
+        y = tile->pos.y + ride->y;
         if (bloke->low_level_action == 0) {
             switch (bloke->param_action) {
             case 0:
@@ -369,15 +371,24 @@ void LegoShop2Update(Element *obj) {
                 bloke->param_action++;
                 break;
             case 3:
+                /* walk to one of three browse spots: (x - 3, y), (x - 1, y - 2) or (x - 3, y - 2.5);
+                 * case 5 puts the visitor back on the same three */
                 r = rand() % 3;
                 if (r == 2) {
                     x = (x - 3) << 8;
-                    y = (y << 8) - 0x80;
+                    y <<= 8;
                     bloke->dest.x = x;
                     bloke->dest.y = y;
+                    dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
+                    bloke->low_level_action = 7;
+                    bloke->target_dir = dir + 0x10;
+                    NewDirForAction(bloke, (bloke->target_dir >> 5) + 3);
+                    bloke->param_action++;
+                    break;
                 } else if (r == 1) {
-                    bloke->dest.x = (x << 8) - 0x100;
+                    x = (x << 8) - 0x100;
                     y = (y - 2) << 8;
+                    bloke->dest.x = x;
                     bloke->dest.y = y;
                 } else {
                     x = (x - 3) << 8;
@@ -397,18 +408,24 @@ void LegoShop2Update(Element *obj) {
             case 5:
                 r = rand() % 3;
                 if (r == 2) {
-                    bloke->pos.x = (x - 3) << 8;
-                    bloke->pos.y = y << 8;
+                    x = (x - 3) << 8;
+                    y <<= 8;
+                    bloke->pos.x = x;
+                    bloke->pos.y = y;
                     bloke->field_58 = rand() % 50;
                     bloke->param_action = 8;
                 } else if (r == 1) {
-                    bloke->pos.x = (x << 8) - 0x100;
-                    bloke->pos.y = (y - 2) << 8;
+                    x = (x << 8) - 0x100;
+                    y = (y - 2) << 8;
+                    bloke->pos.x = x;
+                    bloke->pos.y = y;
                     bloke->field_58 = rand() % 50;
                     bloke->param_action = 8;
                 } else {
-                    bloke->pos.x = (x - 3) << 8;
-                    bloke->pos.y = (y << 8) - 0x280;
+                    x = (x - 3) << 8;
+                    y = (y << 8) - 0x280;
+                    bloke->pos.x = x;
+                    bloke->pos.y = y;
                     bloke->param_action = 9;
                 }
                 break;
@@ -443,8 +460,8 @@ void LegoShop2Update(Element *obj) {
                 break;
             case 11:
                 x <<= 8;
-                bloke->dest.x = x;
                 y <<= 8;
+                bloke->dest.x = x;
                 bloke->dest.y = y;
                 dir = CalcMoveLine(bloke->pos, bloke->dest, &bloke->nav);
                 bloke->low_level_action = 7;
@@ -566,6 +583,8 @@ void RenderLegoMediaShop(struct Element *obj, unsigned int param2, unsigned int 
     PrintSprite(LegMediaShopMask1Sprite, pos.x, pos.y, param1, 0);
 }
 
+/* Advances the LEGO Media shop visitor state machine: enters, chooses a browsing position, buys an item, and walks
+ * back out before removing the ride node. */
 // FUNCTION: LEGOLAND 0x00439ef0
 void LegoMediaShopUpdate(Element *obj) {
     Ride *ride = obj->ride;

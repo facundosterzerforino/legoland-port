@@ -1237,6 +1237,8 @@ LEGO_EXPORT void RenderIcons2(short param_1, short param_2, short param_3) {
     RestoreClipping();
 }
 
+/* Updates the sliding-panel animation, renders visible icons except the supplied ID, advances the focused sprite
+ * animation, and draws flashing buttons with screen clipping. */
 // FUNCTION: LEGOLAND 0x0046f100
 void RenderIconsExceptId(short param_1) {
     struct PrintCtx ctx = {2};
@@ -1296,6 +1298,7 @@ LEGO_EXPORT void RenderHelpIcons(void) {
     RestoreClipping();
 }
 
+/* Returns two for button bits one or four and one for other events; the node and pointer offsets are unused. */
 // DefaultIconEventHandler: the icons' default event handler: 2 if the event has button 1 or 4 (bits 0x1 / 0x4), else 1.
 // FUNCTION: LEGOLAND 0x0046f2e0
 unsigned char DefaultIconEventHandler(struct IconNode *node, unsigned char buttons, short dx, short dy) {

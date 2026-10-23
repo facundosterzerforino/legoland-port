@@ -94,6 +94,8 @@ unsigned int ReadMidiEventStatus(struct MidiTrack *track) {
     return b;
 }
 
+/* Processes MIDI events due at the song time, sends supported channel messages and applies tempo changes. Returns
+ * zero when the track is inactive or finished, one while waiting for a later event. */
 // FUNCTION: LEGOLAND 0x00480330
 unsigned int ProcessMidiTrackEvents(struct MidiTrack *track) {
     int ev;

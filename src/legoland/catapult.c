@@ -157,6 +157,8 @@ void RenderCatapult(struct Element *obj, int unused, int unused2, TileId *tile, 
     }
 }
 
+/* Starts the catapult main animation if inactive, resets its frame, and plays the fourth catapult sound at the ride
+ * tile. */
 // FUNCTION: LEGOLAND 0x00403430
 void StartCatapultMainAnimation(struct CatapultNode *node) {
     struct SampleSource params;
@@ -173,6 +175,7 @@ void StartCatapultMainAnimation(struct CatapultNode *node) {
     PlayInstanceOfSample(Catapult_SFX[3].sample, 0, 1, &params);
 }
 
+/* Advances the active catapult main animation counter and clears its active bit after thirty-two frames. */
 // FUNCTION: LEGOLAND 0x00403480
 void UpdateCatapultMainAnimation(struct CatapultNode *item) {
     if (item->field_8 & 0x1) {
@@ -184,6 +187,8 @@ void UpdateCatapultMainAnimation(struct CatapultNode *item) {
     }
 }
 
+/* Starts an inactive catapult slot animation at frame zero and plays one of the first three catapult sounds at the
+ * ride tile. */
 // FUNCTION: LEGOLAND 0x004034c0
 void StartCatapultSlotAnimation(struct CatapultNode *node, unsigned int index) {
     struct SampleSource params;
@@ -204,6 +209,8 @@ void StartCatapultSlotAnimation(struct CatapultNode *node, unsigned int index) {
     }
 }
 
+/* Advances an active catapult slot animation, clears it after thirty-two frames, and assigns the current frame to
+ * its layer sprite. */
 // FUNCTION: LEGOLAND 0x00403530
 void UpdateCatapultSlotAnimation(struct CatapultNode *node, unsigned int index) {
     if (node->active[index] & 1) {
@@ -312,6 +319,7 @@ void SendRiderToCatapultSlot(const unsigned short *key, struct RideNode *entry, 
     bloke->param_action++;
 }
 
+/* Marks the slot holding this rider as ready and initializes the rider wait timer and repetition count. */
 // FUNCTION: LEGOLAND 0x004037d0
 void MarkCatapultRiderReady(const unsigned short *key, struct RideNode *entry) {
     struct CatapultNode *node = Catapult_FindNode(key);

@@ -25,3 +25,9 @@
 
 - Reading `DAT_0062fdd8` through a pointer or temporary `Point *` instead of a struct copy.
 - Changing `AdjustOffsetForViewMode(&seat)` to operate on a `DAT_0062fdd8` copy directly (not tried).
+
+## 2026-10-23 (Opus 5.5): still 99.20
+The original stores `seat.y` before `seat.x`. Field stores `seat.y = DAT.y; seat.x = DAT.x;` right after
+`person = bloke->person` give that store order (98.93), but both loads stay at the copy; the original loads
+`DAT.x` only after `bloke->screen_x`. All 40 orders of {person, seat.y, seat.x, offset.x, offset.y}: 95.17-99.20.
+`seat = off` / `off2` reuse 93.30; `static __inline` copy helpers 98.93-99.20.

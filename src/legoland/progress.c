@@ -323,6 +323,8 @@ unsigned char TutorialPlayClicked(unsigned char *arg0, unsigned int arg1, unsign
     return 1;
 }
 
+/* Clears the key handlers and progress selection state, releases the current progress or tutorial graphics, and
+ * invokes the return-to-title action. */
 // FUNCTION: LEGOLAND 0x0048c020
 unsigned char ProgressGoBackClicked(unsigned int a1, unsigned int a2, unsigned int a3, unsigned int a4) {
     unsigned int temp;
@@ -344,6 +346,8 @@ unsigned char ProgressGoBackClicked(unsigned int a1, unsigned int a2, unsigned i
     return 1;
 }
 
+/* Clears progress selection and invalidates the current screen, then switches from tutorial graphics to level one
+ * or from progress graphics to tutorial level six. */
 // FUNCTION: LEGOLAND 0x0048c090
 unsigned char ToggleProgressTutorialScreenClicked(void *param1, unsigned char param2) {
     if (param2 & 2) {
